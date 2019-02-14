@@ -1,6 +1,6 @@
-# rd-system-data-api
+# rd-sys-ref-data-api
 
-System Data API
+System Reference Data API
 
 ## Purpose
 
@@ -33,7 +33,7 @@ Alternatively, you can start the application from the current source files using
 If required, to run with a low memory consumption, the following can be used:
 
 ```
-./gradlew --no-daemon assemble && java -Xmx384m -jar build/libs/rd-system-data-api.jar
+./gradlew --no-daemon assemble && java -Xmx384m -jar build/libs/rd-sys-ref-data-api.jar
 ```
 
 ### Using the application
