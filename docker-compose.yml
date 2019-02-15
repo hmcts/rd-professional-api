@@ -1,0 +1,44 @@
+version: '2.1'
+
+services:
+  rd-sys-ref-data-api:
+    build:
+      context: .
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    image: hmcts/rd-sys-ref-data-api
+    container_name: rd-sys-ref-data-api
+    environment:
+      - JAVA_OPTS
+      - POSTGRES_USERNAME=dbrefdata
+      - POSTGRES_PASSWORD=dbrefdata
+      - POSTGRES_HOST=rd-sys-ref-data-db
+      - POSTGRES_PORT=5432
+      # these environment variables are used by java-logging library
+      - JSON_CONSOLE_PRETTY_PRINT
+      - ROOT_APPENDER
+      - ROOT_LOGGING_LEVEL
+      - REFORM_SERVICE_TYPE
+      - REFORM_SERVICE_NAME
+      - REFORM_TEAM
+      - REFORM_ENVIRONMENT
+      - LOGBACK_DATE_FORMAT
+      - LOGBACK_REQUIRE_THREAD
+      - LOGBACK_REQUIRE_ALERT_LEVEL=false
+      - LOGBACK_REQUIRE_ERROR_CODE=false
+    ports:
+      - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
+    depends_on:
+      - rd-sys-ref-data-db
+
+  rd-sys-ref-data-db:
+    build:
+      context: database
+    image: hmcts/rd-sys-ref-data-db
+    container_name: rd-sys-ref-data-db
+    environment:
+      - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
+    ports:
+      - 5428:5432

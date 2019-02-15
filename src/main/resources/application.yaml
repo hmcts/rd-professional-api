@@ -1,0 +1,59 @@
+server:
+  port: ${PORT:8090}
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+spring:
+  application:
+    name: System Reference Data API
+  jackson.date-format: yyyy-MM-dd
+  flyway.enabled: true
+
+### database configuration
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
+    username: ${POSTGRES_USERNAME:dbrefdata}
+    password: ${POSTGRES_PASSWORD:dbrefdata}
+    properties:
+      charSet: UTF-8
+    tomcat:
+      max-active: 10
+      max-idle: 10
+      min-idle: 2
+      max-wait: 10000
+      test-on-borrow: true
+      test-on-connect: true
+      test-on-idle: true
+      validation-query: "SELECT 1"
+      time-between-eviction-runs-millis: 10000
+      test-while-idle: true
+      test-on-return: true
+      remove-abandoned: true
+      remove-abandoned-timeout: 60
+      log-abandoned: true
+      abandon-when-percentage-full: 0
+
+security:
+  anonymousPaths:
+    - "/"
+    - "/health"
+    - "/loggers/**"
+    - "/swagger-ui.html"
+    - "/swagger-resources/**"
+    - "/v2/api-docs"
+    - "/webjars/springfox-swagger-ui/**"
+    - "/sysrefdata"
+  authorisedServices:
+    - "ccd_gw"
+    - "iac"
+
+
+### dependency configuration
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:4502}
+idam.s2s-auth.totp_secret: ${IA_S2S_SECRET:AAAAAAAAAAAAAAAC}
+idam.s2s-auth.microservice: ${IA_S2S_MICROSERVICE:rd}
+idam.s2s-auth.url: ${S2S_URL:http://127.0.0.1:4502}
