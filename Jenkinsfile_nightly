@@ -1,0 +1,36 @@
+#!groovy
+
+properties([
+  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+  pipelineTriggers([cron('H 22 * * *')])
+])
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "rd"
+def component = "sys-ref-data-api"
+
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('s2s-url', 'S2S_URL'),
+    secret('postgres-password', 'POSTGRES_USERNAME'),
+    secret('s2s-url', 'POSTGRES_PASSWORD'),
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
+withNightlyPipeline(type, product, component) {
+
+  setVaultName('rd')
+  loadVaultSecrets(secrets)
+
+  enableMutationTest()
+  enableSlackNotifications('#ia-tech')
+}

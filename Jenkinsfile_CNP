@@ -1,0 +1,43 @@
+#!groovy
+properties([
+    [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/rd-sys-ref-data-api.git'],
+    pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "rd"
+def component = "sys-ref-data-api"
+
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('s2s-url', 'S2S_URL'),
+    secret('postgres-password', 'POSTGRES_PASSWORD'),
+    secret('postgres-username', 'POSTGRES_USERNAME'),
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+    [$class     : 'AzureKeyVaultSecret',
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
+    ]
+}
+
+withPipeline(type, product, component) {
+    enableDockerBuild()
+
+    setVaultName('rd')
+    loadVaultSecrets(secrets)
+
+    after('functionalTest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    }
+
+    after('functionalTest:aat') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    }
+
+    enableSlackNotifications('#ia-tech')
+}

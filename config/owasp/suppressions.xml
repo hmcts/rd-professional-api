@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+    <suppress>
+        <notes><![CDATA[
+   file name: groovy-xml-2.4.15.jar
+   ]]></notes>
+        <gav regex="true">^org\.codehaus\.groovy:groovy-xml:.*$</gav>
+        <cpe>cpe:/a:apache:groovy</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: groovy-json-2.4.15.jar
+   ]]></notes>
+        <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
+        <cpe>cpe:/a:apache:groovy</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+	The offending library and class and not used in our code
+	https://tools.hmcts.net/jira/browse/RIA-951
+	]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2018-8088</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+         Shadowed dependency from AppInsights-Core. Unfortunately, not propagating and applying an override for transitive dependencies.
+         Anyway, this is specific to deserialisation of AtomicDoubleArray and CompoundOrdering classes: https://github.com/google/guava/wiki/CVE-2018-10237
+        ]]></notes>
+        <gav regex="true">^com\.google\.guava:guava:.*$</gav>
+        <cve>CVE-2018-10237</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        CVE-2018-1115: Vulnerability applies to postgresql before versions 10.4, 9.6.9 is vulnerable.  We use Azure 9.6.10 in Azure which does not have this issue.
+]]></notes>
+        <gav regex="true">^org\.postgresql:postgresql:.*$</gav>
+        <cve>CVE-2018-1115</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        CVE-2016-7048: Vulnerability applies to PostgreSQL before 9.3.15, 9.4.x before 9.4.10, and 9.5.x before 9.5.5 only.  We use 9.6.10 on Azure.
+]]></notes>
+        <cve>CVE-2016-7048</cve>
+    </suppress>
+</suppressions>

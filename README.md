@@ -22,6 +22,11 @@ To run the API quickly use the docker helper script as follows:
 ```
 ./bin/run-in-docker.sh install
 ```
+or
+
+```
+docker-compose up
+```
 
 
 Alternatively, you can start the application from the current source files using Gradle as follows:
@@ -50,6 +55,14 @@ If the API is running, you should see this response:
 {"status":"UP"}
 ```
 
+### DB Initialisation˙
+
+The application uses a Postgres database which can be run through a docker container on its own if required.
+
+this
+
+The application should automatically apply any database migrations using flyway.
+
 ### Running integration tests:
 
 
@@ -70,7 +83,7 @@ If the API is running (either inside a Docker container or via `gradle bootRun`)
 If you want to run a specific scenario use this command:
 
 ```
-./gradlew functional --tests <TestClassName> --info -Dscenario=RIA-XXX
+./gradlew functional --tests <TestClassName> --info -Dscenario=<Scenario>
 ```
 
 ### Running smoke tests:
