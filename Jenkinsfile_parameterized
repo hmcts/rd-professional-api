@@ -3,7 +3,7 @@
 
 properties([
     parameters([
-        string(name: 'PRODUCT_NAME', defaultValue: 'ia', description: ''),
+        string(name: 'PRODUCT_NAME', defaultValue: 'rd', description: ''),
         string(name: 'APP', defaultValue: 'sys-ref-data-api', description: 'System Reference Data API'),
         string(name: 'TYPE', defaultValue: 'java', description: ''),
         string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
@@ -15,8 +15,8 @@ properties([
 
 List<LinkedHashMap<String, Object>> secrets = [
     secret('s2s-url', 'S2S_URL'),
-    secret('postgres-password', 'POSTGRES_USERNAME'),
-    secret('s2s-url', 'POSTGRES_PASSWORD'),
+    secret('postgres-password', 'POSTGRES_PASSWORD'),
+    secret('postgres-username', 'POSTGRES_USERNAME'),
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
