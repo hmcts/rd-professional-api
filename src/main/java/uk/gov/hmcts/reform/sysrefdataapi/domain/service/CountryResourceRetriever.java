@@ -25,7 +25,10 @@ public class CountryResourceRetriever implements ResourceRetriever {
         final String query = "SELECT country_name FROM country WHERE id = ?";
 
         String countryName =
-            jdbcTemplate.queryForObject(query, new Object[]{id}, String.class);
+            jdbcTemplate.queryForObject(
+                query,
+                new Object[]{id},
+                String.class);
 
         LOG.info("\n\n ****** Country Name ******: {}", countryName);
 
