@@ -15,12 +15,19 @@ To run the project you will need to have the following installed:
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
 
+### Environment Vars
+
+If running locally for development or testing you will need to set the following environment variables
+
+* export POSTGRES_USERNAME=dbrefdata
+* export POSTGRES_PASSWORD=dbrefdata
+
 ### Running the application
 
 To run the API quickly use the docker helper script as follows:
 
 ```
-./bin/run-in-docker.sh install
+./bin/run-in-docker.sh
 ```
 or
 

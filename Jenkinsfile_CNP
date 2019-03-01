@@ -26,6 +26,12 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+
+    before('buildinfra:prod') {
+        currentBuild.result = 'SUCCESS'
+        sh "exit 0"
+    }
+
     enableDockerBuild()
 
     setVaultName('rd')
