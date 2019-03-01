@@ -29,7 +29,8 @@ withPipeline(type, product, component) {
 
     before('buildinfra:prod') {
         currentBuild.result = 'SUCCESS'
-        sh "exit 0"
+        currentBuild.description = "SUCCESS"
+        error 'Reference Data projects are not authorised to be in production environments yet.'
     }
 
     enableDockerBuild()
