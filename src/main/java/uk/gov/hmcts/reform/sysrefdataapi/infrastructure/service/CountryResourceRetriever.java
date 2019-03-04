@@ -1,10 +1,11 @@
-package uk.gov.hmcts.reform.sysrefdataapi.domain.service;
+package uk.gov.hmcts.reform.sysrefdataapi.infrastructure.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sysrefdataapi.domain.entities.Country;
+import uk.gov.hmcts.reform.sysrefdataapi.domain.service.ResourceRetriever;
 
 @Service
 public class CountryResourceRetriever implements ResourceRetriever {

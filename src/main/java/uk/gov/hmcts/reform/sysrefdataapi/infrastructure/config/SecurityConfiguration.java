@@ -53,15 +53,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
 
-        //TODO - this is for the initial commit for ease of dev while project is being set up.
         http
-            //.addFilter(authCheckerServiceOnlyFilter)
+            .addFilter(authCheckerServiceOnlyFilter)
             .sessionManagement().sessionCreationPolicy(STATELESS)
             .and()
             .csrf().disable()
             .formLogin().disable()
             .logout().disable()
-        //.authorizeRequests().anyRequest().authenticated()
+            .authorizeRequests().anyRequest().authenticated()
         ;
     }
 }

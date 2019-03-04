@@ -25,7 +25,7 @@ public class WelcomeController {
 
     private static final Logger LOG = getLogger(WelcomeController.class);
     private static final String INSTANCE_ID = UUID.randomUUID().toString();
-    private static final String MESSAGE = "Welcome to the System Data API";
+    private static final String MESSAGE = "Welcome to the System Reference Data API";
 
     /**
      * Root GET endpoint.
@@ -36,7 +36,7 @@ public class WelcomeController {
      *
      * @return Welcome message from the service.
      */
-    @ApiOperation("Welcome message for the System Data API")
+    @ApiOperation("Welcome message for the System Reference Data API")
     @ApiResponses({
         @ApiResponse(
             code = 200,
