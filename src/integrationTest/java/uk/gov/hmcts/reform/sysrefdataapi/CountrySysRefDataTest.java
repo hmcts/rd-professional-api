@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sysrefdataapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -13,8 +14,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,9 +36,6 @@ public class CountrySysRefDataTest {
 
     private MockMvc mockMvc;
 
-    //@MockBean
-    //private JdbcTemplate jdbcTemplate;
-
     private static final String APP_BASE_PATH = "/sysrefdata";
 
     @Autowired
@@ -48,14 +49,10 @@ public class CountrySysRefDataTest {
     @Test
     public void should_get_status_200_when_get_country_by_id() throws Exception {
 
-        //String id = String.valueOf(new Random().nextInt());
         String id = "1";
-        //String countryName = "Jamaica";
         String countryName = "South Africa";
         String path = "/countries/" + id;
         Country country = new Country(id, countryName);
-
-        //when(jdbcTemplate.queryForObject(anyString(), any(), eq(String.class))).thenReturn(countryName);
 
         MvcResult response = sendGetRequest(APP_BASE_PATH + path, MediaType.APPLICATION_JSON, HttpStatus.OK.value());
 
@@ -68,14 +65,10 @@ public class CountrySysRefDataTest {
     @Test
     public void should_get_status_404_when_country_id_is_not_in_db() throws Exception {
 
-        String id = String.valueOf(new Random().nextInt());
+        String id = "####";
         String path = "/countries/" + id;
-        //String path = "/countries/1";
-
-        //when(jdbcTemplate.queryForObject(anyString(), any(), eq(String.class))).thenThrow(EmptyResultDataAccessException.class);
 
         sendGetRequest(APP_BASE_PATH + path, MediaType.APPLICATION_JSON, HttpStatus.NOT_FOUND.value());
-
 
     }
 
@@ -86,7 +79,6 @@ public class CountrySysRefDataTest {
         return mockMvc.perform(get(path)
             .contentType(mediaType))
             .andExpect(status().is(expectedHttpStatus)).andReturn();
-
 
     }
 

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sysrefdataapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
@@ -13,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.sysrefdataapi.domain.entities.Country;
 import uk.gov.hmcts.reform.sysrefdataapi.util.AuthorizationHeadersProvider;
@@ -44,12 +44,12 @@ public class RetrieveSysRefDataResource {
         Country result =
             SerenityRest
                 .given()
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(APPLICATION_JSON_UTF8_VALUE)
+                .header(authorizationHeadersProvider.getServiceAuthorization())
                 .when()
                 .get("/sysrefdata/countries/1")
                 .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
+                .statusCode(OK.value())
                 .extract()
                 .body().as(Country.class);
 

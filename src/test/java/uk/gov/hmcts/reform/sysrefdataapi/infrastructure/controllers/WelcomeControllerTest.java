@@ -15,7 +15,7 @@ public class WelcomeControllerTest {
     public void should_return_welcome_response() {
 
         ResponseEntity<String> responseEntity = welcomeController.welcome();
-        String expectedMessage = "Welcome to the System Data API";
+        String expectedMessage = "Welcome to the System Reference Data API";
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
