@@ -20,8 +20,6 @@ public class CountryResourceRetriever implements ResourceRetriever {
     @Override
     public Country getResource(String id) {
 
-        LOG.info("\n\n ****** Getting Resource ****** with id: {}", id);
-
         final String query = "SELECT country_name FROM country WHERE id = ?";
 
         String countryName =
@@ -30,7 +28,7 @@ public class CountryResourceRetriever implements ResourceRetriever {
                 new Object[]{id},
                 String.class);
 
-        LOG.info("\n\n ****** Country Name ******: {}", countryName);
+        LOG.info("Country Name: {}", countryName);
 
         return new Country(id, countryName);
 

@@ -2,7 +2,6 @@
 
 set -e
 
-# Database where jobs are persisted
 if [ -z "$POSTGRES_PASSWORD" ]; then
   echo "ERROR: Missing environment variables. Set value for '$POSTGRES_PASSWORD'."
   exit 1
