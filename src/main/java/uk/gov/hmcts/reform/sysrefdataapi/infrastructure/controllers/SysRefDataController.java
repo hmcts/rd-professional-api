@@ -43,7 +43,7 @@ public class SysRefDataController {
     @ResponseBody
     public ResponseEntity<SystemRefData> getCountry(@NotNull @PathVariable String id) {
 
-        LOG.info("\n\n ****** Getting country ****** with id: {}",id);
+        LOG.info("Getting country with id: {}",id);
 
         return ResponseEntity.ok(resourceRetriever.getResource(id));
 
