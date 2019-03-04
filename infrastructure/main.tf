@@ -88,6 +88,8 @@ module "rd_system_data_api" {
     POSTGRES_USERNAME = "${module.db-sys-ref-data.user_name}"
     POSTGRES_PASSWORD = "${module.db-sys-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
+    IA_S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
+    IA_S2S_MICROSERVICE           = "${data.azurerm_key_vault_secret.s2s_microservice.value}"
 
     S2S_URL = "${data.azurerm_key_vault_secret.s2s_url.value}"
 
