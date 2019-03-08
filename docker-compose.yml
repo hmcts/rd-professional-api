@@ -14,7 +14,7 @@ services:
       - JAVA_OPTS
       - POSTGRES_USERNAME=dbrefdata
       - POSTGRES_PASSWORD=dbrefdata
-      - POSTGRES_HOST=rd-sys-ref-data-db
+      - POSTGRES_HOST=rd-professional-db
       - POSTGRES_PORT=5432
       # these environment variables are used by java-logging library
       - JSON_CONSOLE_PRETTY_PRINT

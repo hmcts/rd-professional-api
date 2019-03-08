@@ -38,9 +38,9 @@ def versions = [
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.sysrefdataapi.Application'
-def jarName = 'rd-sys-ref-data-api.jar'
+def jarName = 'rd-professional-api.jar'
 
-group = 'uk.gov.hmcts.reform'
+group = 'uk.gov.hmcts.reform.refdata'
 version = '0.0.1'
 
 sourceCompatibility = 1.8
@@ -168,8 +168,8 @@ project.tasks['pitest'].group = "Verification"
 
 sonarqube {
     properties {
-        property "sonar.projectName", "RD :: System Reference Data api"
-        property "sonar.projectKey", "RDSYSREFDATAAPI"
+        property "sonar.projectName", "RD :: Professional Reference Data api"
+        property "sonar.projectKey", "RDPROFESSIONALAPI"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.pitest.mode", "reuseReport"
