@@ -37,7 +37,7 @@ def versions = [
     springfoxSwagger: '2.9.2'
 ]
 
-mainClassName = 'uk.gov.hmcts.reform.sysrefdataapi.Application'
+mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
 group = 'uk.gov.hmcts.reform.refdata'
@@ -153,10 +153,10 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sysrefdataapi.*']
+    targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
-        'uk.gov.hmcts.reform.sysrefdataapi.infrastructure.config.*',
-        'uk.gov.hmcts.reform.sysrefdataapi.Application'
+        'uk.gov.hmcts.reform.professionalapi.infrastructure.config.*',
+        'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
     outputFormats = ['XML', 'HTML']
@@ -174,9 +174,9 @@ sonarqube {
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/sysrefdataapi/infrastructure/config/**," +
-                                     "src/main/java/uk/gov/hmcts/reform/sysrefdataapi/infrastructure/SystemDateProvider.java," +
-                                     "src/main/java/uk/gov/hmcts/reform/sysrefdataapi/Application.java"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/config/**," +
+                                     "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/SystemDateProvider.java," +
+                                     "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
 
