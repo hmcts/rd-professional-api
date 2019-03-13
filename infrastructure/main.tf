@@ -50,7 +50,7 @@ data "azurerm_key_vault_secret" "postgres_password" {
 }
 
 
-module "db-sys-ref-data" {
+module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
@@ -62,7 +62,7 @@ module "db-sys-ref-data" {
 
 }
 
-module "rd_system_data_api" {
+module "rd_professional_api" {
   source = "git@github.com:hmcts/cnp-module-webapp?ref=master"
   product = "${var.product}-${var.component}"
   location = "${var.location}"
@@ -81,12 +81,12 @@ module "rd_system_data_api" {
     LOGBACK_REQUIRE_ALERT_LEVEL = false
     LOGBACK_REQUIRE_ERROR_CODE = false
 
-    POSTGRES_HOST = "${module.db-sys-ref-data.host_name}"
-    POSTGRES_PORT = "${module.db-sys-ref-data.postgresql_listen_port}"
-    POSTGRES_DATABASE = "${module.db-sys-ref-data.postgresql_database}"
-    POSTGRES_USER = "${module.db-sys-ref-data.user_name}"
-    POSTGRES_USERNAME = "${module.db-sys-ref-data.user_name}"
-    POSTGRES_PASSWORD = "${module.db-sys-ref-data.postgresql_password}"
+    POSTGRES_HOST = "${module.db-professional-ref-data.host_name}"
+    POSTGRES_PORT = "${module.db-professional-ref-data.postgresql_listen_port}"
+    POSTGRES_DATABASE = "${module.db-professional-ref-data.postgresql_database}"
+    POSTGRES_USER = "${module.db-professional-ref-data.user_name}"
+    POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
+    POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
     IA_S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
     IA_S2S_MICROSERVICE           = "${data.azurerm_key_vault_secret.s2s_microservice.value}"
