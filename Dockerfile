@@ -1,7 +1,7 @@
 FROM hmcts/cnp-java-base:openjdk-8u181-jre-alpine3.8-1.0
 
 # Mandatory!
-ENV APP rd-sys-ref-data-api.jar
+ENV APP rd-professional-api.jar
 ENV APPLICATION_TOTAL_MEMORY 512M
 ENV APPLICATION_SIZE_ON_DISK_IN_MB 48
 

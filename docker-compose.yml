@@ -8,8 +8,8 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/rd-sys-ref-data-api
-    container_name: rd-sys-ref-data-api
+    image: hmcts/rd-professional-api
+    container_name: rd-professional-api
     environment:
       - JAVA_OPTS
       - POSTGRES_USERNAME=dbrefdata
@@ -36,8 +36,8 @@ services:
   rd-sys-ref-data-db:
     build:
       context: database
-    image: hmcts/rd-sys-ref-data-db
-    container_name: rd-sys-ref-data-db
+    image: hmcts/rd-professional-db
+    container_name: rd-professional-db
     environment:
       - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
     ports:
