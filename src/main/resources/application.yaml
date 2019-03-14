@@ -10,7 +10,7 @@ spring:
   application:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
-  flyway.enabled: true
+  flyway.enabled: false
 
 ### database configuration
   datasource:
