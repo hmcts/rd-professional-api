@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.infrastructure.serialization;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import uk.gov.hmcts.reform.professionalapi.infrastructure.serialization.StdSerializer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class StdSerializerTest {
 
-    @Mock private ObjectMapper mapper;
+    @Mock
+    private ObjectMapper mapper;
 
     private StdSerializer<Integer> stdSerializer;
 
@@ -34,8 +35,8 @@ public class StdSerializerTest {
         String expectedSerializedSource = "123";
 
         doReturn(expectedSerializedSource)
-            .when(mapper)
-            .writeValueAsString(source);
+                .when(mapper)
+                .writeValueAsString(source);
 
         String actualSerializedSource = stdSerializer.serialize(source);
 
@@ -48,11 +49,11 @@ public class StdSerializerTest {
         Integer source = 123;
 
         doThrow(mock(JsonProcessingException.class))
-            .when(mapper)
-            .writeValueAsString(source);
+                .when(mapper)
+                .writeValueAsString(source);
 
         assertThatThrownBy(() -> stdSerializer.serialize(source))
-            .hasMessage("Could not serialize data")
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                .hasMessage("Could not serialize data")
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }
