@@ -13,29 +13,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import uk.gov.hmcts.reform.professionalapi.domain.RequiredFieldMissingException;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.advice.SysRefDataAdvice;
-
 @RunWith(MockitoJUnitRunner.class)
-public class SysRefDataAdviceTest {
+public class ExceptionMapperTest {
 
     @Mock
     private HttpServletRequest httpServletRequest;
 
     @InjectMocks
-    private SysRefDataAdvice sysRefDataAdvice;
-
-    @Test
-    public void should_handle_required_field_exception() {
-
-        RequiredFieldMissingException requiredFieldMissingException = mock(RequiredFieldMissingException.class);
-
-        ResponseEntity<String> responseEntity =
-            sysRefDataAdvice.handleRequiredFieldMissingException(httpServletRequest, requiredFieldMissingException);
-
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-    }
+    private ExceptionMapper exceptionMapper;
 
     @Test
     public void should_handle_empty_result_exception() {
@@ -43,7 +28,7 @@ public class SysRefDataAdviceTest {
         EmptyResultDataAccessException emptyResultDataAccessException = mock(EmptyResultDataAccessException.class);
 
         ResponseEntity<String> responseEntity =
-            sysRefDataAdvice.handleEmptyResultDataAccessException(httpServletRequest, emptyResultDataAccessException);
+            exceptionMapper.handleEmptyResultDataAccessException(httpServletRequest, emptyResultDataAccessException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
@@ -54,7 +39,7 @@ public class SysRefDataAdviceTest {
 
         Exception exception = mock(Exception.class);
 
-        ResponseEntity<String> responseEntity = sysRefDataAdvice.handleException(httpServletRequest, exception);
+        ResponseEntity<String> responseEntity = exceptionMapper.handleException(httpServletRequest, exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 

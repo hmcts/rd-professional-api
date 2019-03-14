@@ -7,14 +7,13 @@ if [ -z "$POSTGRES_PASSWORD" ]; then
   exit 1
 fi
 
-echo "Creating dbrefdata Database . . ."
+echo "Creating dbrefdata database . . ."
 
-psql -v ON_ERROR_STOP=1 --username postgres --set USERNAME=dbrefdata --set SRD_PASSWORD=${POSTGRES_PASSWORD} <<-EOSQL
-  CREATE ROLE :USERNAME WITH LOGIN PASSWORD ':SRD_PASSWORD';
-  CREATE DATABASE dbrefdata
-    WITH OWNER = :USERNAME
-    ENCODING = 'UTF-8'
-    CONNECTION LIMIT = -1;
+psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres <<-EOSQL
+  CREATE ROLE dbrefdata WITH PASSWORD 'dbrefdata';
+  CREATE DATABASE dbrefdata ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  GRANT ALL PRIVILEGES ON DATABASE dbrefdata TO dbrefdata;
+  ALTER ROLE dbrefdata WITH LOGIN;
 EOSQL
 
-echo "Done creating Database dbrefdata."
+echo "Done creating database dbrefdata."
