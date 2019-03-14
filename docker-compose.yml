@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  rd-sys-ref-data-api:
+  rd-professional-api:
     build:
       context: .
       args:
@@ -31,9 +31,9 @@ services:
     ports:
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     depends_on:
-      - rd-sys-ref-data-db
+      - rd-professional-db
 
-  rd-sys-ref-data-db:
+  rd-professional-db:
     build:
       context: database
     image: hmcts/rd-professional-db
