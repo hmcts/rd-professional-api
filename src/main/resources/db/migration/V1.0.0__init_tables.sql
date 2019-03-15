@@ -2,7 +2,7 @@ CREATE SCHEMA IF NOT EXISTS dbrefdata;
 
 CREATE TABLE organisation
 (
-  ID              VARCHAR(36)  NOT NULL,
+  ID              UUID,
   NAME            VARCHAR(255) NOT NULL,
   LAST_UPDATED    TIMESTAMP default current_timestamp,
   STATUS          VARCHAR(20) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE organisation
 
 CREATE TABLE professional_user
 (
-  ID              VARCHAR(36)  NOT NULL,
+  ID              UUID,
   FIRST_NAME      VARCHAR(255) NOT NULL,
   LAST_NAME       VARCHAR(255) NOT NULL,
   EMAIL_ADDRESS   VARCHAR(255) NOT NULL,

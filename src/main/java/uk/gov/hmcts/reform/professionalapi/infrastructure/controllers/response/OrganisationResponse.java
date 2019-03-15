@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response;
 
+import static java.util.stream.Collectors.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 
 public class OrganisationResponse {
@@ -15,11 +16,11 @@ public class OrganisationResponse {
     private final List<String> userIds;
 
     public OrganisationResponse(Organisation organisation) {
-        this.id = organisation.getId();
+        this.id = organisation.getId().toString();
         this.name = organisation.getName();
         this.userIds = organisation.getUsers()
                 .stream()
-                .map(user -> user.getId())
-                .collect(Collectors.toList());
+                .map(user -> user.getId().toString())
+                .collect(toList());
     }
 }
