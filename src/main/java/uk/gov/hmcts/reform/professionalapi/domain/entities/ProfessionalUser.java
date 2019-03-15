@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 public class ProfessionalUser {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
     @Column(name = "FIRST_NAME")
     private String firstName;
     @Column(name = "LAST_NAME")
@@ -25,14 +26,12 @@ public class ProfessionalUser {
     private Organisation organisation;
 
     public ProfessionalUser(
-            UUID id,
             String firstName,
             String lastName,
             String emailAddress,
             String status,
             Organisation organisation) {
 
-        this.id = id.toString();
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;

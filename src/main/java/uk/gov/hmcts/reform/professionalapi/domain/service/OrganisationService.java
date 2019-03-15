@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.domain.service;
 
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
@@ -19,7 +18,8 @@ public class OrganisationService {
     private final ProfessionalUserRepository professionalUserRepository;
 
     public OrganisationService(
-            OrganisationRepository organisationRepository, ProfessionalUserRepository professionalUserRepository) {
+            OrganisationRepository organisationRepository,
+            ProfessionalUserRepository professionalUserRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -30,13 +30,11 @@ public class OrganisationService {
             OrganisationCreationRequest organisationCreationRequest) {
 
         Organisation organisation = organisationRepository.save(new Organisation(
-                UUID.randomUUID(),
                 organisationCreationRequest.getName(),
                 OrganisationStatus.PENDING.name()
         ));
 
         ProfessionalUser superUser = professionalUserRepository.save(new ProfessionalUser(
-                UUID.randomUUID(),
                 organisationCreationRequest.getSuperUser().getFirstName(),
                 organisationCreationRequest.getSuperUser().getLastName(),
                 organisationCreationRequest.getSuperUser().getEmail(),

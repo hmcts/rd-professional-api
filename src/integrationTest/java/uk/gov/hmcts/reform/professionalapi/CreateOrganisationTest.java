@@ -64,7 +64,7 @@ public class CreateOrganisationTest  extends Service2ServiceEnabledIntegrationTe
 
         assertThat(nameFromResponse).isEqualTo("some-org-name");
         assertThat((List<String>)response.get("userIds"))
-                .containsExactly(persistedSuperUser.getId());
+                .containsExactly(persistedSuperUser.getId().toString());
     }
 
     @Transactional
