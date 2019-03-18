@@ -7,10 +7,16 @@ management:
       base-path: /
 
 spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
   application:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
-  flyway.enabled: false
+  flyway.enabled: true
 
 ### database configuration
   datasource:
@@ -46,6 +52,8 @@ security:
     - "/swagger-resources/**"
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
+  authorisedServices:
+    - "iac"
 
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:4502}
