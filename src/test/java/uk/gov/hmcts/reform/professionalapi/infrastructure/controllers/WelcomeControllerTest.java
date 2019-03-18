@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.WelcomeController;
-
 public class WelcomeControllerTest {
 
     private final WelcomeController welcomeController = new WelcomeController();

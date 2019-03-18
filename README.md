@@ -1,10 +1,10 @@
-# rd-sys-ref-data-api
+# rd-professional-api
 
-System Reference Data API
+Professional Reference Data API
 
 ## Purpose
 
-Provides system reference data to client applications.  Implemented as a Java/SpringBoot application.
+Provides professional reference data to client applications.  Implemented as a Java/SpringBoot application.
 
 ### Prerequisites
 
