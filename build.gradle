@@ -157,6 +157,7 @@ pitest {
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
         'uk.gov.hmcts.reform.professionalapi.infrastructure.config.*',
+        'uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.*',
         'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
