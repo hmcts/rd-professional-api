@@ -114,3 +114,23 @@ As the project grows, these tests will take longer and longer to execute but are
 More information about mutation testing can be found here:
 http://pitest.org/ 
 
+
+
+### Testing in Postman
+
+To test in Postman the easiest way is to start this service using the ./bin/run-in-docker.sh script.  The in postman paste the following script:
+
+```
+pm.sendRequest('http://127.0.0.1:8089/token', function (err, res) {
+    if (err) {
+        console.log(err);
+    } else {
+        pm.environment.set("token", res.text());
+    }
+});
+```
+into the pre-script window.  Also add a header as follows:
+
+```
+ServiceAuthorization: Bearer {{token}}
+```
