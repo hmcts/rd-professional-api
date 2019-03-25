@@ -40,6 +40,9 @@ services:
       context: database
     image: hmcts/rd-professional-db
     container_name: rd-professional-db
+    volumes:
+      - rd-professional-db-volume:/var/lib/postgresql/data
+
     environment:
       - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
     ports:
@@ -76,11 +79,14 @@ services:
       TESTING_SUPPORT_ENABLED: "true"
 
   service-token-provider:
-    image: service-token-provider:latest
+    image: hmcts/service-token-provider
     container_name: service-token-provider
     environment:
       - S2S_URL=http://service-auth-provider-api:8080
     ports:
-      - ${SERVER_PORT:-8089}:${SERVER_PORT:-8090}
+      - 8089:${SERVER_PORT:-8090}
     depends_on:
       - service-auth-provider-api
+
+volumes:
+  rd-professional-db-volume:
