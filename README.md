@@ -29,11 +29,14 @@ To run the API quickly use the docker helper script as follows:
 ```
 ./bin/run-in-docker.sh
 ```
+
 or
 
 ```
 docker-compose up
 ```
+
+application will listen on 9090 when started using the above methods.
 
 
 Alternatively, you can start the application from the current source files using Gradle as follows:

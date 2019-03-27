@@ -23,7 +23,7 @@ GRADLE_CLEAN=true
 GRADLE_INSTALL=true
 
 build_s2s_image() {
-    git clone https://github.com/hmcts/s2s-test-tool.git
+    git clone git@github.com:hmcts/s2s-test-tool.git
     cd s2s-test-tool
     gradle build
     docker build -t hmcts/service-token-provider .
