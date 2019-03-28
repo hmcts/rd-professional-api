@@ -5,8 +5,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +19,8 @@ import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response.O
     produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
+@Slf4j
 public class OrganisationController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OrganisationController.class);
 
     private final OrganisationService organisationService;
 
@@ -46,10 +44,13 @@ public class OrganisationController {
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        LOG.info("Received request to create a new organisation...");
+        log.info("Received request to create a new organisation...");
 
-        OrganisationResponse organisationResponse = organisationService.create(organisationCreationRequest);
+        OrganisationResponse organisationResponse =
+                organisationService.createOrganisationFrom(organisationCreationRequest);
 
-        return ResponseEntity.ok(organisationResponse);
+        return ResponseEntity
+                .status(201)
+                .body(organisationResponse);
     }
 }
