@@ -28,17 +28,65 @@ services:
       - LOGBACK_REQUIRE_THREAD
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
+      - S2S_URL=http://service-auth-provider-api:8080
     ports:
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     depends_on:
       - rd-professional-db
+      - service-auth-provider-api
 
   rd-professional-db:
     build:
       context: database
     image: hmcts/rd-professional-db
     container_name: rd-professional-db
+    volumes:
+      - rd-professional-db-volume:/var/lib/postgresql/data
+
     environment:
       - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
     ports:
       - 5428:5432
+
+  service-auth-provider-api:
+    image: hmcts/service-auth-provider-app
+    container_name: service-auth-provider-api
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ports:
+      - 8502:8080
+    environment:
+      JAVA_OPTS: -Xmx384m
+      SERVER_PORT: 8080
+      JWT_KEY: wThK0f0/lh3FlxFcL4xUWDMI5C1J9KyQBgXV4wseh1e5J1uYJIjvTvArHxQDrYoHJ23xFxjHkOnvNbR5dXRoxA==
+      MICROSERVICE_KEYS_CCD_DATA: "${IDAM_KEY_CCD_DATA_STORE}"
+      MICROSERVICE_KEYS_CCD_GW: "${IDAM_KEY_CCD_GATEWAY}"
+      MICROSERVICE_KEYS_CCD_DEFINITION: "${IDAM_KEY_CCD_DEFINITION_STORE}"
+      MICROSERVICE_KEYS_CCD_ADMIN: "${IDAM_KEY_CCD_ADMIN}"
+      MICROSERVICE_KEYS_FPL_CASE_SERVICE: "${IDAM_KEY_FPL_CASE_SERVICE}"
+      MICROSERVICE_KEYS_IAC: "${IDAM_KEY_IAC}"
+
+      # Duplicated until we what the correct var name should be
+      MICROSERVICEKEYS_CCD_DATA: "${IDAM_KEY_CCD_DATA_STORE}"
+      MICROSERVICEKEYS_CCD_GW: "${IDAM_KEY_CCD_GATEWAY}"
+      MICROSERVICEKEYS_CCD_DEFINITION: "${IDAM_KEY_CCD_DEFINITION_STORE}"
+      MICROSERVICEKEYS_CCD_ADMIN: "${IDAM_KEY_CCD_ADMIN}"
+      MICROSERVICEKEYS_FPL_CASE_SERVICE: "${IDAM_KEY_FPL_CASE_SERVICE}"
+      MICROSERVICEKEYS_IAC: "${IDAM_KEY_IAC}"
+
+      TESTING_SUPPORT_ENABLED: "true"
+
+  service-token-provider:
+    image: hmcts/service-token-provider
+    container_name: service-token-provider
+    environment:
+      - S2S_URL=http://service-auth-provider-api:8080
+    ports:
+      - 8089:${SERVER_PORT:-8090}
+    depends_on:
+      - service-auth-provider-api
+
+volumes:
+  rd-professional-db-volume:
