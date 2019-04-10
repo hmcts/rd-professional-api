@@ -21,6 +21,7 @@ If running locally for development or testing you will need to set the following
 
 * export POSTGRES_USERNAME=dbrefdata
 * export POSTGRES_PASSWORD=dbrefdata
+* export IDAM_KEY_IAC=AAAAAAAAAAAAAAAC
 
 ### Running the application
 
@@ -36,7 +37,7 @@ or
 docker-compose up
 ```
 
-application will listen on 9090 when started using the above methods.
+application will listen on 8090 when started using the above methods.
 
 
 Alternatively, you can start the application from the current source files using Gradle as follows:
