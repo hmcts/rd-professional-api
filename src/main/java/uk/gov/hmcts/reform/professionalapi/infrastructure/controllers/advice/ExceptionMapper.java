@@ -52,7 +52,7 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(HTTPException.class)
-    protected ResponseEntity<String> handleHTTPException(HttpServletRequest request, HTTPException ex) {
+    protected ResponseEntity<String> handleHttpException(HttpServletRequest request, HTTPException ex) {
         LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         return new ResponseEntity<>(HttpStatus.resolve(ex.getStatusCode()));
     }

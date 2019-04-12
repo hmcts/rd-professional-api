@@ -8,13 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
 
-import lombok.extern.slf4j.Slf4j;
-
-/**
- * @author Tabby Cromarty
- */
 @Service
-@Slf4j
 public class ProfessionalUserService {
 
     private final ProfessionalUserRepository professionalUserRepository;
@@ -23,6 +17,14 @@ public class ProfessionalUserService {
         this.professionalUserRepository = professionalUserRepository;
     }
 
+    /**
+     * Searches for a user with the given email address.
+     *
+     * @param email The email address to search for
+     * @return The user with the matching email address
+     * @throws HTTPException with the status set to 404 if the email address was not
+     *                       found
+     */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         ProfessionalUser user = new ProfessionalUser();
         user.setEmailAddress(email);
