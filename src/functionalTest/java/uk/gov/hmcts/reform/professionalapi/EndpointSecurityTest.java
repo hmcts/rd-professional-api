@@ -23,11 +23,6 @@ public class EndpointSecurityTest {
 
     @Value("${targetInstance}") private String targetInstance;
 
-    private final List<String> restEndpoints =
-        Arrays.asList(
-            "/sysrefdata/countries/1"
-        );
-
     @Before
     public void setUp() {
         RestAssured.baseURI = targetInstance;
@@ -64,40 +59,5 @@ public class EndpointSecurityTest {
 
         assertThat(response)
             .contains("UP");
-    }
-
-    @Test
-    public void should_not_allow_unauthenticated_requests_and_return_403_response_code() {
-
-        restEndpoints.forEach(endpoint ->
-
-            SerenityRest
-                .given()
-                .contentType(APPLICATION_JSON_UTF8_VALUE)
-                .when()
-                .get(endpoint)
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
-        );
-    }
-
-    @Test
-    public void should_not_allow_requests_without_valid_service_authorisation_and_return_403_response_code() {
-
-        String invalidServiceToken = "invalid";
-
-        restEndpoints.forEach(endpoint ->
-
-            SerenityRest
-                .given()
-                .contentType(APPLICATION_JSON_UTF8_VALUE)
-                .header("ServiceAuthorization", invalidServiceToken)
-                .when()
-                .get(endpoint)
-                .andReturn()
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value())
-        );
-
     }
 }
