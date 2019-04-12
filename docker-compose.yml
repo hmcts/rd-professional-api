@@ -30,7 +30,7 @@ services:
       - LOGBACK_REQUIRE_ERROR_CODE=false
       - S2S_URL=http://service-auth-provider-api:8080
     ports:
-      - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
+      - 9090:${SERVER_PORT:-8090}
     depends_on:
       - rd-professional-db
       - service-auth-provider-api
