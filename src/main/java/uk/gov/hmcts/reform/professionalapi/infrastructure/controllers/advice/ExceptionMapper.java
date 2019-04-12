@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.advice;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.http.HTTPException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,9 +27,8 @@ public class ExceptionMapper {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     protected ResponseEntity<String> handleEmptyResultDataAccessException(
-        HttpServletRequest request,
-        EmptyResultDataAccessException e
-    ) {
+            HttpServletRequest request,
+            EmptyResultDataAccessException e) {
         LOG.info(HANDLING_EXCEPTION_TEMPLATE, e.getMessage());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -50,11 +51,16 @@ public class ExceptionMapper {
         LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
     }
 
+    @ExceptionHandler(HTTPException.class)
+    protected ResponseEntity<String> handleHTTPException(HttpServletRequest request, HTTPException ex) {
+        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        return new ResponseEntity<>(HttpStatus.resolve(ex.getStatusCode()));
+    }
+
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<String> handleException(
-        HttpServletRequest request,
-        Exception e
-    ) {
+            HttpServletRequest request,
+            Exception e) {
         LOG.info("Exception: {}", e);
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
