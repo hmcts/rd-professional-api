@@ -16,7 +16,6 @@ public class OrganisationTest {
         assertThat(organisation.getStatus()).isEqualTo("some-status");
 
         assertThat(organisation.getId()).isNull();              // hibernate generated
-        assertThat(organisation.getLastUpdated()).isNull();     // hibernate generated
     }
 
     @Test
@@ -27,6 +26,19 @@ public class OrganisationTest {
         Organisation organisation = new Organisation();
         organisation.addProfessionalUser(professionalUser);
 
-        assertThat(organisation.getUsers()).containsExactly(professionalUser);
+        assertThat(organisation.getUsers())
+                .containsExactly(professionalUser);
+    }
+
+    @Test
+    public void adds_payment_account_correctly() {
+
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+
+        Organisation organisation = new Organisation();
+        organisation.addPaymentAccount(paymentAccount);
+
+        assertThat(organisation.getPaymentAccounts())
+                .containsExactly(paymentAccount);
     }
 }
