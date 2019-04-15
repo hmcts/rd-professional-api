@@ -12,9 +12,9 @@ public class PaymentAccountTest {
 
         ProfessionalUser user = new ProfessionalUser();
 
-        paymentAccount.setUser(user);
+        paymentAccount.addUser(user);
 
-        assertThat(paymentAccount.getUser()).isSameAs(user);
+        assertThat(paymentAccount.getUser().get(0)).isSameAs(user);
     }
 
     @Test

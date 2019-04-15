@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static javax.persistence.GenerationType.AUTO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.persistence.*;
 import lombok.NoArgsConstructor;
@@ -24,9 +26,8 @@ public class PaymentAccount {
     @JoinColumn(name = "ORGANISATION_ID")
     private Organisation organisation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
-    private ProfessionalUser user;
+    @OneToMany(mappedBy = "paymentAccount")
+    private List<ProfessionalUser> users;
 
     @UpdateTimestamp
     @Column(name = "LAST_UPDATED")
@@ -44,8 +45,11 @@ public class PaymentAccount {
         this.organisation = organisation;
     }
 
-    public void setUser(ProfessionalUser user) {
-        this.user = user;
+    public void addUser(ProfessionalUser user) {
+        if (users == null) {
+            users = new ArrayList<>();
+        }
+        this.users.add(user);
     }
 
     public UUID getId() {
@@ -60,7 +64,7 @@ public class PaymentAccount {
         return organisation;
     }
 
-    public ProfessionalUser getUser() {
-        return user;
+    public List<ProfessionalUser> getUser() {
+        return users;
     }
 }
