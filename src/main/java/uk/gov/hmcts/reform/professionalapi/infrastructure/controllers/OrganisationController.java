@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.domain.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response.OrganisationResponse;
 
 @RequestMapping(
@@ -23,9 +24,14 @@ import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response.O
 public class OrganisationController {
 
     private final OrganisationService organisationService;
+    private final OrganisationCreationRequestValidator validator;
 
-    public OrganisationController(OrganisationService organisationService) {
+    public OrganisationController(
+            OrganisationService organisationService,
+            OrganisationCreationRequestValidator validator) {
+
         this.organisationService = organisationService;
+        this.validator = validator;
     }
 
     @ApiOperation("Creates an organisation")
@@ -45,6 +51,8 @@ public class OrganisationController {
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation...");
+
+        validator.validate(organisationCreationRequest);
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
