@@ -10,11 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest;
 
 public class ProfessionalReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/organisations";
+    private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
     private final int prdApiPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -25,26 +25,14 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> createOrganisation(
-            String organisationName,
-            String superUserFirstName,
-            String superUserLastName,
-            String superUserEmail
-    ) {
+            OrganisationCreationRequest organisationCreationRequest) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("ServiceAuthorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+        headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
-                organisationName,
-                new UserCreationRequest(
-                        superUserFirstName,
-                        superUserLastName,
-                        superUserEmail
-                )
-        );
-
-        HttpEntity<OrganisationCreationRequest> request = new HttpEntity<>(organisationCreationRequest, headers);
+        HttpEntity<OrganisationCreationRequest> request =
+                new HttpEntity<>(organisationCreationRequest, headers);
 
         ResponseEntity<Map> responseEntity;
 
@@ -66,8 +54,9 @@ public class ProfessionalReferenceDataClient {
                 responseEntity.getBody(),
                 Map.class);
 
-        organisationResponse.put("http_status", responseEntity.getStatusCode());
+        organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
 
         return organisationResponse;
     }
+
 }
