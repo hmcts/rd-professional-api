@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.infrastructure.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,8 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response.P
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RestController
 public class SearchController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OrganisationController.class);
 
     private final ProfessionalUserService professionalUserService;
 

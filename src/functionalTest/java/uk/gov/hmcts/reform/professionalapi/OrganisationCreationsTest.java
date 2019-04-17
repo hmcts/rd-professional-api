@@ -73,7 +73,7 @@ public class OrganisationCreationsTest {
                                 .build())
                         .build();
 
-        Map<String, Object> repsonse =
+        Map<String, Object> response =
                 SerenityRest
                         .given()
                         .contentType(APPLICATION_JSON_UTF8_VALUE)
@@ -86,9 +86,9 @@ public class OrganisationCreationsTest {
                         .extract()
                         .body().as(Map.class);
 
-        assertThat(repsonse.get("name")).isEqualTo(organisationName);
-        assertThat(userIdsFrom(repsonse).size()).isEqualTo(1);
-        assertThat(paymentAccountsFrom(repsonse).size()).isEqualTo(2);
+        assertThat(response.get("name")).isEqualTo(organisationName);
+        assertThat(userIdsFrom(response).size()).isEqualTo(1);
+        assertThat(paymentAccountsFrom(response).size()).isEqualTo(2);
     }
 
     private List<String> userIdsFrom(Map<String, Object> response) {

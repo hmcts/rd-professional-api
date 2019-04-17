@@ -1,16 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.domain.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 
 import javax.xml.ws.http.HTTPException;
 
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.springframework.data.domain.Example;
 
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
@@ -29,19 +26,19 @@ public class ProfessionalUserServiceTest {
 
     @Test
     public void retrieveUserByEmail() {
-        when(professionalUserRepository.findOne(ArgumentMatchers.<Example<ProfessionalUser>>any()))
-                .thenReturn(Optional.ofNullable(professionalUser));
+        when(professionalUserRepository.findByEmailAddress(any(String.class)))
+                .thenReturn(professionalUser);
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some-email");
         assertEquals(professionalUser.getFirstName(), user.getFirstName());
         assertEquals(professionalUser.getLastName(), user.getLastName());
         assertEquals(professionalUser.getEmailAddress(), user.getEmailAddress());
     }
-    
-    @Test (expected = HTTPException.class)
+
+    @Test(expected = HTTPException.class)
     public void retrieveUserByEmailNotFound() {
-        when(professionalUserRepository.findOne(ArgumentMatchers.<Example<ProfessionalUser>>any()))
-                .thenReturn(Optional.ofNullable(null));
+        when(professionalUserRepository.findByEmailAddress(any(String.class)))
+                .thenReturn(null);
 
         professionalUserService.findProfessionalUserByEmailAddress("some-email");
     }
