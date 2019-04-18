@@ -32,7 +32,7 @@ public class OrganisationServiceTest {
     private final UserCreationRequest superUser = new UserCreationRequest(
             "some-fname",
             "some-lname",
-            "some-email");
+            "some-email", null);
     private final List<PbaAccountCreationRequest> pbaAccountCreationRequests = new ArrayList<>();
     private final PbaAccountCreationRequest pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
     private final OrganisationService organisationService = new OrganisationService(

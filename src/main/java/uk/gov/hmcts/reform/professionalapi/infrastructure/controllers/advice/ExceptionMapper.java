@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.InvalidRequest;
 
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.infrastructure.controllers")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
@@ -33,7 +34,13 @@ public class ExceptionMapper {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void validationError(MethodArgumentNotValidException ex) {
+    public void annotationDrivenValidationError(MethodArgumentNotValidException ex) {
+        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidRequest.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void customValidationError(InvalidRequest ex) {
         LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
     }
 
