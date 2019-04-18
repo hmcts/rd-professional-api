@@ -10,11 +10,12 @@ import lombok.Getter;
 @Builder(builderMethodName = "aPbaPaymentAccount")
 public class PbaAccountCreationRequest {
 
+    @NotNull
     private final String pbaNumber;
 
     @JsonCreator
     public PbaAccountCreationRequest(
-            @JsonProperty("pbaAccounts") @NotNull String pbaNumber) {
+            @JsonProperty("pbaAccounts") String pbaNumber) {
         this.pbaNumber = pbaNumber;
     }
 }

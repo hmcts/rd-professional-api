@@ -57,6 +57,10 @@ public class OrganisationCreationsTest {
                         .pbaNumber(pbaNumber2)
                         .build());
 
+        PbaAccountCreationRequest superUserPaymentAccount = aPbaPaymentAccount()
+                .pbaNumber(pbaNumber1)
+                .build();
+
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .name(organisationName)
@@ -65,6 +69,7 @@ public class OrganisationCreationsTest {
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email("someone@somewhere.com")
+                                .pbaAccount(superUserPaymentAccount)
                                 .build())
                         .build();
 

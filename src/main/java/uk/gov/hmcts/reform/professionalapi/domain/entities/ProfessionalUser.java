@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.*;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class ProfessionalUser {
 
     @Id
@@ -35,11 +37,11 @@ public class ProfessionalUser {
     @JoinColumn(name = "PAYMENT_ACCOUNT_ID")
     private  PaymentAccount paymentAccount;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "CREATED")
     private LocalDateTime created;
 
@@ -83,5 +85,9 @@ public class ProfessionalUser {
 
     public LocalDateTime getCreated() {
         return created;
+    }
+
+    public PaymentAccount getPaymentAccount() {
+        return paymentAccount;
     }
 }
