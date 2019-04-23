@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,14 @@ public class SuperuserPbaAccountValidator implements OrganisationRequestValidato
                 throw new InvalidRequest("Super user pba account number not in the organisations accounts");
             }
 
-            pbaAccounts.stream()
-                    .filter(organisationAccount -> organisationAccount
-                            .getPbaNumber()
-                            .equals(userPbaAccount.getPbaNumber()))
+            PbaAccountCreationRequest pbaAccountCreationRequest =
+                    pbaAccounts.stream()
+                            .filter(organisationAccount -> organisationAccount
+                                    .getPbaNumber()
+                                    .equals(userPbaAccount.getPbaNumber()))
+                            .findFirst().orElseThrow(() -> new InvalidRequest("Super user pba account number not in the organisations accounts"));
 
-                    .findFirst().orElseThrow(() -> new InvalidRequest("Super user pba account number not in the organisations accounts"));
+            requireNonNull(pbaAccountCreationRequest);
         }
     }
 }
