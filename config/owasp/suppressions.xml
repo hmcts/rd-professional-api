@@ -85,4 +85,10 @@
         <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+	   Insecure randomness vulnerability when using SecureRandomFactoryBean#setSeed to configure a SecureRandom instance. However we do not use the offending Bean.
+	   ]]></notes>
+        <cve>CVE-2019-3795</cve>
+    </suppress>
 </suppressions>
