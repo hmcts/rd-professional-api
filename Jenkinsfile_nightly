@@ -30,6 +30,9 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 withNightlyPipeline(type, product, component) {
 
+    enableDockerBuild()
+    installCharts()
+
     setVaultName('rd')
     loadVaultSecrets(secrets)
 
