@@ -1,19 +1,18 @@
 java:
   applicationPort: 8090
   environment:
-    POSTGRES_HOST: ${SERVICE_NAME}-postgresql  # do not modify
-    POSTGRES_SSL_MODE: disable
-    POSTGRES_USER: dbrefdata
-    POSTGRES_PASSWORD: dbrefdata
-    JSON_CONSOLE_PRETTY_PRINT:
-    ROOT_APPENDER:
-    ROOT_LOGGING_LEVEL:
-    REFORM_SERVICE_TYPE:
-    REFORM_SERVICE_NAME:
-    REFORM_TEAM:
-    REFORM_ENVIRONMENT:
-    LOGBACK_DATE_FORMAT:
-    LOGBACK_REQUIRE_THREAD:
-    LOGBACK_REQUIRE_ALERT_LEVEL: false
-    LOGBACK_REQUIRE_ERROR_CODE: false
-    S2S_URL: 'http://service-auth-provider-api:8080'
+    POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+    POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_PORT: 5432
+    IDAM_URL: https://idam-api.aat.platform.hmcts.net
+    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
+    LOGBACK_REQUIRE_ERROR_CODE: 'false'
+  image: 'https://hmcts.azurecr.io/hmcts/draft-store-service:latest'
+  postgresql:
+    postgresqlUsername: dbrefdata
+    postgresqlPassword: dbrefdata
+    postgresqlDatabase: dbrefdata
+    service:
+      port: 5432
