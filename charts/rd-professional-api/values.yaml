@@ -17,13 +17,3 @@ java:
     LOGBACK_REQUIRE_ALERT_LEVEL: false
     LOGBACK_REQUIRE_ERROR_CODE: false
     S2S_URL: 'http://service-auth-provider-api:8080'
-  # Don't modify below here
-  image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
-
-postgresql:
-  postgresqlUsername: dbrefdata
-  postgresqlPassword: dbrefdata
-  postgresqlDatabase: hmcts
-  persistence:
-    enabled: true
