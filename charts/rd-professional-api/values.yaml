@@ -1,4 +1,4 @@
-rd-professional-api:
+java:
   applicationPort: 8090
   environment:
     POSTGRES_HOST: ${SERVICE_NAME}-postgresql  # do not modify
