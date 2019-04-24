@@ -8,6 +8,7 @@ management:
 
 spring:
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         jdbc:
@@ -21,7 +22,7 @@ spring:
 ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:rd-professional-db}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
+    url: jdbc:postgresql://${POSTGRES_HOST:rd-professional-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
     properties:

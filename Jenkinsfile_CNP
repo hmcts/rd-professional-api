@@ -31,6 +31,7 @@ withPipeline(type, product, component) {
         error 'Reference Data projects are not authorised to be in production environments yet.'
     }
 
+    enableDbMigration()
     enableDockerBuild()
     installCharts()
 

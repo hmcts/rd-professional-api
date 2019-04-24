@@ -2,6 +2,7 @@ java:
   applicationPort: 8090
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: 5432
