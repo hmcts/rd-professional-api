@@ -2,20 +2,27 @@ package uk.gov.hmcts.reform.professionalapi.domain.service;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DXAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest;
@@ -26,6 +33,9 @@ public class OrganisationServiceTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
+    private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
+    private final DXAddressRepository dxAddressRepository = mock(DXAddressRepository.class);
+
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
@@ -38,7 +48,9 @@ public class OrganisationServiceTest {
     private final OrganisationService organisationService = new OrganisationService(
             organisationRepository,
             professionalUserRepository,
-            paymentAccountRepository);
+            paymentAccountRepository, 
+            dxAddressRepository, 
+            contactInformationRepository);
 
     @Before
     public void setUp() {
@@ -65,7 +77,7 @@ public class OrganisationServiceTest {
                 new OrganisationCreationRequest(
                         "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
-                        pbaAccountCreationRequests);
+                        pbaAccountCreationRequests, new ArrayList<ContactInformationCreationRequest>());
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
