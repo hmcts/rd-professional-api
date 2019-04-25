@@ -37,7 +37,11 @@ public class OrganisationService {
 
         Organisation newOrganisation = new Organisation(
                 organisationCreationRequest.getName(),
-                OrganisationStatus.PENDING.name()
+                OrganisationStatus.PENDING.name(),
+                organisationCreationRequest.getSraId(),
+                organisationCreationRequest.getCompanyNumber(),
+                organisationCreationRequest.getSraRegulated(),
+                organisationCreationRequest.getCompanyUrl()
         );
 
         Organisation organisation = organisationRepository.save(newOrganisation);

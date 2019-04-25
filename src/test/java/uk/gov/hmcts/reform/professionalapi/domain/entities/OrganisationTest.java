@@ -10,11 +10,15 @@ public class OrganisationTest {
     @Test
     public void creates_organisation_correctly() {
 
-        Organisation organisation = new Organisation("some-name", "some-status");
+        Organisation organisation = new Organisation("some-name", "some-status",
+                "sra-id","company-number",Boolean.FALSE,"company-url");
 
         assertThat(organisation.getName()).isEqualTo("some-name");
         assertThat(organisation.getStatus()).isEqualTo("some-status");
-
+        assertThat(organisation.getSraId()).isEqualTo("sra-id");
+        assertThat(organisation.getCompanyNumber()).isEqualTo("company-number");
+        assertThat(organisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
+        assertThat(organisation.getCompanyUrl()).isEqualTo("company-url");
         assertThat(organisation.getId()).isNull();              // hibernate generated
     }
 

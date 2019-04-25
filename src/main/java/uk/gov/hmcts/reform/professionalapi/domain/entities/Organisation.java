@@ -41,12 +41,32 @@ public class Organisation {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
+    @Column(name = "SRA_ID")
+    private String sraId;
+
+    @Column(name = "SRA_REGULATED")
+    private Boolean sraRegulated;
+
+    @Column(name = "COMPANY_NUMBER")
+    private String companyNumber;
+
+    @Column(name = "COMPANY_URL")
+    private String companyUrl;
+
     public Organisation(
             String name,
-            String status) {
+            String status,
+            String sraId,
+            String companyNumber,
+            Boolean sraRegulated,
+            String companyUrl) {
 
         this.name = name;
         this.status = status;
+        this.sraId = sraId;
+        this.companyNumber = companyNumber;
+        this.sraRegulated = sraRegulated;
+        this.companyUrl = companyUrl;
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {
@@ -76,4 +96,19 @@ public class Organisation {
     public String getStatus() {
         return status;
     }
+        public String getSraId() {
+            return sraId;
+        }
+
+        public String getCompanyNumber() {
+            return companyNumber;
+        }
+
+        public Boolean getSraRegulated() {
+            return sraRegulated;
+        }
+
+        public String getCompanyUrl() {
+            return companyUrl;
+        }
 }

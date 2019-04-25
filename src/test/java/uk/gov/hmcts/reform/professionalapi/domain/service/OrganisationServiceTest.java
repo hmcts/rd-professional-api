@@ -63,7 +63,7 @@ public class OrganisationServiceTest {
 
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name",
+                        "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
                         pbaAccountCreationRequests);
 
