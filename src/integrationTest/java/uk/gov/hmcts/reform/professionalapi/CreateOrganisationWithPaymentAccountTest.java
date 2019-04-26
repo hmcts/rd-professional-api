@@ -84,6 +84,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
         contactInformation.add(aContactInformationCreationRequest().addressLine1("addressLine1").build());
+
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
@@ -102,13 +103,6 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                 )
                 .contactInformation(contactInformation)
                 .build();
-
-        /*OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest().pbaAccounts(Arrays.asList(
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-1").build(),
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-2").build(),
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-3").build())
-                ).build();*/
 
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -158,8 +152,6 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         assertThat(persistedPaymentAccounts).isEmpty();
 
-        //assertThat(pbaNumbersFrom(createOrganisationResponse).size()).isEqualTo(0);
-
         assertThat(persistedOrganisation.getName())
                 .isEqualTo(organisationCreationRequest.getName());
     }
@@ -186,8 +178,6 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
-
-        //assertThat(pbaNumbersFrom(createOrganisationResponse).size()).isEqualTo(0);
 
         assertThat(persistedOrganisation.getName())
                 .isEqualTo(organisationCreationRequest.getName());
