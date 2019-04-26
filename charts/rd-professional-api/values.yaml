@@ -15,3 +15,8 @@ java:
     postgresqlDatabase: dbrefdata
     service:
       port: 5432
+  keyVaults:
+    "s2s":
+      resourceGroup: rpe-service-auth-provider
+      secrets:
+        - microservicekey-rd-professional-api

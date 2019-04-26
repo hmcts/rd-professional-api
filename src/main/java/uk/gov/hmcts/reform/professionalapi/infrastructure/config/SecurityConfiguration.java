@@ -31,10 +31,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web
-                .ignoring()
-                .antMatchers(
-                        "/health");
+        web.ignoring()
+            .antMatchers(
+                    "/health",
+                    "/health/liveness",
+                    "/actuator/**");
     }
 
     @Override
@@ -45,20 +46,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
 
-        http
-                .sessionManagement()
-                .sessionCreationPolicy(STATELESS)
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .logout()
-                .disable()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .addFilter(authCheckerServiceOnlyFilter);
+        http.authorizeRequests()
+            .antMatchers("/actuator/**")
+            .permitAll()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(STATELESS)
+            .and()
+            .csrf()
+            .disable()
+            .formLogin()
+            .disable()
+            .logout()
+            .disable()
+            .authorizeRequests()
+            .anyRequest()
+            .authenticated()
+            .and()
+            .addFilter(authCheckerServiceOnlyFilter);
     }
 }

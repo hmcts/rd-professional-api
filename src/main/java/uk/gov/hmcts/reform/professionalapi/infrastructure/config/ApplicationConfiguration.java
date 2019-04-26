@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.infrastructure.config;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,16 +14,28 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ApplicationConfiguration {
 
+    private static final String DEFAULT_KEY = "AAAAAAAAAAAAAAAC";
+
     private final String s2sSecret;
     private final String s2sMicroService;
     private final String s2sUrl;
 
     public ApplicationConfiguration(@Value("${idam.s2s-auth.totp_secret}") String s2sSecret,
-            @Value("${idam.s2s-auth.microservice}") String s2sMicroService,
-            @Value("${idam.s2s-auth.url}") String s2sUrl) {
+                                    @Value("${idam.s2s-auth.microservice}") String s2sMicroService,
+                                    @Value("${idam.s2s-auth.url}") String s2sUrl) {
         this.s2sSecret = s2sSecret;
         this.s2sMicroService = s2sMicroService;
         this.s2sUrl = s2sUrl;
+        if (s2sSecret == DEFAULT_KEY) {
+            File secret = new File("/mnt/secrets/s2s/microservicekey-rd-professional-api");
+            if (secret.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(secret))) {
+                    s2sSecret = reader.readLine();
+                } catch (IOException e) {
+                    log.warn("Default key used and keyvault file not readable");
+                }
+            }
+        }
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 3) + "**********" + s2sSecret.substring(13));
         log.info("Configured S2S microservice: " + s2sMicroService);
         log.info("Configured S2S URL: " + s2sUrl);
