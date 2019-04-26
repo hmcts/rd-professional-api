@@ -27,7 +27,7 @@ public class OrganisationCreationRequest {
 
     private List<PbaAccountCreationRequest> pbaAccounts;
     
-	private final List<ContactInformationCreationRequest> contactInformation;
+	private List<ContactInformationCreationRequest> contactInformation;
 
     @JsonCreator
     public OrganisationCreationRequest(
@@ -49,6 +49,38 @@ public class OrganisationCreationRequest {
         this.pbaAccounts = pbaAccountCreationRequests;
 		this.contactInformation = contactInformationRequest;
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public String getSraId() {
+		return sraId;
+	}
+
+	public Boolean getSraRegulated() {
+		return sraRegulated;
+	}
+
+	public String getCompanyNumber() {
+		return companyNumber;
+	}
+
+	public String getCompanyUrl() {
+		return companyUrl;
+	}
+
+	public UserCreationRequest getSuperUser() {
+		return superUser;
+	}
+
+	public List<PbaAccountCreationRequest> getPbaAccounts() {
+		return pbaAccounts;
+	}
+
+	public List<ContactInformationCreationRequest> getContactInformation() {
+		return contactInformation;
+	}
 
 
 

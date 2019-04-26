@@ -69,7 +69,7 @@ public class OrganisationService {
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
-        
+
         organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
@@ -111,6 +111,7 @@ public class OrganisationService {
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
+    
     private void addContactInformationToOrganisation(
     		List<ContactInformationCreationRequest> contactInformationCreationRequest,
             Organisation organisation) {

@@ -14,6 +14,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.hmcts.reform.professionalapi.domain.entities.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.DXAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.Organisati
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest;
@@ -39,26 +42,74 @@ public class OrganisationServiceTest {
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
-    private final UserCreationRequest superUser = new UserCreationRequest(
-            "some-fname",
-            "some-lname",
-            "some-email", null);
-    private final List<PbaAccountCreationRequest> pbaAccountCreationRequests = new ArrayList<>();
-    private final PbaAccountCreationRequest pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
-    private final OrganisationService organisationService = new OrganisationService(
-            organisationRepository,
-            professionalUserRepository,
-            paymentAccountRepository, 
-            dxAddressRepository, 
-            contactInformationRepository);
+    private final ContactInformation contactInformation = mock(ContactInformation.class);
+    private final DXAddress dxAddress = mock(DXAddress.class);
+    
+    private UserCreationRequest superUser;
+    private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
+    private PbaAccountCreationRequest pbaAccountCreationRequest;
+    private List<ContactInformationCreationRequest> contactInformationCreationRequests;
+    private List<DXAddressCreationRequest> dxAddressRequests;
+    
+    private DXAddressCreationRequest dxAddressRequest ;
+    
+    private ContactInformationCreationRequest contactInformationCreationRequest;
+    
+    private OrganisationCreationRequest organisationCreationRequest ;
+    
+    private OrganisationService organisationService ;
 
     @Before
     public void setUp() {
+    	
+    	superUser = new UserCreationRequest(
+                "some-fname",
+                "some-lname",
+                "some-email", null);
+    	
+    	pbaAccountCreationRequests = new ArrayList<>();
+    	
+    	contactInformationCreationRequests = new ArrayList<>();
+    	
+        dxAddressRequests = new ArrayList<>();
+        
+       	pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
         pbaAccountCreationRequests.add(pbaAccountCreationRequest);
+        
+        dxAddressRequest= new DXAddressCreationRequest("DXNumber-1", "dxExchange");
+        
+        contactInformationCreationRequest = new ContactInformationCreationRequest(
+        		"addressLine-1",
+    			"addressLine-2", 
+    			"addressLine-3", 
+    			"townCity",
+    			"county", 
+    			"country", 
+    			"postCode", 
+    			dxAddressRequests);
+        
+        dxAddressRequests.add(dxAddressRequest);
+        
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
+        
+        organisationService = new OrganisationService(
+                organisationRepository,
+                professionalUserRepository,
+                paymentAccountRepository, 
+                dxAddressRepository, 
+                contactInformationRepository);
+        
+        organisationCreationRequest =
+                new OrganisationCreationRequest(
+                        "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
+                        superUser,
+                        pbaAccountCreationRequests, contactInformationCreationRequests);
 
         when(organisation.getId()).thenReturn(UUID.randomUUID());
 
+        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
+        
         when(professionalUserRepository.save(any(ProfessionalUser.class)))
                 .thenReturn(professionalUser);
 
@@ -67,17 +118,19 @@ public class OrganisationServiceTest {
 
         when(paymentAccountRepository.save(any(PaymentAccount.class)))
                 .thenReturn(paymentAccount);
+        
+        when(contactInformationRepository.save(any(ContactInformation.class)))
+        .thenReturn(contactInformation);
+        
+        when(dxAddressRepository.save(any(DXAddress.class)))
+        .thenReturn(dxAddress);
 
     }
 
     @Test
     public void saves_an_organisation() {
 
-        OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest(
-                        "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
-                        superUser,
-                        pbaAccountCreationRequests, new ArrayList<ContactInformationCreationRequest>());
+        
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
@@ -93,5 +146,13 @@ public class OrganisationServiceTest {
         verify(
                 paymentAccountRepository,
                 times(1)).save(any(PaymentAccount.class));
+        verify(
+        		contactInformationRepository,
+                times(2)).save(any(ContactInformation.class));
+        verify(
+        		dxAddressRepository,
+                times(1)).save(any(DXAddress.class));
+        
+        
     }
 }

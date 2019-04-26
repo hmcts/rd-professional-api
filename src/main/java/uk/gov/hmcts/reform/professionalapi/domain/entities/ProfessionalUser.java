@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.*;
+
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity(name = "professional_user")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public class ProfessionalUser {
 
     @Id
@@ -58,36 +61,5 @@ public class ProfessionalUser {
         this.status = status;
         this.organisation = organisation;
     }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public Organisation getOrganisation() {
-        return organisation;
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public PaymentAccount getPaymentAccount() {
-        return paymentAccount;
-    }
+   
 }
