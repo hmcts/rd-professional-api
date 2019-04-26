@@ -13,6 +13,7 @@ import lombok.Getter;
 public class DXAddressCreationRequest {
 
 	private final String dxNumber;
+	
 	private final String dxExchange;
 
 	@JsonCreator
@@ -23,5 +24,13 @@ public class DXAddressCreationRequest {
 
 		this.dxNumber = dxNumber;
 		this.dxExchange = dxExchange;
+	}
+
+	public String getDxNumber() {
+		return dxNumber;
+	}
+
+	public String getDxExchange() {
+		return dxExchange;
 	}
 }

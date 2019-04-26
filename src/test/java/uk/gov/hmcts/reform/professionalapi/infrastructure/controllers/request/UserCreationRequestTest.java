@@ -23,5 +23,5 @@ public class UserCreationRequestTest {
 
         assertThat(violations.size()).isEqualTo(3);
     }
-
+    
 }
