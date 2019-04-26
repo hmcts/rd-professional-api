@@ -115,7 +115,6 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
-        System.out.println("persistedPaymentAccounts::"+persistedPaymentAccounts);
         assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
 
         assertThat(persistedPaymentAccounts).extracting(acc -> acc.getPbaNumber())
@@ -148,9 +147,8 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        System.out.println("Response::"+createOrganisationResponse);
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
-        System.out.println("persistedPaymentAccounts::"+persistedPaymentAccounts);
+
         String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
 
         Organisation persistedOrganisation = organisationRepository
