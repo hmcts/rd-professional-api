@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class ContactInformationCreationRequestTest {
 
-	private List<DXAddressCreationRequest> dxAddresses;
+	private List<DXAddressCreationRequest> dxAddresses = new ArrayList<>();
 
 	private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -34,7 +34,7 @@ public class ContactInformationCreationRequestTest {
 
 	@Test
 	public void creates_contact_information_creation_request_correctly() {
-		DXAddressCreationRequest dxAddressCreationRequest = mock(DXAddressCreationRequest.class);
+		DXAddressCreationRequest dxAddressCreationRequest = new DXAddressCreationRequest("some-address", "some-exchange");
 
 		dxAddresses.add(dxAddressCreationRequest);
 

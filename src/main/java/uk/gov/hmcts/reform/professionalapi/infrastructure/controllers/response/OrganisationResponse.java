@@ -10,23 +10,23 @@ public class OrganisationResponse {
 
     @JsonProperty
     private final String id;
-    @JsonProperty
-    private final String name;
-    @JsonProperty
-    private final List<String> userIds;
-    @JsonProperty
-    private final List<String> pbaAccounts;
+//    @JsonProperty
+//    private final String name;
+//    @JsonProperty
+//    private final List<String> userIds;
+//    @JsonProperty
+//    private final List<String> pbaAccounts;
 
     public OrganisationResponse(Organisation organisation) {
         this.id = organisation.getId().toString();
-        this.name = organisation.getName();
-        this.userIds = organisation.getUsers()
-                .stream()
-                .map(user -> user.getId().toString())
-                .collect(toList());
-        this.pbaAccounts = organisation.getPaymentAccounts()
-                .stream()
-                .map(acc -> acc.getPbaNumber())
-                .collect(toList());
+//        this.name = organisation.getName();
+//        this.userIds = organisation.getUsers()
+//                .stream()
+//                .map(user -> user.getId().toString())
+//                .collect(toList());
+//        this.pbaAccounts = organisation.getPaymentAccounts()
+//                .stream()
+//                .map(acc -> acc.getPbaNumber())
+//                .collect(toList());
     }
 }
