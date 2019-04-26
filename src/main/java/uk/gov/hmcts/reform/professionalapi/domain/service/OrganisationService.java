@@ -128,8 +128,9 @@ public class OrganisationService {
             			organisation);
                 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
-                            	
+                
                 addDXAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
+                
             	contactInformationRepository.save(contactInformation);
             	organisation.addContactInformation(contactInformation);
             });

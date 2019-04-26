@@ -31,7 +31,7 @@ public class DXAddress {
 	private String dxNumber;
 
 	@Column(name = "DX_EXCHANGE")
-	@Size(min = 0, max = 20)
+	@Size(max = 20)
 	private String dxExchange;
 
 	@ManyToOne
