@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder(builderMethodName = "contactInformationCreationRequest")
+@Builder(builderMethodName = "aContactInformationCreationRequest")
 public class ContactInformationCreationRequest {
 
     @NotNull

@@ -18,4 +18,8 @@ public class PbaAccountCreationRequest {
             @JsonProperty("pbaAccounts") String pbaNumber) {
         this.pbaNumber = pbaNumber;
     }
+
+	public String getPbaNumber() {
+		return pbaNumber;
+	}
 }

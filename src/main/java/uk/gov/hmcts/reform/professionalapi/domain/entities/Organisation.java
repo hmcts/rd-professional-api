@@ -55,6 +55,9 @@ public class Organisation {
 
     @Column(name = "COMPANY_URL")
     private String companyUrl;
+    
+    @Column(name = "ORGANISATION_IDENTIFIER")
+    private UUID organisationIdentifier;
 
     public Organisation(
             String name,
@@ -70,6 +73,7 @@ public class Organisation {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
+        this.organisationIdentifier=setOrganisationIdentifier();
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {
@@ -122,4 +126,12 @@ public class Organisation {
         public String getCompanyUrl() {
             return companyUrl;
         }
+
+		public UUID getOrganisationIdentifier() {			
+			return organisationIdentifier;
+		}
+		
+		public UUID setOrganisationIdentifier() {			
+			return UUID.randomUUID();
+		}
 }
