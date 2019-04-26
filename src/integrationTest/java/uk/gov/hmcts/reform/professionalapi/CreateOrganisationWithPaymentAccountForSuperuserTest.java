@@ -8,9 +8,11 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
@@ -58,15 +60,13 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .build())
                 .build();
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgNameFromResponse = (String) response.get("name");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
-
-        assertThat(response.get("http_status")).isEqualTo("201");
+        assertThat(response.get("http_status")).asString().contains("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
                 .isEqualTo(orgNameFromResponse);
@@ -90,11 +90,9 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .build())
                 .build();
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).asString().contains("400");
 
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
@@ -119,11 +117,9 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .build())
                 .build();
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).asString().contains("400");
 
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
