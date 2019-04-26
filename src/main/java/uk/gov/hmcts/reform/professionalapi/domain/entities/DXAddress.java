@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,10 +26,12 @@ public class DXAddress {
 	@GeneratedValue(strategy = AUTO)
 	private UUID id;
 
-	@Column(name = "DX_NUMBER", length = 13)
+	@Column(name = "DX_NUMBER")
+	@Size(min = 13, max = 13)
 	private String dxNumber;
 
-	@Column(name = "DX_EXCHANGE", length = 20)
+	@Column(name = "DX_EXCHANGE")
+	@Size(min = 0, max = 20)
 	private String dxExchange;
 
 	@ManyToOne
