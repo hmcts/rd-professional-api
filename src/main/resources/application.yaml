@@ -1,14 +1,10 @@
 server:
   port: ${PORT:8090}
 
-management:
-  endpoints:
-    web:
-      base-path: /
-
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
     properties:
       hibernate:
         jdbc:
@@ -58,6 +54,8 @@ security:
 
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
-idam.s2s-auth.totp_secret: ${IA_S2S_SECRET:AAAAAAAAAAAAAAAC}
-idam.s2s-auth.microservice: ${IA_S2S_MICROSERVICE:iac}
-idam.s2s-auth.url: ${S2S_URL:http://127.0.0.1:8502}
+idam:
+  s2s-auth:
+    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
+    microservice: rd_professional_api
+    url: ${S2S_URL:http://127.0.0.1:8502}
