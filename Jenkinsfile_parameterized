@@ -11,12 +11,10 @@ properties([
   ])
 ])
 
-List<LinkedHashMap<String, Object>> secrets = [
-    secret('s2s-url', 'S2S_URL'),
-    secret('s2s-secret', 'RD_P_S2S_SECRET'),
-    secret('s2s-microservice', 'RD_P_S2S_MICROSERVICE'),
-    secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('postgres-username', 'POSTGRES_USERNAME'),
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+  ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -28,13 +26,18 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
+def vaultOverrides = [
+    'preview' : 'aat',
+    'spreview': 'saat'
+]
+
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+
+    overrideVaultEnvironments(vaultOverrides)
+    loadVaultSecrets(secrets)
 
     enableDockerBuild()
     installCharts()
-
-    setVaultName('rd')
-    loadVaultSecrets(secrets)
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

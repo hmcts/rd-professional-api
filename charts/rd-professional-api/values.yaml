@@ -6,8 +6,6 @@ java:
     POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: 5432
-    IDAM_URL: https://idam-api.aat.platform.hmcts.net
-    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
     LOGBACK_REQUIRE_ERROR_CODE: 'false'
   image: 'https://hmcts.azurecr.io/hmcts/draft-store-service:latest'
