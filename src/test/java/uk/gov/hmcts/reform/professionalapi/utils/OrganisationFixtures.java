@@ -2,8 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.utils;
 
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
-
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class OrganisationFixtures {
 
@@ -11,7 +15,7 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
-        return anOrganisationCreationRequest()
+                return anOrganisationCreationRequest()
                 .name("some-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("fname")
@@ -19,6 +23,24 @@ public class OrganisationFixtures {
                         .email("email-address")
                         .build());
 
+    }
+
+   public static OrganisationCreationRequest someMinimalOrganisationRequestWithContactInfo() {
+
+        return anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("company-number")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
+                .build();
     }
 
 }

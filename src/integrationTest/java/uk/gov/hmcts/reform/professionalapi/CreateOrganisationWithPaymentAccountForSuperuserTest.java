@@ -61,15 +61,15 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgNameFromResponse = (String) response.get("name");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
 
         assertThat(response.get("http_status")).isEqualTo("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
-                .isEqualTo(orgNameFromResponse);
+        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
+                .isEqualTo(orgIdentifierResponse);
     }
 
     @Test

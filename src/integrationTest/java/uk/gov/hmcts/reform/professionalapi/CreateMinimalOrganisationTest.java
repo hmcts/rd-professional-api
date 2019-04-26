@@ -72,14 +72,14 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        UUID orgIdentifierResponse =  (UUID)response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(orgIdentifierResponse);
+                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
 
         ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
-        assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getStatus()).isEqualTo("PENDING");
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
