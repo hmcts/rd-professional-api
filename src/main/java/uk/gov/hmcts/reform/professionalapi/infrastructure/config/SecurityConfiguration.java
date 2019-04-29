@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnl
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final RequestAuthorizer<Service> serviceRequestAuthorizer;
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager      authenticationManager;
 
     public SecurityConfiguration(
-            RequestAuthorizer<Service> serviceRequestAuthorizer,
-            AuthenticationManager authenticationManager) {
+                                 RequestAuthorizer<Service> serviceRequestAuthorizer,
+                                 AuthenticationManager authenticationManager) {
         this.serviceRequestAuthorizer = serviceRequestAuthorizer;
         this.authenticationManager = authenticationManager;
     }
@@ -32,17 +32,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-            .antMatchers(
-                    "/health",
-                    "/health/liveness",
-                    "/actuator/**");
+            .antMatchers("/",
+                         "/health",
+                         "/health/liveness",
+                         "/actuator/**",
+                         "/error");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(
-                serviceRequestAuthorizer);
+                                                                                                     serviceRequestAuthorizer);
 
         authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
 

@@ -11,7 +11,7 @@ services:
     image: hmcts/rd-professional-api
     container_name: rd-professional-api
     environment:
-      - JAVA_OPTS
+      - JAVA_OPTS= ${JAVA_OPTS}
       - POSTGRES_USERNAME=dbrefdata
       - POSTGRES_PASSWORD=dbrefdata
       - POSTGRES_HOST=rd-professional-db
@@ -30,6 +30,7 @@ services:
       - LOGBACK_REQUIRE_ERROR_CODE=false
       - S2S_URL=http://service-auth-provider-api:8080
     ports:
+      - 8000:8000
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     depends_on:
       - rd-professional-db
