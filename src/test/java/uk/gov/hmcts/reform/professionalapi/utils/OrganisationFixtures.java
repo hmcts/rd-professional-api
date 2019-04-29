@@ -21,26 +21,10 @@ public class OrganisationFixtures {
                         .firstName("fname")
                         .lastName("lname")
                         .email("email-address")
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                                .addressLine1("addressLine1").build()))
                         .build());
 
-    }
-
-   public static OrganisationCreationRequest someMinimalOrganisationRequestWithContactInfo() {
-
-        return anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("company-number")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build()))
-                .build();
     }
 
 }
