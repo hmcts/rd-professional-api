@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest.dxAddressCreationRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -45,8 +43,8 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        contactInformationRepository.deleteAll();
         dxAddressRepository.deleteAll();
+        contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         organisationRepository.deleteAll();
     }
@@ -66,7 +64,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
-                .contactInformation(contactInformation)
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response =
@@ -94,6 +92,36 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         
     }
 
+    @Test
+    public void persists_and_returns_valid_organisation_with_contact_and_dxaddres() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("company-number")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("dx 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(1);
+    }
     @Test
     public void returns_400_when_mandatory_data_not_present() {
 
