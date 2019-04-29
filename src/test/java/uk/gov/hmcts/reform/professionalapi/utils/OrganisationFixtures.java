@@ -20,10 +20,10 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName("fname")
                         .lastName("lname")
-                        .email("email-address")
+                        .email("email-address").build())
                         .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                                .addressLine1("addressLine1").build()))
-                        .build());
+                                .addressLine1("addressLine1").build()));
+
 
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
@@ -9,6 +10,7 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 import java.util.*;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInf
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DXAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
@@ -51,14 +54,12 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
     @Test
     public void persists_and_returns_valid_minimal_organisation() {
-        List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
-        contactInformation.add(aContactInformationCreationRequest().addressLine1("addressLine1").build());
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("company-number")
+                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -100,7 +101,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("company-number")
+                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -144,7 +145,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     }
 
     @Test
-    public void returns_400_when_database_constraint_violated() {
+    public void returns_500_when_database_constraint_violated() {
 
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
@@ -155,14 +156,14 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body")).isEqualTo("");
+        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("response_body")).isEqualTo("Error");
 
-        assertThat(organisationRepository.findAll()).isEmpty();
     }
 }
