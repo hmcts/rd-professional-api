@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +22,19 @@ public class ProfessionalUser {
     private UUID id;
 
     @Column(name = "FIRST_NAME")
+	@Size(max = 255)
     private String firstName;
 
     @Column(name = "LAST_NAME")
+	@Size(max = 255)
     private String lastName;
 
     @Column(name = "EMAIL_ADDRESS")
+	@Size(max = 255)
     private String emailAddress;
 
     @Column(name = "STATUS")
+	@Size(max = 50)
     private String status;
 
     @ManyToOne
