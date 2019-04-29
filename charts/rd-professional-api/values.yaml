@@ -20,3 +20,7 @@ java:
       resourceGroup: rpe-service-auth-provider
       secrets:
         - microservicekey-rd-professional-api
+    "rd":
+      resourceGroup: rd
+      secrets:
+        - s2s-url
