@@ -8,8 +8,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import io.restassured.RestAssured;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -69,11 +71,12 @@ public class OrganisationCreationsTest {
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email("someone@somewhere.com")
-                                .pbaAccount(superUserPaymentAccount)
                                 .build())
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
                         .build();
 
-        Map<String, Object> repsonse =
+        Map<String, Object> response =
                 SerenityRest
                         .given()
                         .contentType(APPLICATION_JSON_UTF8_VALUE)
@@ -85,10 +88,11 @@ public class OrganisationCreationsTest {
                         .statusCode(CREATED.value())
                         .extract()
                         .body().as(Map.class);
-
-        assertThat(repsonse.get("name")).isEqualTo(organisationName);
-        assertThat(userIdsFrom(repsonse).size()).isEqualTo(1);
-        assertThat(paymentAccountsFrom(repsonse).size()).isEqualTo(2);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        assertThat(response.get("name")).isEqualTo(organisationName);
+        assertThat(userIdsFrom(response).size()).isEqualTo(1);
+        assertThat(paymentAccountsFrom(response).size()).isEqualTo(2);
     }
 
     private List<String> userIdsFrom(Map<String, Object> response) {

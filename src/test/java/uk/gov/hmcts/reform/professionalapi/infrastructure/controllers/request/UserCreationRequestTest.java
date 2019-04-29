@@ -16,7 +16,7 @@ public class UserCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
 
         UserCreationRequest userCreationRequest =
-                new UserCreationRequest(null, null, null, null);
+                new UserCreationRequest(null, null, null);
 
         Set<ConstraintViolation<UserCreationRequest>> violations =
                 validator.validate(userCreationRequest);

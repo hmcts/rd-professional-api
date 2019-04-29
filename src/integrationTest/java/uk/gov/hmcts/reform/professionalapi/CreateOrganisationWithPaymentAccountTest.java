@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.ResponseUtils.pbaNumbersFrom;
 
 import java.util.*;
 
@@ -120,7 +119,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         organisationCreationRequest.getName(),
                         organisationCreationRequest.getName());
 
-        assertThat(pbaNumbersFrom(createOrganisationResponse)).isNull();
+
     }
 
     @Test

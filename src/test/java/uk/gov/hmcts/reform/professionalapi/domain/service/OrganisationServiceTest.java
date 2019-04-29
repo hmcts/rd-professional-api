@@ -65,7 +65,7 @@ public class OrganisationServiceTest {
     	superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email", null);
+                "some-email");
     	
     	pbaAccountCreationRequests = new ArrayList<>();
     	
