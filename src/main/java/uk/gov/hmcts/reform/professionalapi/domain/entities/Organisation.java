@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
+
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,6 +24,7 @@ public class Organisation {
     private UUID id;
 
     @Column(name = "NAME")
+	@Size(max = 255)
     private String name;
 
     @OneToMany(mappedBy = "organisation")
@@ -34,6 +37,7 @@ public class Organisation {
     private List<ContactInformation> contactInformations = new ArrayList<>();
     
     @Column(name = "STATUS")
+	@Size(max = 50)
     private String status;
 
     @LastModifiedDate
@@ -45,15 +49,18 @@ public class Organisation {
     private LocalDateTime created;
 
     @Column(name = "SRA_ID")
+	@Size(max = 255)
     private String sraId;
 
     @Column(name = "SRA_REGULATED")
     private Boolean sraRegulated;
 
     @Column(name = "COMPANY_NUMBER")
+	@Size(max = 8)
     private String companyNumber;
 
     @Column(name = "COMPANY_URL")
+	@Size(max = 512)
     private String companyUrl;
     
     @Column(name = "ORGANISATION_IDENTIFIER")
