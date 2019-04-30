@@ -100,13 +100,6 @@ public class OrganisationService {
                 ProfessionalUserStatus.PENDING.name(),
                 organisation);
 
-        if (userCreationRequest.getPbaAccount() != null) {
-
-            PaymentAccount paymentAccount = organisation.getPaymentAccounts().get(0);
-
-            paymentAccount.addUser(newProfessionalUser);
-        }
-
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         organisation.addProfessionalUser(persistedSuperUser);

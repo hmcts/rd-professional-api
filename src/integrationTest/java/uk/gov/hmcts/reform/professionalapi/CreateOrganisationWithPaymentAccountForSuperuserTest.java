@@ -52,9 +52,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-1")
-                                .build())
                         .build())
                 .build();
 
@@ -73,7 +70,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
     }
 
     @Test
-    public void returns_bad_request_when_superuser_pba_number_doesnt_match_one_associated_with_the_organisation() {
+    public void returns_bad_request_when_user_first_name_null() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -81,28 +78,23 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .pbaNumber("pbaNumber-1")
                         .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
+                        .firstName(null)
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-2")
-                                .build())
                         .build())
                 .build();
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-
         assertThat(response.get("http_status")).isEqualTo("400");
-
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
     }
 
     @Test
-    public void returns_bad_request_when_superuser_pba_number_null() {
+    public void returns_bad_request_when_user_LastName_null() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -110,21 +102,40 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .pbaNumber("pbaNumber-1")
                         .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
+                        .firstName("firstname")
+                        .lastName(null)
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber(null)
-                                .build())
                         .build())
                 .build();
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
+        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
+        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void returns_bad_request_when_user_email_null() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .pbaAccounts(asList(aPbaPaymentAccount()
+                        .pbaNumber("pbaNumber-1")
+                        .build()))
+                .superUser(aUserCreationRequest()
+                        .firstName("firstname")
+                        .lastName("some-lname")
+                        .email(null)
+                        .build())
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         assertThat(response.get("http_status")).isEqualTo("400");
-
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);

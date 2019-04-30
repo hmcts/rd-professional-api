@@ -81,8 +81,5 @@ public class OrganisationCreationRequest {
 	public List<ContactInformationCreationRequest> getContactInformation() {
 		return contactInformation;
 	}
-
-
-
+	
 }
-

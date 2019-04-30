@@ -12,8 +12,9 @@ import lombok.Getter;
 @Builder(builderMethodName = "dxAddressCreationRequest")
 public class DXAddressCreationRequest {
 
+	@NotNull
 	private final String dxNumber;
-	
+	@NotNull
 	private final String dxExchange;
 
 	@JsonCreator

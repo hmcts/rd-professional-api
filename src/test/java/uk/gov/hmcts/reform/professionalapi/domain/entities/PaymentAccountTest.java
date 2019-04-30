@@ -7,17 +7,6 @@ import org.junit.Test;
 public class PaymentAccountTest extends AbstractEntityTest{
 
     @Test
-    public void can_set_user() {
-        PaymentAccount paymentAccount = new PaymentAccount();
-
-        ProfessionalUser user = new ProfessionalUser();
-
-        paymentAccount.addUser(user);
-
-        assertThat(paymentAccount.getUser().get(0)).isSameAs(user);
-    }
-
-    @Test
     public void can_set_organisation() {
         PaymentAccount paymentAccount = new PaymentAccount();
 
