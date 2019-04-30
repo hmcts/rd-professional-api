@@ -154,16 +154,16 @@ public class OrganisationServiceTest {
                 times(1)).save(any(DXAddress.class));
         verify(
                 contactInformation,
-                times(1)).addDXAddress(dxAddress);
+                times(1)).addDXAddress(any(DXAddress.class));
         verify(
                 organisation,
-                times(1)).addContactInformation(contactInformation);
+                times(1)).addContactInformation(any(ContactInformation.class));
         verify(
                 organisation,
-                times(1)).addPaymentAccount(paymentAccount);
+                times(1)).addPaymentAccount(any(PaymentAccount.class));
         verify(
                 paymentAccount,
-                times(1)).setOrganisation(organisation);
+                times(1)).setOrganisation(any(Organisation.class));
         
         
     }
