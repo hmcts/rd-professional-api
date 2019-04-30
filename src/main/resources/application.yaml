@@ -55,6 +55,8 @@ security:
   anonymousPaths:
     - "/"
     - "/health"
+    - "/health/liveness"
+    - "/actuator/**"
     - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"

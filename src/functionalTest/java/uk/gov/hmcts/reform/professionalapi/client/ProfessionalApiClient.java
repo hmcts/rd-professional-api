@@ -95,7 +95,11 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
-        return RestAssured.given().relaxedHTTPSValidation().baseUri(professionalApiUrl);
+        return RestAssured.given()
+            .relaxedHTTPSValidation()
+            .baseUri(professionalApiUrl)
+            .header("Content-Type", "application/json")
+            .header("Accepts", "application/json");
     }
 
     private RequestSpecification withAuthenticatedRequest() {
