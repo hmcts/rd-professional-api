@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 
 import static java.util.Arrays.asList;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -34,6 +35,24 @@ public class ProfessionalApiClient {
                                  String s2sToken) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
+    }
+
+    public String getWelcomePage() {
+        return withUnauthenticatedRequest()
+            .get("/")
+            .then()
+            .statusCode(OK.value())
+            .and()
+            .extract().body().asString();
+    }
+
+    public String getHealthPage() {
+        return withUnauthenticatedRequest()
+            .get("/health")
+            .then()
+            .statusCode(OK.value())
+            .and()
+            .extract().body().asString();
     }
 
     @SuppressWarnings("unchecked")
@@ -75,11 +94,13 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    private RequestSpecification withUnauthenticatedRequest() {
+        return RestAssured.given().relaxedHTTPSValidation().baseUri(professionalApiUrl);
+    }
+
     private RequestSpecification withAuthenticatedRequest() {
 
-        return RestAssured.given()
-            .relaxedHTTPSValidation()
-            .baseUri(professionalApiUrl)
+        return withUnauthenticatedRequest()
             .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 

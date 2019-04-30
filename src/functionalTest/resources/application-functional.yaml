@@ -1,5 +1,5 @@
 targetInstance: ${TEST_URL:http://localhost:8090}
-s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8052}
+s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
 s2s-name: rd_professional_api
 s2s-secret: ${S2S_SECRET_FOR_TESTS:AAAAAAAAAAAAAAAC}
 spring:
