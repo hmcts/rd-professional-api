@@ -161,10 +161,5 @@ public class OrganisationServiceTest {
         verify(
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
-        verify(
-                paymentAccount,
-                times(1)).setOrganisation(any(Organisation.class));
-        
-        
-    }
+           }
 }
