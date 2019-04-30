@@ -1,100 +1,31 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-
-import io.restassured.RestAssured;
 
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import net.serenitybdd.rest.SerenityRest;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.OrganisationController;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.util.AuthorizationHeadersProvider;
-
-@RunWith(SpringIntegrationSerenityRunner.class)
-@WebMvcTest(OrganisationController.class)
-@AutoConfigureMockMvc(secure = false)
+@RunWith(SpringRunner.class)
 @ActiveProfiles("functional")
-public class OrganisationCreationsTest {
+public class OrganisationCreationsTest extends FunctionalTestSuite {
 
-    @Value("${targetInstance}")
-    private String targetInstance;
-
-    @Autowired
-    private AuthorizationHeadersProvider authorizationHeadersProvider;
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = targetInstance;
-        RestAssured.useRelaxedHTTPSValidation();
-    }
-
-    @SuppressWarnings("unchecked")
     @Test
     public void can_create_an_organisation() {
 
         String organisationName = randomAlphabetic(10);
-        String pbaNumber1 = randomAlphabetic(10);
-        String pbaNumber2 = randomAlphabetic(10);
+        String[] pbas = new String[] { randomAlphabetic(10), randomAlphabetic(10) };
 
-        List<PbaAccountCreationRequest> pbaAccounts = asList(
-                                                             aPbaPaymentAccount()
-                                                                 .pbaNumber(pbaNumber1)
-                                                                 .build(),
-                                                             aPbaPaymentAccount()
-                                                                 .pbaNumber(pbaNumber2)
-                                                                 .build());
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationName, pbas);
 
-        PbaAccountCreationRequest superUserPaymentAccount = aPbaPaymentAccount()
-            .pbaNumber(pbaNumber1)
-            .build();
-
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
-            .name(organisationName)
-            .pbaAccounts(pbaAccounts)
-            .superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
-                .email("someone@somewhere.com")
-                .pbaAccount(superUserPaymentAccount)
-                .build())
-            .build();
-
-        Map<String, Object> repsonse = SerenityRest
-            .given()
-            .contentType(APPLICATION_JSON_UTF8_VALUE)
-            .header(authorizationHeadersProvider.getServiceAuthorization())
-            .body(organisationCreationRequest)
-            .when()
-            .post("/organisations")
-            .then()
-            .statusCode(CREATED.value())
-            .extract()
-            .body().as(Map.class);
-
-        assertThat(repsonse.get("name")).isEqualTo(organisationName);
-        assertThat(userIdsFrom(repsonse).size()).isEqualTo(1);
-        assertThat(paymentAccountsFrom(repsonse).size()).isEqualTo(2);
+        assertThat(response.get("name")).isEqualTo(organisationName);
+        assertThat(userIdsFrom(response).size()).isEqualTo(1);
+        assertThat(paymentAccountsFrom(response).size()).isEqualTo(2);
     }
 
     @SuppressWarnings("unchecked")
