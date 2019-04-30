@@ -265,7 +265,7 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-    
+
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
