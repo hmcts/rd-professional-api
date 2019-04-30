@@ -70,6 +70,7 @@ services:
     container_name: service-token-provider
     environment:
       - S2S_URL=http://service-auth-provider-api:8080
+      - S2S_MICROSERVICE=rd_professional_api
       - S2S_SECRET=${S2S_SECRET}
     ports:
       - 8089:${SERVER_PORT:-8090}

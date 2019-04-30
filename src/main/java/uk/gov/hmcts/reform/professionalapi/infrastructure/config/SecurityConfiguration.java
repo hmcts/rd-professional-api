@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.infrastructure.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnl
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    List<String>                             anonymousPaths;
     private final RequestAuthorizer<Service> serviceRequestAuthorizer;
     private final AuthenticationManager      authenticationManager;
 
@@ -29,14 +32,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.authenticationManager = authenticationManager;
     }
 
+    public List<String> getAnonymousPaths() {
+        return anonymousPaths;
+    }
+
+    public void setAnonymousPaths(List<String> anonymousPaths) {
+        this.anonymousPaths = anonymousPaths;
+    }
+
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-            .antMatchers("/",
-                         "/health",
-                         "/health/liveness",
-                         "/actuator/**",
-                         "/error");
+            .antMatchers(anonymousPaths.toArray(new String[0]));
     }
 
     @Override

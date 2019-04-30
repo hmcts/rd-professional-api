@@ -61,7 +61,8 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
   authorisedServices:
-    - "rd_professional_api,rd_user_profile"
+    - rd_professional_api
+    - rd_user_profile
 
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
