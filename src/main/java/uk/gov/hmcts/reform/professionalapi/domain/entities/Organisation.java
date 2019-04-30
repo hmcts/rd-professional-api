@@ -100,7 +100,7 @@ public class Organisation {
     }
 
     public UUID getId() {
-        return null;
+        return id;
     }
 
     public String getName() {
@@ -139,7 +139,7 @@ public class Organisation {
         }
 
 	public UUID getOrganisationIdentifier() {
-			return null;
+			return organisationIdentifier;
 		}
 
     public void setOrganisationIdentifier(UUID organisationIdentifier) {

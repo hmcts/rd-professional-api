@@ -9,13 +9,17 @@ import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity(name = "payment_account")
 @NoArgsConstructor
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class PaymentAccount {
 
