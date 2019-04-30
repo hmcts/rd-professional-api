@@ -52,9 +52,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-1")
-                                .build())
                         .build())
                 .build();
 
@@ -84,9 +81,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-2")
-                                .build())
                         .build())
                 .build();
 
@@ -113,9 +107,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber(null)
-                                .build())
                         .build())
                 .build();
 

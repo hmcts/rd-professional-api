@@ -7,9 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequestWithContactInfo;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.ResponseUtils.pbaNumbersFrom;
 
 import java.util.*;
 
@@ -82,15 +80,12 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
 
-        List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
-        contactInformation.add(aContactInformationCreationRequest().addressLine1("addressLine1").build());
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+       OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("company-number")
+                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -101,7 +96,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         aPbaPaymentAccount().pbaNumber("pbaNumber-2").build(),
                         aPbaPaymentAccount().pbaNumber("pbaNumber-3").build())
                 )
-                .contactInformation(contactInformation)
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> createOrganisationResponse =
@@ -124,19 +119,16 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         organisationCreationRequest.getName(),
                         organisationCreationRequest.getName());
 
-        assertThat(pbaNumbersFrom(createOrganisationResponse)).isNull();
+
     }
 
     @Test
     public void still_persists_organisation_when_payment_accounts_list_is_empty() {
 
-        List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
-        contactInformation.add(aContactInformationCreationRequest().addressLine1("addressLine1").build());
-
-        OrganisationCreationRequest organisationCreationRequest =
+       OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .pbaAccounts(emptyList())
-                        .contactInformation(contactInformation)
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                         .build();
 
         Map<String, Object> createOrganisationResponse =

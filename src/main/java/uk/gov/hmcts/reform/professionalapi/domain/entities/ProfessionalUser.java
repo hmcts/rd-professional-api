@@ -41,10 +41,6 @@ public class ProfessionalUser {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
-    @ManyToOne
-    @JoinColumn(name = "PAYMENT_ACCOUNT_ID")
-    private  PaymentAccount paymentAccount;
-
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;

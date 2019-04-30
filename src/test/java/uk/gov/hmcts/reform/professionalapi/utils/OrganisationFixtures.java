@@ -11,9 +11,10 @@ import java.util.List;
 
 public class OrganisationFixtures {
 
-    private OrganisationFixtures() {}
+	private OrganisationFixtures() {
+	}
 
-    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
+	public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
                 return anOrganisationCreationRequest()
                 		.name("some-org-name")
@@ -25,24 +26,4 @@ public class OrganisationFixtures {
                 		.contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 		.addressLine1("addressLine1").build()));
     }
-   
-
-   public static OrganisationCreationRequest someMinimalOrganisationRequestWithContactInfo() {
-
-        return anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("company-number")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build()))
-                .build();
-    }
-
 }

@@ -31,9 +31,6 @@ public class PaymentAccount {
     @JoinColumn(name = "ORGANISATION_ID")
     private Organisation organisation;
 
-    @OneToMany(mappedBy = "paymentAccount")
-    private List<ProfessionalUser> users;
-
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
@@ -50,13 +47,6 @@ public class PaymentAccount {
         this.organisation = organisation;
     }
 
-    public void addUser(ProfessionalUser user) {
-        if (users == null) {
-            users = new ArrayList<>();
-        }
-        this.users.add(user);
-    }
-
     public UUID getId() {
         return id;
     }
@@ -69,7 +59,4 @@ public class PaymentAccount {
         return organisation;
     }
 
-    public List<ProfessionalUser> getUser() {
-        return users;
-    }
-}
+   }

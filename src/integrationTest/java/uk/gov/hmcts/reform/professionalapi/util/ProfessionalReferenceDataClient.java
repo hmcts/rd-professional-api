@@ -48,6 +48,11 @@ public class ProfessionalReferenceDataClient {
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
+        }catch (Exception e) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", "500");
+            statusAndBody.put("response_body", "Error");
+            return statusAndBody;
         }
 
         Map organisationResponse = objectMapper.convertValue(

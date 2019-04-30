@@ -9,10 +9,9 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import io.restassured.RestAssured;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -76,10 +75,9 @@ public class OrganisationCreationsTest {
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email("someone@somewhere.com")
-                                .pbaAccount(superUserPaymentAccount)
                                 .build())
                         .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                                .addressLine1("addressLine1").build()))
+                        .addressLine1("addressLine1").build()))
                         .build();
 
         Map<String, Object> response =
@@ -95,10 +93,11 @@ public class OrganisationCreationsTest {
                         .extract()
                         .body().as(Map.class);
 
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
         assertThat(response.get("name")).isEqualTo(organisationName);
         assertThat(userIdsFrom(response).size()).isEqualTo(1);
         assertThat(paymentAccountsFrom(response).size()).isEqualTo(2);
-        assertThat(contactInformationFrom(response).size()).isEqualTo(1);
     }
 
     private List<String> userIdsFrom(Map<String, Object> response) {

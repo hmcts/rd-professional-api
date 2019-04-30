@@ -122,23 +122,23 @@ public class Organisation {
             return sraId;
         }
 
-        public String getCompanyNumber() {
+    public String getCompanyNumber() {
             return companyNumber;
         }
 
-        public Boolean getSraRegulated() {
+    public Boolean getSraRegulated() {
             return sraRegulated;
         }
 
-        public String getCompanyUrl() {
+    public String getCompanyUrl() {
             return companyUrl;
         }
 
-		public UUID getOrganisationIdentifier() {			
+	public UUID getOrganisationIdentifier() {
 			return organisationIdentifier;
 		}
 		
-		public UUID setOrganisationIdentifier() {			
+	public UUID setOrganisationIdentifier() {
 			return UUID.randomUUID();
 		}
 }
