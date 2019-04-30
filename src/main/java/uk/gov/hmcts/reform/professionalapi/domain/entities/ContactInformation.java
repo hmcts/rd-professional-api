@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "contact_information")
 @NoArgsConstructor
 @Getter
+@Setter
 public class ContactInformation {
 
 	@Id
@@ -128,6 +130,14 @@ public class ContactInformation {
 
 	public Organisation getOrganisation() {
 		return organisation;
+	}
+
+	public LocalDateTime getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public LocalDateTime getCreated() {
+		return created;
 	}
 
 }

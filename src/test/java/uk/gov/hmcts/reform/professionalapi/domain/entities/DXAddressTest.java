@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-public class DXAddressTest {
+public class DXAddressTest extends AbstractEntityTest{
 
 	@Test
 	public void creates_dx_address_correctly() {
@@ -18,5 +18,10 @@ public class DXAddressTest {
 		assertThat(dxAddress.getDxExchange()).isEqualTo("some-exchange");
 		assertThat(dxAddress.getContactInformation()).isEqualTo(contactInformation);
 		assertThat(dxAddress.getId()).isNull();
+	}
+
+	@Override
+	protected Object getBeanInstance() {
+		return new DXAddress();
 	}
 }

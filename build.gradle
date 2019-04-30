@@ -195,7 +195,7 @@ repositories {
 }
 
 dependencies {
-
+    compile group: 'org.meanbean', name: 'meanbean', version: '2.0.3'
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot

@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-public class ProfessionalUserTest {
+public class ProfessionalUserTest extends AbstractEntityTest{
 
     @Test
     public void creates_professional_user_correctly() {
@@ -28,4 +28,8 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
     }
 
+    @Override
+    protected Object getBeanInstance() {
+        return new ProfessionalUser();
+    }
 }

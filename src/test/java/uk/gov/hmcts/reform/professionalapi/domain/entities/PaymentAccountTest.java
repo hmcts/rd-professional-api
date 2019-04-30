@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class PaymentAccountTest {
+public class PaymentAccountTest extends AbstractEntityTest{
 
     @Test
     public void can_set_user() {
@@ -26,5 +26,10 @@ public class PaymentAccountTest {
         paymentAccount.setOrganisation(organisation);
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
+    }
+
+    @Override
+    protected Object getBeanInstance() {
+        return new PaymentAccount();
     }
 }

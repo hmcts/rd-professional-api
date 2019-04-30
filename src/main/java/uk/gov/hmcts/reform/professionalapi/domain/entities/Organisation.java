@@ -9,7 +9,9 @@ import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +19,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity(name = "organisation")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 public class Organisation {
 
     @Id
@@ -80,7 +84,7 @@ public class Organisation {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
-        this.organisationIdentifier=setOrganisationIdentifier();
+        this.organisationIdentifier=getOrganisationIdentifier();
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {
@@ -96,7 +100,7 @@ public class Organisation {
     }
 
     public UUID getId() {
-        return id;
+        return null;
     }
 
     public String getName() {
@@ -135,10 +139,13 @@ public class Organisation {
         }
 
 	public UUID getOrganisationIdentifier() {
-			return organisationIdentifier;
+			return null;
 		}
-		
-	public UUID setOrganisationIdentifier() {
-			return UUID.randomUUID();
+
+    public void setOrganisationIdentifier(UUID organisationIdentifier) {
+        this.organisationIdentifier = organisationIdentifier;
+    }
+	public UUID generateUniqueOrganisationIdentifier() {
+            return UUID.randomUUID();
 		}
 }
