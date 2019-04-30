@@ -53,7 +53,7 @@ public class DXAddressCreationRequestTest {
 		PbaAccountCreationRequest pbaAccountCreationRequests = new PbaAccountCreationRequest("some-pba-number");
 		pbaAccounts.add(pbaAccountCreationRequests);
 
-		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email", pbaAccountCreationRequests);
+		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email");
 
 		List<ContactInformationCreationRequest> contactInformationList = new ArrayList<>();
 		ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
@@ -79,7 +79,7 @@ public class DXAddressCreationRequestTest {
 		PbaAccountCreationRequest pbaAccountCreationRequests = new PbaAccountCreationRequest("some-pba-number");
 		pbaAccounts.add(pbaAccountCreationRequests);
 
-		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email", pbaAccountCreationRequests);
+		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email");
 
 		List<ContactInformationCreationRequest> contactInformationList = new ArrayList<>();
 		ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
@@ -105,7 +105,7 @@ public class DXAddressCreationRequestTest {
 		PbaAccountCreationRequest pbaAccountCreationRequests = new PbaAccountCreationRequest("some-pba-number");
 		pbaAccounts.add(pbaAccountCreationRequests);
 
-		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email", pbaAccountCreationRequests);
+		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email");
 
 		List<ContactInformationCreationRequest> contactInformationList = new ArrayList<>();
 		ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
@@ -131,7 +131,7 @@ public class DXAddressCreationRequestTest {
 		PbaAccountCreationRequest pbaAccountCreationRequests = new PbaAccountCreationRequest("some-pba-number");
 		pbaAccounts.add(pbaAccountCreationRequests);
 
-		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email", pbaAccountCreationRequests);
+		UserCreationRequest superUser = new UserCreationRequest("some-name", "last-name", "some-email");
 
 		List<ContactInformationCreationRequest> contactInformationList = new ArrayList<>();
 		ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(

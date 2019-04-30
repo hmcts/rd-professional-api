@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
@@ -94,36 +93,6 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     }
 
     @Test
-    public void persists_and_returns_valid_organisation_with_contact_and_dxaddres() {
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("companyn")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("dx 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
-                .build();
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
-        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
-        assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(1);
-    }
-    @Test
     public void returns_400_when_mandatory_data_not_present() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -145,7 +114,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     }
     
     @Test
-    public void returns_400_when_mandatory_data_for_contact_information_not_present() {
+    public void returns_500_when_mandatory_data_for_contact_information_not_present() {
     	
     	  List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
     	  List<DXAddressCreationRequest> dxAddresses = new ArrayList<DXAddressCreationRequest>();
@@ -173,9 +142,9 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body")).isEqualTo("");
+        System.out.println("response"+response);
+        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("response_body")).isEqualTo("Error");
 
         assertThat(organisationRepository.findAll()).isEmpty();
     }
