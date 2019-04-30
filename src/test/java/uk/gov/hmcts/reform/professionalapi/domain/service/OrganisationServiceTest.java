@@ -152,6 +152,18 @@ public class OrganisationServiceTest {
         verify(
         		dxAddressRepository,
                 times(1)).save(any(DXAddress.class));
+        verify(
+                contactInformation,
+                times(1)).addDXAddress(dxAddress);
+        verify(
+                organisation,
+                times(1)).addContactInformation(contactInformation);
+        verify(
+                organisation,
+                times(1)).addPaymentAccount(paymentAccount);
+        verify(
+                paymentAccount,
+                times(1)).setOrganisation(organisation);
         
         
     }
