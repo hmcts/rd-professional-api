@@ -1,7 +1,8 @@
 targetInstance: ${TEST_URL:http://localhost:8090}
 s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
 s2s-name: rd_professional_api
-s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
+# Test key - not used in any deployed vaults or services
+s2s-secret: ${S2S_SECRET:SZDUA3L7N32PE2IS}
 spring:
   flyway:
     enabled: false
