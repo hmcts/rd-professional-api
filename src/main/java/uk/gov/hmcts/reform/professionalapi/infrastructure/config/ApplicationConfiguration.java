@@ -19,7 +19,7 @@ public class ApplicationConfiguration {
         this.s2sSecret = s2sSecret;
         this.s2sMicroService = s2sMicroService;
         this.s2sUrl = s2sUrl;
-        log.info("Configured S2S secret: " + s2sSecret.substring(0, 3) + "**********" + s2sSecret.substring(13));
+        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sMicroService);
         log.info("Configured S2S URL: " + s2sUrl);
     }

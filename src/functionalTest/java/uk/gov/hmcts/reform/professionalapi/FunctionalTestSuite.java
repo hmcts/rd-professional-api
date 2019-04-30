@@ -33,7 +33,7 @@ public abstract class FunctionalTestSuite {
 
     @Before
     public void setUp() {
-        log.info("Configured S2S secret: " + s2sSecret.substring(0, 3) + "**********" + s2sSecret.substring(13));
+        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
