@@ -63,6 +63,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response =

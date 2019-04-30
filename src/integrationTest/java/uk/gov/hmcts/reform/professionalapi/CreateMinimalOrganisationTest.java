@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DXAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
@@ -40,6 +41,9 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     @Autowired
     private  DXAddressRepository dxAddressRepository;
 
+    @Autowired
+    private PaymentAccountRepository paymentAccountRepository;
+
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
     @Before
@@ -48,6 +52,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
+        paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 

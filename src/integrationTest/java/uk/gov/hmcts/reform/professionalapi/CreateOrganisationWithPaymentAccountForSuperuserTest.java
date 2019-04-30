@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
@@ -53,6 +55,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response =
@@ -68,77 +71,4 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
                 .isEqualTo(orgIdentifierResponse);
     }
-
-    @Test
-    public void returns_bad_request_when_user_first_name_null() {
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
-                .superUser(aUserCreationRequest()
-                        .firstName(null)
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
-        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
-        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
-    }
-
-    @Test
-    public void returns_bad_request_when_user_LastName_null() {
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
-                .superUser(aUserCreationRequest()
-                        .firstName("firstname")
-                        .lastName(null)
-                        .email("someone@somewhere.com")
-                        .build())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
-        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
-        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
-    }
-
-    @Test
-    public void returns_bad_request_when_user_email_null() {
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
-                .superUser(aUserCreationRequest()
-                        .firstName("firstname")
-                        .lastName("some-lname")
-                        .email(null)
-                        .build())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
-        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
-        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
-    }
-
 }

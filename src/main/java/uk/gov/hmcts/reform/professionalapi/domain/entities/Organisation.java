@@ -84,7 +84,7 @@ public class Organisation {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
-        this.organisationIdentifier=getOrganisationIdentifier();
+        this.organisationIdentifier=generateUniqueOrganisationIdentifier();
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {

@@ -34,9 +34,9 @@ public class OrganisationService {
     private final PaymentAccountRepository paymentAccountRepository;
     private final DXAddressRepository dxAddressRepository;
     private final ContactInformationRepository contactInformationRepository;
-    
+
     public OrganisationService(
-    		OrganisationRepository organisationRepository,
+            OrganisationRepository organisationRepository,
             ProfessionalUserRepository professionalUserRepository,
             PaymentAccountRepository paymentAccountRepository,
             DXAddressRepository dxAddressRepository,
@@ -104,43 +104,42 @@ public class OrganisationService {
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
-    
+
     private void addContactInformationToOrganisation(
-    		List<ContactInformationCreationRequest> contactInformationCreationRequest,
+            List<ContactInformationCreationRequest> contactInformationCreationRequest,
             Organisation organisation) {
-    	
-    	if (contactInformationCreationRequest != null) {
-    		contactInformationCreationRequest.forEach(contactInfo -> {
+
+        if (contactInformationCreationRequest != null) {
+            contactInformationCreationRequest.forEach(contactInfo -> {
                 ContactInformation newContactInformation = new ContactInformation(contactInfo.getAddressLine1(),
-                		contactInfo.getAddressLine2(),
-                		contactInfo.getAddressLine3(),
-                		contactInfo.getTownCity(),
-                		contactInfo.getCounty(),
-                		contactInfo.getCountry(),
-                		contactInfo.getPostCode(),
-            			organisation);
-                
+                        contactInfo.getAddressLine2(),
+                        contactInfo.getAddressLine3(),
+                        contactInfo.getTownCity(),
+                        contactInfo.getCounty(),
+                        contactInfo.getCountry(),
+                        contactInfo.getPostCode(),
+                        organisation);
+
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
-                
+
                 addDXAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
-                
-            	contactInformationRepository.save(contactInformation);
-            	organisation.addContactInformation(contactInformation);
+
+                contactInformationRepository.save(contactInformation);
+                organisation.addContactInformation(contactInformation);
             });
         }
     }
-    
-    private void addDXAddressToContactInformation(
-    		List<DXAddressCreationRequest> dxAddressCreationRequest,
-            ContactInformation contactInformation) {
-    	
-    	 if (dxAddressCreationRequest != null) {
-    		 dxAddressCreationRequest.forEach(dxAdd -> {
-                 DXAddress dxAddress = new DXAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
-                 dxAddressRepository.save(dxAddress);
-                 contactInformation.addDXAddress(dxAddress);	
-             });
-         }
+
+    private void addDXAddressToContactInformation(List<DXAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
+        if (dxAddressCreationRequest != null) {
+            dxAddressCreationRequest.forEach(dxAdd -> {
+                if (dxAdd.getIsDXRequestValid()) {
+                    DXAddress dxAddress = new DXAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                    dxAddressRepository.save(dxAddress);
+                    contactInformation.addDXAddress(dxAddress);
+                }
+            });
+        }
     }
 }
 

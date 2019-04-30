@@ -67,7 +67,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("dx 1234567890")
+                                .dxNumber("DX 1234567890")
                                 .dxExchange("dxExchange").build()))
                         .build()))
                 .build();
