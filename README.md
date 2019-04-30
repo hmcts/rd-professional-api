@@ -15,6 +15,9 @@ To run the project you will need to have the following installed:
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
 
+While not essential, it is highly recommended to use the pre-push git hook included in this repository to ensure that all tests are passing. This can be done by running the following command:
+`$ git config core.hooksPath .githooks`
+
 ### Environment Vars
 
 If running locally for development or testing you will need to set the following environment variables

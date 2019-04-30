@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+
 import net.serenitybdd.rest.SerenityRest;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
