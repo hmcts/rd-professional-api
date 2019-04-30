@@ -63,9 +63,9 @@ public class DXAddressCreationRequestTest {
 		OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
 				"org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
-		assertThatThrownBy(() -> dxValidator.validate(organisationCreationRequest))
-				.isExactlyInstanceOf(InvalidRequest.class)
-				.hasMessage("DX Address Number should start with either 'DX' or 'NI' and be followed by a space");
+		dxValidator.validate(organisationCreationRequest);
+		assertThat(dxAddressCreationRequest.getIsDXRequestValid()== false);
+
 	}
 	
 	@Test
@@ -89,9 +89,8 @@ public class DXAddressCreationRequestTest {
 		OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
 				"org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
-		assertThatThrownBy(() -> dxValidator.validate(organisationCreationRequest))
-				.isExactlyInstanceOf(InvalidRequest.class)
-				.hasMessage("DX Address Number should start with either 'DX' or 'NI' and be followed by a space");
+		dxValidator.validate(organisationCreationRequest);
+		assertThat(dxAddressCreationRequest.getIsDXRequestValid()== false);
 	}
 	
 	@Test
@@ -115,9 +114,8 @@ public class DXAddressCreationRequestTest {
 		OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
 				"org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
-		assertThatThrownBy(() -> dxValidator.validate(organisationCreationRequest))
-				.isExactlyInstanceOf(InvalidRequest.class)
-				.hasMessage("DX Address Number is invalid format");
+		dxValidator.validate(organisationCreationRequest);
+		assertThat(dxAddressCreationRequest.getIsDXRequestValid()== false);
 	}
 
 	@Test
@@ -141,8 +139,7 @@ public class DXAddressCreationRequestTest {
 		OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
 				"org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
-		assertThatThrownBy(() -> dxValidator.validate(organisationCreationRequest))
-				.isExactlyInstanceOf(InvalidRequest.class)
-				.hasMessage("DX Address Number should contain 10 numerical digits");
+		dxValidator.validate(organisationCreationRequest);
+		assertThat(dxAddressCreationRequest.getIsDXRequestValid()== false);
 	}
 }

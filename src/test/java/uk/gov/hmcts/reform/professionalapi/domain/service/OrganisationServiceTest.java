@@ -38,6 +38,7 @@ public class OrganisationServiceTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DXAddressRepository dxAddressRepository = mock(DXAddressRepository.class);
+    private final DXAddressCreationRequest dxAddressCreationRequest = mock(DXAddressCreationRequest.class);
 
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
@@ -77,7 +78,9 @@ public class OrganisationServiceTest {
 
         pbaAccountCreationRequests.add(pbaAccountCreationRequest);
         
-        dxAddressRequest= new DXAddressCreationRequest("DXNumber-1", "dxExchange");
+        dxAddressRequest= new DXAddressCreationRequest("DX 1234567890", "dxExchange");
+
+        dxAddressRequest.setIsDXRequestValid(true);
         
         contactInformationCreationRequest = new ContactInformationCreationRequest(
         		"addressLine-1",
@@ -124,6 +127,9 @@ public class OrganisationServiceTest {
         
         when(dxAddressRepository.save(any(DXAddress.class)))
         .thenReturn(dxAddress);
+
+        when(dxAddressCreationRequest.getIsDXRequestValid())
+                .thenReturn(true);
 
     }
 
