@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:application-functional.yaml")
+@Slf4j
 public abstract class FunctionalTestSuite {
 
     @Value("${s2s-url}")
@@ -30,6 +33,10 @@ public abstract class FunctionalTestSuite {
 
     @Before
     public void setUp() {
+        log.info("Configured S2S secret: " + s2sSecret.substring(0, 3) + "**********" + s2sSecret.substring(13));
+        log.info("Configured S2S microservice: " + s2sName);
+        log.info("Configured S2S URL: " + s2sUrl);
+
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
         professionalApiClient = new ProfessionalApiClient(
