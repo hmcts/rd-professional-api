@@ -16,14 +16,16 @@ public class OrganisationFixtures {
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
 
                 return anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("fname")
-                        .lastName("lname")
-                        .email("email-address")
-                        .build());
-
+                		.name("some-org-name")
+                		.superUser(aUserCreationRequest()
+                				.firstName("some-fname")
+                				.lastName("some-lname")
+                				.email("someone@somewhere.com")
+                				.build())
+                		.contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                		.addressLine1("addressLine1").build()));
     }
+   
 
    public static OrganisationCreationRequest someMinimalOrganisationRequestWithContactInfo() {
 

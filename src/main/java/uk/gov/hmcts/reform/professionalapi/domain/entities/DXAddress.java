@@ -27,7 +27,7 @@ public class DXAddress {
 	private UUID id;
 
 	@Column(name = "DX_NUMBER")
-	@Size(max = 13)
+	@Size(min = 13, max = 13)
 	private String dxNumber;
 
 	@Column(name = "DX_EXCHANGE")
