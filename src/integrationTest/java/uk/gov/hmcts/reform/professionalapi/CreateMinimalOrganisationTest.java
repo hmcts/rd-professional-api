@@ -60,10 +60,6 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     public void persists_and_returns_valid_minimal_organisation() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
