@@ -141,7 +141,7 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.1"
 }
 
 jacocoTestReport {
@@ -266,6 +266,18 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
+    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+        force = true
+    }
+
+    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+        force = true
+    }
+
+    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+        force = true
+    }
+
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
@@ -284,18 +296,18 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
 }
 
-//dependencyUpdates.resolutionStrategy = {
-//    componentSelection { rules ->
-//        rules.all { ComponentSelection selection ->
-//            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-//                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-//            }
-//            if (rejected) {
-//                selection.reject('Release candidate')
-//            }
-//        }
-//    }
-//}
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
 
 gradle.startParameter.continueOnFailure = true
 
