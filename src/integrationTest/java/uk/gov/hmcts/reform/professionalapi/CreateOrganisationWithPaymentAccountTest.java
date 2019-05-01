@@ -12,9 +12,11 @@ import static uk.gov.hmcts.reform.professionalapi.utils.ResponseUtils.pbaNumbers
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
@@ -60,8 +62,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         .build())
                 .build();
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgNameFromResponse = (String) response.get("name");
 
@@ -75,22 +76,23 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
 
-        OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest().pbaAccounts(Arrays.asList(
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-1").build(),
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-2").build(),
-                        aPbaPaymentAccount().pbaNumber("pbaNumber-3").build())
-                ).build();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+                .pbaAccounts(Arrays
+                        .asList(
+                                aPbaPaymentAccount().pbaNumber("pbaNumber-1").build(),
+                                aPbaPaymentAccount().pbaNumber("pbaNumber-2").build(),
+                                aPbaPaymentAccount().pbaNumber("pbaNumber-3").build()))
+                .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
-
-        assertThat(persistedPaymentAccounts).extracting(acc -> acc.getPbaNumber())
+        assertThat(persistedPaymentAccounts)
+                .extracting(acc -> acc.getPbaNumber())
                 .containsExactlyInAnyOrder(
                         "pbaNumber-1",
                         "pbaNumber-2",
@@ -109,21 +111,19 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void still_persists_organisation_when_payment_accounts_list_is_empty() {
 
-        OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest()
-                        .pbaAccounts(emptyList())
-                        .build();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+                .pbaAccounts(emptyList())
+                .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
         Organisation persistedOrganisation = organisationRepository
                 .findByName((String) createOrganisationResponse.get("name"));
 
-
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
 
@@ -136,21 +136,19 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void still_persists_organisation_when_payment_accounts_list_is_null() {
 
-        OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest()
-                        .pbaAccounts(null)
-                        .build();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+                .pbaAccounts(null)
+                .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
         Organisation persistedOrganisation = organisationRepository
                 .findByName((String) createOrganisationResponse.get("name"));
 
-
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
 
@@ -163,18 +161,17 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void returns_400_when_a_null_pba_number_is_received() {
 
-        OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest()
-                        .pbaAccounts(Arrays.asList(
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+                .pbaAccounts(Arrays
+                        .asList(
                                 aPbaPaymentAccount().pbaNumber("pbaNumber-1").build(),
                                 aPbaPaymentAccount().pbaNumber(null).build()))
-                        .build();
+                .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
 
-
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("400");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("400");
 
         assertThat(paymentAccountRepository.findAll()).isEmpty();
 

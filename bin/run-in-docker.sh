@@ -3,9 +3,14 @@
 GRADLE_CLEAN=true
 GRADLE_INSTALL=true
 
+# Test S2S key - not used in any HMCTS key vaults or services
+export S2S_SECRET=SZDUA3L7N32PE2IS
+export S2S_MICROSERVICE=rd_professional_api
+
 build_s2s_image() {
     git clone git@github.com:hmcts/s2s-test-tool.git
     cd s2s-test-tool
+    git checkout allow-all-microservices
     ./gradlew build
     docker build -t hmcts/service-token-provider .
     cd .. && rm -rf s2s-test-tool
