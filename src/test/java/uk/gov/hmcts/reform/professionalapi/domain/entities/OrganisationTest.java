@@ -15,7 +15,9 @@ public class OrganisationTest {
         assertThat(organisation.getName()).isEqualTo("some-name");
         assertThat(organisation.getStatus()).isEqualTo("some-status");
 
-        assertThat(organisation.getId()).isNull();              // hibernate generated
+        assertThat(organisation.getId()).isNull(); // hibernate generated
+        assertThat(organisation.getLastUpdated()).isNull();
+        assertThat(organisation.getCreated()).isNull();
     }
 
     @Test
@@ -28,6 +30,8 @@ public class OrganisationTest {
 
         assertThat(organisation.getUsers())
                 .containsExactly(professionalUser);
+        assertThat(organisation.getLastUpdated()).isNull();
+        assertThat(organisation.getCreated()).isNull();
     }
 
     @Test
@@ -40,5 +44,7 @@ public class OrganisationTest {
 
         assertThat(organisation.getPaymentAccounts())
                 .containsExactly(paymentAccount);
+        assertThat(organisation.getLastUpdated()).isNull();
+        assertThat(organisation.getCreated()).isNull();
     }
 }
