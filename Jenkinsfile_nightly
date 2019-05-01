@@ -39,5 +39,7 @@ withNightlyPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
 
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+
     enableMutationTest()
 }
