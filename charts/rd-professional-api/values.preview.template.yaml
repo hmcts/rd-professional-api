@@ -1,0 +1,9 @@
+java:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  environment:
+    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+
+postgresql:
+  #Whether to deploy the Postgres Chart or not
+  enabled: true

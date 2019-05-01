@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    propertiesvolume:
+      paths: /mnt/secrets/s2s,/mnt/secrets/rd
+      aliases:
+        s2s.microservicekey-rd-professional-api: S2S_SECRET
+        rd.s2s-url: S2S_URL

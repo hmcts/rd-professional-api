@@ -6,12 +6,10 @@ def type = "java"
 def product = "rd"
 def component = "professional-api"
 
-List<LinkedHashMap<String, Object>> secrets = [
-    secret('s2s-url', 'S2S_URL'),
-    secret('s2s-secret', 'RD_P_S2S_SECRET'),
-    secret('s2s-microservice', 'RD_P_S2S_MICROSERVICE'),
-    secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('postgres-username', 'POSTGRES_USERNAME'),
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+  ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -23,6 +21,11 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     ]
 }
 
+def vaultOverrides = [
+    'preview' : 'aat',
+    'spreview': 'saat'
+]
+
 withPipeline(type, product, component) {
 
     before('buildinfra:prod') {
@@ -31,10 +34,14 @@ withPipeline(type, product, component) {
         error 'Reference Data projects are not authorised to be in production environments yet.'
     }
 
-    enableDockerBuild()
-
-    setVaultName('rd')
+    overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
+
+    enableDbMigration()
+    enableDockerBuild()
+    installCharts()
+
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
