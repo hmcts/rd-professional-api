@@ -13,12 +13,9 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableRetry
 @SpringBootApplication
 @EnableCircuitBreaker
-@EnableFeignClients(basePackages =
-    {
-        "uk.gov.hmcts.reform.auth",
-        "uk.gov.hmcts.reform.authorisation",
+@EnableFeignClients(basePackages = {
         "uk.gov.hmcts.reform.professionalapi",
-    })
+})
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 

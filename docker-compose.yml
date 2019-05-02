@@ -11,7 +11,7 @@ services:
     image: hmcts/rd-professional-api
     container_name: rd-professional-api
     environment:
-      - JAVA_OPTS
+      - JAVA_OPTS= ${JAVA_OPTS}
       - POSTGRES_USERNAME=dbrefdata
       - POSTGRES_PASSWORD=dbrefdata
       - POSTGRES_HOST=rd-professional-db
@@ -29,7 +29,9 @@ services:
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
       - S2S_URL=http://service-auth-provider-api:8080
+      - S2S_SECRET=${S2S_SECRET}
     ports:
+      - 8000:8000
       - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
     depends_on:
       - rd-professional-db
@@ -60,7 +62,7 @@ services:
     environment:
       JAVA_OPTS: -Xmx384m
       SERVER_PORT: 8080
-      MICROSERVICEKEYS_IAC: "${IDAM_KEY_IAC}"
+      MICROSERVICEKEYS_RD_PROFESSIONAL_API: "${S2S_SECRET}"
       TESTING_SUPPORT_ENABLED: "true"
 
   service-token-provider:
@@ -68,6 +70,8 @@ services:
     container_name: service-token-provider
     environment:
       - S2S_URL=http://service-auth-provider-api:8080
+      - S2S_MICROSERVICE=rd_professional_api
+      - S2S_SECRET=${S2S_SECRET}
     ports:
       - 8089:${SERVER_PORT:-8090}
     depends_on:

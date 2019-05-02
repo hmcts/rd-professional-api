@@ -3,13 +3,16 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInf
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
@@ -80,31 +84,19 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
 
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("companyn")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .pbaAccounts(Arrays.asList(
+        OrganisationCreationRequest organisationCreationRequest =
+                someMinimalOrganisationRequest().pbaAccounts(Arrays.asList(
                         aPbaPaymentAccount().pbaNumber("pbaNumber-1").build(),
                         aPbaPaymentAccount().pbaNumber("pbaNumber-2").build(),
                         aPbaPaymentAccount().pbaNumber("pbaNumber-3").build())
-                )
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-                .build();
+                ).build();
 
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).extracting(acc -> acc.getPbaNumber())
                 .containsExactlyInAnyOrder(
@@ -125,7 +117,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void still_persists_organisation_when_payment_accounts_list_is_empty() {
 
-        OrganisationCreationRequest organisationCreationRequest =
+       OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .pbaAccounts(emptyList())
                         .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
@@ -140,7 +132,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
 
@@ -156,8 +148,8 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         .pbaAccounts(null)
                         .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
 
         String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
 
@@ -167,7 +159,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                 .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
 
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
 

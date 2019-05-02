@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
-
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import java.util.*;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DxAddressR
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest;
 
 public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
@@ -37,7 +39,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     private ContactInformationRepository contactInformationRepository;
 
     @Autowired
-    private DxAddressRepository dxAddressRepository;
+    private  DxAddressRepository dxAddressRepository;
 
     @Autowired
     private PaymentAccountRepository paymentAccountRepository;
@@ -141,7 +143,6 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        System.out.println("response" + response);
         assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isEqualTo("Error");
 
