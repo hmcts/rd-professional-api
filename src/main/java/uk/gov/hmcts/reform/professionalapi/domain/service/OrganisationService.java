@@ -2,24 +2,24 @@ package uk.gov.hmcts.reform.professionalapi.domain.service;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.entities.DXAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DXAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest;
@@ -32,14 +32,14 @@ public class OrganisationService {
     private final OrganisationRepository organisationRepository;
     private final ProfessionalUserRepository professionalUserRepository;
     private final PaymentAccountRepository paymentAccountRepository;
-    private final DXAddressRepository dxAddressRepository;
+    private final DxAddressRepository dxAddressRepository;
     private final ContactInformationRepository contactInformationRepository;
 
     public OrganisationService(
             OrganisationRepository organisationRepository,
             ProfessionalUserRepository professionalUserRepository,
             PaymentAccountRepository paymentAccountRepository,
-            DXAddressRepository dxAddressRepository,
+            DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository) {
 
         this.organisationRepository = organisationRepository;
@@ -122,7 +122,7 @@ public class OrganisationService {
 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
 
-                addDXAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
+                addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
                 contactInformationRepository.save(contactInformation);
                 organisation.addContactInformation(contactInformation);
@@ -130,13 +130,13 @@ public class OrganisationService {
         }
     }
 
-    private void addDXAddressToContactInformation(List<DXAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
+    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             dxAddressCreationRequest.forEach(dxAdd -> {
-                if (dxAdd.getIsDXRequestValid()) {
-                    DXAddress dxAddress = new DXAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                if (dxAdd.getIsDxRequestValid()) {
+                    DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
                     dxAddressRepository.save(dxAddress);
-                    contactInformation.addDXAddress(dxAddress);
+                    contactInformation.addDxAddress(dxAddress);
                 }
             });
         }

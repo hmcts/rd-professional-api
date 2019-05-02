@@ -1,27 +1,29 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.*;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest.dxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateOrganisationWithContactInformationDxAddress extends Service2ServiceEnabledIntegrationTest {
 
@@ -38,7 +40,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
     private ContactInformationRepository contactInformationRepository;
 
     @Autowired
-    private DXAddressRepository dxAddressRepository;
+    private DxAddressRepository dxAddressRepository;
 
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
@@ -51,6 +53,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
     }
+
     @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxaddres() {
 

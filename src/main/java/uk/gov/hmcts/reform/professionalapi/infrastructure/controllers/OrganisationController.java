@@ -57,7 +57,7 @@ public class OrganisationController {
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
-        log.info("Received response to create a new organisation..."+organisationResponse);
+        log.info("Received response to create a new organisation..." + organisationResponse);
         return ResponseEntity
                 .status(201)
                 .body(organisationResponse);

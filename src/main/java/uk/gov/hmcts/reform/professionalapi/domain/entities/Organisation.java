@@ -28,7 +28,7 @@ public class Organisation {
     private UUID id;
 
     @Column(name = "NAME")
-	@Size(max = 255)
+    @Size(max = 255)
     private String name;
 
     @OneToMany(mappedBy = "organisation")
@@ -39,9 +39,9 @@ public class Organisation {
 
     @OneToMany(mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
-    
+
     @Column(name = "STATUS")
-	@Size(max = 50)
+    @Size(max = 50)
     private String status;
 
     @LastModifiedDate
@@ -53,20 +53,20 @@ public class Organisation {
     private LocalDateTime created;
 
     @Column(name = "SRA_ID")
-	@Size(max = 255)
+    @Size(max = 255)
     private String sraId;
 
     @Column(name = "SRA_REGULATED")
     private Boolean sraRegulated;
 
     @Column(name = "COMPANY_NUMBER")
-	@Size(max = 8)
+    @Size(max = 8)
     private String companyNumber;
 
     @Column(name = "COMPANY_URL")
-	@Size(max = 512)
+    @Size(max = 512)
     private String companyUrl;
-    
+
     @Column(name = "ORGANISATION_IDENTIFIER")
     private UUID organisationIdentifier;
 
@@ -84,7 +84,7 @@ public class Organisation {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
-        this.organisationIdentifier=generateUniqueOrganisationIdentifier();
+        this.organisationIdentifier = generateUniqueOrganisationIdentifier();
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {
@@ -94,9 +94,9 @@ public class Organisation {
     public void addPaymentAccount(PaymentAccount paymentAccount) {
         paymentAccounts.add(paymentAccount);
     }
-    
+
     public void addContactInformation(ContactInformation contactInformation) {
-    	contactInformations.add(contactInformation);
+        contactInformations.add(contactInformation);
     }
 
     public UUID getId() {
@@ -114,38 +114,40 @@ public class Organisation {
     public List<PaymentAccount> getPaymentAccounts() {
         return paymentAccounts;
     }
-    
+
     public List<ContactInformation> getContactInformation() {
-    	return contactInformations;
+        return contactInformations;
     }
 
     public String getStatus() {
         return status;
     }
-        public String getSraId() {
-            return sraId;
-        }
+
+    public String getSraId() {
+        return sraId;
+    }
 
     public String getCompanyNumber() {
-            return companyNumber;
-        }
+        return companyNumber;
+    }
 
     public Boolean getSraRegulated() {
-            return sraRegulated;
-        }
+        return sraRegulated;
+    }
 
     public String getCompanyUrl() {
-            return companyUrl;
-        }
+        return companyUrl;
+    }
 
-	public UUID getOrganisationIdentifier() {
-			return organisationIdentifier;
-		}
+    public UUID getOrganisationIdentifier() {
+        return organisationIdentifier;
+    }
 
     public void setOrganisationIdentifier(UUID organisationIdentifier) {
         this.organisationIdentifier = organisationIdentifier;
     }
-	public UUID generateUniqueOrganisationIdentifier() {
-            return UUID.randomUUID();
-		}
+
+    public UUID generateUniqueOrganisationIdentifier() {
+        return UUID.randomUUID();
+    }
 }

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.domain.entities;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.junit.Test;
 import org.meanbean.factories.FactoryCollection;
 import org.meanbean.lang.Factory;
 import org.meanbean.test.BeanTester;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 public abstract class AbstractEntityTest {
 
@@ -15,7 +15,7 @@ public abstract class AbstractEntityTest {
         final BeanTester beanTester = new BeanTester();
         FactoryCollection factoryCollection = beanTester.getFactoryCollection();
         factoryCollection.addFactory(LocalDateTime.class, new LocalDateTimeFactory());
-        factoryCollection.addFactory(UUID.class,new UUIDFactory());
+        factoryCollection.addFactory(UUID.class,new UuidFactory());
         beanTester.testBean(getBeanInstance().getClass());
     }
 
@@ -29,7 +29,7 @@ public abstract class AbstractEntityTest {
         }
     }
 
-    class UUIDFactory implements Factory {
+    class UuidFactory implements Factory {
 
         @Override
         public UUID create() {

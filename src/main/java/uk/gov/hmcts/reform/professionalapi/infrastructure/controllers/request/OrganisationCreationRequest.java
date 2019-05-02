@@ -26,8 +26,8 @@ public class OrganisationCreationRequest {
     private final UserCreationRequest superUser;
 
     private List<PbaAccountCreationRequest> pbaAccounts;
-    
-	private List<ContactInformationCreationRequest> contactInformation;
+
+    private List<ContactInformationCreationRequest> contactInformation;
 
     @JsonCreator
     public OrganisationCreationRequest(
@@ -38,7 +38,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,
             @JsonProperty("pbaAccounts") List<PbaAccountCreationRequest> pbaAccountCreationRequests,
-		    @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
+            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
         this.sraId = sraId;
@@ -47,39 +47,39 @@ public class OrganisationCreationRequest {
         this.companyUrl = companyUrl;
         this.superUser = superUser;
         this.pbaAccounts = pbaAccountCreationRequests;
-		this.contactInformation = contactInformationRequest;
+        this.contactInformation = contactInformationRequest;
     }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getSraId() {
-		return sraId;
-	}
+    public String getSraId() {
+        return sraId;
+    }
 
-	public Boolean getSraRegulated() {
-		return sraRegulated;
-	}
+    public Boolean getSraRegulated() {
+        return sraRegulated;
+    }
 
-	public String getCompanyNumber() {
-		return companyNumber;
-	}
+    public String getCompanyNumber() {
+        return companyNumber;
+    }
 
-	public String getCompanyUrl() {
-		return companyUrl;
-	}
+    public String getCompanyUrl() {
+        return companyUrl;
+    }
 
-	public UserCreationRequest getSuperUser() {
-		return superUser;
-	}
+    public UserCreationRequest getSuperUser() {
+        return superUser;
+    }
 
-	public List<PbaAccountCreationRequest> getPbaAccounts() {
-		return pbaAccounts;
-	}
+    public List<PbaAccountCreationRequest> getPbaAccounts() {
+        return pbaAccounts;
+    }
 
-	public List<ContactInformationCreationRequest> getContactInformation() {
-		return contactInformation;
-	}
-	
+    public List<ContactInformationCreationRequest> getContactInformation() {
+        return contactInformation;
+    }
+
 }

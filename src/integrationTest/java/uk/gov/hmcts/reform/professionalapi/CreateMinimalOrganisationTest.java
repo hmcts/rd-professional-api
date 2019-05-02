@@ -4,11 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest.dxAddressCreationRequest;
+
 import java.util.*;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.assertj.core.api.ThrowableAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DXAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DXAddressCreationRequest;
 
 public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
@@ -34,12 +32,12 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
     @Autowired
     private ProfessionalUserRepository professionalUserRepository;
-    
+
     @Autowired
     private ContactInformationRepository contactInformationRepository;
-    
+
     @Autowired
-    private  DXAddressRepository dxAddressRepository;
+    private DxAddressRepository dxAddressRepository;
 
     @Autowired
     private PaymentAccountRepository paymentAccountRepository;
@@ -90,7 +88,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
 
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
-        
+
     }
 
     @Test
@@ -113,37 +111,37 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
         assertThat(organisationRepository.findAll()).isEmpty();
     }
-    
+
     @Test
     public void returns_500_when_mandatory_data_for_contact_information_not_present() {
-    	
-    	  List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
-    	  List<DXAddressCreationRequest> dxAddresses = new ArrayList<DXAddressCreationRequest>();
-    	  
-    	  dxAddresses.add(new DXAddressCreationRequest("DX12345678901", "some-exchange"));
 
-          contactInformation.add(aContactInformationCreationRequest()
-        		  .addressLine1("some-address")
-        		  .dxAddress(dxAddresses)
-        		  .build());
-          
-          OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                  .name("some-org-name")
-                  .sraId("sra-id")
-                  .sraRegulated(Boolean.FALSE)
-                  .companyUrl("company-url")
-                  .companyNumber("company-number")
-                  .superUser(aUserCreationRequest()
-                          .firstName("some-fname")
-                          .lastName("some-lname")
-                          .email("someone@somewhere.com")
-                          .build())
-                  .contactInformation(contactInformation)
-                  .build();
+        List<ContactInformationCreationRequest> contactInformation = new ArrayList<ContactInformationCreationRequest>();
+        List<DxAddressCreationRequest> dxAddresses = new ArrayList<DxAddressCreationRequest>();
+
+        dxAddresses.add(new DxAddressCreationRequest("DX12345678901", "some-exchange"));
+
+        contactInformation.add(aContactInformationCreationRequest()
+                .addressLine1("some-address")
+                .dxAddress(dxAddresses)
+                .build());
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("company-number")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(contactInformation)
+                .build();
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        System.out.println("response"+response);
+        System.out.println("response" + response);
         assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isEqualTo("Error");
 

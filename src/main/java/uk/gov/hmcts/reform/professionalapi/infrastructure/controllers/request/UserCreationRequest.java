@@ -25,26 +25,23 @@ public class UserCreationRequest {
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email
-           ) {
+    ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-     }
+    }
 
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-
-	public String getLastName() {
-		return lastName;
-	}
-
-
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
 }

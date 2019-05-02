@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-public class ProfessionalUserTest extends AbstractEntityTest{
+public class ProfessionalUserTest extends AbstractEntityTest {
 
     @Test
     public void creates_professional_user_correctly() {

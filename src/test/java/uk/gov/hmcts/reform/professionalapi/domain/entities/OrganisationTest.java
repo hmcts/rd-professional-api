@@ -4,14 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
-import org.meanbean.factories.FactoryCollection;
-import org.meanbean.lang.Factory;
-import org.meanbean.test.BeanTester;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-public class OrganisationTest extends AbstractEntityTest{
+public class OrganisationTest extends AbstractEntityTest {
 
     @Test
     public void creates_organisation_correctly() {

@@ -24,19 +24,19 @@ public class ProfessionalUser {
     private UUID id;
 
     @Column(name = "FIRST_NAME")
-	@Size(max = 255)
+    @Size(max = 255)
     private String firstName;
 
     @Column(name = "LAST_NAME")
-	@Size(max = 255)
+    @Size(max = 255)
     private String lastName;
 
     @Column(name = "EMAIL_ADDRESS")
-	@Size(max = 255)
+    @Size(max = 255)
     private String emailAddress;
 
     @Column(name = "STATUS")
-	@Size(max = 50)
+    @Size(max = 50)
     private String status;
 
     @ManyToOne
@@ -64,5 +64,5 @@ public class ProfessionalUser {
         this.status = status;
         this.organisation = organisation;
     }
-   
+
 }

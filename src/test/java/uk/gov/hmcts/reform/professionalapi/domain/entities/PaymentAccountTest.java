@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public class PaymentAccountTest extends AbstractEntityTest{
+public class PaymentAccountTest extends AbstractEntityTest {
 
     @Test
     public void can_set_organisation() {

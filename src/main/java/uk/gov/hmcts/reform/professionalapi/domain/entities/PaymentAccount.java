@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static javax.persistence.GenerationType.AUTO;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -28,7 +26,7 @@ public class PaymentAccount {
     private UUID id;
 
     @Column(name = "PBA_NUMBER")
-	@Size(max = 255)
+    @Size(max = 255)
     private String pbaNumber;
 
     @ManyToOne
@@ -63,4 +61,4 @@ public class PaymentAccount {
         return organisation;
     }
 
-   }
+}
