@@ -40,7 +40,7 @@ data "azurerm_key_vault_secret" "s2s_url" {
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
-  vault_uri = "${data.azurerm_key_vault_secret.s2s_url.value}"
+  vault_uri = "${local.s2s_vault_url}"
 }
 
 data "azurerm_key_vault_secret" "postgres_username" {
