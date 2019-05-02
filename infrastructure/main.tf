@@ -23,9 +23,34 @@ resource "azurerm_resource_group" "rg" {
   tags = "${merge(var.common_tags, map("lastUpdated", "${timestamp()}"))}"
 }
 
+data "azurerm_key_vault" "rd_key_vault" {
+  name = "${local.key_vault_name}"
+  resource_group_name = "${local.key_vault_name}"
+}
+
+data "azurerm_key_vault_secret" "s2s_microservice" {
+  name = "s2s-microservice"
+  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "s2s_url" {
+  name = "s2s-url"
+  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+}
+
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
-  vault_uri = "${local.s2s_vault_url}"
+  vault_uri = "${data.azurerm_key_vault_secret.s2s_url.value}"
+}
+
+data "azurerm_key_vault_secret" "postgres_username" {
+  name = "postgres-username"
+  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "postgres_password" {
+  name = "postgres-password"
+  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
 }
 
 module "db-professional-ref-data" {
