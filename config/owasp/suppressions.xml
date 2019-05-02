@@ -45,42 +45,28 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: dom4j-1.6.1.jar
-   ]]></notes>
-        <gav regex="true">^dom4j:dom4j:.*$</gav>
-        <cve>CVE-2018-1000632</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-config-5.0.7.RELEASE.jar
-   ]]></notes>
-        <gav regex="true">^org\.springframework\.security:spring-security-config:.*$</gav>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-config-5.0.7.RELEASE.jar
+   file name: spring-security-config-5.1.1.RELEASE.jar
    ]]></notes>
         <gav regex="true">^org\.springframework\.security:spring-security-config:.*$</gav>
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-web-5.0.7.RELEASE.jar
+   file name: spring-security-web-5.1.1.RELEASE.jar
    ]]></notes>
         <gav regex="true">^org\.springframework\.security:spring-security-web:.*$</gav>
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-core-5.0.7.RELEASE.jar
+   file name: spring-security-core-5.1.1.RELEASE.jar
    ]]></notes>
         <gav regex="true">^org\.springframework\.security:spring-security-core:.*$</gav>
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.0.7.RELEASE.jar
+   file name: spring-security-crypto-5.1.1.RELEASE.jar
    ]]></notes>
         <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
@@ -90,5 +76,21 @@
 	   Insecure randomness vulnerability when using SecureRandomFactoryBean#setSeed to configure a SecureRandom instance. However we do not use the offending Bean.
 	   ]]></notes>
         <cve>CVE-2019-3795</cve>
+    </suppress>
+    <suppress>
+      <notes><![CDATA[
+        The SslHandler in Netty before 3.9.2 allows remote attackers to cause a denial of service (infinite loop and CPU consumption) via a crafted SSLv2Hello message.
+        Netty before 3.9.8.Final, 3.10.x before 3.10.3.Final, 4.0.x before 4.0.28.Final, and 4.1.x before 4.1.0.Beta5 and Play Framework 2.x before 2.3.9 might allow remote attackers to bypass the httpOnly flag on cookies and obtain sensitive information by leveraging improper validation of cookie name and value characters.
+      ]]></notes>
+      <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:.*$</gav>
+      <cve>CVE-2014-3488</cve>
+      <cve>CVE-2015-2156</cve>
+    </suppress>
+    <suppress>
+      <notes><![CDATA[
+        When running on Windows with enableCmdLineArguments enabled, the CGI Servlet in Apache Tomcat 9.0.0.M1 to 9.0.17, 8.5.0 to 8.5.39 and 7.0.0 to 7.0.93 is vulnerable to Remote Code Execution due to a bug in the way the JRE passes command line arguments to Windows. The CGI Servlet is disabled by default
+      ]]></notes>
+      <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-.*:.*$</gav>
+      <cve>CVE-2019-0232</cve>
     </suppress>
 </suppressions>

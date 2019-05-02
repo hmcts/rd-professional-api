@@ -10,9 +10,11 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
@@ -43,7 +45,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
     }
 
     @Test
-    public void persists_organisation_with_valid_super_user_payment_account() {
+    public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -55,18 +57,17 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
 
-        assertThat(response.get("http_status")).isEqualTo("201");
+        assertThat(response.get("http_status")).asString().contains("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
                 .isEqualTo(orgIdentifierResponse);

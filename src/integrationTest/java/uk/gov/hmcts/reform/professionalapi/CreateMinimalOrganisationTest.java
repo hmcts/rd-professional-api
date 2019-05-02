@@ -143,7 +143,6 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        System.out.println("response"+response);
         assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isEqualTo("Error");
 
