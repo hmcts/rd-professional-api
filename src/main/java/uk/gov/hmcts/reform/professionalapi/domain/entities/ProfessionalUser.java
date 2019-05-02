@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -3,9 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.time.LocalDateTime;
 import org.junit.Test;
 
-public class ProfessionalUserTest extends AbstractEntityTest {
+public class ProfessionalUserTest {
 
     @Test
     public void creates_professional_user_correctly() {
@@ -26,10 +27,14 @@ public class ProfessionalUserTest extends AbstractEntityTest {
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
+
+        professionalUser.setLastUpdated(LocalDateTime.now());
+
+        professionalUser.setCreated(LocalDateTime.now());
+
+        assertThat(professionalUser.getLastUpdated()).isNotNull();
+
+        assertThat(professionalUser.getCreated()).isNotNull();
     }
 
-    @Override
-    protected Object getBeanInstance() {
-        return new ProfessionalUser();
-    }
 }

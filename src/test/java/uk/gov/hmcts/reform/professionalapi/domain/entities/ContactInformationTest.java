@@ -3,9 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.time.LocalDateTime;
 import org.junit.Test;
 
-public class ContactInformationTest extends AbstractEntityTest {
+
+
+public class ContactInformationTest {
 
     @Test
     public void creates_contact_information_correctly() {
@@ -39,10 +42,14 @@ public class ContactInformationTest extends AbstractEntityTest {
         contactInformation.addDxAddress(dxAddress);
 
         assertThat(contactInformation.getDxAddresses()).containsExactly(dxAddress);
+
+        contactInformation.setLastUpdated(LocalDateTime.now());
+
+        contactInformation.setCreated(LocalDateTime.now());
+
+        assertThat(contactInformation.getLastUpdated()).isNotNull();
+
+        assertThat(contactInformation.getCreated()).isNotNull();
     }
 
-    @Override
-    protected ContactInformation getBeanInstance() {
-        return new ContactInformation();
-    }
 }

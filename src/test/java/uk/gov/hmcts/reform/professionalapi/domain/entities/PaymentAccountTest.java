@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
 import org.junit.Test;
 
-public class PaymentAccountTest extends AbstractEntityTest {
+public class PaymentAccountTest {
 
     @Test
     public void can_set_organisation() {
@@ -15,10 +16,14 @@ public class PaymentAccountTest extends AbstractEntityTest {
         paymentAccount.setOrganisation(organisation);
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
+
+        paymentAccount.setLastUpdated(LocalDateTime.now());
+
+        paymentAccount.setCreated(LocalDateTime.now());
+
+        assertThat(paymentAccount.getLastUpdated()).isNotNull();
+
+        assertThat(paymentAccount.getCreated()).isNotNull();
     }
 
-    @Override
-    protected Object getBeanInstance() {
-        return new PaymentAccount();
-    }
 }

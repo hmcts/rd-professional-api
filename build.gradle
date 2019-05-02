@@ -237,7 +237,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
 
     compile group: 'org.meanbean', name: 'meanbean', version: '2.0.3'
-
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

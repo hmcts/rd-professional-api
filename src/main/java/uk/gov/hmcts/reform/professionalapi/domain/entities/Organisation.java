@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
