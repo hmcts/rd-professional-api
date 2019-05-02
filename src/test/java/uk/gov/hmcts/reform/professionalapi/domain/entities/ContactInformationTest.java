@@ -3,14 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
-import org.meanbean.factories.FactoryCollection;
-import org.meanbean.test.BeanTester;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import org.meanbean.lang.Factory;
 
 public class ContactInformationTest extends AbstractEntityTest{
 
@@ -34,7 +28,7 @@ public class ContactInformationTest extends AbstractEntityTest{
 	}
 
 	@Test
-	public void adds_dx_address_correctly() {
+	public void adds_dx_address_into_ContactInformation_Correctly() {
 
 		DXAddress dxAddress = mock(DXAddress.class);
 
@@ -48,15 +42,8 @@ public class ContactInformationTest extends AbstractEntityTest{
 		assertThat(contactInformation.getDxAddresses()).containsExactly(dxAddress);
 	}
 
-
 	@Override
 	protected ContactInformation getBeanInstance() {
-		//DXAddress dxAddress = mock(DXAddress.class);
-
-		//Organisation organisation = mock(Organisation.class);
-		return new ContactInformation();//"some-address1", "some-address2",
-				//"some-address3", "some-town-city", "some-county", "some-country", "some-post-code", organisation);
-
+		return new ContactInformation();
 	}
-
 }
