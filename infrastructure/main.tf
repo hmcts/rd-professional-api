@@ -4,6 +4,7 @@ provider "azurerm" {
 }
 
 locals {
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   preview_app_service_plan = "${var.product}-${var.component}-${var.env}"
   non_preview_app_service_plan = "${var.product}-${var.env}"
   app_service_plan = "${var.env == "preview" || var.env == "spreview" ? local.preview_app_service_plan : local.non_preview_app_service_plan}"
@@ -11,6 +12,9 @@ locals {
   preview_vault_name = "${var.raw_product}-aat"
   non_preview_vault_name = "${var.raw_product}-${var.env}"
   key_vault_name = "${var.env == "preview" || var.env == "spreview" ? local.preview_vault_name : local.non_preview_vault_name}"
+
+  s2s_url = "http://rpe-service-auth-provider-${local.local_env}.service.core-compute-${local.local_env}.internal"
+  s2s_vault_url = "https://s2s-${local.local_env}.vault.azure.net/"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -19,36 +23,10 @@ resource "azurerm_resource_group" "rg" {
   tags = "${merge(var.common_tags, map("lastUpdated", "${timestamp()}"))}"
 }
 
-data "azurerm_key_vault" "rd_key_vault" {
-  name = "${local.key_vault_name}"
-  resource_group_name = "${local.key_vault_name}"
-}
-
 data "azurerm_key_vault_secret" "s2s_secret" {
-  name = "s2s-secret"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  name = "microservicekey-rd-professional-api"
+  vault_uri = "${local.s2s_vault_url}"
 }
-
-data "azurerm_key_vault_secret" "s2s_microservice" {
-  name = "s2s-microservice"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
-data "azurerm_key_vault_secret" "s2s_url" {
-  name = "s2s-url"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
-data "azurerm_key_vault_secret" "postgres_username" {
-  name = "postgres-username"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
-data "azurerm_key_vault_secret" "postgres_password" {
-  name = "postgres-password"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
 
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
@@ -58,8 +36,6 @@ module "db-professional-ref-data" {
   postgresql_user = "${var.postgresql_user}"
   database_name = "${var.database_name}"
   common_tags = "${var.common_tags}"
-
-
 }
 
 module "rd_professional_api" {
@@ -88,10 +64,9 @@ module "rd_professional_api" {
     POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
     POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
-    IA_S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
-    IA_S2S_MICROSERVICE           = "${data.azurerm_key_vault_secret.s2s_microservice.value}"
+    S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
 
-    S2S_URL = "${data.azurerm_key_vault_secret.s2s_url.value}"
+    S2S_URL = "${local.s2s_url}"
 
     ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
     LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"
