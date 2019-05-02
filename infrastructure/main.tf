@@ -43,16 +43,6 @@ data "azurerm_key_vault_secret" "s2s_secret" {
   vault_uri = "${local.s2s_vault_url}"
 }
 
-data "azurerm_key_vault_secret" "postgres_username" {
-  name = "postgres-username"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
-data "azurerm_key_vault_secret" "postgres_password" {
-  name = "postgres-password"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
-}
-
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
