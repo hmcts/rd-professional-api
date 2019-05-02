@@ -27,7 +27,7 @@ public class ContactInformationTest extends AbstractEntityTest {
     }
 
     @Test
-    public void adds_dx_address_correctly() {
+    public void adds_dx_address_into_ContactInformation_Correctly() {
 
         DxAddress dxAddress = mock(DxAddress.class);
 
@@ -41,15 +41,8 @@ public class ContactInformationTest extends AbstractEntityTest {
         assertThat(contactInformation.getDxAddresses()).containsExactly(dxAddress);
     }
 
-
     @Override
     protected ContactInformation getBeanInstance() {
-        //DxAddress dxAddress = mock(DxAddress.class);
-
-        //Organisation organisation = mock(Organisation.class);
-        return new ContactInformation();//"some-address1", "some-address2",
-        //"some-address3", "some-town-city", "some-county", "some-country", "some-post-code", organisation);
-
+        return new ContactInformation();
     }
-
 }

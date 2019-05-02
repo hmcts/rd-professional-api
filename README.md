@@ -114,7 +114,12 @@ If you have some time to spare, you can run the *mutation tests* as follows:
 
 ```
 ./gradlew pitest
+ ```
+If you are using windows machine to run PI test , use following property in gradle.build under pitest section.
 ```
+useClasspathFile = true
+```
+
 
 As the project grows, these tests will take longer and longer to execute but are useful indicators of the quality of the test suite.
 
