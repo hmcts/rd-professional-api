@@ -166,6 +166,7 @@ pitest {
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     mutationThreshold = 90
+    useClasspathFile = true
 }
 
 project.tasks['pitest'].group = "Verification"
@@ -180,6 +181,7 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/SystemDateProvider.java," +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/domain/entities/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
