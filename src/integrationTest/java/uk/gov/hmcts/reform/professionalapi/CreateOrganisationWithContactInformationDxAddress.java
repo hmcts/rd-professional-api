@@ -86,6 +86,121 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
     }
 
     @Test
+    public void persists_and_returns_500_organisation_with_invalid_length_of_company_number() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyno")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("500");
+    }
+
+    @Test
+    public void persists_and_returns_400_organisation_with_unique_constraint_violated_sra_id_and_dxAddress() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response2.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void persists_and_returns_400_organisation_with_unique_constraint_violated_for_company_url() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number1")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response2.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress_null() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
