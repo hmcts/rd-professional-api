@@ -52,20 +52,4 @@ public class DxAddress {
         this.dxExchange = dxExchange;
         this.contactInformation = contactInformation;
     }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getDxNumber() {
-        return dxNumber;
-    }
-
-    public String getDxExchange() {
-        return dxExchange;
-    }
-
-    public ContactInformation getContactInformation() {
-        return contactInformation;
-    }
 }

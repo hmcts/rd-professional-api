@@ -34,7 +34,7 @@ public class ProfessionalUser {
     @Size(max = 255)
     private String emailAddress;
 
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", columnDefinition = "string default 'PENDING'")
     @Size(max = 50)
     private String status;
 

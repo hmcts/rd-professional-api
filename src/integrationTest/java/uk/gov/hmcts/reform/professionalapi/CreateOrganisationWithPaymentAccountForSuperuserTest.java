@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
@@ -45,8 +43,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
     }
-    
-    @Ignore//TODO temporaryily disabled needs work
+
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
 

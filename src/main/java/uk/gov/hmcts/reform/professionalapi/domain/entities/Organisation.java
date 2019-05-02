@@ -39,7 +39,7 @@ public class Organisation {
     @OneToMany(mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", columnDefinition = "string default 'PENDING'")
     @Size(max = 50)
     private String status;
 
