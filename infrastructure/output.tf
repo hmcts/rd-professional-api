@@ -9,6 +9,11 @@ output "resourceGroup" {
 output "appServicePlan" {
   value = "${local.app_service_plan}"
 }
+
 output "vaultName" {
   value = "${local.key_vault_name}"
+}
+
+output "vaultUri" {
+  value = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
 }
