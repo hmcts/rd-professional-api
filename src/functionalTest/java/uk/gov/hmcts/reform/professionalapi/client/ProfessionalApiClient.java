@@ -93,6 +93,7 @@ public class ProfessionalApiClient {
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
+            log.info("Create organisation status: " + response.statusLine());
             log.info("Create organisation response: " + response.asString());
         }
 

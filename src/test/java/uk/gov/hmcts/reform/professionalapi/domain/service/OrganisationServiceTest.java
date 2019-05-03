@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.Us
 import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.response.OrganisationResponse;
 
 public class OrganisationServiceTest {
-
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
@@ -123,13 +122,10 @@ public class OrganisationServiceTest {
 
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
-
     }
 
     @Test
     public void saves_an_organisation() {
-
-
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
@@ -137,11 +133,14 @@ public class OrganisationServiceTest {
         assertThat(organisationResponse).isNotNull();
 
         verify(
-                organisationRepository,
-                times(2)).save(any(Organisation.class));
+               organisationRepository,
+               times(2)).save(any(Organisation.class));
         verify(
-                professionalUserRepository,
-                times(1)).save(any(ProfessionalUser.class));
+               professionalUserRepository,
+               times(1)).save(any(ProfessionalUser.class));
+        verify(
+               paymentAccountRepository,
+               times(1)).save(any(PaymentAccount.class));
         verify(
                 paymentAccountRepository,
                 times(1)).save(any(PaymentAccount.class));
