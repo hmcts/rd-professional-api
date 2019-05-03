@@ -15,7 +15,7 @@ locals {
 
   s2s_url = "http://rpe-service-auth-provider-${local.local_env}.service.core-compute-${local.local_env}.internal"
   s2s_vault_name = "s2s-${local.local_env}"
-  s2s_vault_url = "https://s2s-${local.local_env}.vault.azure.net/"
+  s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
 }
 
 resource "azurerm_resource_group" "rg" {
