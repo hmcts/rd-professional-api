@@ -27,17 +27,17 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-    lombok             : '1.18.6',
-    gradlePitest       : '1.3.0',
-    pitest             : '1.4.2',
-    reformHealthStarter: '0.0.4',
-    reformLogging      : '4.0.1',
-    reformS2sClient    : '3.0.0',
-    serenity           : '2.0.11',
-    sonarPitest        : '0.5',
-    springBoot         : '2.1.4.RELEASE',
-    springHystrix      : '2.1.1.RELEASE',
-    springfoxSwagger   : '2.9.2'
+        lombok             : '1.18.6',
+        gradlePitest       : '1.3.0',
+        pitest             : '1.4.2',
+        reformHealthStarter: '0.0.4',
+        reformLogging      : '4.0.1',
+        reformS2sClient    : '3.0.0',
+        serenity           : '2.0.11',
+        sonarPitest        : '0.5',
+        springBoot         : '2.1.4.RELEASE',
+        springHystrix      : '2.1.1.RELEASE',
+        springfoxSwagger   : '2.9.2'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
@@ -118,8 +118,8 @@ pmd {
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSets = [
-        'category/java/errorprone.xml',
-        'category/java/bestpractices.xml'
+            'category/java/errorprone.xml',
+            'category/java/bestpractices.xml'
     ]
 }
 
@@ -165,9 +165,9 @@ jacocoTestReport {
 pitest {
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
-        'uk.gov.hmcts.reform.professionalapi.infrastructure.config.*',
-        'uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.*',
-        'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.infrastructure.config.*',
+            'uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.*',
+            'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
     outputFormats = ['XML', 'HTML']
@@ -186,8 +186,8 @@ sonarqube {
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/config/**," +
-                                     "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/SystemDateProvider.java," +
-                                     "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/SystemDateProvider.java," +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
 
@@ -204,7 +204,6 @@ repositories {
 }
 
 dependencies {
-
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
@@ -235,6 +234,7 @@ dependencies {
     compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
+        
     }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
