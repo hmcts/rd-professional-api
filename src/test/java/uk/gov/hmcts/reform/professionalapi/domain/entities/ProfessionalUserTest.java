@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.time.LocalDateTime;
 import org.junit.Test;
 
 public class ProfessionalUserTest {
@@ -26,6 +27,14 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
+
+        professionalUser.setLastUpdated(LocalDateTime.now());
+
+        professionalUser.setCreated(LocalDateTime.now());
+
+        assertThat(professionalUser.getLastUpdated()).isNotNull();
+
+        assertThat(professionalUser.getCreated()).isNotNull();
     }
 
 }

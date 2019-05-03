@@ -1,10 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.domain.service;
 
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.professionalapi.domain.entities.*;
+
+import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUserStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
@@ -20,15 +28,21 @@ public class OrganisationService {
     private final OrganisationRepository organisationRepository;
     private final ProfessionalUserRepository professionalUserRepository;
     private final PaymentAccountRepository paymentAccountRepository;
+    private final DxAddressRepository dxAddressRepository;
+    private final ContactInformationRepository contactInformationRepository;
 
     public OrganisationService(
             OrganisationRepository organisationRepository,
             ProfessionalUserRepository professionalUserRepository,
-            PaymentAccountRepository paymentAccountRepository) {
+            PaymentAccountRepository paymentAccountRepository,
+            DxAddressRepository dxAddressRepository,
+            ContactInformationRepository contactInformationRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
         this.paymentAccountRepository = paymentAccountRepository;
+        this.contactInformationRepository = contactInformationRepository;
+        this.dxAddressRepository = dxAddressRepository;
     }
 
     @Transactional
@@ -37,7 +51,11 @@ public class OrganisationService {
 
         Organisation newOrganisation = new Organisation(
                 organisationCreationRequest.getName(),
-                OrganisationStatus.PENDING.name()
+                OrganisationStatus.PENDING.name(),
+                null,
+                null,
+                null,
+                null
         );
 
         Organisation organisation = organisationRepository.save(newOrganisation);
@@ -76,15 +94,9 @@ public class OrganisationService {
                 ProfessionalUserStatus.PENDING.name(),
                 organisation);
 
-        if (userCreationRequest.getPbaAccount() != null) {
-
-            PaymentAccount paymentAccount = organisation.getPaymentAccounts().get(0);
-
-            paymentAccount.addUser(newProfessionalUser);
-        }
-
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
 }
+
