@@ -19,20 +19,29 @@ public class UserCreationRequest {
     @NotNull
     private final String email;
 
-    private final PbaAccountCreationRequest pbaAccount;
-
-
     @JsonCreator
     public UserCreationRequest(
 
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String email,
-            @JsonProperty("pbaAccount") PbaAccountCreationRequest pbaAccount) {
+            @JsonProperty("email") String email
+    ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.pbaAccount = pbaAccount;
     }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
 }

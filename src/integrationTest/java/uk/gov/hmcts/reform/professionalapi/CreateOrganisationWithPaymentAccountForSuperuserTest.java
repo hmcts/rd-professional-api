@@ -2,18 +2,23 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
@@ -34,16 +39,21 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
 
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
+    @Autowired
+    private ContactInformationRepository contactInformationRepository;
+
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 
+    @Ignore
     @Test
-    public void persists_organisation_with_valid_super_user_payment_account() {
+    public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -54,76 +64,65 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-1")
-                                .build())
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgNameFromResponse = (String) response.get("name");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
+
         assertThat(response.get("http_status")).asString().contains("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
-                .isEqualTo(orgNameFromResponse);
+        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
+                .isEqualTo(orgIdentifierResponse);
     }
 
     @Test
-    public void returns_bad_request_when_superuser_pba_number_doesnt_match_one_associated_with_the_organisation() {
+    public void persists_and_returns_400_user_email_is_not_unique() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber("pbaNumber-2")
-                                .build())
                         .build())
-                .build();
-
-        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).asString().contains("400");
-
-        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
-        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
-        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
-    }
-
-    @Test
-    public void returns_bad_request_when_superuser_pba_number_null() {
-
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
                         .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number1")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("company")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .pbaAccount(aPbaPaymentAccount()
-                                .pbaNumber(null)
-                                .build())
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
                 .build();
-
-        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response.get("http_status")).asString().contains("400");
-
-        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
-        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
-        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response2.get("http_status")).isEqualTo("400");
     }
-
 }
