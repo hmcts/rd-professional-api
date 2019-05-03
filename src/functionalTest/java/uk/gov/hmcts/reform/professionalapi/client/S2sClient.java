@@ -12,6 +12,9 @@ import io.restassured.response.Response;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class S2sClient {
 
     private final String              s2sUrl;
@@ -31,22 +34,24 @@ public class S2sClient {
      * @return s2s JWT token.
      */
     public String signIntoS2S() {
-        Map<String, Object> params = ImmutableMap.of(
-                                                     "microservice", this.microserviceName,
+        Map<String, Object> params = ImmutableMap.of("microservice",
+                                                     this.microserviceName,
                                                      "oneTimePassword",
                                                      authenticator.getTotpPassword(this.microserviceKey));
 
         Response response = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(this.s2sUrl)
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .body(params)
-            .post("/lease")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(this.s2sUrl)
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(params)
+                .post("/lease")
+                .andReturn();
 
         assertThat(response.getStatusCode()).isEqualTo(200);
 
-        return response.getBody().print();
+        String jwtToken = response.getBody().asString();
+        log.debug("Got JWT from S2S service: ", jwtToken);
+        return jwtToken;
     }
 }
