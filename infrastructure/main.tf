@@ -103,7 +103,6 @@ module "rd_professional_api" {
     POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
     POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
-    S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
 
     S2S_URL = "${local.s2s_url}"
 
