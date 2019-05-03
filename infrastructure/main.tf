@@ -28,29 +28,54 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
+data "azurerm_key_vault" "s2s_key_vault" {
+  name = "s2s-${local.local_env}"
+  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
+}
+
 data "azurerm_key_vault_secret" "s2s_microservice" {
   name = "s2s-microservice"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_url" {
   name = "s2s-url"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
-  vault_uri = "${data.azurerm_key_vault_secret.s2s_url.value}"
+  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "postgres_username" {
-  name = "postgres-username"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name      = "${var.component}-POSTGRES-USER"
+  value     = "${module.db-professional-ref-data.user_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "postgres_password" {
-  name = "postgres-password"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name      = "${var.component}-POSTGRES-PASS"
+  value     = "${module.db-professional-ref-data.postgresql_password}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name      = "${var.component}-POSTGRES-HOST"
+  value     = "${module.db-professional-ref-data.host_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name      = "${var.component}-POSTGRES-PORT"
+  value     = "5432"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name      = "${var.component}-POSTGRES-DATABASE"
+  value     = "${module.db-professional-ref-data.postgresql_database}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 module "db-professional-ref-data" {
@@ -58,8 +83,8 @@ module "db-professional-ref-data" {
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
-  postgresql_user = "${var.postgresql_user}"
-  database_name = "${var.database_name}"
+  postgresql_user = "dbrefdata"
+  database_name = "dbrefdata"
   common_tags = "${var.common_tags}"
 }
 
