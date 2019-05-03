@@ -7,4 +7,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 public interface OrganisationRepository extends JpaRepository<Organisation, UUID> {
 
     Organisation findByName(String name);
+
+    Organisation findByOrganisationIdentifier(UUID organisationIdentifier);
 }
