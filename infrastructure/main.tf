@@ -14,7 +14,6 @@ locals {
   key_vault_name = "${var.env == "preview" || var.env == "spreview" ? local.preview_vault_name : local.non_preview_vault_name}"
 
   s2s_url = "http://rpe-service-auth-provider-${local.local_env}.service.core-compute-${local.local_env}.internal"
-  s2s_vault_url = "https://s2s-${local.local_env}.vault.azure.net/"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -28,11 +27,6 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
-data "azurerm_key_vault" "s2s_key_vault" {
-  name = "s2s-${local.local_env}"
-  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
-}
-
 data "azurerm_key_vault_secret" "s2s_microservice" {
   name = "s2s-microservice"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
@@ -41,11 +35,6 @@ data "azurerm_key_vault_secret" "s2s_microservice" {
 data "azurerm_key_vault_secret" "s2s_url" {
   name = "s2s-url"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "s2s_secret" {
-  name = "microservicekey-rd-professional-api"
-  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
@@ -114,7 +103,6 @@ module "rd_professional_api" {
     POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
     POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
-    S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
 
     S2S_URL = "${local.s2s_url}"
 
