@@ -17,3 +17,7 @@ output "vaultName" {
 output "vaultUri" {
   value = "${local.s2s_vault_uri}"
 }
+
+output "application_insights_instrumentation_key" {
+  value = "${data.azurerm_application_insights.rd-appinsights.instrumentation_key}"
+}
