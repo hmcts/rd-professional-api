@@ -38,7 +38,6 @@ public class DxAddressCreationRequestTest {
         assertThat(dxAddressCreationRequest.getDxExchange()).isEqualTo("some-exchange");
     }
 
-
     @Test
     public void does_not_create_dx_address_creation_request_when_number_does_not_have_a_space() {
 
