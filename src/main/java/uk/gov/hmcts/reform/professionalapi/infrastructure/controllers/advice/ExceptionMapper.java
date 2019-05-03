@@ -55,7 +55,7 @@ public class ExceptionMapper {
     protected ResponseEntity<String> handleException(
                                                      HttpServletRequest request,
                                                      Exception e) {
-        LOG.error("Exception: {}", e);
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        LOG.error("Exception: ", e);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
