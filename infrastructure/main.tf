@@ -79,6 +79,11 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+data "azurerm_application_insights" "rd-appinsights" {
+  name                = "${var.product}-${var.local_env}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+}
+
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
