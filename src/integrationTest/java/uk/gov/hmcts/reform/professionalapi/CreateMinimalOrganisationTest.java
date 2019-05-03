@@ -6,10 +6,12 @@ import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.req
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
@@ -68,12 +70,12 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo(nameFromResponse);
 
         assertThat(nameFromResponse).isEqualTo("some-org-name");
-        assertThat((List<String>)response.get("userIds"))
+        assertThat((List<String>) response.get("userIds"))
                 .containsExactly(persistedSuperUser.getId().toString());
     }
 
     @Test
-    public void returns_400_when_mandatory_data_not_present() {
+    public void returns_500_when_mandatory_data_not_present() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
@@ -87,7 +89,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isEqualTo("");
 
         assertThat(organisationRepository.findAll()).isEmpty();
