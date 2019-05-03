@@ -75,7 +75,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     }
 
     @Test
-    public void returns_500_when_mandatory_data_not_present() {
+    public void returns_400_when_mandatory_data_not_present() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
@@ -89,14 +89,14 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isEqualTo("");
 
         assertThat(organisationRepository.findAll()).isEmpty();
     }
 
     @Test
-    public void returns_400_when_database_constraint_violated() {
+    public void returns_500_when_database_constraint_violated() {
 
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
@@ -112,7 +112,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isEqualTo("");
 
         assertThat(organisationRepository.findAll()).isEmpty();
