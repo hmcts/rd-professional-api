@@ -23,7 +23,7 @@ public class DxAddressCreationRequestValidator implements OrganisationRequestVal
                             String[] dxNumberToken = dxAdd.getDxNumber().split(" ");
                             String dxNumberDigits = dxNumberToken[1];
                             if (dxNumberDigits == null || dxNumberDigits.length() != 10) {
-                                log.error("DX Address Number should contain 10 numerical digits");
+                                log.error("DX Address Number should contain ten numerical digits");
                                 isDxRequestValid = false;
                             }
                             try {
