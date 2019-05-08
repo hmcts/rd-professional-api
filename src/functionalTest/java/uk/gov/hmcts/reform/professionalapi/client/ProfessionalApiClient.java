@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -81,7 +82,7 @@ public class ProfessionalApiClient {
                         .superUser(aUserCreationRequest()
                                 .firstName("some-fname")
                                 .lastName("some-lname")
-                                .email("someone@somewhere.com")
+                                .email(randomAlphabetic(10) + "@somewhere.com")
                                 .build())
                         .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                                 .addressLine1("addressLine1").build()))
