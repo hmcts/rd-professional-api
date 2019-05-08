@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS dbrefdata;
+
 CREATE TABLE ORGANISATION(
 	ID uuid,
 	NAME varchar(255),
