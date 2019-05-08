@@ -6,24 +6,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity(name = "ORGANISATION")
+@Entity(name = "organisation")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -78,12 +70,12 @@ public class Organisation {
     private UUID organisationIdentifier;
 
     public Organisation(
-                        String name,
-                        String status,
-                        String sraId,
-                        String companyNumber,
-                        Boolean sraRegulated,
-                        String companyUrl) {
+            String name,
+            String status,
+            String sraId,
+            String companyNumber,
+            Boolean sraRegulated,
+            String companyUrl) {
 
         this.name = name;
         this.status = status;

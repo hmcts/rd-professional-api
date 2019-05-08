@@ -2,26 +2,16 @@ package uk.gov.hmcts.reform.professionalapi.domain.entities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity(name = "PROFESSIONAL_USER")
+@Entity(name = "professional_user")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -61,11 +51,11 @@ public class ProfessionalUser {
     private LocalDateTime created;
 
     public ProfessionalUser(
-                            String firstName,
-                            String lastName,
-                            String emailAddress,
-                            String status,
-                            Organisation organisation) {
+            String firstName,
+            String lastName,
+            String emailAddress,
+            String status,
+            Organisation organisation) {
 
         this.firstName = firstName;
         this.lastName = lastName;
