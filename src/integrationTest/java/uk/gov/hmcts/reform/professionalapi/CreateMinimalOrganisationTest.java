@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,16 +16,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.entities.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
@@ -112,7 +112,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body")).isEqualTo("");
+        assertThat(response.get("response_body").toString().contains("Bad Request"));
 
         assertThat(organisationRepository.findAll()).isEmpty();
     }
