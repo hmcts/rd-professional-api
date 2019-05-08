@@ -1,141 +1,142 @@
-CREATE SCHEMA IF NOT EXISTS dbrefdata;
+-- NB Flyway requires lowercase for table names
+create schema if not exists dbrefdata;
 
-CREATE TABLE ORGANISATION(
-	ID uuid,
-	NAME varchar(255),
-	STATUS varchar(50),
-	SRA_ID varchar(255),
-	SRA_REGULATED boolean,
-	COMPANY_NUMBER varchar(8),
-	COMPANY_URL varchar(512),
-	ORGANISATION_IDENTIFIER uuid,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT ORGANISATION_PK PRIMARY KEY (ID),
-	CONSTRAINT ORGANISATION_IDENTIFIER_UQ1 UNIQUE (ORGANISATION_IDENTIFIER),
-	CONSTRAINT SRA_ID_UQ1 UNIQUE (SRA_ID),
-	CONSTRAINT COMPANY_NUMBER_UQ1 UNIQUE (COMPANY_NUMBER),
-	CONSTRAINT COMPANY_URL_UQ1 UNIQUE (COMPANY_URL)
+create table organisation(
+	id uuid,
+	name varchar(255),
+	status varchar(50),
+	sra_id varchar(255),
+	sra_regulated boolean,
+	company_number varchar(8),
+	company_url varchar(512),
+	organisation_identifier uuid,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint organisation_pk primary key (id),
+	constraint organisation_identifier_uq1 unique (organisation_identifier),
+	constraint sra_id_uq1 unique (sra_id),
+	constraint company_number_uq1 unique (company_number),
+	constraint company_url_uq1 unique (company_url)
 );
 
-CREATE TABLE PROFESSIONAL_USER(
-	ID uuid NOT NULL,
-	FIRST_NAME varchar(255) NOT NULL,
-	LAST_NAME varchar(255) NOT NULL,
-	EMAIL_ADDRESS varchar(255) NOT NULL,
-	STATUS varchar(50) NOT NULL,
-	ORGANISATION_ID uuid NOT NULL,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT PROFESSIONAL_USER_PK PRIMARY KEY (ID),
-	CONSTRAINT EMAIL_ADDRESS_UQ1 UNIQUE (EMAIL_ADDRESS)
+create table professional_user(
+	id uuid not null,
+	first_name varchar(255) not null,
+	last_name varchar(255) not null,
+	email_address varchar(255) not null,
+	status varchar(50) not null,
+	organisation_id uuid not null,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint professional_user_pk primary key (id),
+	constraint email_address_uq1 unique (email_address)
 );
 
-CREATE TABLE PAYMENT_ACCOUNT(
-	ID uuid NOT NULL,
-	PBA_NUMBER varchar(255) NOT NULL,
-	ORGANISATION_ID uuid NOT NULL,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT PBA_NUMBER_UQ UNIQUE (PBA_NUMBER),
-	CONSTRAINT PAYMENT_ACCOUNT_PK PRIMARY KEY (ID)
+create table payment_account(
+	id uuid not null,
+	pba_number varchar(255) not null,
+	organisation_id uuid not null,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint pba_number_uq unique (pba_number),
+	constraint payment_account_pk primary key (id)
 );
 
-CREATE TABLE CONTACT_INFORMATION(
-	ID uuid NOT NULL,
-	ADDRESS_LINE1 varchar(150) NOT NULL,
-	ADDRESS_LINE2 varchar(50),
-	ADDRESS_LINE3 varchar(50),
-	TOWN_CITY varchar(50),
-	COUNTRY varchar(50),
-	COUNTY varchar(50),
-	POSTCODE varchar(14),
-	ORGANISATION_ID uuid NOT NULL,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT CONTACT_INFORMATION_PK PRIMARY KEY (ID)
+create table contact_information(
+	id uuid not null,
+	address_line1 varchar(150) not null,
+	address_line2 varchar(50),
+	address_line3 varchar(50),
+	town_city varchar(50),
+	country varchar(50),
+	county varchar(50),
+	postcode varchar(14),
+	organisation_id uuid not null,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint contact_information_pk primary key (id)
 );
 
-CREATE TABLE DX_ADDRESS(
-	ID uuid,
-	DX_EXCHANGE varchar(20) NOT NULL,
-	DX_NUMBER varchar(13) NOT NULL,
-	CONTACT_INFORMATION_ID uuid NOT NULL,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT DX_ADDRESS_PK PRIMARY KEY (ID)
+create table dx_address(
+	id uuid,
+	dx_exchange varchar(20) not null,
+	dx_number varchar(13) not null,
+	contact_information_id uuid not null,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint dx_address_pk primary key (id)
 );
 
-CREATE TABLE USER_ATTRIBUTE(
-	ID uuid,
-	PROFESSIONAL_USER_ID uuid,
-	PRD_ENUM_CODE smallint,
-	PRD_ENUM_TYPE varchar(50),
-	CONSTRAINT PROFESSIONAL_USER_PK1 PRIMARY KEY (ID)
+create table user_attribute(
+	id uuid,
+	professional_user_id uuid,
+	prd_enum_code smallint,
+	prd_enum_type varchar(50),
+	constraint professional_user_pk1 primary key (id)
 );
 
-CREATE TABLE PRD_ENUM(
-	ENUM_CODE smallint NOT NULL,
-	ENUM_NAME varchar(50) NOT NULL,
-	ENUM_TYPE varchar(50) NOT NULL,
-	ENUM_DESC varchar(1024),
-	CONSTRAINT PRD_ENUM_UQ1 PRIMARY KEY (ENUM_CODE,ENUM_TYPE)
+create table prd_enum(
+	enum_code smallint not null,
+	enum_name varchar(50) not null,
+	enum_type varchar(50) not null,
+	enum_desc varchar(1024),
+	constraint prd_enum_uq1 primary key (enum_code,enum_type)
 );
 
-CREATE TABLE USER_ACCOUNT_MAP(
-	PROFESSIONAL_USER_ID uuid,
-	PAYMENT_ACCOUNT_ID uuid,
-	DEFAULTED boolean NOT NULL DEFAULT FALSE,
-	CONSTRAINT PBA_MAPPING_PK PRIMARY KEY (PROFESSIONAL_USER_ID,PAYMENT_ACCOUNT_ID)
+create table user_account_map(
+	professional_user_id uuid,
+	payment_account_id uuid,
+	defaulted boolean not null default false,
+	constraint pba_mapping_pk primary key (professional_user_id,payment_account_id)
 );
 
-CREATE TABLE USER_ADDRESS_MAP(
-	PROFESSIONAL_USER_ID uuid,
-	CONTACT_ADDRESS_ID uuid,
-	DEFAULTED boolean NOT NULL,
-	CONSTRAINT ADDRESS_MAPPING_PK PRIMARY KEY (PROFESSIONAL_USER_ID,CONTACT_ADDRESS_ID)
+create table user_address_map(
+	professional_user_id uuid,
+	contact_address_id uuid,
+	defaulted boolean not null,
+	constraint address_mapping_pk primary key (professional_user_id,contact_address_id)
 );
 
-CREATE TABLE DOMAIN(
-	ID uuid,
-	ORGANISATION_ID uuid NOT NULL,
-	DOMAIN_IDENTIFIER uuid NOT NULL,
-	DOMAIN_NAME varchar(50) NOT NULL,
-	LAST_UPDATED timestamp NOT NULL,
-	CREATED timestamp NOT NULL,
-	CONSTRAINT DOMAIN_PK PRIMARY KEY (ID),
-	CONSTRAINT DOMAIN_IDENTIFIER_UQ1 UNIQUE (DOMAIN_IDENTIFIER)
+create table domain(
+	id uuid,
+	organisation_id uuid not null,
+	domain_identifier uuid not null,
+	domain_name varchar(50) not null,
+	last_updated timestamp not null,
+	created timestamp not null,
+	constraint domain_pk primary key (id),
+	constraint domain_identifier_uq1 unique (domain_identifier)
 );
 
-ALTER TABLE PROFESSIONAL_USER ADD CONSTRAINT ORGANISATION_FK1 FOREIGN KEY (ORGANISATION_ID)
-REFERENCES ORGANISATION (ID);
+alter table professional_user add constraint organisation_fk1 foreign key (organisation_id)
+references organisation (id);
 
-ALTER TABLE PAYMENT_ACCOUNT ADD CONSTRAINT ORGANISATION_FK2 FOREIGN KEY (ORGANISATION_ID)
-REFERENCES ORGANISATION (ID);
+alter table payment_account add constraint organisation_fk2 foreign key (organisation_id)
+references organisation (id);
 
-ALTER TABLE CONTACT_INFORMATION ADD CONSTRAINT ORGANISATION_FK3 FOREIGN KEY (ORGANISATION_ID)
-REFERENCES ORGANISATION (ID);
+alter table contact_information add constraint organisation_fk3 foreign key (organisation_id)
+references organisation (id);
 
-ALTER TABLE DX_ADDRESS ADD CONSTRAINT ORGANISATION_FK4 FOREIGN KEY (CONTACT_INFORMATION_ID)
-REFERENCES CONTACT_INFORMATION (ID);
+alter table dx_address add constraint organisation_fk4 foreign key (contact_information_id)
+references contact_information (id);
 
-ALTER TABLE USER_ATTRIBUTE ADD CONSTRAINT PROFESSIONAL_USER_FK1 FOREIGN KEY (PROFESSIONAL_USER_ID)
-REFERENCES PROFESSIONAL_USER (ID);
+alter table user_attribute add constraint professional_user_fk1 foreign key (professional_user_id)
+references professional_user (id);
 
-ALTER TABLE USER_ATTRIBUTE ADD CONSTRAINT PRD_ENUM_FK1 FOREIGN KEY (PRD_ENUM_CODE,PRD_ENUM_TYPE)
-REFERENCES PRD_ENUM (ENUM_CODE,ENUM_TYPE) ;
+alter table user_attribute add constraint prd_enum_fk1 foreign key (prd_enum_code,prd_enum_type)
+references prd_enum (enum_code,enum_type) ;
 
-ALTER TABLE USER_ACCOUNT_MAP ADD CONSTRAINT PBA_FK1 FOREIGN KEY (PAYMENT_ACCOUNT_ID)
-REFERENCES PAYMENT_ACCOUNT (ID);
+alter table user_account_map add constraint pba_fk1 foreign key (payment_account_id)
+references payment_account (id);
 
-ALTER TABLE USER_ACCOUNT_MAP ADD CONSTRAINT PROFESSIONAL_USER_FK4 FOREIGN KEY (PROFESSIONAL_USER_ID)
-REFERENCES PROFESSIONAL_USER (ID);
+alter table user_account_map add constraint professional_user_fk4 foreign key (professional_user_id)
+references professional_user (id);
 
-ALTER TABLE USER_ADDRESS_MAP ADD CONSTRAINT PROFESSIONAL_USER_FK5 FOREIGN KEY (PROFESSIONAL_USER_ID)
-REFERENCES PROFESSIONAL_USER (ID);
+alter table user_address_map add constraint professional_user_fk5 foreign key (professional_user_id)
+references professional_user (id);
 
-ALTER TABLE USER_ADDRESS_MAP ADD CONSTRAINT CONTACT_ADDRESS_FK1 FOREIGN KEY (CONTACT_ADDRESS_ID)
-REFERENCES CONTACT_INFORMATION (ID);
+alter table user_address_map add constraint contact_address_fk1 foreign key (contact_address_id)
+references contact_information (id);
 
-ALTER TABLE DOMAIN ADD CONSTRAINT ORGANISATION_FK6 FOREIGN KEY (ORGANISATION_ID)
-REFERENCES ORGANISATION (ID);
+alter table domain add constraint organisation_fk6 foreign key (organisation_id)
+references organisation (id);
