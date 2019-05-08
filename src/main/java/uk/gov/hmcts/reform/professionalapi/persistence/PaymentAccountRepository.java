@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.service.persistence;
+package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import java.util.List;
 import java.util.UUID;

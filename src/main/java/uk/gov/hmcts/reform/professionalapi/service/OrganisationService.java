@@ -19,11 +19,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 
 
 @Service

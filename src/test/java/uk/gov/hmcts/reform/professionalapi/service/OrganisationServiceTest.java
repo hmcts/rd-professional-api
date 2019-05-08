@@ -25,11 +25,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 
 
 public class OrganisationServiceTest {
