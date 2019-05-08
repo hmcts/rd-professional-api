@@ -165,15 +165,15 @@ jacocoTestReport {
 pitest {
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
     excludedClasses = [
-            'uk.gov.hmcts.reform.professionalapi.infrastructure.config.*',
-            'uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.*',
+            'uk.gov.hmcts.reform.professionalapi.configuration.*',
+            'uk.gov.hmcts.reform.professionalapi.controller.*',
             'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     mutationThreshold = 90
-}
+   }
 
 project.tasks['pitest'].group = "Verification"
 
@@ -185,8 +185,8 @@ sonarqube {
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/config/**," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/infrastructure/SystemDateProvider.java," +
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
