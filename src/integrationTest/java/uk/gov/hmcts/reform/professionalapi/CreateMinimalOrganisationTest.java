@@ -16,6 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.persistence.ContactInformationRepository;
@@ -23,9 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressReposito
 import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 

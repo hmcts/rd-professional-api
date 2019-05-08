@@ -14,22 +14,23 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.service.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
+
 
 public class OrganisationServiceTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);

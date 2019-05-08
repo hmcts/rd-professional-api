@@ -6,6 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -18,12 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.service.persistence.DxAddressReposito
 import uk.gov.hmcts.reform.professionalapi.service.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+
 
 @Service
 @Slf4j
