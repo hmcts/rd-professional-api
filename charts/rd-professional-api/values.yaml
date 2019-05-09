@@ -10,6 +10,8 @@ java:
     LOGBACK_REQUIRE_ERROR_CODE: 'false'
   image: 'https://hmcts.azurecr.io/hmcts/draft-store-service:latest'
   postgresql:
+    image:
+      tag: 10.7.0-r68
     postgresqlUsername: dbrefdata
     postgresqlPassword: dbrefdata
     postgresqlDatabase: dbrefdata
