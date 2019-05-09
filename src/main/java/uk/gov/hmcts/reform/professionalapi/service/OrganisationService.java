@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-
 
 @Service
 @Slf4j

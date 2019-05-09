@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 
 
 @RequestMapping(
@@ -25,13 +27,16 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 public class OrganisationController {
 
     private final OrganisationService organisationService;
+    private final PaymentAccountService paymentAccountservice;
     private final OrganisationCreationRequestValidator validator;
 
     public OrganisationController(
             OrganisationService organisationService,
+            PaymentAccountService paymentAccountservice,
             OrganisationCreationRequestValidator validator) {
 
         this.organisationService = organisationService;
+        this.paymentAccountservice = paymentAccountservice;
         this.validator = validator;
     }
 
@@ -63,4 +68,21 @@ public class OrganisationController {
                 .status(201)
                 .body(organisationResponse);
     }
+
+    @ApiOperation("Retrieves an organisations payment accounts by super user email")
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "The organisations associated payment accounts",
+                    response = OrganisationPbaResponse.class
+            )
+    })
+    @GetMapping(path = "/pbas")
+    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountBySuperUserEmail(@RequestParam("email") String email) {
+        log.info("Received request to retrieve an organisations payment accounts by email...");
+        return ResponseEntity
+                .status(201)
+                .body(new OrganisationPbaResponse(paymentAccountservice.findPaymentAccountsByEmail(email)));
+    }
+
 }
