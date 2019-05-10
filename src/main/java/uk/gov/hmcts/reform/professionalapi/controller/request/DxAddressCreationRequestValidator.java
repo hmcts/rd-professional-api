@@ -7,9 +7,10 @@ import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
-public class DxAddressCreationRequestValidator implements OrganisationRequestValidator {
+public class DxAddressCreationRequestValidator implements IRequestValidator {
 
     Boolean  isDxRequestValid = true;
+    //TODO refactor to use validation object
 
     @Override
     public void validate(OrganisationCreationRequest organisationCreationRequest) {

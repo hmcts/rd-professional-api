@@ -23,7 +23,6 @@ public class DxAddressCreationRequest {
     @Builder(builderMethodName = "dxAddressCreationRequest")
     @JsonCreator
     public DxAddressCreationRequest(
-
             @JsonProperty("dxNumber") String dxNumber, @JsonProperty("dxExchange") String dxExchange) {
 
         this.dxNumber = dxNumber;

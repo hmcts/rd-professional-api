@@ -21,7 +21,6 @@ public class UserCreationRequest {
 
     @JsonCreator
     public UserCreationRequest(
-
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email

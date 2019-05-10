@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class OrganisationService {
 
     private final OrganisationRepository organisationRepository;
@@ -35,20 +37,6 @@ public class OrganisationService {
     private final PaymentAccountRepository paymentAccountRepository;
     private final DxAddressRepository dxAddressRepository;
     private final ContactInformationRepository contactInformationRepository;
-
-    public OrganisationService(
-            OrganisationRepository organisationRepository,
-            ProfessionalUserRepository professionalUserRepository,
-            PaymentAccountRepository paymentAccountRepository,
-            DxAddressRepository dxAddressRepository,
-            ContactInformationRepository contactInformationRepository) {
-
-        this.organisationRepository = organisationRepository;
-        this.professionalUserRepository = professionalUserRepository;
-        this.paymentAccountRepository = paymentAccountRepository;
-        this.contactInformationRepository = contactInformationRepository;
-        this.dxAddressRepository = dxAddressRepository;
-    }
 
     @Transactional
     public OrganisationResponse createOrganisationFrom(
