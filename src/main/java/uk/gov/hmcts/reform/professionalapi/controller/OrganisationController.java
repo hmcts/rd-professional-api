@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +24,12 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 )
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class OrganisationController {
 
-    private final OrganisationService organisationService;
-    private final OrganisationCreationRequestValidator validator;
+    private OrganisationService organisationService;
 
-    public OrganisationController(
-            OrganisationService organisationService,
-            OrganisationCreationRequestValidator validator) {
-
-        this.organisationService = organisationService;
-        this.validator = validator;
-    }
+    private OrganisationCreationRequestValidator validator;
 
     @ApiOperation("Creates an organisation")
     @ApiResponses({

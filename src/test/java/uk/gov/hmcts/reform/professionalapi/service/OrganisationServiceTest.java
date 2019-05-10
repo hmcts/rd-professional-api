@@ -92,12 +92,15 @@ public class OrganisationServiceTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
+
         organisationService = new OrganisationService(
                 organisationRepository,
                 professionalUserRepository,
                 paymentAccountRepository,
                 dxAddressRepository,
                 contactInformationRepository);
+
+
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(

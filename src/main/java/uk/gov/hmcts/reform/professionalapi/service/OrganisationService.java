@@ -38,6 +38,7 @@ public class OrganisationService {
     private final DxAddressRepository dxAddressRepository;
     private final ContactInformationRepository contactInformationRepository;
 
+
     @Transactional
     public OrganisationResponse createOrganisationFrom(
             OrganisationCreationRequest organisationCreationRequest) {
