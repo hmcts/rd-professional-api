@@ -30,17 +30,4 @@ public class UserCreationRequest {
         this.lastName = lastName;
         this.email = email;
     }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
 }

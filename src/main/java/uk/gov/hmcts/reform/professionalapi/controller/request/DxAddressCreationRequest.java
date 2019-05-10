@@ -29,20 +29,9 @@ public class DxAddressCreationRequest {
         this.dxExchange = dxExchange;
         this.isDxRequestValid = isDxRequestValid;
     }
-
-    public String getDxNumber() {
-        return dxNumber;
-    }
-
-    public String getDxExchange() {
-        return dxExchange;
-    }
-
+    
     public void setIsDxRequestValid(Boolean isDxRequestValid) {
         this.isDxRequestValid = isDxRequestValid;
     }
 
-    public Boolean getIsDxRequestValid() {
-        return isDxRequestValid;
-    }
 }
