@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -33,14 +34,14 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
-public class OrganisationServiceTest {
+public class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
     private final DxAddressCreationRequest dxAddressCreationRequest = mock(DxAddressCreationRequest.class);
-    private OrganisationServiceImpl organisationService = mock(OrganisationServiceImpl.class);
+    private OrganisationServiceImpl organisationServiceImpl = mock(OrganisationServiceImpl.class);
 
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
@@ -56,6 +57,7 @@ public class OrganisationServiceTest {
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
+    private List<Organisation> organisations;
 
     @Before
     public void setUp() {
@@ -70,6 +72,8 @@ public class OrganisationServiceTest {
         contactInformationCreationRequests = new ArrayList<>();
 
         dxAddressRequests = new ArrayList<>();
+
+        organisations = new ArrayList<Organisation>();
 
         pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
@@ -93,7 +97,7 @@ public class OrganisationServiceTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        organisationService = new OrganisationServiceImpl(
+        organisationServiceImpl = new OrganisationServiceImpl(
                 organisationRepository,
                 professionalUserRepository,
                 paymentAccountRepository,
@@ -127,13 +131,15 @@ public class OrganisationServiceTest {
 
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
+        when(organisationRepository.findAll())
+                .thenReturn(organisations);
     }
 
     @Test
     public void saves_an_organisation() {
 
         OrganisationResponse organisationResponse =
-                organisationService.createOrganisationFrom(organisationCreationRequest);
+                organisationServiceImpl.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
 
@@ -161,5 +167,19 @@ public class OrganisationServiceTest {
         verify(
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void retrieve_an_organisations() {
+
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImpl.retrieveOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findAll();
+
     }
 }
