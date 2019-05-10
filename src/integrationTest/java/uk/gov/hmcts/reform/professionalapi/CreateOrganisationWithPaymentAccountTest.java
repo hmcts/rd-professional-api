@@ -46,9 +46,9 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
-        contactInformationRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 
