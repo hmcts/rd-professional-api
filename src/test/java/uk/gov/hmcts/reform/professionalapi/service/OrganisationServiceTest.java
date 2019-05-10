@@ -41,6 +41,7 @@ public class OrganisationServiceTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
+    private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -123,7 +124,7 @@ public class OrganisationServiceTest {
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
 
-        when(organisationRepository.findByOrganisationIdentifier( UUID.randomUUID()))
+		when(organisationRepository.findByOrganisationIdentifier(any()))
                 .thenReturn(organisation);
     }
 
@@ -171,7 +172,7 @@ public class OrganisationServiceTest {
 
         verify(
                 organisationRepository,
-                times(1)).findByOrganisationIdentifier(UUID.randomUUID());
+                times(1)).findByOrganisationIdentifier(any());
 
         verify(
                 organisationRepository,
