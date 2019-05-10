@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrganisationCreationRequestValidator {
 
-    private final List<OrganisationRequestValidator> validators;
+    private final List<RequestValidator> validators;
 
-    public OrganisationCreationRequestValidator(List<OrganisationRequestValidator> validators) {
+    public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
     }
 
