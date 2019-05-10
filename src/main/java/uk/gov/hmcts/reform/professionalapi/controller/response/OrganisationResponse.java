@@ -14,7 +14,6 @@ public class OrganisationResponse {
     public OrganisationResponse(Organisation organisation) {
 
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
-
     }
 
     public UUID getOrganisationIdentifier() {

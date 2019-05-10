@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
 @RequestMapping(
@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 @AllArgsConstructor
 public class OrganisationController {
 
-    private OrganisationService organisationService;
+    private OrganisationServiceImpl organisationService;
 
     private OrganisationCreationRequestValidator validator;
 

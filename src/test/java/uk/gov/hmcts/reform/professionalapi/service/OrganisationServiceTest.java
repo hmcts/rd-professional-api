@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
 public class OrganisationServiceTest {
@@ -39,6 +40,7 @@ public class OrganisationServiceTest {
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
     private final DxAddressCreationRequest dxAddressCreationRequest = mock(DxAddressCreationRequest.class);
+    private OrganisationServiceImpl organisationService = mock(OrganisationServiceImpl.class);
 
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
@@ -54,7 +56,6 @@ public class OrganisationServiceTest {
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
-    private OrganisationService organisationService;
 
     @Before
     public void setUp() {
@@ -92,8 +93,7 @@ public class OrganisationServiceTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-
-        organisationService = new OrganisationService(
+        organisationService = new OrganisationServiceImpl(
                 organisationRepository,
                 professionalUserRepository,
                 paymentAccountRepository,
