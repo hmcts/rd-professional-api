@@ -46,10 +46,4 @@ public class DxAddress {
     @CreationTimestamp
     @Column(name = "CREATED")
     private LocalDateTime created;
-
-    public DxAddress(String dxNumber, String dxExchange, ContactInformation contactInformation) {
-        this.dxNumber = dxNumber;
-        this.dxExchange = dxExchange;
-        this.contactInformation = contactInformation;
-    }
 }

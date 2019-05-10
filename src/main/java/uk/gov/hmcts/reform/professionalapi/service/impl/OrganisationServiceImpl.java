@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
+@AllArgsConstructor
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
@@ -37,33 +38,13 @@ public class OrganisationServiceImpl implements OrganisationService {
     DxAddressRepository dxAddressRepository;
     ContactInformationRepository contactInformationRepository;
 
-    @Autowired
-    public OrganisationServiceImpl(
-            OrganisationRepository organisationRepository,
-            ProfessionalUserRepository professionalUserRepository,
-            PaymentAccountRepository paymentAccountRepository,
-            DxAddressRepository dxAddressRepository,
-            ContactInformationRepository contactInformationRepository) {
-
-        this.organisationRepository = organisationRepository;
-        this.professionalUserRepository = professionalUserRepository;
-        this.paymentAccountRepository = paymentAccountRepository;
-        this.contactInformationRepository = contactInformationRepository;
-        this.dxAddressRepository = dxAddressRepository;
-    }
-
     @Transactional
     public OrganisationResponse createOrganisationFrom(
             OrganisationCreationRequest organisationCreationRequest) {
 
-        Organisation newOrganisation = new Organisation(
-                organisationCreationRequest.getName(),
-                OrganisationStatus.PENDING.name(),
-                organisationCreationRequest.getSraId(),
-                organisationCreationRequest.getCompanyNumber(),
-                organisationCreationRequest.getSraRegulated(),
-                organisationCreationRequest.getCompanyUrl()
-        );
+        Organisation newOrganisation = new Organisation();
+
+        newOrganisation.setStatus(OrganisationStatus.PENDING.name());
 
         Organisation organisation = organisationRepository.save(newOrganisation);
 
@@ -84,7 +65,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (pbaAccountCreationRequest != null) {
             pbaAccountCreationRequest.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
+                PaymentAccount paymentAccount = new PaymentAccount();
+                paymentAccount.setPbaNumber(pbaAccount.getPbaNumber());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
@@ -96,12 +78,11 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
 
-        ProfessionalUser newProfessionalUser = new ProfessionalUser(
-                userCreationRequest.getFirstName(),
-                userCreationRequest.getLastName(),
-                userCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING.name(),
-                organisation);
+        ProfessionalUser newProfessionalUser = new ProfessionalUser();
+        newProfessionalUser.setFirstName(userCreationRequest.getFirstName());
+        newProfessionalUser.setLastName(userCreationRequest.getLastName());
+        newProfessionalUser.setEmailAddress(userCreationRequest.getEmail());
+        newProfessionalUser.setStatus(ProfessionalUserStatus.PENDING.name());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
@@ -114,14 +95,15 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
-                ContactInformation newContactInformation = new ContactInformation(contactInfo.getAddressLine1(),
-                        contactInfo.getAddressLine2(),
-                        contactInfo.getAddressLine3(),
-                        contactInfo.getTownCity(),
-                        contactInfo.getCounty(),
-                        contactInfo.getCountry(),
-                        contactInfo.getPostCode(),
-                        organisation);
+                ContactInformation newContactInformation = new ContactInformation();
+                newContactInformation.setAddressLine1(contactInfo.getAddressLine1());
+                newContactInformation.setAddressLine2(contactInfo.getAddressLine2());
+                newContactInformation.setAddressLine3(contactInfo.getAddressLine3());
+                newContactInformation.setTownCity(contactInfo.getTownCity());
+                newContactInformation.setCounty(contactInfo.getCounty());
+                newContactInformation.setCountry(contactInfo.getCountry());
+                newContactInformation.setPostCode(contactInfo.getPostCode());
+                newContactInformation.setOrganisation(organisation);
 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
 
@@ -137,7 +119,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (dxAddressCreationRequest != null) {
             dxAddressCreationRequest.forEach(dxAdd -> {
                 if (dxAdd.getIsDxRequestValid()) {
-                    DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                    DxAddress dxAddress = new DxAddress();
+                    dxAddress.setDxNumber(dxAdd.getDxNumber());
+                    dxAddress.setDxExchange(dxAdd.getDxExchange());
+                    dxAddress.setContactInformation(contactInformation);
+
                     dxAddressRepository.save(dxAddress);
                     contactInformation.addDxAddress(dxAddress);
                 }

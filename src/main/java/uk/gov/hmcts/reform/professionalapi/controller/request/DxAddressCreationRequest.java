@@ -29,7 +29,7 @@ public class DxAddressCreationRequest {
         this.dxExchange = dxExchange;
         this.isDxRequestValid = isDxRequestValid;
     }
-    
+
     public void setIsDxRequestValid(Boolean isDxRequestValid) {
         this.isDxRequestValid = isDxRequestValid;
     }

@@ -69,23 +69,6 @@ public class Organisation {
     @Column(name = "ORGANISATION_IDENTIFIER")
     private UUID organisationIdentifier;
 
-    public Organisation(
-            String name,
-            String status,
-            String sraId,
-            String companyNumber,
-            Boolean sraRegulated,
-            String companyUrl) {
-
-        this.name = name;
-        this.status = status;
-        this.sraId = sraId;
-        this.companyNumber = companyNumber;
-        this.sraRegulated = sraRegulated;
-        this.companyUrl = companyUrl;
-        this.organisationIdentifier = generateUniqueOrganisationIdentifier();
-    }
-
     public void addProfessionalUser(ProfessionalUser professionalUser) {
         users.add(professionalUser);
     }
@@ -96,54 +79,6 @@ public class Organisation {
 
     public void addContactInformation(ContactInformation contactInformation) {
         contactInformations.add(contactInformation);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<ProfessionalUser> getUsers() {
-        return users;
-    }
-
-    public List<PaymentAccount> getPaymentAccounts() {
-        return paymentAccounts;
-    }
-
-    public List<ContactInformation> getContactInformation() {
-        return contactInformations;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getSraId() {
-        return sraId;
-    }
-
-    public String getCompanyNumber() {
-        return companyNumber;
-    }
-
-    public Boolean getSraRegulated() {
-        return sraRegulated;
-    }
-
-    public String getCompanyUrl() {
-        return companyUrl;
-    }
-
-    public UUID getOrganisationIdentifier() {
-        return organisationIdentifier;
-    }
-
-    public void setOrganisationIdentifier(UUID organisationIdentifier) {
-        this.organisationIdentifier = organisationIdentifier;
     }
 
     public UUID generateUniqueOrganisationIdentifier() {

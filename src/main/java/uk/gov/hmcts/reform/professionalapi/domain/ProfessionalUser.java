@@ -49,19 +49,4 @@ public class ProfessionalUser {
     @CreatedDate
     @Column(name = "CREATED")
     private LocalDateTime created;
-
-    public ProfessionalUser(
-            String firstName,
-            String lastName,
-            String emailAddress,
-            String status,
-            Organisation organisation) {
-
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailAddress = emailAddress;
-        this.status = status;
-        this.organisation = organisation;
-    }
-
 }

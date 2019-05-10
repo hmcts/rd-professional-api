@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.entities;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
+
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -12,34 +13,36 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 public class ContactInformationTest {
 
+    private Organisation organisation;
+
+    private ContactInformation contactInformation;
+
+    private DxAddress dxAddress;
+
+    @Before
+    public void setUp() {
+
+        organisation = new Organisation();
+        contactInformation = new ContactInformation();
+        dxAddress = new DxAddress();
+        contactInformation.setAddressLine1("some-address1");
+        contactInformation.setAddressLine2("some-address2");
+        contactInformation.setAddressLine3("some-address3");
+        contactInformation.setTownCity("some-town-city");
+        contactInformation.setCounty("some-county");
+        contactInformation.setCountry("some-country");
+        contactInformation.setPostCode("some-post-code");
+        contactInformation.setOrganisation(organisation);
+    }
+
     @Test
     public void creates_contact_information_correctly() {
 
-        Organisation organisation = mock(Organisation.class);
-
-        ContactInformation contactInformation = new ContactInformation("some-address1", "some-address2",
-                "some-address3", "some-town-city", "some-county", "some-country", "some-post-code", organisation);
-
-        assertThat(contactInformation.getAddressLine1()).isEqualTo("some-address1");
-        assertThat(contactInformation.getAddressLine2()).isEqualTo("some-address2");
-        assertThat(contactInformation.getAddressLine3()).isEqualTo("some-address3");
-        assertThat(contactInformation.getTownCity()).isEqualTo("some-town-city");
-        assertThat(contactInformation.getCounty()).isEqualTo("some-county");
-        assertThat(contactInformation.getCountry()).isEqualTo("some-country");
-        assertThat(contactInformation.getPostCode()).isEqualTo("some-post-code");
-        assertThat(contactInformation.getOrganisation()).isEqualTo(organisation);
         assertThat(contactInformation.getId()).isNull();
     }
 
     @Test
     public void adds_dx_address_into_ContactInformation_Correctly() {
-
-        DxAddress dxAddress = mock(DxAddress.class);
-
-        Organisation organisation = mock(Organisation.class);
-
-        ContactInformation contactInformation = new ContactInformation("some-address1", "some-address2",
-                "some-address3", "some-town-city", "some-county", "some-country", "some-post-code", organisation);
 
         contactInformation.addDxAddress(dxAddress);
 
@@ -53,5 +56,4 @@ public class ContactInformationTest {
 
         assertThat(contactInformation.getCreated()).isNotNull();
     }
-
 }

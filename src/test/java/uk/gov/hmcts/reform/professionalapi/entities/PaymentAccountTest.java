@@ -11,6 +11,7 @@ public class PaymentAccountTest {
 
     @Test
     public void can_set_organisation() {
+
         PaymentAccount paymentAccount = new PaymentAccount();
 
         Organisation organisation = new Organisation();
@@ -27,5 +28,4 @@ public class PaymentAccountTest {
 
         assertThat(paymentAccount.getCreated()).isNotNull();
     }
-
 }

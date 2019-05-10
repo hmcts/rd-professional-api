@@ -39,17 +39,4 @@ public class PaymentAccount {
     @CreatedDate
     @Column(name = "CREATED")
     private LocalDateTime created;
-
-    public PaymentAccount(String pbaNumber) {
-        this.pbaNumber = pbaNumber;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
-    }
-
-    public Organisation getOrganisation() {
-        return organisation;
-    }
-
 }

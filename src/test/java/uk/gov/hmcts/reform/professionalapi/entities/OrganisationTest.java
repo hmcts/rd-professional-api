@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -15,11 +17,22 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class OrganisationTest {
 
+    private Organisation organisation;
+
+    @Before
+    public void setUp() {
+
+        organisation = new Organisation();
+        organisation.setName("some-name");
+        organisation.setStatus("some-status");
+        organisation.setSraId("sra-id");
+        organisation.setCompanyNumber("company-number");
+        organisation.setSraRegulated(Boolean.FALSE);
+        organisation.setCompanyUrl("company-url");
+    }
+
     @Test
     public void creates_organisation_correctly() {
-
-        Organisation organisation = new Organisation("some-name", "some-status",
-                "sra-id","company-number",Boolean.FALSE,"company-url");
 
         assertThat(organisation.getName()).isEqualTo("some-name");
         assertThat(organisation.getStatus()).isEqualTo("some-status");
@@ -53,7 +66,6 @@ public class OrganisationTest {
 
         ProfessionalUser professionalUser = mock(ProfessionalUser.class);
 
-        Organisation organisation = new Organisation();
         organisation.addProfessionalUser(professionalUser);
 
         assertThat(organisation.getUsers())
@@ -65,11 +77,9 @@ public class OrganisationTest {
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
 
-        Organisation organisation = new Organisation();
         organisation.addPaymentAccount(paymentAccount);
 
         assertThat(organisation.getPaymentAccounts())
                 .containsExactly(paymentAccount);
     }
-
 }

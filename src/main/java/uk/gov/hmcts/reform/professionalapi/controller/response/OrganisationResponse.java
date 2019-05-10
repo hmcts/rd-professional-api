@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
+import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
+@Getter
 public class OrganisationResponse {
 
     @JsonProperty
@@ -15,10 +17,4 @@ public class OrganisationResponse {
 
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
     }
-
-    public UUID getOrganisationIdentifier() {
-
-        return organisationIdentifier;
-    }
-
 }

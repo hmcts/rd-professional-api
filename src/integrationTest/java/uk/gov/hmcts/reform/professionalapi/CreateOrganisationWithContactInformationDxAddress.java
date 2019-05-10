@@ -85,8 +85,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
-
+        assertThat(persistedOrganisation.getContactInformations().size()).isEqualTo(1);
     }
 
     @Test
@@ -232,8 +231,8 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
-        assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(0);
+        assertThat(persistedOrganisation.getContactInformations().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getContactInformations().get(0).getDxAddresses().size()).isEqualTo(0);
     }
 
     @Test
