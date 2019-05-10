@@ -7,7 +7,7 @@ import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
-public class DxAddressCreationRequestValidator implements IRequestValidator {
+public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
 
     Boolean  isDxRequestValid = true;
     //TODO refactor to use validation object

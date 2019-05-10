@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-public interface IRequestValidator {
+public interface RequestValidator {
 
     void validate(OrganisationCreationRequest organisationCreationRequest);
 }
