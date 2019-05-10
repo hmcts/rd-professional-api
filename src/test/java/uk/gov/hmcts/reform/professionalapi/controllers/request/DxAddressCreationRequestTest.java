@@ -1,22 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controllers.request;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class DxAddressCreationRequestTest {
 
@@ -63,7 +58,7 @@ public class DxAddressCreationRequestTest {
         contactInformationList.add(contactInformationCreationRequest);
 
         OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
-                "org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
+                "org-name", OrganisationStatus.PENDING, "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
         dxValidator.validate(organisationCreationRequest);
         assertThat(dxAddressCreationRequest.getIsDxRequestValid() == false);
@@ -89,7 +84,7 @@ public class DxAddressCreationRequestTest {
         contactInformationList.add(contactInformationCreationRequest);
 
         OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
-                "org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
+                "org-name", OrganisationStatus.PENDING,"some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
         dxValidator.validate(organisationCreationRequest);
         assertThat(dxAddressCreationRequest.getIsDxRequestValid() == false);
@@ -114,7 +109,7 @@ public class DxAddressCreationRequestTest {
         contactInformationList.add(contactInformationCreationRequest);
 
         OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
-                "org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
+                "org-name", OrganisationStatus.PENDING,"some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
         dxValidator.validate(organisationCreationRequest);
         assertThat(dxAddressCreationRequest.getIsDxRequestValid() == false);
@@ -139,7 +134,7 @@ public class DxAddressCreationRequestTest {
         contactInformationList.add(contactInformationCreationRequest);
 
         OrganisationCreationRequest organisationCreationRequest = new OrganisationCreationRequest(
-                "org-name", "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
+                "org-name", OrganisationStatus.PENDING, "some-id", true, "some-number", "some-url", superUser, pbaAccounts, contactInformationList);
 
         dxValidator.validate(organisationCreationRequest);
         assertThat(dxAddressCreationRequest.getIsDxRequestValid() == false);

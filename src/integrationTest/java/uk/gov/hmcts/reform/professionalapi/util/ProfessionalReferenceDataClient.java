@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfessionalReferenceDataClient {
 
@@ -56,6 +55,32 @@ public class ProfessionalReferenceDataClient {
 
         organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
 
+        return organisationResponse;
+    }
+
+    public Map<String, Object> updateOrganisation(
+            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier ) {
+
+        ResponseEntity<OrganisationResponse> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_BASE_PATH+"/"+organisationIdentifier;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        try {
+            System.out.println("Into Client :  urlPath :" + urlPath );
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<OrganisationCreationRequest>(organisationCreationRequest,headers);
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
+        }
+        catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map organisationResponse = new HashMap<String, Object>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return organisationResponse;
     }
 

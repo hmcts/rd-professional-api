@@ -20,11 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -101,7 +97,7 @@ public class OrganisationServiceTest {
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
+                        "some-org-name", OrganisationStatus.PENDING, "sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
                         pbaAccountCreationRequests, contactInformationCreationRequests);
 

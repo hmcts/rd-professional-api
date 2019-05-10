@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controllers.request;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
-import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import java.util.Set;
+
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class OrganisationCreationRequestTest {
 
@@ -17,7 +18,7 @@ public class OrganisationCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest(null, null, Boolean.FALSE,null,null,null,null, null);
+                new OrganisationCreationRequest(null, null ,null, Boolean.FALSE,null,null,null,null, null);
 
         Set<ConstraintViolation<OrganisationCreationRequest>> violations =
                 validator.validate(organisationCreationRequest);

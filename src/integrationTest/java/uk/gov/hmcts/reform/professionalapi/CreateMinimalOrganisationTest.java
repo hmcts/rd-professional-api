@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
@@ -82,7 +83,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getStatus()).isEqualTo("PENDING");
+        assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.PENDING);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");

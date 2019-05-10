@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import static javax.persistence.GenerationType.AUTO;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import javax.persistence.*;
-import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static javax.persistence.GenerationType.AUTO;
 
 @Entity(name = "organisation")
 @NoArgsConstructor
@@ -40,8 +41,7 @@ public class Organisation {
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
-    @Size(max = 50)
-    private String status;
+    private OrganisationStatus status;
 
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
@@ -71,7 +71,7 @@ public class Organisation {
 
     public Organisation(
             String name,
-            String status,
+            OrganisationStatus status,
             String sraId,
             String companyNumber,
             Boolean sraRegulated,
@@ -118,7 +118,7 @@ public class Organisation {
         return contactInformations;
     }
 
-    public String getStatus() {
+    public OrganisationStatus getStatus() {
         return status;
     }
 

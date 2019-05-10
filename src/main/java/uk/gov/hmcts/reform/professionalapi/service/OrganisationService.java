@@ -1,29 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.exception.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.persistence.*;
+
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -56,7 +43,7 @@ public class OrganisationService {
 
         Organisation newOrganisation = new Organisation(
                 organisationCreationRequest.getName(),
-                OrganisationStatus.PENDING.name(),
+                OrganisationStatus.PENDING,
                 organisationCreationRequest.getSraId(),
                 organisationCreationRequest.getCompanyNumber(),
                 organisationCreationRequest.getSraRegulated(),
@@ -141,6 +128,31 @@ public class OrganisationService {
                 }
             });
         }
+    }
+
+    @Transactional
+    public OrganisationResponse updateOrganisation(
+            OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        if(organisation == null){
+            String errorMessage ="Organisation not found with organisationIdentifier: "+ organisationIdentifier;
+            log.error(errorMessage);
+            throw new ResourceNotFoundException(errorMessage);
+        }
+        else{
+            log.info("Into update Organisation service");
+            organisation.setName(organisationCreationRequest.getName());
+            organisation.setStatus(organisationCreationRequest.getStatus());
+            organisation.setSraId(organisationCreationRequest.getSraId());
+            organisation.setCompanyNumber(organisationCreationRequest.getCompanyNumber());
+            organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
+            organisation.setCompanyUrl(organisationCreationRequest.getCompanyUrl());
+            organisationRepository.save(organisation);
+            log.info("Update Organisation service done...");
+        }
+        return new OrganisationResponse(organisation);
     }
 }
 
