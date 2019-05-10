@@ -13,7 +13,7 @@ import javax.validation.Validator;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -22,7 +22,7 @@ public class DxAddressCreationRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    private final DxAddressCreationRequestValidator dxValidator = new DxAddressCreationRequestValidator();
+    private final DxAddressCreationRequestValidatorImpl dxValidator = new DxAddressCreationRequestValidatorImpl();
 
     @Test
     public void has_mandatory_fields_specified_not_null() {
