@@ -51,16 +51,97 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 	}
 
 	@Test
-	public void updates_organisation_and_returns_status_200() {
+	public void updates_non_existing_organisation_returns_status_404() {
 
-		//String organisationIdentifier = "9a9b1a14-00d1-460a-badc-e98137a6dc1f";
-		//1. Create Organisation
+		updateAndValidateOrganisation(UUID.randomUUID().toString(),OrganisationStatus.ACTIVE,404);
+	}
+
+	@Test
+	public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
+
+		updateAndValidateOrganisation(null,OrganisationStatus.ACTIVE,400);
+	}
+
+	@Test
+	public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
+		updateAndValidateOrganisation("1234ab12",OrganisationStatus.ACTIVE,400);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_pending_to_active_should_returns_status_200() {
+		updateAndValidateOrganisation(createOrganisationRequest(),OrganisationStatus.ACTIVE,200);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_active_to_blocked_should_returns_status_200() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,200);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_active_to_deleted_should_returns_status_200() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_pending_to_pending_should_returns_status_200() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,200);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_active_to_active_should_returns_status_200() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+	}
+
+	@Test
+	public void can_update_organisation_status_from_blocked_to_blocked_should_returns_status_200() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,200);
+	}
+
+	@Test
+	public void can_not_update_organisation_status_from_deleted_to_active_should_returns_status_400() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,400);
+	}
+
+	@Test
+	public void can_not_update_organisation_status_from_deleted_to_pending_should_returns_status_400() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,400);
+	}
+
+	@Test
+	public void can_not_update_organisation_status_from_deleted_to_blocked_should_returns_status_400() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,400);
+	}
+
+	@Test
+	public void can_not_update_organisation_status_from_active_to_pending_should_returns_status_400() {
+		String organisationIdentifier = createOrganisationRequest();
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+		updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,400);
+	}
+
+
+	public String createOrganisationRequest(){
 		OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
 				.name("some-org-name")
 				.sraId("sra-id")
-				.sraRegulated(Boolean.FALSE)
-				.companyUrl("company-url")
-				.companyNumber("companyn")
+				.sraRegulated(Boolean.TRUE)
+				.companyUrl("company-url1")
+				.companyNumber("company1")
 				.superUser(aUserCreationRequest()
 						.firstName("some-fname")
 						.lastName("some-lname")
@@ -68,21 +149,14 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 						.build())
 				.contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
 				.build();
+		Map<String, Object> responseForOrganisationCreation = 	professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+		return (String) responseForOrganisationCreation.get("organisationIdentifier");
+	}
 
-		Map<String, Object> responseForOrganisationCreation =
-				professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-		String organisationIdentifier = (String) responseForOrganisationCreation.get("organisationIdentifier");
-
-		Organisation persistedOrganisation = organisationRepository
-				.findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
-
-		assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.PENDING);
-
-		//2. Updating organisation status to active
-		organisationCreationRequest = anOrganisationCreationRequest()
+	public void updateAndValidateOrganisation(String organisationIdentifier, OrganisationStatus status, Integer httpStatus){
+		OrganisationCreationRequest organisationUpdateRequest = anOrganisationCreationRequest()
 				.name("some-org-name1")
-				.status(OrganisationStatus.ACTIVE)
+				.status(status)
 				.sraId("sra-id1")
 				.sraRegulated(Boolean.TRUE)
 				.companyUrl("company-url1")
@@ -95,86 +169,25 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 				.contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
 				.build();
 		Map<String, Object> responseForOrganisationUpdate =
-				professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, organisationIdentifier);
+				professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+		if(httpStatus == 200) {
+			Organisation persistedOrganisation = organisationRepository
+					.findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
 
-		persistedOrganisation = organisationRepository
-				.findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
-
-		assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
-		assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
-		assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
-		assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
-		assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
-
-		assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
-	}
-
-	@Test
-	public void updates_non_existing_organisation_returns_status_404() {
-
-		OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-				.name("some-org-name")
-				.status(OrganisationStatus.ACTIVE)
-				.sraId("sra-id")
-				.sraRegulated(Boolean.TRUE)
-				.companyUrl("company-url1")
-				.companyNumber("company1")
-				.superUser(aUserCreationRequest()
-						.firstName("some-fname")
-						.lastName("some-lname")
-						.email("someone@somewhere.com")
-						.build())
-				.contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-				.build();
-		Map<String, Object> responseForOrganisationUpdate =
-				professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, UUID.randomUUID().toString());
-
-		assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo("404");
-	}
-
-	@Test
-	public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-
-		OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-				.name("some-org-name")
-				.status(OrganisationStatus.ACTIVE)
-				.sraId("sra-id")
-				.sraRegulated(Boolean.TRUE)
-				.companyUrl("company-url1")
-				.companyNumber("company1")
-				.superUser(aUserCreationRequest()
-						.firstName("some-fname")
-						.lastName("some-lname")
-						.email("someone@somewhere.com")
-						.build())
-				.contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-				.build();
-		Map<String, Object> responseForOrganisationUpdate =
-				professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, null);
-
-		assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo("400");
-	}
-
-	@Test
-	public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-
-		OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-				.name("some-org-name")
-				.status(OrganisationStatus.ACTIVE)
-				.sraId("sra-id")
-				.sraRegulated(Boolean.TRUE)
-				.companyUrl("company-url1")
-				.companyNumber("company1")
-				.superUser(aUserCreationRequest()
-						.firstName("some-fname")
-						.lastName("some-lname")
-						.email("someone@somewhere.com")
-						.build())
-				.contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-				.build();
-		Map<String, Object> responseForOrganisationUpdate =
-				professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, "1234ab12");
-
-		assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo("400");
+			assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
+			assertThat(persistedOrganisation.getStatus()).isEqualTo(status);
+			assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
+			assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
+			assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
+			assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+		}
+		else{
+			if(responseForOrganisationUpdate.get("http_status") instanceof String) {
+				assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(String.valueOf(httpStatus.intValue()));
+			}
+			else{
+				assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+			}
+		}
 	}
 }

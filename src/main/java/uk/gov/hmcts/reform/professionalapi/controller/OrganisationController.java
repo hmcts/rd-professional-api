@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.exception.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import javax.validation.Valid;
@@ -29,14 +29,18 @@ import java.util.UUID;
 public class OrganisationController {
 
     private final OrganisationService organisationService;
-    private final OrganisationCreationRequestValidator validator;
+    private final OrganisationCreationRequestValidator organisationCreationRequestValidator;
+    private final UpdateOrganisationValidatorImpl updateOrganisationValidatorImpl;
+
 
     public OrganisationController(
             OrganisationService organisationService,
-            OrganisationCreationRequestValidator validator) {
+            OrganisationCreationRequestValidator organisationCreationRequestValidator,
+            UpdateOrganisationValidatorImpl updateOrganisationValidatorImpl) {
 
         this.organisationService = organisationService;
-        this.validator = validator;
+        this.organisationCreationRequestValidator = organisationCreationRequestValidator;
+        this.updateOrganisationValidatorImpl = updateOrganisationValidatorImpl;
     }
 
     @ApiOperation("Creates an organisation")
@@ -57,7 +61,7 @@ public class OrganisationController {
 
         log.info("Received request to create a new organisation...");
 
-        validator.validate(organisationCreationRequest);
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
@@ -84,18 +88,13 @@ public class OrganisationController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("Received request to update organisation for organisationIdentifier: "+organisationIdentifier);
-        OrganisationResponse organisationResponse = null;
-        try {
-            organisationResponse =
+
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
+        updateOrganisationValidatorImpl.validate(organisationCreationRequest, organisationIdentifier);
+
+        OrganisationResponse organisationResponse =
                     organisationService.updateOrganisation(organisationCreationRequest, UUID.fromString(organisationIdentifier));
             log.info("Received response to update organisation..." + organisationResponse);
             return ResponseEntity.status(200).build();
         }
-        catch(ResourceNotFoundException resourceNotFound){
-            return ResponseEntity.status(404).build();
-        }
-        catch(IllegalArgumentException IllegalArgumentException){
-            return ResponseEntity.status(400).build();
-        }
-    }
 }

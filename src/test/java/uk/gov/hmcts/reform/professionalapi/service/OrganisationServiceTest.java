@@ -122,6 +122,9 @@ public class OrganisationServiceTest {
 
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
+
+        when(organisationRepository.findByOrganisationIdentifier( UUID.randomUUID()))
+                .thenReturn(organisation);
     }
 
     @Test
@@ -157,4 +160,22 @@ public class OrganisationServiceTest {
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
     }
+
+    @Test
+    public void updates_an_organisation() {
+
+        OrganisationResponse organisationResponse =
+                organisationService.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+
+        assertThat(organisationResponse).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByOrganisationIdentifier(UUID.randomUUID());
+
+        verify(
+                organisationRepository,
+                times(1)).save(any(Organisation.class));
+    }
+
 }

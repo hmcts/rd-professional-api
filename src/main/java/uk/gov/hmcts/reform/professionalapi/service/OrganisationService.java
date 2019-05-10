@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
-import uk.gov.hmcts.reform.professionalapi.exception.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
 
 import java.util.List;
@@ -136,22 +135,16 @@ public class OrganisationService {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-        if(organisation == null){
-            String errorMessage ="Organisation not found with organisationIdentifier: "+ organisationIdentifier;
-            log.error(errorMessage);
-            throw new ResourceNotFoundException(errorMessage);
-        }
-        else{
-            log.info("Into update Organisation service");
-            organisation.setName(organisationCreationRequest.getName());
-            organisation.setStatus(organisationCreationRequest.getStatus());
-            organisation.setSraId(organisationCreationRequest.getSraId());
-            organisation.setCompanyNumber(organisationCreationRequest.getCompanyNumber());
-            organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
-            organisation.setCompanyUrl(organisationCreationRequest.getCompanyUrl());
-            organisationRepository.save(organisation);
-            log.info("Update Organisation service done...");
-        }
+        log.info("Into update Organisation service");
+        organisation.setName(organisationCreationRequest.getName());
+        organisation.setStatus(organisationCreationRequest.getStatus());
+        organisation.setSraId(organisationCreationRequest.getSraId());
+        organisation.setCompanyNumber(organisationCreationRequest.getCompanyNumber());
+        organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
+        organisation.setCompanyUrl(organisationCreationRequest.getCompanyUrl());
+        organisationRepository.save(organisation);
+        log.info("Update Organisation service done...");
+
         return new OrganisationResponse(organisation);
     }
 }
