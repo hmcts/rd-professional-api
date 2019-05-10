@@ -31,15 +31,10 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
 
-    @Autowired
     OrganisationRepository organisationRepository;
-    @Autowired
     ProfessionalUserRepository professionalUserRepository;
-    @Autowired
     PaymentAccountRepository paymentAccountRepository;
-    @Autowired
     DxAddressRepository dxAddressRepository;
-    @Autowired
     ContactInformationRepository contactInformationRepository;
 
     @Autowired
