@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import javax.xml.ws.http.HTTPException;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -9,17 +11,11 @@ import uk.gov.hmcts.reform.professionalapi.persistence.*;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class PaymentAccountService {
-    private final OrganisationRepository organisationRepository;
-    private final ProfessionalUserRepository professionalUserRepository;
 
-    public PaymentAccountService(
-            OrganisationRepository organisationRepository,
-            ProfessionalUserRepository professionalUserRepository) {
-
-        this.organisationRepository = organisationRepository;
-        this.professionalUserRepository = professionalUserRepository;
-    }
+    private OrganisationRepository organisationRepository;
+    private ProfessionalUserRepository professionalUserRepository;
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
