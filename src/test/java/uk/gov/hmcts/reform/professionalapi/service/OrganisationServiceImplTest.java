@@ -104,6 +104,8 @@ public class OrganisationServiceImplTest {
                 dxAddressRepository,
                 contactInformationRepository);
 
+
+
         organisationCreationRequest =
                 new OrganisationCreationRequest(
                         "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
