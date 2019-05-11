@@ -201,5 +201,29 @@ public class OrganisationServiceImplTest {
 		verify(
 				organisationRepository,
 				times(1)).save(any(Organisation.class));
+
+        verify(
+                organisation,
+                times(1)).setName(any());
+
+        verify(
+                organisation,
+                times(1)).setStatus(any());
+
+        verify(
+                organisation,
+                times(1)).setSraId(any());
+
+        verify(
+                organisation,
+                times(1)).setCompanyNumber(any());
+
+        verify(
+                organisation,
+                times(1)).setSraRegulated(any());
+
+        verify(
+                organisation,
+                times(1)).setCompanyUrl(any());
 	}
 }
