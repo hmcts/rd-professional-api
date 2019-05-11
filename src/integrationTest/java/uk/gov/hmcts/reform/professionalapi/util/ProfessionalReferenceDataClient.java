@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
 public class ProfessionalReferenceDataClient {
 
@@ -104,7 +105,6 @@ public class ProfessionalReferenceDataClient {
 		headers.add("ServiceAuthorization", JWT_TOKEN);
 
 		try {
-			System.out.println("Into Client :  urlPath :" + urlPath );
 			HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<OrganisationCreationRequest>(organisationCreationRequest,headers);
 			responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
 		}
@@ -115,7 +115,7 @@ public class ProfessionalReferenceDataClient {
 			return statusAndBody;
 		}
 
-		Map organisationResponse = new HashMap<String, Object>();
+		Map<String, Object> organisationResponse = new HashMap<String, Object>();
 		organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
 		return organisationResponse;
 	}

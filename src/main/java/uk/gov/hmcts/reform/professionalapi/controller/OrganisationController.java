@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -35,8 +36,8 @@ import java.util.UUID;
 public class OrganisationController {
 
     private OrganisationServiceImpl organisationService;
-	private final UpdateOrganisationValidatorImpl updateOrganisationValidatorImpl;
-    private OrganisationCreationRequestValidator validator;
+	private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
+    private OrganisationCreationRequestValidator organisationCreationRequestValidator;
 
     @ApiOperation("Creates an organisation")
     @ApiResponses({
@@ -107,7 +108,7 @@ public class OrganisationController {
 		log.info("Received request to update organisation for organisationIdentifier: "+organisationIdentifier);
 
 		organisationCreationRequestValidator.validate(organisationCreationRequest);
-		updateOrganisationValidatorImpl.validate(organisationCreationRequest, organisationIdentifier);
+		updateOrganisationRequestValidator.validate(organisationCreationRequest, organisationIdentifier);
 
 		OrganisationResponse organisationResponse =
 				organisationService.updateOrganisation(organisationCreationRequest, UUID.fromString(organisationIdentifier));

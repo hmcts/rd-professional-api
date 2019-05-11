@@ -21,11 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreation
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -140,7 +136,6 @@ public class OrganisationServiceImplTest {
 
 		when(organisationRepository.findByOrganisationIdentifier(any()))
 				.thenReturn(organisation);
-	}
     }
 
     @Test
@@ -195,7 +190,7 @@ public class OrganisationServiceImplTest {
 	public void updates_an_organisation() {
 
 		OrganisationResponse organisationResponse =
-				organisationService.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+				organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
 
 		assertThat(organisationResponse).isNotNull();
 
