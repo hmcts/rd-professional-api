@@ -20,21 +20,28 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
-public class OrganisationServiceTest {
+public class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
     private final DxAddressCreationRequest dxAddressCreationRequest = mock(DxAddressCreationRequest.class);
+    private OrganisationServiceImpl organisationServiceImpl = mock(OrganisationServiceImpl.class);
 
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
@@ -51,7 +58,7 @@ public class OrganisationServiceTest {
     private DxAddressCreationRequest dxAddressRequest;
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
-    private OrganisationService organisationService;
+    private List<Organisation> organisations;
 
     @Before
     public void setUp() {
@@ -66,6 +73,8 @@ public class OrganisationServiceTest {
         contactInformationCreationRequests = new ArrayList<>();
 
         dxAddressRequests = new ArrayList<>();
+
+        organisations = new ArrayList<Organisation>();
 
         pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
@@ -89,12 +98,14 @@ public class OrganisationServiceTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        organisationService = new OrganisationService(
+        organisationServiceImpl = new OrganisationServiceImpl(
                 organisationRepository,
                 professionalUserRepository,
                 paymentAccountRepository,
                 dxAddressRepository,
                 contactInformationRepository);
+
+
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -124,15 +135,19 @@ public class OrganisationServiceTest {
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
 
+        when(organisationRepository.findAll())
+                .thenReturn(organisations);
+
 		when(organisationRepository.findByOrganisationIdentifier(any()))
-                .thenReturn(organisation);
+				.thenReturn(organisation);
+	}
     }
 
     @Test
     public void saves_an_organisation() {
 
         OrganisationResponse organisationResponse =
-                organisationService.createOrganisationFrom(organisationCreationRequest);
+                organisationServiceImpl.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
 
@@ -163,20 +178,33 @@ public class OrganisationServiceTest {
     }
 
     @Test
-    public void updates_an_organisation() {
+    public void retrieve_an_organisations() {
 
-        OrganisationResponse organisationResponse =
-                organisationService.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImpl.retrieveOrganisations();
 
-        assertThat(organisationResponse).isNotNull();
-
-        verify(
-                organisationRepository,
-                times(1)).findByOrganisationIdentifier(any());
+        assertThat(organisationDetailResponse).isNotNull();
 
         verify(
                 organisationRepository,
-                times(1)).save(any(Organisation.class));
+                times(1)).findAll();
+
     }
 
+	@Test
+	public void updates_an_organisation() {
+
+		OrganisationResponse organisationResponse =
+				organisationService.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+
+		assertThat(organisationResponse).isNotNull();
+
+		verify(
+				organisationRepository,
+				times(1)).findByOrganisationIdentifier(any());
+
+		verify(
+				organisationRepository,
+				times(1)).save(any(Organisation.class));
+	}
 }

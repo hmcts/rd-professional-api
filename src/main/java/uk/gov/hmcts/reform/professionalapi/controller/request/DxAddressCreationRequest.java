@@ -23,27 +23,15 @@ public class DxAddressCreationRequest {
     @Builder(builderMethodName = "dxAddressCreationRequest")
     @JsonCreator
     public DxAddressCreationRequest(
-
             @JsonProperty("dxNumber") String dxNumber, @JsonProperty("dxExchange") String dxExchange) {
 
         this.dxNumber = dxNumber;
         this.dxExchange = dxExchange;
         this.isDxRequestValid = isDxRequestValid;
     }
-
-    public String getDxNumber() {
-        return dxNumber;
-    }
-
-    public String getDxExchange() {
-        return dxExchange;
-    }
-
+    
     public void setIsDxRequestValid(Boolean isDxRequestValid) {
         this.isDxRequestValid = isDxRequestValid;
     }
 
-    public Boolean getIsDxRequestValid() {
-        return isDxRequestValid;
-    }
 }

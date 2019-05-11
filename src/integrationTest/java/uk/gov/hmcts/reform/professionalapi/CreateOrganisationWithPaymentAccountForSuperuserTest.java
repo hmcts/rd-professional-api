@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -50,7 +49,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         organisationRepository.deleteAll();
     }
 
-    @Ignore
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
 
