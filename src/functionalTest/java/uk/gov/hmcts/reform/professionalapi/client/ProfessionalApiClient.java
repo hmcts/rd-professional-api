@@ -105,7 +105,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body(organisationCreationRequest)
-                .post("/organisations")
+                .post("v1/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -117,6 +117,24 @@ public class ProfessionalApiClient {
                 .statusCode(CREATED.value());
 
         return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationDetails() {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations")
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("Retrieve organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
