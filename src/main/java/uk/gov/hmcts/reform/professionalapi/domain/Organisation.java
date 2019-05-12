@@ -40,6 +40,7 @@ public class Organisation {
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
+    @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
 
     @LastModifiedDate
