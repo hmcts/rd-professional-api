@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import static javax.persistence.GenerationType.AUTO;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static javax.persistence.GenerationType.AUTO;
 
 @Entity(name = "organisation")
 @NoArgsConstructor

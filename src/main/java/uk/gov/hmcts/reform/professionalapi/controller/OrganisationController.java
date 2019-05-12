@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.util.UUID;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -14,16 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
-
 
 @RequestMapping(
     path = "v1/organisations",
@@ -36,7 +32,7 @@ import java.util.UUID;
 public class OrganisationController {
 
     private OrganisationServiceImpl organisationService;
-	private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
+    private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
 
     @ApiOperation("Creates an organisation")
@@ -90,29 +86,29 @@ public class OrganisationController {
                 .body(organisationResponse);
     }
 
-	@ApiOperation(value = "Updates an organisation")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Updated an organisation"),
-			@ApiResponse(code = 404, message = "If Organisation is not found"),
-			@ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
-	})
-	@PutMapping(
-			value = "/{orgId}",
-			consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
-	)
-	@ResponseBody
-	public ResponseEntity UpdatesOrganisation(
-			@Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-			@PathVariable("orgId") @NotBlank String organisationIdentifier) {
+    @ApiOperation(value = "Updates an organisation")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Updated an organisation"),
+        @ApiResponse(code = 404, message = "If Organisation is not found"),
+        @ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
+    })
+    @PutMapping(
+            value = "/{orgId}",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity updatesOrganisation(
+            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-		log.info("Received request to update organisation for organisationIdentifier: "+organisationIdentifier);
+        log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
 
-		organisationCreationRequestValidator.validate(organisationCreationRequest);
-		updateOrganisationRequestValidator.validate(organisationCreationRequest, organisationIdentifier);
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
+        updateOrganisationRequestValidator.validate(organisationCreationRequest, organisationIdentifier);
 
-		OrganisationResponse organisationResponse =
-				organisationService.updateOrganisation(organisationCreationRequest, UUID.fromString(organisationIdentifier));
-		log.info("Received response to update organisation..." + organisationResponse);
-		return ResponseEntity.status(200).build();
-	}
+        OrganisationResponse organisationResponse =
+                organisationService.updateOrganisation(organisationCreationRequest, UUID.fromString(organisationIdentifier));
+        log.info("Received response to update organisation..." + organisationResponse);
+        return ResponseEntity.status(200).build();
+    }
 }

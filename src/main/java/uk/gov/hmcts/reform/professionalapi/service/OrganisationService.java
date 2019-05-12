@@ -13,7 +13,7 @@ public interface OrganisationService {
 
     OrganisationsDetailResponse retrieveOrganisations();
 
-	OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier);
+    OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier);
 
 }
 

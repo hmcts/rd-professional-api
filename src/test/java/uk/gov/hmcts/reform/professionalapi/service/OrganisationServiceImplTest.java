@@ -134,8 +134,8 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findAll())
                 .thenReturn(organisations);
 
-		when(organisationRepository.findByOrganisationIdentifier(any()))
-				.thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier(any()))
+                .thenReturn(organisation);
     }
 
     @Test
@@ -185,22 +185,20 @@ public class OrganisationServiceImplTest {
                 times(1)).findAll();
 
     }
+    
+    @Test
+    public void updates_an_organisation() {
+        OrganisationResponse organisationResponse =
+            organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
 
-	@Test
-	public void updates_an_organisation() {
+        assertThat(organisationResponse).isNotNull();
+        verify(
+            organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
 
-		OrganisationResponse organisationResponse =
-				organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
-
-		assertThat(organisationResponse).isNotNull();
-
-		verify(
-				organisationRepository,
-				times(1)).findByOrganisationIdentifier(any());
-
-		verify(
-				organisationRepository,
-				times(1)).save(any(Organisation.class));
+        verify(
+            organisationRepository,
+                times(1)).save(any(Organisation.class));
 
         verify(
                 organisation,
@@ -225,5 +223,5 @@ public class OrganisationServiceImplTest {
         verify(
                 organisation,
                 times(1)).setCompanyUrl(any());
-	}
+    }
 }
