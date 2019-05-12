@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -49,12 +48,6 @@ public class ExceptionMapper {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public void dataIntegrityViolationError(DataIntegrityViolationException ex) {
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-    }
-
-    @ExceptionHandler(InvalidFormatException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void dataInvalidFormatExceptionError(InvalidFormatException ex) {
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
     }
 
