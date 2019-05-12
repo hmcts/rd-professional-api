@@ -185,7 +185,7 @@ public class OrganisationServiceImplTest {
                 times(1)).findAll();
 
     }
-    
+
     @Test
     public void updates_an_organisation() {
         OrganisationResponse organisationResponse =

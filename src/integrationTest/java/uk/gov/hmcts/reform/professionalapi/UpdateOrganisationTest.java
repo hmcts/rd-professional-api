@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -134,42 +132,20 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
 
     public String createOrganisationRequest() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.TRUE)
-                .companyUrl("company-url1")
-                .companyNumber("company1")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-                .build();
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
     public void updateAndValidateOrganisation(String organisationIdentifier, OrganisationStatus status, Integer httpStatus) {
-        OrganisationCreationRequest organisationUpdateRequest = anOrganisationCreationRequest()
-                .name("some-org-name1")
-                .status(status)
-                .sraId("sra-id1")
-                .sraRegulated(Boolean.TRUE)
-                .companyUrl("company-url1")
-                .companyNumber("company1")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
-                .build();
+        Organisation persistedOrganisation = null;
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
+
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+
         if (httpStatus == 200) {
-            Organisation persistedOrganisation = organisationRepository
+            persistedOrganisation = organisationRepository
                     .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
 
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
