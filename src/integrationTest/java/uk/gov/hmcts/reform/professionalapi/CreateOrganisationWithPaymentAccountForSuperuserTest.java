@@ -11,16 +11,14 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.*;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
@@ -40,9 +38,13 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
     @Autowired
     private ContactInformationRepository contactInformationRepository;
 
+    @Autowired
+    private DxAddressRepository dxAddressRepository;
+
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
@@ -51,7 +53,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
 
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
-
+        String prefix = UUID.randomUUID().toString();
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .pbaAccounts(asList(aPbaPaymentAccount()
@@ -60,7 +62,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("someone@somewhere.com")
+                        .email(String.format("%s@somewhere.com", prefix))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
