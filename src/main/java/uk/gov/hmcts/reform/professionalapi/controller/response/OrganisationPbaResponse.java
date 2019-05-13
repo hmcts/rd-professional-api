@@ -11,7 +11,13 @@ public class OrganisationPbaResponse {
 
     public OrganisationPbaResponse(Organisation organisation) {
 
+        getOrganisationPbaResponse(organisation);
+    }
+
+    private void getOrganisationPbaResponse(Organisation organisation) {
+
         this.organisations = new PaymentAccountResponse(organisation);
+
     }
 
 }

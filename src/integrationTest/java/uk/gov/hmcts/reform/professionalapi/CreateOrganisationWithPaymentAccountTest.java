@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -41,14 +42,18 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Autowired
     private ContactInformationRepository contactInformationRepository;
 
+    @Autowired
+    private DxAddressRepository dxAddressRepository;
+
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        dxAddressRepository.deleteAll();
+        contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
-        contactInformationRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 

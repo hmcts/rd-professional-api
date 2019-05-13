@@ -70,7 +70,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
 
         String responseString = response.toString();
 
-        assertEquals("{organisations={organisationIdentifier=" + theOrganisation.getOrganisationIdentifier().toString() + ", name=some-org-, status=pending, sraId=sra-id, sraRegulated=false, companyNumber=comp-num, companyUrl=company-url, superUser=[{firstName=some-fname, lastName=some-lname, email=some@email.com}], pbaAccounts=[{pbaNumber=pbaNum}]}, http_status=201 CREATED}", responseString);
+        assertEquals("{organisations={organisationIdentifier=" + theOrganisation.getOrganisationIdentifier().toString() + ", name=some-org-, status=pending, sraId=sra-id, sraRegulated=false, companyNumber=comp-num, companyUrl=company-url, superUser=[{firstName=some-fname, lastName=some-lname, email=some@email.com}], pbaAccounts=[{pbaNumber=pbaNum}]}, http_status=200 OK}", responseString);
 
     }
 

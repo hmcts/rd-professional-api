@@ -4,15 +4,14 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import org.springframework.util.StringUtils;
-
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
-
-public class PaymentAccountResponse {
+@NoArgsConstructor
+public class OrganisationEntityResponse  {
 
     @JsonProperty
-    private String organisationIdentifier;
+    private String id;
     @JsonProperty
     private String name;
     @JsonProperty
@@ -29,32 +28,35 @@ public class PaymentAccountResponse {
     private List<SuperUserResponse> superUser;
     @JsonProperty
     private List<PbaAccountResponse> pbaAccounts;
+    @JsonProperty
+    private List<ContactInformationResponse> contactInformation;
 
-    public PaymentAccountResponse(Organisation organisation) {
+    public OrganisationEntityResponse(Organisation organisation) {
 
-        getPaymentAccountResponse(organisation);
-
+        getOrganisationEntityResponse(organisation);
     }
 
-    private void getPaymentAccountResponse(Organisation organisation) {
+    private void getOrganisationEntityResponse(Organisation organisation) {
 
-        this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
-                ? "" : organisation.getOrganisationIdentifier().toString();
+        this.id = organisation.getId().toString();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-
         this.superUser = organisation.getUsers()
                 .stream()
                 .map(user -> new SuperUserResponse(user))
                 .collect(toList());
-
         this.pbaAccounts = organisation.getPaymentAccounts()
                 .stream()
-                .map(pbaAcc -> new PbaAccountResponse(pbaAcc))
+                .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
+                .collect(toList());
+        this.contactInformation = organisation.getContactInformation()
+                .stream()
+                .map(contactInfo -> new ContactInformationResponse(contactInfo))
                 .collect(toList());
     }
+
 }
