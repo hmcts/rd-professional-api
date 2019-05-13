@@ -8,8 +8,5 @@ public class DxAddressValidatorImpl implements RequestValidator {
     @Override
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
 
-
-
-
     }
 }
