@@ -149,7 +149,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
         log.debug("Received new organisation details...");
-        return new OrganisationsDetailResponse(organisations);
+        return new OrganisationsDetailResponse(organisations, true);
     }
     
 }

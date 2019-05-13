@@ -72,6 +72,6 @@ public class PaymentAccountServiceTest {
 
         paymentAccountService.findPaymentAccountsByEmail("some-email");
 
-        assertEquals(organisation.getOrganisationIdentifier().toString(), "");
+        assertEquals("", organisation.getOrganisationIdentifier().toString());
     }
 }

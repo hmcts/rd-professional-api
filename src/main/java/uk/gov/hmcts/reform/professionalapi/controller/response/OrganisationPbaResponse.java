@@ -7,16 +7,16 @@ public class OrganisationPbaResponse {
 
 
     @JsonProperty
-    private PaymentAccountResponse organisations;
+    private OrganisationEntityResponse organisationEntityResponse;
 
-    public OrganisationPbaResponse(Organisation organisation) {
+    public OrganisationPbaResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        getOrganisationPbaResponse(organisation);
+        getOrganisationPbaResponse(organisation, isRequiredAllEntities);
     }
 
-    private void getOrganisationPbaResponse(Organisation organisation) {
+    private void getOrganisationPbaResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        this.organisations = new PaymentAccountResponse(organisation);
+        this.organisationEntityResponse = new OrganisationEntityResponse(organisation, isRequiredAllEntities);
 
     }
 

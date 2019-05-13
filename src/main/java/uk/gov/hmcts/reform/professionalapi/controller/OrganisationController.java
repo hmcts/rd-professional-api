@@ -106,11 +106,11 @@ public class OrganisationController {
         if (StringUtils.isEmpty(organisation)) {
             return ResponseEntity
                     .status(404)
-                    .body(new OrganisationPbaResponse(new Organisation()));
+                    .body(new OrganisationPbaResponse(new Organisation(), false));
         } else {
             return ResponseEntity
                     .status(200)
-                    .body(new OrganisationPbaResponse(organisation));
+                    .body(new OrganisationPbaResponse(organisation, false));
         }
     }
 }
