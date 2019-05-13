@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-@Service
+@Component
 @Slf4j
 public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
 

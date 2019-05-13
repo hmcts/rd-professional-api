@@ -4,12 +4,12 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
-
-@Service
+@Component
 @Slf4j
 public class UpdateOrganisationValidatorImpl implements UpdateOrganisationValidator {
 
@@ -22,13 +22,13 @@ public class UpdateOrganisationValidatorImpl implements UpdateOrganisationValida
     private OrganisationStatus inputRequestOrganisationStatus;
 
     @Autowired
-    private OrganisationRepository organisationRepository;
+    private OrganisationService organisationService;
 
     @Override
     public void validate(OrganisationCreationRequest organisationCreationRequest, String inputOrganisationIdentifier) {
         log.info("Into UpdateOrganisationValidator...");
         UUID validInputOrganisationIdentifier = validateAndReturnInputOrganisationIdentifier(inputOrganisationIdentifier);
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(validInputOrganisationIdentifier);
+        Organisation organisation = organisationService.getOrganisationByOrganisationIdentifier(validInputOrganisationIdentifier);
 
         checkOrganisationDoesNotExist(organisation, validInputOrganisationIdentifier);
 

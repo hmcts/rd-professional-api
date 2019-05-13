@@ -153,7 +153,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationsDetailResponse(organisations);
     }
 
-    @Transactional
+    @Override
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier) {
 
@@ -171,6 +171,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationResponse(organisation);
     }
-    
+
+    @Override
+    public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
+        return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    }
 }
 
