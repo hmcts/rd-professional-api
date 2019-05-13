@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,8 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
@@ -130,6 +130,62 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,400);
     }
 
+    @Test
+    public void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
+        String organisationIdentifier = createOrganisationRequest();
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
+
+        List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
+        PaymentAccount paymentAccount = pbaAccounts.get(0);
+        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pbaNumber-1");
+
+        List<ProfessionalUser> professionalUsers = persistedOrganisation.getUsers();
+        ProfessionalUser professionalUser = professionalUsers.get(0);
+        assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
+        assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
+        assertThat(professionalUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
+
+        List<ContactInformation> contactInformations = persistedOrganisation.getContactInformations();
+        ContactInformation contactInformation = contactInformations.get(0);
+        assertThat(contactInformation.getAddressLine1()).isEqualTo("addressLine1");
+        assertThat(contactInformation.getAddressLine2()).isEqualTo("addressLine2");
+        assertThat(contactInformation.getAddressLine3()).isEqualTo("addressLine3");
+        assertThat(contactInformation.getTownCity()).isEqualTo("some-town-city");
+        assertThat(contactInformation.getCounty()).isEqualTo("some-county");
+        assertThat(contactInformation.getCountry()).isEqualTo("some-country");
+        assertThat(contactInformation.getPostCode()).isEqualTo("some-post-code");
+    }
+
+    @Test
+    public void fields_other_than_organisation_should_override_if_same_and_should_returns_status_200() {
+        String organisationIdentifier = createOrganisationRequest();
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE, 200);
+    }
+
+    @Test
+    public void can_not_update_entities_other_than_organisation_should_returns_status_200() {
+        String organisationIdentifier = createOrganisationRequest();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+            .status(OrganisationStatus.ACTIVE)
+            .name("some-org-name")
+            .sraId("sra-id")
+            .sraRegulated(Boolean.FALSE)
+            .companyUrl("company-url")
+            .companyNumber("company")
+            .build();
+        Map<String, Object> responseForOrganisationUpdate =
+            professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+
+        Organisation persistedOrganisation = organisationRepository
+            .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
+
+        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
+        assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+        assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
+        assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
+        assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
+        assertThat(persistedOrganisation.getCompanyNumber()).isEqualTo("company");
+    }
 
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
@@ -137,7 +193,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public void updateAndValidateOrganisation(String organisationIdentifier, OrganisationStatus status, Integer httpStatus) {
+    public Organisation updateAndValidateOrganisation(String organisationIdentifier, OrganisationStatus status, Integer httpStatus) {
         Organisation persistedOrganisation = null;
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
 
@@ -161,5 +217,6 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
             }
         }
+        return persistedOrganisation;
     }
 }

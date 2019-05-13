@@ -55,9 +55,9 @@ public class OrganisationFixtures {
                 .county("some-county")
                 .townCity("some-town-city")
                 .postCode("some-post-code")
-                .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                    .dxNumber("DX 1234567890")
-                    .dxExchange("dxExchange").build()))
+                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                        .dxNumber("DX 1234567890")
+                        .dxExchange("dxExchange").build()))
                 .build()));
     }
 
@@ -74,8 +74,8 @@ public class OrganisationFixtures {
                 .pbaNumber("pbaNumber-1")
                 .build()))
             .superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
+                .firstName("somefname")
+                .lastName("somelname")
                 .email("someone@somewhere.com")
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
@@ -86,9 +86,9 @@ public class OrganisationFixtures {
                 .county("some-county1")
                 .townCity("som1-town-city")
                 .postCode("som1-post-code")
-                .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                    .dxNumber("NI 1234567890")
-                    .dxExchange("dxExchange1").build()))
+                    .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                        .dxNumber("NI 1234567890")
+                        .dxExchange("dxExchange1").build()))
                 .build()));
     }
 }
