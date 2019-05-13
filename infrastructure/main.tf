@@ -1,9 +1,10 @@
 # Temporary fix for template API version error on deployment
 provider "azurerm" {
-  version = "1.19.0"
+  version = "1.22.0"
 }
 
 locals {
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   preview_app_service_plan = "${var.product}-${var.component}-${var.env}"
   non_preview_app_service_plan = "${var.product}-${var.env}"
   app_service_plan = "${var.env == "preview" || var.env == "spreview" ? local.preview_app_service_plan : local.non_preview_app_service_plan}"
@@ -11,6 +12,10 @@ locals {
   preview_vault_name = "${var.raw_product}-aat"
   non_preview_vault_name = "${var.raw_product}-${var.env}"
   key_vault_name = "${var.env == "preview" || var.env == "spreview" ? local.preview_vault_name : local.non_preview_vault_name}"
+
+  s2s_url = "http://rpe-service-auth-provider-${local.local_env}.service.core-compute-${local.local_env}.internal"
+  s2s_vault_name = "s2s-${local.local_env}"
+  s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -24,42 +29,64 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
-data "azurerm_key_vault_secret" "s2s_secret" {
-  name = "s2s-secret"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+data "azurerm_key_vault" "s2s_key_vault" {
+  name = "s2s-${local.local_env}"
+  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
 }
 
 data "azurerm_key_vault_secret" "s2s_microservice" {
   name = "s2s-microservice"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_url" {
   name = "s2s-url"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "postgres_username" {
-  name = "postgres-username"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+data "azurerm_key_vault_secret" "s2s_secret" {
+  name = "microservicekey-rd-professional-api"
+  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "postgres_password" {
-  name = "postgres-password"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name      = "${var.component}-POSTGRES-USER"
+  value     = "${module.db-professional-ref-data.user_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name      = "${var.component}-POSTGRES-PASS"
+  value     = "${module.db-professional-ref-data.postgresql_password}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name      = "${var.component}-POSTGRES-HOST"
+  value     = "${module.db-professional-ref-data.host_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name      = "${var.component}-POSTGRES-PORT"
+  value     = "5432"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name      = "${var.component}-POSTGRES-DATABASE"
+  value     = "${module.db-professional-ref-data.postgresql_database}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
 
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
   env = "${var.env}"
-  postgresql_user = "${var.postgresql_user}"
-  database_name = "${var.database_name}"
+  postgresql_user = "dbrefdata"
+  database_name = "dbrefdata"
   common_tags = "${var.common_tags}"
-
-
 }
 
 module "rd_professional_api" {
@@ -88,10 +115,8 @@ module "rd_professional_api" {
     POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
     POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
-    IA_S2S_SECRET                 = "${data.azurerm_key_vault_secret.s2s_secret.value}"
-    IA_S2S_MICROSERVICE           = "${data.azurerm_key_vault_secret.s2s_microservice.value}"
 
-    S2S_URL = "${data.azurerm_key_vault_secret.s2s_url.value}"
+    S2S_URL = "${local.s2s_url}"
 
     ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
     LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"

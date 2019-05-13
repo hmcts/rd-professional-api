@@ -37,14 +37,6 @@ variable "instance_size" {
   default = "I1"
 }
 
-variable "postgresql_user" {
-  default = "dbrefdata"
-}
-
-variable "database_name" {
-  default = "dbrefdata"
-}
-
 variable "appinsights_instrumentation_key" {
   default = ""
 }

@@ -3,24 +3,27 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.PbaAccountCreationRequest.aPbaPaymentAccount;
-import static uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.ResponseUtils.pbaNumbersFrom;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.professionalapi.domain.entities.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.entities.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.domain.service.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.infrastructure.controllers.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
@@ -35,6 +38,9 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Autowired
     private PaymentAccountRepository paymentAccountRepository;
 
+    @Autowired
+    private ContactInformationRepository contactInformationRepository;
+
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
     @Before
@@ -42,6 +48,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
+        contactInformationRepository.deleteAll();
         organisationRepository.deleteAll();
     }
 
@@ -58,18 +65,19 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
                         .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgNameFromResponse = (String) response.get("name");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
-                .isEqualTo(orgNameFromResponse);
+                .isEqualTo("some-org-name");
     }
 
     @Test
@@ -87,8 +95,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
-
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).extracting(acc -> acc.getPbaNumber())
                 .containsExactlyInAnyOrder(
@@ -103,7 +110,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         organisationCreationRequest.getName(),
                         organisationCreationRequest.getName());
 
-        assertThat(pbaNumbersFrom(createOrganisationResponse).size()).isEqualTo(3);
+
     }
 
     @Test
@@ -112,22 +119,21 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .pbaAccounts(emptyList())
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                         .build();
 
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
+        String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
+
         Organisation persistedOrganisation = organisationRepository
-                .findByName((String) createOrganisationResponse.get("name"));
+                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
 
-
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
-
-        assertThat(pbaNumbersFrom(createOrganisationResponse).size()).isEqualTo(0);
 
         assertThat(persistedOrganisation.getName())
                 .isEqualTo(organisationCreationRequest.getName());
@@ -141,20 +147,20 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                         .pbaAccounts(null)
                         .build();
 
-        Map<String, Object> createOrganisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
         Organisation persistedOrganisation = organisationRepository
-                .findByName((String) createOrganisationResponse.get("name"));
+                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
 
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("201");
+        assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
         assertThat(persistedPaymentAccounts).isEmpty();
-
-        assertThat(pbaNumbersFrom(createOrganisationResponse).size()).isEqualTo(0);
 
         assertThat(persistedOrganisation.getName())
                 .isEqualTo(organisationCreationRequest.getName());

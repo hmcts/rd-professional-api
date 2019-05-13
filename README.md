@@ -24,7 +24,7 @@ If running locally for development or testing you will need to set the following
 
 * export POSTGRES_USERNAME=dbrefdata
 * export POSTGRES_PASSWORD=dbrefdata
-* export IDAM_KEY_IAC=AAAAAAAAAAAAAAAC
+* export S2S_SECRET=AAAAAAAAAAAAAAAC
 
 ### Running the application
 
@@ -114,7 +114,12 @@ If you have some time to spare, you can run the *mutation tests* as follows:
 
 ```
 ./gradlew pitest
+ ```
+If you are using windows machine to run PI test , use following property in gradle.build under pitest section.
 ```
+useClasspathFile = true
+```
+
 
 As the project grows, these tests will take longer and longer to execute but are useful indicators of the quality of the test suite.
 
