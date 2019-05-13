@@ -53,44 +53,4 @@ public class ContactInformationCreationRequest {
         this.postCode = postCode;
         this.dxAddress = dxAddress;
     }
-
-
-    public String getAddressLine1() {
-        return addressLine1;
-    }
-
-
-    public String getAddressLine2() {
-        return addressLine2;
-    }
-
-
-    public String getAddressLine3() {
-        return addressLine3;
-    }
-
-
-    public String getTownCity() {
-        return townCity;
-    }
-
-
-    public String getCounty() {
-        return county;
-    }
-
-
-    public String getCountry() {
-        return country;
-    }
-
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-
-    public List<DxAddressCreationRequest> getDxAddress() {
-        return dxAddress;
-    }
 }

@@ -24,7 +24,5 @@ public class OrganisationCreationsTest extends FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationName,paymentNumbers);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-
     }
-
 }

@@ -10,16 +10,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
 
     @Mock
-    OrganisationRequestValidator validator1;
+    RequestValidator validator1;
 
     @Mock
-    OrganisationRequestValidator validator2;
+    RequestValidator validator2;
 
     @Mock
     OrganisationCreationRequest request;

@@ -21,7 +21,6 @@ public class UserCreationRequest {
 
     @JsonCreator
     public UserCreationRequest(
-
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email
@@ -31,17 +30,4 @@ public class UserCreationRequest {
         this.lastName = lastName;
         this.email = email;
     }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
 }

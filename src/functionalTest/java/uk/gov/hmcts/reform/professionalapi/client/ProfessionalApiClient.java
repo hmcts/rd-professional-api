@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -70,31 +71,45 @@ public class ProfessionalApiClient {
                                                   String[] pbas) {
 
         List<PbaAccountCreationRequest> pbaAccounts = asList(aPbaPaymentAccount()
-                                                             .pbaNumber(pbas[0])
-                                                             .build(),
+                                                                .pbaNumber(pbas[0])
+                                                                .build(),
                                                              aPbaPaymentAccount()
-                                                             .pbaNumber(pbas[1])
-                                                             .build());
+                                                                 .pbaNumber(pbas[1])
+                                                                 .build());
 
         return createOrganisation(someMinimalOrganisationRequest()
-                                  .name(organisationName)
-                                  .pbaAccounts(pbaAccounts)
-                                  .superUser(aUserCreationRequest()
-                                             .firstName("some-fname")
-                                             .lastName("some-lname")
-                                             .email(randomAlphabetic(10) + "@somewhere.com")
-                                             .build())
-                                  .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                                                                    .addressLine1("addressLine1")
-                                                                    .build()))
-                                  .build());
+                .name(organisationName)
+                .sraId(randomAlphabetic(10) + "sra-id-number1")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl(randomAlphabetic(10) + "company-url")
+                .companyNumber(randomAlphabetic(5) + "com")
+                .pbaAccounts(pbaAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(randomAlphabetic(10) + "@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("some-country")
+                        .county("some-county")
+                        .townCity("some-town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange")
+                                .build()))
+                        .build()))
+                .build());
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
         Response response = withAuthenticatedRequest()
                 .body(organisationCreationRequest)
-                .post("/organisations")
+                .post("v1/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -118,6 +133,25 @@ public class ProfessionalApiClient {
         .statusCode(OK.value());
 
         return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrieveOrganisationDetails() {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations")
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("Retrieve organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
