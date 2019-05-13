@@ -22,7 +22,7 @@ public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
             List<DxAddressCreationRequest> dxAddresses = contactInfo.getDxAddress();
             if (!CollectionUtils.isEmpty(dxAddresses)) {
                 dxAddresses.forEach(dxAdd -> {
-                    if (!isDXNumberValid(dxAdd.getDxNumber()) || dxAdd.getDxExchange() == null) {
+                    if (!isDxNumberValid(dxAdd.getDxNumber()) || dxAdd.getDxExchange() == null) {
 
                         log.error("DX Address Number OR DX Exchange should not be null");
                         isDxRequestValid = false;
@@ -33,11 +33,11 @@ public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
         });
     }
 
-    private Boolean isDXNumberValid(String dxNumber){
+    private Boolean isDxNumberValid(String dxNumber) {
 
         Boolean numberIsValid = true;
 
-        if(dxNumber != null) {
+        if (dxNumber != null) {
 
             String regex = "^(?:DX|NI) [0-9]{10}+$";
             Pattern pattern = Pattern.compile(regex);
