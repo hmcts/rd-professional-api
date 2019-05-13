@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./gradlew clean
-./gradlew check
-./gradlew integrationTest
+./gradlew clean && \
+./gradlew check && \
+./gradlew integrationTest && \
 ./gradlew pitest

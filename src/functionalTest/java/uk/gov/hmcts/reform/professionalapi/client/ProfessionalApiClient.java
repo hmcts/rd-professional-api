@@ -117,8 +117,8 @@ public class ProfessionalApiClient {
         }
 
         response.then()
-        .assertThat()
-        .statusCode(CREATED.value());
+                .assertThat()
+                .statusCode(CREATED.value());
 
         return response.body().as(Map.class);
     }
@@ -129,8 +129,8 @@ public class ProfessionalApiClient {
                 .get("/search/user/" + email)
                 .andReturn();
         response.then()
-        .assertThat()
-        .statusCode(OK.value());
+                .assertThat()
+                .statusCode(OK.value());
 
         return response.body().as(Map.class);
     }
