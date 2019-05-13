@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Map;

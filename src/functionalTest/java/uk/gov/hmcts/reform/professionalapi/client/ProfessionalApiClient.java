@@ -145,7 +145,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
             .body(organisationCreationRequest)
-            .put("v1/organisations/" +organisationIdentifier)
+            .put("v1/organisations/" + organisationIdentifier)
             .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
