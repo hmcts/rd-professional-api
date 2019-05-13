@@ -37,8 +37,8 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        professionalUserRepository.deleteAll();
         contactInformationRepository.deleteAll();
+        professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
     }
