@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 
 
 @RequestMapping(
-    path = "/organisations",
+    path = "v1/organisations",
     consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
     produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
