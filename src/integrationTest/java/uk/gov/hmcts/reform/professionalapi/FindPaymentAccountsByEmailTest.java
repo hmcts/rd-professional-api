@@ -13,10 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.*;
 
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
@@ -30,6 +27,8 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Autowired
     private ContactInformationRepository contactInformationRepository;
     @Autowired
+    private DxAddressRepository dxAddressRepository;
+    @Autowired
     PaymentAccountRepository paymentAccountRepository;
 
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
@@ -37,6 +36,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Before
     public void setUp() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
