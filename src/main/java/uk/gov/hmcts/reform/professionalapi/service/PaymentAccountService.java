@@ -22,7 +22,6 @@ public class PaymentAccountService {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
 
         if (user != null) {
-            log.info("user is not empty in payment account service");
             organisation = organisationRepository.findByUsers(user);
         }
         return organisation;

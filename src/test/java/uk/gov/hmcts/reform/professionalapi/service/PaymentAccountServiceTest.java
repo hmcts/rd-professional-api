@@ -59,6 +59,7 @@ public class PaymentAccountServiceTest {
 
         assertEquals(anOrganisation.getName(), theOrganisation.getName());
         assertEquals(anOrganisation.getSraId(), theOrganisation.getSraId());
+        assertEquals(anOrganisation.getStatus(), theOrganisation.getStatus());
         assertEquals(anOrganisation.getCompanyNumber(), theOrganisation.getCompanyNumber());
         assertEquals(anOrganisation.getSraRegulated(), theOrganisation.getSraRegulated());
         assertEquals(anOrganisation.getCompanyUrl(), theOrganisation.getCompanyUrl());
