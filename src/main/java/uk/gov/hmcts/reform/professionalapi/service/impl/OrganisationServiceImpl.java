@@ -148,9 +148,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
-        log.debug("Received new organisation details...");
+        log.debug("Retrieving all organisations...");
         return new OrganisationsDetailResponse(organisations, true);
     }
-    
+
 }
 
