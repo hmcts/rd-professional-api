@@ -89,6 +89,11 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
     }
 
     @Test
+    public void can_update_organisation_status_from_pending_to_deleted_should_returns_status_200() {
+        updateAndValidateOrganisation(createOrganisationRequest(),OrganisationStatus.DELETED,200);
+    }
+
+    @Test
     public void can_update_organisation_status_from_pending_to_pending_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,200);
@@ -127,6 +132,13 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,400);
+    }
+
+    @Test
+    public void can_not_update_organisation_status_from_deleted_to_deleted_should_returns_status_400() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,400);
     }
 
     @Test

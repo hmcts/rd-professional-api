@@ -77,6 +77,7 @@ public class ProfessionalApiClient {
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
+            .status(OrganisationStatus.PENDING)
             .sraId(randomAlphabetic(10) + "sra-id-number1")
             .sraRegulated(Boolean.FALSE)
             .companyUrl(randomAlphabetic(10) + "company-url")
