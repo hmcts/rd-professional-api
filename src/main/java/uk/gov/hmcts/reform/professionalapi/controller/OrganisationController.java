@@ -69,7 +69,7 @@ public class OrganisationController {
             @ApiResponse(
                     code = 200,
                     message = "A representation of the retrieve organisation",
-                    response = OrganisationResponse.class
+                    response = OrganisationsDetailResponse.class
             )
     })
     @GetMapping

@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import java.util.List;
-import org.springframework.stereotype.Service;
 
-@Service
+import org.springframework.stereotype.Component;
+
+@Component
 public class UpdateOrganisationRequestValidator {
 
     private final List<UpdateOrganisationValidator> validators;
