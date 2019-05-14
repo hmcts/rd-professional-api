@@ -12,52 +12,17 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 
 public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegrationTest {
-
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private  DxAddressRepository dxAddressRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void persists_and_returns_valid_minimal_organisation() {

@@ -7,31 +7,15 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
 
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
     @Before
     public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        professionalUserRepository.deleteAll();
-        organisationRepository.deleteAll();
-
         Organisation organisation = new Organisation("some-org-name", "PENDING", null, null, null, null);
         ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", "PENDING", organisation);
         organisationRepository.save(organisation);
