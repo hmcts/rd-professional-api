@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -17,13 +18,12 @@ public class PaymentAccountService {
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
-        Organisation organisation = null;
-
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
 
-        if (user != null) {
-            organisation = organisationRepository.findByUsers(user);
+        if (user == null) {
+            throw new EmptyResultDataAccessException(404);
         }
+        Organisation organisation = organisationRepository.findByUsers(user);
         return organisation;
     }
 
