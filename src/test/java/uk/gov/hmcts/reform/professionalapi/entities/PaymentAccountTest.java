@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.entities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -26,6 +28,16 @@ public class PaymentAccountTest {
         assertThat(paymentAccount.getLastUpdated()).isNotNull();
 
         assertThat(paymentAccount.getCreated()).isNotNull();
+
+        paymentAccount.setId(UUID.randomUUID());
+
+        paymentAccount.setPbaNumber("some-pba-number");
+
+        assertThat(paymentAccount.getId()).isNotNull();
+
+        assertThat(paymentAccount.getPbaNumber()).isNotNull();
+
+
     }
 
 }

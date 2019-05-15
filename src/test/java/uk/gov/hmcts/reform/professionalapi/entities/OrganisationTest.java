@@ -8,21 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 
 public class OrganisationTest {
 
     @Test
     public void creates_organisation_correctly() {
 
-        Organisation organisation = new Organisation("some-name", "some-status",
+        Organisation organisation = new Organisation("some-name", OrganisationStatus.PENDING,
                 "sra-id","company-number",Boolean.FALSE,"company-url");
 
         assertThat(organisation.getName()).isEqualTo("some-name");
-        assertThat(organisation.getStatus()).isEqualTo("some-status");
+        assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.PENDING);
         assertThat(organisation.getSraId()).isEqualTo("sra-id");
         assertThat(organisation.getCompanyNumber()).isEqualTo("company-number");
         assertThat(organisation.getSraRegulated()).isEqualTo(Boolean.FALSE);

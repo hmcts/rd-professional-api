@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
@@ -16,7 +17,7 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private String name;
     @JsonProperty
-    private String status;
+    private OrganisationStatus status;
     @JsonProperty
     private String sraId;
     @JsonProperty

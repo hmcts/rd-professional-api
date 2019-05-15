@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Getter
 @Builder(builderMethodName = "anOrganisationCreationRequest")
@@ -13,6 +14,8 @@ public class OrganisationCreationRequest {
 
     @NotNull
     private final String name;
+
+    private final OrganisationStatus status;
 
     private final String sraId;
 
@@ -32,6 +35,7 @@ public class OrganisationCreationRequest {
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
+            @JsonProperty("status") OrganisationStatus status,
             @JsonProperty("sraId") String sraId,
             @JsonProperty("sraRegulated") Boolean sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
@@ -41,6 +45,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
+        this.status = status;
         this.sraId = sraId;
         this.sraRegulated = sraRegulated;
         this.companyNumber = companyNumber;
