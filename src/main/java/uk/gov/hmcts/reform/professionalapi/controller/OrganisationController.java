@@ -13,12 +13,20 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @RequestMapping(
@@ -102,12 +110,13 @@ public class OrganisationController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
-
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        updateOrganisationRequestValidator.validate(organisationCreationRequest, organisationIdentifier);
+        UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), inputOrganisationIdentifier);
 
         OrganisationResponse organisationResponse =
-                organisationService.updateOrganisation(organisationCreationRequest, UUID.fromString(organisationIdentifier));
+                organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
         return ResponseEntity.status(200).build();
     }

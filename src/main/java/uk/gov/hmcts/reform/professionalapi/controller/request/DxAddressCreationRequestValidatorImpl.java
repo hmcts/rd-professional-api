@@ -9,11 +9,11 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
 
-    Boolean  isDxRequestValid = true;
     //TODO refactor to use validation object
 
     @Override
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
+        Boolean  isDxRequestValid;
         List<ContactInformationCreationRequest> contactInformationCreationRequests = organisationCreationRequest.getContactInformation();
         contactInformationCreationRequests.forEach(contactInfo -> {
             List<DxAddressCreationRequest> dxAddresses = contactInfo.getDxAddress();
@@ -25,26 +25,24 @@ public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
                             String dxNumberDigits = dxNumberToken[1];
                             if (dxNumberDigits == null || dxNumberDigits.length() != 10) {
                                 log.error("DX Address Number should contain ten numerical digits");
-                                isDxRequestValid = false;
+                                dxAdd.setIsDxRequestValid(false);
                             }
                             try {
                                 Integer.valueOf(dxNumberDigits);
                             } catch (NumberFormatException ne) {
                                 log.error("DX Address Number is invalid format");
-                                isDxRequestValid = false;
+                                dxAdd.setIsDxRequestValid(false);
                             }
                         } else {
                             log.error("DX Address Number should start with either 'DX ' or 'NI ' and be followed by a space");
-                            isDxRequestValid = false;
+                            dxAdd.setIsDxRequestValid(false);
                         }
                     } else {
                         log.error("DX Address Number OR DX Exchange should not be null");
-                        isDxRequestValid = false;
+                        dxAdd.setIsDxRequestValid(false);
                     }
-                    dxAdd.setIsDxRequestValid(isDxRequestValid);
                 });
             }
         });
     }
-
 }
