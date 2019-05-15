@@ -26,5 +26,4 @@ public class PaymentAccountService {
         Organisation organisation = organisationRepository.findByUsers(user);
         return organisation;
     }
-
 }
