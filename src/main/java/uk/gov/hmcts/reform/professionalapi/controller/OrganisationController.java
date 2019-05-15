@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,7 +36,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
@@ -51,7 +51,12 @@ public class OrganisationController {
     private PaymentAccountService paymentAccountservice;
 
 
-    @ApiOperation("Creates an organisation")
+    @ApiOperation(
+        value = "Creates an organisation",
+        authorizations = {
+                @Authorization(value = "ServiceAuthorization")
+        }
+    )
     @ApiResponses({
             @ApiResponse(
                     code = 201,
@@ -80,7 +85,12 @@ public class OrganisationController {
                 .body(organisationResponse);
     }
 
-    @ApiOperation("Retrieves an organisation")
+    @ApiOperation(
+          value = "Retrieves an organisation",
+          authorizations = {
+                  @Authorization(value = "ServiceAuthorization")
+          }
+    )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -88,7 +98,7 @@ public class OrganisationController {
                     response = OrganisationsDetailResponse.class
             )
     })
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<OrganisationsDetailResponse> retrieveOrganisations() {
 
         log.info("Received request to retrieve a new organisation...");
@@ -102,7 +112,12 @@ public class OrganisationController {
                 .body(organisationResponse);
     }
 
-    @ApiOperation("Retrieves the user with the given email address")
+    @ApiOperation(
+          value = "Retrieves the user with the given email address",
+          authorizations = {
+                  @Authorization(value = "ServiceAuthorization")
+          }
+    )
     @ApiParam(
         name = "email",
         type = "string",
@@ -124,14 +139,22 @@ public class OrganisationController {
             message = "No user was found with the provided email address"
         )
     })
-    @GetMapping("/users")
+    @GetMapping(
+        value = "/users",
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
     public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity
                 .status(200)
                 .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
     }
 
-    @ApiOperation("Retrieves an organisations payment accounts by super user email")
+    @ApiOperation(
+          value = "Retrieves an organisations payment accounts by super user email",
+          authorizations = {
+                  @Authorization(value = "ServiceAuthorization")
+          }
+    )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -139,7 +162,10 @@ public class OrganisationController {
                     response = OrganisationPbaResponse.class
             )
     })
-    @GetMapping(path = "/pbas")
+    @GetMapping(
+        path = "/pbas",
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
     public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email...");
 
