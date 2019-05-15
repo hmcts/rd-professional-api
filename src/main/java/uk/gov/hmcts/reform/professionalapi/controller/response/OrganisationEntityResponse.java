@@ -5,36 +5,42 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
 
     @JsonProperty
-    private   String id;
+    private String organisationIdentifier;
     @JsonProperty
-    private   String name;
+    private String name;
     @JsonProperty
-    private OrganisationStatus status;
+    private String status;
     @JsonProperty
-    private   String sraId;
+    private String sraId;
     @JsonProperty
-    private   Boolean sraRegulated;
+    private Boolean sraRegulated;
     @JsonProperty
-    private   String companyNumber;
+    private String companyNumber;
     @JsonProperty
-    private   String companyUrl;
+    private String companyUrl;
     @JsonProperty
-    private   List<SuperUserResponse> superUser;
+    private List<SuperUserResponse> superUser;
     @JsonProperty
-    private  List<PbaAccountResponse> pbaAccounts;
+    private List<PbaAccountResponse> pbaAccounts;
     @JsonProperty
-    private  List<ContactInformationResponse> contactInformation;
+    private List<ContactInformationResponse> contactInformation;
 
-    public OrganisationEntityResponse(Organisation organisation) {
+    public OrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        this.id = organisation.getId().toString();
+        getOrganisationEntityResponse(organisation, isRequiredAllEntities);
+    }
+
+    private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
+
+        this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
+                ? "" : organisation.getOrganisationIdentifier().toString();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
         this.sraId = organisation.getSraId();
@@ -49,9 +55,12 @@ public class OrganisationEntityResponse  {
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
                 .collect(toList());
-        this.contactInformation = organisation.getContactInformation()
-                                   .stream()
-                                   .map(contactInfo -> new ContactInformationResponse(contactInfo))
-                                   .collect(toList());
+        if (isRequiredAllEntities) {
+            this.contactInformation = organisation.getContactInformation()
+                    .stream()
+                    .map(contactInfo -> new ContactInformationResponse(contactInfo))
+                    .collect(toList());
+        }
     }
+
 }

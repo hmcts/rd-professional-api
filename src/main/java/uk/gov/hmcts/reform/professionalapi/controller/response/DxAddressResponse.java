@@ -13,6 +13,11 @@ public class DxAddressResponse {
     private  String dxExchange;
 
     public DxAddressResponse(DxAddress dxAddress) {
+        getDxAddressResponse(dxAddress);
+    }
+
+    private void getDxAddressResponse(DxAddress dxAddress) {
+
         this.dxNumber = dxAddress.getDxNumber();
         this.dxExchange = dxAddress.getDxExchange();
     }

@@ -12,7 +12,10 @@ public class PbaAccountResponse {
 
 
     public PbaAccountResponse(PaymentAccount paymentAccount) {
+        getPbaAccountResponse(paymentAccount);
+    }
 
+    private void getPbaAccountResponse(PaymentAccount paymentAccount) {
         this.pbaNumber = paymentAccount.getPbaNumber();
     }
 }
