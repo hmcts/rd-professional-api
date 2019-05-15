@@ -182,6 +182,5 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepository,
                 times(1)).findAll();
-
     }
 }

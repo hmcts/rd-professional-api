@@ -12,10 +12,10 @@ public class OrganisationsDetailResponse {
     @JsonProperty
     private  List<OrganisationEntityResponse> organisations;
 
-    public OrganisationsDetailResponse(List<Organisation> organisations) {
+    public OrganisationsDetailResponse(List<Organisation> organisations, Boolean isRequiredAllEntities) {
 
         this.organisations = organisations.stream().map(organisation ->
-                new OrganisationEntityResponse(organisation)).collect(Collectors.toList());
+                new OrganisationEntityResponse(organisation, isRequiredAllEntities)).collect(Collectors.toList());
 
     }
 }

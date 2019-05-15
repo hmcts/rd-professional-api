@@ -15,9 +15,9 @@ public class DxAddressTest {
 
         ContactInformation contactInformation = mock(ContactInformation.class);
 
-        DxAddress dxAddress = new DxAddress("some-number", "some-exchange", contactInformation);
+        DxAddress dxAddress = new DxAddress("DX 1234567890", "some-exchange", contactInformation);
 
-        assertThat(dxAddress.getDxNumber()).isEqualTo("some-number");
+        assertThat(dxAddress.getDxNumber()).isEqualTo("DX 1234567890");
         assertThat(dxAddress.getDxExchange()).isEqualTo("some-exchange");
         assertThat(dxAddress.getContactInformation()).isEqualTo(contactInformation);
         assertThat(dxAddress.getId()).isNull();

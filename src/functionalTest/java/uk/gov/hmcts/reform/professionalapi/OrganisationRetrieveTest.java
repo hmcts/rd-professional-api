@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("functional")
 public class OrganisationRetrieveTest extends FunctionalTestSuite {
 
-
     @Test
     public void can_retrieve_an_organisation() {
 

@@ -7,4 +7,5 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Repository
 public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUser, UUID> {
+    ProfessionalUser findByEmailAddress(String email);
 }
