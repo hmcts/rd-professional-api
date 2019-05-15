@@ -40,7 +40,7 @@ public class PaymentAccountServiceTest {
 
     @Test
     public void retrievePaymentAccountsByEmail() {
-        Organisation theOrganisation = new Organisation("some-org-", "pending", "sra-id", "company-number", false, "company-url");
+        Organisation theOrganisation = new Organisation("some-org-", OrganisationStatus.PENDING, "sra-id", "company-number", false, "company-url");
         PowerMockito.when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
 
         ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", "status", theOrganisation);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation newOrganisation = new Organisation(
                 organisationCreationRequest.getName(),
-                OrganisationStatus.PENDING.name(),
+                OrganisationStatus.PENDING,
                 organisationCreationRequest.getSraId(),
                 organisationCreationRequest.getCompanyNumber(),
                 organisationCreationRequest.getSraRegulated(),
@@ -152,5 +153,28 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationsDetailResponse(organisations, true);
     }
 
+    @Override
+    public OrganisationResponse updateOrganisation(
+            OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        log.info("Into update Organisation service");
+        organisation.setName(organisationCreationRequest.getName());
+        organisation.setStatus(organisationCreationRequest.getStatus());
+        organisation.setSraId(organisationCreationRequest.getSraId());
+        organisation.setCompanyNumber(organisationCreationRequest.getCompanyNumber());
+        organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
+        organisation.setCompanyUrl(organisationCreationRequest.getCompanyUrl());
+        organisationRepository.save(organisation);
+        log.info("Update Organisation service done...");
+
+        return new OrganisationResponse(organisation);
+    }
+
+    @Override
+    public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
+        return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    }
 }
 
