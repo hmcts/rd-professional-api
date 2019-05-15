@@ -17,9 +17,13 @@ public class SuperUserResponse {
 
     public SuperUserResponse(ProfessionalUser professionalUser) {
 
+        getSuperUserResponse(professionalUser);
+
+    }
+
+    private void getSuperUserResponse(ProfessionalUser professionalUser) {
         this.firstName = professionalUser.getFirstName();
         this.lastName = professionalUser.getLastName();
         this.email = professionalUser.getEmailAddress();
-
     }
 }

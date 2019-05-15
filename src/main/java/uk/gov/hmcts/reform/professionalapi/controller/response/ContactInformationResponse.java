@@ -30,6 +30,11 @@ public class ContactInformationResponse {
 
     public ContactInformationResponse(ContactInformation contactInfo) {
 
+        getContactInformationResponse(contactInfo);
+    }
+
+    private void getContactInformationResponse(ContactInformation contactInfo) {
+
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();

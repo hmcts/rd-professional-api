@@ -155,6 +155,25 @@ public class ProfessionalApiClient {
 
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations/pbas?email=" + email)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("Retrieve organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+
     private RequestSpecification withUnauthenticatedRequest() {
         return RestAssured.given()
                 .relaxedHTTPSValidation()
