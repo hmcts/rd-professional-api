@@ -126,7 +126,8 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchForUserByEmailAddress(String email) {
         Response response = withAuthenticatedRequest()
-                .get("/search/user/" + email)
+                .param("email", email)
+                .get("/v1/organisations/users/")
                 .andReturn();
         response.then()
                 .assertThat()

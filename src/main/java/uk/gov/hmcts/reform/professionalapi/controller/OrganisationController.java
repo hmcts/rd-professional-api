@@ -1,20 +1,32 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
@@ -29,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 public class OrganisationController {
 
     private OrganisationServiceImpl organisationService;
+    private ProfessionalUserService professionalUserService;
 
     private OrganisationCreationRequestValidator validator;
 
@@ -81,5 +94,34 @@ public class OrganisationController {
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
+    }
+
+    @ApiOperation("Retrieves the user with the given email address")
+    @ApiParam(
+        name = "email",
+        type = "string",
+        value = "The email address of the user to return",
+        required = true
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "A representation of a professional user",
+            response = ProfessionalUserResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "An invalid email address was provided"
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "No user was found with the provided email address"
+        )
+    })
+    @GetMapping("/users")
+    public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
+        return ResponseEntity
+                .status(200)
+                .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
     }
 }

@@ -65,7 +65,7 @@ public class ProfessionalReferenceDataClient {
 
         return organisationResponse;
     }
-    
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Map<String, Object> findUserByEmail(String email) {
         HttpHeaders headers = new HttpHeaders();
@@ -77,10 +77,11 @@ public class ProfessionalReferenceDataClient {
         try {
             HttpEntity<?> request = new HttpEntity<>(headers);
             responseEntity = restTemplate
-                    .exchange("http://localhost:" + prdApiPort + "/search/user/" + email,
+                    .exchange("http://localhost:" + prdApiPort + "/v1/organisations/users?email={email}",
                               HttpMethod.GET,
                               request,
-                              Map.class);
+                              Map.class,
+                              email);
         } catch (HttpClientErrorException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
