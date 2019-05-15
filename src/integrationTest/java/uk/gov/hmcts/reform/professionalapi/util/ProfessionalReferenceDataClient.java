@@ -61,6 +61,37 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
+    public Map<String, Object> findPaymentAccountsByEmail(String email) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(headers);
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + "/v1/organisations/pbas?email=" + email,
+                            HttpMethod.GET,
+                            request,
+                            Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map organisationResponse = objectMapper
+                .convertValue(
+                        responseEntity.getBody(),
+                        Map.class);
+
+        organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
+
+        return organisationResponse;
+    }
+
     public Map<String,Object> retrieveAllOrganisationDetailsTest() {
 
         HttpHeaders headers = new HttpHeaders();
