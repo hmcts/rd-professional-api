@@ -6,7 +6,10 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.UUID;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -32,7 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserR
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
-
 
 @RequestMapping(
         path = "v1/organisations",
@@ -46,7 +51,8 @@ public class OrganisationController {
     private OrganisationServiceImpl organisationService;
     private ProfessionalUserService professionalUserService;
 
-    private OrganisationCreationRequestValidator validator;
+    private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
+    private OrganisationCreationRequestValidator organisationCreationRequestValidator;
 
     private PaymentAccountService paymentAccountservice;
 
@@ -74,7 +80,7 @@ public class OrganisationController {
 
         log.info("Received request to create a new organisation...");
 
-        validator.validate(organisationCreationRequest);
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
@@ -174,5 +180,32 @@ public class OrganisationController {
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
+    }
+
+    @ApiOperation(value = "Updates an organisation")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Updated an organisation"),
+        @ApiResponse(code = 404, message = "If Organisation is not found"),
+        @ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
+    })
+    @PutMapping(
+        value = "/{orgId}",
+        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity<?> updatesOrganisation(
+        @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
+        @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
+        UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), inputOrganisationIdentifier);
+
+        OrganisationResponse organisationResponse =
+            organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
+        log.info("Received response to update organisation..." + organisationResponse);
+        return ResponseEntity.status(200).build();
     }
 }

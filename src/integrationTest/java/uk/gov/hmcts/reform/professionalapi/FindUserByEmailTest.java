@@ -16,7 +16,7 @@ public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
 
     @Before
     public void setUp() {
-        Organisation organisation = new Organisation("some-org-name", "PENDING", null, null, null, null);
+        Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
         ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", "PENDING", organisation);
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);

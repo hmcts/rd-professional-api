@@ -5,14 +5,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-@Service
+@Component
 @Slf4j
 public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
-
-    Boolean  isDxRequestValid = true;
     //TODO refactor to use validation object
 
     @Override
@@ -25,9 +23,8 @@ public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
                     if (!isDxNumberValid(dxAdd.getDxNumber()) || dxAdd.getDxExchange() == null) {
 
                         log.error("DX Address Number OR DX Exchange should not be null");
-                        isDxRequestValid = false;
+                        dxAdd.setIsDxRequestValid(false);
                     }
-                    dxAdd.setIsDxRequestValid(isDxRequestValid);
                 });
             }
         });

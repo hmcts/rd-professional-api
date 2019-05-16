@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
 public class ProfessionalReferenceDataClient {
 
@@ -111,5 +112,29 @@ public class ProfessionalReferenceDataClient {
         response.put("http_status", responseEntity.getStatusCode().toString());
 
         return response;
+    }
+
+    public Map<String, Object> updateOrganisation(
+        OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+
+        ResponseEntity<OrganisationResponse> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_BASE_PATH + "/" + organisationIdentifier;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        try {
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,headers);
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return organisationResponse;
     }
 }
