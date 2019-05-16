@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
@@ -103,9 +104,11 @@ public class ProfessionalApiClient {
     }
 
     public Map<String, Object> createOrganisation() {
+        return createOrganisation(createOrganisationRequest().build());
+    }
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
         Response response = withAuthenticatedRequest()
                 .body(organisationCreationRequest)
                 .post("v1/organisations")
@@ -122,6 +125,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveOrganisationDetails() {
         Response response = withAuthenticatedRequest()
                 .body("")
@@ -140,6 +144,7 @@ public class ProfessionalApiClient {
 
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
         Response response = withAuthenticatedRequest()
                 .body("")
@@ -155,7 +160,6 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
 
         return response.body().as(Map.class);
-
     }
 
     public void updateOrganisation(String organisationIdentifier) {
@@ -178,8 +182,8 @@ public class ProfessionalApiClient {
         return RestAssured.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", "application/json")
-                .header("Accepts", "application/json");
+                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
+                .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
     }
 
     private RequestSpecification withAuthenticatedRequest() {
