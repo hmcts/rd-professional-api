@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -66,43 +68,47 @@ public class ProfessionalApiClient {
                 .asString();
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> createOrganisation(String organisationName,
-                                                  String[] pbas) {
-
+    private  OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
         List<PbaAccountCreationRequest> pbaAccounts = asList(aPbaPaymentAccount()
-                                                                     .pbaNumber(pbas[0])
-                                                                     .build(),
-                                                             aPbaPaymentAccount()
-                                                                     .pbaNumber(pbas[1])
-                                                                     .build());
+                .pbaNumber(randomAlphabetic(10))
+                .build(),
+            aPbaPaymentAccount()
+                .pbaNumber(randomAlphabetic(10))
+                .build());
 
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
-                        .name(organisationName)
-                        .sraId(randomAlphabetic(10) + "sra-id-number1")
-                        .sraRegulated(Boolean.FALSE)
-                        .companyUrl(randomAlphabetic(10) + "company-url")
-                        .companyNumber(randomAlphabetic(5) + "com")
-                        .pbaAccounts(pbaAccounts)
-                        .superUser(aUserCreationRequest()
-                                .firstName("some-fname")
-                                .lastName("some-lname")
-                                .email(randomAlphabetic(10) + "@somewhere.com")
-                                .build())
-                        .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                                .addressLine1("addressLine1")
-                                .addressLine2("addressLine2")
-                                .addressLine3("addressLine3")
-                                .country("some-country")
-                                .county("some-county")
-                                .townCity("some-town-city")
-                                .postCode("some-post-code")
-                                .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                        .dxNumber("DX 1234567890")
-                                        .dxExchange("dxExchange").build()))
-                                .build()))
-                        .build();
+        return someMinimalOrganisationRequest()
+            .name(randomAlphabetic(10))
+            .status(OrganisationStatus.PENDING)
+            .sraId(randomAlphabetic(10) + "sra-id-number1")
+            .sraRegulated(Boolean.FALSE)
+            .companyUrl(randomAlphabetic(10) + "company-url")
+            .companyNumber(randomAlphabetic(5) + "com")
+            .pbaAccounts(pbaAccounts)
+            .superUser(aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email(randomAlphabetic(10) + "@somewhere.com")
+                .build())
+            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                    .dxNumber("DX 1234567890")
+                    .dxExchange("dxExchange").build()))
+                .build()));
+    }
 
+    public Map<String, Object> createOrganisation() {
+        return createOrganisation(createOrganisationRequest().build());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
         Response response = withAuthenticatedRequest()
                 .body(organisationCreationRequest)
                 .post("v1/organisations")
@@ -119,6 +125,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveOrganisationDetails() {
         Response response = withAuthenticatedRequest()
                 .body("")
@@ -137,6 +144,7 @@ public class ProfessionalApiClient {
 
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
         Response response = withAuthenticatedRequest()
                 .body("")
@@ -152,16 +160,30 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
 
         return response.body().as(Map.class);
-
     }
 
+    public void updateOrganisation(String organisationIdentifier) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+
+        Response response = withAuthenticatedRequest()
+            .body(organisationCreationRequest)
+            .put("v1/organisations/" + organisationIdentifier)
+            .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(OK.value());
+    }
 
     private RequestSpecification withUnauthenticatedRequest() {
         return RestAssured.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", "application/json")
-                .header("Accepts", "application/json");
+                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
+                .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
     }
 
     private RequestSpecification withAuthenticatedRequest() {
