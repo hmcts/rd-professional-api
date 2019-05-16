@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -48,6 +49,7 @@ public class OrganisationServiceImplTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
+    private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -108,7 +110,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name","sra-id",Boolean.FALSE,"company-number","company-url",
+                        "some-org-name", OrganisationStatus.PENDING, "sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
                         pbaAccountCreationRequests, contactInformationCreationRequests);
 
@@ -133,8 +135,12 @@ public class OrganisationServiceImplTest {
 
         when(dxAddressCreationRequest.getIsDxRequestValid())
                 .thenReturn(true);
+
         when(organisationRepository.findAll())
                 .thenReturn(organisations);
+
+        when(organisationRepository.findByOrganisationIdentifier(any()))
+                .thenReturn(organisation);
     }
 
     @Test
@@ -182,5 +188,44 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepository,
                 times(1)).findAll();
+    }
+
+    @Test
+    public void updates_an_organisation() {
+        OrganisationResponse organisationResponse =
+            organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+
+        assertThat(organisationResponse).isNotNull();
+        verify(
+            organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
+
+        verify(
+            organisationRepository,
+                times(1)).save(any(Organisation.class));
+
+        verify(
+                organisation,
+                times(1)).setName(any());
+
+        verify(
+                organisation,
+                times(1)).setStatus(any());
+
+        verify(
+                organisation,
+                times(1)).setSraId(any());
+
+        verify(
+                organisation,
+                times(1)).setCompanyNumber(any());
+
+        verify(
+                organisation,
+                times(1)).setSraRegulated(any());
+
+        verify(
+                organisation,
+                times(1)).setCompanyUrl(any());
     }
 }
