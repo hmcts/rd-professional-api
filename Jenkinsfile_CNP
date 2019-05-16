@@ -29,7 +29,9 @@ def vaultOverrides = [
 withPipeline(type, product, component) {
 
     before('buildinfra:prod') {
-        sh "rm -rf infrastructure/"
+        currentBuild.result = 'SUCCESS'
+        currentBuild.description = "SUCCESS"
+        error 'Reference Data projects are not authorised to be in production environments yet.'
     }
 
     overrideVaultEnvironments(vaultOverrides)
