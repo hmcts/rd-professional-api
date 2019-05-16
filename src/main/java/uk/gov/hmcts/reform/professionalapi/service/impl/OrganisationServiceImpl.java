@@ -176,5 +176,11 @@ public class OrganisationServiceImpl implements OrganisationService {
     public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
+
+    @Override
+    public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
+
+        return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
+    }
 }
 

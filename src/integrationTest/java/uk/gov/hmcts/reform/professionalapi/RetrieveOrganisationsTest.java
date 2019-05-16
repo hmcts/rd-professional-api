@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 @Slf4j
@@ -23,43 +20,78 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void persists_and_returns_all_organisations_details() {
 
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id1")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("company")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .pbaAccounts(Arrays.asList(aPbaPaymentAccount()
-                .pbaNumber("pbaNumber")
-                .build()))
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1")
-                        .addressLine2("addressLine2")
-                        .addressLine3("addressLine3")
-                        .country("country")
-                        .county("county")
-                        .townCity("town-city")
-                        .postCode("post-code-test")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
-                .build();
-
-        Map<String, Object> response =
-              professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
+        String organisationIdentifier = createOrganisationRequest("pending");
+        assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsTest();
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
-        log.info("RetrieveOrganisationsTest:Received response to retrieve an organisation details...");
+
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_pending_status() {
+
+        String organisationIdentifier = createOrganisationRequest("pending");
+        assertThat(organisationIdentifier).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.getStatus().toUpperCase());
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations_details_by_active_status() {
+        Map<String, Object> orgResponse;
+        String organisationIdentifier = createOrganisationRequest("active");
+        assertThat(organisationIdentifier).isNotEmpty();
+        orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+                .status(OrganisationStatus.ACTIVE).build();
+
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+
+        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
+        orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void persists_and_return_empty_organisation_details_when_no_status_found_in_the_db() {
+
+        String organisationIdentifier = createOrganisationRequest("active");
+        assertThat(organisationIdentifier).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
+    public void return_404_when_invalid_status_send_in_the_request_param() {
+
+        String organisationIdentifier = createOrganisationRequest("active");
+        assertThat(organisationIdentifier).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV");
+        assertThat(orgResponse.get("http_status").toString().contains("404"));
+    }
+
+    private String createOrganisationRequest(String status) {
+        OrganisationCreationRequest organisationCreationRequest = null;
+        if (status.equals("active")) {
+            organisationCreationRequest = organisationRequestWithAllFields().status(OrganisationStatus.ACTIVE).build();
+        } else if (status.equals("pending")) {
+            organisationCreationRequest = organisationRequestWithAllFields().build();
+        }
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 }
