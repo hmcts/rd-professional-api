@@ -1,18 +1,21 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 
 public class ProfessionalReferenceDataClient {
 
@@ -27,22 +30,38 @@ public class ProfessionalReferenceDataClient {
         this.prdApiPort = prdApiPort;
     }
 
-    public Map<String, Object> createOrganisation(
-            OrganisationCreationRequest organisationCreationRequest) {
+    public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
+        return postRequest(APP_BASE_PATH, request);
+    }
+
+    public Map<String, Object> findUserByEmail(String email) {
+        return getRequest("/v1/organisations/users?email={email}", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsByEmail(String email) {
+        return getRequest("/v1/organisations/pbas?email={email}", email);
+    }
+
+    public Map<String,Object> retrieveAllOrganisationDetailsTest() {
+        return getRequest(APP_BASE_PATH);
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        HttpEntity<OrganisationCreationRequest> request =
-                new HttpEntity<>(organisationCreationRequest, headers);
+        HttpEntity<T> request =
+                new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<Map> responseEntity;
 
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    "http://localhost:" + prdApiPort + APP_BASE_PATH,
+                    "http://localhost:" + prdApiPort + uriPath,
                     request,
                     Map.class);
 
@@ -62,7 +81,8 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
-    public Map<String, Object> findPaymentAccountsByEmail(String email) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Map<String, Object> getRequest(String uriPath, Object... params) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("ServiceAuthorization", JWT_TOKEN);
@@ -72,58 +92,26 @@ public class ProfessionalReferenceDataClient {
         try {
             HttpEntity<?> request = new HttpEntity<>(headers);
             responseEntity = restTemplate
-                    .exchange("http://localhost:" + prdApiPort + "/v1/organisations/pbas?email=" + email,
-                            HttpMethod.GET,
-                            request,
-                            Map.class);
-        } catch (RestClientResponseException ex) {
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                              HttpMethod.GET,
+                              request,
+                              Map.class,
+                              params);
+        } catch (HttpClientErrorException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
 
-        Map organisationResponse = objectMapper
+        Map response = objectMapper
                 .convertValue(
                         responseEntity.getBody(),
                         Map.class);
 
-        organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
+        response.put("http_status", responseEntity.getStatusCode().toString());
 
-        return organisationResponse;
-    }
-
-    public Map<String,Object> retrieveAllOrganisationDetailsTest() {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("ServiceAuthorization", JWT_TOKEN);
-
-        HttpEntity request = new HttpEntity(null,headers);
-
-        ResponseEntity<OrganisationsDetailResponse> responseEntity;
-        try {
-            final String baseUrl = "http://localhost:" + prdApiPort + APP_BASE_PATH;
-            responseEntity = restTemplate.exchange(baseUrl,
-                    HttpMethod.GET,
-                    request,
-                    OrganisationsDetailResponse.class);
-
-        } catch (RestClientResponseException ex) {
-            HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
-            statusAndBody.put("response_body", ex.getResponseBodyAsString());
-            return statusAndBody;
-        }
-
-        Map organisationResponse = objectMapper.convertValue(
-                responseEntity.getBody(),
-                Map.class);
-
-        organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
-
-        return organisationResponse;
-
+        return response;
     }
 
     public Map<String, Object> updateOrganisation(
@@ -136,7 +124,7 @@ public class ProfessionalReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
         try {
-            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<OrganisationCreationRequest>(organisationCreationRequest,headers);
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,headers);
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -145,7 +133,7 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
-        Map<String, Object> organisationResponse = new HashMap<String, Object>();
+        Map<String, Object> organisationResponse = new HashMap<>();
         organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return organisationResponse;
     }

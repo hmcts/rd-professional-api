@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.http.HTTPException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,9 @@ public class ExceptionMapper {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<String> handleEmptyResultDataAccessException(
-                                                                          HttpServletRequest request,
-                                                                          EmptyResultDataAccessException e) {
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, e.getMessage());
+            HttpServletRequest request,
+            EmptyResultDataAccessException e) {
+        LOG.info(HANDLING_EXCEPTION_TEMPLATE, e.getMessage());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -52,6 +53,12 @@ public class ExceptionMapper {
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
     }
 
+    @ExceptionHandler(HTTPException.class)
+    protected ResponseEntity<String> handleHttpException(HttpServletRequest request, HTTPException ex) {
+        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        return new ResponseEntity<>(HttpStatus.resolve(ex.getStatusCode()));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public void httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
@@ -60,9 +67,9 @@ public class ExceptionMapper {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(
-                                                     HttpServletRequest request,
-                                                     Exception e) {
-        LOG.error("Exception: {}", e);
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            HttpServletRequest request,
+            Exception e) {
+        LOG.info("Exception: {}", e);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

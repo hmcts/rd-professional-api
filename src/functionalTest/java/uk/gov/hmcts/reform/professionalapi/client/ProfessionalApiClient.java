@@ -126,6 +126,19 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
+    public Map<String, Object> searchForUserByEmailAddress(String email) {
+        Response response = withAuthenticatedRequest()
+                .param("email", email)
+                .get("/v1/organisations/users/")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveOrganisationDetails() {
         Response response = withAuthenticatedRequest()
                 .body("")

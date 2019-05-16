@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -13,50 +12,15 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 
 
 public class CreateOrganisationWithContactInformationDxAddress extends Service2ServiceEnabledIntegrationTest {
-
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress() {
@@ -68,15 +32,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -99,15 +63,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyno")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -124,15 +88,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -144,15 +108,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -169,15 +133,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -189,15 +153,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber("DX 1234567890")
+                                                                           .dxExchange("dxExchange").build()))
+                                                  .build()))
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -214,15 +178,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .companyUrl("company-url")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber(null)
-                                .dxExchange(null).build()))
-                        .build()))
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber(null)
+                                                                           .dxExchange(null).build()))
+                                                  .build()))
                 .build();
 
         Map<String, Object> response =
@@ -242,15 +206,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                                    .pbaNumber("pbaNumber-1")
+                                    .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName(null)
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName(null)
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .build()))
+                                                  .build()))
                 .build();
 
         Map<String, Object> response =
@@ -268,15 +232,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                                    .pbaNumber("pbaNumber-1")
+                                    .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName("firstname")
-                        .lastName(null)
-                        .email("someone@somewhere.com")
-                        .build())
+                           .firstName("firstname")
+                           .lastName(null)
+                           .email("someone@somewhere.com")
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .build()))
+                                                  .build()))
                 .build();
 
         Map<String, Object> response =
@@ -294,15 +258,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                                    .pbaNumber("pbaNumber-1")
+                                    .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName("firstname")
-                        .lastName("some-lname")
-                        .email(null)
-                        .build())
+                           .firstName("firstname")
+                           .lastName("some-lname")
+                           .email(null)
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .build()))
+                                                  .build()))
                 .build();
 
         Map<String, Object> response =
@@ -320,15 +284,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                                    .pbaNumber("pbaNumber-1")
+                                    .build()))
                 .superUser(aUserCreationRequest()
-                        .firstName("firstname")
-                        .lastName("some-lname")
-                        .email(null)
-                        .build())
+                           .firstName("firstname")
+                           .lastName("some-lname")
+                           .email(null)
+                           .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .build()))
+                                                  .build()))
                 .build();
 
         Map<String, Object> response =
