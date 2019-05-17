@@ -92,27 +92,36 @@ public class OrganisationController {
     }
 
     @ApiOperation(
-          value = "Retrieves an organisation",
+          value = "Retrieves organisation details",
           authorizations = {
                   @Authorization(value = "ServiceAuthorization")
           }
     )
+    @ApiParam(
+        allowEmptyValue = true,
+        required = true
+    )
     @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A representation of the retrieve organisation",
-                    response = OrganisationsDetailResponse.class
-            )
+        @ApiResponse(
+            code = 200,
+            message = "Details of one or more organisations",
+            response = OrganisationsDetailResponse.class
+        )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<OrganisationsDetailResponse> retrieveOrganisations() {
+    public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
+        Object organisationResponse;
+        if (id == null) {
+            log.info("Received request to retrieve all organisations");
+            organisationResponse =
+                    organisationService.retrieveOrganisations();
+        } else {
+            log.info("Received request to retrieve organisation with ID " + id.toString());
+            organisationResponse =
+                    organisationService.retrieveOrganisation(UUID.fromString(id));
+        }
 
-        log.info("Received request to retrieve a new organisation...");
-
-        OrganisationsDetailResponse organisationResponse =
-                organisationService.retrieveOrganisations();
-
-        log.debug("Received response to retrieve an organisation details..." + organisationResponse);
+        log.debug("Received response to retrieve organisation details" + organisationResponse);
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
