@@ -4,4 +4,4 @@
 ./gradlew test && \
 ./gradlew integration && \
 ./gradlew check && \
-./gradlew pitest
+
