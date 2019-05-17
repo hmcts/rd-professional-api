@@ -109,7 +109,7 @@ public class OrganisationController {
         )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) UUID id) {
+    public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
         Object organisationResponse;
         if (id == null) {
             log.info("Received request to retrieve all organisations");
@@ -118,7 +118,7 @@ public class OrganisationController {
         } else {
             log.info("Received request to retrieve organisation with ID " + id.toString());
             organisationResponse =
-                    organisationService.retrieveOrganisation(id);
+                    organisationService.retrieveOrganisation(UUID.fromString(id));
         }
 
         log.debug("Received response to retrieve organisation details" + organisationResponse);

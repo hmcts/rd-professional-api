@@ -118,4 +118,16 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }
+
+    @Test
+    public void error_if_organisation_id_invalid() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!");
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void error_if_organisation_id_not_found() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("19591f16-8503-4f25-a119-5c22c024e9be");
+        assertThat(response.get("http_status")).isEqualTo("404");
+    }
 }

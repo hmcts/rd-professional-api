@@ -6,8 +6,10 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -179,10 +181,15 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
+    @Override
     public OrganisationEntityResponse retrieveOrganisation(UUID id) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
-        log.debug("Retrieving organisation with ID " + id.toString());
-        return new OrganisationEntityResponse(organisation, true);
+        if (organisation == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        } else {
+            log.debug("Retrieving organisation with ID " + id.toString());
+            return new OrganisationEntityResponse(organisation, true);
+        }
     }
 }
 
