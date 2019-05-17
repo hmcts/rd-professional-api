@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.dxAddressRepository = dxAddressRepository;
     }
 
+    @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
             OrganisationCreationRequest organisationCreationRequest) {
@@ -138,15 +140,14 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             dxAddressCreationRequest.forEach(dxAdd -> {
-                if (dxAdd.getIsDxRequestValid()) {
-                    DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
-                    dxAddressRepository.save(dxAddress);
-                    contactInformation.addDxAddress(dxAddress);
-                }
+                DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                dxAddress = dxAddressRepository.save(dxAddress);
+                contactInformation.addDxAddress(dxAddress);
             });
         }
     }
 
+    @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
         log.debug("Retrieving all organisations...");
