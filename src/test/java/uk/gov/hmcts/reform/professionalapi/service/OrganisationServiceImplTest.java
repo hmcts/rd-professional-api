@@ -246,4 +246,5 @@ public class OrganisationServiceImplTest {
                 times(1)).findByStatus(any());
 
     }
+
 }

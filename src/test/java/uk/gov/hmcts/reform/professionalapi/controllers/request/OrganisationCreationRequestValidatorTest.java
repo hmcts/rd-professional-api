@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controllers.request;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -34,5 +35,9 @@ public class OrganisationCreationRequestValidatorTest {
 
         verify(validator1, times(1)).validate(request);
         verify(validator2, times(1)).validate(request);
+
+        assertThat(OrganisationCreationRequestValidator.contains("pending")).isEqualTo(true);
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
     }
+
 }
