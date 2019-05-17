@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -24,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+
+import net.serenitybdd.rest.SerenityRest;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
@@ -192,7 +193,7 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
-        return RestAssured.given()
+        return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
                 .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
