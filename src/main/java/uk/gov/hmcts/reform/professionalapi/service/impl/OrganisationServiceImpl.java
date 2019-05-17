@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -176,6 +177,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    }
+
+    public OrganisationEntityResponse retrieveOrganisation(UUID id) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
+        log.debug("Retrieving organisation with ID " + id.toString());
+        return new OrganisationEntityResponse(organisation, true);
     }
 }
 

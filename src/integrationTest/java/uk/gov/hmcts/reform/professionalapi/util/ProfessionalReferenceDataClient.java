@@ -42,7 +42,11 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations/pbas?email={email}", email);
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsTest() {
+    public Map<String,Object> retrieveSingleOrganisation(String id) {
+        return getRequest(APP_BASE_PATH + "?id={id}", id);
+    }
+
+    public Map<String,Object> retrieveAllOrganisations() {
         return getRequest(APP_BASE_PATH);
     }
 
