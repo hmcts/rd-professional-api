@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountC
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegratio
 @Slf4j
 public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegrationTest {
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void persists_and_returns_all_organisations_details() {
+    public void persists_and_returns_organisation_details() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -57,9 +59,75 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsTest();
-        assertThat(orgResponse.get("organisations")).isNotNull();
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
+
+        assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
+        assertThat(orgResponse.get("sraId")).isEqualTo("sra-id1");
+        assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
+        assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
+        assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
+
+        Map<String, Object> superUser = ((List<Map<String, Object>>) orgResponse.get("superUser")).get(0);
+        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
+        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
+        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+
+        List<Map<String, Object>> accounts = (List<Map<String, Object>>) orgResponse.get("pbaAccounts");
+        assertThat(accounts.get(0).get("pbaNumber")).isEqualTo("pbaNumber");
+
+        Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
+        assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo.get("addressLine2")).isEqualTo("addressLine2");
+        assertThat(contactInfo.get("addressLine3")).isEqualTo("addressLine3");
+        assertThat(contactInfo.get("county")).isEqualTo("county");
+        assertThat(contactInfo.get("country")).isEqualTo("country");
+        assertThat(contactInfo.get("townCity")).isEqualTo("town-city");
+        assertThat(contactInfo.get("postCode")).isEqualTo("post-code-test");
+
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
+        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
+        assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
+
         log.info("RetrieveOrganisationsTest:Received response to retrieve an organisation details...");
+    }
+
+    @Test
+    public void persists_and_returns_all_organisations() {
+        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
+                .name("some-org-name")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .build());
+        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
+                .name("some-other-org-name")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someoneElse@somewhere.com")
+                        .build())
+                .build());
+
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisations();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
+    }
+
+    @Test
+    public void error_if_organisation_id_invalid() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!");
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void error_if_organisation_id_not_found() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("19591f16-8503-4f25-a119-5c22c024e9be");
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 }
