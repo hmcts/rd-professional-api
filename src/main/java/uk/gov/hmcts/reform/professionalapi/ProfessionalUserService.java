@@ -5,7 +5,11 @@ import javax.xml.ws.http.HTTPException;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProfessionalUserService {
@@ -31,4 +35,6 @@ public class ProfessionalUserService {
         }
         return user;
     }
+
+
 }

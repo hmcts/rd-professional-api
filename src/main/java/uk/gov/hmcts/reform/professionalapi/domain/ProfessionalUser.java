@@ -45,8 +45,7 @@ public class ProfessionalUser {
     private String emailAddress;
 
     @Column(name = "STATUS")
-    @Size(max = 50)
-    private String status;
+    private ProfessionalUserStatus status;
 
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
@@ -64,7 +63,7 @@ public class ProfessionalUser {
                             String firstName,
                             String lastName,
                             String emailAddress,
-                            String status,
+                            ProfessionalUserStatus status,
                             Organisation organisation) {
 
         this.firstName = firstName;

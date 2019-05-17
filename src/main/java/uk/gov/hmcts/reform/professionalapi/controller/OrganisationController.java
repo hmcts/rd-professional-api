@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
@@ -207,5 +208,51 @@ public class OrganisationController {
             organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
         return ResponseEntity.status(200).build();
+    }
+
+    @ApiOperation(
+        value = "Retrieves the user with the given email address",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization")
+        }
+    )
+    @ApiParam(
+        name = "email",
+        type = "string",
+        value = "The email address of the user to return",
+        required = true
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 200,
+            message = "A representation of a professional user",
+            response = ProfessionalUserResponse.class
+        ),
+        @ApiResponse(
+            code = 400,
+            message = "An invalid email address was provided"
+        ),
+        @ApiResponse(
+            code = 404,
+            message = "No user was found with the provided email address"
+        )
+    })
+    @GetMapping(
+        value = "/{orgId}/users/",
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation( @PathVariable("orgId") @NotBlank String organisationIdentifier,
+                                                                             @RequestParam(value = "showdeleted") String showDeleted) {
+
+        UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
+        boolean showDeletedFlag = false;
+        if(null == showDeleted || showDeleted.equalsIgnoreCase("False")){
+            showDeletedFlag = false;
+        } else if(showDeleted.equalsIgnoreCase("True")) {
+            showDeletedFlag = true;
+        }
+        return ResponseEntity
+            .status(200)
+            .body(new ProfessionalUsersEntityResponse(organisationService.findProfessionalUsersByOrganisation(inputOrganisationIdentifier, showDeletedFlag)));
     }
 }
