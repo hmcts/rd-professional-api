@@ -140,7 +140,26 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails() {
+    public Map<String, Object> retrieveOrganisationDetails(String id) {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations?id=" + id)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("Retrieve organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrieveAllOrganisations() {
         Response response = withAuthenticatedRequest()
                 .body("")
                 .get("v1/organisations")
