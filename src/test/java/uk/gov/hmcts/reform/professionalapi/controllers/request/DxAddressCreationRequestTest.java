@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controllers.request;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import org.junit.Test;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequestValidatorImpl;
@@ -144,5 +146,17 @@ public class DxAddressCreationRequestTest {
 
         dxValidator.validate(organisationCreationRequest);
         assertThat(dxAddressCreationRequest.getIsDxRequestValid() == false);
+    }
+
+    @Test
+    public void does_not_throw_exception_if_no_contact_information_in_request() {
+        OrganisationCreationRequest request = new OrganisationCreationRequest(null, null, null, null, null, null, null, null, null);
+        dxValidator.validate(request);
+    }
+
+    @Test
+    public void does_not_throw_exception_if_no_dx_address_in_contact_information_in_request() {
+        OrganisationCreationRequest request = new OrganisationCreationRequest(null, null, null, null, null, null, null, null, Arrays.asList(new ContactInformationCreationRequest(null, null, null, null, null, null, null, null)));
+        dxValidator.validate(request);
     }
 }

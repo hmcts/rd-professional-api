@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -16,18 +17,20 @@ public class DxAddressCreationRequestValidatorImpl implements RequestValidator {
     @Override
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
         List<ContactInformationCreationRequest> contactInformationCreationRequests = organisationCreationRequest.getContactInformation();
-        contactInformationCreationRequests.forEach(contactInfo -> {
-            List<DxAddressCreationRequest> dxAddresses = contactInfo.getDxAddress();
-            if (!CollectionUtils.isEmpty(dxAddresses)) {
-                dxAddresses.forEach(dxAdd -> {
-                    if (!isDxNumberValid(dxAdd.getDxNumber()) || dxAdd.getDxExchange() == null) {
+        if (!CollectionUtils.isEmpty(contactInformationCreationRequests)) {
+            contactInformationCreationRequests.forEach(contactInfo -> {
+                List<DxAddressCreationRequest> dxAddresses = contactInfo.getDxAddress();
+                if (!CollectionUtils.isEmpty(dxAddresses)) {
+                    dxAddresses.forEach(dxAdd -> {
+                        if (!isDxNumberValid(dxAdd.getDxNumber()) || dxAdd.getDxExchange() == null) {
 
-                        log.error("DX Address Number OR DX Exchange should not be null");
-                        dxAdd.setIsDxRequestValid(false);
-                    }
-                });
-            }
-        });
+                            log.error("DX Address Number OR DX Exchange should not be null");
+                            dxAdd.setIsDxRequestValid(false);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private Boolean isDxNumberValid(String dxNumber) {
