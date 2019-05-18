@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
@@ -53,10 +54,22 @@ public class ExceptionMapper {
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handleIllegalArgumentException(IllegalArgumentException ex) {
+        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+    }
+
     @ExceptionHandler(HTTPException.class)
-    protected ResponseEntity<String> handleHttpException(HttpServletRequest request, HTTPException ex) {
+    protected ResponseEntity<?> handleHttpException(HttpServletRequest request, HTTPException ex) {
         LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         return new ResponseEntity<>(HttpStatus.resolve(ex.getStatusCode()));
+    }
+
+    @ExceptionHandler(HttpStatusCodeException.class)
+    protected ResponseEntity<?> handleHttpStatusException(HttpServletRequest request, HttpStatusCodeException ex) {
+        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        return new ResponseEntity<>(ex.getStatusCode());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

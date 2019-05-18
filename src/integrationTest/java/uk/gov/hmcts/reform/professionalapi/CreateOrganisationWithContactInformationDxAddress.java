@@ -183,9 +183,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                            .email("someone@somewhere.com")
                            .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                                                           .dxNumber(null)
-                                                                           .dxExchange(null).build()))
                                                   .build()))
                 .build();
 
@@ -198,6 +195,38 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
         assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void returns_bad_request_when_dxnumber_is_null() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyn")
+                .superUser(aUserCreationRequest()
+                           .firstName("some-fname")
+                           .lastName("some-lname")
+                           .email("someone@somewhere.com")
+                           .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                                                           .dxNumber(null)
+                                                                           .dxExchange(null).build()))
+                                                  .build()))
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
+        assertThat(organisationRepository.findAll().size()).isEqualTo(0);
+        assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
+        assertThat(contactInformationRepository.findAll().size()).isEqualTo(0);
+        assertThat(dxAddressRepository.findAll().size()).isEqualTo(0);
     }
 
     @Test

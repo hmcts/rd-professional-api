@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Map;
@@ -17,20 +16,34 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationRetrieveTest extends FunctionalTestSuite {
 
     @Test
-    public void can_retrieve_an_organisation() {
+    public void can_retrieve_all_organisations() {
+        professionalApiClient.createOrganisation();
 
-        String organisationName = randomAlphabetic(10);
-        String[] paymentNumbers = new String[]{randomAlphabetic(10), randomAlphabetic(10)};
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationDetails();
+        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations();
         assertThat(response.get("organisations")).isNotNull();
-        Assertions.assertThat(response.size()).isEqualTo(1);
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    public void can_retrieve_a_single_organisation() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+
+        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"));
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response.get("status")).isEqualTo("PENDING");
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("pbaAccounts")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
-        String organisationName = randomAlphabetic(10);
-        String[] paymentNumbers = new String[]{randomAlphabetic(10), randomAlphabetic(10)};
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.getStatus().toUpperCase());
         assertThat(response.get("organisations")).asList().isNotEmpty();
@@ -40,8 +53,6 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
-        String organisationName = randomAlphabetic(10);
-        String[] paymentNumbers = new String[]{randomAlphabetic(10), randomAlphabetic(10)};
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
         assertThat(response.get("organisations")).isNotNull();
@@ -51,8 +62,6 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     @Test
     public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
 
-        String organisationName = randomAlphabetic(10);
-        String[] paymentNumbers = new String[]{randomAlphabetic(10), randomAlphabetic(10)};
         professionalApiClient
                 .retrieveOrganisationDetailsByUnknownStatus("ACTIV");
     }

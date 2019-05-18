@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -25,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+
+import net.serenitybdd.rest.SerenityRest;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
@@ -140,7 +141,26 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails() {
+    public Map<String, Object> retrieveOrganisationDetails(String id) {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations?id=" + id)
+                .andReturn();
+
+        if (response.statusCode() != OK.value()) {
+            log.info("Retrieve organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrieveAllOrganisations() {
         Response response = withAuthenticatedRequest()
                 .body("")
                 .get("v1/organisations")
@@ -207,16 +227,18 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations?status=" + status)
+                .get("v1/organisations/?status=" + status)
                 .andReturn();
-        log.debug("Retrieve organisation response for unknown status: " + response.getStatusCode());
+
+        log.debug("Retrieve organisation response for unknown status: " + response.asString());
+
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
-        return RestAssured.given()
+        return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
                 .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)

@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -54,6 +58,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.dxAddressRepository = dxAddressRepository;
     }
 
+    @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(
             OrganisationCreationRequest organisationCreationRequest) {
@@ -138,15 +143,14 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             dxAddressCreationRequest.forEach(dxAdd -> {
-                if (dxAdd.getIsDxRequestValid()) {
-                    DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
-                    dxAddressRepository.save(dxAddress);
-                    contactInformation.addDxAddress(dxAddress);
-                }
+                DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                dxAddress = dxAddressRepository.save(dxAddress);
+                contactInformation.addDxAddress(dxAddress);
             });
         }
     }
 
+    @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
         log.debug("Retrieving all organisations...");
@@ -175,6 +179,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    }
+
+    @Override
+    public OrganisationEntityResponse retrieveOrganisation(UUID id) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
+        if (organisation == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        } else {
+            log.debug("Retrieving organisation with ID " + id.toString());
+            return new OrganisationEntityResponse(organisation, true);
+        }
     }
 
     @Override

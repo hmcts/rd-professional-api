@@ -10,7 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,12 +44,16 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations/pbas?email={email}", email);
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsTest() {
+    public Map<String,Object> retrieveSingleOrganisation(String id) {
+        return getRequest(APP_BASE_PATH + "?id={id}", id);
+    }
+
+    public Map<String,Object> retrieveAllOrganisations() {
         return getRequest(APP_BASE_PATH);
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status) {
-        return getRequest("/v1/organisations?status={status}", status);
+        return getRequest("/v1/organisations/?status={status}", status);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -93,7 +97,7 @@ public class ProfessionalReferenceDataClient {
                               request,
                               Map.class,
                               params);
-        } catch (HttpClientErrorException ex) {
+        } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());

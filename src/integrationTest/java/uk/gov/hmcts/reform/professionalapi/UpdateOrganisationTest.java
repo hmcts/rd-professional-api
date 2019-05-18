@@ -168,9 +168,9 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         assertThat(contactInformation.getAddressLine1()).isEqualTo("addressLine1");
         assertThat(contactInformation.getAddressLine2()).isEqualTo("addressLine2");
         assertThat(contactInformation.getAddressLine3()).isEqualTo("addressLine3");
-        assertThat(contactInformation.getTownCity()).isEqualTo("some-town-city");
-        assertThat(contactInformation.getCounty()).isEqualTo("some-county");
-        assertThat(contactInformation.getCountry()).isEqualTo("some-country");
+        assertThat(contactInformation.getTownCity()).isEqualTo("town-city");
+        assertThat(contactInformation.getCounty()).isEqualTo("county");
+        assertThat(contactInformation.getCountry()).isEqualTo("country");
         assertThat(contactInformation.getPostCode()).isEqualTo("some-post-code");
     }
 
