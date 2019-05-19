@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
@@ -36,7 +37,7 @@ public class OrganisationCreationRequestValidatorTest {
         verify(validator1, times(1)).validate(request);
         verify(validator2, times(1)).validate(request);
 
-        assertThat(OrganisationCreationRequestValidator.contains("pending")).isEqualTo(true);
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isEqualTo(true);
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
     }
 

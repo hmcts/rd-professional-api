@@ -24,7 +24,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void persists_and_returns_organisation_details() {
 
-        String orgIdentifierResponse = createOrganisationRequest("pending");
+        String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING.name().toLowerCase());
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
@@ -104,10 +104,10 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
 
-        String organisationIdentifier = createOrganisationRequest("pending");
+        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.PENDING.name().toLowerCase());
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.getStatus().toUpperCase());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name());
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
@@ -116,10 +116,10 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void persists_and_returns_all_organisations_details_by_active_status() {
         Map<String, Object> orgResponse;
-        String organisationIdentifier = createOrganisationRequest("active");
+        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE.name().toLowerCase());
         assertThat(organisationIdentifier).isNotEmpty();
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
@@ -130,7 +130,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
 
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
@@ -139,17 +139,17 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void persists_and_return_empty_organisation_details_when_no_status_found_in_the_db() {
 
-        String organisationIdentifier = createOrganisationRequest("active");
+        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE.name().toLowerCase());
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 
     @Test
     public void return_404_when_invalid_status_send_in_the_request_param() {
 
-        String organisationIdentifier = createOrganisationRequest("active");
+        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE.name().toLowerCase());
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV");

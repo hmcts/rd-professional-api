@@ -45,7 +45,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.getStatus().toUpperCase());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name());
         assertThat(response.get("organisations")).asList().isNotEmpty();
         assertThat(response.size()).isEqualTo(1);
     }
@@ -54,7 +54,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.getStatus().toUpperCase());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name());
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isEqualTo(1);
     }

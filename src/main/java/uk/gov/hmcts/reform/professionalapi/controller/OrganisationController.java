@@ -237,7 +237,7 @@ public class OrganisationController {
             @ApiResponse(
                     code = 200,
                     message = "A representation of a organisation ",
-                    response = ProfessionalUserResponse.class
+                    response = OrganisationsDetailResponse.class
             ),
             @ApiResponse(
                     code = 200,
@@ -253,7 +253,7 @@ public class OrganisationController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
-        log.debug("Inside getAllOrganisationDetailsByStatus method::");
+
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
 
