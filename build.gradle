@@ -167,7 +167,8 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.Application',
+            'uk.gov.hmcts.reform.professionalapi.utils.*'
     ]
     threads = 10
     outputFormats = ['XML', 'HTML']
