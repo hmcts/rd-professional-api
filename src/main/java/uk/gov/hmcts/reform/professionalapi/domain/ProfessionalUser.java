@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import uk.gov.hmcts.reform.professionalapi.utils.MD5Converter;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -35,6 +36,10 @@ public class ProfessionalUser {
     @Column(name = "FIRST_NAME")
     @Size(max = 255)
     private String firstName;
+
+    @Column(name = "USER_IDENTIFIER")
+    @Size(max = 32)
+    private String userIdentifier;
 
     @Column(name = "LAST_NAME")
     @Size(max = 255)
@@ -72,5 +77,6 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
+        this.userIdentifier = MD5Converter.getMd5ConvertedString(emailAddress);
     }
 }
