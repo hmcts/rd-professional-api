@@ -38,7 +38,6 @@ public class ProfessionalUser {
     private String firstName;
 
     @Column(name = "USER_IDENTIFIER")
-    @Size(max = 32)
     private String userIdentifier;
 
     @Column(name = "LAST_NAME")

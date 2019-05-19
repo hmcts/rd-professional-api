@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 
@@ -25,22 +27,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
     @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress() {
 
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("companyn")
-                .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                                                           .dxNumber("DX 1234567890")
-                                                                           .dxExchange("dxExchange").build()))
-                                                  .build()))
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -50,6 +37,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
+
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        assertThat(persistedSuperUser.getUserIdentifier()).isNotNull();
+        assertThat(persistedSuperUser.getUserIdentifier().length()).isEqualTo(32);
+        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
 
     }
 

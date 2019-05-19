@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import javax.xml.ws.http.HTTPException;
-
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
@@ -15,15 +15,22 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 
 public class ProfessionalUserServiceTest {
+    private ProfessionalUserRepository professionalUserRepository;
+    private ProfessionalUser professionalUser;
+    private ProfessionalUserService professionalUserService;
 
-    private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
-    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
-            "some-lname",
-            "some-email",
-            "PENDING",
-            mock(Organisation.class));
-    private final ProfessionalUserService professionalUserService = new ProfessionalUserService(
-            professionalUserRepository);
+
+    @Before
+    public void setUp() {
+        professionalUserRepository = mock(ProfessionalUserRepository.class);
+
+        professionalUser = new ProfessionalUser("some-fname",
+                "some-lname",
+                "some-email",
+                "PENDING",
+                mock(Organisation.class));
+        professionalUserService = new ProfessionalUserService(professionalUserRepository);
+    }
 
     @Test
     public void retrieveUserByEmail() {
