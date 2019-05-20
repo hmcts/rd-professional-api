@@ -6,14 +6,17 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -104,7 +107,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
                 userCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING.name(),
+                ProfessionalUserStatus.PENDING,
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
@@ -176,6 +179,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    }
+
+    @Override
+    public OrganisationEntityResponse retrieveOrganisation(UUID id) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
+        if (organisation == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        } else {
+            log.debug("Retrieving organisation with ID " + id.toString());
+            return new OrganisationEntityResponse(organisation, true);
+        }
     }
 
     @Override

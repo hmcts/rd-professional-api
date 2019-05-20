@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,21 +35,26 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUserByEmail(String email) {
-        return getRequest("/" + APP_BASE_PATH + "/users?email={email}", email);
+        return getRequest("/v1/organisations/users?email={email}", email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email) {
-        return getRequest("/" + APP_BASE_PATH + "/pbas?email={email}", email);
+        return getRequest("/v1/organisations/pbas?email={email}", email);
     }
 
-    public Map<String, Object> findUsersByUserStatusForGivenOrganisation(String organisationIdentifier, String status) {
-        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showdeleted={status}", status);
+    public Map<String,Object> retrieveSingleOrganisation(String id) {
+        return getRequest(APP_BASE_PATH + "?id={id}", id);
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsTest() {
+    public Map<String,Object> retrieveAllOrganisations() {
         return getRequest(APP_BASE_PATH);
     }
 
+    public Map<String, Object> findUsersByUserStatusForGivenOrganisation(String organisationIdentifier, String showDeleted) {
+        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", showDeleted);
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -83,6 +89,7 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private Map<String, Object> getRequest(String uriPath, Object... params) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -98,7 +105,7 @@ public class ProfessionalReferenceDataClient {
                               request,
                               Map.class,
                               params);
-        } catch (RestClientResponseException ex) {
+        } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
