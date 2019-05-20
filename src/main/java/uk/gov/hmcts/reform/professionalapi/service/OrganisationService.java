@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 
 public interface OrganisationService {
@@ -20,6 +21,8 @@ public interface OrganisationService {
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier);
 
     Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier);
+
+    OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
 
 }
 

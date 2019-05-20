@@ -191,5 +191,11 @@ public class OrganisationServiceImpl implements OrganisationService {
             return new OrganisationEntityResponse(organisation, true);
         }
     }
+
+    @Override
+    public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
+
+        return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
+    }
 }
 
