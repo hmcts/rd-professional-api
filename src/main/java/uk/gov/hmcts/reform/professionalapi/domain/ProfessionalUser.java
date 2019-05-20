@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -20,7 +19,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import uk.gov.hmcts.reform.professionalapi.utils.MD5Converter;
+import uk.gov.hmcts.reform.professionalapi.utils.EncryptEmailUtility;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -76,6 +75,6 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
-        this.userIdentifier = MD5Converter.getMd5ConvertedString(emailAddress);
+        this.userIdentifier = EncryptEmailUtility.getMd5ConvertedString(emailAddress);
     }
 }
