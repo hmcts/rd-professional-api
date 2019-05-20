@@ -231,6 +231,7 @@ public class OrganisationController {
             type = "string",
             value = "The organisation details of the status to return",
             required = true
+
     )
 
     @ApiResponses({
@@ -249,10 +250,10 @@ public class OrganisationController {
             )
     })
     @GetMapping(
-            value = {"/"},
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+           params = {"status"},
+           produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
+    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam(required = true) String status) {
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {

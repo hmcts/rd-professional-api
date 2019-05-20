@@ -53,7 +53,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status) {
-        return getRequest("/v1/organisations/?status={status}", status);
+        return getRequest("/v1/organisations?status={status}", status);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

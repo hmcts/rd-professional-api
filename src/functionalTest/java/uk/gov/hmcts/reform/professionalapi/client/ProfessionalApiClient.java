@@ -227,7 +227,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations/?status=" + status)
+                .get("v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
