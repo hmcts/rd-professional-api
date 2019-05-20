@@ -25,9 +25,11 @@ public class ProfessionalReferenceDataClient {
     private final int prdApiPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
+    private String baseUrl;
 
     public ProfessionalReferenceDataClient(int prdApiPort) {
         this.prdApiPort = prdApiPort;
+        this.baseUrl = "http://localhost:" + prdApiPort + APP_BASE_PATH;
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
@@ -50,22 +52,22 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_BASE_PATH);
     }
 
+    public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status) {
+        return getRequest("/v1/organisations?status={status}", status);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("ServiceAuthorization", JWT_TOKEN);
-
         HttpEntity<T> request =
-                new HttpEntity<>(requestBody, headers);
+                new HttpEntity<>(requestBody, getHeaders());
 
         ResponseEntity<Map> responseEntity;
 
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    "http://localhost:" + prdApiPort + uriPath,
+                    baseUrl,
                     request,
                     Map.class);
 
@@ -76,13 +78,7 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
-        Map organisationResponse = objectMapper.convertValue(
-                responseEntity.getBody(),
-                Map.class);
-
-        organisationResponse.put("http_status", responseEntity.getStatusCode().toString());
-
-        return organisationResponse;
+        return getResponse(responseEntity);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -94,7 +90,7 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Map> responseEntity;
 
         try {
-            HttpEntity<?> request = new HttpEntity<>(headers);
+            HttpEntity<?> request = new HttpEntity<>(getHeaders());
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                               HttpMethod.GET,
@@ -108,14 +104,7 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
-        Map response = objectMapper
-                .convertValue(
-                        responseEntity.getBody(),
-                        Map.class);
-
-        response.put("http_status", responseEntity.getStatusCode().toString());
-
-        return response;
+        return getResponse(responseEntity);
     }
 
     public Map<String, Object> updateOrganisation(
@@ -140,5 +129,26 @@ public class ProfessionalReferenceDataClient {
         Map<String, Object> organisationResponse = new HashMap<>();
         organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return organisationResponse;
+    }
+
+    private HttpHeaders getHeaders() {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        return headers;
+    }
+
+    private Map getResponse(ResponseEntity<Map> responseEntity) {
+
+        Map response = objectMapper
+                .convertValue(
+                        responseEntity.getBody(),
+                        Map.class);
+
+        response.put("http_status", responseEntity.getStatusCode().toString());
+
+        return response;
     }
 }

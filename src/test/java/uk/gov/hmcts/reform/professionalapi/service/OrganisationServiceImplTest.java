@@ -48,6 +48,8 @@ public class OrganisationServiceImplTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
+    private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
+    private final OrganisationsDetailResponse organisationDetailResponse = mock(OrganisationsDetailResponse.class);
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -73,7 +75,7 @@ public class OrganisationServiceImplTest {
 
         dxAddressRequests = new ArrayList<>();
 
-        organisations = new ArrayList<>();
+        organisations = new ArrayList<Organisation>();
 
         pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
@@ -134,6 +136,9 @@ public class OrganisationServiceImplTest {
 
         when(organisationRepository.findByOrganisationIdentifier(any()))
                 .thenReturn(organisation);
+
+        when(organisationRepository.findByStatus(any()))
+                .thenReturn(organisations);
     }
 
     @Test
@@ -221,4 +226,19 @@ public class OrganisationServiceImplTest {
                 organisation,
                 times(1)).setCompanyUrl(any());
     }
+
+    @Test
+    public void retrieve_an_organisations_by_status() {
+
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImpl.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+
+        assertThat(organisationDetailResponse).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByStatus(any());
+
+    }
+
 }
