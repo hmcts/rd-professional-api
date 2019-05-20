@@ -3,14 +3,13 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Map;
-
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class OrganisationRetrieveTest extends FunctionalTestSuite {
 

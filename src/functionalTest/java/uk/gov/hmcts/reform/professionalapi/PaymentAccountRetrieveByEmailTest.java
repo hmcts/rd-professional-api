@@ -9,15 +9,13 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
 
