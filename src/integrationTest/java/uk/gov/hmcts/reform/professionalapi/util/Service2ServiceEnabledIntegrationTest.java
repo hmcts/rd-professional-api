@@ -6,7 +6,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

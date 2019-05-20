@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
@@ -37,11 +37,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
+        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
@@ -220,38 +222,86 @@ public class OrganisationController {
     }
 
     @ApiOperation(
-        value = "Retrieves the user with the given email address",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization")
-        }
+            value = "Retrieves the organisation details with the given status ",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
     )
     @ApiParam(
-        name = "email",
-        type = "string",
-        value = "The email address of the user to return",
-        required = true
+            name = "status",
+            type = "string",
+            value = "The organisation details of the status to return",
+            required = true
+
     )
+
     @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "A representation of a professional user",
-            response = ProfessionalUserResponse.class
-        ),
-        @ApiResponse(
-            code = 400,
-            message = "An invalid email address was provided"
-        ),
-        @ApiResponse(
-            code = 404,
-            message = "No user was found with the provided email address"
-        )
+            @ApiResponse(
+                    code = 200,
+                    message = "A representation of a organisation ",
+                    response = OrganisationsDetailResponse.class
+            ),
+            @ApiResponse(
+                    code = 200,
+                    message = "No organisation details found with the provided status "
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid status provided for an organisation"
+            )
     })
     @GetMapping(
-        value = "/{orgId}/users/",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+           params = {"status"},
+           produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam(required = true) String status) {
+
+        OrganisationsDetailResponse organisationsDetailResponse;
+        if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
+
+            organisationsDetailResponse =
+                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
+        } else {
+            log.error("Invalid Request param for status field");
+            throw new InvalidRequest("400");
+        }
+        log.info("Received response for status...");
+        return ResponseEntity.status(200).body(organisationsDetailResponse);
+    }
+
+    @ApiOperation(
+            value = "Retrieves the user with the given email address",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The email address of the user to return",
+            required = true
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "A representation of a professional user",
+                    response = ProfessionalUserResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email address was provided"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No user was found with the provided email address"
+            )
+    })
+    @GetMapping(
+            value = "/{orgId}/users/",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation( @PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                                             @RequestParam(value = "showDeleted") String showDeleted) {
+                                                                                    @RequestParam(value = "showDeleted") String showDeleted) {
 
         UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
         boolean showDeletedFlag = false;
@@ -261,7 +311,7 @@ public class OrganisationController {
             showDeletedFlag = true;
         }
         return ResponseEntity
-            .status(200)
-            .body(new ProfessionalUsersEntityResponse(organisationService.findProfessionalUsersByOrganisation(inputOrganisationIdentifier, showDeletedFlag)));
+                .status(200)
+                .body(new ProfessionalUsersEntityResponse(organisationService.findProfessionalUsersByOrganisation(inputOrganisationIdentifier, showDeletedFlag)));
     }
 }

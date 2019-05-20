@@ -8,51 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
@@ -168,9 +135,9 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         assertThat(contactInformation.getAddressLine1()).isEqualTo("addressLine1");
         assertThat(contactInformation.getAddressLine2()).isEqualTo("addressLine2");
         assertThat(contactInformation.getAddressLine3()).isEqualTo("addressLine3");
-        assertThat(contactInformation.getTownCity()).isEqualTo("some-town-city");
-        assertThat(contactInformation.getCounty()).isEqualTo("some-county");
-        assertThat(contactInformation.getCountry()).isEqualTo("some-country");
+        assertThat(contactInformation.getTownCity()).isEqualTo("town-city");
+        assertThat(contactInformation.getCounty()).isEqualTo("county");
+        assertThat(contactInformation.getCountry()).isEqualTo("country");
         assertThat(contactInformation.getPostCode()).isEqualTo("some-post-code");
     }
 
