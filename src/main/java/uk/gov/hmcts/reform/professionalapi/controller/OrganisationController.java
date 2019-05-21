@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
@@ -36,11 +36,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
+        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
@@ -216,5 +218,53 @@ public class OrganisationController {
             organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
         return ResponseEntity.status(200).build();
+    }
+
+    @ApiOperation(
+            value = "Retrieves the organisation details with the given status ",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
+    )
+    @ApiParam(
+            name = "status",
+            type = "string",
+            value = "The organisation details of the status to return",
+            required = true
+
+    )
+
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "A representation of a organisation ",
+                    response = OrganisationsDetailResponse.class
+            ),
+            @ApiResponse(
+                    code = 200,
+                    message = "No organisation details found with the provided status "
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid status provided for an organisation"
+            )
+    })
+    @GetMapping(
+           params = {"status"},
+           produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam(required = true) String status) {
+
+        OrganisationsDetailResponse organisationsDetailResponse;
+        if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
+
+            organisationsDetailResponse =
+                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
+        } else {
+            log.error("Invalid Request param for status field");
+            throw new InvalidRequest("400");
+        }
+        log.info("Received response for status...");
+        return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
@@ -165,16 +166,13 @@ public class ProfessionalApiClient {
                 .get("v1/organisations")
                 .andReturn();
 
-        if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.asString());
-        }
+        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
 
         return response.body().as(Map.class);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -209,6 +207,34 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(OK.value());
+    }
+
+    public Map<String, Object> retrieveOrganisationDetailsByStatus(String status) {
+
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations?status=" + status)
+                .andReturn();
+        log.debug("Retrieve organisation response by status: " + response.getStatusCode());
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public void retrieveOrganisationDetailsByUnknownStatus(String status) {
+
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations?status=" + status)
+                .andReturn();
+
+        log.debug("Retrieve organisation response for unknown status: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
