@@ -27,11 +27,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRoles;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
@@ -42,6 +45,8 @@ public class OrganisationServiceImplTest {
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
     private OrganisationServiceImpl organisationServiceImpl = mock(OrganisationServiceImpl.class);
+    private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
+    private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
 
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
@@ -64,10 +69,13 @@ public class OrganisationServiceImplTest {
     @Before
     public void setUp() {
 
+        List<String> userRoles = new ArrayList<>();
+
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email");
+                "some-email",
+                userRoles);
 
         pbaAccountCreationRequests = new ArrayList<>();
 
@@ -102,8 +110,9 @@ public class OrganisationServiceImplTest {
                 professionalUserRepository,
                 paymentAccountRepository,
                 dxAddressRepository,
-                contactInformationRepository);
-
+                contactInformationRepository,
+                userAttributeRepository,
+                prdEnumRepository);
 
 
         organisationCreationRequest =
@@ -191,15 +200,15 @@ public class OrganisationServiceImplTest {
     @Test
     public void updates_an_organisation() {
         OrganisationResponse organisationResponse =
-            organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+                organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
 
         assertThat(organisationResponse).isNotNull();
         verify(
-            organisationRepository,
+                organisationRepository,
                 times(1)).findByOrganisationIdentifier(any());
 
         verify(
-            organisationRepository,
+                organisationRepository,
                 times(1)).save(any(Organisation.class));
 
         verify(

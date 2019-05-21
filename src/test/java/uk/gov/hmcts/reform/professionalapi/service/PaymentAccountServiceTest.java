@@ -12,6 +12,7 @@ import org.powermock.api.mockito.PowerMockito;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
 
+
 public class PaymentAccountServiceTest {
 
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);

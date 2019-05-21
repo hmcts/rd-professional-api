@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -51,6 +54,9 @@ public class ProfessionalUser {
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
+
+    @OneToMany(mappedBy = "professionalUser")
+    private List<UserAttribute> userAttributes = new ArrayList<>();
 
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")

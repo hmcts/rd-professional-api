@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -28,17 +29,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
@@ -52,6 +57,7 @@ public class OrganisationController {
 
     private OrganisationServiceImpl organisationService;
     private ProfessionalUserService professionalUserService;
+    private ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
@@ -266,5 +272,43 @@ public class OrganisationController {
         }
         log.info("Received response for status...");
         return ResponseEntity.status(200).body(organisationsDetailResponse);
+    }
+
+    @ApiOperation("Add a user to an organisation")
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User has been added",
+                    response = OrganisationResponse.class
+            )
+    })
+    @PostMapping(
+            path = "/{orgId}/users/",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity<OrganisationResponse> addUserToOrganisation(
+            @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
+            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
+
+        List<PrdEnum> prdEnumList = organisationService.findAllPrdEnums();
+
+        if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
+            log.error("Invalid user role provided");
+            throw new InvalidRequest("404");
+        } else {
+            UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
+
+            OrganisationResponse organisationResponse =
+                    professionalUserServiceImpl.addNewUserToAnOrganisation(newUserCreationRequest, inputOrganisationIdentifier);
+
+            log.info("Received request to add a new user to an organisation..." + organisationResponse);
+            return ResponseEntity
+                    .status(201)
+                    .body(organisationResponse);
+        }
     }
 }
