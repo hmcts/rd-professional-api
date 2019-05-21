@@ -47,7 +47,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name());
         assertThat(response.get("organisations")).asList().isNotEmpty();
-        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name());
         assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
