@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import static javax.persistence.GenerationType.AUTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -48,6 +50,10 @@ public class PaymentAccount {
     @CreatedDate
     @Column(name = "CREATED")
     private LocalDateTime created;
+
+    @OneToMany
+    @JoinColumn(name = "PAYMENT_ACCOUNT_ID", referencedColumnName = "id")
+    private List<UserAccountMap> userAccountMap;
 
     public PaymentAccount(String pbaNumber) {
         this.pbaNumber = pbaNumber;

@@ -27,17 +27,21 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
 public class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
+    private final UserAccountMapRepository userAccountRepository = mock(UserAccountMapRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
@@ -48,6 +52,8 @@ public class OrganisationServiceImplTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
+    private final UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
+    private final UserAccountMap userAccountMap = mock(UserAccountMap.class);
     private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
     private final OrganisationsDetailResponse organisationDetailResponse = mock(OrganisationsDetailResponse.class);
 
@@ -102,7 +108,8 @@ public class OrganisationServiceImplTest {
                 professionalUserRepository,
                 paymentAccountRepository,
                 dxAddressRepository,
-                contactInformationRepository);
+                contactInformationRepository,
+                userAccountRepository);
 
 
 
@@ -124,6 +131,9 @@ public class OrganisationServiceImplTest {
 
         when(paymentAccountRepository.save(any(PaymentAccount.class)))
                 .thenReturn(paymentAccount);
+
+        when(userAccountRepository.save(any(UserAccountMap.class)))
+                .thenReturn(userAccountMap);
 
         when(contactInformationRepository.save(any(ContactInformation.class)))
                 .thenReturn(contactInformation);
@@ -158,6 +168,9 @@ public class OrganisationServiceImplTest {
         verify(
                 paymentAccountRepository,
                 times(1)).save(any(PaymentAccount.class));
+        /*verify(
+                userAccountRepository,
+                times(1)).save(any(UserAccountMap.class));*/
         verify(
                 contactInformationRepository,
                 times(2)).save(any(ContactInformation.class));

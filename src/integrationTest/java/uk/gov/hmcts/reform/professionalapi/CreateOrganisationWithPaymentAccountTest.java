@@ -19,12 +19,14 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEnabledIntegrationTest {
 
     @Test
     public void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
+
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -43,12 +45,12 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
-
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
                 .isEqualTo("some-org-name");
+        List<UserAccountMap> userAccountMaps = userAccountMapRepository.findAll();
+        assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
     }
 
     @Test
@@ -108,6 +110,11 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         assertThat(persistedOrganisation.getName())
                 .isEqualTo(organisationCreationRequest.getName());
+
+        List<UserAccountMap> userAccountMaps = userAccountMapRepository.findAll();
+        assertThat(userAccountMaps).isEmpty();
+        assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
+
     }
 
     @Test
@@ -156,6 +163,60 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         assertThat(paymentAccountRepository.findAll()).isEmpty();
 
         assertThat(organisationRepository.findAll()).isEmpty();
+
+        assertThat(userAccountMapRepository.findAll()).isEmpty();
     }
 
+    @Test
+    public void persists_and_returns_a_multiple_pba_accounts_number_for_multiple_organisations() {
+
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .pbaAccounts(asList(aPbaPaymentAccount()
+                        .pbaNumber("pbaNumber-1")
+                        .build()))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .build();
+        OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .pbaAccounts(asList(aPbaPaymentAccount()
+                        .pbaNumber("pbaNumber-2")
+                        .build()))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone1@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse1 = (String) response.get("organisationIdentifier");
+
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest2);
+
+        String orgIdentifierResponse2 = (String) response2.get("organisationIdentifier");
+
+        assertThat(orgIdentifierResponse1).isNotEqualTo(orgIdentifierResponse2);
+
+        List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
+
+        assertThat(persistedPaymentAccounts.size()).isEqualTo(2);
+
+        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
+                .isEqualTo(persistedPaymentAccounts.get(1).getOrganisation().getName());
+
+        List<UserAccountMap> userAccountMaps = userAccountMapRepository.findAll();
+
+        assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
+    }
 }

@@ -26,11 +26,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 @Service
@@ -42,6 +45,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     PaymentAccountRepository paymentAccountRepository;
     DxAddressRepository dxAddressRepository;
     ContactInformationRepository contactInformationRepository;
+    UserAccountMapRepository userAccountMapRepository;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -49,13 +53,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             ProfessionalUserRepository professionalUserRepository,
             PaymentAccountRepository paymentAccountRepository,
             DxAddressRepository dxAddressRepository,
-            ContactInformationRepository contactInformationRepository) {
+            ContactInformationRepository contactInformationRepository,
+            UserAccountMapRepository userAccountMapRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
+        this.userAccountMapRepository = userAccountMapRepository;
     }
 
     @Override
@@ -94,6 +100,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -111,6 +118,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
+
+        persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
@@ -146,6 +155,19 @@ public class OrganisationServiceImpl implements OrganisationService {
                 DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
                 dxAddress = dxAddressRepository.save(dxAddress);
                 contactInformation.addDxAddress(dxAddress);
+            });
+        }
+    }
+
+    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
+        UserAccountMap userAccountMap;
+        log.debug("Inside persistedUserAccountMap method...");
+        if (paymentAccounts != null
+                &&  paymentAccounts.size() > 0) {
+
+            paymentAccounts.forEach(paymentAccount -> {
+
+                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
         }
     }
