@@ -9,5 +9,4 @@ public interface ProfessionalUserServiceI {
 
     OrganisationResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier);
 
-
 }

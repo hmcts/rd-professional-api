@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
@@ -58,12 +59,11 @@ public class OrganisationController {
     private OrganisationServiceImpl organisationService;
     private ProfessionalUserService professionalUserService;
     private ProfessionalUserServiceImpl professionalUserServiceImpl;
+    private UserAttributeServiceImpl userAttributeService;
+    private PaymentAccountService paymentAccountservice;
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
-
-    private PaymentAccountService paymentAccountservice;
-
 
     @ApiOperation(
         value = "Creates an organisation",
@@ -294,10 +294,10 @@ public class OrganisationController {
 
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
-        List<PrdEnum> prdEnumList = professionalUserServiceImpl.findAllPrdEnums();
+        List<PrdEnum> prdEnumList = userAttributeService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
-            log.error("Invalid user role provided");
+            log.error("Invalid/No user role(s) provided");
             throw new InvalidRequest("404");
         } else {
             UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
