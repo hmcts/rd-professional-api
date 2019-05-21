@@ -4,12 +4,8 @@ import javax.xml.ws.http.HTTPException;
 
 import org.springframework.stereotype.Service;
 
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-
-import java.util.UUID;
 
 @Service
 public class ProfessionalUserService {
@@ -34,10 +30,5 @@ public class ProfessionalUserService {
             throw new HTTPException(404);
         }
         return user;
-    }
-
-    public OrganisationResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID inputOrganisationIdentifier) {
-
-        return null;
     }
 }

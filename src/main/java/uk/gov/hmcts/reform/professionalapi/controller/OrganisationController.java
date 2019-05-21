@@ -294,7 +294,7 @@ public class OrganisationController {
 
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
-        List<PrdEnum> prdEnumList = organisationService.findAllPrdEnums();
+        List<PrdEnum> prdEnumList = professionalUserServiceImpl.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
             log.error("Invalid user role provided");

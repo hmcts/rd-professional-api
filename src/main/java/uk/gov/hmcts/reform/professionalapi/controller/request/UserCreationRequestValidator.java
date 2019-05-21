@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+
 public class UserCreationRequestValidator {
+
+    private UserCreationRequestValidator(){
+    }
 
     static List<String> verifiedUserRoles;
 
@@ -21,37 +22,17 @@ public class UserCreationRequestValidator {
         return verifiedUserRoles;
     }
 
-    public static String verifyRole(String amendedRole, List<PrdEnum> prdEnumList){
+    public static String verifyRole(String amendedRole, List<PrdEnum> prdEnumList) {
         AtomicReference<String> verifiedRole = new AtomicReference<>("");
 
         prdEnumList.forEach(prdEnum -> {
-            if(prdEnum.getEnumName().equals(amendedRole)){
+            if (prdEnum.getEnumName().equals(amendedRole)) {
                 verifiedRole.set(amendedRole);
-
-//                UserAttribute userAttribute = new UserAttribute(prdEnum);
-//
-//                PrdEnumId prdEnumId = prdEnum.getPrdEnumId();
-//
-//                prdEnumId.getEnumCode();
-//
-//                prdEnumId.getEnumType();
             }
         });
 
         return verifiedRole.get();
 
     }
-
-//    public static List<String> verifyRole(List<String> amendedRoles, List<PrdEnum> prdEnumList){
-//
-//        List<String> verifiedList = new ArrayList<>();
-//
-//        amendedRoles.forEach(amendedRole ->
-//                prdEnumList.stream()
-//                        .filter(prdEnum -> amendedRole.contains(prdEnum.getEnumName())).forEach(verifiedList::add));
-//
-//        return verifiedList;
-//
-//    }
 }
 

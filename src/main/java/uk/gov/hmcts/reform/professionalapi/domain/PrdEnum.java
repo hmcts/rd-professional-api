@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import java.util.List;
 import javax.validation.constraints.Size;
 
+@NoArgsConstructor
 @Entity
 public class PrdEnum {
 
@@ -19,30 +23,27 @@ public class PrdEnum {
 
     @Column
     @Size(max = 1024)
-    private String enumDescription;
+    private String enumDesc;
 
     @OneToMany(mappedBy = "prdEnum")
     private List<UserAttribute> userAttributes;
 
-    public PrdEnum (PrdEnumId prdEnumId, String enumName, String enumDescription, List<UserAttribute> userAttributes){
+    public PrdEnum(PrdEnumId prdEnumId, String enumName, String enumDescription) {
         this.prdEnumId = prdEnumId;
         this.enumName = enumName;
-        this.enumDescription = enumDescription;
-        this.userAttributes = userAttributes;
+        this.enumDesc = enumDescription;
     }
 
     public String getEnumName() {
         return enumName;
     }
 
-    public PrdEnumId getPrdEnumId(){
+    public PrdEnumId getPrdEnumId() {
         return prdEnumId;
     }
 
+    public String getEnumDescription() {
+        return enumDesc;
+    }
+
 }
-
-
-
-//    @OneToMany
-//    @JoinColumn(name = "PRD_ENUM_CODE", nullable = false)
-//    private List<String> enumCodes;

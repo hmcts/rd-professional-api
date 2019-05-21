@@ -10,8 +10,6 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
-import uk.gov.hmcts.reform.professionalapi.domain.UserRoles;
-
 @Getter
 @Builder(builderMethodName = "aUserCreationRequest")
 public class NewUserCreationRequest {
