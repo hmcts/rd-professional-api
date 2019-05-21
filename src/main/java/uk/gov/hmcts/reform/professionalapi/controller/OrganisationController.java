@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -211,7 +210,7 @@ public class OrganisationController {
 
         log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
+        UUID inputOrganisationIdentifier = organisationCreationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), inputOrganisationIdentifier);
 
@@ -267,51 +266,5 @@ public class OrganisationController {
         }
         log.info("Received response for status...");
         return ResponseEntity.status(200).body(organisationsDetailResponse);
-    }
-
-    @ApiOperation(
-            value = "Retrieves the user with the given email address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
-            }
-    )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The email address of the user to return",
-            required = true
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A representation of a professional user",
-                    response = ProfessionalUserResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid email address was provided"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No user was found with the provided email address"
-            )
-    })
-    @GetMapping(
-            value = "/{orgId}/users/",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation( @PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                                                    @RequestParam(value = "showDeleted") String showDeleted) {
-
-        UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-        boolean showDeletedFlag = false;
-        if(null == showDeleted || showDeleted.equalsIgnoreCase("False")){
-            showDeletedFlag = false;
-        } else if(showDeleted.equalsIgnoreCase("True")) {
-            showDeletedFlag = true;
-        }
-        return ResponseEntity
-                .status(200)
-                .body(new ProfessionalUsersEntityResponse(organisationService.findProfessionalUsersByOrganisation(inputOrganisationIdentifier, showDeletedFlag)));
     }
 }

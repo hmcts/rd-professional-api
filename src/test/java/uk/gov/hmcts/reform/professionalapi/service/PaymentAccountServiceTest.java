@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 public class PaymentAccountServiceTest {
 
@@ -24,7 +25,7 @@ public class PaymentAccountServiceTest {
 
     @Before
     public void setUp() {
-        paymentAccountService = new PaymentAccountService(
+        paymentAccountService = new PaymentAccountServiceImpl(
                 organisationRepository,
                 professionalUserRepository);
 
@@ -43,7 +44,7 @@ public class PaymentAccountServiceTest {
         Organisation theOrganisation = new Organisation("some-org-", OrganisationStatus.PENDING, "sra-id", "company-number", false, "company-url");
         PowerMockito.when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
 
-        ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", "status", theOrganisation);
+        ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", ProfessionalUserStatus.PENDING, theOrganisation);
         theOrganisation.addProfessionalUser(theSuperUser);
 
         ContactInformation theContactInfo = new ContactInformation("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", theOrganisation);

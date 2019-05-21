@@ -9,10 +9,11 @@ import javax.xml.ws.http.HTTPException;
 
 import org.junit.Test;
 
-import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 public class ProfessionalUserServiceTest {
 
@@ -20,9 +21,9 @@ public class ProfessionalUserServiceTest {
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
             "some-email",
-            "PENDING",
+            ProfessionalUserStatus.PENDING,
             mock(Organisation.class));
-    private final ProfessionalUserService professionalUserService = new ProfessionalUserService(
+    private final ProfessionalUserService professionalUserService = new ProfessionalUserServiceImpl(
             professionalUserRepository);
 
     @Test

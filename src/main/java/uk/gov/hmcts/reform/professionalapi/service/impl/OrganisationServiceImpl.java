@@ -197,14 +197,5 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
     }
-
-    @Override
-    public List<ProfessionalUser> findProfessionalUsersByOrganisation(UUID organisationIdentifier, boolean showDeleted){
-        if(showDeleted){
-            return professionalUserRepository.findByOrganisationIdentifier(organisationIdentifier);
-        }else {
-            return professionalUserRepository.findByOrganisationIdentifierAndStatusNot(organisationIdentifier, ProfessionalUserStatus.DELETED);
-        }
-    }
 }
 

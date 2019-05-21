@@ -32,6 +32,9 @@ public class ProfessionalUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(name = "USER_IDENTIFIER")
+    private String userIdentifier;
+
     @Column(name = "FIRST_NAME")
     @Size(max = 255)
     private String firstName;

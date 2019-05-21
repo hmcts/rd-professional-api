@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 public class ProfessionalUserTest {
 
@@ -21,7 +22,7 @@ public class ProfessionalUserTest {
                                                                  "some-fname",
                                                                  "some-lname",
                                                                  "some-email-address",
-                                                                 "some-status",
+                                                                 ProfessionalUserStatus.PENDING,
                                                                  organisation);
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
