@@ -1,18 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import lombok.extern.slf4j.Slf4j;
-
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 public abstract class FunctionalTestSuite {
