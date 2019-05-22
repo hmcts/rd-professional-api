@@ -160,7 +160,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
-        log.info("persistedUserAccountMap::"+paymentAccounts.size());
+
         if (paymentAccounts != null
                 &&  paymentAccounts.size() > 0) {
             log.debug("PaymentAccount is not empty");

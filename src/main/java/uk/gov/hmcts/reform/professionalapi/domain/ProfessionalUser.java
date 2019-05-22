@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,7 +65,7 @@ public class ProfessionalUser {
 
     @OneToMany
     @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
-    private List<UserAccountMap> userAccountMap;
+    private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     public ProfessionalUser(
                             String firstName,

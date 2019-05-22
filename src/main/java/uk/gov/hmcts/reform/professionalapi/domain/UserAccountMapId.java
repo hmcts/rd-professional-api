@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -10,8 +9,6 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-
 
 @Embeddable
 @Getter
@@ -36,24 +33,4 @@ public class UserAccountMapId implements Serializable {
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-        if (!(o instanceof UserAccountMapId))  {
-
-            return false;
-        }
-        UserAccountMapId that = (UserAccountMapId) o;
-        return Objects.equals(getProfessionalUser(), that.getProfessionalUser())
-                &&  Objects.equals(getPaymentAccount(), that.getPaymentAccount());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getProfessionalUser(), getPaymentAccount());
-    }
 }

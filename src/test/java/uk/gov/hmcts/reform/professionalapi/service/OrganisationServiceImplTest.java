@@ -14,11 +14,14 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Mockito;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -39,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
 public class OrganisationServiceImplTest {
+
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepository = mock(UserAccountMapRepository.class);
@@ -56,6 +60,8 @@ public class OrganisationServiceImplTest {
     private final UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
     private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
     private final OrganisationsDetailResponse organisationDetailResponse = mock(OrganisationsDetailResponse.class);
+    private final OrganisationEntityResponse organisationEntityResponse = mock(OrganisationEntityResponse.class);
+
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -67,7 +73,9 @@ public class OrganisationServiceImplTest {
     private OrganisationCreationRequest organisationCreationRequest;
     private List<Organisation> organisations;
     private List<UserAccountMap> userAccountMaps;
-    List<PaymentAccount> paymentAccounts;
+    private List<PaymentAccount> paymentAccounts;
+
+
 
     @Before
     public void setUp() {
@@ -274,6 +282,41 @@ public class OrganisationServiceImplTest {
                 organisationRepository,
                 times(1)).findByStatus(any());
 
+    }
+
+    @Test
+    public void retrieve_an_organisations_by_Uuid() {
+
+        OrganisationEntityResponse organisationEntityResponse =
+                organisationServiceImpl.retrieveOrganisation(UUID.randomUUID());
+
+        assertThat(organisationEntityResponse).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void retrieveAnOrganisationByUuidNotFound() {
+
+        Mockito.when(organisationRepository.findByOrganisationIdentifier(any(UUID.class)))
+                .thenReturn(null);
+
+        organisationServiceImpl.retrieveOrganisation(UUID.randomUUID());
+    }
+
+    @Test
+    public void getOrganisationByOrganisationIdentifier() {
+
+        Organisation organisation =
+                organisationServiceImpl.getOrganisationByOrganisationIdentifier(UUID.randomUUID());
+
+        assertThat(organisation).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
     }
 
 }

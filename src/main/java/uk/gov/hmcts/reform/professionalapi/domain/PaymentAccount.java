@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import static javax.persistence.GenerationType.AUTO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,7 +54,7 @@ public class PaymentAccount {
 
     @OneToMany
     @JoinColumn(name = "PAYMENT_ACCOUNT_ID", referencedColumnName = "id")
-    private List<UserAccountMap> userAccountMap;
+    private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     public PaymentAccount(String pbaNumber) {
         this.pbaNumber = pbaNumber;
