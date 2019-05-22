@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.professionalapi.entities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
 public class PaymentAccountTest {
 
@@ -36,6 +38,10 @@ public class PaymentAccountTest {
         assertThat(paymentAccount.getId()).isNotNull();
 
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
+
+        paymentAccount.setUserAccountMap(new ArrayList<UserAccountMap>());
+
+        assertThat(paymentAccount.getUserAccountMap()).isNotNull();
 
 
     }
