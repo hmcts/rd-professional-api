@@ -56,6 +56,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations?status={status}", status);
     }
 
+    public Map<String, Object> addUserToOrganisation(String orgId) {
+        return postRequest(APP_BASE_PATH + "/{orgId}/users/", orgId);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
@@ -7,11 +9,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import javax.xml.ws.http.HTTPException;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
 import org.junit.Test;
-
 import org.mockito.Mockito;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -26,9 +28,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class ProfessionalUserServiceTest {
 

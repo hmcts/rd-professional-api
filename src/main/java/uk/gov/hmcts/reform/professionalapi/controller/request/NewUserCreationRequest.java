@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder(builderMethodName = "aUserCreationRequest")
+@Builder(builderMethodName = "aNewUserCreationRequest")
 public class NewUserCreationRequest {
 
     @NotNull

@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-
 import java.util.UUID;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class NewUserResponse {
 
@@ -15,4 +14,7 @@ public class NewUserResponse {
         this.userIdentifier = user.getProfessionalUserIdentifier();
     }
 
+    public UUID getUserIdentifier() {
+        return userIdentifier;
+    }
 }
