@@ -129,6 +129,8 @@ public class OrganisationServiceImplTest {
 
         when(organisation.getId()).thenReturn(UUID.randomUUID());
 
+        when(organisation.getPaymentAccounts()).thenReturn(paymentAccounts);
+
         when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
 
         when(professionalUserRepository.save(any(ProfessionalUser.class)))
