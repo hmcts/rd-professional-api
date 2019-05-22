@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -41,7 +41,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserServiceI {
     }
 
     @Override
-    public OrganisationResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier) {
+    public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
         ProfessionalUser newUser = new ProfessionalUser(
@@ -57,7 +57,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserServiceI {
 
         theOrganisation.addProfessionalUser(persistedNewUser);
 
-        OrganisationResponse organisationResponse = new OrganisationResponse(theOrganisation);
-        return organisationResponse;
+        NewUserResponse newUserResponse = new NewUserResponse(newUser);
+        return newUserResponse;
     }
 }

@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -288,7 +289,7 @@ public class OrganisationController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<OrganisationResponse> addUserToOrganisation(
+    public ResponseEntity<NewUserResponse> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
@@ -302,13 +303,13 @@ public class OrganisationController {
         } else {
             UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
 
-            OrganisationResponse organisationResponse =
+            NewUserResponse newUserResponse =
                     professionalUserServiceImpl.addNewUserToAnOrganisation(newUserCreationRequest, inputOrganisationIdentifier);
 
-            log.info("Received request to add a new user to an organisation..." + organisationResponse);
+            log.info("Received request to add a new user to an organisation..." + newUserResponse);
             return ResponseEntity
                     .status(201)
-                    .body(organisationResponse);
+                    .body(newUserResponse);
         }
     }
 }
