@@ -12,7 +12,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Repository
 public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUser, UUID> {
+
     ProfessionalUser findByEmailAddress(String email);
+
     List<ProfessionalUser> findByOrganisationAndStatusNot(Organisation organisation, ProfessionalUserStatus status);
+
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 }

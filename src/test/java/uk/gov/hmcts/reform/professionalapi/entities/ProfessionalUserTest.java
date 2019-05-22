@@ -27,11 +27,12 @@ public class ProfessionalUserTest {
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
-        assertThat(professionalUser.getStatus()).isEqualTo("some-status");
+        assertThat(professionalUser.getStatus()).isEqualTo(ProfessionalUserStatus.PENDING);
         assertThat(professionalUser.getEmailAddress()).isEqualTo("some-email-address");
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getLastUpdated()).isNull();
         assertThat(professionalUser.getCreated()).isNull();
+        assertThat(professionalUser.getUserIdentifier()).isNull();
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
 
@@ -40,8 +41,11 @@ public class ProfessionalUserTest {
         professionalUser.setCreated(LocalDateTime.now());
 
         assertThat(professionalUser.getLastUpdated()).isNotNull();
-
+        assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
+
+        ProfessionalUser user = new ProfessionalUser();
+        assertThat(user).isNotNull();
     }
 
 }

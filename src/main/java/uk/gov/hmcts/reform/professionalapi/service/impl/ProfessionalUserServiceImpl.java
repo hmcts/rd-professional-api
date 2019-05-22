@@ -1,18 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import java.util.List;
+import javax.xml.ws.http.HTTPException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import javax.xml.ws.http.HTTPException;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -41,19 +38,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted){
+    public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
         log.info("Into  ProfessionalService for get all users for organisation");
         List<ProfessionalUser> professionalUsers = null;
-        if(showDeleted){
+        if (showDeleted) {
             log.info("Getting all users having any status");
-            return professionalUserRepository.findByOrganisation(organisation);
-        }else {
+            professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+        } else {
             log.info("Excluding DELETED users for search");
             professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
-            if(CollectionUtils.isEmpty(professionalUsers)){
-                log.error("No professional users with other than DELETED status present for Organisation: " + organisation.getOrganisationIdentifier());
-                throw new EmptyResultDataAccessException(1);
-            }
         }
         return professionalUsers;
     }

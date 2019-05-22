@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 
@@ -42,7 +43,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
-        assertThat(persistedSuperUser.getStatus()).isEqualTo("PENDING");
+        assertThat(persistedSuperUser.getStatus()).isEqualTo(ProfessionalUserStatus.PENDING);
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
 

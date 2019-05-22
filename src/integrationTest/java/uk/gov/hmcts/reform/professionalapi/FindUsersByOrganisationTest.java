@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
@@ -52,49 +55,53 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
         organisationRepository.deleteAll();
     }
 
-    public String createOrganisationRequest() {
-        uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
-    }
-
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier , "True");
+        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
         validateUsers(response);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier , "False");
+        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False");
         validateUsers(response);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier , null);
+        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null);
         validateUsers(response);
 
     }
 
     @Test
+    public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_200() {
+        String organisationIdentifier = createOrganisationRequest();
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(0);
+    }
+
+    @Test
     public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_400() {
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123" , "False");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False");
         assertThat(response.get("http_status")).isEqualTo("400");
 
     }
 
     @Test
     public void retrieve_users_with_non_existing_organisationIdentifier_should_return_status_404() {
-        String organisationIdentifier = createOrganisationRequest();
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(UUID.randomUUID().toString() , "False");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(UUID.randomUUID().toString(),"False");
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
-    private void validateUsers(Map<String, Object> response){
+    private void validateUsers(Map<String, Object> response) {
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
 
@@ -109,5 +116,14 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 
+    public String createOrganisationRequest() {
+        uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
 
+    public void updateOrganisation(String organisationIdentifier, OrganisationStatus status) {
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+    }
 }
