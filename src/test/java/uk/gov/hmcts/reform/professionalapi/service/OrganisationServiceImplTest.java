@@ -125,15 +125,11 @@ public class OrganisationServiceImplTest {
                 contactInformationRepository,
                 userAccountMapRepository);
 
-
-
         organisationCreationRequest =
                 new OrganisationCreationRequest(
                         "some-org-name", OrganisationStatus.PENDING, "sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
                         pbaAccountCreationRequests, contactInformationCreationRequests);
-
-
 
         when(organisation.getId()).thenReturn(UUID.randomUUID());
 
@@ -156,7 +152,7 @@ public class OrganisationServiceImplTest {
         paymentAccounts.add(paymentAccount);
 
         when(userAccountMapRepository.save(any(UserAccountMap.class)))
-                .thenReturn(userAccountMap);
+               .thenReturn(userAccountMap);
 
         when(contactInformationRepository.save(any(ContactInformation.class)))
                 .thenReturn(contactInformation);

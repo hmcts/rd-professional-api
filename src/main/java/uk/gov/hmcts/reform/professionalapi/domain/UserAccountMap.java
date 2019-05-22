@@ -7,7 +7,6 @@ import javax.persistence.EntityListeners;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,7 +14,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 public class UserAccountMap {
 
     @EmbeddedId

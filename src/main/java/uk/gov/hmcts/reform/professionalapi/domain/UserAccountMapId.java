@@ -8,11 +8,9 @@ import javax.persistence.ManyToOne;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Embeddable
 @Getter
-@Setter
 @NoArgsConstructor
 public class UserAccountMapId implements Serializable {
 
