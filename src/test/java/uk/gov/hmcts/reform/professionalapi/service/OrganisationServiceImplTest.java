@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 public class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
-    private final UserAccountMapRepository userAccountRepository = mock(UserAccountMapRepository.class);
+    private final UserAccountMapRepository userAccountMapRepository = mock(UserAccountMapRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
@@ -52,8 +52,8 @@ public class OrganisationServiceImplTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
-    private final UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
     private final UserAccountMap userAccountMap = mock(UserAccountMap.class);
+    private final UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
     private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
     private final OrganisationsDetailResponse organisationDetailResponse = mock(OrganisationsDetailResponse.class);
 
@@ -66,6 +66,8 @@ public class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
     private List<Organisation> organisations;
+    private List<UserAccountMap> userAccountMaps;
+    List<PaymentAccount> paymentAccounts;
 
     @Before
     public void setUp() {
@@ -82,6 +84,10 @@ public class OrganisationServiceImplTest {
         dxAddressRequests = new ArrayList<>();
 
         organisations = new ArrayList<Organisation>();
+
+        paymentAccounts = new ArrayList<PaymentAccount>();
+
+        userAccountMaps = new ArrayList<UserAccountMap>();
 
         pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
@@ -109,7 +115,7 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepository,
                 dxAddressRepository,
                 contactInformationRepository,
-                userAccountRepository);
+                userAccountMapRepository);
 
 
 
@@ -118,6 +124,8 @@ public class OrganisationServiceImplTest {
                         "some-org-name", OrganisationStatus.PENDING, "sra-id",Boolean.FALSE,"company-number","company-url",
                         superUser,
                         pbaAccountCreationRequests, contactInformationCreationRequests);
+
+
 
         when(organisation.getId()).thenReturn(UUID.randomUUID());
 
@@ -132,7 +140,12 @@ public class OrganisationServiceImplTest {
         when(paymentAccountRepository.save(any(PaymentAccount.class)))
                 .thenReturn(paymentAccount);
 
-        when(userAccountRepository.save(any(UserAccountMap.class)))
+        when(paymentAccountRepository.findAll())
+                .thenReturn(paymentAccounts);
+
+        paymentAccounts.add(paymentAccount);
+
+        when(userAccountMapRepository.save(any(UserAccountMap.class)))
                 .thenReturn(userAccountMap);
 
         when(contactInformationRepository.save(any(ContactInformation.class)))
@@ -149,6 +162,9 @@ public class OrganisationServiceImplTest {
 
         when(organisationRepository.findByStatus(any()))
                 .thenReturn(organisations);
+
+        when(userAccountMapRepository.findAll())
+                .thenReturn(userAccountMaps);
     }
 
     @Test
@@ -168,15 +184,13 @@ public class OrganisationServiceImplTest {
         verify(
                 paymentAccountRepository,
                 times(1)).save(any(PaymentAccount.class));
-        /*verify(
-                userAccountRepository,
-                times(1)).save(any(UserAccountMap.class));*/
         verify(
                 contactInformationRepository,
                 times(2)).save(any(ContactInformation.class));
         verify(
                 dxAddressRepository,
                 times(1)).save(any(DxAddress.class));
+
         verify(
                 contactInformation,
                 times(1)).addDxAddress(any(DxAddress.class));
@@ -186,6 +200,12 @@ public class OrganisationServiceImplTest {
         verify(
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
+        verify(
+                organisation,
+                times(1)).addProfessionalUser(any(ProfessionalUser.class));
+        verify(
+                userAccountMapRepository,
+                times(1)).save(any(UserAccountMap.class));
     }
 
     @Test

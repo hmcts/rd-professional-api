@@ -160,11 +160,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
-        UserAccountMap userAccountMap;
-        log.debug("Inside persistedUserAccountMap method...");
+        log.info("persistedUserAccountMap::"+paymentAccounts.size());
         if (paymentAccounts != null
                 &&  paymentAccounts.size() > 0) {
-
+            log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
 
                 userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
