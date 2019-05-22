@@ -131,6 +131,7 @@ public class OrganisationServiceImplTest {
         when(dxAddressRepository.save(any(DxAddress.class)))
                 .thenReturn(dxAddress);
 
+
         when(organisationRepository.findAll())
                 .thenReturn(organisations);
 
@@ -173,6 +174,7 @@ public class OrganisationServiceImplTest {
         verify(
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
+
     }
 
     @Test
@@ -239,6 +241,15 @@ public class OrganisationServiceImplTest {
                 organisationRepository,
                 times(1)).findByStatus(any());
 
+    }
+
+    @Test
+    public void retrieve_organisation_identifier() {
+        UUID uuid = UUID.randomUUID();
+        Organisation organisation = organisationServiceImpl.getOrganisationByOrganisationIdentifier(uuid);
+        assertThat(organisation).isNotNull();
+        verify(organisationRepository,
+                times(1)).findByOrganisationIdentifier(uuid);
     }
 
 }
