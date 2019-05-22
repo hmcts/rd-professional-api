@@ -13,6 +13,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -98,5 +99,13 @@ public class ProfessionalUserServiceTest {
         verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
         verify(organisation, times(1)).addProfessionalUser(any(ProfessionalUser.class));
         verify(userAttributeService, times(1)).addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()));
+    }
+
+    @Test(expected = InvalidUseOfMatchersException.class)
+    public void addNewUserWithInvalidFields() {
+        when(professionalUserService.addNewUserToAnOrganisation(any(NewUserCreationRequest.class), any(UUID.class)))
+                .thenReturn(null);
+
+        professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, UUID.randomUUID());
     }
 }
