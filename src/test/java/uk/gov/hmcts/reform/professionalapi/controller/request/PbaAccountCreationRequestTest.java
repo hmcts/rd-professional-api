@@ -33,7 +33,6 @@ public class PbaAccountCreationRequestTest {
         String pbaNumber2 = "987654";
         PbaAccountCreationRequest testPbaAccountCreationRequest = aPbaPaymentAccount().pbaNumber(pbaNumber2).build();
         assertThat(testPbaAccountCreationRequest.getPbaNumber()).isEqualTo(pbaNumber2);
-        System.out.println(testPbaAccountCreationRequest.getPbaNumber());
     }
 
 

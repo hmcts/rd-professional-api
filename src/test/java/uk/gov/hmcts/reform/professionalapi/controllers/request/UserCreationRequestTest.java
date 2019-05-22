@@ -52,10 +52,6 @@ public class UserCreationRequestTest {
         assertThat(testUserCreationRequest.getFirstName()).isEqualTo(firstName2);
         assertThat(testUserCreationRequest.getLastName()).isEqualTo(lastName2);
         assertThat(testUserCreationRequest.getEmail()).isEqualTo(email2);
-        System.out.println(testUserCreationRequest.getFirstName());
-        System.out.println(testUserCreationRequest.getLastName());
-        System.out.println(testUserCreationRequest.getEmail());
-
     }
 
 }
