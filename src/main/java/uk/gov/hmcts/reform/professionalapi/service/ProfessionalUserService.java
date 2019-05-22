@@ -4,9 +4,11 @@ import java.util.UUID;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-public interface ProfessionalUserServiceI {
+public interface ProfessionalUserService {
 
     NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier);
 
+    ProfessionalUser findProfessionalUserByEmailAddress(String email);
 }
