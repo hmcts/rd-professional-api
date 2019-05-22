@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -42,8 +41,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserR
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
@@ -58,10 +58,10 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 public class OrganisationController {
 
     private OrganisationServiceImpl organisationService;
-    private ProfessionalUserService professionalUserService;
     private ProfessionalUserServiceImpl professionalUserServiceImpl;
     private UserAttributeServiceImpl userAttributeService;
-    private PaymentAccountService paymentAccountservice;
+    private PaymentAccountServiceImpl paymentAccountservice;
+    private PrdEnumServiceImpl prdEnumService;
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
@@ -170,7 +170,7 @@ public class OrganisationController {
     public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
         return ResponseEntity
                 .status(200)
-                .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
+                .body(new ProfessionalUserResponse(professionalUserServiceImpl.findProfessionalUserByEmailAddress(email)));
     }
 
     @ApiOperation(
@@ -295,7 +295,7 @@ public class OrganisationController {
 
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
-        List<PrdEnum> prdEnumList = userAttributeService.findAllPrdEnums();
+        List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
             log.error("Invalid/No user role(s) provided");

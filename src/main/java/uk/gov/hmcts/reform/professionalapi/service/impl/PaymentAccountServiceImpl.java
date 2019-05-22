@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.service;
+package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 
 @Service
 @Slf4j
 @AllArgsConstructor
-public class PaymentAccountService {
+public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     private OrganisationRepository organisationRepository;
     private ProfessionalUserRepository professionalUserRepository;

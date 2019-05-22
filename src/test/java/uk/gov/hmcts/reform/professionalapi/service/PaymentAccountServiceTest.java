@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 
 public class PaymentAccountServiceTest {
@@ -21,11 +22,11 @@ public class PaymentAccountServiceTest {
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
 
-    private PaymentAccountService paymentAccountService;
+    private PaymentAccountServiceImpl paymentAccountService;
 
     @Before
     public void setUp() {
-        paymentAccountService = new PaymentAccountService(
+        paymentAccountService = new PaymentAccountServiceImpl(
                 organisationRepository,
                 professionalUserRepository);
 

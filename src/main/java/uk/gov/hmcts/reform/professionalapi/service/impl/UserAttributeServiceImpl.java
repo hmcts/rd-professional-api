@@ -21,17 +21,21 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
 
+    PrdEnumServiceImpl prdEnumService;
+
     @Autowired
     public UserAttributeServiceImpl(
             UserAttributeRepository userAttributeRepository,
-            PrdEnumRepository prdEnumRepository) {
+            PrdEnumRepository prdEnumRepository,
+            PrdEnumServiceImpl prdEnumService) {
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
+        this.prdEnumService = prdEnumService;
     }
 
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles) {
-        List<PrdEnum> prdEnums = findAllPrdEnums();
+        List<PrdEnum> prdEnums = prdEnumService.findAllPrdEnums();
         List<String> verifiedRoles = UserCreationRequestValidator.contains(userRoles, prdEnums);
 
         if (verifiedRoles.isEmpty()) {
@@ -47,10 +51,5 @@ public class UserAttributeServiceImpl implements UserAttributeService {
                 }
             });
         }
-    }
-
-    public List<PrdEnum> findAllPrdEnums() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-        return prdEnums;
     }
 }

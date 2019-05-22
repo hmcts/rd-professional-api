@@ -3,14 +3,16 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+import java.util.UUID;
+
 public class NewUserResponse {
 
     @JsonProperty
-    private final String email;
+    private final UUID userIdentifier;
 
     public NewUserResponse(ProfessionalUser user) {
 
-        this.email = user.getEmailAddress();
+        this.userIdentifier = user.getProfessionalUserIdentifier();
     }
 
 }

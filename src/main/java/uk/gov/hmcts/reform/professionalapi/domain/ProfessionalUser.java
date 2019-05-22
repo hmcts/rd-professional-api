@@ -66,6 +66,9 @@ public class ProfessionalUser {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
+    @Column(name = "USER_IDENTIFIER")
+    private UUID professionalUserIdentifier;
+
     public ProfessionalUser(
                             String firstName,
                             String lastName,
@@ -78,5 +81,11 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
+        this.professionalUserIdentifier = generateUniqueProfessionalUserIdentifier();
     }
+
+    public UUID generateUniqueProfessionalUserIdentifier() {
+        return UUID.randomUUID();
+    }
+
 }
