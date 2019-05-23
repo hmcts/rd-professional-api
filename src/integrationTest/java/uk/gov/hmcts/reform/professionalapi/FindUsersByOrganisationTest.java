@@ -1,59 +1,21 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 
 public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrationTest {
-
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
@@ -114,16 +76,5 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
         assertThat(professionalUsersResponse.get("email")).isNotNull();
         assertThat(professionalUsersResponse.get("status")).isEqualTo(ProfessionalUserStatus.PENDING.name());
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
-    }
-
-    public String createOrganisationRequest() {
-        uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
-    }
-
-    public void updateOrganisation(String organisationIdentifier, OrganisationStatus status) {
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
-        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
     }
 }
