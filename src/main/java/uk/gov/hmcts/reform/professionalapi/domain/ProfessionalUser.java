@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -13,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -64,6 +67,10 @@ public class ProfessionalUser {
     @CreatedDate
     @Column(name = "CREATED")
     private LocalDateTime created;
+
+    @OneToMany
+    @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
+    private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     public ProfessionalUser(
                             String firstName,
