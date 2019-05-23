@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class FindUsersByOrganisationTest extends FunctionalTestSuite {
 
