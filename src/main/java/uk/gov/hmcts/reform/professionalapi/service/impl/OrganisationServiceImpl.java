@@ -26,12 +26,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
@@ -46,6 +49,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
+    UserAccountMapRepository userAccountMapRepository;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -55,13 +59,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
-            PrdEnumRepository prdEnumRepository) {
+            PrdEnumRepository prdEnumRepository,
+            UserAccountMapRepository userAccountMapRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
+        this.userAccountMapRepository = userAccountMapRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
     }
@@ -102,6 +108,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -119,6 +126,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
+
+        persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
@@ -155,6 +164,18 @@ public class OrganisationServiceImpl implements OrganisationService {
                 DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
                 dxAddress = dxAddressRepository.save(dxAddress);
                 contactInformation.addDxAddress(dxAddress);
+            });
+        }
+    }
+
+    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
+
+        if (paymentAccounts != null
+                &&  paymentAccounts.size() > 0) {
+            log.debug("PaymentAccount is not empty");
+            paymentAccounts.forEach(paymentAccount -> {
+
+                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
         }
     }

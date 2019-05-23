@@ -14,11 +14,14 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Mockito;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -27,19 +30,24 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
 public class OrganisationServiceImplTest {
+
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
+    private final UserAccountMapRepository userAccountMapRepository = mock(UserAccountMapRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepository = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepository = mock(DxAddressRepository.class);
@@ -52,8 +60,12 @@ public class OrganisationServiceImplTest {
     private final PaymentAccount paymentAccount = mock(PaymentAccount.class);
     private final ContactInformation contactInformation = mock(ContactInformation.class);
     private final DxAddress dxAddress = mock(DxAddress.class);
+    private final UserAccountMap userAccountMap = mock(UserAccountMap.class);
+    private final UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
     private final OrganisationResponse organisationResponse = mock(OrganisationResponse.class);
     private final OrganisationsDetailResponse organisationDetailResponse = mock(OrganisationsDetailResponse.class);
+    private final OrganisationEntityResponse organisationEntityResponse = mock(OrganisationEntityResponse.class);
+
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -64,6 +76,10 @@ public class OrganisationServiceImplTest {
     private ContactInformationCreationRequest contactInformationCreationRequest;
     private OrganisationCreationRequest organisationCreationRequest;
     private List<Organisation> organisations;
+    private List<UserAccountMap> userAccountMaps;
+    private List<PaymentAccount> paymentAccounts;
+
+
 
     @Before
     public void setUp() {
@@ -83,6 +99,10 @@ public class OrganisationServiceImplTest {
         dxAddressRequests = new ArrayList<>();
 
         organisations = new ArrayList<Organisation>();
+
+        paymentAccounts = new ArrayList<PaymentAccount>();
+
+        userAccountMaps = new ArrayList<UserAccountMap>();
 
         pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
 
@@ -111,7 +131,8 @@ public class OrganisationServiceImplTest {
                 dxAddressRepository,
                 contactInformationRepository,
                 userAttributeRepository,
-                prdEnumRepository);
+                prdEnumRepository,
+                userAccountMapRepository);
 
 
         organisationCreationRequest =
@@ -121,6 +142,8 @@ public class OrganisationServiceImplTest {
                         pbaAccountCreationRequests, contactInformationCreationRequests);
 
         when(organisation.getId()).thenReturn(UUID.randomUUID());
+
+        when(organisation.getPaymentAccounts()).thenReturn(paymentAccounts);
 
         when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
 
@@ -132,6 +155,14 @@ public class OrganisationServiceImplTest {
 
         when(paymentAccountRepository.save(any(PaymentAccount.class)))
                 .thenReturn(paymentAccount);
+
+        when(paymentAccountRepository.findAll())
+                .thenReturn(paymentAccounts);
+
+        paymentAccounts.add(paymentAccount);
+
+        when(userAccountMapRepository.save(any(UserAccountMap.class)))
+               .thenReturn(userAccountMap);
 
         when(contactInformationRepository.save(any(ContactInformation.class)))
                 .thenReturn(contactInformation);
@@ -147,6 +178,9 @@ public class OrganisationServiceImplTest {
 
         when(organisationRepository.findByStatus(any()))
                 .thenReturn(organisations);
+
+        when(userAccountMapRepository.findAll())
+                .thenReturn(userAccountMaps);
     }
 
     @Test
@@ -172,6 +206,7 @@ public class OrganisationServiceImplTest {
         verify(
                 dxAddressRepository,
                 times(1)).save(any(DxAddress.class));
+
         verify(
                 contactInformation,
                 times(1)).addDxAddress(any(DxAddress.class));
@@ -181,6 +216,12 @@ public class OrganisationServiceImplTest {
         verify(
                 organisation,
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
+        verify(
+                organisation,
+                times(1)).addProfessionalUser(any(ProfessionalUser.class));
+        verify(
+                userAccountMapRepository,
+                times(1)).save(any(UserAccountMap.class));
     }
 
     @Test
@@ -199,15 +240,15 @@ public class OrganisationServiceImplTest {
     @Test
     public void updates_an_organisation() {
         OrganisationResponse organisationResponse =
-                organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+            organisationServiceImpl.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
 
         assertThat(organisationResponse).isNotNull();
         verify(
-                organisationRepository,
+            organisationRepository,
                 times(1)).findByOrganisationIdentifier(any());
 
         verify(
-                organisationRepository,
+            organisationRepository,
                 times(1)).save(any(Organisation.class));
 
         verify(
@@ -247,6 +288,41 @@ public class OrganisationServiceImplTest {
                 organisationRepository,
                 times(1)).findByStatus(any());
 
+    }
+
+    @Test
+    public void retrieve_an_organisations_by_Uuid() {
+
+        OrganisationEntityResponse organisationEntityResponse =
+                organisationServiceImpl.retrieveOrganisation(UUID.randomUUID());
+
+        assertThat(organisationEntityResponse).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void retrieveAnOrganisationByUuidNotFound() {
+
+        Mockito.when(organisationRepository.findByOrganisationIdentifier(any(UUID.class)))
+                .thenReturn(null);
+
+        organisationServiceImpl.retrieveOrganisation(UUID.randomUUID());
+    }
+
+    @Test
+    public void getOrganisationByOrganisationIdentifier() {
+
+        Organisation organisation =
+                organisationServiceImpl.getOrganisationByOrganisationIdentifier(UUID.randomUUID());
+
+        assertThat(organisation).isNotNull();
+
+        verify(
+                organisationRepository,
+                times(1)).findByOrganisationIdentifier(any());
     }
 
 }

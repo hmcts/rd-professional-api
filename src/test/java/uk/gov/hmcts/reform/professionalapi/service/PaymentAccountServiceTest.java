@@ -9,9 +9,16 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
-import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 
@@ -70,13 +77,13 @@ public class PaymentAccountServiceTest {
         assertEquals(anOrganisation.getPaymentAccounts(), theOrganisation.getPaymentAccounts());
     }
 
-    public void retrievePaymentAccountsByEmailNotFound() {
-        when(professionalUserRepository.findByEmailAddress(any(String.class)))
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieveUserByEmailNotFound() {
+        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
         paymentAccountService.findPaymentAccountsByEmail("some-email");
 
-        assertEquals("", organisation.getOrganisationIdentifier().toString());
     }
 
 

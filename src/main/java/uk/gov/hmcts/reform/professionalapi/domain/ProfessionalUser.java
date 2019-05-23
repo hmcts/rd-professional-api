@@ -66,6 +66,10 @@ public class ProfessionalUser {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
+    @OneToMany
+    @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
+    private List<UserAccountMap> userAccountMap = new ArrayList<>();
+
     @Column(name = "USER_IDENTIFIER")
     private UUID professionalUserIdentifier;
 
