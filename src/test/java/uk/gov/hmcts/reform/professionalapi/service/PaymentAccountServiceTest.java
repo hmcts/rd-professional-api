@@ -4,11 +4,13 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
@@ -30,20 +32,20 @@ public class PaymentAccountServiceTest {
                 organisationRepository,
                 professionalUserRepository);
 
-        PowerMockito.when(organisationRepository.save(any(Organisation.class)))
+        when(organisationRepository.save(any(Organisation.class)))
                 .thenReturn(organisation);
 
-        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
+        when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
-        PowerMockito.when(organisationRepository.findByUsers(any(ProfessionalUser.class)))
+        when(organisationRepository.findByUsers(any(ProfessionalUser.class)))
                 .thenReturn(organisation);
     }
 
     @Test
     public void retrievePaymentAccountsByEmail() {
         Organisation theOrganisation = new Organisation("some-org-", OrganisationStatus.PENDING, "sra-id", "company-number", false, "company-url");
-        PowerMockito.when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
+        when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
 
         ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", "status", theOrganisation);
         theOrganisation.addProfessionalUser(theSuperUser);
@@ -69,12 +71,23 @@ public class PaymentAccountServiceTest {
         assertEquals(anOrganisation.getPaymentAccounts(), theOrganisation.getPaymentAccounts());
     }
 
-    public void retrieveUserByEmailNotFound() {
-        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
+    public void retrievePaymentAccountsByEmailNotFound() {
+        when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
         paymentAccountService.findPaymentAccountsByEmail("some-email");
 
         assertEquals("", organisation.getOrganisationIdentifier().toString());
     }
+
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrievePaymentAccountsWithInvalidEmail() {
+        when(paymentAccountService.findPaymentAccountsByEmail("some-email"))
+                .thenReturn(null);
+
+        paymentAccountService.findPaymentAccountsByEmail(null);
+    }
+
+
 }
