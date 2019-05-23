@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 public class UserAttributeTest {
 
     @Test
-    public void creates_user_attribute_correctly(){
+    public void creates_user_attribute_correctly() {
 
         PrdEnum prdEnum = mock(PrdEnum.class);
 

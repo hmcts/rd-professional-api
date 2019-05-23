@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -19,6 +20,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import net.serenitybdd.rest.SerenityRest;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -120,6 +123,34 @@ public class ProfessionalApiClient {
             log.info("Create organisation response: " + response.asString());
         }
 
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public  NewUserCreationRequest createNewUserCreationRequest() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .status("PENDING")
+                .roles(userRoles)
+                .build();
+
+        return userCreationRequest;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest) {
+        Response response = withAuthenticatedRequest()
+                .body(newUserCreationRequest)
+                .post("/v1/organisations/" + orgId + "/users/")
+                .andReturn();
         response.then()
                 .assertThat()
                 .statusCode(CREATED.value());
