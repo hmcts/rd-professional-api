@@ -67,6 +67,8 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
+
+
         Organisation persistedOrganisation = paymentAccountService.findPaymentAccountsByEmail("some@email.com");
 
         assertEquals("some-org-", persistedOrganisation.getName());

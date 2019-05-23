@@ -4,6 +4,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -41,6 +42,11 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getLastUpdated()).isNotNull();
 
         assertThat(professionalUser.getCreated()).isNotNull();
+
+        professionalUser.setUserAccountMap(new ArrayList<>());
+
+        assertThat(professionalUser.getUserAccountMap()).isNotNull();
+
     }
 
 }
