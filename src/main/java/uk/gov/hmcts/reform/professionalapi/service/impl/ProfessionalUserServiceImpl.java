@@ -64,8 +64,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         theOrganisation.addProfessionalUser(persistedNewUser);
 
-        NewUserResponse newUserResponse = new NewUserResponse(persistedNewUser);
-        return newUserResponse;
+       return new NewUserResponse(persistedNewUser);
     }
 
     /**
