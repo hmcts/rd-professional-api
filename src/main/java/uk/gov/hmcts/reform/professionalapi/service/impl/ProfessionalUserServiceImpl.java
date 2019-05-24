@@ -1,24 +1,70 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.List;
+import java.util.UUID;
+import javax.transaction.Transactional;
 import javax.xml.ws.http.HTTPException;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-
 
 @Service
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
-    private final ProfessionalUserRepository professionalUserRepository;
+    OrganisationRepository organisationRepository;
+    ProfessionalUserRepository professionalUserRepository;
+    UserAttributeRepository userAttributeRepository;
+    PrdEnumRepository prdEnumRepository;
 
-    public ProfessionalUserServiceImpl(ProfessionalUserRepository professionalUserRepository) {
+    UserAttributeServiceImpl userAttributeService;
+
+    @Autowired
+    public ProfessionalUserServiceImpl(
+            OrganisationRepository organisationRepository,
+            ProfessionalUserRepository professionalUserRepository,
+            UserAttributeRepository userAttributeRepository,
+            PrdEnumRepository prdEnumRepository,
+            UserAttributeServiceImpl userAttributeService) {
+
+        this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
+        this.userAttributeRepository = userAttributeRepository;
+        this.prdEnumRepository = prdEnumRepository;
+        this.userAttributeService = userAttributeService;
+    }
+
+    @Transactional
+    @Override
+    public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier) {
+        Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        ProfessionalUser newUser = new ProfessionalUser(
+                newUserCreationRequest.getFirstName(),
+                newUserCreationRequest.getLastName(),
+                newUserCreationRequest.getEmail(),
+                ProfessionalUserStatus.PENDING,
+                theOrganisation);
+
+        ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
+
+        userAttributeService.addUserAttributesToUser(persistedNewUser, newUserCreationRequest.getRoles());
+
+        theOrganisation.addProfessionalUser(persistedNewUser);
+
+        return new NewUserResponse(persistedNewUser);
     }
 
     /**

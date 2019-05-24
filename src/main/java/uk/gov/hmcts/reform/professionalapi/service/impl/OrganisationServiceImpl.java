@@ -32,8 +32,10 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationReposit
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 @Service
@@ -45,6 +47,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PaymentAccountRepository paymentAccountRepository;
     DxAddressRepository dxAddressRepository;
     ContactInformationRepository contactInformationRepository;
+    UserAttributeRepository userAttributeRepository;
+    PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
 
     @Autowired
@@ -54,6 +58,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             PaymentAccountRepository paymentAccountRepository,
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
+            UserAttributeRepository userAttributeRepository,
+            PrdEnumRepository prdEnumRepository,
             UserAccountMapRepository userAccountMapRepository) {
 
         this.organisationRepository = organisationRepository;
@@ -62,6 +68,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
         this.userAccountMapRepository = userAccountMapRepository;
+        this.userAttributeRepository = userAttributeRepository;
+        this.prdEnumRepository = prdEnumRepository;
     }
 
     @Override
@@ -123,6 +131,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
+
 
     private void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,

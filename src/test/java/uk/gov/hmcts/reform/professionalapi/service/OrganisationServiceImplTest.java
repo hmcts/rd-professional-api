@@ -31,13 +31,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
@@ -51,16 +52,15 @@ public class OrganisationServiceImplTest {
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private OrganisationServiceImpl organisationServiceImplMock = mock(OrganisationServiceImpl.class);
 
+    private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
+    private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
+
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
-    private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
-    private final OrganisationResponse organisationResponseMock = mock(OrganisationResponse.class);
-    private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
-    private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
 
     private UserCreationRequest superUser;
@@ -79,10 +79,13 @@ public class OrganisationServiceImplTest {
     @Before
     public void setUp() {
 
+        List<String> userRoles = new ArrayList<>();
+
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email");
+                "some-email",
+                userRoles);
 
         pbaAccountCreationRequests = new ArrayList<>();
 
@@ -122,8 +125,9 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
+                userAttributeRepository,
+                prdEnumRepository,
                 userAccountMapRepositoryMock);
-
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -293,7 +297,7 @@ public class OrganisationServiceImplTest {
         testOrganisation.setId(UUID.randomUUID());
         UUID testOrganisationId = testOrganisation.getId();
 
-        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAccountMapRepositoryMock);
+        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAttributeRepository, prdEnumRepository, userAccountMapRepositoryMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 

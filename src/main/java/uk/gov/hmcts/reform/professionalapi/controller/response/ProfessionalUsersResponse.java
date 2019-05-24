@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private String userIdentifier;
+    private UUID userIdentifier;
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -30,7 +31,7 @@ public class ProfessionalUsersResponse {
     private List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = user.getUserIdentifier();
+        this.userIdentifier = user.getProfessionalUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
