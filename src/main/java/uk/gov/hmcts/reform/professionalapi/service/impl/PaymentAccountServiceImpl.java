@@ -23,7 +23,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
 
         if (user == null) {
-            throw new EmptyResultDataAccessException(404);
+            throw new EmptyResultDataAccessException(1);
         }
         Organisation organisation = organisationRepository.findByUsers(user);
         return organisation;

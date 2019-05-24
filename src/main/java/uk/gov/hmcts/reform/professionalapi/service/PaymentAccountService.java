@@ -4,6 +4,5 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 public interface PaymentAccountService {
 
-    public Organisation findPaymentAccountsByEmail(String email);
-
+    Organisation findPaymentAccountsByEmail(String email);
 }

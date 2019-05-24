@@ -21,4 +21,16 @@ public class UpdateOrganisationRequestValidator {
     public void validateStatus(Organisation existingOrganisation, OrganisationStatus inputStatus, UUID inputOrganisationIdentifier) {
         validators.forEach(v -> v.validate(existingOrganisation, inputStatus, inputOrganisationIdentifier));
     }
+
+    public UUID validateAndReturnInputOrganisationIdentifier(String inputOrganisationIdentifier) {
+        UUID orgIdentifier = null;
+        try {
+            orgIdentifier = UUID.fromString(inputOrganisationIdentifier);
+        } catch (IllegalArgumentException ex) {
+            String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
+            log.error(errorMessage);
+            throw new InvalidRequest(errorMessage);
+        }
+        return orgIdentifier;
+    }
 }
