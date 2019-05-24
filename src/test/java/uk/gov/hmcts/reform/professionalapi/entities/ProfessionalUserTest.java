@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 public class ProfessionalUserTest {
 
@@ -22,16 +23,17 @@ public class ProfessionalUserTest {
                                                                  "some-fname",
                                                                  "some-lname",
                                                                  "some-email-address",
-                                                                 "some-status",
+                                                                 ProfessionalUserStatus.PENDING,
                                                                  organisation);
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
-        assertThat(professionalUser.getStatus()).isEqualTo("some-status");
+        assertThat(professionalUser.getStatus()).isEqualTo(ProfessionalUserStatus.PENDING);
         assertThat(professionalUser.getEmailAddress()).isEqualTo("some-email-address");
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getLastUpdated()).isNull();
         assertThat(professionalUser.getCreated()).isNull();
+        assertThat(professionalUser.getProfessionalUserIdentifier()).isNotNull();
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
 
@@ -47,6 +49,9 @@ public class ProfessionalUserTest {
 
         assertThat(professionalUser.getUserAccountMap()).isNotNull();
 
+
+        ProfessionalUser user = new ProfessionalUser();
+        assertThat(user).isNotNull();
     }
 
 }

@@ -122,7 +122,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
                 userCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING.name(),
+                ProfessionalUserStatus.PENDING,
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);

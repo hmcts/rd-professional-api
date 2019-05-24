@@ -60,6 +60,10 @@ public class ProfessionalReferenceDataClient {
         return postRequest(APP_BASE_PATH + "/{orgId}/users/", orgId);
     }
 
+    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
+        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", showDeleted);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
 

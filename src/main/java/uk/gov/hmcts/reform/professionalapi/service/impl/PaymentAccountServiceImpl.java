@@ -6,7 +6,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 
 @Service
@@ -21,7 +22,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
 
-        if (user != null) {
+        if (user == null) {
             throw new EmptyResultDataAccessException(1);
         }
         Organisation organisation = organisationRepository.findByUsers(user);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import javax.xml.ws.http.HTTPException;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -53,7 +55,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName(),
                 newUserCreationRequest.getEmail(),
-                newUserCreationRequest.getStatus(),
+                ProfessionalUserStatus.PENDING,
                 theOrganisation);
 
         ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
@@ -80,5 +82,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new HTTPException(404);
         }
         return user;
+    }
+
+    @Override
+    public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
+        log.info("Into  ProfessionalService for get all users for organisation");
+        List<ProfessionalUser> professionalUsers = null;
+        if (showDeleted) {
+            log.info("Getting all users having any status");
+            professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+        } else {
+            log.info("Excluding DELETED users for search");
+            professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+        }
+        return professionalUsers;
     }
 }
