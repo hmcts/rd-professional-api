@@ -20,12 +20,13 @@ import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-
 import net.serenitybdd.rest.SerenityRest;
+import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
@@ -191,6 +192,21 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
 
         return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String showDeleted, HttpStatus status) {
+        Response response = withAuthenticatedRequest()
+                .get("/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+                .andReturn();
+        response.then()
+                    .assertThat()
+                    .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.body().as(Map.class);
+        } else {
+            return new HashMap<String, Object>();
+        }
     }
 
     public void updateOrganisation(String organisationIdentifier) {

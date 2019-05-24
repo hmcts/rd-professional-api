@@ -1,33 +1,36 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.ws.http.HTTPException;
-
 import org.junit.Test;
-
-import uk.gov.hmcts.reform.professionalapi.ProfessionalUserService;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 public class ProfessionalUserServiceTest {
 
-    private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
+    private final ProfessionalUserRepository professionalUserRepository = Mockito.mock(ProfessionalUserRepository.class);
+    private final Organisation organisation = Mockito.mock(Organisation.class);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
             "some-email",
-            "PENDING",
-            mock(Organisation.class));
-    private final ProfessionalUserService professionalUserService = new ProfessionalUserService(
+            ProfessionalUserStatus.PENDING,
+            Mockito.mock(Organisation.class));
+    private final ProfessionalUserService professionalUserService = new ProfessionalUserServiceImpl(
             professionalUserRepository);
+    private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
 
     @Test
     public void retrieveUserByEmail() {
-        when(professionalUserRepository.findByEmailAddress(any(String.class)))
+        Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some-email");
@@ -38,10 +41,40 @@ public class ProfessionalUserServiceTest {
 
     @Test(expected = HTTPException.class)
     public void retrieveUserByEmailNotFound() {
-        when(professionalUserRepository.findByEmailAddress(any(String.class)))
+        Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
         professionalUserService.findProfessionalUserByEmailAddress("some-email");
     }
 
+
+    @Test
+    public void findUsersByOrganisation_with_deleted_users() {
+
+        usersNonEmptyList.add(professionalUser);
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
+                .thenReturn(usersNonEmptyList);
+
+        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, true);
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByOrganisation(organisation);
+
+        assertThat(usersFromDb).isNotNull();
+    }
+
+    @Test
+    public void findUsersByOrganisation_with_non_deleted_users() {
+
+        usersNonEmptyList.add(professionalUser);
+        Mockito.when(professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED))
+                .thenReturn(usersNonEmptyList);
+
+        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+
+        assertThat(usersFromDb).isNotNull();
+    }
 }
