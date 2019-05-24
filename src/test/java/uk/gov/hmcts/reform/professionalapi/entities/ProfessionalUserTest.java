@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.junit.Test;
 
@@ -33,7 +34,8 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getLastUpdated()).isNull();
         assertThat(professionalUser.getCreated()).isNull();
-        assertThat(professionalUser.getUserIdentifier()).isNull();
+        assertThat(professionalUser.getUserIdentifier()).isNotNull();
+        assertThat(professionalUser.getUserIdentifier().toString().length()).isEqualTo(36);
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
 
@@ -52,6 +54,10 @@ public class ProfessionalUserTest {
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
+
+        UUID userIdentifier = ProfessionalUser.generateUserIdentifier();
+        assertThat(userIdentifier).isNotNull();
+        assertThat(userIdentifier.toString().length()).isEqualTo(36);
     }
 
 }

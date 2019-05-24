@@ -38,7 +38,7 @@ public class ProfessionalUser {
     private UUID id;
 
     @Column(name = "USER_IDENTIFIER")
-    private String userIdentifier;
+    private UUID userIdentifier;
 
     @Column(name = "FIRST_NAME")
     @Size(max = 255)
@@ -84,5 +84,10 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
+        this.userIdentifier = generateUserIdentifier();
+    }
+
+    public static UUID generateUserIdentifier() {
+        return UUID.randomUUID();
     }
 }

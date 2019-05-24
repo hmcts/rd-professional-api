@@ -33,6 +33,7 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
@@ -54,6 +55,7 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
@@ -75,6 +77,7 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
