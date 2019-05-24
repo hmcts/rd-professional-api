@@ -137,7 +137,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(randomAlphabetic(10).toLowerCase() + "@hotmail.com")
+                .email(randomAlphabetic(10) + "@hotmail.com")
                 .status("PENDING")
                 .roles(userRoles)
                 .build();
