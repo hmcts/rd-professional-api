@@ -1,17 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controllers.request;
 
-import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserAttributeRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserAttributeRequest;
 
 public class UserAttributeRequestTest {
 
