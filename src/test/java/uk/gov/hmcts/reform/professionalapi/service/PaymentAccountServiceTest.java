@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
+
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
+
 
 public class PaymentAccountServiceTest {
 
@@ -81,6 +83,13 @@ public class PaymentAccountServiceTest {
                 .thenReturn(null);
 
         paymentAccountService.findPaymentAccountsByEmail("some-email");
+
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void throwsExceptionWhenUserIsNull() {
+
+        paymentAccountService.findPaymentAccountsByEmail(null);
 
     }
 }
