@@ -8,6 +8,8 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,6 +37,9 @@ public class ProfessionalUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(name = "USER_IDENTIFIER")
+    private String userIdentifier;
+
     @Column(name = "FIRST_NAME")
     @Size(max = 255)
     private String firstName;
@@ -48,8 +53,8 @@ public class ProfessionalUser {
     private String emailAddress;
 
     @Column(name = "STATUS")
-    @Size(max = 50)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ProfessionalUserStatus status;
 
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
@@ -71,7 +76,7 @@ public class ProfessionalUser {
                             String firstName,
                             String lastName,
                             String emailAddress,
-                            String status,
+                            ProfessionalUserStatus status,
                             Organisation organisation) {
 
         this.firstName = firstName;
