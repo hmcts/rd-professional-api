@@ -3,15 +3,16 @@ package uk.gov.hmcts.reform.professionalapi.controllers.request;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+import java.util.UUID;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationValidator;
 
-import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateOrganisationRequestValidatorTest {
