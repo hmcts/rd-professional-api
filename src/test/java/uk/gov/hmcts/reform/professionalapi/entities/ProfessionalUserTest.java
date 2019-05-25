@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.entities;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_UUID;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getLastUpdated()).isNull();
         assertThat(professionalUser.getCreated()).isNull();
         assertThat(professionalUser.getUserIdentifier()).isNotNull();
-        assertThat(professionalUser.getUserIdentifier().toString().length()).isEqualTo(36);
+        assertThat(professionalUser.getUserIdentifier().toString().length()).isEqualTo(LENGTH_OF_UUID);
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
 
@@ -54,10 +54,6 @@ public class ProfessionalUserTest {
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
-
-        UUID userIdentifier = ProfessionalUser.generateUserIdentifier();
-        assertThat(userIdentifier).isNotNull();
-        assertThat(userIdentifier.toString().length()).isEqualTo(36);
     }
 
 }

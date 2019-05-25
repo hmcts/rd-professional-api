@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_UUID;
 
 import java.util.Map;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
         assertThat(persistedSuperUser.getUserIdentifier()).isNotNull();
-        assertThat(persistedSuperUser.getUserIdentifier().toString().length()).isEqualTo(36);
+        assertThat(persistedSuperUser.getUserIdentifier().toString().length()).isEqualTo(LENGTH_OF_UUID);
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");

@@ -25,6 +25,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -84,10 +85,7 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
-        this.userIdentifier = generateUserIdentifier();
+        this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
 
-    public static UUID generateUserIdentifier() {
-        return UUID.randomUUID();
-    }
 }
