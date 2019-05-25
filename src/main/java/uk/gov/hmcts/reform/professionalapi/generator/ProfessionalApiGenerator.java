@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.generator;
 import java.util.UUID;
 
 /**
- * This interface is responsible for generating unique UUID
+ * This interface is responsible for generating unique UUID.
  */
 
 public interface ProfessionalApiGenerator {
