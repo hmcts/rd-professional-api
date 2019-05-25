@@ -56,6 +56,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations?status={status}", status);
     }
 
+    public Map<String, Object> addUserToOrganisation(String orgId) {
+        return postRequest(APP_BASE_PATH + "/{orgId}/users/", orgId);
+    }
+
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
         return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", showDeleted);
     }

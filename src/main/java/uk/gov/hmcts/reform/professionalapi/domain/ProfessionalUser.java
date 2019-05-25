@@ -38,9 +38,6 @@ public class ProfessionalUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "USER_IDENTIFIER")
-    private UUID userIdentifier;
-
     @Column(name = "FIRST_NAME")
     @Size(max = 255)
     private String firstName;
@@ -61,6 +58,9 @@ public class ProfessionalUser {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
+    @OneToMany(mappedBy = "professionalUser")
+    private List<UserAttribute> userAttributes = new ArrayList<>();
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
@@ -72,6 +72,9 @@ public class ProfessionalUser {
     @OneToMany
     @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
+
+    @Column(name = "USER_IDENTIFIER")
+    private UUID userIdentifier;
 
     public ProfessionalUser(
                             String firstName,
@@ -87,5 +90,4 @@ public class ProfessionalUser {
         this.organisation = organisation;
         this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
-
 }
