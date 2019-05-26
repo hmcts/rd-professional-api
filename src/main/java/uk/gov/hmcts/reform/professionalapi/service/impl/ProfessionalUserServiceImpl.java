@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.List;
-import java.util.UUID;
 import javax.transaction.Transactional;
 import javax.xml.ws.http.HTTPException;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Transactional
     @Override
-    public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, UUID organisationIdentifier) {
+    public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
         ProfessionalUser newUser = new ProfessionalUser(
