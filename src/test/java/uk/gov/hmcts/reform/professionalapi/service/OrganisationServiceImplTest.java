@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.assertj.core.api.Assertions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -224,6 +226,28 @@ public class OrganisationServiceImplTest {
         verify(
                 userAccountMapRepositoryMock,
                 times(1)).save(any(UserAccountMap.class));
+
+    }
+
+    @Test
+    public void saves_organisation_with_constraint_violation_exception() {
+
+        when(organisationRepositoryMock.save(organisationMock))
+                .thenThrow(ConstraintViolationException.class);
+
+        Assertions.assertThatThrownBy(() -> organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest))
+                .isExactlyInstanceOf(ConstraintViolationException.class);
+
+        verify(
+                organisationMock,
+                times(1)).setOrganisationIdentifier(any(String.class));
+
+        verify(
+                organisationRepositoryMock,
+                times(3)).save(any(Organisation.class));
+
+        organisationMock.setOrganisationIdentifier("1XCDFG3");
+        assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
     }
 
     @Test

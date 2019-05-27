@@ -97,7 +97,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        organisationRepository.save(organisation);
+        saveOrganisation(organisation);
 
         return new OrganisationResponse(organisation);
     }
