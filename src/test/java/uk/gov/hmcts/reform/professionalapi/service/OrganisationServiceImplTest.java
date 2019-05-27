@@ -232,7 +232,7 @@ public class OrganisationServiceImplTest {
     @Test
     public void saves_organisation_with_constraint_violation_exception() {
 
-        when(organisationRepositoryMock.save(organisationMock))
+        when(organisationRepositoryMock.save(any(Organisation.class)))
                 .thenThrow(ConstraintViolationException.class);
 
         Assertions.assertThatThrownBy(() -> organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest))
@@ -240,11 +240,11 @@ public class OrganisationServiceImplTest {
 
         verify(
                 organisationMock,
-                times(1)).setOrganisationIdentifier(any(String.class));
+                times(0)).setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
 
         verify(
                 organisationRepositoryMock,
-                times(3)).save(any(Organisation.class));
+                times(2)).save(any(Organisation.class));
 
         organisationMock.setOrganisationIdentifier("1XCDFG3");
         assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
