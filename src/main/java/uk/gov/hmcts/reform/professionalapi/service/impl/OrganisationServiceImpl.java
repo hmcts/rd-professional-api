@@ -88,7 +88,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = organisationRepository.save(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPbaAccounts(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccounts(), organisation);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -100,11 +100,11 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void addPbaAccountToOrganisation(
-            List<String> pbaAccountCreationRequest,
+            List<String> paymentAccounts,
             Organisation organisation) {
 
-        if (pbaAccountCreationRequest != null) {
-            pbaAccountCreationRequest.forEach(pbaAccount -> {
+        if (paymentAccounts != null) {
+            paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);

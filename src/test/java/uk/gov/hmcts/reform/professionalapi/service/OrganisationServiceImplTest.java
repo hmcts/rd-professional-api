@@ -87,7 +87,7 @@ public class OrganisationServiceImplTest {
                 "some-email",
                 userRoles);
 
-        pbaAccountCreationRequests = new ArrayList<>();
+        List<String> pbaAccounts = new ArrayList<>();
 
         contactInformationCreationRequests = new ArrayList<>();
 
@@ -99,9 +99,9 @@ public class OrganisationServiceImplTest {
 
         userAccountMaps = new ArrayList<UserAccountMap>();
 
-        pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
+        String pbaNumber = "pbaNumber-1";
 
-        pbaAccountCreationRequests.add(pbaAccountCreationRequest);
+        pbaAccounts.add(pbaNumber);
 
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
 
@@ -133,7 +133,7 @@ public class OrganisationServiceImplTest {
                 new OrganisationCreationRequest(
                         "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "company-number", "company-url",
                         superUser,
-                        pbaAccountCreationRequests, contactInformationCreationRequests);
+                        pbaAccounts, contactInformationCreationRequests);
 
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
