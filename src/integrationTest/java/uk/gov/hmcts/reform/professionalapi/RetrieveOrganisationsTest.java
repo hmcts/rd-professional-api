@@ -39,6 +39,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
 
         Map<String, Object> superUser = ((List<Map<String, Object>>) orgResponse.get("superUser")).get(0);
+        assertThat(superUser.get("userIdentifier")).isNotNull();
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
