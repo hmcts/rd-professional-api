@@ -75,12 +75,8 @@ public class ProfessionalApiClient {
     }
 
     private  OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
-        List<PbaAccountCreationRequest> pbaAccounts = asList(aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build(),
-            aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build());
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(randomAlphabetic(8) );
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
@@ -89,7 +85,7 @@ public class ProfessionalApiClient {
             .sraRegulated(Boolean.FALSE)
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
-            .pbaAccounts(pbaAccounts)
+            .paymentAccounts(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")

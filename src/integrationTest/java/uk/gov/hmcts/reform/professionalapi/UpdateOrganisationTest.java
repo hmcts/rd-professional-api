@@ -155,7 +155,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
         PaymentAccount paymentAccount = pbaAccounts.get(0);
-        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pbaNumber-1");
+        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pba123");
 
         List<ProfessionalUser> professionalUsers = persistedOrganisation.getUsers();
         ProfessionalUser professionalUser = professionalUsers.get(0);

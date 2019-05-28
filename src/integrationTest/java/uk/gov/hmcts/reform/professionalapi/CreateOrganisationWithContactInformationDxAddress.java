@@ -8,7 +8,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -231,12 +233,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_first_name_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName(null)
                            .lastName("some-lname")
@@ -257,12 +259,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_LastName_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName(null)
@@ -283,12 +285,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_email_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")
@@ -309,12 +311,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_contact_information_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")

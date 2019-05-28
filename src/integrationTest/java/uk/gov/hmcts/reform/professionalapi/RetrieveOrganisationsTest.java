@@ -43,8 +43,8 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
 
-        List<Map<String, Object>> accounts = (List<Map<String, Object>>) orgResponse.get("pbaAccounts");
-        assertThat(accounts.get(0).get("pbaNumber")).isEqualTo("pbaNumber-1");
+        List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
+        assertThat(accounts.get(0).equals("pba123"));
 
         Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
         assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");

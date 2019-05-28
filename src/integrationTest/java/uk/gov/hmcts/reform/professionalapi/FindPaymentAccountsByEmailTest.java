@@ -8,7 +8,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,11 +53,12 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Test
     public void get_request_returns_correct_payment_accounts() {
 
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
+
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -72,7 +75,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         Organisation persistedOrganisation = paymentAccountService.findPaymentAccountsByEmail("some@email.com");
 
         assertEquals("some-org-", persistedOrganisation.getName());
-        assertThat(persistedOrganisation.getPaymentAccounts().contains("pbaNumber-1"));
+        assertThat(persistedOrganisation.getPaymentAccounts().contains("pba123"));
     }
 
     @Test

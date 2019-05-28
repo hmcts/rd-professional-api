@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountC
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,13 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
     @Test
     public void can_retrieve_payment_accounts_by_email() {
         String email = randomAlphabetic(10) + "@pbasearch.test";
-        List<PbaAccountCreationRequest> pbas = Arrays.asList(aPbaPaymentAccount().pbaNumber(randomAlphabetic(10)).build());
+
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(randomAlphabetic(10));
+
         professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
-                .pbaAccounts(pbas)
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")

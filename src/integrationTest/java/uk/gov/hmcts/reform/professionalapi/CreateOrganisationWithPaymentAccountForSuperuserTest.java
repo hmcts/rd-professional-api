@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,12 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
         String prefix = UUID.randomUUID().toString();
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
+
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                .paymentAccounts(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
