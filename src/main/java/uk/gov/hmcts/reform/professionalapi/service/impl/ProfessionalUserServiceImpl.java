@@ -77,9 +77,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
-        if (user == null) {
+        /*if (user == null) {
             throw new HTTPException(404);
-        }
+        }*/
         return user;
     }
 

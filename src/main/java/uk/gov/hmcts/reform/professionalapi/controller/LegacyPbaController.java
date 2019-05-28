@@ -1,0 +1,83 @@
+package uk.gov.hmcts.reform.professionalapi.controller;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.xml.ws.http.HTTPException;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.professionalapi.controller.response.LegacyPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.service.impl.LegacyPbaAccountServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+
+@RequestMapping(
+        path = "/search",
+        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+)
+@RestController
+@Slf4j
+@AllArgsConstructor
+public class LegacyPbaController {
+
+
+    private LegacyPbaAccountServiceImpl legacyPbaAccountService;
+    private ProfessionalUserServiceImpl professionalUserService;
+
+    @ApiOperation(
+            value = "Retrieve pba numbers by user email address",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Details of one or more payment accounts",
+                    response = LegacyPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email was provided"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No payment users was found with the email"
+            )
+    })
+    @GetMapping(
+            value = "/pba/{email}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity<LegacyPbaResponse> retrievePbaAccountsByEmail(@PathVariable("email") @NotBlank String email) {
+
+        List<String> pbaNumbers;
+        ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(email);
+        if (professionalUser == null) {
+
+            throw new HTTPException(404);
+        }
+
+        pbaNumbers =  legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);
+        return ResponseEntity
+                .status(200)
+                .body(new LegacyPbaResponse(pbaNumbers));
+    }
+}
