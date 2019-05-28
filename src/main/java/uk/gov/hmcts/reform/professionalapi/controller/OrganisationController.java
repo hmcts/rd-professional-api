@@ -52,7 +52,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 
 @RequestMapping(
         path = "v1/organisations",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
@@ -203,7 +202,11 @@ public class OrganisationController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    @ApiOperation(value = "Updates an organisation")
+    @ApiOperation(
+        value = "Updates an organisation",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization")
+        })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation"),
             @ApiResponse(code = 404, message = "If Organisation is not found"),
@@ -278,7 +281,12 @@ public class OrganisationController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    @ApiOperation("Add a user to an organisation")
+    @ApiOperation(
+        value = "Add a user to an organisation",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization")
+        }
+    )
     @ApiResponses({
             @ApiResponse(
                     code = 201,
