@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controllers.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.controller.request;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Java6Assertions.assertThat;
