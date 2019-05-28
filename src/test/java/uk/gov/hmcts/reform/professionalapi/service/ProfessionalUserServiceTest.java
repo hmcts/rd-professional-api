@@ -66,7 +66,6 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getEmailAddress(), user.getEmailAddress());
     }
 
-    @Test//(expected = HTTPException.class)
     public void retrieveUserByEmailNotFound() {
         Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);

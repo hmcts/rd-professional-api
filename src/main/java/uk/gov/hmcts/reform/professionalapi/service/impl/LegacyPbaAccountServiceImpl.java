@@ -25,19 +25,11 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
         List<String> pbaNumbers = null;
         List<PaymentAccount>  paymentAccountsFromEntity = new ArrayList<>();
 
-        if (professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
-
-            log.debug("No Payments associated with the user::");
-            pbaNumbers = new ArrayList<>();
-
-        } else {
-
-            paymentAccountsFromEntity = professionalUser.getOrganisation().getPaymentAccounts();
-            log.info("payments size:::" + paymentAccountsFromEntity.size());
+        if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
 
             List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
 
-            pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, paymentAccountsFromEntity);
+            pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation().getPaymentAccounts());
 
         }
 

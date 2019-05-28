@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -76,6 +77,10 @@ public class LegacyPbaController {
         }
 
         pbaNumbers =  legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);
+        if (null == pbaNumbers) {
+
+            pbaNumbers = new ArrayList<>();
+        }
         return ResponseEntity
                 .status(200)
                 .body(new LegacyPbaResponse(pbaNumbers));

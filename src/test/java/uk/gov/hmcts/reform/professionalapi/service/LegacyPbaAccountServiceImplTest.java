@@ -77,6 +77,8 @@ public class LegacyPbaAccountServiceImplTest {
 
         when(professionalUser.getUserAccountMap()).thenReturn(userAccountMaps);
 
+        //when(legacyPbaAccountServiceImpl.getPaymentAccountsFromUserAccountMap(professionalUser.setUserAccountMap())).thenReturn(paymentAccountsFromEntity);
+
         when(legacyPbaAccountServiceImpl.findLegacyPbaAccountByUserEmail(any(ProfessionalUser.class)))
                 .thenReturn(paymentAccountPbaNumbers);
 
