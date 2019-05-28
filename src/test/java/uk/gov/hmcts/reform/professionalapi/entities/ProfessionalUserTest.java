@@ -33,7 +33,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getLastUpdated()).isNull();
         assertThat(professionalUser.getCreated()).isNull();
-        assertThat(professionalUser.getUserIdentifier()).isNull();
+        assertThat(professionalUser.getProfessionalUserIdentifier()).isNotNull();
 
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
 

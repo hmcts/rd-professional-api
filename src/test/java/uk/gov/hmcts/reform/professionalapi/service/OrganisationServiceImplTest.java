@@ -36,8 +36,10 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationReposit
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 
@@ -50,7 +52,8 @@ public class OrganisationServiceImplTest {
     private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private OrganisationServiceImpl organisationServiceImplMock = mock(OrganisationServiceImpl.class);
-
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
+    private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
@@ -62,7 +65,6 @@ public class OrganisationServiceImplTest {
     private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
     private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
-
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
     private PbaAccountCreationRequest pbaAccountCreationRequest;
@@ -79,10 +81,13 @@ public class OrganisationServiceImplTest {
     @Before
     public void setUp() {
 
+        List<String> userRoles = new ArrayList<>();
+
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email");
+                "some-email",
+                userRoles);
 
         pbaAccountCreationRequests = new ArrayList<>();
 
@@ -122,8 +127,8 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
+                userAttributeRepositoryMock, prdEnumRepositoryMock,
                 userAccountMapRepositoryMock);
-
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -292,8 +297,13 @@ public class OrganisationServiceImplTest {
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
         UUID testOrganisationId = testOrganisation.getId();
-
-        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAccountMapRepositoryMock);
+        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock,
+                professionalUserRepositoryMock,
+                paymentAccountRepositoryMock,
+                dxAddressRepositoryMock, contactInformationRepositoryMock,
+                userAttributeRepositoryMock,
+                prdEnumRepositoryMock,
+                userAccountMapRepositoryMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 

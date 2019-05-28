@@ -4,6 +4,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class PaymentAccountServiceTest {
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private final Organisation organisation = mock(Organisation.class);
 
-    private PaymentAccountService paymentAccountService;
+    private PaymentAccountServiceImpl paymentAccountService;
 
     @Before
     public void setUp() {
@@ -38,20 +39,19 @@ public class PaymentAccountServiceTest {
                 organisationRepository,
                 professionalUserRepository);
 
-        PowerMockito.when(organisationRepository.save(any(Organisation.class)))
+        when(organisationRepository.save(any(Organisation.class)))
                 .thenReturn(organisation);
 
-        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
+        when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
-        PowerMockito.when(organisationRepository.findByUsers(any(ProfessionalUser.class)))
+        when(organisationRepository.findByUsers(any(ProfessionalUser.class)))
                 .thenReturn(organisation);
     }
 
     @Test
     public void retrievePaymentAccountsByEmail() {
         Organisation theOrganisation = new Organisation("some-org-", OrganisationStatus.PENDING, "sra-id", "company-number", false, "company-url");
-        PowerMockito.when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
 
         ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", ProfessionalUserStatus.PENDING, theOrganisation);
         theOrganisation.addProfessionalUser(theSuperUser);
@@ -63,6 +63,8 @@ public class PaymentAccountServiceTest {
         theOrganisation.addPaymentAccount(thePaymentAcc);
 
         organisationRepository.save(theOrganisation);
+
+        when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
 
         Organisation anOrganisation = paymentAccountService.findPaymentAccountsByEmail("some-email");
         assertThat(anOrganisation).isNotNull();
@@ -91,5 +93,13 @@ public class PaymentAccountServiceTest {
 
         paymentAccountService.findPaymentAccountsByEmail(null);
 
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrievePaymentAccountsWithInvalidEmail() {
+        when(paymentAccountService.findPaymentAccountsByEmail("some-email"))
+                .thenReturn(null);
+
+        paymentAccountService.findPaymentAccountsByEmail(null);
     }
 }
