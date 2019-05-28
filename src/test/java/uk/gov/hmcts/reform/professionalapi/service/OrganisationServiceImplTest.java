@@ -89,6 +89,10 @@ public class OrganisationServiceImplTest {
 
         List<String> pbaAccounts = new ArrayList<>();
 
+        String pbaNumber = "pbaNumber-1";
+
+        pbaAccounts.add(pbaNumber);
+
         contactInformationCreationRequests = new ArrayList<>();
 
         dxAddressRequests = new ArrayList<>();
@@ -98,10 +102,6 @@ public class OrganisationServiceImplTest {
         paymentAccounts = new ArrayList<PaymentAccount>();
 
         userAccountMaps = new ArrayList<UserAccountMap>();
-
-        String pbaNumber = "pbaNumber-1";
-
-        pbaAccounts.add(pbaNumber);
 
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
 
