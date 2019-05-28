@@ -100,12 +100,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void addPbaAccountToOrganisation(
-            List<PbaAccountCreationRequest> pbaAccountCreationRequest,
+            List<String> pbaAccountCreationRequest,
             Organisation organisation) {
 
         if (pbaAccountCreationRequest != null) {
             pbaAccountCreationRequest.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
+                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
 
