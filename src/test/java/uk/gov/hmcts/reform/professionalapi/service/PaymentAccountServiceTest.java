@@ -96,7 +96,6 @@ public class PaymentAccountServiceTest {
 
     }
 
-
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrievePaymentAccountsWithInvalidEmail() {
         when(paymentAccountService.findPaymentAccountsByEmail("some-email"))
@@ -104,6 +103,4 @@ public class PaymentAccountServiceTest {
 
         paymentAccountService.findPaymentAccountsByEmail(null);
     }
-
-
 }

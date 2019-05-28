@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controllers;
+package uk.gov.hmcts.reform.professionalapi.controller.request.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;

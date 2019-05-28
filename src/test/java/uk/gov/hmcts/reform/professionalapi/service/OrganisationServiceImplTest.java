@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -51,18 +52,19 @@ public class OrganisationServiceImplTest {
     private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private OrganisationServiceImpl organisationServiceImplMock = mock(OrganisationServiceImpl.class);
-
-    private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
-    private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
-
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
+    private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
+    private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
+    private final OrganisationResponse organisationResponseMock = mock(OrganisationResponse.class);
+    private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
+    private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
-
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
     private PbaAccountCreationRequest pbaAccountCreationRequest;
@@ -125,8 +127,7 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
-                userAttributeRepository,
-                prdEnumRepository,
+                userAttributeRepositoryMock, prdEnumRepositoryMock,
                 userAccountMapRepositoryMock);
 
         organisationCreationRequest =
@@ -296,8 +297,13 @@ public class OrganisationServiceImplTest {
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
         UUID testOrganisationId = testOrganisation.getId();
-
-        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAttributeRepository, prdEnumRepository, userAccountMapRepositoryMock);
+        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock,
+                professionalUserRepositoryMock,
+                paymentAccountRepositoryMock,
+                dxAddressRepositoryMock, contactInformationRepositoryMock,
+                userAttributeRepositoryMock,
+                prdEnumRepositoryMock,
+                userAccountMapRepositoryMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
