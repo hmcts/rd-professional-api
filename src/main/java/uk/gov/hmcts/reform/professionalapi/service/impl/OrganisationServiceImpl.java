@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -25,16 +24,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
@@ -49,6 +49,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
+    UserAccountMapRepository userAccountMapRepository;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -58,13 +59,15 @@ public class OrganisationServiceImpl implements OrganisationService {
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
-            PrdEnumRepository prdEnumRepository) {
+            PrdEnumRepository prdEnumRepository,
+            UserAccountMapRepository userAccountMapRepository) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
+        this.userAccountMapRepository = userAccountMapRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
     }
@@ -105,6 +108,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -118,44 +122,16 @@ public class OrganisationServiceImpl implements OrganisationService {
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
                 userCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING.name(),
+                ProfessionalUserStatus.PENDING,
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
-        addUserAttributesToUser(persistedSuperUser, userCreationRequest.getRoles());
+
+        persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
     }
 
-    private void  addUserAttributesToUser(ProfessionalUser professionalUser, List<String> userRoles){
-
-        List<PrdEnum> prdEnums = findAllPrdEnums();
-
-        if(userRoles != null && userRoles.size() > 1){
-            UserCreationRequestValidator.contains(userRoles, prdEnums);
-
-            UserAttribute userAttribute = addPrdEnumToUserAttribute(userRoles);
-
-            userAttributeRepository.save(userAttribute);
-        }
-    }
-
-    private UserAttribute addPrdEnumToUserAttribute(List<String> userRoles) {
-        List<PrdEnum> prdEnumList = findAllPrdEnums();
-
-        prdEnumList.forEach(prdEnum -> {
-            UserAttribute userAttribute = new UserAttribute(prdEnum);
-        });
-
-//
-//                PrdEnumId prdEnumId = prdEnum.getPrdEnumId();
-//
-//                prdEnumId.getEnumCode();
-//
-//                prdEnumId.getEnumType();
-
-        return null;
-    }
 
     private void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
@@ -188,6 +164,18 @@ public class OrganisationServiceImpl implements OrganisationService {
                 DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
                 dxAddress = dxAddressRepository.save(dxAddress);
                 contactInformation.addDxAddress(dxAddress);
+            });
+        }
+    }
+
+    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
+
+        if (paymentAccounts != null
+                &&  paymentAccounts.size() > 0) {
+            log.debug("PaymentAccount is not empty");
+            paymentAccounts.forEach(paymentAccount -> {
+
+                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
         }
     }
@@ -239,11 +227,5 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
     }
-
-    public List<PrdEnum> findAllPrdEnums() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-        return prdEnums;
-    }
-
 }
 

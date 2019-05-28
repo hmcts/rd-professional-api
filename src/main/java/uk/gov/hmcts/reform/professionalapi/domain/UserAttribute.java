@@ -4,11 +4,6 @@ import static javax.persistence.GenerationType.AUTO;
 
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
@@ -17,11 +12,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @Entity(name = "user_attribute")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 public class UserAttribute {
 
     @Id
@@ -34,23 +33,13 @@ public class UserAttribute {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "enum_code", referencedColumnName = "enum_code"),
-            @JoinColumn(name = "enum_type", referencedColumnName = "enum_type")})
+            @JoinColumn(name = "prd_enum_code", referencedColumnName = "enum_code"),
+            @JoinColumn(name = "prd_enum_type", referencedColumnName = "enum_type")})
     private PrdEnum prdEnum;
 
 
-    public UserAttribute(PrdEnum prdEnum){
+    public UserAttribute(ProfessionalUser professionalUser, PrdEnum prdEnum) {
+        this.professionalUser = professionalUser;
         this.prdEnum = prdEnum;
     }
 }
-
-//    @ManyToOne
-//    @JoinColumn(name = "PRD_ENUM_CODE", nullable = false)
-//    @Type(type = "java.lang.Short")
-//    private PrdEnum enumCode;
-//
-//    @ManyToOne(targetEntity= UserRoles.class)
-//    @JoinColumn(name = "PRD_ENUM_TYPE")
-//    @Size(max = 50)
-//    @Enumerated(EnumType.STRING)
-//    private UserRoles enumType;

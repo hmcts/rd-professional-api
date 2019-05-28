@@ -3,15 +3,15 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Map;
-
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class OrganisationRetrieveTest extends FunctionalTestSuite {
 
@@ -46,8 +46,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
 
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name());
-        assertThat(response.get("organisations")).asList().isNotEmpty();
-        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test
@@ -56,7 +55,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name());
         assertThat(response.get("organisations")).isNotNull();
-        assertThat(response.size()).isEqualTo(1);
+        assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
     @Test

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
-import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
@@ -34,7 +34,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
     @Autowired
-    PaymentAccountService paymentAccountService;
+    PaymentAccountServiceImpl paymentAccountService;
 
     private ProfessionalReferenceDataClient professionalReferenceDataClient;
 
@@ -66,6 +66,8 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
 
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+
 
         Organisation persistedOrganisation = paymentAccountService.findPaymentAccountsByEmail("some@email.com");
 
