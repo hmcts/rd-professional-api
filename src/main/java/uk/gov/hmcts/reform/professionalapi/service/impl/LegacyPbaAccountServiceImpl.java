@@ -18,11 +18,12 @@ import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
 @Slf4j
 public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
-    List<String> paymentAccountPbaNumbers = new ArrayList<>();
+
 
     public List<String> findLegacyPbaAccountByUserEmail(ProfessionalUser professionalUser) {
 
         List<String> pbaNumbers = null;
+
         List<PaymentAccount>  paymentAccountsFromEntity = new ArrayList<>();
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
@@ -37,6 +38,8 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
     }
 
     private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+
+        List<String> paymentAccountPbaNumbers = new ArrayList<>();
 
         if (!paymentAccountsEntity.isEmpty()) {
 
