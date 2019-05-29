@@ -34,7 +34,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
-        return postRequest("", request);
+        return postRequest(baseUrl, request);
     }
 
     public Map<String, Object> findUserByEmail(String email) {
@@ -62,7 +62,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest userCreationRequest ) {
-        return postRequest( "/" + orgId + "/users/", userCreationRequest);
+        return postRequest( baseUrl + "/" + orgId + "/users/", userCreationRequest);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
