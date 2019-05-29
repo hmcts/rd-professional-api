@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationValidator {
 
     @Override
-    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, UUID inputOrganisationIdentifier) {
+    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
         log.info("Into Organisation identifier validator...");
 
         checkOrganisationDoesNotExist(existingOrganisation, inputOrganisationIdentifier);
@@ -21,7 +20,7 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
         log.info("Validation completed for identifier Organisation...");
     }
 
-    private void checkOrganisationDoesNotExist(Organisation organisation, UUID inputOrganisationIdentifier) {
+    private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = "Organisation not found with organisationIdentifier: " + inputOrganisationIdentifier;
             log.error(errorMessage);
