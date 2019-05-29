@@ -277,6 +277,22 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrieveLegacyPbaNumbersByUserEmail(String email) {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("/search/pba/" + email)
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
