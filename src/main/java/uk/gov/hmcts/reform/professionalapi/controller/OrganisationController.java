@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -129,9 +128,11 @@ public class OrganisationController {
             organisationResponse =
                     organisationService.retrieveOrganisations();
         } else {
-            log.info("Received request to retrieve organisation with ID " + id.toString());
+            log.info("Received request to retrieve organisation with ID " + id);
+
+            organisationCreationRequestValidator.validateOrganisationIdentifier(id);
             organisationResponse =
-                    organisationService.retrieveOrganisation(UUID.fromString(id));
+                    organisationService.retrieveOrganisation(id);
         }
 
         log.debug("Received response to retrieve organisation details" + organisationResponse);
@@ -230,12 +231,12 @@ public class OrganisationController {
 
         log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        UUID inputOrganisationIdentifier = organisationCreationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), inputOrganisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         OrganisationResponse organisationResponse =
-                organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
+                organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
         return ResponseEntity.status(200).build();
     }
@@ -313,16 +314,15 @@ public class OrganisationController {
 
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
             log.error("Invalid/No user role(s) provided");
             throw new InvalidRequest("404");
         } else {
-            UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-
             NewUserResponse newUserResponse =
-                    professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, inputOrganisationIdentifier);
+                    professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, organisationIdentifier);
 
             log.info("Received request to add a new user to an organisation..." + newUserResponse);
             return ResponseEntity
