@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class LegacyPbaNumbersRetrieveByUserEmailTest extends FunctionalTestSuite {
@@ -26,11 +23,16 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends FunctionalTestSuite
     public void can_retrieve_payment_numbers_by_user_email() {
 
         String email = randomAlphabetic(10) + "@pbasearch.test";
-        String pbaNumber =  "pba" + randomAlphabetic(10);
-        List<PbaAccountCreationRequest> pbas = Arrays.asList(aPbaPaymentAccount().pbaNumber(pbaNumber).build());
+
+        List<String> paymentAccounts = new ArrayList<>();
+
+        String pbaNumber = randomAlphabetic(10);
+
+        paymentAccounts.add(pbaNumber);
+
         professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
-                .pbaAccounts(pbas)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
