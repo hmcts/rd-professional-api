@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -11,12 +10,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.UUID;
-import javax.xml.ws.http.HTTPException;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -67,12 +66,11 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getEmailAddress(), user.getEmailAddress());
     }
 
-    @Test(expected = HTTPException.class)
     public void retrieveUserByEmailNotFound() {
         Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
-        professionalUserService.findProfessionalUserByEmailAddress("some-email");
+        assertThat(professionalUserService.findProfessionalUserByEmailAddress("some-email")).isNull();
     }
 
 

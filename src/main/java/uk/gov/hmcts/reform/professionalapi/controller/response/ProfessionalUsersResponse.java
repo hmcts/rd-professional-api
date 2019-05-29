@@ -31,7 +31,7 @@ public class ProfessionalUsersResponse {
     private List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = user.getProfessionalUserIdentifier();
+        this.userIdentifier = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
