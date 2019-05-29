@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990"})
 public abstract class Service2ServiceEnabledIntegrationTest extends SpringBootIntegrationTest {
@@ -43,6 +44,9 @@ public abstract class Service2ServiceEnabledIntegrationTest extends SpringBootIn
 
     @Autowired
     protected UserAccountMapRepository userAccountMapRepository;
+
+    @Autowired
+    protected UserAttributeRepository userAttributeRepository;
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
@@ -68,6 +72,7 @@ public abstract class Service2ServiceEnabledIntegrationTest extends SpringBootIn
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
         contactInformationRepository.deleteAll();
+        userAttributeRepository.deleteAll();
         userAccountMapRepository.deleteAll();
         professionalUserRepository.deleteAll();
         paymentAccountRepository.deleteAll();
