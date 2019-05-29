@@ -8,51 +8,13 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
 import org.junit.Test;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegrationTest {
-
-    @Autowired
-    private OrganisationRepository organisationRepository;
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-    @Autowired
-    PaymentAccountRepository paymentAccountRepository;
-    @Autowired
-    PaymentAccountServiceImpl paymentAccountService;
-    @Autowired
-    ProfessionalUserServiceImpl professionalUserService;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void post_request_adds_new_user_to_an_organisation() {

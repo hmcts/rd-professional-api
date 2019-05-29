@@ -61,8 +61,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations?status={status}", status);
     }
 
-    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest userCreationRequest ) {
-        return postRequest( baseUrl + "/" + orgId + "/users/", userCreationRequest);
+    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest userCreationRequest) {
+        return postRequest(baseUrl + "/" + orgId + "/users/", userCreationRequest);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
@@ -70,7 +70,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
+    private <T> Map<String, Object> postRequest(String uriPath, T requestBody) {
 
         HttpEntity<T> request =
                 new HttpEntity<>(requestBody, getHeaders());
@@ -80,7 +80,7 @@ public class ProfessionalReferenceDataClient {
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    baseUrl + uriPath,
+                    uriPath,
                     request,
                     Map.class);
 

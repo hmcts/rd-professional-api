@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
@@ -66,8 +64,8 @@ public class OrganisationEntityResponse  {
         }
     }
 
-    private SuperUserResponse getSuperUserFromUserList(Organisation organisation){
-            ProfessionalUser user = organisation.getUsers().stream().sorted((Comparator.comparing(ProfessionalUser::getCreated))).findFirst().get();
+    private SuperUserResponse getSuperUserFromUserList(Organisation organisation) {
+        ProfessionalUser user = organisation.getUsers().stream().sorted((Comparator.comparing(ProfessionalUser::getCreated))).findFirst().get();
         return new SuperUserResponse(user);
     }
 

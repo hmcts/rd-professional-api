@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
@@ -41,7 +40,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
         assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
 
-        Map<String, Object> superUser = ((List<Map<String, Object>>) orgResponse.get("superUser")).get(0);
+        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("userIdentifier")).isNotNull();
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
