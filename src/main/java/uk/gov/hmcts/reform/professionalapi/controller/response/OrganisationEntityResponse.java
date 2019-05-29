@@ -3,11 +3,16 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
@@ -27,7 +32,7 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private String companyUrl;
     @JsonProperty
-    private List<SuperUserResponse> superUser;
+    private SuperUserResponse superUser;
     @JsonProperty
     private List<PbaAccountResponse> pbaAccounts;
     @JsonProperty
@@ -48,10 +53,7 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        this.superUser = organisation.getUsers()
-                .stream()
-                .map(user -> new SuperUserResponse(user))
-                .collect(toList());
+        this.superUser = getSuperUserFromUserList(organisation);
         this.pbaAccounts = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
@@ -62,6 +64,11 @@ public class OrganisationEntityResponse  {
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))
                     .collect(toList());
         }
+    }
+
+    private SuperUserResponse getSuperUserFromUserList(Organisation organisation){
+            ProfessionalUser user = organisation.getUsers().stream().sorted((Comparator.comparing(ProfessionalUser::getCreated))).findFirst().get();
+        return new SuperUserResponse(user);
     }
 
 }

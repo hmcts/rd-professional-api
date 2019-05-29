@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
@@ -33,7 +34,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
-        return postRequest(APP_BASE_PATH, request);
+        return postRequest("", request);
     }
 
     public Map<String, Object> findUserByEmail(String email) {
@@ -56,8 +57,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations?status={status}", status);
     }
 
-    public Map<String, Object> addUserToOrganisation(String orgId) {
-        return postRequest(APP_BASE_PATH + "/{orgId}/users/", orgId);
+    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest userCreationRequest ) {
+        return postRequest( "/" + orgId + "/users/", userCreationRequest);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
@@ -75,7 +76,7 @@ public class ProfessionalReferenceDataClient {
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    baseUrl,
+                    baseUrl + uriPath,
                     request,
                     Map.class);
 

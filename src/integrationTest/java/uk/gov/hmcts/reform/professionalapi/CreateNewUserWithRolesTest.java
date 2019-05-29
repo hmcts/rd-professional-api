@@ -75,7 +75,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -85,9 +85,17 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
     @Test
     public void returns_404_when_organisation_identifier_not_found() {
-
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .status("PENDING")
+                .roles(userRoles)
+                .build();
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid");
+                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
     }
