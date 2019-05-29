@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @RequestMapping(
         path = "v1/organisations",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
