@@ -45,6 +45,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations/pbas?email={email}", email);
     }
 
+    public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
+        return getRequest("/search/pba/{email}", email);
+    }
+
     public Map<String,Object> retrieveSingleOrganisation(String id) {
         return getRequest(APP_BASE_PATH + "?id={id}", id);
     }

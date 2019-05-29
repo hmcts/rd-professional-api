@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public class SuperUserResponse {
 
     @JsonProperty
+    private String userIdentifier;
+    @JsonProperty
     private String firstName;
     @JsonProperty
     private String lastName;
@@ -22,6 +24,7 @@ public class SuperUserResponse {
     }
 
     private void getSuperUserResponse(ProfessionalUser professionalUser) {
+        this.userIdentifier = professionalUser.getUserIdentifier().toString();
         this.firstName = professionalUser.getFirstName();
         this.lastName = professionalUser.getLastName();
         this.email = professionalUser.getEmailAddress();

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
-import javax.xml.ws.http.HTTPException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,14 +71,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      *
      * @param email The email address to search for
      * @return The user with the matching email address
-     * @throws HTTPException with the status set to 404 if the email address was not
-     *                       found
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
-        if (user == null) {
-            throw new HTTPException(404);
-        }
         return user;
     }
 
