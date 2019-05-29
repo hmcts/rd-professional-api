@@ -87,7 +87,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = organisationRepository.save(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccounts(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 

@@ -29,7 +29,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -59,7 +59,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
 
         OrganisationCreationRequest organisationCreationRequest =
-                someMinimalOrganisationRequest().paymentAccounts(paymentAccounts).build();
+                someMinimalOrganisationRequest().paymentAccount(paymentAccounts).build();
 
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -90,7 +90,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
-                        .paymentAccounts(paymentAccounts)
+                        .paymentAccount(paymentAccounts)
                         .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                         .build();
 
@@ -121,7 +121,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
-                        .paymentAccounts(null)
+                        .paymentAccount(null)
                         .build();
 
         Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
@@ -150,7 +150,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
-                        .paymentAccounts(paymentAccounts)
+                        .paymentAccount(paymentAccounts)
                         .build();
 
         Map<String, Object> createOrganisationResponse =
@@ -176,7 +176,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -187,7 +187,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts2)
+                .paymentAccount(paymentAccounts2)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")

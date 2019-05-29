@@ -236,7 +236,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName(null)
                            .lastName("some-lname")
@@ -262,7 +262,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName(null)
@@ -288,7 +288,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")
@@ -314,7 +314,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")

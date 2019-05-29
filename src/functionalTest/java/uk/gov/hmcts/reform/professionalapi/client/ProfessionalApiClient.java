@@ -82,7 +82,7 @@ public class ProfessionalApiClient {
             .sraRegulated(Boolean.FALSE)
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
-            .paymentAccounts(paymentAccounts)
+            .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")

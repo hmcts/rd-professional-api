@@ -56,7 +56,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")

@@ -28,7 +28,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")

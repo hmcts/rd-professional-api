@@ -26,7 +26,7 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
 
         professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
-                .paymentAccounts(paymentAccounts)
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
