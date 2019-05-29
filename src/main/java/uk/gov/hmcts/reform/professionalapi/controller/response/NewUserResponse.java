@@ -11,7 +11,7 @@ public class NewUserResponse {
 
     public NewUserResponse(ProfessionalUser user) {
 
-        this.userIdentifier = user.getProfessionalUserIdentifier();
+        this.userIdentifier = user.getUserIdentifier();
     }
 
     public UUID getUserIdentifier() {

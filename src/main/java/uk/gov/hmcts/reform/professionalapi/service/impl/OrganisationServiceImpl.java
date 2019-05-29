@@ -184,8 +184,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
-        if (paymentAccounts != null
-                &&  paymentAccounts.size() > 0) {
+        if (!paymentAccounts.isEmpty()) {
             log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
 
