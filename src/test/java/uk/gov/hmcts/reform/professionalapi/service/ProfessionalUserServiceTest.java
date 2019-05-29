@@ -7,10 +7,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -116,7 +117,7 @@ public class ProfessionalUserServiceTest {
                 "PENDING",
                 userRoles);
 
-        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
+        when(organisation.getOrganisationIdentifier()).thenReturn(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
         when(organisationRepository.findByOrganisationIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
@@ -124,7 +125,7 @@ public class ProfessionalUserServiceTest {
 
         assertThat(newUserResponse).isNotNull();
 
-        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(UUID.class));
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
         verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
         verify(organisation, times(1)).addProfessionalUser(any(ProfessionalUser.class));
         verify(userAttributeService, times(1)).addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()));
@@ -132,9 +133,9 @@ public class ProfessionalUserServiceTest {
 
     @Test(expected = InvalidUseOfMatchersException.class)
     public void addNewUserWithInvalidFields() {
-        when(professionalUserService.addNewUserToAnOrganisation(any(NewUserCreationRequest.class), any(UUID.class)))
+        when(professionalUserService.addNewUserToAnOrganisation(any(NewUserCreationRequest.class), any(String.class)))
                 .thenReturn(null);
 
-        professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, UUID.randomUUID());
+        professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
     }
 }

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import java.util.ArrayList;
-import java.util.UUID;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,9 +78,9 @@ public class ProfessionalUserController {
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
         log.info("Received request to get users for organisationIdentifier: " + organisationIdentifier);
-        UUID inputOrganisationIdentifier = organisationCreationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
-        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, inputOrganisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.info("Organisation is not Active hence not returning any users");

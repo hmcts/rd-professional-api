@@ -6,11 +6,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.assertj.core.api.Assertions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,6 +66,7 @@ public class OrganisationServiceImplTest {
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
+    private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -140,7 +145,7 @@ public class OrganisationServiceImplTest {
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        when(organisationMock.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
+        when(organisationMock.getOrganisationIdentifier()).thenReturn(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
 
         when(professionalUserRepositoryMock.save(any(ProfessionalUser.class)))
                 .thenReturn(professionalUserMock);
@@ -221,6 +226,28 @@ public class OrganisationServiceImplTest {
         verify(
                 userAccountMapRepositoryMock,
                 times(1)).save(any(UserAccountMap.class));
+
+    }
+
+    @Test
+    public void saves_organisation_with_constraint_violation_exception() {
+
+        when(organisationRepositoryMock.save(any(Organisation.class)))
+                .thenThrow(ConstraintViolationException.class);
+
+        Assertions.assertThatThrownBy(() -> organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest))
+                .isExactlyInstanceOf(ConstraintViolationException.class);
+
+        verify(
+                organisationMock,
+                times(0)).setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+
+        verify(
+                organisationRepositoryMock,
+                times(2)).save(any(Organisation.class));
+
+        organisationMock.setOrganisationIdentifier("1XCDFG3");
+        assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
     }
 
     @Test
@@ -239,7 +266,7 @@ public class OrganisationServiceImplTest {
     @Test
     public void updates_an_organisation() {
         OrganisationResponse organisationResponse =
-                organisationServiceImplMock.updateOrganisation(organisationCreationRequest, UUID.randomUUID());
+                organisationServiceImplMock.updateOrganisation(organisationCreationRequest, organisationIdentifier);
 
         assertThat(organisationResponse).isNotNull();
         verify(
@@ -298,14 +325,14 @@ public class OrganisationServiceImplTest {
         UUID testOrganisationId = testOrganisation.getId();
 
         OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAttributeRepository, prdEnumRepository, userAccountMapRepositoryMock);
-        realOrganisationService.retrieveOrganisation(testOrganisationId);
+        realOrganisationService.retrieveOrganisation(null);
     }
 
     @Test
     public void retrieve_an_organisations_by_Uuid() {
 
         OrganisationEntityResponse organisationEntityResponse =
-                organisationServiceImplMock.retrieveOrganisation(UUID.randomUUID());
+                organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
 
         assertThat(organisationEntityResponse).isNotNull();
 
@@ -317,17 +344,17 @@ public class OrganisationServiceImplTest {
     @Test(expected = HttpClientErrorException.class)
     public void retrieveAnOrganisationByUuidNotFound() {
 
-        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(any(UUID.class)))
+        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class)))
                 .thenReturn(null);
 
-        organisationServiceImplMock.retrieveOrganisation(UUID.randomUUID());
+        organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
     }
 
     @Test
     public void getOrganisationByOrganisationIdentifier() {
 
         Organisation organisation =
-                organisationServiceImplMock.getOrganisationByOrganisationIdentifier(UUID.randomUUID());
+                organisationServiceImplMock.getOrganisationByOrganisationIdentifier(organisationIdentifier);
 
         assertThat(organisation).isNotNull();
 

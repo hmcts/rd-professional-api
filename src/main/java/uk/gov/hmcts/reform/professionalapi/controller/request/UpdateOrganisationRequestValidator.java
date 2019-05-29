@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,19 +17,7 @@ public class UpdateOrganisationRequestValidator {
         this.validators = validators;
     }
 
-    public void validateStatus(Organisation existingOrganisation, OrganisationStatus inputStatus, UUID inputOrganisationIdentifier) {
+    public void validateStatus(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
         validators.forEach(v -> v.validate(existingOrganisation, inputStatus, inputOrganisationIdentifier));
-    }
-
-    public UUID validateAndReturnInputOrganisationIdentifier(String inputOrganisationIdentifier) {
-        UUID orgIdentifier = null;
-        try {
-            orgIdentifier = UUID.fromString(inputOrganisationIdentifier);
-        } catch (IllegalArgumentException ex) {
-            String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
-            log.error(errorMessage);
-            throw new InvalidRequest(errorMessage);
-        }
-        return orgIdentifier;
     }
 }
