@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.xml.ws.http.HTTPException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserR
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
@@ -171,6 +173,11 @@ public class OrganisationController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
+
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
+        if (null == user) {
+            throw new HTTPException(404);
+        }
         return ResponseEntity
                 .status(200)
                 .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
