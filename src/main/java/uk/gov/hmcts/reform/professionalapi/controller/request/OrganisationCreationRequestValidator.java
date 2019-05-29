@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import java.util.List;
-import java.util.UUID;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -30,16 +31,12 @@ public class OrganisationCreationRequestValidator {
         return false;
     }
 
-    public UUID validateAndReturnInputOrganisationIdentifier(String inputOrganisationIdentifier) {
-        UUID orgIdentifier = null;
-        try {
-            orgIdentifier = UUID.fromString(inputOrganisationIdentifier);
-        } catch (IllegalArgumentException ex) {
+    public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
+
+        if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
             String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
             log.error(errorMessage);
             throw new InvalidRequest(errorMessage);
         }
-        return orgIdentifier;
     }
-
 }

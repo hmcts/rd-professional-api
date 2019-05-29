@@ -1,12 +1,21 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,7 +77,7 @@ public class Organisation {
     private String companyUrl;
 
     @Column(name = "ORGANISATION_IDENTIFIER")
-    private UUID organisationIdentifier;
+    private String organisationIdentifier;
 
     public Organisation(
             String name,
@@ -84,7 +93,7 @@ public class Organisation {
         this.companyNumber = companyNumber;
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
-        this.organisationIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
+        this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
     public void addProfessionalUser(ProfessionalUser professionalUser) {
@@ -139,12 +148,11 @@ public class Organisation {
         return companyUrl;
     }
 
-    public UUID getOrganisationIdentifier() {
+    public String getOrganisationIdentifier() {
         return organisationIdentifier;
     }
 
-    public void setOrganisationIdentifier(UUID organisationIdentifier) {
+    public void setOrganisationIdentifier(String organisationIdentifier) {
         this.organisationIdentifier = organisationIdentifier;
     }
-
 }

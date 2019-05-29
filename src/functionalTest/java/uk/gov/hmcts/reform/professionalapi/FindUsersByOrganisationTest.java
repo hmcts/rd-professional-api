@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Map;
-import java.util.UUID;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -41,6 +40,6 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
 
     @Test
     public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation(UUID.randomUUID().toString(), "False", HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", "False", HttpStatus.NOT_FOUND);
     }
 }

@@ -46,7 +46,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
 
         assertThat(response.get("http_status")).asString().contains("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
+        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier())
                 .isEqualTo(orgIdentifierResponse);
     }
 
