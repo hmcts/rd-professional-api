@@ -24,10 +24,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -41,6 +43,8 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
+
+    private final static String PRD_ENUM_TYPE = "PRD_ROLE";
 
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
@@ -99,7 +103,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-
     private void addPbaAccountToOrganisation(
             List<PbaAccountCreationRequest> pbaAccountCreationRequest,
             Organisation organisation) {
@@ -127,6 +130,17 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
+
+        //TODO populate org managers with all enums
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+
+        prdEnums.forEach(prdEnum -> {
+            if(prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase(PRD_ENUM_TYPE)){
+                UserAttribute userAttribute = new UserAttribute(newProfessionalUser, prdEnum);
+                userAttributeRepository.save(userAttribute);
+            }
+
+        });
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
