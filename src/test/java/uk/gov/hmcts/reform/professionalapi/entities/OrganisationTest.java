@@ -2,14 +2,18 @@ package uk.gov.hmcts.reform.professionalapi.entities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class OrganisationTest {
 
@@ -41,9 +45,11 @@ public class OrganisationTest {
 
         assertThat(organisation.getContactInformations()).isNotNull();
 
-        organisation.setOrganisationIdentifier(UUID.randomUUID());
+        organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
 
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
+
+        assertThat(organisation.getOrganisationIdentifier().length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
     @Test

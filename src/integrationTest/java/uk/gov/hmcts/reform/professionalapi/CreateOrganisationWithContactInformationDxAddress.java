@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -47,7 +46,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
+                .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
 
@@ -191,8 +190,8 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
-        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
         assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(0);
     }

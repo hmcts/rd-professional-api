@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -101,7 +100,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
 
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
+                .findByOrganisationIdentifier(orgIdentifierResponse);
 
         assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");
 
@@ -132,7 +131,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
+                .findByOrganisationIdentifier(orgIdentifierResponse);
 
 
         assertThat(createOrganisationResponse.get("http_status")).asString().contains("201");

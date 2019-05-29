@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+
 import java.util.List;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -85,7 +88,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisationCreationRequest.getCompanyUrl()
         );
 
-        Organisation organisation = organisationRepository.save(newOrganisation);
+        Organisation organisation = saveOrganisation(newOrganisation);
 
         addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
 
@@ -96,6 +99,17 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
+    }
+
+    private Organisation saveOrganisation(Organisation organisation) {
+        Organisation persistedOrganisation = null;
+        try {
+            persistedOrganisation = organisationRepository.save(organisation);
+        } catch (ConstraintViolationException ex) {
+            organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+            persistedOrganisation = organisationRepository.save(organisation);
+        }
+        return persistedOrganisation;
     }
 
     private void addPbaAccountToOrganisation(
@@ -187,7 +201,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationResponse updateOrganisation(
-            OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier) {
+            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
@@ -205,17 +219,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
+    public Organisation getOrganisationByOrganisationIdentifier(String organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
     @Override
-    public OrganisationEntityResponse retrieveOrganisation(UUID id) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
+    public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         } else {
-            log.debug("Retrieving organisation with ID " + id.toString());
+            log.debug("Retrieving organisation with ID " + organisationIdentifier);
             return new OrganisationEntityResponse(organisation, true);
         }
     }

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
-import java.util.UUID;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -16,11 +14,11 @@ public interface OrganisationService {
 
     OrganisationsDetailResponse retrieveOrganisations();
 
-    OrganisationEntityResponse retrieveOrganisation(UUID organisationId);
+    OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier);
 
-    OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier);
+    OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
 
-    Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier);
+    Organisation getOrganisationByOrganisationIdentifier(String organisationIdentifier);
 
     OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
 

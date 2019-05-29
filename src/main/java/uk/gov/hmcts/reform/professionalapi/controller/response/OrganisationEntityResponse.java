@@ -43,7 +43,7 @@ public class OrganisationEntityResponse  {
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
         this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
-                ? "" : organisation.getOrganisationIdentifier().toString();
+                ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
         this.sraId = organisation.getSraId();

@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +55,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
-        updateAndValidateOrganisation(UUID.randomUUID().toString(),OrganisationStatus.ACTIVE,404);
+        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,404);
     }
 
     @Test
@@ -195,7 +194,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
 
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
+                .findByOrganisationIdentifier(organisationIdentifier);
 
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
         assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
@@ -220,7 +219,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
         if (httpStatus == 200) {
             persistedOrganisation = organisationRepository
-                    .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
+                    .findByOrganisationIdentifier(organisationIdentifier);
 
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
             assertThat(persistedOrganisation.getStatus()).isEqualTo(status);
