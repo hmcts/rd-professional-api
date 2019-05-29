@@ -39,6 +39,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
 
         Map<String, Object> superUser = ((List<Map<String, Object>>) orgResponse.get("superUser")).get(0);
+        assertThat(superUser.get("userIdentifier")).isNotNull();
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
@@ -95,7 +96,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
 
     @Test
     public void error_if_organisation_id_not_found() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("19591f16-8503-4f25-a119-5c22c024e9be");
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116");
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
