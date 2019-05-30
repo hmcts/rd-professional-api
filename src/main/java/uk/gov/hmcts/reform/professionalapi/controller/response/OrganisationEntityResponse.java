@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
 
+    private PbaAccountResponse pbaAccountResponse;
+
     @JsonProperty
     private String organisationIdentifier;
     @JsonProperty
@@ -29,7 +31,7 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private List<SuperUserResponse> superUser;
     @JsonProperty
-    private List<PbaAccountResponse> pbaAccounts;
+    private List<String> paymentAccount;
     @JsonProperty
     private List<ContactInformationResponse> contactInformation;
 
@@ -52,9 +54,9 @@ public class OrganisationEntityResponse  {
                 .stream()
                 .map(user -> new SuperUserResponse(user))
                 .collect(toList());
-        this.pbaAccounts = organisation.getPaymentAccounts()
+        this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
-                .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
+                .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                 .collect(toList());
         if (isRequiredAllEntities) {
             this.contactInformation = organisation.getContactInformation()

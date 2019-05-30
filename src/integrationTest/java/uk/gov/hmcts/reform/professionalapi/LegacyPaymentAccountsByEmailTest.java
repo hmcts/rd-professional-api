@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +24,12 @@ public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledInte
 
     @Test
     public void get_request_returns_correct_payment_accounts_for_user_email_address_ac1() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -48,13 +48,13 @@ public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledInte
 
     @Test
     public void get_request_returns_multiple_payment_accounts_associated_with_user_email_address_ac2() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pbaNumber-1");
+        paymentAccounts.add("pbaNumber-2");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .pbaNumber("pbaNumber-2")
-                        .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
