@@ -36,7 +36,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
         assertThat(response.get("companyNumber")).isNotNull();
         assertThat(response.get("companyUrl")).isNotNull();
         assertThat(response.get("superUser")).isNotNull();
-        assertThat(response.get("pbaAccounts")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }

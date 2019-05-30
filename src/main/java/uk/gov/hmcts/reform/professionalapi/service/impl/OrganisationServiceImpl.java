@@ -17,7 +17,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -93,7 +92,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = saveOrganisation(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPbaAccounts(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -128,12 +127,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private void addPbaAccountToOrganisation(
-            List<PbaAccountCreationRequest> pbaAccountCreationRequest,
+            List<String> paymentAccounts,
             Organisation organisation) {
 
-        if (pbaAccountCreationRequest != null) {
-            pbaAccountCreationRequest.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
+        if (paymentAccounts != null) {
+            paymentAccounts.forEach(pbaAccount -> {
+                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
 
