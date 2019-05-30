@@ -2,21 +2,30 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 
 public class OrganisationPbaResponseTest {
 
     private Organisation organisationMock = Mockito.mock(Organisation.class);
+    private final ProfessionalUser professionalUserMock = Mockito.mock(ProfessionalUser.class);
 
     @Test
     public void testGetOrganisationPbaResponse() throws Exception {
+
+        ArrayList<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUserMock);
+
+        when(organisationMock.getUsers())
+                .thenReturn(users);
 
         OrganisationPbaResponse organisationPbaResponse = new OrganisationPbaResponse(organisationMock, true);
 
@@ -29,8 +38,8 @@ public class OrganisationPbaResponseTest {
         assertNotNull(name);
         assertTrue(name instanceof OrganisationEntityResponse);
 
-        verify(organisationMock,
-                times(1)).getCompanyUrl();
+        Mockito.verify(organisationMock,
+                Mockito.times(1)).getCompanyUrl();
 
 
 
