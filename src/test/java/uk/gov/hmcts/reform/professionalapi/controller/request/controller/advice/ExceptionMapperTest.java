@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controllers.advice;
+package uk.gov.hmcts.reform.professionalapi.controller.request.controller.advice;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

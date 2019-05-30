@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 
+
 public class PaymentAccountServiceTest {
 
     private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
@@ -95,7 +96,6 @@ public class PaymentAccountServiceTest {
 
     }
 
-
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrievePaymentAccountsWithInvalidEmail() {
         when(paymentAccountService.findPaymentAccountsByEmail("some-email"))
@@ -103,6 +103,4 @@ public class PaymentAccountServiceTest {
 
         paymentAccountService.findPaymentAccountsByEmail(null);
     }
-
-
 }
