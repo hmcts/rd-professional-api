@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 public class PbaAccountResponse {
 
+
+
     @JsonProperty
     private String pbaNumber;
 
@@ -13,7 +15,11 @@ public class PbaAccountResponse {
         getPbaAccountResponse(paymentAccount);
     }
 
-    private void getPbaAccountResponse(PaymentAccount paymentAccount) {
+    public void getPbaAccountResponse(PaymentAccount paymentAccount) {
         this.pbaNumber = paymentAccount.getPbaNumber();
+    }
+
+    public String getPbaNumber() {
+        return pbaNumber;
     }
 }

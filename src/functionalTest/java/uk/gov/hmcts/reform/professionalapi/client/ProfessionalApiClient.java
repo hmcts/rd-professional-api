@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -9,7 +8,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -32,7 +30,6 @@ import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Slf4j
@@ -75,12 +72,8 @@ public class ProfessionalApiClient {
     }
 
     private  OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
-        List<PbaAccountCreationRequest> pbaAccounts = asList(aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build(),
-            aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build());
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(randomAlphabetic(8));
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
@@ -89,7 +82,7 @@ public class ProfessionalApiClient {
             .sraRegulated(Boolean.FALSE)
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
-            .pbaAccounts(pbaAccounts)
+            .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")

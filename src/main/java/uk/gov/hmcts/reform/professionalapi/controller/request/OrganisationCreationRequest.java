@@ -28,7 +28,7 @@ public class OrganisationCreationRequest {
     @NotNull
     private final UserCreationRequest superUser;
 
-    private List<PbaAccountCreationRequest> pbaAccounts;
+    private List<String> paymentAccount;
 
     private List<ContactInformationCreationRequest> contactInformation;
 
@@ -41,7 +41,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("companyNumber") String companyNumber,
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,
-            @JsonProperty("pbaAccounts") List<PbaAccountCreationRequest> pbaAccountCreationRequests,
+            @JsonProperty("paymentAccount") List<String> paymentAccount,
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
@@ -51,7 +51,7 @@ public class OrganisationCreationRequest {
         this.companyNumber = companyNumber;
         this.companyUrl = companyUrl;
         this.superUser = superUser;
-        this.pbaAccounts = pbaAccountCreationRequests;
+        this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
     }
 }
