@@ -45,7 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
-
 public class OrganisationServiceImplTest {
 
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -92,7 +91,11 @@ public class OrganisationServiceImplTest {
                 "some-email",
                 userRoles);
 
-        pbaAccountCreationRequests = new ArrayList<>();
+        List<String> paymentAccountList = new ArrayList<>();
+
+        String pbaNumber = "pbaNumber-1";
+
+        paymentAccountList.add(pbaNumber);
 
         contactInformationCreationRequests = new ArrayList<>();
 
@@ -103,10 +106,6 @@ public class OrganisationServiceImplTest {
         paymentAccounts = new ArrayList<PaymentAccount>();
 
         userAccountMaps = new ArrayList<UserAccountMap>();
-
-        pbaAccountCreationRequest = new PbaAccountCreationRequest("pbaNumber-1");
-
-        pbaAccountCreationRequests.add(pbaAccountCreationRequest);
 
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
 
@@ -138,7 +137,7 @@ public class OrganisationServiceImplTest {
                 new OrganisationCreationRequest(
                         "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "company-number", "company-url",
                         superUser,
-                        pbaAccountCreationRequests, contactInformationCreationRequests);
+                        paymentAccountList, contactInformationCreationRequests);
 
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
