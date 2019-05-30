@@ -104,9 +104,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user){
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if(prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")){
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);

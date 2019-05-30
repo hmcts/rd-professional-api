@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -43,13 +42,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserR
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
-import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 
 @RequestMapping(
@@ -60,11 +57,9 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 @Slf4j
 @AllArgsConstructor
 public class OrganisationController {
-    private final boolean hasSuperUserWithAllRolesToggle = false;
 
     private OrganisationService organisationService;
     private ProfessionalUserService professionalUserService;
-    private UserAttributeService userAttributeService;
     private PaymentAccountService paymentAccountService;
     private PrdEnumService prdEnumService;
 
@@ -98,15 +93,6 @@ public class OrganisationController {
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
-
-        if(hasSuperUserWithAllRolesToggle) {
-            //String orgId = organisationResponse.getOrganisationIdentifier();
-            //Organisation org = organisationService.getOrganisationByOrganisationIdentifier(orgId);
-            //ProfessionalUser user = org.getUsers().get(0);
-            ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(organisationCreationRequest.getSuperUser().getEmail());
-
-            professionalUserService.addAllRolesToUser(user, organisationResponse.getOrganisationIdentifier());
-        }
 
         log.info("Received response to create a new organisation..." + organisationResponse);
         return ResponseEntity

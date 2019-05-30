@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public interface ProfessionalUserService {
-    ProfessionalUser addAllRolesToUser(ProfessionalUser professionalUser, String organisationIdentifier);
-
     NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);

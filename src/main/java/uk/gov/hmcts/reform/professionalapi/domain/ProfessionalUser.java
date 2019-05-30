@@ -59,7 +59,7 @@ public class ProfessionalUser {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
-    @OneToMany(mappedBy = "professionalUser", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
     @LastModifiedDate

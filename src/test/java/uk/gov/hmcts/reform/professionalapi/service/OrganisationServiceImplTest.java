@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -332,7 +331,6 @@ public class OrganisationServiceImplTest {
                 prdEnumRepositoryMock,
                 userAccountMapRepositoryMock
                 );
-        //realOrganisationService.retrieveOrganisation(testOrganisationId);
         realOrganisationService.retrieveOrganisation(null);
     }
 

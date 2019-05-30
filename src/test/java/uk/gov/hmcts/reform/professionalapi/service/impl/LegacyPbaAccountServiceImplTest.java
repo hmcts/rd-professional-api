@@ -28,14 +28,10 @@ public class LegacyPbaAccountServiceImplTest {
     @Test
     public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-        List<UserAccountMap> userAccountMap = new ArrayList<>();
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        final List<UserAccountMap> userAccountMap = new ArrayList<>();
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
-
         Organisation organisationMock = mock(Organisation.class);
-        Organisation organisation = new Organisation();
-        organisation.setPaymentAccounts(paymentAccounts);
-
 
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
 
@@ -60,7 +56,7 @@ public class LegacyPbaAccountServiceImplTest {
         UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
 
-        UUID paymentAccountUuid = UUID.randomUUID();
+        final UUID paymentAccountUuid = UUID.randomUUID();
 
         Field f = userAccountMap.getClass().getDeclaredField("userAccountMapId");
         f.setAccessible(true);
