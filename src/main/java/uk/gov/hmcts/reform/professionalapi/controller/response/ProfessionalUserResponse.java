@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
