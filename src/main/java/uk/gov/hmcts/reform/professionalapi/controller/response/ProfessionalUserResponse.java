@@ -2,23 +2,33 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 public class ProfessionalUserResponse {
 
     @JsonProperty
-    private final String id;
+    private UUID userIdentifier;
     @JsonProperty
-    private final String firstName;
+    private String firstName;
     @JsonProperty
-    private final String lastName;
+    private String lastName;
     @JsonProperty
-    private final String email;
+    private String email;
+    @JsonProperty
+    private ProfessionalUserStatus status;
+    @JsonProperty
+    private List<String> roles = new ArrayList<String>();
 
     public ProfessionalUserResponse(ProfessionalUser user) {
-        this.id = user.getId().toString();
+        this.userIdentifier = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
+        this.status = user.getStatus();
     }
 }
