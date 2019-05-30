@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
@@ -38,7 +40,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
         assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
 
-        Map<String, Object> superUser = ((List<Map<String, Object>>) orgResponse.get("superUser")).get(0);
+        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("userIdentifier")).isNotNull();
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
@@ -166,6 +168,52 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         }
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
+
+    @Test
+    public void retrieve_organisation_should_have_single_super_user() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
+                .firstName("someName1")
+                .lastName("someLastName1")
+                .email("some@email.com")
+                .status("PENDING")
+                .roles(userRoles)
+                .build();
+
+        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
+                .firstName("someName2")
+                .lastName("someLastName2")
+                .email("some@email2.com")
+                .status("PENDING")
+                .roles(userRoles)
+                .build();
+
+        Map<String, Object> organisationResponse =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
+
+        Map<String, Object> newUserResponse1 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1);
+        Map<String, Object> newUserResponse2 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2);
+
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
+
+        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
+        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
+        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
+        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+
     }
 
 
