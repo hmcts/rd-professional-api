@@ -46,9 +46,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
-
-    private final static String PRD_ENUM_TYPE = "PRD_ROLE";
-
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
     PaymentAccountRepository paymentAccountRepository;
@@ -67,7 +64,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository) {
+            UserAccountMapRepository userAccountMapRepository
+    ) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -104,6 +102,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
+    }
+
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user){
+        prdEnumRepository.findAll().stream().forEach(prdEnum -> {
+            if(prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")){
+                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
+                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
+                attributes.add(persistedAttribute);
+            }
+        });
+        return attributes;
     }
 
     private Organisation saveOrganisation(Organisation organisation) {
@@ -145,22 +155,14 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
-        //TODO populate org managers with all enums
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-
-        prdEnums.forEach(prdEnum -> {
-            if(prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase(PRD_ENUM_TYPE)){
-                UserAttribute userAttribute = new UserAttribute(newProfessionalUser, prdEnum);
-                userAttributeRepository.save(userAttribute);
-            }
-
-        });
+        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser);
+        newProfessionalUser.setUserAttributes(attributes);
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
-    }
 
+    }
 
     private void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,

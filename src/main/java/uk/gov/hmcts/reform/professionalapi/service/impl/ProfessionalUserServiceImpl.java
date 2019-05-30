@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,23 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         theOrganisation.addProfessionalUser(persistedNewUser);
 
         return new NewUserResponse(persistedNewUser);
+    }
+
+    @Transactional
+    public ProfessionalUser addAllRolesToUser(ProfessionalUser professionalUser, String organisationIdentifier){
+        Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        List<String> allUserRoles = new ArrayList<>();
+        allUserRoles.add("pui-user-manager");
+        allUserRoles.add("pui-organisation-manager");
+        allUserRoles.add("pui-finance-manager");
+        allUserRoles.add("pui-case-manager");
+
+        userAttributeService.addUserAttributesToUser(professionalUser, allUserRoles);
+
+        theOrganisation.addProfessionalUser(professionalUser);
+
+        return professionalUser;
     }
 
     /**

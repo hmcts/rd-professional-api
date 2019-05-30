@@ -64,11 +64,9 @@ public class OrganisationServiceImplTest {
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
-    private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
-    private final OrganisationResponse organisationResponseMock = mock(OrganisationResponse.class);
-    private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
-    private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
+    private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
+
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     private UserCreationRequest superUser;
     private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
@@ -133,7 +131,8 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
                 userAttributeRepositoryMock, prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock
+                );
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -324,21 +323,17 @@ public class OrganisationServiceImplTest {
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
         UUID testOrganisationId = testOrganisation.getId();
-//<<<<<<< HEAD
+
         OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock,
                 professionalUserRepositoryMock,
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock, contactInformationRepositoryMock,
                 userAttributeRepositoryMock,
                 prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock
+                );
         //realOrganisationService.retrieveOrganisation(testOrganisationId);
         realOrganisationService.retrieveOrganisation(null);
-//=======
-//
-//        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, dxAddressRepositoryMock, contactInformationRepositoryMock, userAttributeRepository, prdEnumRepository, userAccountMapRepositoryMock);
-//        realOrganisationService.retrieveOrganisation(null);
-////>>>>>>> master
     }
 
     @Test
