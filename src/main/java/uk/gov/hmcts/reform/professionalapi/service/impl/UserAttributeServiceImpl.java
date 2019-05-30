@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 @Service
 @Slf4j
 public class UserAttributeServiceImpl implements UserAttributeService {
-
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
 
@@ -52,4 +51,5 @@ public class UserAttributeServiceImpl implements UserAttributeService {
             });
         }
     }
+
 }

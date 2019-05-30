@@ -28,10 +28,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -46,7 +48,6 @@ import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
-
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
     PaymentAccountRepository paymentAccountRepository;
@@ -65,7 +66,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository) {
+            UserAccountMapRepository userAccountMapRepository
+    ) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -102,6 +104,18 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
+    }
+
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
+        prdEnumRepository.findAll().stream().forEach(prdEnum -> {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
+                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
+                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
+                attributes.add(persistedAttribute);
+            }
+        });
+        return attributes;
     }
 
     private Organisation saveOrganisation(Organisation organisation) {
@@ -143,11 +157,14 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
+        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser);
+        newProfessionalUser.setUserAttributes(attributes);
+
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
-    }
 
+    }
 
     private void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,

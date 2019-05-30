@@ -9,7 +9,6 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 
 public interface ProfessionalApiGenerator {
-
     int LENGTH_OF_UUID = 36;
     int LENGTH_OF_ORGANISATION_IDENTIFIER = 7;
     String ORGANISATION_IDENTIFIER_FORMAT_REGEX = "^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{7}$";

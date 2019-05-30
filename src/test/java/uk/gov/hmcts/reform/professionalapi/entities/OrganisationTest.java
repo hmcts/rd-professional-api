@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;

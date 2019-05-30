@@ -43,12 +43,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
-
 
 
 @RequestMapping(
@@ -60,11 +58,10 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 @AllArgsConstructor
 public class OrganisationController {
 
-    private OrganisationServiceImpl organisationService;
+    private OrganisationService organisationService;
     private ProfessionalUserService professionalUserService;
-    private UserAttributeServiceImpl userAttributeService;
-    private PaymentAccountServiceImpl paymentAccountService;
-    private PrdEnumServiceImpl prdEnumService;
+    private PaymentAccountService paymentAccountService;
+    private PrdEnumService prdEnumService;
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
