@@ -3,10 +3,11 @@ package uk.gov.hmcts.reform.professionalapi.utils;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -31,6 +32,8 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         return anOrganisationCreationRequest()
             .name("some-org-name")
@@ -39,9 +42,7 @@ public class OrganisationFixtures {
             .sraRegulated(Boolean.FALSE)
             .companyUrl("company-url")
             .companyNumber("company")
-            .pbaAccounts(Arrays.asList(aPbaPaymentAccount()
-                .pbaNumber("pbaNumber-1")
-                .build()))
+            .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")
@@ -62,6 +63,8 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         return anOrganisationCreationRequest()
             .name("some-org-name1")
@@ -70,10 +73,8 @@ public class OrganisationFixtures {
             .sraRegulated(Boolean.TRUE)
             .companyUrl("company-url1")
             .companyNumber("company1")
-            .pbaAccounts(Arrays.asList(aPbaPaymentAccount()
-                .pbaNumber("pbaNumber-1")
-                .build()))
-            .superUser(aUserCreationRequest()
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
                 .email("someone@somewhere.com")

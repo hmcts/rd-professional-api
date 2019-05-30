@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
@@ -12,6 +11,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
+
+    private PbaAccountResponse pbaAccountResponse;
 
     @JsonProperty
     private String organisationIdentifier;
@@ -30,7 +31,7 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private SuperUserResponse superUser;
     @JsonProperty
-    private List<PbaAccountResponse> pbaAccounts;
+    private List<String> paymentAccount;
     @JsonProperty
     private List<ContactInformationResponse> contactInformation;
 
@@ -50,9 +51,9 @@ public class OrganisationEntityResponse  {
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
         this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
-        this.pbaAccounts = organisation.getPaymentAccounts()
+        this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
-                .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
+                .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                 .collect(toList());
         if (isRequiredAllEntities) {
             this.contactInformation = organisation.getContactInformation()
