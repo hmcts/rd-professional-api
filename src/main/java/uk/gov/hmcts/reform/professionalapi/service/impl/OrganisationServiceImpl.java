@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUserListByCreatedDate;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
 
 @Service
 @Slf4j
@@ -196,7 +199,15 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
+
         log.debug("Retrieving all organisations...");
+
+        organisations = organisations.stream()
+               .map(organisation -> {
+                   organisation.setUsers(sortUserListByCreatedDate(organisation));
+                   return organisation;
+               }).collect(Collectors.toList());
+
         return new OrganisationsDetailResponse(organisations, true);
     }
 
@@ -231,6 +242,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         } else {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
+            organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
             return new OrganisationEntityResponse(organisation, true);
         }
     }
@@ -240,5 +252,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
     }
+
+
 }
 

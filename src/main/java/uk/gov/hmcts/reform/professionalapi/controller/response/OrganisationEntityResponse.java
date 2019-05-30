@@ -4,13 +4,11 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Comparator;
 import java.util.List;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
@@ -51,7 +49,7 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        this.superUser = getSuperUserFromUserList(organisation);
+        this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         this.pbaAccounts = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
@@ -62,11 +60,6 @@ public class OrganisationEntityResponse  {
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))
                     .collect(toList());
         }
-    }
-
-    private SuperUserResponse getSuperUserFromUserList(Organisation organisation) {
-        ProfessionalUser user = organisation.getUsers().stream().sorted((Comparator.comparing(ProfessionalUser::getCreated))).findFirst().get();
-        return new SuperUserResponse(user);
     }
 
 }
