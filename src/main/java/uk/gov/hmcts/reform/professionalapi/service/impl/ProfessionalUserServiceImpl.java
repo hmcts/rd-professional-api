@@ -5,11 +5,13 @@ import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -73,6 +75,18 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
+        return user;
+    }
+
+    public ProfessionalUser findProfessionalUserByEmailAddressForActiveOrganisation(String email) {
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
+
+        if(user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE){
+            String errorMsg = "The user you are searching for belongs to an Organisation that is not active";
+            log.info(errorMsg);
+            throw new EmptyResultDataAccessException(1);
+        }
+
         return user;
     }
 

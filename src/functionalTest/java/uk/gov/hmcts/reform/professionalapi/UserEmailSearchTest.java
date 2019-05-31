@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -30,7 +31,12 @@ public class UserEmailSearchTest extends FunctionalTestSuite {
                         .email(email)
                         .build())
                 .build();
-        professionalApiClient.createOrganisation(request);
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+
         Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");

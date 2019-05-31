@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -157,7 +157,7 @@ public class OrganisationController {
             @ApiResponse(
                     code = 200,
                     message = "A representation of a professional user",
-                    response = ProfessionalUserResponse.class
+                    response = ProfessionalUsersResponse.class
             ),
             @ApiResponse(
                     code = 400,
@@ -172,7 +172,7 @@ public class OrganisationController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity<ProfessionalUsersResponse> findUserByEmail(@RequestParam(value = "email") String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
         if (null == user) {
@@ -180,7 +180,7 @@ public class OrganisationController {
         }
         return ResponseEntity
                 .status(200)
-                .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
+                .body(new ProfessionalUsersResponse(professionalUserService.findProfessionalUserByEmailAddressForActiveOrganisation(email)));
     }
 
     @ApiOperation(
