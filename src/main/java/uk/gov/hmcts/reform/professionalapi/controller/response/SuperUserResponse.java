@@ -25,7 +25,6 @@ public class SuperUserResponse {
     }
 
     private void getSuperUserResponse(ProfessionalUser professionalUser) {
-
         this.userIdentifier = StringUtils.isEmpty(professionalUser.getUserIdentifier())
                 ? "" : professionalUser.getUserIdentifier().toString();
         this.firstName = professionalUser.getFirstName();
