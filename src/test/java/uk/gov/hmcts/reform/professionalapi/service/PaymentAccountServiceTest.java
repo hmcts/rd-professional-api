@@ -33,8 +33,8 @@ public class PaymentAccountServiceTest {
     @Test
     public void retrievePaymentAccountsByPbaEmail() {
 
-        List<UserAccountMap> userAccountMap = new ArrayList<>();
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
 
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
@@ -52,11 +52,11 @@ public class PaymentAccountServiceTest {
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMap);
+        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMaps);
 
         when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
 
-        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMap);
+        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
 
         when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
                 .thenReturn(professionalUserMock);

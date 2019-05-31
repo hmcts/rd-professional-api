@@ -5,13 +5,12 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.List;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
-@Slf4j
-public class PbaAccountUtil {
+public interface PbaAccountUtil {
+
+
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -32,8 +31,8 @@ public class PbaAccountUtil {
         if (!paymentAccountsEntity.isEmpty()) {
 
             paymentAccountsEntity.forEach(paymentAccount -> {
-                for (PaymentAccount usrMapAccount : userMapPaymentAccount) {
-                    if (usrMapAccount.getId().equals(paymentAccount.getId())) {
+                for (PaymentAccount usrMapPaymentAccount : userMapPaymentAccount) {
+                    if (usrMapPaymentAccount.getId().equals(paymentAccount.getId())) {
 
                         paymentAccounts.add(paymentAccount);
 

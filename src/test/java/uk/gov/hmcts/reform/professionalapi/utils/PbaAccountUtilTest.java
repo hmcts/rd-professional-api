@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 public class PbaAccountUtilTest {
 
     @Test
-    public void shouldReturnPaymentAccountsFromUserAccountMap(){
+    public void shouldReturnPaymentAccountsFromUserAccountMap() {
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
         UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
@@ -35,7 +35,7 @@ public class PbaAccountUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountFromUserMap(){
+    public void shouldReturnPaymentAccountFromUserMap() {
 
         final UUID paymentAccountUuid = UUID.randomUUID();
 
