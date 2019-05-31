@@ -98,13 +98,13 @@
    file name: tomcat-embed-websocket-9.0.17.jar
    ]]></notes>
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-websocket:.*$</gav>
-        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:apache:tomcat</cpe>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: tomcat-embed-core-9.0.17.jar
    ]]></notes>
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
-        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:apache:tomcat</cpe>
     </suppress>
 </suppressions>

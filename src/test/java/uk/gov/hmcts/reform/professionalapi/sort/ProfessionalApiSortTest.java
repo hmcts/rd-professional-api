@@ -33,12 +33,8 @@ public class ProfessionalApiSortTest {
                 organisationMock);
 
         user1.setCreated(LocalDateTime.now());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        user2.setCreated(LocalDateTime.now());
+
+        user2.setCreated(LocalDateTime.now().plusMinutes(60));
 
         List<ProfessionalUser> users = new ArrayList<ProfessionalUser>();
         users.add(user2);
