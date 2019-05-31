@@ -81,7 +81,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ProfessionalUser findProfessionalUserByEmailAddressForActiveOrganisation(String email) {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
 
-        if(user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE){
+        if (user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             String errorMsg = "The user you are searching for belongs to an Organisation that is not active";
             log.info(errorMsg);
             throw new EmptyResultDataAccessException(1);
