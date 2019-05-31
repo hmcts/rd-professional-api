@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 
 @RequestMapping(
@@ -60,7 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 public class OrganisationController {
 
     private OrganisationService organisationService;
-    private ProfessionalUserServiceImpl professionalUserService;
+    private ProfessionalUserService professionalUserService;
     private PaymentAccountService paymentAccountService;
     private PrdEnumService prdEnumService;
 
