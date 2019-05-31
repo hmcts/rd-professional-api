@@ -82,13 +82,11 @@ public class OrganisationServiceImplTest {
     @Before
     public void setUp() {
 
-        List<String> userRoles = new ArrayList<>();
-
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email",
-                userRoles);
+                "some-email"
+        );
 
         List<String> paymentAccountList = new ArrayList<>();
 
@@ -130,7 +128,7 @@ public class OrganisationServiceImplTest {
                 contactInformationRepositoryMock,
                 userAttributeRepositoryMock, prdEnumRepositoryMock,
                 userAccountMapRepositoryMock
-                );
+        );
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -344,7 +342,7 @@ public class OrganisationServiceImplTest {
                 userAttributeRepositoryMock,
                 prdEnumRepositoryMock,
                 userAccountMapRepositoryMock
-                );
+        );
         realOrganisationService.retrieveOrganisation(null);
     }
 
