@@ -29,7 +29,7 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private String companyUrl;
     @JsonProperty
-    private List<SuperUserResponse> superUser;
+    private SuperUserResponse superUser;
     @JsonProperty
     private List<String> paymentAccount;
     @JsonProperty
@@ -50,10 +50,7 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        this.superUser = organisation.getUsers()
-                .stream()
-                .map(user -> new SuperUserResponse(user))
-                .collect(toList());
+        this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())

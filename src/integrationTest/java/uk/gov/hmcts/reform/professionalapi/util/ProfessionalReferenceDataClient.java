@@ -70,7 +70,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
+    private <T> Map<String, Object> postRequest(String uriPath, T requestBody) {
 
         HttpEntity<T> request =
                 new HttpEntity<>(requestBody, getHeaders());

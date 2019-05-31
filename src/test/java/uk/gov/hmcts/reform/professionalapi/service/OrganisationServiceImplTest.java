@@ -251,6 +251,17 @@ public class OrganisationServiceImplTest {
     @Test
     public void retrieve_an_organisations() {
 
+        ArrayList<ProfessionalUser> users = new ArrayList<>();
+        ArrayList<Organisation> organisations = new ArrayList<>();
+        users.add(professionalUserMock);
+        organisations.add(organisationMock);
+
+        when(organisationMock.getUsers())
+                .thenReturn(users);
+
+        when(organisationRepositoryMock.findAll())
+                .thenReturn(organisations);
+
         OrganisationsDetailResponse organisationDetailResponse =
                 organisationServiceImplMock.retrieveOrganisations();
 
@@ -259,6 +270,10 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepositoryMock,
                 times(1)).findAll();
+
+        verify(
+                organisationMock,
+                times(1)).setUsers(any());
     }
 
     @Test
@@ -334,7 +349,13 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieve_an_organisations_by_Uuid() {
+    public void retrieve_an_organisations_by_organisationIdentifier() {
+
+        ArrayList<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUserMock);
+
+        when(organisationMock.getUsers())
+                .thenReturn(users);
 
         OrganisationEntityResponse organisationEntityResponse =
                 organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
@@ -344,6 +365,10 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepositoryMock,
                 times(1)).findByOrganisationIdentifier(any());
+
+        verify(
+                organisationMock,
+                times(1)).setUsers(any());
     }
 
     @Test(expected = HttpClientErrorException.class)
