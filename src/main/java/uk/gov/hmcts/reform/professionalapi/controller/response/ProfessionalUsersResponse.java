@@ -1,17 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-        import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-        import java.util.ArrayList;
-        import java.util.List;
-        import java.util.Optional;
-        import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-        import lombok.Getter;
-        import lombok.NoArgsConstructor;
-        import lombok.Setter;
-        import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-        import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Getter
 @Setter
