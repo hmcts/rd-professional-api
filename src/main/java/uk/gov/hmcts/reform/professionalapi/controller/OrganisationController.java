@@ -16,6 +16,7 @@ import javax.xml.ws.http.HTTPException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -202,7 +203,10 @@ public class OrganisationController {
         log.info("Received request to retrieve an organisations payment accounts by email...");
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
+        if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
+            throw new EmptyResultDataAccessException(1);
+        }
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
@@ -272,7 +276,7 @@ public class OrganisationController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam(required = true) String status) {
+    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {

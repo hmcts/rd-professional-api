@@ -7,51 +7,18 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {

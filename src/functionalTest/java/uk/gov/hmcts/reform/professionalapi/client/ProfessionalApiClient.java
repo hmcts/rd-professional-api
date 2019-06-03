@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -207,9 +208,7 @@ public class ProfessionalApiClient {
                 .get("v1/organisations/pbas?email=" + email)
                 .andReturn();
 
-        if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.asString());
-        }
+        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -217,6 +216,22 @@ public class ProfessionalApiClient {
 
         return response.body().as(Map.class);
     }
+
+    @SuppressWarnings("unchecked")
+    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email) {
+
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations/pbas?email=" + email)
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(NOT_FOUND.value());
+    }
+
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String showDeleted, HttpStatus status) {
