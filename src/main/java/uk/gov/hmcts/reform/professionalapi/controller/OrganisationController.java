@@ -139,7 +139,7 @@ public class OrganisationController {
     }
 
     @ApiOperation(
-            value = "Retrieves the user with the given email address",
+            value = "Retrieves the user with the given email address if organisation is active",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -172,12 +172,13 @@ public class OrganisationController {
     public ResponseEntity<ProfessionalUsersResponse> findUserByEmail(@RequestParam(value = "email") String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
-        if (null == user) {
+
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new HTTPException(404);
         }
         return ResponseEntity
                 .status(200)
-                .body(new ProfessionalUsersResponse(professionalUserService.findProfessionalUserByEmailAddressForActiveOrganisation(email)));
+                .body(new ProfessionalUsersResponse(user));
     }
 
     @ApiOperation(

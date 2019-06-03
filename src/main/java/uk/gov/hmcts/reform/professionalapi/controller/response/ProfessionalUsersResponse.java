@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+        import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.List;
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.Optional;
+        import java.util.UUID;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.util.StringUtils;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
+        import lombok.Getter;
+        import lombok.NoArgsConstructor;
+        import lombok.Setter;
+        import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+        import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private String userIdentifier;
+    private UUID userIdentifier;
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -31,8 +32,7 @@ public class ProfessionalUsersResponse {
     private List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = StringUtils.isEmpty(user.getUserIdentifier())
-                ? "" : user.getUserIdentifier().toString();
+        this.userIdentifier = Optional.ofNullable(user.getUserIdentifier()).orElse(user.getUserIdentifier());
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
