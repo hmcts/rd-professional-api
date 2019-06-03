@@ -76,6 +76,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return user;
     }
 
+
     @Override
     public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
         log.info("Into  ProfessionalService for get all users for organisation");
