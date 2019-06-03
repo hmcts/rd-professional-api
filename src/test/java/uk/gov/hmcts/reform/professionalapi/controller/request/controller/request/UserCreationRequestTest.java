@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.controller.reques
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -21,24 +19,22 @@ public class UserCreationRequestTest {
     private String firstName = "Joe";
     private String lastName = "Bloggs";
     private String email = "joe.bloggs@email.com";
-    private List<String> userRoles = new ArrayList<>();
 
     @Before
     public void setUp() {
-        userRoles.add("pui-organisation-manager");
-        userCreationRequest = new UserCreationRequest(firstName, lastName, email, userRoles);
+        userCreationRequest = new UserCreationRequest(firstName, lastName, email);
     }
 
     @Test
     public void has_mandatory_fields_specified_not_null() {
 
         UserCreationRequest userCreationRequest =
-                new UserCreationRequest(null, null, null, null);
+                new UserCreationRequest(null, null, null);
 
         Set<ConstraintViolation<UserCreationRequest>> violations =
                 validator.validate(userCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(4);
+        assertThat(violations.size()).isEqualTo(3);
     }
 
     @Test
