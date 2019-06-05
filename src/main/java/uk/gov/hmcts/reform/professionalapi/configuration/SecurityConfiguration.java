@@ -55,7 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
 
         http.authorizeRequests()
-            .antMatchers("/actuator/**")
+            .antMatchers("/actuator/**", "/search/**")
             .permitAll()
             .and()
             .sessionManagement()
