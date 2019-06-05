@@ -49,6 +49,10 @@ public class AuthCheckerConfiguration {
 
     @Bean
     public Function<HttpServletRequest, Optional<String>> userIdExtractor() {
+
+
+        //Idam service call
+
         return any -> Optional.empty();
     }
 }
