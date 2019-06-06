@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
 
 @Configuration
 @ConfigurationProperties(prefix = "security")
@@ -26,42 +27,45 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerService
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     List<String>    anonymousPaths;
-    @Autowired
+   // @Autowired
     private  RequestAuthorizer<Service> serviceRequestAuthorizer;
-    @Autowired
+    //@Autowired
     private  RequestAuthorizer<User> userRequestAuthorizer;
-    @Autowired
+   // @Autowired
     private AuthenticationManager      authenticationManager;
-    @Autowired
+   // @Autowired
     private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
 
-   /* public SecurityConfiguration(
-                                 RequestAuthorizer<Service> serviceRequestAuthorizer,
-                                 RequestAuthorizer<User> userRequestAuthorizer,
-                                 AuthenticationManager authenticationManager) {
-        this.serviceRequestAuthorizer = serviceRequestAuthorizer;
-        this.userRequestAuthorizer = userRequestAuthorizer;
-        this.authenticationManager = authenticationManager;
-    }*/
+    public SecurityConfiguration(
+                RequestAuthorizer<Service> serviceRequestAuthorizer,
+                RequestAuthorizer<User> userRequestAuthorizer,
+                AuthenticationManager authenticationManager) {
+            this.serviceRequestAuthorizer = serviceRequestAuthorizer;
+            this.userRequestAuthorizer = userRequestAuthorizer;
+            this.authenticationManager = authenticationManager;
+        }
 
-    public List<String> getAnonymousPaths() {
-        return anonymousPaths;
-    }
+        public List<String> getAnonymousPaths() {
+            return anonymousPaths;
+        }
 
-    public void setAnonymousPaths(List<String> anonymousPaths) {
-        this.anonymousPaths = anonymousPaths;
-    }
+        public void setAnonymousPaths(List<String> anonymousPaths) {
+            this.anonymousPaths = anonymousPaths;
+        }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring()
-            .antMatchers(anonymousPaths.toArray(new String[0]));
-    }
+        @Override
+        public void configure(WebSecurity web) {
+            web.ignoring()
+                    .antMatchers(anonymousPaths.toArray(new String[0]));
+        }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
 
+            log.info("Inside SecurityConfiguration::");
+            AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer );
         authCheckerServiceAndUserFilter.setAuthenticationManager(authenticationManager);
+
 
         http.authorizeRequests()
             .antMatchers("/actuator/**","/search/**")

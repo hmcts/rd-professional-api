@@ -7,12 +7,14 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 @EnableJpaAuditing
 @EnableJpaRepositories
 @EnableRetry
 @SpringBootApplication
 @EnableCircuitBreaker
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @EnableFeignClients(basePackages = {
         "uk.gov.hmcts.reform.professionalapi",
 })
