@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -25,6 +26,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -57,7 +59,7 @@ public class ProfessionalUser {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
-    @OneToMany(mappedBy = "professionalUser")
+    @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
     @LastModifiedDate
@@ -73,7 +75,7 @@ public class ProfessionalUser {
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     @Column(name = "USER_IDENTIFIER")
-    private UUID professionalUserIdentifier;
+    private UUID userIdentifier;
 
     public ProfessionalUser(
                             String firstName,
@@ -87,11 +89,6 @@ public class ProfessionalUser {
         this.emailAddress = emailAddress;
         this.status = status;
         this.organisation = organisation;
-        this.professionalUserIdentifier = generateUniqueProfessionalUserIdentifier();
+        this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
-
-    public UUID generateUniqueProfessionalUserIdentifier() {
-        return UUID.randomUUID();
-    }
-
 }

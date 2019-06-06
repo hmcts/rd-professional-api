@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUserListByCreatedDate;
+
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,7 +19,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -24,10 +28,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -37,11 +43,11 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
 
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
-
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;
     PaymentAccountRepository paymentAccountRepository;
@@ -60,7 +66,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository) {
+            UserAccountMapRepository userAccountMapRepository
+    ) {
 
         this.organisationRepository = organisationRepository;
         this.professionalUserRepository = professionalUserRepository;
@@ -86,9 +93,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                 organisationCreationRequest.getCompanyUrl()
         );
 
-        Organisation organisation = organisationRepository.save(newOrganisation);
+        Organisation organisation = saveOrganisation(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPbaAccounts(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -99,13 +106,36 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
+        prdEnumRepository.findAll().stream().forEach(prdEnum -> {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
+                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
+                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
+                attributes.add(persistedAttribute);
+            }
+        });
+        return attributes;
+    }
+
+    private Organisation saveOrganisation(Organisation organisation) {
+        Organisation persistedOrganisation = null;
+        try {
+            persistedOrganisation = organisationRepository.save(organisation);
+        } catch (ConstraintViolationException ex) {
+            organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+            persistedOrganisation = organisationRepository.save(organisation);
+        }
+        return persistedOrganisation;
+    }
+
     private void addPbaAccountToOrganisation(
-            List<PbaAccountCreationRequest> pbaAccountCreationRequest,
+            List<String> paymentAccounts,
             Organisation organisation) {
 
-        if (pbaAccountCreationRequest != null) {
-            pbaAccountCreationRequest.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.getPbaNumber());
+        if (paymentAccounts != null) {
+            paymentAccounts.forEach(pbaAccount -> {
+                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
 
@@ -127,11 +157,14 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
+        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser);
+        newProfessionalUser.setUserAttributes(attributes);
+
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser);
-    }
 
+    }
 
     private void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
@@ -170,8 +203,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
-        if (paymentAccounts != null
-                &&  paymentAccounts.size() > 0) {
+        if (!paymentAccounts.isEmpty()) {
             log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
 
@@ -183,13 +215,21 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
         List<Organisation> organisations = organisationRepository.findAll();
+
         log.debug("Retrieving all organisations...");
+
+        organisations = organisations.stream()
+               .map(organisation -> {
+                   organisation.setUsers(sortUserListByCreatedDate(organisation));
+                   return organisation;
+               }).collect(Collectors.toList());
+
         return new OrganisationsDetailResponse(organisations, true);
     }
 
     @Override
     public OrganisationResponse updateOrganisation(
-            OrganisationCreationRequest organisationCreationRequest, UUID organisationIdentifier) {
+            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
@@ -207,17 +247,18 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation getOrganisationByOrganisationIdentifier(UUID organisationIdentifier) {
+    public Organisation getOrganisationByOrganisationIdentifier(String organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
     @Override
-    public OrganisationEntityResponse retrieveOrganisation(UUID id) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(id);
+    public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         } else {
-            log.debug("Retrieving organisation with ID " + id.toString());
+            log.debug("Retrieving organisation with ID " + organisationIdentifier);
+            organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
             return new OrganisationEntityResponse(organisation, true);
         }
     }
@@ -227,5 +268,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
     }
+
+
 }
 

@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @NoArgsConstructor
 public class OrganisationEntityResponse  {
 
+    private PbaAccountResponse pbaAccountResponse;
+
     @JsonProperty
     private String organisationIdentifier;
     @JsonProperty
@@ -27,9 +29,9 @@ public class OrganisationEntityResponse  {
     @JsonProperty
     private String companyUrl;
     @JsonProperty
-    private List<SuperUserResponse> superUser;
+    private SuperUserResponse superUser;
     @JsonProperty
-    private List<PbaAccountResponse> pbaAccounts;
+    private List<String> paymentAccount;
     @JsonProperty
     private List<ContactInformationResponse> contactInformation;
 
@@ -41,20 +43,19 @@ public class OrganisationEntityResponse  {
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
         this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
-                ? "" : organisation.getOrganisationIdentifier().toString();
+                ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        this.superUser = organisation.getUsers()
+        if (organisation.getUsers().size() > 0) {
+            this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
+        }
+        this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
-                .map(user -> new SuperUserResponse(user))
-                .collect(toList());
-        this.pbaAccounts = organisation.getPaymentAccounts()
-                .stream()
-                .map(pbaAccount -> new PbaAccountResponse(pbaAccount))
+                .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                 .collect(toList());
         if (isRequiredAllEntities) {
             this.contactInformation = organisation.getContactInformation()

@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
@@ -33,7 +34,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
-        return postRequest(APP_BASE_PATH, request);
+        return postRequest(baseUrl, request);
     }
 
     public Map<String, Object> findUserByEmail(String email) {
@@ -42,6 +43,10 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String, Object> findPaymentAccountsByEmail(String email) {
         return getRequest("/v1/organisations/pbas?email={email}", email);
+    }
+
+    public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
+        return getRequest("/search/pba/{email}", email);
     }
 
     public Map<String,Object> retrieveSingleOrganisation(String id) {
@@ -56,8 +61,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/v1/organisations?status={status}", status);
     }
 
-    public Map<String, Object> addUserToOrganisation(String orgId) {
-        return postRequest(APP_BASE_PATH + "/{orgId}/users/", orgId);
+    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest) {
+        return postRequest(baseUrl + "/" + orgId + "/users/", newUserCreationRequest);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
@@ -65,7 +70,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private <T> Map<String, Object> postRequest(String uriPath, T requestBody, Object... params) {
+    private <T> Map<String, Object> postRequest(String uriPath, T requestBody) {
 
         HttpEntity<T> request =
                 new HttpEntity<>(requestBody, getHeaders());
@@ -75,7 +80,7 @@ public class ProfessionalReferenceDataClient {
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    baseUrl,
+                    uriPath,
                     request,
                     Map.class);
 

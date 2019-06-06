@@ -7,15 +7,16 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.xml.ws.http.HTTPException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,21 +39,19 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
-
 
 
 @RequestMapping(
         path = "v1/organisations",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
@@ -60,11 +59,10 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl
 @AllArgsConstructor
 public class OrganisationController {
 
-    private OrganisationServiceImpl organisationService;
+    private OrganisationService organisationService;
     private ProfessionalUserService professionalUserService;
-    private UserAttributeServiceImpl userAttributeService;
-    private PaymentAccountServiceImpl paymentAccountService;
-    private PrdEnumServiceImpl prdEnumService;
+    private PaymentAccountService paymentAccountService;
+    private PrdEnumService prdEnumService;
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
@@ -128,9 +126,11 @@ public class OrganisationController {
             organisationResponse =
                     organisationService.retrieveOrganisations();
         } else {
-            log.info("Received request to retrieve organisation with ID " + id.toString());
+            log.info("Received request to retrieve organisation with ID " + id);
+
+            organisationCreationRequestValidator.validateOrganisationIdentifier(id);
             organisationResponse =
-                    organisationService.retrieveOrganisation(UUID.fromString(id));
+                    organisationService.retrieveOrganisation(id);
         }
 
         log.debug("Received response to retrieve organisation details" + organisationResponse);
@@ -140,7 +140,7 @@ public class OrganisationController {
     }
 
     @ApiOperation(
-            value = "Retrieves the user with the given email address",
+            value = "Retrieves the user with the given email address if organisation is active",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -155,7 +155,7 @@ public class OrganisationController {
             @ApiResponse(
                     code = 200,
                     message = "A representation of a professional user",
-                    response = ProfessionalUserResponse.class
+                    response = ProfessionalUsersResponse.class
             ),
             @ApiResponse(
                     code = 400,
@@ -170,10 +170,16 @@ public class OrganisationController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<ProfessionalUserResponse> findUserByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity<ProfessionalUsersResponse> findUserByEmail(@RequestParam(value = "email") String email) {
+
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
+
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            throw new HTTPException(404);
+        }
         return ResponseEntity
                 .status(200)
-                .body(new ProfessionalUserResponse(professionalUserService.findProfessionalUserByEmailAddress(email)));
+                .body(new ProfessionalUsersResponse(user));
     }
 
     @ApiOperation(
@@ -197,13 +203,20 @@ public class OrganisationController {
         log.info("Received request to retrieve an organisations payment accounts by email...");
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
+        if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
+            throw new EmptyResultDataAccessException(1);
+        }
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    @ApiOperation(value = "Updates an organisation")
+    @ApiOperation(
+        value = "Updates an organisation",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization")
+        })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation"),
             @ApiResponse(code = 404, message = "If Organisation is not found"),
@@ -220,12 +233,12 @@ public class OrganisationController {
 
         log.info("Received request to update organisation for organisationIdentifier: " + organisationIdentifier);
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        UUID inputOrganisationIdentifier = organisationCreationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(inputOrganisationIdentifier);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), inputOrganisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         OrganisationResponse organisationResponse =
-                organisationService.updateOrganisation(organisationCreationRequest, inputOrganisationIdentifier);
+                organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
         return ResponseEntity.status(200).build();
     }
@@ -263,7 +276,7 @@ public class OrganisationController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam(required = true) String status) {
+    public ResponseEntity<OrganisationsDetailResponse> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
@@ -278,7 +291,12 @@ public class OrganisationController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    @ApiOperation("Add a user to an organisation")
+    @ApiOperation(
+        value = "Add a user to an organisation",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization")
+        }
+    )
     @ApiResponses({
             @ApiResponse(
                     code = 201,
@@ -298,16 +316,15 @@ public class OrganisationController {
 
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
             log.error("Invalid/No user role(s) provided");
             throw new InvalidRequest("404");
         } else {
-            UUID inputOrganisationIdentifier = updateOrganisationRequestValidator.validateAndReturnInputOrganisationIdentifier(organisationIdentifier);
-
             NewUserResponse newUserResponse =
-                    professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, inputOrganisationIdentifier);
+                    professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, organisationIdentifier);
 
             log.info("Received request to add a new user to an organisation..." + newUserResponse);
             return ResponseEntity

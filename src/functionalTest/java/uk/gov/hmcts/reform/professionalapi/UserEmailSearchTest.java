@@ -25,15 +25,19 @@ public class UserEmailSearchTest extends FunctionalTestSuite {
         String email = randomAlphabetic(10) + "@usersearch.test";
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email(email)
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(email)
+                        .build())
                 .build();
-        professionalApiClient.createOrganisation(request);
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+
         Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }
-
 }

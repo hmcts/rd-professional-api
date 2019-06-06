@@ -1,22 +1,22 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.UUID;
-import javax.xml.ws.http.HTTPException;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -67,12 +67,11 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getEmailAddress(), user.getEmailAddress());
     }
 
-    @Test(expected = HTTPException.class)
     public void retrieveUserByEmailNotFound() {
         Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
-        professionalUserService.findProfessionalUserByEmailAddress("some-email");
+        assertThat(professionalUserService.findProfessionalUserByEmailAddress("some-email")).isNull();
     }
 
 
@@ -118,7 +117,7 @@ public class ProfessionalUserServiceTest {
                 "PENDING",
                 userRoles);
 
-        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID());
+        when(organisation.getOrganisationIdentifier()).thenReturn(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
         when(organisationRepository.findByOrganisationIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
@@ -126,7 +125,7 @@ public class ProfessionalUserServiceTest {
 
         assertThat(newUserResponse).isNotNull();
 
-        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(UUID.class));
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
         verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
         verify(organisation, times(1)).addProfessionalUser(any(ProfessionalUser.class));
         verify(userAttributeService, times(1)).addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()));
@@ -134,9 +133,9 @@ public class ProfessionalUserServiceTest {
 
     @Test(expected = InvalidUseOfMatchersException.class)
     public void addNewUserWithInvalidFields() {
-        when(professionalUserService.addNewUserToAnOrganisation(any(NewUserCreationRequest.class), any(UUID.class)))
+        when(professionalUserService.addNewUserToAnOrganisation(any(NewUserCreationRequest.class), any(String.class)))
                 .thenReturn(null);
 
-        professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, UUID.randomUUID());
+        professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
     }
 }

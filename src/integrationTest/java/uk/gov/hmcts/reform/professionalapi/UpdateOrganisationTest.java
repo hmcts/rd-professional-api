@@ -6,57 +6,23 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
 public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
-    @Autowired
-    private OrganisationRepository organisationRepository;
-
-    @Autowired
-    private ProfessionalUserRepository professionalUserRepository;
-
-    @Autowired
-    private ContactInformationRepository contactInformationRepository;
-
-    @Autowired
-    private DxAddressRepository dxAddressRepository;
-
-    @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
-
-    private ProfessionalReferenceDataClient professionalReferenceDataClient;
-
-    @Before
-    public void setUp() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-        dxAddressRepository.deleteAll();
-        contactInformationRepository.deleteAll();
-        professionalUserRepository.deleteAll();
-        paymentAccountRepository.deleteAll();
-        organisationRepository.deleteAll();
-    }
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
-        updateAndValidateOrganisation(UUID.randomUUID().toString(),OrganisationStatus.ACTIVE,404);
+        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,404);
     }
 
     @Test
@@ -155,7 +121,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
         PaymentAccount paymentAccount = pbaAccounts.get(0);
-        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pbaNumber-1");
+        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pba123");
 
         List<ProfessionalUser> professionalUsers = persistedOrganisation.getUsers();
         ProfessionalUser professionalUser = professionalUsers.get(0);
@@ -195,7 +161,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
 
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
+                .findByOrganisationIdentifier(organisationIdentifier);
 
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
         assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
@@ -220,7 +186,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
         if (httpStatus == 200) {
             persistedOrganisation = organisationRepository
-                    .findByOrganisationIdentifier(UUID.fromString(organisationIdentifier));
+                    .findByOrganisationIdentifier(organisationIdentifier);
 
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
             assertThat(persistedOrganisation.getStatus()).isEqualTo(status);

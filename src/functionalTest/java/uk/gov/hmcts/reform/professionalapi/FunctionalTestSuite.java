@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
@@ -9,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @TestPropertySource("classpath:application-functional.yaml")
@@ -44,5 +50,29 @@ public abstract class FunctionalTestSuite {
 
     @After
     public void tearDown() {
+    }
+
+    protected String createAndUpdateOrganisationToActive() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisation(organisationIdentifier);
+        return organisationIdentifier;
+
+    }
+
+    protected void validateUsers(Map<String, Object> searchResponse) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
+
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
+        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
+        assertThat(professionalUsersResponse.get("email")).isNotNull();
+        assertThat(professionalUsersResponse.get("status")).isNotNull();
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 }

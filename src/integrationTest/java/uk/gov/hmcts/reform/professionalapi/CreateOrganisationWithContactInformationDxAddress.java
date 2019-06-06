@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -47,7 +46,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
+                .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
 
@@ -191,8 +190,8 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(UUID.fromString(orgIdentifierResponse));
-        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
         assertThat(persistedOrganisation.getContactInformation().get(0).getDxAddresses().size()).isEqualTo(0);
     }
@@ -231,12 +230,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_first_name_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName(null)
                            .lastName("some-lname")
@@ -257,12 +256,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_LastName_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName(null)
@@ -283,12 +282,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_user_email_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")
@@ -309,12 +308,12 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
 
     @Test
     public void returns_bad_request_when_contact_information_null() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                                    .pbaNumber("pbaNumber-1")
-                                    .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")

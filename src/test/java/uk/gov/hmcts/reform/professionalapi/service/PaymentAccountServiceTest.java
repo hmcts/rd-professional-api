@@ -1,105 +1,85 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import org.powermock.api.mockito.PowerMockito;
-import org.springframework.dao.EmptyResultDataAccessException;
-
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 
 public class PaymentAccountServiceTest {
 
-    private final ProfessionalUserRepository professionalUserRepository = mock(ProfessionalUserRepository.class);
-    private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
+    private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
 
-    private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
-    private final Organisation organisation = mock(Organisation.class);
+    private final PaymentAccountService sut = new PaymentAccountServiceImpl(professionalUserRepositoryMock);
 
-    private PaymentAccountServiceImpl paymentAccountService;
+    private Organisation organisationMock;
 
     @Before
     public void setUp() {
-        paymentAccountService = new PaymentAccountServiceImpl(
-                organisationRepository,
-                professionalUserRepository);
-
-        when(organisationRepository.save(any(Organisation.class)))
-                .thenReturn(organisation);
-
-        when(professionalUserRepository.findByEmailAddress(any(String.class)))
-                .thenReturn(professionalUser);
-
-        when(organisationRepository.findByUsers(any(ProfessionalUser.class)))
-                .thenReturn(organisation);
+        organisationMock = mock(Organisation.class);
     }
 
     @Test
-    public void retrievePaymentAccountsByEmail() {
-        Organisation theOrganisation = new Organisation("some-org-", OrganisationStatus.PENDING, "sra-id", "company-number", false, "company-url");
+    public void retrievePaymentAccountsByPbaEmail() {
 
-        ProfessionalUser theSuperUser = new ProfessionalUser("some-fname", "some-lname", "some-email", ProfessionalUserStatus.PENDING, theOrganisation);
-        theOrganisation.addProfessionalUser(theSuperUser);
+        final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
 
-        ContactInformation theContactInfo = new ContactInformation("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", theOrganisation);
-        theOrganisation.addContactInformation(theContactInfo);
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
 
-        PaymentAccount thePaymentAcc = new PaymentAccount("pbaNumber-1");
-        theOrganisation.addPaymentAccount(thePaymentAcc);
+        final UUID paymentAccountUuid = UUID.randomUUID();
 
-        organisationRepository.save(theOrganisation);
+        UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
 
-        when(paymentAccountService.findPaymentAccountsByEmail("some-email")).thenReturn(theOrganisation);
+        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
 
-        Organisation anOrganisation = paymentAccountService.findPaymentAccountsByEmail("some-email");
-        assertThat(anOrganisation).isNotNull();
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 
-        assertEquals(anOrganisation.getName(), theOrganisation.getName());
-        assertEquals(anOrganisation.getSraId(), theOrganisation.getSraId());
-        assertEquals(anOrganisation.getStatus(), theOrganisation.getStatus());
-        assertEquals(anOrganisation.getCompanyNumber(), theOrganisation.getCompanyNumber());
-        assertEquals(anOrganisation.getSraRegulated(), theOrganisation.getSraRegulated());
-        assertEquals(anOrganisation.getCompanyUrl(), theOrganisation.getCompanyUrl());
-        assertEquals(anOrganisation.getUsers(), (theOrganisation.getUsers()));
-        assertEquals(anOrganisation.getPaymentAccounts(), theOrganisation.getPaymentAccounts());
-    }
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieveUserByEmailNotFound() {
-        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
-                .thenReturn(null);
+        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMaps);
 
-        paymentAccountService.findPaymentAccountsByEmail("some-email");
+        when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
 
-    }
+        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void throwsExceptionWhenUserIsNull() {
+        when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
+                .thenReturn(professionalUserMock);
 
-        paymentAccountService.findPaymentAccountsByEmail(null);
+        Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
+
+        assertThat(organisation).isNotNull();
+
+        verify(
+                organisationMock,
+                times(1)).setPaymentAccounts(any());
 
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test(expected = Exception.class)
     public void retrievePaymentAccountsWithInvalidEmail() {
-        when(paymentAccountService.findPaymentAccountsByEmail("some-email"))
-                .thenReturn(null);
-
-        paymentAccountService.findPaymentAccountsByEmail(null);
+        when(sut.findPaymentAccountsByEmail("some-email"))
+                .thenReturn(organisationMock);
     }
 }

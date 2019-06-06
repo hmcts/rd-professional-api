@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
-import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -32,7 +31,6 @@ import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Slf4j
@@ -75,12 +73,8 @@ public class ProfessionalApiClient {
     }
 
     private  OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
-        List<PbaAccountCreationRequest> pbaAccounts = asList(aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build(),
-            aPbaPaymentAccount()
-                .pbaNumber(randomAlphabetic(10))
-                .build());
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(randomAlphabetic(8));
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
@@ -89,7 +83,7 @@ public class ProfessionalApiClient {
             .sraRegulated(Boolean.FALSE)
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
-            .pbaAccounts(pbaAccounts)
+            .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")
@@ -214,9 +208,7 @@ public class ProfessionalApiClient {
                 .get("v1/organisations/pbas?email=" + email)
                 .andReturn();
 
-        if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.asString());
-        }
+        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -224,6 +216,22 @@ public class ProfessionalApiClient {
 
         return response.body().as(Map.class);
     }
+
+    @SuppressWarnings("unchecked")
+    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email) {
+
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("v1/organisations/pbas?email=" + email)
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(NOT_FOUND.value());
+    }
+
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String showDeleted, HttpStatus status) {
@@ -282,6 +290,22 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrieveLegacyPbaNumbersByUserEmail(String email) {
+        Response response = withAuthenticatedRequest()
+                .body("")
+                .get("/search/pba/" + email)
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
     }
 
     private RequestSpecification withUnauthenticatedRequest() {

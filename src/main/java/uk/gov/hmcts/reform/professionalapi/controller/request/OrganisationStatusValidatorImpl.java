@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -11,7 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationStatusValidatorImpl implements UpdateOrganisationValidator {
 
     @Override
-    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, UUID inputOrganisationIdentifier) {
+    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
         log.info("Into Organisation status validator...");
 
         validateOrganisationStatus(inputStatus, existingOrganisation.getStatus(), inputOrganisationIdentifier);
@@ -19,7 +18,7 @@ public class OrganisationStatusValidatorImpl implements UpdateOrganisationValida
         log.info("Validation completed for Update Organisation...");
     }
 
-    private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus, OrganisationStatus existingStatus, UUID inputOrganisationIdentifier) {
+    private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus, OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
         if (existingStatus == OrganisationStatus.DELETED) {
             String errorMessage = "Cannot amend status since existing organisation status is DELETED for organisationIdentifier: " + inputOrganisationIdentifier;
             log.error(errorMessage);

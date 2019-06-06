@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest.aPbaPaymentAccount;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +23,12 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
         String prefix = UUID.randomUUID().toString();
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123");
+
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
-                .pbaAccounts(asList(aPbaPaymentAccount()
-                        .pbaNumber("pbaNumber-1")
-                        .build()))
+                .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
@@ -46,7 +46,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
 
         assertThat(response.get("http_status")).asString().contains("201");
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier().toString())
+        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier())
                 .isEqualTo(orgIdentifierResponse);
     }
 
