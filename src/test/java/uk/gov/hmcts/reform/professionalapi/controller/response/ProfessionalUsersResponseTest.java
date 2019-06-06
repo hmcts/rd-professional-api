@@ -1,29 +1,29 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import java.util.UUID;
+import static org.junit.Assert.assertEquals;
+
+import java.lang.reflect.Field;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 
 public class ProfessionalUsersResponseTest {
 
 
     @Test
-    public void professionalUsersTest() {
+    public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
 
+        String expectEmailAddress = "dummy@email.com";
         ProfessionalUser user = new ProfessionalUser();
-        user.setEmailAddress("rotimi@gmail.com");
-        user.setFirstName("Test");
-        user.setLastName("best");
-        user.setUserIdentifier(UUID.randomUUID());
-        user.setStatus(ProfessionalUserStatus.ACTIVE);
-        ProfessionalUsersResponse professionalUsersResponse  = new ProfessionalUsersResponse(user);
-        // TODO
-        // assertThat(professionalUsersResponse.getEmail()).isEqualTo(user.getEmailAddress());
-        // assertThat(professionalUsersResponse.getLastName()).isEqualTo(user.getLastName());
-        // assertThat(professionalUsersResponse.getFirstName()).isEqualTo(user.getFirstName());
-        // assertThat(professionalUsersResponse.getUserIdentifier()).isEqualTo(user.getUserIdentifier());
-        // assertThat(professionalUsersResponse.getStatus()).isEqualTo(user.getStatus());
+        user.setEmailAddress(expectEmailAddress);
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
+
+        String email = "";
+
+        Field f = professionalUsersResponse.getClass().getDeclaredField("email");
+        f.setAccessible(true);
+        email = (String) f.get(professionalUsersResponse);
+
+        assertEquals(email, expectEmailAddress);
     }
 }

@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 public class OrganisationEntityResponse  {
 
-    private PbaAccountResponse pbaAccountResponse;
-
     @JsonProperty
     private String organisationIdentifier;
     @JsonProperty
@@ -48,7 +46,7 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        if (organisation.getUsers().size() > 0) {
+        if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
         this.paymentAccount = organisation.getPaymentAccounts()
