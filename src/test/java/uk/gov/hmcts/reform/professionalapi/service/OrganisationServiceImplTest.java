@@ -334,7 +334,7 @@ public class OrganisationServiceImplTest {
 
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
-        String testOrganisationId = null;
+        String testOrganisationId = testOrganisation.getOrganisationIdentifier();
 
         OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock,
                 professionalUserRepositoryMock,

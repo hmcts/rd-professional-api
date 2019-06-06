@@ -4,12 +4,10 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-@NoArgsConstructor
 public class OrganisationEntityResponse  {
 
     private PbaAccountResponse pbaAccountResponse;
