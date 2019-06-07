@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import javax.xml.ws.http.HTTPException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.ws.http.HTTPException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public abstract class SuperController {
     @Autowired
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
-    protected ResponseEntity<?>  getCreateOrganisation(OrganisationCreationRequest organisationCreationRequest){
+    protected ResponseEntity<?>  getCreateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
@@ -64,7 +64,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> getRetrieveOrganisation(String id){
+    protected ResponseEntity<?> getRetrieveOrganisation(String id) {
 
         Object organisationResponse;
         if (id == null) {
@@ -85,7 +85,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> getfindUserByEmail(String email){
+    protected ResponseEntity<?> getFindUserByEmail(String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
@@ -97,7 +97,7 @@ public abstract class SuperController {
                 .body(new ProfessionalUsersResponse(user));
     }
 
-    protected ResponseEntity<?> getRetrievePaymentAccountBySuperUserEmail(String email){
+    protected ResponseEntity<?> getRetrievePaymentAccountBySuperUserEmail(String email) {
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
@@ -109,7 +109,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity<?> getUpdateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier){
+    protected ResponseEntity<?> getUpdateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
@@ -122,7 +122,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationDetailsByStatus(String status){
+    protected ResponseEntity<?> retrieveAllOrganisationDetailsByStatus(String status) {
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
@@ -137,7 +137,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    protected ResponseEntity<?> getAddUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier){
+    protected ResponseEntity<?> getAddUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
@@ -156,7 +156,7 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> getProfessionalUsersEntityResponseOrganisationValid(String organisationIdentifier, String showDeleted){
+    protected ResponseEntity<ProfessionalUsersEntityResponse> getProfessionalUsersEntityResponseOrganisationValid(String organisationIdentifier, String showDeleted) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);

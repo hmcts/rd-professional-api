@@ -32,6 +32,7 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
         validateUsers(response);
     }
 
+
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();

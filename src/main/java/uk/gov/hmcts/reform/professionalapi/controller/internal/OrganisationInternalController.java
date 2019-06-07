@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,9 +42,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 @RestController
 @Slf4j
 @NoArgsConstructor
+//@EnableGlobalMethodSecurity(securedEnabled = true)
 public class OrganisationInternalController extends SuperController {
 
-    // @Secured("SuperUser")
+   // @Secured("SuperUser")
     @ApiOperation(
             value = "Creates an Internal Organisation",
             authorizations = {
@@ -125,7 +128,7 @@ public class OrganisationInternalController extends SuperController {
     )
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
-        return getfindUserByEmail(email);
+        return getFindUserByEmail(email);
     }
 
     @ApiOperation(

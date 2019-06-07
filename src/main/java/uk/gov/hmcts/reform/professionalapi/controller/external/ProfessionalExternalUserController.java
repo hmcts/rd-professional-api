@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.resolver.OrgId;
 
 
 @RequestMapping(
@@ -27,9 +28,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 )
 @RestController
 @Slf4j
-public class ProfessionalUserController  extends SuperController {
+public class ProfessionalExternalUserController extends SuperController {
 
-   @ApiOperation(
+    @ApiOperation(
             value = "Retrieves the external users with the given organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
@@ -63,7 +64,7 @@ public class ProfessionalUserController  extends SuperController {
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
-        log.info("Received request to get users for organisationIdentifier: By External user:ProfessionalUserInternalController" + organisationIdentifier);
+        log.info("ProfessionalUserInternalController:: get users for organisationIdentifier By External user:" + organisationIdentifier);
 
         return getProfessionalUsersEntityResponseOrganisationValid(organisationIdentifier, showDeleted);
     }
