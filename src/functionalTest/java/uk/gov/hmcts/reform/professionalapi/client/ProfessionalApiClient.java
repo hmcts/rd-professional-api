@@ -111,7 +111,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
         Response response = withAuthenticatedRequest()
                 .body(organisationCreationRequest)
-                .post("v1/organisations")
+                .post("/refdata/external/v1/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -144,7 +144,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest) {
         Response response = withAuthenticatedRequest()
                 .body(newUserCreationRequest)
-                .post("/v1/organisations/" + orgId + "/users/")
+                .post("/refdata/external/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -157,7 +157,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchForUserByEmailAddress(String email) {
         Response response = withAuthenticatedRequest()
                 .param("email", email)
-                .get("/v1/organisations/users/")
+                .get("/refdata/external/v1/organisations/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -170,7 +170,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveOrganisationDetails(String id) {
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations?id=" + id)
+                .get("refdata/external/v1/organisations?id=" + id)
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -189,7 +189,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveAllOrganisations() {
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations")
+                .get("refdata/external/v1/organisations")
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -205,7 +205,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations/pbas?email=" + email)
+                .get("refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -222,7 +222,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations/pbas?email=" + email)
+                .get("refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -236,7 +236,7 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String showDeleted, HttpStatus status) {
         Response response = withAuthenticatedRequest()
-                .get("/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+                .get("/refdata/external/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
                     .assertThat()
@@ -254,7 +254,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
             .body(organisationCreationRequest)
-            .put("v1/organisations/" + organisationIdentifier)
+            .put("refdata/external/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
@@ -268,7 +268,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations?status=" + status)
+                .get("refdata/external/v1/organisations?status=" + status)
                 .andReturn();
         log.debug("Retrieve organisation response by status: " + response.getStatusCode());
         response.then()
@@ -282,7 +282,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations?status=" + status)
+                .get("refdata/external/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
@@ -318,7 +318,8 @@ public class ProfessionalApiClient {
 
     private RequestSpecification withAuthenticatedRequest() {
         return withUnauthenticatedRequest()
-                .header(SERVICE_HEADER, "Bearer " + s2sToken);
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ");
     }
 
     @SuppressWarnings("unused")
