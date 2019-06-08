@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,13 +38,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
-//@EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
 
 
-    //@Secured("SuperUser")
+    @Secured("SuperUser")
     @ApiOperation(
             value = "Creates an External Organisation",
             authorizations = {
@@ -71,7 +69,7 @@ public class OrganisationExternalController extends SuperController {
         return getCreateOrganisation(organisationCreationRequest);
     }
 
-    //@Secured("OrgAdmin")
+    @Secured("OrgAdmin")
     @ApiOperation(
             value = "Retrieves organisation details for external users",
             authorizations = {

@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 
-
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
@@ -42,10 +40,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 @RestController
 @Slf4j
 @NoArgsConstructor
-//@EnableGlobalMethodSecurity(securedEnabled = true)
 public class OrganisationInternalController extends SuperController {
 
-   // @Secured("SuperUser")
+    @Secured("SuperUser")
     @ApiOperation(
             value = "Creates an Internal Organisation",
             authorizations = {
@@ -71,7 +68,7 @@ public class OrganisationInternalController extends SuperController {
         return getCreateOrganisation(organisationCreationRequest);
     }
 
-    //@Secured("OrgAdmin")
+    @Secured("OrgAdmin")
     @ApiOperation(
             value = "Retrieves organisation details for internal users",
             authorizations = {

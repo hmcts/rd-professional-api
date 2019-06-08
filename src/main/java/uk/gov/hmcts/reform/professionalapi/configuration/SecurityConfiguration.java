@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerService
 @Configuration
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 

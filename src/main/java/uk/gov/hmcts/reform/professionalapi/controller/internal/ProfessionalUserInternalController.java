@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
+import javax.validation.constraints.NotBlank;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import javax.validation.constraints.NotBlank;
-
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",

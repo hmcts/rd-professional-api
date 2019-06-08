@@ -18,6 +18,7 @@ public class HeaderVersionArgumentResolver implements HandlerMethodArgumentResol
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
+
         return methodParameter.getParameterAnnotation(OrgId.class) != null;
     }
 
@@ -30,16 +31,18 @@ public class HeaderVersionArgumentResolver implements HandlerMethodArgumentResol
 
         HttpServletRequest request
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
-
+        String userId = null;
         log.info("Inside HeaderVersionArgumentResolver");
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        String orgId = serviceAndUserDetails.getUsername();
-        log.info("Inside HeaderVersionArgumentResolver::orgId::" + orgId);
-        Object roles[] =  serviceAndUserDetails.getAuthorities().toArray();
+        if (null != serviceAndUserDetails) {
+            userId = serviceAndUserDetails.getUsername();
+            log.info("Inside HeaderVersionArgumentResolver::orgId::" + userId);
+            Object[] roles  =  serviceAndUserDetails.getAuthorities().toArray();
+            String serviceName = serviceAndUserDetails.getServicename();
+        }
 
-        String serviceName = serviceAndUserDetails.getServicename();
-        return orgId;
+        return userId;
     }
 }
