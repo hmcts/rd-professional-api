@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,6 +28,42 @@ public class ExceptionMapperTest {
                 exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_illegal_argument_exception() {
+
+        IllegalArgumentException exception = mock(IllegalArgumentException.class);
+
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.handleIllegalArgumentException(exception);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_http_message_not_readable_exception() {
+
+        HttpMessageNotReadableException exception = mock(HttpMessageNotReadableException.class);
+
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.httpMessageNotReadableExceptionError(exception);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_http_media_type_not_supported_exception() {
+
+        HttpMessageNotReadableException exception = mock(HttpMessageNotReadableException.class);
+
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.httpMessageNotReadableExceptionError(exception);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
     }
 
