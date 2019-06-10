@@ -16,6 +16,7 @@ import javax.xml.ws.http.HTTPException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.FeinClient.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -48,7 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-
 
 @RequestMapping(
         path = "v1/organisations",
@@ -66,6 +62,9 @@ public class OrganisationController {
 
     private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
+
+    @Autowired
+    private UserProfileFeignClient userProfileFeignClient;
 
     @ApiOperation(
             value = "Creates an organisation",
@@ -237,10 +236,22 @@ public class OrganisationController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
+        createUserProfileFor(organisationCreationRequest,existingOrganisation);
         OrganisationResponse organisationResponse =
                 organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
         log.info("Received response to update organisation..." + organisationResponse);
+        createUserProfileFor(organisationCreationRequest,existingOrganisation);
         return ResponseEntity.status(200).build();
+    }
+
+    private void createUserProfileFor(OrganisationCreationRequest organisationCreationRequest, Organisation existingOrganisation){
+
+        ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
+        UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(professionalUser.getEmailAddress(),professionalUser.getFirstName(),professionalUser.getLastName(), "EN", true, true, "PROFESSIONAL" ,"EXTERNAL", "pui-user-manager");
+        UserProfileCreateResponse userProfileCreateResponse = userProfileFeignClient.createUserProfile(userCreationRequest);
+
+        log.info("UserProfile Response success:: IDAM_ID:" + userProfileCreateResponse.getId() + " IDAM_STATUS_CODE:" + userProfileCreateResponse.getIdamStatusCode() );
+
     }
 
     @ApiOperation(
