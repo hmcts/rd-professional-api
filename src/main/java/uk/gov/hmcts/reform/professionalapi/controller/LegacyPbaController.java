@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +41,7 @@ public class LegacyPbaController {
     private ProfessionalUserServiceImpl professionalUserService;
 
     @ApiOperation(
-            value = "Retrieve pba numbers by user email address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
-            }
+            value = "Retrieve pba numbers by user email address"
     )
     @ApiResponses({
             @ApiResponse(
