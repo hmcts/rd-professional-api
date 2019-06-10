@@ -1,17 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
-import java.sql.Time;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ErrorResponseTest {
 
     @Test
-    public void errorResponseTest(){
+    public void errorResponseTest() {
         ErrorResponse errorDetails = ErrorResponse.builder()
                 .errorDescription("desc")
                 .errorMessage("msg")
