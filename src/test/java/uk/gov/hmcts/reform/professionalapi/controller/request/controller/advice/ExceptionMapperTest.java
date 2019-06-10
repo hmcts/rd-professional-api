@@ -24,7 +24,7 @@ public class ExceptionMapperTest {
         EmptyResultDataAccessException emptyResultDataAccessException = mock(EmptyResultDataAccessException.class);
 
         ResponseEntity<Object> responseEntity =
-            exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
+                exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 

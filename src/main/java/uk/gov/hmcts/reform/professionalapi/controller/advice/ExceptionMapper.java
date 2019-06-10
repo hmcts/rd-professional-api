@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -54,7 +53,6 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(InvalidRequest.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> customValidationError(
             InvalidRequest ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
@@ -120,7 +118,7 @@ public class ExceptionMapper {
         return rootException;
     }
 
-    private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg){
+    private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         ErrorResponse errorDetails = ErrorResponse.builder()
