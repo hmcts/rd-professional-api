@@ -93,13 +93,13 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void error_if_organisation_id_invalid() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!");
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("500");
     }
 
     @Test
     public void error_if_organisation_id_not_found() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116");
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
 

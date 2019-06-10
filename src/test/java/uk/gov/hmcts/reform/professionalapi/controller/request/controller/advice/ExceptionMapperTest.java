@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
@@ -20,6 +21,12 @@ public class ExceptionMapperTest {
     @Mock
     private HttpServletRequest httpServletRequest;
 
+    @Mock
+    private HttpHeaders httpHeaders;
+
+    @Mock
+    private HttpStatus httpStatus;
+
     @InjectMocks
     private ExceptionMapper exceptionMapper;
 
@@ -28,10 +35,10 @@ public class ExceptionMapperTest {
 
         EmptyResultDataAccessException emptyResultDataAccessException = mock(EmptyResultDataAccessException.class);
 
-        ResponseEntity<String> responseEntity =
-            exceptionMapper.handleEmptyResultDataAccessException(httpServletRequest, emptyResultDataAccessException);
+        ResponseEntity<Object> responseEntity =
+            exceptionMapper.handleEmptyResultDataAccessException(httpServletRequest, emptyResultDataAccessException, httpHeaders, httpStatus);
 
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
     }
 
