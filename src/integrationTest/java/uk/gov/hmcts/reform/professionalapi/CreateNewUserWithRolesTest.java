@@ -46,7 +46,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
     }
 
     @Test
-    public void returns_500_when_organisation_identifier_not_found() {
+    public void returns_404_when_organisation_identifier_not_found() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -62,9 +62,9 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("500");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
 

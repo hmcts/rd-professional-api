@@ -156,7 +156,7 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
 
-        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("500");
+        assertThat(createOrganisationResponse.get("http_status")).isEqualTo("400");
 
         assertThat(paymentAccountRepository.findAll()).isEmpty();
 

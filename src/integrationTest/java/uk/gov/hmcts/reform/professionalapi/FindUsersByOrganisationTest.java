@@ -52,14 +52,14 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
     @Test
     public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_400() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False");
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
 
     }
 
     @Test
     public void retrieve_users_with_non_existing_organisationIdentifier_should_return_status_404() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("A1B2C3D","False");
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     private void validateUsers(Map<String, Object> response) {

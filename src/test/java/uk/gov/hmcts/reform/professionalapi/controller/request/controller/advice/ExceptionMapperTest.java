@@ -3,29 +3,17 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.controller.advice
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionMapperTest {
-
-    @Mock
-    private HttpServletRequest httpServletRequest;
-
-    @Mock
-    private HttpHeaders httpHeaders;
-
-    @Mock
-    private HttpStatus httpStatus;
 
     @InjectMocks
     private ExceptionMapper exceptionMapper;
@@ -36,9 +24,9 @@ public class ExceptionMapperTest {
         EmptyResultDataAccessException emptyResultDataAccessException = mock(EmptyResultDataAccessException.class);
 
         ResponseEntity<Object> responseEntity =
-            exceptionMapper.handleEmptyResultDataAccessException(httpServletRequest, emptyResultDataAccessException, httpHeaders, httpStatus);
+            exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
     }
 
@@ -47,7 +35,7 @@ public class ExceptionMapperTest {
 
         Exception exception = mock(Exception.class);
 
-        ResponseEntity<String> responseEntity = exceptionMapper.handleException(httpServletRequest, exception);
+        ResponseEntity<String> responseEntity = exceptionMapper.handleException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 

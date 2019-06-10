@@ -40,6 +40,6 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
 
     @Test
     public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", "False", HttpStatus.INTERNAL_SERVER_ERROR);
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", "False", HttpStatus.NOT_FOUND);
     }
 }

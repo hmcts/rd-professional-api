@@ -119,7 +119,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response2.get("http_status")).isEqualTo("500");
+        assertThat(response2.get("http_status")).isEqualTo("400");
     }
 
     @Test
@@ -164,7 +164,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response2.get("http_status")).isEqualTo("500");
+        assertThat(response2.get("http_status")).isEqualTo("400");
     }
 
     @Test
@@ -220,7 +220,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
@@ -248,7 +248,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
@@ -274,7 +274,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
@@ -300,7 +300,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
@@ -326,7 +326,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Service2S
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);

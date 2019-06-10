@@ -22,17 +22,17 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
-        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,500);
+        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,404);
     }
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-        updateAndValidateOrganisation(null,OrganisationStatus.ACTIVE,500);
+        updateAndValidateOrganisation(null,OrganisationStatus.ACTIVE,400);
     }
 
     @Test
     public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-        updateAndValidateOrganisation("1234ab12",OrganisationStatus.ACTIVE,500);
+        updateAndValidateOrganisation("1234ab12",OrganisationStatus.ACTIVE,400);
     }
 
     @Test
@@ -83,35 +83,35 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
     public void can_not_update_organisation_status_from_deleted_to_active_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
-        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,500);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_pending_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
-        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,500);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_blocked_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
-        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,500);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.BLOCKED,400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_deleted_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,200);
-        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,500);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.DELETED,400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_active_to_pending_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
         updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.ACTIVE,200);
-        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,500);
+        updateAndValidateOrganisation(organisationIdentifier,OrganisationStatus.PENDING,400);
     }
 
     @Test

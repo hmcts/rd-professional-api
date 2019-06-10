@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ILLEGAL_ARGUMENT;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.METHOD_ARG_NOT_VALID;
@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.http.HTTPException;
 
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -43,144 +41,69 @@ public class ExceptionMapper {
     private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
-    public ResponseEntity<Object> handleEmptyResultDataAccessException(HttpServletRequest request,
-                                                                       EmptyResultDataAccessException e, HttpHeaders headers, HttpStatus status) {
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, e.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(e).getLocalizedMessage())
-                .errorMessage(EMPTY_RESULT_DATA_ACCESS)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
-
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+    public ResponseEntity<Object> handleEmptyResultDataAccessException(
+            EmptyResultDataAccessException ex) {
+        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> annotationDrivenValidationError(HttpServletRequest request,
-                                                                  MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status) {
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, e.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(e).getLocalizedMessage())
-                .errorMessage(METHOD_ARG_NOT_VALID)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
 
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+    public ResponseEntity<Object> annotationDrivenValidationError(
+            MethodArgumentNotValidException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID);
     }
 
-
     @ExceptionHandler(InvalidRequest.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> customValidationError(HttpServletRequest request,
-                                                        InvalidRequest ex, HttpHeaders headers, HttpStatus status) {
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(INVALID_REQUEST)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
-
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> customValidationError(
+            InvalidRequest ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> dataIntegrityViolationError(HttpServletRequest request,
-                                                              DataIntegrityViolationException ex, HttpHeaders headers, HttpStatus status) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(DATA_INTEGRITY_VIOLATION)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
+    public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
 
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION);
+
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> handleIllegalArgumentException(HttpServletRequest request,
-                                                                 IllegalArgumentException ex, HttpHeaders headers, HttpStatus status) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(ILLEGAL_ARGUMENT)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
 
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
     }
 
     @ExceptionHandler(HTTPException.class)
-    public ResponseEntity<Object> handleHttpException(HttpServletRequest request, HTTPException ex) {
-        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        return new ResponseEntity<>(HttpStatus.resolve(ex.getStatusCode()));
+    public ResponseEntity<Object> handleHttpException(HTTPException ex) {
+        HttpStatus httpStatus = HttpStatus.resolve(ex.getStatusCode());
+        return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
 
     @ExceptionHandler(HttpStatusCodeException.class)
-    public ResponseEntity<Object> handleHttpStatusException(HttpServletRequest request, HttpStatusCodeException ex) {
-        LOG.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(EMPTY_RESULT_DATA_ACCESS)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
-
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+    public ResponseEntity<Object> handleHttpStatusException(HttpStatusCodeException ex) {
+        HttpStatus httpStatus = ex.getStatusCode();
+        return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpServletRequest request,
-                                                                       HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(MALFORMED_JSON)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
+    public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
 
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON);
+
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpServletRequest request,
-                                                                 IllegalArgumentException ex, HttpHeaders headers, HttpStatus status) {
+    public ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+            IllegalArgumentException ex) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .errorMessage(UNSUPPORTED_MEDIA_TYPES)
-                .status(BAD_REQUEST).errorCode(BAD_REQUEST.value())
-                .timeStamp(getTimeStamp())
-                .build();
-
-        return new ResponseEntity<>(
-                errorDetails, new HttpHeaders(), BAD_REQUEST);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, UNSUPPORTED_MEDIA_TYPES);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(
-            HttpServletRequest request,
-            Exception e) {
+    public ResponseEntity<String> handleException(Exception e) {
         LOG.info("Exception: {}", e);
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -195,5 +118,19 @@ public class ExceptionMapper {
             rootException = rootException.getCause();
         }
         return rootException;
+    }
+
+    private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg){
+
+        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        ErrorResponse errorDetails = ErrorResponse.builder()
+                .errorDescription(getRootException(ex).getLocalizedMessage())
+                .errorMessage(errorMsg)
+                .status(httpStatus).errorCode(httpStatus.value())
+                .timeStamp(getTimeStamp())
+                .build();
+
+        return new ResponseEntity<>(
+                errorDetails, httpStatus);
     }
 }

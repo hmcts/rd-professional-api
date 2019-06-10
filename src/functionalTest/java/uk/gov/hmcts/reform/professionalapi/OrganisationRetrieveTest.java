@@ -59,7 +59,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     }
 
     @Test
-    public void can_retrieve_500_error_code_by_request_param_status_value_other_than_required_values() {
+    public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
 
         professionalApiClient
                 .retrieveOrganisationDetailsByUnknownStatus("ACTIV");
