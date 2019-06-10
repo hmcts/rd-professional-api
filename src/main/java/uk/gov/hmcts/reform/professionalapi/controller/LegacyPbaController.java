@@ -42,10 +42,7 @@ public class LegacyPbaController {
     private ProfessionalUserServiceImpl professionalUserService;
 
     @ApiOperation(
-            value = "Retrieve pba numbers by user email address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
-            }
+            value = "Retrieve pba numbers by user email address"
     )
     @ApiResponses({
             @ApiResponse(
