@@ -78,7 +78,7 @@ public class PaymentAccountServiceTest {
     }
 
     @Test(expected = Exception.class)
-    public void retrievePaymentAccountsWithInvalidEmail() {
+    public void testThrowsExceptionWhenEmailInvalid() {
         when(sut.findPaymentAccountsByEmail("some-email"))
                 .thenReturn(organisationMock);
     }

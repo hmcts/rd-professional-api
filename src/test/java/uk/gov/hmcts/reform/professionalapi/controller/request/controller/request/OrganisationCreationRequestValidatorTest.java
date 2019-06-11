@@ -27,7 +27,7 @@ public class OrganisationCreationRequestValidatorTest {
     OrganisationCreationRequest request;
 
     @Test
-    public void calls_all_validators() {
+    public void testCallsAllValidators() {
 
         OrganisationCreationRequestValidator organisationCreationRequestValidator =
                 new OrganisationCreationRequestValidator(asList(validator1, validator2));

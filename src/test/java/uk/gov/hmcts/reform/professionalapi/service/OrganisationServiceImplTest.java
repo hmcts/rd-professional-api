@@ -185,7 +185,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void saves_an_organisation() {
+    public void testSavesAnOrganisation() {
 
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
@@ -227,7 +227,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void saves_organisation_with_constraint_violation_exception() {
+    public void testSavesOrganisationWithConstraintViolationException() {
 
         when(organisationRepositoryMock.save(any(Organisation.class)))
                 .thenThrow(ConstraintViolationException.class);
@@ -248,7 +248,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieve_an_organisations() {
+    public void testRetrieveOrganisations() {
 
         ArrayList<ProfessionalUser> users = new ArrayList<>();
         ArrayList<Organisation> organisations = new ArrayList<>();
@@ -276,7 +276,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void updates_an_organisation() {
+    public void testUpdatesAnOrganisation() {
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.updateOrganisation(organisationCreationRequest, organisationIdentifier);
 
@@ -315,7 +315,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieve_an_organisations_by_status() {
+    public void testRetrieveAnOrganisationsByStatus() {
 
         OrganisationsDetailResponse organisationDetailResponse =
                 organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.ACTIVE);
@@ -347,7 +347,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieve_an_organisations_by_organisationIdentifier() {
+    public void testRetrieveAnOrganisationsByOrganisationIdentifier() {
 
         ArrayList<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUserMock);
@@ -370,7 +370,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = HttpClientErrorException.class)
-    public void retrieveAnOrganisationByUuidNotFound() {
+    public void testThrowsExceptionWhenUuidNotFound() {
 
         Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class)))
                 .thenReturn(null);

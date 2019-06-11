@@ -15,7 +15,7 @@ public class OrganisationIdentifierValidatorImplTest {
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl();
 
     @Test
-    public void validateTest() {
+    public void testValidate() {
         Organisation dummyOrganisation = new Organisation(
                 "dummyName",
                 OrganisationStatus.ACTIVE,

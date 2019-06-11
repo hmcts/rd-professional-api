@@ -19,7 +19,7 @@ public class PrdEnumServiceTest {
 
 
     @Test
-    public void retrieves_prd_enums_correctly() {
+    public void testRetrievesPrdEnumsCorrectly() {
 
         List<PrdEnum> prdEnums = prdEnumService.findAllPrdEnums();
 

@@ -19,7 +19,7 @@ public class NewUserCreationRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void testHasMandatoryFieldsSpecified() {
         NewUserCreationRequest newUserCreationRequest =
                 new NewUserCreationRequest(null, null, null, null, null);
 
@@ -29,7 +29,7 @@ public class NewUserCreationRequestTest {
     }
 
     @Test
-    public void creates_new_user_creation_request_correctly() {
+    public void testCreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -44,7 +44,7 @@ public class NewUserCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_new_user_creation_request_when_email_is_not_valid() {
+    public void testDoesNotCreateNewUserWhenEmailIsInvalid() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
