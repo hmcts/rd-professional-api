@@ -20,4 +20,6 @@ public interface ErrorConstants {
     static String DATA_INTEGRITY_VIOLATION = "attempt to insert or update data resulted in violation of an integrity constraint";
 
     static String ILLEGAL_ARGUMENT = "method has been passed an illegal or inappropriate argument";
+
+    static String UNKNOWN_EXCEPTION = " error was caused by an unknown exception";
 }
