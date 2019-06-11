@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -87,7 +88,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         } else {
             log.info("Excluding DELETED users for search");
             professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+            if(professionalUsers.isEmpty()) {
+                throw new EmptyResultDataAccessException(404){
+                };
+            }
         }
+
+
         return professionalUsers;
     }
 }
