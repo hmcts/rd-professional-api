@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
+import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
+import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
+import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 
 import javax.validation.constraints.NotNull;
 
@@ -17,27 +20,27 @@ public class UserProfileCreationRequest  {
 
     @NotNull
     private String lastName;
-    private String languagePreference;
+    private LanguagePreference languagePreference;
 
     private boolean emailCommsConsent;
     private boolean postalCommsConsent;
 
     @NotNull
-    private String userCategory;
+    private UserCategory userCategory;
 
     @NotNull
-    private String userType;
+    private UserType userType;
     private String idamRoles;
 
     @JsonCreator
     public UserProfileCreationRequest(@JsonProperty(value = "email") String email,
                                  @JsonProperty(value = "firstName") String firstName,
                                  @JsonProperty(value = "lastName") String lastName,
-                                 @JsonProperty(value = "languagePreference") String languagePreference,
+                                 @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
                                  @JsonProperty(value = "emailCommsConsent") boolean emailCommsConsent,
                                  @JsonProperty(value = "postalCommsConsent") boolean postalCommsConsent,
-                                 @JsonProperty(value = "userCategory") String userCategory,
-                                 @JsonProperty(value = "userType") String userType,
+                                 @JsonProperty(value = "userCategory") UserCategory userCategory,
+                                 @JsonProperty(value = "userType") UserType userType,
                                  @JsonProperty(value = "idamRoles") String idamRoles) {
 
         if (email == null) {
@@ -75,7 +78,7 @@ public class UserProfileCreationRequest  {
         return lastName;
     }
 
-    public String getLanguagePreference() {
+    public LanguagePreference getLanguagePreference() {
         return languagePreference;
     }
 
@@ -87,15 +90,13 @@ public class UserProfileCreationRequest  {
         return postalCommsConsent;
     }
 
-    public String getUserCategory() {
+    public UserCategory getUserCategory() {
         return userCategory;
     }
 
-    public String getUserType() {
+    public UserType getUserType() {
         return userType;
     }
 
-    public String getIdamRoles() {
-        return idamRoles;
-    }
+    public String getIdamRoles() {  return idamRoles; }
 }
