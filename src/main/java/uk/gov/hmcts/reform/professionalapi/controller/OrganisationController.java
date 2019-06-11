@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.FeinClient.UserProfileFeignClient;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -251,7 +250,7 @@ public class OrganisationController {
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         if(existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()){
-            createUserProfileFor(organisationCreationRequest, existingOrganisation);
+            createUserProfileFor(existingOrganisation);
         }
 
         OrganisationResponse organisationResponse =
@@ -260,7 +259,7 @@ public class OrganisationController {
         return ResponseEntity.status(200).build();
     }
 
-    private void createUserProfileFor(OrganisationCreationRequest organisationCreationRequest, Organisation existingOrganisation){
+    private void createUserProfileFor(Organisation existingOrganisation){
         log.info("Creating user...");
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
         UserProfileCreationRequest userCreationRequest = anUserProfileCreationRequest()
