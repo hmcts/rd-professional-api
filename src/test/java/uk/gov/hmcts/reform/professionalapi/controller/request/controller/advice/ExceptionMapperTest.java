@@ -58,10 +58,10 @@ public class ExceptionMapperTest {
     @Test
     public void should_handle_http_media_type_not_supported_exception() {
 
-        HttpMessageNotReadableException exception = mock(HttpMessageNotReadableException.class);
+        IllegalArgumentException exception = mock(IllegalArgumentException.class);
 
         ResponseEntity<Object> responseEntity =
-                exceptionMapper.httpMessageNotReadableExceptionError(exception);
+                exceptionMapper.handleHttpMediaTypeNotSupported(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
