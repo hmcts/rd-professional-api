@@ -72,7 +72,7 @@ public class ExceptionMapperTest {
 
         Exception exception = mock(Exception.class);
 
-        ResponseEntity<String> responseEntity = exceptionMapper.handleException(exception);
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 
