@@ -4,15 +4,11 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-@NoArgsConstructor
 public class OrganisationEntityResponse  {
-
-    private PbaAccountResponse pbaAccountResponse;
 
     @JsonProperty
     private String organisationIdentifier;
@@ -50,7 +46,9 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
+        if (!organisation.getUsers().isEmpty()) {
+            this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
+        }
         this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())

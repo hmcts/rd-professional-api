@@ -27,5 +27,4 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }
-
 }
