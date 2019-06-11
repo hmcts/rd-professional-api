@@ -27,9 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.LegacyPbaAccountServiceI
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @RequestMapping(
-        path = "/search",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        path = "/search"
 )
 @RestController
 @Slf4j
