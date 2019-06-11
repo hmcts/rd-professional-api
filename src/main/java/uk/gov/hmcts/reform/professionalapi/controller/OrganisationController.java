@@ -317,6 +317,10 @@ public class OrganisationController {
         log.info("Received request to add a new user to an organisation..." + organisationIdentifier);
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
+
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
