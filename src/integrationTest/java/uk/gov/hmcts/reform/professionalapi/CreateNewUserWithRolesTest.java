@@ -62,9 +62,9 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
 

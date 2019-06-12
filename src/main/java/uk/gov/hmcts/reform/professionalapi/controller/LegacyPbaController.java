@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.LegacyPbaAccountServiceI
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @RequestMapping(
-        path = "/search",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        path = "/search"
 )
 @RestController
 @Slf4j
