@@ -10,9 +10,9 @@ public class ErrorConstantsTest {
     @Test
     public void check_constants() {
 
-        assertThat(ErrorConstants.MALFORMED_JSON.equals("Malformed Input Request"));
+        assertThat(ErrorConstants.MALFORMED_JSON.equals("1 : Malformed Input Request"));
 
-        assertThat(ErrorConstants.UNSUPPORTED_MEDIA_TYPES.equals("Unsupported Media Types"));
+        assertThat(ErrorConstants.UNSUPPORTED_MEDIA_TYPES.equals("2 : Unsupported Media Type"));
 
         assertThat(ErrorConstants.INVALID_REQUEST.equals("There is a problem with your request. Please check and try again"));
 
