@@ -41,7 +41,7 @@ public class PaymentAccountServiceTest {
     }
 
     @Test
-    public void retrievePaymentAccountsByPbaEmail() {
+    public void retrievePaymentAccountsByPbaEmailWhenConfigTrue() {
 
         final List<UserAccountMap> userAccountMaps = new ArrayList<>();
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -67,6 +67,43 @@ public class PaymentAccountServiceTest {
         when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
 
         List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
+
+        when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
+                .thenReturn(professionalUserMock);
+
+        Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
+
+        assertThat(organisation).isNotNull();
+
+        verify(
+                organisationMock,
+                times(1)).setPaymentAccounts(any());
+
+    }
+
+    @Test
+    public void retrievePaymentAccountsByPbaEmailWhenConfigFalse() {
+
+        final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+
+        final UUID paymentAccountUuid = UUID.randomUUID();
+
+        UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
+
+        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
+
+        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("false");
+
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+
+        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccount(paymentAccounts);
 
         when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
                 .thenReturn(professionalUserMock);
