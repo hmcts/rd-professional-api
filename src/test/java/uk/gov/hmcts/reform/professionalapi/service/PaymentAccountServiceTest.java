@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -27,9 +28,10 @@ import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 public class PaymentAccountServiceTest {
 
+    private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
 
-    private final PaymentAccountService sut = new PaymentAccountServiceImpl(professionalUserRepositoryMock);
+    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, professionalUserRepositoryMock);
 
     private Organisation organisationMock;
 
@@ -53,6 +55,8 @@ public class PaymentAccountServiceTest {
         UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
 
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
+
+        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("true");
 
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 

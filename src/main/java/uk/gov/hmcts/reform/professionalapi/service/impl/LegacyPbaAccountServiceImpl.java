@@ -7,18 +7,27 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
+import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
+//@ConfigurationProperties(prefix = "usermap")
 @Service
 @Slf4j
+//@Configuration
 public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
-
+    @Autowired
+    ApplicationConfiguration configuration ;
 
     public List<String> findLegacyPbaAccountByUserEmail(ProfessionalUser professionalUser) {
 
@@ -28,13 +37,39 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
 
-            List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
+           // log.info("PBA Value ::" + getPbaFromUserAccountMap());
+            log.info("PBA Value ::1::" + configuration.getPbaFromUserAccountMap());
 
-            pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation().getPaymentAccounts());
+            if("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())){
+
+                pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
+
+            } else if("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+
+                List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
+
+                pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation().getPaymentAccounts());
+
+            }
 
         }
 
         return pbaNumbers;
+    }
+
+    private  List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> paymentAccountsEntity) {
+
+        List<String> paymentAccountPbaNumbers = new ArrayList<>();
+
+        if (!paymentAccountsEntity.isEmpty()) {
+
+            paymentAccountsEntity.forEach(paymentAccount -> {
+
+                paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim());
+
+            });
+        }
+        return paymentAccountPbaNumbers;
     }
 
     private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
