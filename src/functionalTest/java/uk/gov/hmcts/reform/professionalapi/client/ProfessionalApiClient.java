@@ -229,7 +229,7 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(NOT_FOUND.value());
+                .statusCode(BAD_REQUEST.value());
     }
 
 
