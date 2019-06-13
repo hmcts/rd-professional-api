@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
-@NoArgsConstructor
 public class OrganisationsDetailResponse {
 
     @JsonProperty

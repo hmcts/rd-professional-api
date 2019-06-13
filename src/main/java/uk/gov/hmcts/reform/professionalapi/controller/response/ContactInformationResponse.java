@@ -5,10 +5,9 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
-@NoArgsConstructor
+
 public class ContactInformationResponse {
 
     @JsonProperty
