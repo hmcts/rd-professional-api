@@ -99,7 +99,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void error_if_organisation_id_not_found() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116");
-        assertThat(response.get("http_status")).isEqualTo("500");//TODO investigate 404 or 500?
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
 
