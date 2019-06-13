@@ -19,10 +19,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
 
 
-@ConfigurationProperties(prefix = "usermap")
 @Service
 @Slf4j
-@Configuration
 public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
     @Autowired

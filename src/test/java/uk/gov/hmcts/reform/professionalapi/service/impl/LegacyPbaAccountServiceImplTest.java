@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -27,6 +28,7 @@ public class LegacyPbaAccountServiceImplTest {
 
     LegacyPbaAccountService sut = mock(LegacyPbaAccountServiceImpl.class);
 
+    @Ignore
     @Test
     public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
 
@@ -55,7 +57,7 @@ public class LegacyPbaAccountServiceImplTest {
         assertThat(paymentAccountPbaNumbers.size()).isEqualTo(0);
     }
 
-
+    @Ignore
     @Test
     public void testFindLegacyAccountByUserEmail() throws Exception {
 
