@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -175,7 +174,7 @@ public class OrganisationController {
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            throw new DataRetrievalFailureException("404");
+            throw new EmptyResultDataAccessException(1);
         }
         return ResponseEntity
                 .status(200)

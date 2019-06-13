@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +67,7 @@ public class LegacyPbaController {
         ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(email);
         if (professionalUser == null) {
 
-            throw new DataRetrievalFailureException("404");
+            throw new EmptyResultDataAccessException(1);
         }
 
         pbaNumbers =  legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);

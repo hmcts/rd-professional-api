@@ -19,7 +19,6 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +39,6 @@ public class ExceptionMapper {
 
     private static final Logger LOG                         = LoggerFactory.getLogger(ExceptionMapper.class);
     private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
-
-
-    @ExceptionHandler(DataRetrievalFailureException.class)
-    public ResponseEntity<Object> handleEmptyResultDataAccessException(
-            DataRetrievalFailureException ex) {
-        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS);
-    }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
