@@ -5,13 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public class LegacyPbaResponse {
 
     @JsonProperty
-
     @SuppressWarnings({"checkstyle:MemberName"})
     private List<String> payment_accounts;
 
