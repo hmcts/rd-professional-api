@@ -11,12 +11,7 @@ public class ErrorResponseTest {
 
     @Test
     public void testErrorResponse() throws Exception {
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription("desc")
-                .errorMessage("msg")
-                .status(HttpStatus.OK)
-                .timeStamp("time")
-                .build();
+        ErrorResponse errorDetails = new ErrorResponse(42, HttpStatus.OK, "msg", "desc","time");
 
         assertThat((String) getPrivateField(errorDetails, "errorDescription")).isEqualTo("desc");
         assertThat((String) getPrivateField(errorDetails, "errorMessage")).isEqualTo("msg");
