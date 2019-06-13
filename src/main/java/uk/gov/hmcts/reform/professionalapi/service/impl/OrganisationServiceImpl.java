@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortU
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.jsonwebtoken.lang.Collections;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -218,7 +219,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         log.debug("Retrieving all organisations...");
 
         if (organisations.isEmpty()) {
-            throw new EmptyResultDataAccessException(404);
+            throw new EmptyResultDataAccessException(1);
         }
 
         organisations = organisations.stream()
@@ -258,7 +259,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
-            throw new EmptyResultDataAccessException(404);
+            throw new EmptyResultDataAccessException(1);
         } else {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
             organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
@@ -271,8 +272,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-        if (organisations.isEmpty()) {
-            throw new EmptyResultDataAccessException(404);
+        if (Collections.isEmpty(organisations)) {
+            throw new EmptyResultDataAccessException(1);
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

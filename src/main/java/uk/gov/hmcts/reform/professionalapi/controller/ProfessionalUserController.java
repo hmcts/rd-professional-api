@@ -84,8 +84,8 @@ public class ProfessionalUserController {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.info("Organisation is not Active hence not returning any users");
             return ResponseEntity
-                    .status(200)
-                    .body(new ProfessionalUsersEntityResponse(new ArrayList<ProfessionalUser>()));
+                    .status(404)
+                    .build();
         }
 
         if (null == showDeleted) {

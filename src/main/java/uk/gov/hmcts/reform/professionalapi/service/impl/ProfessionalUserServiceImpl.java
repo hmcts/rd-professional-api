@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -88,13 +89,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         } else {
             log.info("Excluding DELETED users for search");
             professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
-            if (professionalUsers.isEmpty()) {
-                throw new EmptyResultDataAccessException(404){
-                };
-            }
         }
-
-
+        if (CollectionUtils.isEmpty(professionalUsers)) {
+            throw new EmptyResultDataAccessException(1);
+        }
         return professionalUsers;
     }
 }

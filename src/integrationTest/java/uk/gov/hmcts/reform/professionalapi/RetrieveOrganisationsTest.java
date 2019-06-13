@@ -123,7 +123,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         assertThat(organisationIdentifier).isNotEmpty();
         orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status").toString().contains("NOT_FOUND"));
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE).build();
@@ -140,13 +140,13 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     }
 
     @Test
-    public void persists_and_return_empty_organisation_details_when_no_status_found_in_the_db() {
+    public void persists_and_return_404_organisation_details_when_no_status_found_in_the_db() {
 
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status").toString().contains("NOT_FOUND"));
     }
 
     @Test

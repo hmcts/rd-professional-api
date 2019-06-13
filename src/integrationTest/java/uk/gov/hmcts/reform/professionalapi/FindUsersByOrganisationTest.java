@@ -46,7 +46,6 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
         String organisationIdentifier = createOrganisationRequest();
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(0);
     }
 
     @Test
