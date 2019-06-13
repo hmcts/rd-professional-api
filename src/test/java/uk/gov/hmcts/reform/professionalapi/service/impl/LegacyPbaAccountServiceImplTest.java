@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -26,35 +29,44 @@ public class LegacyPbaAccountServiceImplTest {
 
     List<String> paymentAccountPbaNumbers = new ArrayList<>();
 
-    LegacyPbaAccountService sut = mock(LegacyPbaAccountServiceImpl.class);
+    ProfessionalUser professionalUserMock;
 
-    @Ignore
+    ApplicationConfiguration configurationMock;
+
+    Organisation organisationMock;
+
+    @InjectMocks
+    LegacyPbaAccountServiceImpl sut;
+
+    @Before
+    public void setup() {
+
+        professionalUserMock = mock(ProfessionalUser.class);
+        configurationMock = mock(ApplicationConfiguration.class);
+        organisationMock = mock(Organisation.class);
+        final List<UserAccountMap> userAccountMap = new ArrayList<>();
+        /*final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount("PBA123"));*/
+
+        /*when(configurationMock.getPbaFromUserAccountMap()).thenReturn("false");
+        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);*/
+        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMap);
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
 
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-
-        ApplicationConfiguration configurationMock = mock(ApplicationConfiguration.class);
-
-        final List<UserAccountMap> userAccountMap = new ArrayList<>();
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(new PaymentAccount());
-
+        paymentAccounts.add(new PaymentAccount("PBA123"));
         when(configurationMock.getPbaFromUserAccountMap()).thenReturn("false");
-
-        Organisation organisationMock = mock(Organisation.class);
-
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMap);
-
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUserMock);
-
         assertThat(paymentAccountPbaNumbers).isNotNull();
-
-        assertThat(paymentAccountPbaNumbers.size()).isEqualTo(0);
+        assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
     }
 
     @Ignore
