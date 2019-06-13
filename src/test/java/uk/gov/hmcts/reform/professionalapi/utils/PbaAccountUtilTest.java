@@ -65,7 +65,7 @@ public class PbaAccountUtilTest {
 
         paymentAccountsEntity.add(paymentAccountMock);
 
-        if(!paymentAccountsEntity.isEmpty()){
+        if (!paymentAccountsEntity.isEmpty()) {
 
             List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccount(paymentAccountsEntity);
             assertThat(paymentAccounts.size()).isGreaterThan(0);

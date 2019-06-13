@@ -8,8 +8,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -33,8 +31,6 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
         List<PaymentAccount>  paymentAccountsFromEntity = new ArrayList<>();
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
-
-            log.info("PBA Value ::1::" + config.getPbaFromUserAccountMap());
 
             if ("false".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
 
