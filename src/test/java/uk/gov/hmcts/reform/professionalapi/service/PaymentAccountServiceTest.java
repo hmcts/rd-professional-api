@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -30,6 +31,13 @@ public class PaymentAccountServiceTest {
 
     private final PaymentAccountService sut = new PaymentAccountServiceImpl(professionalUserRepositoryMock);
 
+    private Organisation organisationMock;
+
+    @Before
+    public void setUp() {
+        organisationMock = mock(Organisation.class);
+    }
+
     @Test
     public void retrievePaymentAccountsByPbaEmail() {
 
@@ -39,8 +47,6 @@ public class PaymentAccountServiceTest {
 
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
         PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
-
-        Organisation organisationMock = mock(Organisation.class);
 
         final UUID paymentAccountUuid = UUID.randomUUID();
 
@@ -69,5 +75,11 @@ public class PaymentAccountServiceTest {
                 organisationMock,
                 times(1)).setPaymentAccounts(any());
 
+    }
+
+    @Test(expected = Exception.class)
+    public void testThrowsExceptionWhenEmailInvalid() {
+        when(sut.findPaymentAccountsByEmail("some-email"))
+                .thenReturn(organisationMock);
     }
 }

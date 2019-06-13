@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,19 +13,21 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class PrdEnumServiceTest {
 
-    private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
+    private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
 
-    private final PrdEnumServiceImpl prdEnumService = new PrdEnumServiceImpl(prdEnumRepository);
+    private final PrdEnumServiceImpl prdEnumService = new PrdEnumServiceImpl(prdEnumRepositoryMock);
 
 
     @Test
-    public void retrieves_prd_enums_correctly() {
+    public void testRetrievesPrdEnumsCorrectly() {
 
         List<PrdEnum> prdEnums = prdEnumService.findAllPrdEnums();
 
         verify(
-                prdEnumRepository,
+                prdEnumRepositoryMock,
                 times(1)).findAll();
+
+        assertThat(prdEnums).isNotNull();
     }
 
 }

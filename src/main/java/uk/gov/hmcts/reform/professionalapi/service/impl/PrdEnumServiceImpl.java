@@ -24,7 +24,6 @@ public class PrdEnumServiceImpl implements PrdEnumService {
 
     @Override
     public List<PrdEnum> findAllPrdEnums() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-        return prdEnums;
+        return prdEnumRepository.findAll();
     }
 }
