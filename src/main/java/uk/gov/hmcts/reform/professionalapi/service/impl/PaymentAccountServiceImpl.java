@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     @Autowired
-    ApplicationConfiguration configuration ;
+    ApplicationConfiguration configuration;
 
     private ProfessionalUserRepository professionalUserRepository;
 
@@ -36,7 +36,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         if (null != user
                 && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
 
-            if("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())){
+            if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
                 List<PaymentAccount> userMapPaymentAccount =  PbaAccountUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
                 paymentAccountsEntity = PbaAccountUtil
@@ -45,7 +45,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
                 organisation = user.getOrganisation();
 
-            } else if("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
                 paymentAccountsEntity =  PbaAccountUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);

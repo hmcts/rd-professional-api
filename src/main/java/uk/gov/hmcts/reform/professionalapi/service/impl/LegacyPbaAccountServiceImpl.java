@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +17,16 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
-//@ConfigurationProperties(prefix = "usermap")
+
+@ConfigurationProperties(prefix = "usermap")
 @Service
 @Slf4j
-//@Configuration
+@Configuration
 public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
     @Autowired
-    ApplicationConfiguration configuration ;
+    ApplicationConfiguration config;
 
     public List<String> findLegacyPbaAccountByUserEmail(ProfessionalUser professionalUser) {
 
@@ -37,14 +36,13 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
 
-           // log.info("PBA Value ::" + getPbaFromUserAccountMap());
-            log.info("PBA Value ::1::" + configuration.getPbaFromUserAccountMap());
+            log.info("PBA Value ::1::" + config.getPbaFromUserAccountMap());
 
-            if("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())){
+            if ("false".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
 
                 pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
 
-            } else if("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+            } else if ("true".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
 
                 List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
 
@@ -94,8 +92,7 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
-        userMapPaymentAccount = userAccountMaps.stream().map(
-            userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
                 .collect(toList());
 
         return userMapPaymentAccount;

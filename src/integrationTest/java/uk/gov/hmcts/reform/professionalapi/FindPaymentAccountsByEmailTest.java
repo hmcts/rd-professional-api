@@ -26,7 +26,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     PaymentAccountServiceImpl paymentAccountService;
 
     @Autowired
-    ApplicationConfiguration configuration ;
+    ApplicationConfiguration configuration;
 
 
     @Test

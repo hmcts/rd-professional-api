@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -26,13 +25,10 @@ public class LegacyPbaAccountServiceImplTest {
 
     List<String> paymentAccountPbaNumbers = new ArrayList<>();
 
-    LegacyPbaAccountServiceImpl sut = mock(LegacyPbaAccountServiceImpl.class);
-    //LegacyPbaAccountService sut = new LegacyPbaAccountServiceImpl();
+    LegacyPbaAccountService sut = mock(LegacyPbaAccountServiceImpl.class);
 
-    @Ignore
     @Test
     public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
-        //LegacyPbaAccountService sutMock = mock(LegacyPbaAccountServiceImpl.class);
 
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
@@ -62,16 +58,15 @@ public class LegacyPbaAccountServiceImplTest {
 
     @Test
     public void testFindLegacyAccountByUserEmail() throws Exception {
+
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
         ApplicationConfiguration configurationMock = mock(ApplicationConfiguration.class);
-        List<UserAccountMap> userAccountMapData = new ArrayList<>();
-        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
-
         when(configurationMock.getPbaFromUserAccountMap()).thenReturn("true");
 
+        List<UserAccountMap> userAccountMapData = new ArrayList<>();
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
         UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
-
         final UUID paymentAccountUuid = UUID.randomUUID();
 
         Field f = userAccountMap.getClass().getDeclaredField("userAccountMapId");
@@ -99,6 +94,6 @@ public class LegacyPbaAccountServiceImplTest {
 
         assertThat(paymentAccountPbaNumbers).isNotNull();
 
-        assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
+
     }
 }

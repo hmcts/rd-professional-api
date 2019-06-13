@@ -53,7 +53,7 @@ public interface PbaAccountUtil {
 
             paymentAccounts.forEach(paymentAccount -> {
 
-                        paymentAccounts.add(paymentAccount);
+                paymentAccounts.add(paymentAccount);
             });
         }
         return paymentAccounts;
