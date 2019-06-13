@@ -5,10 +5,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import java.util.ArrayList;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdenti
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
@@ -83,9 +82,7 @@ public class ProfessionalUserController {
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.info("Organisation is not Active hence not returning any users");
-            return ResponseEntity
-                    .status(404)
-                    .build();
+            throw new EmptyResultDataAccessException(1);
         }
 
         if (null == showDeleted) {

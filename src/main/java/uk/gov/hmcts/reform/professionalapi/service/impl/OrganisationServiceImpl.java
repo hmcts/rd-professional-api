@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortU
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.jsonwebtoken.lang.Collections;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -16,6 +15,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -272,7 +272,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-        if (Collections.isEmpty(organisations)) {
+        if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(1);
         }
         return new OrganisationsDetailResponse(organisations, true);
