@@ -82,7 +82,7 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
     }
 
     @Test
-    public void returns_200_when_database_constraint_disabled() {
+    public void returns_500_when_database_constraint_violated() {
 
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
@@ -91,6 +91,6 @@ public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegra
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(response.get("http_status")).isEqualTo("200");
+        assertThat(response.get("http_status")).isEqualTo("500");
     }
 }

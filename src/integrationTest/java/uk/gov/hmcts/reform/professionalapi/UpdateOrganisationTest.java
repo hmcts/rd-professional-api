@@ -21,8 +21,8 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
 
     @Test
-    public void updates_non_existing_organisation_returns_status_404() {
-        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,404);
+    public void updates_non_existing_organisation_returns_status_400() {
+        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,400);//TODO 400 or 404?
     }
 
     @Test
@@ -193,7 +193,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
             assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
             assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
-            assertThat(responseForOrganisationUpdate.get("http_status").toString().startsWith(httpStatus.toString().substring(0,1)));//TODO be more specific
+            assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
         } else {
             if (responseForOrganisationUpdate.get("http_status") instanceof String) {
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(String.valueOf(httpStatus.intValue()));
