@@ -163,7 +163,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
 
         Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
 
-        assertThat(response.get("http_status")).isEqualTo("500");//TODO determine if 404 or 500 is required
+        assertThat(response.get("http_status").toString().startsWith("4"));//TODO be more specific
 
     }
 
@@ -173,7 +173,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         Map<String, Object> response =
                 professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com");
 
-        assertThat(response.get("http_status")).isEqualTo("500");//TODO determine if 404 or 500 is desired
+        assertThat(response.get("http_status").toString().startsWith("4"));//TODO be more specific
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {
