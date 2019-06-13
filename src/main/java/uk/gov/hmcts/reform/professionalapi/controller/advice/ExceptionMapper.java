@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
@@ -43,7 +42,7 @@ public class ExceptionMapper {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
             EmptyResultDataAccessException ex) {
-        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, EMPTY_RESULT_DATA_ACCESS);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

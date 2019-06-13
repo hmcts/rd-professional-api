@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.utils.ReflectionHelper.getPrivateField;
+import static uk.gov.hmcts.reform.professionalapi.helpers.ReflectionHelper.getPrivateField;
 
 import org.junit.Test;
 

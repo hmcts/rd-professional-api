@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.utils;
+package uk.gov.hmcts.reform.professionalapi.helpers;
 
 import java.lang.reflect.Field;
 
