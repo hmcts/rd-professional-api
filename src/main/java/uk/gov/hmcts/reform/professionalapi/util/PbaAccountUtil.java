@@ -43,4 +43,19 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
+
+
+    public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
+
+        List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
+
+        if (!paymentAccounts.isEmpty()) {
+
+            paymentAccounts.forEach(paymentAccount -> {
+
+                paymentAccountsFromOrg.add(paymentAccount);
+            });
+        }
+        return paymentAccounts;
+    }
 }
