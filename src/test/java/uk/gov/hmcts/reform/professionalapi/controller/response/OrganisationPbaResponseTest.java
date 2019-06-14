@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -26,9 +27,12 @@ public class OrganisationPbaResponseTest {
         when(organisationMock.getUsers())
                 .thenReturn(users);
 
-        OrganisationPbaResponse organisationPbaResponse = new OrganisationPbaResponse(organisationMock, true);
+        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisationMock, true);
 
         OrganisationEntityResponse name;
+
+        assertThat(sut.getOrganisationEntityResponse()).isNotNull();
+
     }
 
 }
