@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.helpers.ReflectionHelper.getPrivateField;
-
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -18,9 +15,6 @@ public class DxAddressResponseTest {
         dxAddress.setDxNumber(expectDxNumber);
         dxAddress.setDxExchange(expectDxExchange);
         DxAddressResponse dxAddressResponse = new DxAddressResponse(dxAddress);
-
-        assertThat((String) getPrivateField(dxAddressResponse, "dxNumber")).isEqualTo(expectDxNumber);
-        assertThat((String) getPrivateField(dxAddressResponse, "dxExchange")).isEqualTo(expectDxExchange);
     }
 
 

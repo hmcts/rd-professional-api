@@ -4,7 +4,6 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,32 +56,5 @@ public class LegacyPbaAccountServiceImplTest {
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
 
         final UUID paymentAccountUuid = UUID.randomUUID();
-
-        Field f = userAccountMap.getClass().getDeclaredField("userAccountMapId");
-        f.setAccessible(true);
-        f.set(userAccountMap, newUserAccountMapId);
-
-        userAccountMapData.add(userAccountMap);
-
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(paymentAccountMock);
-
-        Organisation organisationMock = mock(Organisation.class);
-        Organisation organisation = new Organisation();
-        organisation.setPaymentAccounts(paymentAccounts);
-
-        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-
-        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMapData);
-
-        when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
-
-        paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUserMock);
-
-        assertThat(paymentAccountPbaNumbers).isNotNull();
-
-        assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
     }
 }
