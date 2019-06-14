@@ -55,4 +55,20 @@ public class PbaAccountUtilTest {
 
         assertThat(paymentAccounts.size()).isGreaterThan(0);
     }
+
+    @Test
+    public void shouldReturnPaymentAccountFromOrganisationUser() {
+
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+
+        List<PaymentAccount> paymentAccountsEntity = new ArrayList<>();
+
+        paymentAccountsEntity.add(paymentAccountMock);
+
+        if (!paymentAccountsEntity.isEmpty()) {
+
+            List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccount(paymentAccountsEntity);
+            assertThat(paymentAccounts.size()).isGreaterThan(0);
+        }
+    }
 }

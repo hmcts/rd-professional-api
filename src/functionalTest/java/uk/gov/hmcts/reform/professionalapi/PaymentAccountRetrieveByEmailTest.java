@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("functional")
 public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
 
+
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
         String email = randomAlphabetic(10) + "@pbasearch.test";

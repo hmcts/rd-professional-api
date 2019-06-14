@@ -74,3 +74,7 @@ idam:
     totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: rd_professional_api
     url: ${S2S_URL:http://127.0.0.1:8502}
+    pbaFromUserAccountMap: false
+usermap:
+    pbaFromUserAccountMap:
+    - "false"
