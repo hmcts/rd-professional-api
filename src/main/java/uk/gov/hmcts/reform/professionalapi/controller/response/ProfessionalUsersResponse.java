@@ -15,17 +15,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private UUID userIdentifier;
+    private final UUID userIdentifier;
     @JsonProperty
-    private String firstName;
+    private final String firstName;
     @JsonProperty
-    private String lastName;
+    private final String lastName;
     @JsonProperty
-    private String email;
+    private final String email;
     @JsonProperty
-    private ProfessionalUserStatus status;
+    private final ProfessionalUserStatus status;
     @JsonProperty
-    private List<String> roles = new ArrayList<String>();
+    private final List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
         this.userIdentifier = Optional.ofNullable(user.getUserIdentifier()).orElse(user.getUserIdentifier());
