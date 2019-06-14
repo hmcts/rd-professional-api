@@ -42,11 +42,11 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
     }
 
     @Test
-    public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_200() {
+    public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(0);
+        assertThat(response.get("http_status")).isEqualTo("404");
+
     }
 
     @Test

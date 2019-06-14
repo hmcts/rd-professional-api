@@ -11,11 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -218,6 +218,10 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         log.debug("Retrieving all organisations...");
 
+        if (organisations.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
         organisations = organisations.stream()
                .map(organisation -> {
                    organisation.setUsers(sortUserListByCreatedDate(organisation));
@@ -255,7 +259,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            throw new EmptyResultDataAccessException(1);
         } else {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
             organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
@@ -266,7 +270,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-        return new OrganisationsDetailResponse(organisationRepository.findByStatus(status), true);
+        List<Organisation> organisations = organisationRepository.findByStatus(status);
+
+        if (CollectionUtils.isEmpty(organisations)) {
+            throw new EmptyResultDataAccessException(1);
+        }
+        return new OrganisationsDetailResponse(organisations, true);
     }
 
 
