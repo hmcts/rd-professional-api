@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-
 
 public class ProfessionalUsersResponseTest {
 
@@ -15,7 +16,7 @@ public class ProfessionalUsersResponseTest {
         user.setEmailAddress(expectEmailAddress);
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
 
-        String email = "";
+        assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
 
     }
 }
