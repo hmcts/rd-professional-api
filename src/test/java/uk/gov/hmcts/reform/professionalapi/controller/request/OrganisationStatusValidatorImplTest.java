@@ -3,12 +3,9 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-@RunWith(value = BlockJUnit4ClassRunner.class)
 public class OrganisationStatusValidatorImplTest {
 
     OrganisationStatusValidatorImpl organisationStatusValidatorImpl = new OrganisationStatusValidatorImpl();
