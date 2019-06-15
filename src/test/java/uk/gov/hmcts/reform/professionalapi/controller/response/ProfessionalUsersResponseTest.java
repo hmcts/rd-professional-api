@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.reflect.Field;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-
 
 public class ProfessionalUsersResponseTest {
 
@@ -13,17 +11,18 @@ public class ProfessionalUsersResponseTest {
     @Test
     public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
 
-        String expectEmailAddress = "dummy@email.com";
+        final String expectEmailAddress = "dummy@email.com";
+        final String expectFirstName = "Bob";
+        final String expectLastName = "Smith";
+
         ProfessionalUser user = new ProfessionalUser();
         user.setEmailAddress(expectEmailAddress);
+        user.setFirstName(expectFirstName);
+        user.setLastName(expectLastName);
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
 
-        String email = "";
-
-        Field f = professionalUsersResponse.getClass().getDeclaredField("email");
-        f.setAccessible(true);
-        email = (String) f.get(professionalUsersResponse);
-
-        assertEquals(email, expectEmailAddress);
+        assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
+        assertThat(professionalUsersResponse.getFirstName()).isEqualTo(expectFirstName);
+        assertThat(professionalUsersResponse.getLastName()).isEqualTo(expectLastName);
     }
 }

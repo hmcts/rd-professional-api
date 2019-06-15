@@ -39,7 +39,7 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
 
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-ithc.service.core-compute-ithc.internal"
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
