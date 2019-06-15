@@ -97,9 +97,7 @@ public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledInte
         Map<String, Object> response =
                 professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("wrong@email.com");
 
-        assertThat(response.get("http_status").toString().startsWith("4"));//TODO be more specific
-
-
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
 }

@@ -59,7 +59,7 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
     @Test
     public void retrieve_users_with_non_existing_organisationIdentifier_should_return_status_404() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("A1B2C3D","False");
-        assertThat(response.get("http_status").toString().startsWith("4"));//TODO be more specific
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     private void validateUsers(Map<String, Object> response) {

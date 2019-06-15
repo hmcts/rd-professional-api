@@ -50,7 +50,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        //OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -64,7 +64,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest);
 
-        assertThat(newUserResponse.get("http_status").toString().startsWith("4"));//TODO be more specific
+        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
 

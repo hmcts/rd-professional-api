@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
@@ -31,7 +32,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 public class ExceptionMapper {
@@ -42,7 +42,7 @@ public class ExceptionMapper {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
             EmptyResultDataAccessException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, EMPTY_RESULT_DATA_ACCESS);
+        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -112,8 +112,16 @@ public class ExceptionMapper {
     }
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
+
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        ErrorResponse errorDetails = ErrorResponse.builder()
+                .errorDescription(getRootException(ex).getLocalizedMessage())
+                .errorMessage(errorMsg)
+                .status(httpStatus).errorCode(httpStatus.value())
+                .timeStamp(getTimeStamp())
+                .build();
+
         return new ResponseEntity<>(
-                new ErrorResponse(42, httpStatus, errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp()), httpStatus);
+                errorDetails, httpStatus);
     }
 }

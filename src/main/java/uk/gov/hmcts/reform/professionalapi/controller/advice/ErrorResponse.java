@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@Builder
 public class ErrorResponse {
 
     private final int errorCode;
@@ -15,13 +17,5 @@ public class ErrorResponse {
     private final String errorDescription;
 
     private final String timeStamp;
-
-    public ErrorResponse(int errorCode, HttpStatus status, String errorMessage, String errorDescription, String timeStamp) {
-        this.errorCode = errorCode;
-        this.status = status;
-        this.errorMessage = errorMessage;
-        this.errorDescription = errorDescription;
-        this.timeStamp = timeStamp;
-    }
 
 }

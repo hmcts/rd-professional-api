@@ -22,7 +22,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
     @Test
     public void updates_non_existing_organisation_returns_status_400() {
-        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,400);//TODO 400 or 404?
+        updateAndValidateOrganisation("AA11NNF",OrganisationStatus.ACTIVE,404);
     }
 
     @Test
