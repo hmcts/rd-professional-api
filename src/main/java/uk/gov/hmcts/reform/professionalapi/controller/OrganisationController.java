@@ -11,7 +11,6 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.xml.ws.http.HTTPException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,7 +174,7 @@ public class OrganisationController {
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            throw new HTTPException(404);
+            throw new EmptyResultDataAccessException(1);
         }
         return ResponseEntity
                 .status(200)
