@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mockito;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -314,13 +314,13 @@ public class OrganisationServiceImplTest {
                 times(1)).setCompanyUrl(any());
     }
 
-    @Test
-    public void testRetrieveAnOrganisationsByStatus() {
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieve_an_organisations_by_status() throws Exception {
 
         OrganisationsDetailResponse organisationDetailResponse =
                 organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.ACTIVE);
 
-        assertThat(organisationDetailResponse).isNotNull();
+        assertThat(organisationDetailResponse).isEqualTo(404);
 
         verify(
                 organisationRepositoryMock,
@@ -329,8 +329,8 @@ public class OrganisationServiceImplTest {
     }
 
 
-    @Test(expected = HttpClientErrorException.class)
-    public void testThrowsExceptionWhenOrganisationIsNull() throws Exception {
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void throwsEmptyResultDataAccessException() throws Exception {
 
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
@@ -369,8 +369,8 @@ public class OrganisationServiceImplTest {
                 times(1)).setUsers(any());
     }
 
-    @Test(expected = HttpClientErrorException.class)
-    public void testThrowsExceptionWhenUuidNotFound() {
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieveAnOrganisationByUuidNotFound() {
 
         Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class)))
                 .thenReturn(null);
