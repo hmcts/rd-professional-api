@@ -18,12 +18,10 @@ public class ErrorResponseTest {
         ErrorResponse errorDetails = ErrorResponse.builder()
                 .errorDescription("desc")
                 .errorMessage(expectMsg)
-                .status(httpStatus).errorCode(httpStatus.value())
                 .timeStamp("time")
                 .build();
 
         assertThat(errorDetails).isNotNull();
-        assertThat(errorDetails.getErrorCode()).isEqualTo(httpStatus.value());
         assertThat(errorDetails.getErrorMessage()).isEqualTo(expectMsg);
         assertThat(errorDetails.getTimeStamp()).isEqualTo(expectTs);
         assertThat(errorDetails.getErrorDescription()).isEqualTo(expectDesc);
