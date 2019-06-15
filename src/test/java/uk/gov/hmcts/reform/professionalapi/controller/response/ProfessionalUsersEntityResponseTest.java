@@ -2,10 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Test;
 
@@ -41,34 +39,9 @@ public class ProfessionalUsersEntityResponseTest {
         List<ProfessionalUsersResponse> usersExpected = new ArrayList<>();
         usersExpected.add(professionalUsersResponse);
 
-        Field firstNameField = sut.getClass().getDeclaredField("users");
-        firstNameField.setAccessible(true);
-        Object obj = ((List<ProfessionalUsersResponse>) firstNameField.get(sut)).get(0);
-
-        Field f = obj.getClass().getDeclaredField("userIdentifier");
-        f.setAccessible(true);
-        final UUID userIdentifier = (UUID) f.get(obj);
-
-        f = obj.getClass().getDeclaredField("firstName");
-        f.setAccessible(true);
-        final String firstName = (String) f.get(obj);
-
-        f = obj.getClass().getDeclaredField("lastName");
-        f.setAccessible(true);
-        final String lastName = (String) f.get(obj);
-
-        f = obj.getClass().getDeclaredField("email");
-        f.setAccessible(true);
-        final String email = (String) f.get(obj);
-
-        f = obj.getClass().getDeclaredField("status");
-        f.setAccessible(true);
-        final ProfessionalUserStatus status = (ProfessionalUserStatus) f.get(obj);
-
-        assertThat(userIdentifier.toString().length()).isEqualTo(lengthOfUuid);
-        assertThat(firstName).isEqualTo(dummyFirstName);
-        assertThat(lastName).isEqualTo(dummyLastName);
-        assertThat(email).isEqualTo(dummyEmail);
-        assertThat(status).isEqualTo(dummyStatus);
+        assertThat(sut.getUsers().get(0).getUserIdentifier()).isEqualTo(professionalUser.getUserIdentifier());
+        assertThat(sut.getUsers().get(0).getFirstName()).isEqualTo(professionalUser.getFirstName());
+        assertThat(sut.getUsers().get(0).getLastName()).isEqualTo(professionalUser.getLastName());
+        assertThat(sut.getUsers().get(0).getEmail()).isEqualTo(professionalUser.getEmailAddress());
     }
 }
