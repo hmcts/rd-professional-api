@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -65,9 +64,6 @@ public class LegacyPbaAccountServiceImplTest {
         UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
 
-        Field f = userAccountMap.getClass().getDeclaredField("userAccountMapId");
-        f.setAccessible(true);
-        f.set(userAccountMap, newUserAccountMapId);
         userAccountMapData.add(userAccountMap);
 
         organisationMock.setPaymentAccounts(paymentAccounts);

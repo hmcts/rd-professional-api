@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.controller.request;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
