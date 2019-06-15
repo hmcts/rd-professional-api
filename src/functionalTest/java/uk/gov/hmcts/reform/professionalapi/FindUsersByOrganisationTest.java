@@ -34,8 +34,7 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
     public void find_users_for_non_active_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, "False", HttpStatus.OK);
-        assertThat(searchResponse.get("users")).asList().isEmpty();
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, "False", HttpStatus.NOT_FOUND);
     }
 
     @Test
