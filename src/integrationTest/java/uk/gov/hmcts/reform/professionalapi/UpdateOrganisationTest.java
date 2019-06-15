@@ -27,12 +27,12 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-        updateAndValidateOrganisation(null,OrganisationStatus.ACTIVE,400);
+        updateAndValidateOrganisation(null,OrganisationStatus.ACTIVE,404);
     }
 
     @Test
     public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-        updateAndValidateOrganisation("1234ab12",OrganisationStatus.ACTIVE,400);
+        updateAndValidateOrganisation("1234ab12",OrganisationStatus.ACTIVE,404);
     }
 
     @Test
