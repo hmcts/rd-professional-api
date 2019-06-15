@@ -1,25 +1,31 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 
-@SuppressWarnings({
-        "checkstyle:HideUtilityClassConstructor",
-        "PMD.FieldNamingConventions"
-})
-public interface ErrorConstants {
+public enum ErrorConstants {
 
-    static String MALFORMED_JSON =  "Malformed Input Request";
+    MALFORMED_JSON("1 : Malformed Input Request"),
 
-    static String UNSUPPORTED_MEDIA_TYPES = "Unsupported Media Type";
+    UNSUPPORTED_MEDIA_TYPES("2 : Unsupported Media Type"),
 
-    static String INVALID_REQUEST =  "There is a problem with your request. Please check and try again";
+    INVALID_REQUEST("3 : There is a problem with your request. Please check and try again"),
 
-    static String EMPTY_RESULT_DATA_ACCESS = "Resource not found";
+    EMPTY_RESULT_DATA_ACCESS("4 : Resource not found"),
 
-    static String METHOD_ARG_NOT_VALID = "validation on an argument failed";
+    METHOD_ARG_NOT_VALID("5 : validation on an argument failed"),
 
-    static String DATA_INTEGRITY_VIOLATION = "attempt to insert or update data resulted in violation of an integrity constraint";
+    DATA_INTEGRITY_VIOLATION("6 : attempt to insert or update data resulted in violation of an integrity constraint"),
 
-    static String ILLEGAL_ARGUMENT = "method has been passed an illegal or inappropriate argument";
+    ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
 
-    static String UNKNOWN_EXCEPTION = " error was caused by an unknown exception";
+    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception");
+
+    private final String errorMessage;
+
+    ErrorConstants(String  errorMessage) {
+        this.errorMessage  = errorMessage;
+    }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
 }
