@@ -27,7 +27,7 @@ public class SwaggerConfiguration {
             .select()
             .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
             .paths(PathSelectors.any())
-            .build().enableUrlTemplating(true)
+            .build()
            .securitySchemes(apiKeyList());
     }
 
