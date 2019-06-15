@@ -21,6 +21,7 @@
 *.ipr
 /out/
 /bin/
+Connection
 
 ### NetBeans ###
 /nbproject/private/

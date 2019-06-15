@@ -1,12 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -31,19 +27,12 @@ public class OrganisationPbaResponseTest {
         when(organisationMock.getUsers())
                 .thenReturn(users);
 
-        OrganisationPbaResponse organisationPbaResponse = new OrganisationPbaResponse(organisationMock, true);
+        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisationMock, true);
 
         OrganisationEntityResponse name;
 
-        Field f = organisationPbaResponse.getClass().getDeclaredField("organisationEntityResponse");
-        f.setAccessible(true);
-        name = (OrganisationEntityResponse) f.get(organisationPbaResponse);
+        assertThat(sut.getOrganisationEntityResponse()).isNotNull();
 
-        assertNotNull(name);
-        assertTrue(name instanceof OrganisationEntityResponse);
-
-        verify(organisationMock,
-                times(1)).getCompanyUrl();
     }
 
 }
