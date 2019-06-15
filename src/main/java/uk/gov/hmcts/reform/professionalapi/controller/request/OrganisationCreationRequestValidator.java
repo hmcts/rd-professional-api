@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -36,7 +37,7 @@ public class OrganisationCreationRequestValidator {
         if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
             String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
             log.error(errorMessage);
-            throw new InvalidRequest(errorMessage);
+            throw new EmptyResultDataAccessException(1);
         }
     }
 }

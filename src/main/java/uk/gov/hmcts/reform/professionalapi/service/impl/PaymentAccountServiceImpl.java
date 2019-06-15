@@ -5,7 +5,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -19,6 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 @AllArgsConstructor
 public class PaymentAccountServiceImpl implements PaymentAccountService {
 
+    @Autowired
+    ApplicationConfiguration configuration;
+
     private ProfessionalUserRepository professionalUserRepository;
 
     public Organisation findPaymentAccountsByEmail(String email) {
@@ -28,14 +33,25 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
-        if (null != user && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
+        if (null != user
+                && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
 
-            List<PaymentAccount> userMapPaymentAccount =  PbaAccountUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
-            paymentAccountsEntity = PbaAccountUtil
-                    .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
+            if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
-            user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-            organisation = user.getOrganisation();
+                List<PaymentAccount> userMapPaymentAccount =  PbaAccountUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
+                paymentAccountsEntity = PbaAccountUtil
+                        .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
+
+                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+                organisation = user.getOrganisation();
+
+            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+
+                paymentAccountsEntity =  PbaAccountUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
+                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+                organisation = user.getOrganisation();
+            }
+
         }
         return organisation;
     }

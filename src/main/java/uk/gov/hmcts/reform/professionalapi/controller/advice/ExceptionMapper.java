@@ -16,8 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.xml.ws.http.HTTPException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,27 +42,27 @@ public class ExceptionMapper {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
             EmptyResultDataAccessException ex) {
-        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS);
+        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
 
     public ResponseEntity<Object> annotationDrivenValidationError(
             MethodArgumentNotValidException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID.getErrorMessage());
     }
 
     @ExceptionHandler(InvalidRequest.class)
     public ResponseEntity<Object> customValidationError(
             InvalidRequest ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
 
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
 
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
 
     }
 
@@ -72,13 +70,7 @@ public class ExceptionMapper {
 
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
 
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
-    }
-
-    @ExceptionHandler(HTTPException.class)
-    public ResponseEntity<Object> handleHttpException(HTTPException ex) {
-        HttpStatus httpStatus = HttpStatus.resolve(ex.getStatusCode());
-        return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
     @ExceptionHandler(HttpStatusCodeException.class)
@@ -91,7 +83,7 @@ public class ExceptionMapper {
 
     public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
 
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON.getErrorMessage());
 
     }
 
@@ -99,12 +91,12 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handleHttpMediaTypeNotSupported(
             IllegalArgumentException ex) {
 
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, UNSUPPORTED_MEDIA_TYPES);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, UNSUPPORTED_MEDIA_TYPES.getErrorMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
-        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION);
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION.getErrorMessage());
     }
 
     private String getTimeStamp() {
@@ -123,9 +115,8 @@ public class ExceptionMapper {
 
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorDescription(getRootException(ex).getLocalizedMessage())
                 .errorMessage(errorMsg)
-                .status(httpStatus).errorCode(httpStatus.value())
+                .errorDescription(getRootException(ex).getLocalizedMessage())
                 .timeStamp(getTimeStamp())
                 .build();
 
