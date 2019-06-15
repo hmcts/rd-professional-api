@@ -50,7 +50,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        //OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")

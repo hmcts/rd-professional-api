@@ -16,8 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.xml.ws.http.HTTPException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -73,12 +71,6 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
 
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST);
-    }
-
-    @ExceptionHandler(HTTPException.class)
-    public ResponseEntity<Object> handleHttpException(HTTPException ex) {
-        HttpStatus httpStatus = HttpStatus.resolve(ex.getStatusCode());
-        return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
 
     @ExceptionHandler(HttpStatusCodeException.class)
