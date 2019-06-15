@@ -12,5 +12,4 @@ public class ErrorResponse {
     private final String errorDescription;
 
     private final String timeStamp;
-
 }
