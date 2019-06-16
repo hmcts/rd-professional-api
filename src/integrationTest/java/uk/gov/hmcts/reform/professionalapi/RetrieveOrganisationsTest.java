@@ -86,6 +86,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisations();
+
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }
@@ -101,8 +102,6 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116");
         assertThat(response.get("http_status")).isEqualTo("404");
     }
-
-
 
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
@@ -212,5 +211,16 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
 
     }
 
+    @Test
+    public void  remove_empty_spaces_in_response_and_returns_organisation_details() {
+
+        Map<String, Object> organisationResponse =
+                professionalReferenceDataClient.createOrganisation(organisationRequestWithAllEmptyFields().build());
+        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+
+    }
 
 }

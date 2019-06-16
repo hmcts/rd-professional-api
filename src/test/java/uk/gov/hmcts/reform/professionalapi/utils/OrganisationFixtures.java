@@ -92,4 +92,36 @@ public class OrganisationFixtures {
                         .dxExchange("dxExchange1").build()))
                 .build()));
     }
+
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllEmptyFields() {
+
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(" ");
+
+        return anOrganisationCreationRequest()
+                .name("some-org-name ")
+                .status(OrganisationStatus.PENDING)
+                .sraId(" ")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("companyurl")
+                .companyNumber(" ")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1(" ")
+                        .addressLine2(" ")
+                        .addressLine3(" ")
+                        .country(" ")
+                        .county(" ")
+                        .townCity(" ")
+                        .postCode(" ")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange(" ").build()))
+                        .build()));
+    }
 }

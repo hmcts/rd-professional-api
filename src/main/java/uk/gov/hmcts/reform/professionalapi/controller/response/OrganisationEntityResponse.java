@@ -3,10 +3,15 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 public class OrganisationEntityResponse  {
 
@@ -40,25 +45,59 @@ public class OrganisationEntityResponse  {
 
         this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
                 ? "" : organisation.getOrganisationIdentifier();
-        this.name = organisation.getName();
+        if (!StringUtils.isEmpty(PbaAccountUtil.removeEmptySpaces(organisation.getName()))) {
+
+            this.name = organisation.getName().trim();
+        }
         this.status = organisation.getStatus();
-        this.sraId = organisation.getSraId();
+
+        if (!StringUtils.isEmpty(PbaAccountUtil.removeEmptySpaces(organisation.getSraId()))) {
+
+            this.sraId = organisation.getSraId().trim();
+        }
+
         this.sraRegulated = organisation.getSraRegulated();
-        this.companyNumber = organisation.getCompanyNumber();
-        this.companyUrl = organisation.getCompanyUrl();
+
+        if (!StringUtils.isEmpty(PbaAccountUtil.removeEmptySpaces(organisation.getCompanyNumber()))) {
+
+            this.companyNumber = organisation.getCompanyNumber().trim();
+        }
+
+        if (!StringUtils.isEmpty(PbaAccountUtil.removeEmptySpaces(organisation.getCompanyUrl()))) {
+
+            this.companyUrl = organisation.getCompanyUrl().trim();
+        }
+
         if (!organisation.getUsers().isEmpty()) {
+
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
-        this.paymentAccount = organisation.getPaymentAccounts()
-                .stream()
-                .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
-                .collect(toList());
-        if (isRequiredAllEntities) {
+        if (!CollectionUtils.isEmpty(organisation.getPaymentAccounts())) {
+
+            List<String> pbaNumbers = removeEmptyStringFromList(organisation.getPaymentAccounts()
+                    .stream()
+                    .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
+                    .collect(toList()));
+            if (!CollectionUtils.isEmpty(pbaNumbers)) {
+
+                this.paymentAccount = pbaNumbers;
+            }
+
+        }
+
+        if (isRequiredAllEntities && !CollectionUtils.isEmpty(organisation.getContactInformation())) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))
                     .collect(toList());
         }
+    }
+
+    private List<String> removeEmptyStringFromList(List<String> values) {
+
+        List<String> modifiedValues;
+
+        return modifiedValues = values.stream().filter(value -> !value.trim().isEmpty()).collect(Collectors.toList());
     }
 
 }

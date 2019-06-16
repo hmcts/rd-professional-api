@@ -43,8 +43,6 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-
-
     public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
@@ -57,5 +55,15 @@ public interface PbaAccountUtil {
             });
         }
         return paymentAccounts;
+    }
+
+    public static String removeEmptySpaces(String value) {
+
+        String modValue = "";
+        if (null != value && !value.trim().isEmpty()) {
+
+            modValue = value.trim();
+        }
+        return modValue;
     }
 }

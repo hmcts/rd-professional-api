@@ -71,4 +71,18 @@ public class PbaAccountUtilTest {
             assertThat(paymentAccounts.size()).isGreaterThan(0);
         }
     }
+
+    @Test
+    public void testRemoveSpacesForReturnValues() {
+
+        assertThat(PbaAccountUtil.removeEmptySpaces("some-name ")).isEqualTo("some-name");
+        assertThat(PbaAccountUtil.removeEmptySpaces(null)).isEmpty();
+
+        PaymentAccount paymentAccount = new PaymentAccount("PBA123");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        assertThat(PbaAccountUtil.getPaymentAccount(paymentAccounts).size()).isEqualTo(1);
+
+    }
+
 }
