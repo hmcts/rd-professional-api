@@ -21,7 +21,7 @@ public class DxAddressResponse {
 
         if (!StringUtils.isEmpty(PbaAccountUtil.removeEmptySpaces(dxAddress.getDxExchange()))) {
 
-            this.dxExchange = dxAddress.getDxExchange();
+            this.dxExchange = dxAddress.getDxExchange().trim();
         }
 
     }

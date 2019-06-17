@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,37 +34,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
 
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
-        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
-
-        assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
-        assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
-        assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
-        assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
-        assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
-
-        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
-        assertThat(superUser.get("userIdentifier")).isNotNull();
-        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
-        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
-        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
-
-        List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
-        assertThat(accounts.get(0).equals("pba123"));
-
-        Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
-        assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
-        assertThat(contactInfo.get("addressLine2")).isEqualTo("addressLine2");
-        assertThat(contactInfo.get("addressLine3")).isEqualTo("addressLine3");
-        assertThat(contactInfo.get("county")).isEqualTo("county");
-        assertThat(contactInfo.get("country")).isEqualTo("country");
-        assertThat(contactInfo.get("townCity")).isEqualTo("town-city");
-        assertThat(contactInfo.get("postCode")).isEqualTo("some-post-code");
-
-        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
-        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
-        assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
-
+        compareOrganisationResponse(orgResponse,orgIdentifierResponse);
         log.info("RetrieveOrganisationsTest:Received response to retrieve an organisation details...");
     }
 
@@ -214,12 +187,75 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
     @Test
     public void  remove_empty_spaces_in_response_and_returns_organisation_details() {
 
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("pba123 ");
+        paymentAccounts.add("  ");
+        OrganisationCreationRequest organisationCreationRequest =   anOrganisationCreationRequest()
+                .name("some-org-name ")
+                .status(OrganisationStatus.PENDING)
+                .sraId("sra-id ")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url ")
+                .companyNumber("company")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname ")
+                        .lastName("some-lname ")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1 ")
+                        .addressLine2("addressLine2 ")
+                        .addressLine3("addressLine3 ")
+                        .country("country ")
+                        .county("county  ")
+                        .townCity("town-city  ")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange ").build()))
+                        .build())).build();
         Map<String, Object> organisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationRequestWithAllEmptyFields().build());
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+
+        compareOrganisationResponse(orgResponse,orgIdentifierResponse);
+    }
+
+    private void compareOrganisationResponse(Map<String, Object> orgResponse, String orgIdentifierResponse) {
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
+
+        assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
+        assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
+        assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
+        assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
+        assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
+
+        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
+        assertThat(superUser.get("userIdentifier")).isNotNull();
+        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
+        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
+        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+
+        List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
+        assertThat(accounts.get(0).equals("pba123"));
+        Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
+        assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo.get("addressLine2")).isEqualTo("addressLine2");
+        assertThat(contactInfo.get("addressLine3")).isEqualTo("addressLine3");
+        assertThat(contactInfo.get("county")).isEqualTo("county");
+        assertThat(contactInfo.get("country")).isEqualTo("country");
+        assertThat(contactInfo.get("townCity")).isEqualTo("town-city");
+        assertThat(contactInfo.get("postCode")).isEqualTo("some-post-code");
+
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
+        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
+        assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
 
     }
 
