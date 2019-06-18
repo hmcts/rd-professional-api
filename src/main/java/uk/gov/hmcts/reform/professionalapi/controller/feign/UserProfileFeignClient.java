@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.FeinClient;
+package uk.gov.hmcts.reform.professionalapi.controller.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
