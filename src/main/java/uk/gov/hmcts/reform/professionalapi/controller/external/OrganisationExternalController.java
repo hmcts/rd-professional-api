@@ -45,9 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
-    @Value("${exui.role.hmcts-admin:}")
-    private String roleName;
-
 
     @ApiOperation(
             value = "Creates an External Organisation",
@@ -130,7 +127,7 @@ public class OrganisationExternalController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("SuperUser")
+    @PreAuthorize(value="hasRole(roleName)")
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
         return getFindUserByEmail(email);
@@ -153,7 +150,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("SuperUser")
+    @PreAuthorize(value="hasRole(roleName)")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -217,7 +214,7 @@ public class OrganisationExternalController extends SuperController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("SuperUser")
+    @PreAuthorize(value="hasRole(roleName)")
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
 

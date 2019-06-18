@@ -6,6 +6,7 @@ import javax.xml.ws.http.HTTPException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +51,9 @@ public abstract class SuperController {
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+
+    @Value("${exui.role.hmcts-admin:}")
+    private String roleName;
 
     protected ResponseEntity<?>  getCreateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
 

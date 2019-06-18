@@ -25,7 +25,6 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
 
-        //System.out.println("UserRole::value::"+ value);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, "pui-case-manager", OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
