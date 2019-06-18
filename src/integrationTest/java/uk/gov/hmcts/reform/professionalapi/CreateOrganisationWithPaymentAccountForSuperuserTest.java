@@ -16,9 +16,9 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateOrganisationWithPaymentAccountForSuperuserTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {

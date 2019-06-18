@@ -17,10 +17,10 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
-public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegrationTest {
+public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
@@ -129,7 +129,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,"pui-case-manager", organisationIdentifier);
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
         orgResponse =

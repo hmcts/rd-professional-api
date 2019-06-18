@@ -34,15 +34,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 
 
 @RequestMapping(
-        path = "refdata/internal/v1/organisations",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        path = "refdata/internal/v1/organisations"
 )
 @RestController
 @Slf4j
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
 
-    @Secured("SuperUser")
+
     @ApiOperation(
             value = "Creates an Internal Organisation",
             authorizations = {
@@ -68,7 +67,6 @@ public class OrganisationInternalController extends SuperController {
         return getCreateOrganisation(organisationCreationRequest);
     }
 
-    @Secured("OrgAdmin")
     @ApiOperation(
             value = "Retrieves organisation details for internal users",
             authorizations = {
@@ -87,6 +85,7 @@ public class OrganisationInternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Secured("${exui.role.hmcts-admin}")
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
         return getRetrieveOrganisation(id);

@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
+public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Before
     public void setUp() {
@@ -23,6 +23,7 @@ public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);
     }
+
 
     @Test
     public void search_returns_valid_user_with_organisation_status_as_active() {
@@ -39,6 +40,7 @@ public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
         assertEquals("activesomeone@here.com", response.get("email"));
     }
 
+
     @Test
     public void returns_404_when_email_not_found() {
         Map<String, Object> response =
@@ -46,6 +48,7 @@ public class FindUserByEmailTest extends Service2ServiceEnabledIntegrationTest {
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }
+
 
     @Test
     public void returns_404_when_organisation_status_is_not_active() {

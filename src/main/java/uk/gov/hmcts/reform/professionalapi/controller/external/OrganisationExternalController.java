@@ -6,15 +6,20 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,16 +39,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 @RequestMapping(
-        path = "refdata/external/v1/organisations",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        path = "refdata/external/v1/organisations"
 )
 @RestController
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
+    @Value("${exui.role.hmcts-admin:}")
+    private String roleName;
 
 
-    @Secured("SuperUser")
     @ApiOperation(
             value = "Creates an External Organisation",
             authorizations = {
@@ -69,7 +74,6 @@ public class OrganisationExternalController extends SuperController {
         return getCreateOrganisation(organisationCreationRequest);
     }
 
-    @Secured("OrgAdmin")
     @ApiOperation(
             value = "Retrieves organisation details for external users",
             authorizations = {
@@ -88,6 +92,8 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Secured("SuperUser")
+    //@RolesAllowed(roleName)
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
         return getRetrieveOrganisation(id);
@@ -124,6 +130,7 @@ public class OrganisationExternalController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @Secured("SuperUser")
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
         return getFindUserByEmail(email);
@@ -146,6 +153,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @Secured("SuperUser")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -167,6 +175,7 @@ public class OrganisationExternalController extends SuperController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
+    @Secured("SuperUser")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
@@ -208,6 +217,7 @@ public class OrganisationExternalController extends SuperController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @Secured("SuperUser")
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
 

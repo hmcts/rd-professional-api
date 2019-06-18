@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegrationTest {
+public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
@@ -51,7 +51,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
 
@@ -87,7 +87,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
 
@@ -118,7 +118,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,"pui-case-manager", uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
 

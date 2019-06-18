@@ -8,18 +8,26 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrationTest {
+public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegrationTest {
+
+
+    @Value("${exui.role.hmcts-admin}")
+    private String value;
+
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
+
+        //System.out.println("UserRole::value::"+ value);
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, "pui-case-manager", OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
         validateUsers(response);
     }
@@ -27,7 +35,7 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier,"pui-case-manager", OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False");
         validateUsers(response);
     }
@@ -36,7 +44,7 @@ public class FindUsersByOrganisationTest extends Service2ServiceEnabledIntegrati
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier,"pui-case-manager", OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null);
         validateUsers(response);
 

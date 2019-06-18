@@ -6,8 +6,11 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -18,71 +21,105 @@ import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
 
-@Configuration
-@ConfigurationProperties(prefix = "security")
+
+//@ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 @Slf4j
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration  {
 
-    List<String>    anonymousPaths;
+    //@ConfigurationProperties(prefix = "security")
+    @Configuration
+    @Order(1)
+    public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-    private  RequestAuthorizer<Service> serviceRequestAuthorizer;
+        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
 
-    private  RequestAuthorizer<User> userRequestAuthorizer;
+        public PostApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
 
-    private AuthenticationManager      authenticationManager;
+                                                       AuthenticationManager authenticationManager) {
 
-    private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
+            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
 
-    public SecurityConfiguration(
-            RequestAuthorizer<Service> serviceRequestAuthorizer,
-            RequestAuthorizer<User> userRequestAuthorizer,
-            AuthenticationManager authenticationManager) {
-        this.serviceRequestAuthorizer = serviceRequestAuthorizer;
-        this.userRequestAuthorizer = userRequestAuthorizer;
-        this.authenticationManager = authenticationManager;
+            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
+
+        }
+
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http.requestMatchers()
+                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
+                    .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
+                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations/**")
+                    .and()
+                    .addFilter(authCheckerServiceOnlyFilter)
+                    .csrf().disable()
+                    .authorizeRequests()
+                    .anyRequest().authenticated();
+        }
     }
 
-    public List<String> getAnonymousPaths() {
-        return anonymousPaths;
+    @ConfigurationProperties(prefix = "security")
+    @Configuration
+    @Order(2)
+    public static class RestAllApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+
+        List<String> anonymousPaths;
+
+        private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
+
+        public List<String> getAnonymousPaths() {
+            return anonymousPaths;
+        }
+
+        public void setAnonymousPaths(List<String> anonymousPaths) {
+            this.anonymousPaths = anonymousPaths;
+        }
+
+        @Override
+        public void configure(WebSecurity web) {
+            web.ignoring()
+                    .antMatchers(anonymousPaths.toArray(new String[0]));
+        }
+
+
+        public RestAllApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
+
+                                                       RequestAuthorizer<Service> serviceRequestAuthorizer,
+
+                                                       AuthenticationManager authenticationManager) {
+
+            authCheckerServiceAndUserFilter = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
+
+            authCheckerServiceAndUserFilter.setAuthenticationManager(authenticationManager);
+
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http.authorizeRequests()
+                    .antMatchers("/actuator/**","/search/**")
+                    .permitAll()
+                    .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(STATELESS)
+                    .and()
+                    .csrf()
+                    .disable()
+                    .formLogin()
+                    .disable()
+                    .logout()
+                    .disable()
+                    .authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                    .addFilter(authCheckerServiceAndUserFilter);
+        }
+
+
     }
 
-    public void setAnonymousPaths(List<String> anonymousPaths) {
-        this.anonymousPaths = anonymousPaths;
-    }
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring()
-                .antMatchers(anonymousPaths.toArray(new String[0]));
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        log.info("Inside SecurityConfiguration::");
-        AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
-        authCheckerServiceAndUserFilter.setAuthenticationManager(authenticationManager);
-
-
-        http.authorizeRequests()
-                .antMatchers("/actuator/**","/search/**")
-                .permitAll()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(STATELESS)
-                .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .logout()
-                .disable()
-                .authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .addFilter(authCheckerServiceAndUserFilter);
-    }
 }

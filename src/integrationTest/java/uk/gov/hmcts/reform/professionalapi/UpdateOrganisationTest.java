@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTest {
+public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
@@ -158,7 +158,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
                 .companyNumber("company")
                 .build();
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", organisationIdentifier);
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
@@ -182,7 +182,7 @@ public class UpdateOrganisationTest extends Service2ServiceEnabledIntegrationTes
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", organisationIdentifier);
 
         if (httpStatus == 200) {
             persistedOrganisation = organisationRepository

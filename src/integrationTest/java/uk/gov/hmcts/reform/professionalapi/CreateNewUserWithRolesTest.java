@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void post_request_adds_new_user_to_an_organisation() {

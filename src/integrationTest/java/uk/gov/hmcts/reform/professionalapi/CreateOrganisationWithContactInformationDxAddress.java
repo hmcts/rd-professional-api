@@ -15,11 +15,11 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
 
-public class CreateOrganisationWithContactInformationDxAddress extends Service2ServiceEnabledIntegrationTest {
+public class CreateOrganisationWithContactInformationDxAddress extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress() {

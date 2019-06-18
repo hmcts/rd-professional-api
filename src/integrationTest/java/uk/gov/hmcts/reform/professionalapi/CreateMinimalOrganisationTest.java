@@ -19,10 +19,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void persists_and_returns_valid_minimal_organisation() {
