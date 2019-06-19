@@ -6,3 +6,10 @@ s2s-secret: ${S2S_SECRET:SZDUA3L7N32PE2IS}
 spring:
   flyway:
     enabled: false
+## Secure roles configuration
+exui.role:
+  hmcts-admin: SuperUser
+  pui-user-manager: pui-user-manager
+  pui-organisation-manager: pui-organisation-manager
+  pui-finance-manager: pui-finance-manager
+  pui-case-manager: pui-case-manager

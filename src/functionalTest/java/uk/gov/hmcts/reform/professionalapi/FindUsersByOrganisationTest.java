@@ -17,29 +17,29 @@ public class FindUsersByOrganisationTest extends FunctionalTestSuite {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), "False", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager, "False", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), "True", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager,"True", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), "invalid", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager,"invalid", HttpStatus.OK));
     }
 
     @Test
     public void find_users_for_non_active_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, "False", HttpStatus.OK);
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, puiCaseManager,"False", HttpStatus.OK);
         assertThat(searchResponse.get("users")).asList().isEmpty();
     }
 
     @Test
     public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", "False", HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", puiCaseManager,"False", HttpStatus.NOT_FOUND);
     }
 }

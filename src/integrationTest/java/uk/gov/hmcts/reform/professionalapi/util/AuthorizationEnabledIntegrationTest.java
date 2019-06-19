@@ -3,21 +3,20 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.matching;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableSet;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestPropertySource;
 
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -28,8 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
-import java.util.concurrent.ConcurrentHashMap;
-
+@Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000"})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -61,6 +59,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Rule
     public WireMockRule sidam_service = new WireMockRule(5000);
+
+    @Value("${exui.role.hmcts-admin}")
+    protected String hmctsAdmin;
+
+    @Value("${exui.role.pui-user-manager}")
+    protected String puiUserManager;
+
+    @Value("${exui.role.pui-organisation-manager}")
+    protected String puiOrgManager;
+
+    @Value("${exui.role.pui-finance-manager}")
+    protected String puiFinanceManager;
+
+    @Value("${exui.role.pui-case-manager}")
+    protected String puiCaseManager;
 
     @Before
     public void setUpClient() {

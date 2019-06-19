@@ -23,13 +23,10 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
 
-
-//@ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfiguration  {
 
-    //@ConfigurationProperties(prefix = "security")
     @Configuration
     @Order(1)
     public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {

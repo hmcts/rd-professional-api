@@ -18,6 +18,6 @@ public class UpdateOrganisationTest extends FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
     }
 }

@@ -26,16 +26,16 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
 
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, "pui-case-manager", OrganisationStatus.ACTIVE);
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
+        updateOrganisation(organisationIdentifier, puiCaseManager, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", puiCaseManager);
         validateUsers(response);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier,"pui-case-manager", OrganisationStatus.ACTIVE);
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False");
+        updateOrganisation(organisationIdentifier, puiCaseManager, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", puiCaseManager);
         validateUsers(response);
     }
 
@@ -43,8 +43,8 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier,"pui-case-manager", OrganisationStatus.ACTIVE);
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null);
+        updateOrganisation(organisationIdentifier, puiCaseManager, OrganisationStatus.ACTIVE);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null, puiCaseManager);
         validateUsers(response);
 
     }
@@ -52,21 +52,21 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     @Test
     public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(0);
     }
 
     @Test
     public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_400() {
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("400");
 
     }
 
     @Test
     public void retrieve_users_with_non_existing_organisationIdentifier_should_return_status_404() {
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("A1B2C3D","False");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("A1B2C3D","False", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 

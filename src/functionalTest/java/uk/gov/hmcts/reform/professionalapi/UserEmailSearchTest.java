@@ -34,9 +34,9 @@ public class UserEmailSearchTest extends FunctionalTestSuite {
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email, puiCaseManager);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }

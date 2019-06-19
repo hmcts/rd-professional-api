@@ -38,8 +38,8 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email, puiCaseManager);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
     }
@@ -61,7 +61,7 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                                 .build())
                         .build());
 
-        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email);
+        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, puiCaseManager);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {

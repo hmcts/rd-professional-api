@@ -37,7 +37,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, puiCaseManager);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -62,7 +62,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest, puiCaseManager);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
     }

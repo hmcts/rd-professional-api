@@ -19,7 +19,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_all_organisations() {
         professionalApiClient.createOrganisation();
 
-        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations();
+        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(puiCaseManager);
         assertThat(response.get("organisations")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -28,7 +28,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
-        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"));
+        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager);
         assertThat(response.get("name")).isNotNull();
         assertThat(response.get("status")).isEqualTo("PENDING");
         assertThat(response.get("sraId")).isNotNull();
@@ -45,7 +45,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), puiCaseManager);
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
@@ -53,7 +53,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), puiCaseManager);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -62,7 +62,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
 
         professionalApiClient
-                .retrieveOrganisationDetailsByUnknownStatus("ACTIV");
+                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", puiCaseManager);
     }
 
 }

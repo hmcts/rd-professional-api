@@ -46,36 +46,36 @@ public class ProfessionalReferenceDataClient {
         return postRequest(baseUrl, request);
     }
 
-    public Map<String, Object> findUserByEmail(String email) {
-        return getRequest("/refdata/external/v1/organisations/users?email={email}", "pui-case-manager",email);
+    public Map<String, Object> findUserByEmail(String email, String role) {
+        return getRequest("/refdata/external/v1/organisations/users?email={email}", role,email); //"pui-case-manager"
     }
 
-    public Map<String, Object> findPaymentAccountsByEmail(String email) {
-        return getRequest("/refdata/external/v1/organisations/pbas?email={email}", "pui-case-manager",email);
+    public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
+        return getRequest("/refdata/external/v1/organisations/pbas?email={email}", role,email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
-        return getRequest("/search/pba/{email}", "pui-case-manager", email);
+        return getRequest("/search/pba/{email}","pui-case-manager", email);
     }
 
-    public Map<String,Object> retrieveSingleOrganisation(String id) {
-        return getRequest(APP_BASE_PATH + "?id={id}", "pui-case-manager", id);
+    public Map<String,Object> retrieveSingleOrganisation(String id, String role) {
+        return getRequest(APP_BASE_PATH + "?id={id}", role, id);
     }
 
-    public Map<String,Object> retrieveAllOrganisations() {
-        return getRequest(APP_BASE_PATH, "pui-case-manager");
+    public Map<String,Object> retrieveAllOrganisations(String role) {
+        return getRequest(APP_BASE_PATH, role);
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status) {
-        return getRequest("/refdata/external/v1/organisations?status={status}", "pui-case-manager", status);
+    public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
+        return getRequest("/refdata/external/v1/organisations?status={status}", role, status);
     }
 
-    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest) {
+    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {
         return postRequest(baseUrl + "/" + orgId + "/users/", newUserCreationRequest);
     }
 
-    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted) {
-        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", "pui-case-manager", showDeleted);
+    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role) {
+        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -150,6 +150,7 @@ public class ProfessionalReferenceDataClient {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
         headers.add("ServiceAuthorization", JWT_TOKEN);
         headers.add("Authorization", sidamTokenMap.get(role));
 

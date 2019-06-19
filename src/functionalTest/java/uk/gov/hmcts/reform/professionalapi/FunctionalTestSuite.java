@@ -33,6 +33,21 @@ public abstract class FunctionalTestSuite {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
+    @Value("${hmcts-admin}")
+    protected String hmctsAdmin;
+
+    @Value("${pui-user-manager}")
+    protected String puiUserManager;
+
+    @Value("${pui-organisation-manager}")
+    protected String puiOrgManager;
+
+    @Value("${pui-finance-manager}")
+    protected String puiFinanceManager;
+
+    @Value("${pui-case-manager}")
+    protected String puiCaseManager;
+
     protected ProfessionalApiClient professionalApiClient;
 
     @Before
@@ -57,7 +72,7 @@ public abstract class FunctionalTestSuite {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier);
+        professionalApiClient.updateOrganisation(organisationIdentifier,puiCaseManager);
         return organisationIdentifier;
 
     }

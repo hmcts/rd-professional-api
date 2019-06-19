@@ -22,7 +22,7 @@ public class AddNewUserTest extends FunctionalTestSuite {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserCreationRequest();
         assertThat(newUserCreationRequest).isNotNull();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, puiCaseManager,newUserCreationRequest);
 
         assertThat(newUserResponse).isNotNull();
     }
