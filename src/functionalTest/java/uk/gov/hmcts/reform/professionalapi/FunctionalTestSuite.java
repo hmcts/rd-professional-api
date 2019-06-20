@@ -17,16 +17,23 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
+import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+@ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-public  class FunctionalTestSuite {
+public abstract class FunctionalTestSuite {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -55,7 +62,7 @@ public  class FunctionalTestSuite {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-    @Value("${url}")
+    @Value("${test.url}")
     public String baseTestUrl;
 
     @Value("${email.pattern}")
@@ -69,6 +76,8 @@ public  class FunctionalTestSuite {
 
     protected ProfessionalApiClient professionalApiClient;
 
+    @Autowired
+    protected TestConfigProperties configProperties;
 
 
     @Before

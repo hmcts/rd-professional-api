@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.config;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @Component
 @Getter
+@Configuration
 public class Oauth2 {
 
     private final String clientId;

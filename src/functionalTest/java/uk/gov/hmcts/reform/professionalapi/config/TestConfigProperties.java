@@ -4,14 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Component
+@Configuration
 public class TestConfigProperties {
 
-    //@Autowired
+    @Autowired
     public Oauth2 oauth2;
 
     @Value("${test.url}")
@@ -26,20 +28,4 @@ public class TestConfigProperties {
     @Value("${idam.api.url}")
     public String idamApiUrl;
 
- /*   @Value("${s2s.url}")
-    private String s2sBaseUrl;
-
-    @Value("${s2s.service.name}")
-    public String s2sServiceName;
-
-    @Value("${s2s.service.secret}")
-    public String s2sServiceSecret;*/
-
-   /* @Value("${payments.account.existing.account.number}")
-    public String existingAccountNumber;
-
-    @Value("${payments.account.fake.account.number}")
-    public String fakeAccountNumber;
-    @Value("${mock.callback.url.endpoint}")
-    public String mockCallBackUrl;*/
 }
