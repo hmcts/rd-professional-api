@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
@@ -64,6 +65,42 @@ public class ProfessionalUserInternalController extends SuperController {
 
         log.info("Received request to get users for internal organisationIdentifier:ProfessionalUserInternalController " + organisationIdentifier);
 
-        return getProfessionalUsersEntityResponseOrganisationValid(organisationIdentifier, showDeleted);
+        return getUsersByOrganisation(organisationIdentifier, showDeleted);
+    }
+
+    @ApiOperation(
+            value = "Retrieves the internal user with the given email address if organisation is active",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization")
+            }
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The email address of the user to return",
+            required = true
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "A representation of a professional user",
+                    response = ProfessionalUsersResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email address was provided"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No user was found with the provided email address"
+            )
+    })
+    @GetMapping(
+            value = "/users",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
+
+        return getFindUserByEmail(email);
     }
 }

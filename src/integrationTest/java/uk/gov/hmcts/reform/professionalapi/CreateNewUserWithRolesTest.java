@@ -62,7 +62,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid", userCreationRequest, puiCaseManager);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, puiCaseManager);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
     }

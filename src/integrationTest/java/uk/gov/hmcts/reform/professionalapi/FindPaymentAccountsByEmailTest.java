@@ -14,6 +14,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
@@ -23,6 +24,9 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
+
+    @Autowired
+    ApplicationConfiguration configuration;
 
 
     @Test

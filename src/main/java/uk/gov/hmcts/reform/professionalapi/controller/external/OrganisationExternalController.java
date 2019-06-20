@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -85,48 +85,13 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize(value="hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
         return getRetrieveOrganisation(id);
     }
 
-    @ApiOperation(
-            value = "Retrieves the External user with the given email address if organisation is active",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
-            }
-    )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The email address of the external user to return",
-            required = true
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A representation of a professional user for external",
-                    response = ProfessionalUsersResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid email address was provided"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No user was found with the provided email address"
-            )
-    })
-    @GetMapping(
-            value = "/users",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    @PreAuthorize(value="hasRole(roleName)")
-    public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
-        return getFindUserByEmail(email);
-    }
 
     @ApiOperation(
             value = "Retrieves an organisations payment accounts by super user email for external",
@@ -145,7 +110,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value="hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -209,7 +174,7 @@ public class OrganisationExternalController extends SuperController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value="hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
 
@@ -235,7 +200,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize(value="hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {

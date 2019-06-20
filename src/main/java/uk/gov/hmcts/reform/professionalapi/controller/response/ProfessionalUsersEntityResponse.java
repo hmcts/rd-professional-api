@@ -5,13 +5,13 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-@NoArgsConstructor
+@Getter
 public class ProfessionalUsersEntityResponse {
     @JsonProperty
-    private List<ProfessionalUsersResponse> users;
+    private final List<ProfessionalUsersResponse> users;
 
     public ProfessionalUsersEntityResponse(List<ProfessionalUser> professionalUsers) {
         this.users = professionalUsers.stream()

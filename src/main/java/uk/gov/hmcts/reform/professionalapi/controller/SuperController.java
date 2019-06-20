@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.ws.http.HTTPException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,7 @@ public abstract class SuperController {
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            throw new HTTPException(404);
+            throw new EmptyResultDataAccessException(1);
         }
         return ResponseEntity
                 .status(200)
@@ -144,6 +143,8 @@ public abstract class SuperController {
     protected ResponseEntity<?> getAddUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
         if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
@@ -160,7 +161,7 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> getProfessionalUsersEntityResponseOrganisationValid(String organisationIdentifier, String showDeleted) {
+    protected ResponseEntity<ProfessionalUsersEntityResponse> getUsersByOrganisation(String organisationIdentifier, String showDeleted) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);

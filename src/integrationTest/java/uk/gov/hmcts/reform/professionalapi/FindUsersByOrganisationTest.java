@@ -39,7 +39,6 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         validateUsers(response);
     }
 
-
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
@@ -50,11 +49,10 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     }
 
     @Test
-    public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_200() {
+    public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_404() {
         String organisationIdentifier = createOrganisationRequest();
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", puiCaseManager);
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(0);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test

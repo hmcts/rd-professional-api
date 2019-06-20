@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -52,7 +53,10 @@ public class ProfessionalApiClient {
                                  String s2sToken) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        new RestActions(new UserResolverBackdoor()).getAuthorizationToken(CASEWORKER_ID);
+        //new RestActions(new UserResolverBackdoor()).getAuthorizationToken(CASEWORKER_ID);
+
+
+
     }
 
     public String getWelcomePage() {
@@ -329,7 +333,7 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeaders(String role) {
 
-        authToken = UserResolverBackdoor.getBearerAuthorizationHeader(CASEWORKER_ID);
+       // authToken = UserResolverBackdoor.getBearerAuthorizationHeader(CASEWORKER_ID);
         log.info("authToken::" + authToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()

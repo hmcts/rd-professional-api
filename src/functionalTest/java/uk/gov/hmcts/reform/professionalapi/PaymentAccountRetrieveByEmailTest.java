@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
+
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
