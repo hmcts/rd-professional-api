@@ -61,18 +61,7 @@ public abstract class FunctionalTestSuite {
 
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
-
-    @Value("${test.url}")
-    public String baseTestUrl;
-
-    @Value("${email.pattern}")
-    public String generatedUserEmailPattern;
-
-    @Value("${test.user.password}")
-    public String testUserPassword;
-
-    @Value("${idam.api.url}")
-    public String idamApiUrl;
+    
 
     protected ProfessionalApiClient professionalApiClient;
 
