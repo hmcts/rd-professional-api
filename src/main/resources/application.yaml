@@ -76,7 +76,8 @@ idam:
     microservice: rd_professional_api
     url: ${S2S_URL:http://127.0.0.1:8502}
 
-auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+auth.idam.client.baseUrl: ${IDAM_URL:http://0.0.0.0:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
