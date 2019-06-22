@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class UpdateOrganisationTest extends FunctionalTestSuite {
+public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
 
     @Test

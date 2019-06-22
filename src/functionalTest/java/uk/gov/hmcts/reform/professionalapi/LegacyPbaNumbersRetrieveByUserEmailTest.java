@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class LegacyPbaNumbersRetrieveByUserEmailTest extends FunctionalTestSuite {
+public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_payment_numbers_by_user_email() {

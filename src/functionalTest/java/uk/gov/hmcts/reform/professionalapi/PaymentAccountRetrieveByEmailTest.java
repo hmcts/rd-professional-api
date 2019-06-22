@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
+public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
     @Test

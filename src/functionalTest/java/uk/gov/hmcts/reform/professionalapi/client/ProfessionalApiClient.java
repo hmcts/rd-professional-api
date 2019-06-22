@@ -32,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -44,19 +43,14 @@ public class ProfessionalApiClient {
 
     private final String professionalApiUrl;
     private final String s2sToken;
-    private final static String CASEWORKER_ID = "2";
-
-    private  String authToken;
+    private final String authToken;
 
     public ProfessionalApiClient(
                                  String professionalApiUrl,
-                                 String s2sToken) {
+                                 String s2sToken, String authToken) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        //new RestActions(new UserResolverBackdoor()).getAuthorizationToken(CASEWORKER_ID);
-
-
-
+        this.authToken = authToken;
     }
 
     public String getWelcomePage() {
@@ -227,7 +221,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email , String role) {
+    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email, String role) {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
@@ -333,7 +327,6 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeaders(String role) {
 
-       // authToken = UserResolverBackdoor.getBearerAuthorizationHeader(CASEWORKER_ID);
         log.info("authToken::" + authToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()

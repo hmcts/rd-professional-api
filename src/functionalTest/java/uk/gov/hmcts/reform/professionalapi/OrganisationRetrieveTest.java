@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class OrganisationRetrieveTest extends FunctionalTestSuite {
+public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_all_organisations() {

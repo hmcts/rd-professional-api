@@ -21,7 +21,7 @@ public class Oauth2 {
         @Value("${oauth2.client.id}") String clientId,
         @Value("${oauth2.client.secret}") String clientSecret) {
         this.clientId = clientId;
-        this.redirectUrl = redirectUrl + "/receiver";
+        this.redirectUrl = redirectUrl;
         this.clientSecret = clientSecret;
     }
 }

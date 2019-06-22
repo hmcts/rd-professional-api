@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class AddNewUserTest extends FunctionalTestSuite {
+public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Test
     public void add_new_user_to_organisation() {

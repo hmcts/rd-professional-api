@@ -1,8 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.idam;
 
+import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.CreateUserRequest;
+import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.CreateUserRequest.*;
+import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.TokenExchangeResponse;
+
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+
+import java.util.Base64;
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,21 +21,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.idam.models.User;
 
-import java.util.Base64;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.CreateUserRequest;
-import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.TokenExchangeResponse;
-
-import static uk.gov.hmcts.reform.professionalapi.idam.IdamApi.CreateUserRequest.*;
 
 @Service
+@Slf4j
 public class IdamService {
-    private static final Logger LOG = LoggerFactory.getLogger(IdamService.class);
 
-    public static final String CMC_CITIZEN_GROUP = "cmc-private-beta";
-    public static final String CMC_CASE_WORKER_GROUP = "caseworker";
+    private static final Logger LOG = LoggerFactory.getLogger(IdamService.class);
 
     public static final String BEARER = "Bearer ";
     public static final String AUTHORIZATION_CODE = "authorization_code";
@@ -66,7 +68,7 @@ public class IdamService {
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl());
+                testConfig.getOauth2().getRedirectUrl(), "create-user");
 
         TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
                 authenticateUserResponse.getCode(),
@@ -81,6 +83,7 @@ public class IdamService {
 
 
     private CreateUserRequest userRequest(String email, String userGroup, String[] roles) {
+
         return userRequestWith()
                 .email(email)
                 .password(testConfig.getTestUserPassword())
