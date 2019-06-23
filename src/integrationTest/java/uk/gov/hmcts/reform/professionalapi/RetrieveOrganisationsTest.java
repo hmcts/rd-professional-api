@@ -93,7 +93,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void error_if_organisation_id_invalid() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!", puiCaseManager);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test
@@ -101,8 +101,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
-
-
 
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {

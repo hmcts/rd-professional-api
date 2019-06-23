@@ -47,7 +47,6 @@ public class SecurityConfiguration  {
             http.requestMatchers()
                     .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
                     .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
-                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations/**")
                     .and()
                     .addFilter(authCheckerServiceOnlyFilter)
                     .csrf().disable()

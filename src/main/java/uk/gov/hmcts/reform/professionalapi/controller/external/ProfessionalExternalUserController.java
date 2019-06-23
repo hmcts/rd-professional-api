@@ -33,7 +33,8 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the external users with the given organisation",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -73,7 +74,8 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the External user with the given email address if organisation is active",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(

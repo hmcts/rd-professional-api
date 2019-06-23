@@ -46,7 +46,7 @@ public interface IdamApi {
     class CreateUserRequest {
         private final String email;
         private final String forename = "John";
-        private final String id = "my_reference_data_client_id";// UUID.randomUUID().toString();
+        private final String id = "my_reference_data_client_id";
         private final String surname = "Smith";
         private final UserGroup userGroup;
         private final List<Role> roles;

@@ -69,7 +69,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves organisation details for internal users",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -95,7 +96,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves an organisations payment accounts by super user email for internal user",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiResponses({
@@ -117,7 +119,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiOperation(
             value = "Updates an organisation",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation"),
@@ -140,7 +143,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves the  internal organisation details with the given status ",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -178,7 +182,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiOperation(
             value = "Add an internal user to an organisation",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiResponses({

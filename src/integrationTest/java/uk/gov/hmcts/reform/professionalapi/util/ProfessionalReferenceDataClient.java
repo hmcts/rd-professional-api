@@ -43,7 +43,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
-        return postRequest(baseUrl, request);
+        return postRequest(baseUrl, request, null);
     }
 
     public Map<String, Object> findUserByEmail(String email, String role) {
@@ -71,7 +71,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {
-        return postRequest(baseUrl + "/" + orgId + "/users/", newUserCreationRequest);
+        return postRequest(baseUrl + "/" + orgId + "/users/", newUserCreationRequest, role);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role) {
@@ -79,10 +79,17 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private <T> Map<String, Object> postRequest(String uriPath, T requestBody) {
+    private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role) {
 
-        HttpEntity<T> request =
-                new HttpEntity<>(requestBody, getS2sTokenHeaders());
+        HttpEntity<T> request = null;
+
+        if (null == role) {
+            request = new HttpEntity<>(requestBody, getS2sTokenHeaders());
+
+        } else {
+
+            request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role));
+        }
 
         ResponseEntity<Map> responseEntity;
 

@@ -32,7 +32,8 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves the internal users with the given organisation",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -63,7 +64,7 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
-        log.info("Received request to get users for internal organisationIdentifier:ProfessionalUserInternalController " + organisationIdentifier);
+        log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
         return getUsersByOrganisation(organisationIdentifier, showDeleted);
     }
@@ -71,7 +72,8 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves the internal user with the given email address if organisation is active",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(

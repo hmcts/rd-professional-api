@@ -56,9 +56,9 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     }
 
     @Test
-    public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_400() {
+    public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_404() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False", puiCaseManager);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("404");
 
     }
 

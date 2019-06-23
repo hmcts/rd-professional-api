@@ -70,7 +70,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves organisation details for external users",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -96,7 +97,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves an organisations payment accounts by super user email for external",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiResponses({
@@ -120,7 +122,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
         value = "Updates an organisation",
         authorizations = {
-            @Authorization(value = "ServiceAuthorization")
+            @Authorization(value = "ServiceAuthorization"),
+            @Authorization(value = "Authorization")
         })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation for external"),
@@ -144,7 +147,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves the organisation details with the given status for external",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
             }
     )
     @ApiParam(
@@ -184,7 +188,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
         value = "Add a external user to an organisation",
         authorizations = {
-            @Authorization(value = "ServiceAuthorization")
+            @Authorization(value = "ServiceAuthorization"),
+            @Authorization(value = "Authorization")
         }
     )
     @ApiResponses({
