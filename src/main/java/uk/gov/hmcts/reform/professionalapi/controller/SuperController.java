@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -168,10 +167,8 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.info("Organisation is not Active hence not returning any users");
-            return ResponseEntity
-                    .status(200)
-                    .body(new ProfessionalUsersEntityResponse(new ArrayList<ProfessionalUser>()));
+            log.error("Organisation is not Active hence not returning any users");
+            throw new EmptyResultDataAccessException(1);
         }
 
         if (null == showDeleted) {

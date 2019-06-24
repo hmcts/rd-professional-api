@@ -66,7 +66,7 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
-        log.info("ProfessionalUserInternalController:: get users for organisationIdentifier By External user:" + organisationIdentifier);
+        log.info("ProfessionalExternalUserController:: get users for organisationIdentifier By External user:" + organisationIdentifier);
 
         return getUsersByOrganisation(organisationIdentifier, showDeleted);
     }
