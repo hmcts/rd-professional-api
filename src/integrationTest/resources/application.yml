@@ -18,7 +18,7 @@ security:
     - "it"
 
 exui.role:
-  hmcts-admin: SuperUser
+  hmcts-admin: prd-admin
   pui-user-manager: pui-user-manager
   pui-organisation-manager: pui-organisation-manager
   pui-finance-manager: pui-finance-manager

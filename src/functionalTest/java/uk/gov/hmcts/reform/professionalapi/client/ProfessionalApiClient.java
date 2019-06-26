@@ -147,7 +147,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeaders(role)
                 .body(newUserCreationRequest)
-                .post("/refdata/external/v1/organisations/" + orgId + "/users/")
+                .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -160,7 +160,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .param("email", email)
-                .get("/refdata/external/v1/organisations/users/")
+                .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -239,7 +239,7 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
         Response response = getMultipleAuthHeaders(role)
-                .get("/refdata/external/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
                     .assertThat()
@@ -257,7 +257,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
             .body(organisationCreationRequest)
-            .put("refdata/external/v1/organisations/" + organisationIdentifier)
+            .put("refdata/internal/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());

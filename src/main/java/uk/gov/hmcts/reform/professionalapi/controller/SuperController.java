@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -36,24 +37,39 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 public abstract class SuperController {
 
     @Autowired
-    private OrganisationService organisationService;
+    protected OrganisationService organisationService;
     @Autowired
-    private ProfessionalUserService professionalUserService;
+    protected ProfessionalUserService professionalUserService;
     @Autowired
-    private PaymentAccountService paymentAccountService;
+    protected PaymentAccountService paymentAccountService;
     @Autowired
-    private PrdEnumService prdEnumService;
+    protected PrdEnumService prdEnumService;
     @Autowired
-    private UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
+    protected UpdateOrganisationRequestValidator updateOrganisationRequestValidator;
     @Autowired
-    private OrganisationCreationRequestValidator organisationCreationRequestValidator;
+    protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
-    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    @Autowired
+    protected ProfessionalUserReqValidator profExtUsrReqValidator;
 
     @Value("${exui.role.hmcts-admin:}")
     private String roleName;
 
-    protected ResponseEntity<?>  getCreateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
+    @Value("${exui.role.hmcts-admin:}")
+    protected String puiUserManager;
+
+    @Value("${exui.role.hmcts-admin:}")
+    protected String puiOrgManager;
+
+    @Value("${exui.role.hmcts-admin:}")
+    protected String puiFinanceManager;
+
+    @Value("${exui.role.hmcts-admin:}")
+    protected String puiCaseManager;
+
+
+    protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
@@ -66,7 +82,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> getRetrieveOrganisation(String id) {
+    protected ResponseEntity<?> retrieveAllOrganisationOrById(String id) {
 
         Object organisationResponse;
         if (id == null) {
@@ -87,7 +103,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> getFindUserByEmail(String email) {
+    protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
@@ -99,7 +115,7 @@ public abstract class SuperController {
                 .body(new ProfessionalUsersResponse(user));
     }
 
-    protected ResponseEntity<?> getRetrievePaymentAccountBySuperUserEmail(String email) {
+    protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
@@ -111,7 +127,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity<?> getUpdateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+    protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
@@ -124,7 +140,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationDetailsByStatus(String status) {
+    protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
@@ -139,7 +155,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    protected ResponseEntity<?> getAddUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
+    protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
@@ -160,7 +176,7 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> getUsersByOrganisation(String organisationIdentifier, String showDeleted) {
+    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);

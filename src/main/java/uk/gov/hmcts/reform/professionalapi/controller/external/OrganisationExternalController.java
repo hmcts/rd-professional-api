@@ -14,10 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,13 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+
 
 
 @RequestMapping(
@@ -64,7 +64,7 @@ public class OrganisationExternalController extends SuperController {
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for external users...");
-        return getCreateOrganisation(organisationCreationRequest);
+        return createOrganisationFrom(organisationCreationRequest);
     }
 
     @ApiOperation(
@@ -89,7 +89,7 @@ public class OrganisationExternalController extends SuperController {
     @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
-        return getRetrieveOrganisation(id);
+        return retrieveAllOrganisationOrById(id);
     }
 
 
@@ -116,7 +116,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
-        return getRetrievePaymentAccountBySuperUserEmail(email);
+        return retrievePaymentAccountByUserEmail(email);
     }
 
     @ApiOperation(
@@ -131,17 +131,17 @@ public class OrganisationExternalController extends SuperController {
             @ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
     })
     @PutMapping(
-            value = "/{orgId}",
+            value = "/",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @Secured("SuperUser")
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @OrgId @NotBlank String organisationIdentifier) {
 
         log.info("Received request to update organisation for organisationIdentifier:external " + organisationIdentifier);
-        return getUpdateOrganisation(organisationCreationRequest, organisationIdentifier);
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
 
     @ApiOperation(
@@ -182,7 +182,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
 
-        return retrieveAllOrganisationDetailsByStatus(status);
+        return retrieveAllOrganisationsByStatus(status);
     }
 
     @ApiOperation(
@@ -200,7 +200,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @PostMapping(
-            path = "/{orgId}/users/",
+            path = "/users/",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
@@ -208,11 +208,11 @@ public class OrganisationExternalController extends SuperController {
     @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @OrgId @NotBlank String organisationIdentifier) {
 
         log.info("Received request to add a new user to an organisation for external..." + organisationIdentifier);
 
-        return getAddUserToOrganisation(newUserCreationRequest, organisationIdentifier);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
 
     }
 }

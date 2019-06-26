@@ -101,7 +101,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"email\": \"super.user@hmcts.net\","
                                 +  "  \"accountStatus\": \"active\","
                                 +  "  \"roles\": ["
-                                +  "    \"SuperUser\""
+                                +  "    \"SuperUser\","
+                                +  "    \"prd-admin\""
                                 +  "  ]"
                                 +  "}")));
     }

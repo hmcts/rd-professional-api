@@ -20,7 +20,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 
 public class ProfessionalReferenceDataClient {
 
-    private static final String APP_BASE_PATH = "refdata/external/v1/organisations";
+    private static final String APP_EXT_BASE_PATH = "refdata/external/v1/organisations";
+    private static final String APP_INT_BASE_PATH = "refdata/internal/v1/organisations";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
     private static final Map<String, String> sidamTokenMap = new HashMap() {{
@@ -39,7 +40,7 @@ public class ProfessionalReferenceDataClient {
 
     public ProfessionalReferenceDataClient(int prdApiPort) {
         this.prdApiPort = prdApiPort;
-        this.baseUrl = "http://localhost:" + prdApiPort + APP_BASE_PATH;
+        this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
     }
 
     public Map<String, Object> createOrganisation(OrganisationCreationRequest request) {
@@ -47,11 +48,11 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUserByEmail(String email, String role) {
-        return getRequest("/refdata/external/v1/organisations/users?email={email}", role,email);
+        return getRequest("/" + APP_INT_BASE_PATH + "/users?email={email}", role,email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
-        return getRequest("/refdata/external/v1/organisations/pbas?email={email}", role,email);
+        return getRequest("/" + APP_EXT_BASE_PATH + "/pbas?email={email}", role,email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
@@ -59,15 +60,15 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String,Object> retrieveSingleOrganisation(String id, String role) {
-        return getRequest(APP_BASE_PATH + "?id={id}", role, id);
+        return getRequest(APP_EXT_BASE_PATH + "?id={id}", role, id);
     }
 
     public Map<String,Object> retrieveAllOrganisations(String role) {
-        return getRequest(APP_BASE_PATH, role);
+        return getRequest(APP_EXT_BASE_PATH, role);
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
-        return getRequest("/refdata/external/v1/organisations?status={status}", role, status);
+        return getRequest(APP_EXT_BASE_PATH + "?status={status}", role, status);
     }
 
     public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {
@@ -75,7 +76,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role) {
-        return getRequest("/" + APP_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
+        return getRequest("/" + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -137,7 +138,7 @@ public class ProfessionalReferenceDataClient {
             OrganisationCreationRequest organisationCreationRequest,String role, String organisationIdentifier) {
 
         ResponseEntity<OrganisationResponse> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_BASE_PATH + "/" + organisationIdentifier;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
         try {
             HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);

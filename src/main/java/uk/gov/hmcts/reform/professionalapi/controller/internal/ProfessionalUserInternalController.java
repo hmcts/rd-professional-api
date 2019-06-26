@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,12 +62,13 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/{orgId}/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
-        return getUsersByOrganisation(organisationIdentifier, showDeleted);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted);
     }
 
     @ApiOperation(
@@ -101,8 +103,9 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @PreAuthorize(value = "hasRole(roleName)")
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
-        return getFindUserByEmail(email);
+        return retrieveUserByEmail(email);
     }
 }

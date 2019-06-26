@@ -63,7 +63,7 @@ public class OrganisationInternalController extends SuperController {
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for internal users...");
-        return getCreateOrganisation(organisationCreationRequest);
+        return createOrganisationFrom(organisationCreationRequest);
     }
 
     @ApiOperation(
@@ -88,7 +88,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("${exui.role.hmcts-admin}")
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
-        return getRetrieveOrganisation(id);
+        return retrieveAllOrganisationOrById(id);
     }
 
 
@@ -113,7 +113,7 @@ public class OrganisationInternalController extends SuperController {
     )
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for internal...");
-        return getRetrievePaymentAccountBySuperUserEmail(email);
+        return retrievePaymentAccountByUserEmail(email);
     }
 
     @ApiOperation(
@@ -137,7 +137,7 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("Received request to update organisation for organisationIdentifier: ");
-        return getUpdateOrganisation(organisationCreationRequest, organisationIdentifier);
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
 
     @ApiOperation(
@@ -176,7 +176,7 @@ public class OrganisationInternalController extends SuperController {
     )
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
-        return  retrieveAllOrganisationDetailsByStatus(status);
+        return  retrieveAllOrganisationsByStatus(status);
     }
 
     @ApiOperation(
@@ -199,13 +199,14 @@ public class OrganisationInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
+    @Secured("${exui.role.hmcts-admin}")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("Received request to add a internal new user to an organisation...");
 
-        return addUserToOrganisation(newUserCreationRequest, organisationIdentifier);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
 
     }
 

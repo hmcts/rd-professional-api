@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.professionalapi.resolver;
+package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -14,12 +15,12 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 
 
 @Slf4j
-public class HeaderVersionArgumentResolver implements HandlerMethodArgumentResolver {
+public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
 
-        return methodParameter.getParameterAnnotation(OrgId.class) != null;
+        return null != methodParameter.getParameterAnnotation(UserId.class);
     }
 
     @Override
@@ -32,13 +33,13 @@ public class HeaderVersionArgumentResolver implements HandlerMethodArgumentResol
         HttpServletRequest request
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         String userId = null;
-        log.info("Inside HeaderVersionArgumentResolver");
+        log.info("Inside UserIdArgumentResolver");
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        if (null != serviceAndUserDetails) {
-            userId = serviceAndUserDetails.getUsername();
-            log.info("Inside HeaderVersionArgumentResolver::orgId::" + userId);
+        if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
+            userId = serviceAndUserDetails.getUsername().trim();
+            log.info("Inside UserIdArgumentResolver::userId::" + userId);
             Object[] roles  =  serviceAndUserDetails.getAuthorities().toArray();
             String serviceName = serviceAndUserDetails.getServicename();
         }
