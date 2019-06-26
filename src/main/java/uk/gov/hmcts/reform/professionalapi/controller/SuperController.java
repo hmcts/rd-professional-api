@@ -54,23 +54,24 @@ public abstract class SuperController {
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
 
     @Value("${exui.role.hmcts-admin:}")
-    private String roleName;
+    private String prdAdmin;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-user-manager:}")
     protected String puiUserManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-organisation-manager:}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-case-manager:}")
     protected String puiCaseManager;
 
 
     protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
+        log.info("ROLE::" + puiCaseManager + ":" + prdAdmin);
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
         OrganisationResponse organisationResponse =

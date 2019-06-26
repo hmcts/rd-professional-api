@@ -86,7 +86,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(puiCaseManager)")
     public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
         return retrieveAllOrganisationOrById(id);
@@ -112,7 +112,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(puiCaseManager)")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -178,7 +178,7 @@ public class OrganisationExternalController extends SuperController {
             params = {"status"},
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(puiCaseManager)")
     public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
 
 
@@ -205,7 +205,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(puiCaseManager)")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {

@@ -17,17 +17,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
 
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin, "False", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin,"True", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin,"invalid", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK));
     }
 
     @Test

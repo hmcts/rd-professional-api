@@ -93,12 +93,12 @@ public abstract class AuthorizationFunctionalTest {
     public void tearDown() {
     }
 
-    protected String createAndUpdateOrganisationToActive() {
+    protected String createAndUpdateOrganisationToActive(String role) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier,puiCaseManager);
+        professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
 
     }
