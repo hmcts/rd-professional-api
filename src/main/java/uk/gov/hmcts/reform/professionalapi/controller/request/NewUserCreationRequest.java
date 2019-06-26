@@ -38,10 +38,6 @@ public class NewUserCreationRequest {
             @JsonProperty("status") String status,
             @JsonProperty("roles") List<String> roles) {
 
-        if (email != null) {
-            email = email.toLowerCase();
-        }
-
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

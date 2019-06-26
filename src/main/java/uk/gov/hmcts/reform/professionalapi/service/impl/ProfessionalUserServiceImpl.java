@@ -54,7 +54,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         ProfessionalUser newUser = new ProfessionalUser(
                 newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName(),
-                newUserCreationRequest.getEmail(),
+                newUserCreationRequest.getEmail().toLowerCase(),
                 ProfessionalUserStatus.PENDING,
                 theOrganisation);
 
@@ -74,7 +74,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      * @return The user with the matching email address
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email.toLowerCase());
         return user;
     }
 

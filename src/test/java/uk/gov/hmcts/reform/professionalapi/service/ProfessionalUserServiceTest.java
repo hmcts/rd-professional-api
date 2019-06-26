@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -12,6 +13,8 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,6 +23,7 @@ import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
@@ -42,7 +46,7 @@ public class ProfessionalUserServiceTest {
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
-            "some-email",
+            "SOME-EMAIL",
             ProfessionalUserStatus.PENDING,
             Mockito.mock(Organisation.class));
 
@@ -113,7 +117,7 @@ public class ProfessionalUserServiceTest {
 
         newUserCreationRequest = new NewUserCreationRequest("first",
                 "last",
-                "domain@hotmail.com",
+                "DOMAIN@hotmail.com",
                 "PENDING",
                 userRoles);
 

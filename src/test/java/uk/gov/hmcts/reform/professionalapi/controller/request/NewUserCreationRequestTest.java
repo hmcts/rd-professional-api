@@ -55,16 +55,6 @@ public class NewUserCreationRequestTest {
     }
 
     @Test
-    public void testEmailIsMadeLowercase() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-
-        NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "Dummy@EMAIL.com", "PENDING", userRoles);
-        assertThat(newUserCreationRequest.getEmail()).isEqualTo("dummy@email.com");
-    }
-
-    @Test
     public void newUserCreationBuilderTest() {
         String testFirstName = "Jane";
         String testLastName = "Doe";

@@ -38,11 +38,6 @@ public class UserCreationRequestTest {
     }
 
     @Test
-    public void testEmailIsMadeLowercase() {
-        assertThat(userCreationRequest.getEmail()).isEqualTo("joe.bloggs@email.com");
-    }
-
-    @Test
     public void testThatUserCreationIsChangedByBuilder() {
         String firstName2 = "Jane";
         String lastName2 = "Doe";

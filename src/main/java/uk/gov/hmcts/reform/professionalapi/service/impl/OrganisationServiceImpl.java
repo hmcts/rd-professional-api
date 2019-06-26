@@ -151,7 +151,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         ProfessionalUser newProfessionalUser = new ProfessionalUser(
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
-                userCreationRequest.getEmail(),
+                userCreationRequest.getEmail().toLowerCase(),
                 ProfessionalUserStatus.PENDING,
                 organisation);
 

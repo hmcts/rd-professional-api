@@ -25,9 +25,6 @@ public class UserCreationRequest {
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email
     ) {
-        if (email != null) {
-            email = email.toLowerCase();
-        }
 
         this.firstName = firstName;
         this.lastName = lastName;
