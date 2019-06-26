@@ -18,7 +18,7 @@ oauth2.client.secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64
 s2s-secret: ${S2S_SECRET:SZDUA3L7N32PE2IS}
 spring.flyway.enabled: false
 ## Secure roles configuration 1
-exui.role.hmcts-admin: SuperUser
+exui.role.hmcts-admin: prd-admin
 exui.role.pui-user-manager: pui-user-manager
 exui.role.pui-organisation-manager: pui-organisation-manager
 exui.role.pui-finance-manager: pui-finance-manager
