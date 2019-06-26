@@ -16,28 +16,34 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager, "False", HttpStatus.OK));
+
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin, "False", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager,"True", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin,"True", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), puiCaseManager,"invalid", HttpStatus.OK));
+        validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(), hmctsAdmin,"invalid", HttpStatus.OK));
     }
 
     @Test
     public void find_users_for_non_active_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, puiCaseManager,"False", HttpStatus.NOT_FOUND);
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, hmctsAdmin,"False", HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", puiCaseManager,"False", HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,"False", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void for_users_non_existing_role_organisation() {
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", "SuperUser","False", HttpStatus.FORBIDDEN);
     }
 }

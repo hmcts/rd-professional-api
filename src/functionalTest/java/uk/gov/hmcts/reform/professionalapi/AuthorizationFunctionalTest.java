@@ -77,11 +77,16 @@ public abstract class AuthorizationFunctionalTest {
 
         idamService = new IdamService(configProperties);
 
-        String userToken = idamService.createUserWith("", "SuperUser").getAuthorisationToken();
-
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
-                                                          s2sToken, userToken);
+                                                          s2sToken, idamService);
+    }
+
+
+    protected String getUserAccessToken(String role) {
+
+        idamService = new IdamService(configProperties);
+        return idamService.createUserWith("", role).getAuthorisationToken();
     }
 
     @After

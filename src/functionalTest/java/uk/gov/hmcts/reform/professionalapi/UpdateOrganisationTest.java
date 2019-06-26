@@ -17,6 +17,7 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_update_an_organisation() {
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
