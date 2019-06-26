@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void post_request_adds_new_user_to_an_organisation() {
@@ -37,7 +37,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, puiCaseManager);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -50,7 +50,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        //OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -62,7 +62,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, puiCaseManager);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }

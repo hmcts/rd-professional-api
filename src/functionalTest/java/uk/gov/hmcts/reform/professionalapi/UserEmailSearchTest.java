@@ -9,6 +9,7 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,7 +18,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class UserEmailSearchTest extends FunctionalTestSuite {
+@Ignore
+public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_find_a_user_by_their_email_address() {
@@ -34,9 +36,9 @@ public class UserEmailSearchTest extends FunctionalTestSuite {
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email, puiCaseManager);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }

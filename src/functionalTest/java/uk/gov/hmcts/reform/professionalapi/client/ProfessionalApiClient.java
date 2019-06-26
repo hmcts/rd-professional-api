@@ -39,15 +39,18 @@ public class ProfessionalApiClient {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final String professionalApiUrl;
     private final String s2sToken;
+    private final String authToken;
 
     public ProfessionalApiClient(
                                  String professionalApiUrl,
-                                 String s2sToken) {
+                                 String s2sToken, String authToken) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
+        this.authToken = authToken;
     }
 
     public String getWelcomePage() {
@@ -109,9 +112,9 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
-        Response response = withAuthenticatedRequest()
+        Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
-                .post("v1/organisations")
+                .post("/refdata/external/v1/organisations")
                 .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
@@ -141,10 +144,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest) {
-        Response response = withAuthenticatedRequest()
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
+        Response response = getMultipleAuthHeaders(role)
                 .body(newUserCreationRequest)
-                .post("/v1/organisations/" + orgId + "/users/")
+                .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -154,10 +157,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchForUserByEmailAddress(String email) {
-        Response response = withAuthenticatedRequest()
+    public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
+        Response response = getMultipleAuthHeaders(role)
                 .param("email", email)
-                .get("/v1/organisations/users/")
+                .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -167,10 +170,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id) {
-        Response response = withAuthenticatedRequest()
+    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations?id=" + id)
+                .get("refdata/external/v1/organisations?id=" + id)
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -186,10 +189,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveAllOrganisations() {
-        Response response = withAuthenticatedRequest()
+    public Map<String, Object> retrieveAllOrganisations(String role) {
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations")
+                .get("/refdata/external/v1/organisations")
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -202,10 +205,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
-        Response response = withAuthenticatedRequest()
+    public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations/pbas?email=" + email)
+                .get("refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -218,11 +221,11 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email) {
+    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email, String role) {
 
-        Response response = withAuthenticatedRequest()
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations/pbas?email=" + email)
+                .get("refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -234,9 +237,9 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String showDeleted, HttpStatus status) {
-        Response response = withAuthenticatedRequest()
-                .get("/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+        Response response = getMultipleAuthHeaders(role)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
                     .assertThat()
@@ -248,13 +251,13 @@ public class ProfessionalApiClient {
         }
     }
 
-    public void updateOrganisation(String organisationIdentifier) {
+    public void updateOrganisation(String organisationIdentifier, String role) {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
 
-        Response response = withAuthenticatedRequest()
+        Response response = getMultipleAuthHeaders(role)
             .body(organisationCreationRequest)
-            .put("v1/organisations/" + organisationIdentifier)
+            .put("refdata/internal/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
@@ -264,11 +267,11 @@ public class ProfessionalApiClient {
             .statusCode(OK.value());
     }
 
-    public Map<String, Object> retrieveOrganisationDetailsByStatus(String status) {
+    public Map<String, Object> retrieveOrganisationDetailsByStatus(String status, String role) {
 
-        Response response = withAuthenticatedRequest()
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations?status=" + status)
+                .get("/refdata/external/v1/organisations?status=" + status)
                 .andReturn();
         log.debug("Retrieve organisation response by status: " + response.getStatusCode());
         response.then()
@@ -278,11 +281,11 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public void retrieveOrganisationDetailsByUnknownStatus(String status) {
+    public void retrieveOrganisationDetailsByUnknownStatus(String status, String role) {
 
-        Response response = withAuthenticatedRequest()
+        Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("v1/organisations?status=" + status)
+                .get("refdata/external/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
@@ -294,7 +297,7 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveLegacyPbaNumbersByUserEmail(String email) {
-        Response response = withAuthenticatedRequest()
+        Response response = withUnauthenticatedRequest()
                 .body("")
                 .get("/search/pba/" + email)
                 .andReturn();
@@ -316,9 +319,23 @@ public class ProfessionalApiClient {
                 .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
     }
 
-    private RequestSpecification withAuthenticatedRequest() {
+    private RequestSpecification getS2sTokenHeaders() {
         return withUnauthenticatedRequest()
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
+
+    }
+
+    private RequestSpecification getMultipleAuthHeaders(String role) {
+
+        log.info("authToken::" + authToken);
+        return SerenityRest.given()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
+                .header("Accepts", APPLICATION_JSON_UTF8_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, authToken);
+
     }
 
     @SuppressWarnings("unused")

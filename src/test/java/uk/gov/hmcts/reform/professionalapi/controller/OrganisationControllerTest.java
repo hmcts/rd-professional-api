@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
@@ -41,7 +42,7 @@ public class OrganisationControllerTest {
     private ResponseEntity responseEntity;
 
     @InjectMocks
-    private OrganisationController organisationController;
+    private OrganisationExternalController organisationController;
 
 
     @Before
@@ -69,7 +70,7 @@ public class OrganisationControllerTest {
 
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequestMock)).thenReturn(organisationResponseMock);
 
-        ResponseEntity<OrganisationResponse> actual = organisationController.createOrganisation(organisationCreationRequestMock);
+        ResponseEntity<?> actual = organisationController.createOrganisation(organisationCreationRequestMock);
 
         verify(organisationCreationRequestValidatorMock,
                 times(1))

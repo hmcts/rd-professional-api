@@ -96,4 +96,5 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
         return professionalUsers;
     }
+
 }

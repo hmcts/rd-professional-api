@@ -16,14 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
 @Slf4j
-public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegrationTest {
+public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void get_request_returns_correct_payment_accounts_for_user_email_address_ac1() {
+
+
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("pba123");
 
@@ -73,6 +75,7 @@ public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledInte
 
                 assertThat(v.toString().contains("pbaNumber-1, pbaNumber-2"));
                 assertThat(v.toString().contains("Ok"));
+
             }
         });
 

@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
