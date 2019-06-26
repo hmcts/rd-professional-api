@@ -29,7 +29,7 @@ public interface IdamApi {
     AuthenticateUserResponse authenticateUser(@Param("authorization") String authorization,
                                               @Param("response_type") String responseType,
                                               @Param("client_id") String clientId,
-                                              @Param("redirect_uri") String redirectUri, @Param("scope") String scope);
+                                              @Param("redirect_uri") String redirectUri);
 
     @RequestLine("POST /oauth2/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")

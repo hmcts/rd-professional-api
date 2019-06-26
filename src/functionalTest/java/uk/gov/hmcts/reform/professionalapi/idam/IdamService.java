@@ -63,7 +63,7 @@ public class IdamService {
         log.info("UserRequest :: email::" + userRequest.getEmail() + ":Password:" + userRequest.getPassword()
                 + ":ID:" + userRequest.getId() + ":SurName:" + userRequest.getSurname());
         for (IdamApi.Role role: userRequest.getRoles()) {
-            builder.append(role);
+            builder.append(role.getCode());
             log.info("UserRequest::Role" + role);
         }
 
@@ -88,18 +88,18 @@ public class IdamService {
         log.info("authorisation::" + authorisation);
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
-        log.info("base64Authorisation::" + authorisation);
+        log.info("base64Authorisation::" + base64Authorisation);
+        log.info("Client::ID::" + testConfig.getOauth2().getClientId());
+        log.info("Client::SECRET::" + testConfig.getOauth2().getClientSecret());
+        log.info("Client::URL::" + testConfig.getOauth2().getRedirectUrl());
         IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl(), "create-user");
+                testConfig.getOauth2().getRedirectUrl());
 
         log.info("authenticateUserResponse::" + authenticateUserResponse);
         log.info("authenticateUserResponse::Code::" + authenticateUserResponse.getCode());
-        log.info("Client::ID::" + testConfig.getOauth2().getClientId());
-        log.info("Client::SECRET::" + testConfig.getOauth2().getClientSecret());
-        log.info("Client::URL::" + testConfig.getOauth2().getRedirectUrl());
 
         TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
                 authenticateUserResponse.getCode(),
