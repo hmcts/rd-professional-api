@@ -94,7 +94,7 @@ public class OrganisationServiceImplTest {
 
         List<String> paymentAccountList = new ArrayList<>();
 
-        String pbaNumber = "pbaNumber-1";
+        String pbaNumber = "PBA1234567";
 
         paymentAccountList.add(pbaNumber);
 

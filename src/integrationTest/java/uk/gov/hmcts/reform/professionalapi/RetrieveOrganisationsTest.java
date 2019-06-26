@@ -175,7 +175,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .firstName("someName1")
                 .lastName("someLastName1")
                 .email("some@email.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 
@@ -183,7 +182,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .firstName("someName2")
                 .lastName("someLastName2")
                 .email("some@email2.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 

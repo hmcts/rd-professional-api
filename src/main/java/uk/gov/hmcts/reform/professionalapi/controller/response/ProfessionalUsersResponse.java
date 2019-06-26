@@ -23,8 +23,6 @@ public class ProfessionalUsersResponse {
     @JsonProperty
     private final String email;
     @JsonProperty
-    private final ProfessionalUserStatus status;
-    @JsonProperty
     private final List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
@@ -32,6 +30,5 @@ public class ProfessionalUsersResponse {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
-        this.status = user.getStatus();
     }
 }

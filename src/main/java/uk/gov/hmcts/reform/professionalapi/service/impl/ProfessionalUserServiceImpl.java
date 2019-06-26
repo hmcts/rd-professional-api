@@ -55,7 +55,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                 newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName(),
                 newUserCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING,
                 theOrganisation);
 
         ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
@@ -86,10 +85,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (showDeleted) {
             log.info("Getting all users having any status");
             professionalUsers = professionalUserRepository.findByOrganisation(organisation);
-        } else {
-            log.info("Excluding DELETED users for search");
-            professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
         }
+//        else {
+//            log.info("Excluding DELETED users for search");
+//            professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+//        }
 
         if (CollectionUtils.isEmpty(professionalUsers)) {
             throw new EmptyResultDataAccessException(1);

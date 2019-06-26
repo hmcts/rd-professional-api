@@ -26,7 +26,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
 
         List<String> paymentAccounts = new ArrayList<>();
 
-        String pbaNumber = randomAlphabetic(10);
+        String pbaNumber = "PBA" + randomAlphabetic(7);
 
         paymentAccounts.add(pbaNumber);
 

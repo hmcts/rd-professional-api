@@ -24,12 +24,10 @@ public class ProfessionalUserTest {
                                                                  "some-fname",
                                                                  "some-lname",
                                                                  "some-email-address",
-                                                                 ProfessionalUserStatus.PENDING,
                                                                  organisation);
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
-        assertThat(professionalUser.getStatus()).isEqualTo(ProfessionalUserStatus.PENDING);
         assertThat(professionalUser.getEmailAddress()).isEqualTo("some-email-address");
         assertThat(professionalUser.getOrganisation()).isEqualTo(organisation);
         assertThat(professionalUser.getLastUpdated()).isNull();

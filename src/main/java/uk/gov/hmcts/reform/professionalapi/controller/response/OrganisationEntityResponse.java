@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class OrganisationEntityResponse  {
 
@@ -60,5 +61,16 @@ public class OrganisationEntityResponse  {
                     .collect(toList());
         }
     }
+
+//    private ProfessionalUser findOrgAdmin(List<ProfessionalUser> users){
+//
+//        users.forEach(user -> {
+//            if(user.getDeleted == null){
+//                user.get
+//            }
+//        });
+//
+//        return orgAdmin;
+//    }
 
 }

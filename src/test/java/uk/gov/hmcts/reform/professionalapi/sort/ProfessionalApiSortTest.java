@@ -22,14 +22,12 @@ public class ProfessionalApiSortTest {
         ProfessionalUser user1 = new ProfessionalUser("firstName1",
                 "lastName1",
                 "emailAddress1@org.com",
-                ProfessionalUserStatus.PENDING,
                 organisationMock);
 
 
         ProfessionalUser user2 = new ProfessionalUser("firstName2",
                 "lastName2",
                 "emailAddress2@org.com",
-                ProfessionalUserStatus.PENDING,
                 organisationMock);
 
         user1.setCreated(LocalDateTime.now());

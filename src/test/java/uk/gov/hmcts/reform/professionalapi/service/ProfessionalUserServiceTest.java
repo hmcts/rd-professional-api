@@ -43,7 +43,6 @@ public class ProfessionalUserServiceTest {
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
             "some-email",
-            ProfessionalUserStatus.PENDING,
             Mockito.mock(Organisation.class));
 
     private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
@@ -90,20 +89,20 @@ public class ProfessionalUserServiceTest {
         assertThat(usersFromDb).isNotNull();
     }
 
-    @Test
-    public void findUsersByOrganisation_with_non_deleted_users() {
-
-        usersNonEmptyList.add(professionalUser);
-        Mockito.when(professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED))
-                .thenReturn(usersNonEmptyList);
-
-        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
-        Mockito.verify(
-                professionalUserRepository,
-                Mockito.times(1)).findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
-
-        assertThat(usersFromDb).isNotNull();
-    }
+//    @Test
+//    public void findUsersByOrganisation_with_non_deleted_users() {
+//
+//        usersNonEmptyList.add(professionalUser);
+//        Mockito.when(professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED))
+//                .thenReturn(usersNonEmptyList);
+//
+//        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
+//        Mockito.verify(
+//                professionalUserRepository,
+//                Mockito.times(1)).findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+//
+//        assertThat(usersFromDb).isNotNull();
+//    }
 
     @Test
     public void addNewUserToAnOrganisation() {
@@ -114,7 +113,6 @@ public class ProfessionalUserServiceTest {
         newUserCreationRequest = new NewUserCreationRequest("first",
                 "last",
                 "domain@hotmail.com",
-                "PENDING",
                 userRoles);
 
         when(organisation.getOrganisationIdentifier()).thenReturn(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
