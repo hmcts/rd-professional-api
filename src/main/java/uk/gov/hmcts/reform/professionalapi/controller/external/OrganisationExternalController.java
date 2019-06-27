@@ -63,7 +63,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<?> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("Received request to create a new organisation for external users...");
+        log.info("Received request to create a new organisation for external users..." + puiCaseManager);
         return createOrganisationFrom(organisationCreationRequest);
     }
 

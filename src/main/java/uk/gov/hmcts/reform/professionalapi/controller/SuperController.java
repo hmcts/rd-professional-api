@@ -71,7 +71,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("ROLE::" + puiCaseManager + ":" + prdAdmin);
+        log.info("ROLES::" + puiCaseManager + ":" + prdAdmin + ":" + puiFinanceManager + ":" + puiOrgManager + ":" + puiUserManager);
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
         OrganisationResponse organisationResponse =

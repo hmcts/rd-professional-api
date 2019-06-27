@@ -289,7 +289,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations?status=" + status)
+                .get("Update organisation response:refdata/external/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
