@@ -39,7 +39,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email, puiCaseManager);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);

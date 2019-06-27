@@ -176,7 +176,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations?id=" + id)
+                .get("/refdata/external/v1/organisations?id=" + id)
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -211,7 +211,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -228,7 +228,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -289,7 +289,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("Update organisation response:refdata/external/v1/organisations?status=" + status)
+                .get("/refdata/external/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
