@@ -112,7 +112,7 @@ public class OrganisationInternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(prdAdmin)")
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for internal...");
         return retrievePaymentAccountByUserEmail(email);
