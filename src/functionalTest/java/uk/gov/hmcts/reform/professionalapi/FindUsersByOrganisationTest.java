@@ -42,8 +42,4 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,"False", HttpStatus.NOT_FOUND);
     }
 
-    @Test
-    public void for_users_non_existing_role_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", puiUserManager,"False", HttpStatus.UNAUTHORIZED);
-    }
 }
