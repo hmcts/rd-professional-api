@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 
 
 @RequestMapping(
-        path = "/refdata/internal/v1/organisations"
+        path = "refdata/internal/v1/organisations"
 )
 @RestController
 @Slf4j

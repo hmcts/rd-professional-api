@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@Ignore
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Before

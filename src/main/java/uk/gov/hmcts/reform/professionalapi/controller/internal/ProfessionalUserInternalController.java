@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 @RequestMapping(
-        path = "/refdata/internal/v1/organisations",
+        path = "refdata/internal/v1/organisations",
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
