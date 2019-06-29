@@ -23,7 +23,6 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
         log.info("hmctsAdmin::" + hmctsAdmin);
-        log.info("hmctsAdmin::" + hmctsAdmin.trim());
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
     }
 }
