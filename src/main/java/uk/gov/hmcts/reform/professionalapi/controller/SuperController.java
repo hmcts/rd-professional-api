@@ -54,7 +54,7 @@ public abstract class SuperController {
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
 
     @Value("${exui.role.hmcts-admin:}")
-    private String prdAdmin;
+    protected String prdAdmin;
 
     @Value("${exui.role.pui-user-manager:}")
     protected String puiUserManager;

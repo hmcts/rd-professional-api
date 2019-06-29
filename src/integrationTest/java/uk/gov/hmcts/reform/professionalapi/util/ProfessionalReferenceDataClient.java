@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,9 +19,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 
+@Slf4j
 public class ProfessionalReferenceDataClient {
 
-    private static final String APP_EXT_BASE_PATH = "refdata/external/v1/organisations";
+    private static final String APP_EXT_BASE_PATH = "/refdata/external/v1/organisations";
     private static final String APP_INT_BASE_PATH = "/refdata/internal/v1/organisations";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
@@ -50,11 +52,11 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUserByEmail(String email, String role) {
-        return getRequest("/" + APP_INT_BASE_PATH + "/users?email={email}", role,email);
+        return getRequest(APP_INT_BASE_PATH + "/users?email={email}", role,email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
-        return getRequest("/" + APP_EXT_BASE_PATH + "/pbas?email={email}", role,email);
+        return getRequest("/refdata/external/v1/organisations" + "/pbas?email={email}", role,email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
@@ -78,7 +80,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role) {
-        return getRequest("/" + APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

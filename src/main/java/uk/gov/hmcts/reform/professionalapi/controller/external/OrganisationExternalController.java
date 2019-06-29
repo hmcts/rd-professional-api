@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 
 
 @RequestMapping(
-        path = "refdata/external/v1/organisations"
+        path = "/refdata/external/v1/organisations"
 )
 @RestController
 @Slf4j
@@ -112,7 +113,8 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(puiCaseManager)")
+    // @PreAuthorize(value = "hasRole(puiCaseManager)")
+    @Secured("pui-case-manager")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -135,7 +137,7 @@ public class OrganisationExternalController extends SuperController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize(value = "hasRole(puiCaseManager)")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {

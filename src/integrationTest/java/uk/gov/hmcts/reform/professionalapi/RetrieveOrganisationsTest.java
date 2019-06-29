@@ -12,6 +12,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@Ignore
 @Slf4j
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 

@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@Ignore
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
 

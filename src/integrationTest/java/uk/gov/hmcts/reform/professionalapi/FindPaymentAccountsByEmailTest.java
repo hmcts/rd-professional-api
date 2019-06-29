@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@Ignore
 public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -28,7 +30,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     @Autowired
     ApplicationConfiguration configuration;
 
-
+    @Ignore
     @Test
     public void get_request_returns_correct_payment_accounts_associated_with_email() {
 
@@ -64,6 +66,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         responseValidate(orgResponse);
     }
 
+    @Ignore
     @Test
     public void returns_multiple_correct_payment_accounts_associated_with_email() {
 
@@ -100,6 +103,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         responseValidate(orgResponse);
     }
 
+    @Ignore
     @Test
     public void returns_200_organisation_user_accounts_associated_with_email_and_no_payment_account() {
 
