@@ -158,7 +158,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 .companyNumber("company")
                 .build();
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
@@ -182,7 +182,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiCaseManager, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
 
         if (httpStatus == 200) {
             persistedOrganisation = organisationRepository

@@ -33,7 +33,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         professionalUserRepository.save(activeSuperUser);
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail("activesomeone@here.com", puiCaseManager);
+                professionalReferenceDataClient.findUserByEmail("activesomeone@here.com", hmctsAdmin);
 
         assertEquals("some-fname", response.get("firstName"));
         assertEquals("some-lname", response.get("lastName"));
@@ -44,7 +44,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void returns_404_when_email_not_found() {
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail("someone@nowhere.com", puiCaseManager);
+                professionalReferenceDataClient.findUserByEmail("someone@nowhere.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }
@@ -53,7 +53,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void returns_404_when_organisation_status_is_not_active() {
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail("someone@somewhere.com", puiCaseManager);
+                professionalReferenceDataClient.findUserByEmail("someone@somewhere.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }

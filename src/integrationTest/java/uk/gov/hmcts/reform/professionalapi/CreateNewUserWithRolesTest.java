@@ -37,7 +37,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, puiCaseManager);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -62,7 +62,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, puiCaseManager);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, hmctsAdmin);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }

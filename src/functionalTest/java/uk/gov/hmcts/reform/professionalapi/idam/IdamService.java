@@ -9,13 +9,10 @@ import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.Base64;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.idam.models.User;
-
 
 
 @Service
@@ -43,10 +39,6 @@ public class IdamService {
     @Autowired
     public IdamService(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
-
-        Proxy proxy = new Proxy(Proxy.Type.HTTP,
-                new InetSocketAddress("proxyout.reform.hmcts.net", 8080));
-        OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
 
         idamApi = Feign.builder()
                 .encoder(new JacksonEncoder())

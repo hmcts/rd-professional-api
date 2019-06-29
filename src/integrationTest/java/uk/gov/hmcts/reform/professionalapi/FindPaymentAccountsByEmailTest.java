@@ -55,7 +55,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiCaseManager, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
@@ -91,7 +91,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, "pui-case-manager", uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
@@ -122,7 +122,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiCaseManager, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
