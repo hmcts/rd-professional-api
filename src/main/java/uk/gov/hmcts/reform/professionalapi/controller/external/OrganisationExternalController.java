@@ -93,7 +93,6 @@ public class OrganisationExternalController extends SuperController {
     }
 
 
-
     @ApiOperation(
             value = "Retrieves an organisations payment accounts by super user email for external",
             authorizations = {

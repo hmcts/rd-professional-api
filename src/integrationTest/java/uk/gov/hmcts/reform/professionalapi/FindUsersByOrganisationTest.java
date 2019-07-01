@@ -79,7 +79,6 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(professionalUsersResponse.get("status")).isEqualTo(ProfessionalUserStatus.PENDING.name());
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 }

@@ -61,16 +61,4 @@ public class OrganisationEntityResponse  {
                     .collect(toList());
         }
     }
-
-//    private ProfessionalUser findOrgAdmin(List<ProfessionalUser> users){
-//
-//        users.forEach(user -> {
-//            if(user.getDeleted == null){
-//                user.get
-//            }
-//        });
-//
-//        return orgAdmin;
-//    }
-
 }

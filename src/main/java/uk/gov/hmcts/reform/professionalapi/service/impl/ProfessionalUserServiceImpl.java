@@ -86,10 +86,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             log.info("Getting all users having any status");
             professionalUsers = professionalUserRepository.findByOrganisation(organisation);
         }
-//        else {
-//            log.info("Excluding DELETED users for search");
-//            professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
-//        }
+        else {
+            log.info("Excluding DELETED users for search");
+            professionalUsers = professionalUserRepository.findByOrganisationAndDeletedNotNull(organisation);
+        }
 
         if (CollectionUtils.isEmpty(professionalUsers)) {
             throw new EmptyResultDataAccessException(1);

@@ -89,20 +89,20 @@ public class ProfessionalUserServiceTest {
         assertThat(usersFromDb).isNotNull();
     }
 
-//    @Test
-//    public void findUsersByOrganisation_with_non_deleted_users() {
-//
-//        usersNonEmptyList.add(professionalUser);
-//        Mockito.when(professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED))
-//                .thenReturn(usersNonEmptyList);
-//
-//        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
-//        Mockito.verify(
-//                professionalUserRepository,
-//                Mockito.times(1)).findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
-//
-//        assertThat(usersFromDb).isNotNull();
-//    }
+    @Test
+    public void findUsersByOrganisation_with_non_deleted_users() {
+
+        usersNonEmptyList.add(professionalUser);
+        Mockito.when(professionalUserRepository.findByOrganisationAndDeletedNotNull(organisation))
+                .thenReturn(usersNonEmptyList);
+
+        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByOrganisationAndDeletedNotNull(organisation);
+
+        assertThat(usersFromDb).isNotNull();
+    }
 
     @Test
     public void addNewUserToAnOrganisation() {

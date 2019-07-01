@@ -15,7 +15,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     ProfessionalUser findByEmailAddress(String email);
 
-//    List<ProfessionalUser> findByOrganisationAndStatusNot(Organisation organisation);
+    List<ProfessionalUser> findByOrganisationAndDeletedNotNull(Organisation organisation);
 
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
