@@ -16,7 +16,7 @@ security:
 
   authorisedServices:
     - "it"
-
+auth.idam.client.baseUrl: ${IDAM_URL:http://127.0.0.1:5000}
 exui.role:
   hmcts-admin: prd-admin
   pui-user-manager: pui-user-manager

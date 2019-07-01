@@ -65,7 +65,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(roleName)")
+    @PreAuthorize("hasRole('pui-case-manager')")
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId  String organisationIdentifier,
                                        @ApiParam(name = "showDeleted", required = false)@RequestParam(value = "showDeleted", required = false) String showDeleted,
                                        @ApiParam(name = "email", required = false) @RequestParam (value = "email", required = false) String email) {

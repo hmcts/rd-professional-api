@@ -29,7 +29,7 @@ public interface IdamApi {
     AuthenticateUserResponse authenticateUser(@Param("authorization") String authorization,
                                               @Param("response_type") String responseType,
                                               @Param("client_id") String clientId,
-                                              @Param("redirect_uri") String redirectUri, @Param("scope") String scope);
+                                              @Param("redirect_uri") String redirectUri);
 
     @RequestLine("POST /oauth2/token")
     @Headers("Content-Type: application/x-www-form-urlencoded")
@@ -46,7 +46,7 @@ public interface IdamApi {
     class CreateUserRequest {
         private final String email;
         private final String forename = "John";
-        private final String id = " "; //my_reference_data_client_id
+        private final String id = " ";
         private final String surname = "Smith";
         private final UserGroup userGroup;
         private final List<Role> roles;

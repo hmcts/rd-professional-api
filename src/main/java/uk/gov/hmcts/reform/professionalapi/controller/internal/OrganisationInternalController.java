@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,7 +67,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves organisation details for internal users",
+            value = "Retrieves all organisation details for external users if no value entered then get all org details or based on id or status, if both values present then get the details based on id",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -82,13 +82,28 @@ public class OrganisationInternalController extends SuperController {
                     code = 200,
                     message = "Details of one or more organisations",
                     response = OrganisationsDetailResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid status or id provided for an organisation"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Data not found"
             )
     })
-    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @Secured("${exui.role.hmcts-admin}")
-    public ResponseEntity<?> retrieveOrganisations(@RequestParam(required = false) String id) {
 
-        return retrieveAllOrganisationOrById(id);
+    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PreAuthorize("hasRole('prd-admin')")
+    public ResponseEntity<?> retrieveOrganisations(
+            @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
+
+        return retrieveAllOrganisationOrById(id, status);
     }
 
 
@@ -105,12 +120,21 @@ public class OrganisationInternalController extends SuperController {
                     code = 200,
                     message = "The organisations associated payment accounts",
                     response = OrganisationPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Data not found"
             )
     })
     @GetMapping(
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for internal...");
         return retrievePaymentAccountByUserEmail(email);
@@ -125,6 +149,7 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation"),
             @ApiResponse(code = 404, message = "If Organisation is not found"),
+            @ApiResponse(code = 403, message = "Forbidden Error"),
             @ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
     })
     @PutMapping(
@@ -132,51 +157,13 @@ public class OrganisationInternalController extends SuperController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         log.info("Received request to update organisation for organisationIdentifier: ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
-    }
-
-    @ApiOperation(
-            value = "Retrieves the  internal organisation details with the given status ",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiParam(
-            name = "status",
-            type = "string",
-            value = "The organisation details of the status to return",
-            required = true
-
-    )
-
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A representation of a organisation ",
-                    response = OrganisationsDetailResponse.class
-            ),
-            @ApiResponse(
-                    code = 200,
-                    message = "No organisation details found with the provided status "
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "Invalid status provided for an organisation"
-            )
-    })
-    @GetMapping(
-            params = {"status"},
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    public ResponseEntity<?> getAllOrganisationDetailsByStatus(@NotNull @RequestParam("status") String status) {
-
-        return  retrieveAllOrganisationsByStatus(status);
     }
 
     @ApiOperation(
@@ -191,6 +178,14 @@ public class OrganisationInternalController extends SuperController {
                     code = 201,
                     message = "User has been added",
                     response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
             )
     })
     @PostMapping(
@@ -199,7 +194,7 @@ public class OrganisationInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @Secured("${exui.role.hmcts-admin}")
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {

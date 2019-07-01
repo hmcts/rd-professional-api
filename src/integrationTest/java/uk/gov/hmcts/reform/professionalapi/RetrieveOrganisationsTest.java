@@ -127,7 +127,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,"pui-case-manager", organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
         orgResponse =
@@ -193,9 +193,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, puiCaseManager);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
         Map<String, Object> newUserResponse2 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, puiCaseManager);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);

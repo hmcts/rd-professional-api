@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Ignore
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Test
@@ -24,7 +22,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserCreationRequest();
         assertThat(newUserCreationRequest).isNotNull();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, puiCaseManager,newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest);
 
         assertThat(newUserResponse).isNotNull();
     }
