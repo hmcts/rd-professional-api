@@ -166,6 +166,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"pui-user-manager\""
                                 +  "  ]"
                                 +  "}")));
+
     }
 
     @After

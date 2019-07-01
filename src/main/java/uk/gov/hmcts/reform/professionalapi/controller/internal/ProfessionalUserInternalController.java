@@ -62,7 +62,7 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/{orgId}/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(prdAdmin)")
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<ProfessionalUsersEntityResponse> findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                                                    @RequestParam(value = "showDeleted", required = false) String showDeleted) {
 
@@ -103,7 +103,7 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize(value = "hasRole(prdAdmin)")
+    @PreAuthorize("hasRole('prd-admin')")
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
         return retrieveUserByEmail(email);

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
-
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
 
@@ -61,6 +60,7 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("A1B2C3D","False", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
+
 
     private void validateUsers(Map<String, Object> response) {
 

@@ -60,8 +60,6 @@ public class IdamService {
                 .append(userRequest.getSurname());
 
 
-        log.info("UserRequest :: email::" + userRequest.getEmail() + ":Password:" + userRequest.getPassword()
-                + ":ID:" + userRequest.getId() + ":SurName:" + userRequest.getSurname());
         for (IdamApi.Role role: userRequest.getRoles()) {
             builder.append(role.getCode());
             log.info("UserRequest::Role" + role);
