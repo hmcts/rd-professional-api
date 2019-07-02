@@ -17,12 +17,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -93,13 +93,13 @@ public class ProfessionalUserServiceTest {
     public void findUsersByOrganisation_with_non_deleted_users() {
 
         usersNonEmptyList.add(professionalUser);
-        Mockito.when(professionalUserRepository.findByOrganisationAndDeletedNotNull(organisation))
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(usersNonEmptyList);
 
         List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
         Mockito.verify(
                 professionalUserRepository,
-                Mockito.times(1)).findByOrganisationAndDeletedNotNull(organisation);
+                Mockito.times(1)).findByOrganisation(organisation);
 
         assertThat(usersFromDb).isNotNull();
     }
@@ -135,5 +135,15 @@ public class ProfessionalUserServiceTest {
                 .thenReturn(null);
 
         professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void findUsersByOrganisationEmptyResultExceptionTest() {
+        List<ProfessionalUser> emptyList = new ArrayList<>();
+
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
+                .thenReturn(emptyList);
+
+        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
     }
 }

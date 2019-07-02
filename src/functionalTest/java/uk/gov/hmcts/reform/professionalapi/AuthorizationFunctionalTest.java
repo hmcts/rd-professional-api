@@ -77,23 +77,28 @@ public abstract class AuthorizationFunctionalTest {
 
         idamService = new IdamService(configProperties);
 
-        String userToken = idamService.createUserWith("", "SuperUser").getAuthorisationToken();
-
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
-                                                          s2sToken, userToken);
+                                                          s2sToken, idamService);
+    }
+
+
+    protected String getUserAccessToken(String role) {
+
+        idamService = new IdamService(configProperties);
+        return idamService.createUserWith("", role).getAuthorisationToken();
     }
 
     @After
     public void tearDown() {
     }
 
-    protected String createAndUpdateOrganisationToActive() {
+    protected String createAndUpdateOrganisationToActive(String role) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier,puiCaseManager);
+        professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
 
     }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Repository
 public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUser, UUID> {

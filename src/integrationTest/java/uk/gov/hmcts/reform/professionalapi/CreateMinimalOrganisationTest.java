@@ -15,9 +15,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 

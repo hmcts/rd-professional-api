@@ -80,12 +80,12 @@ usermap:
     pbaFromUserAccountMap:
     - "false"
 
+#auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
-#auth.idam.client.baseUrl: ${IDAM_URL:http://0.0.0.0:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
-    hmcts-admin: SuperUser
+    hmcts-admin: prd-admin
     pui-user-manager: pui-user-manager
     pui-organisation-manager: pui-organisation-manager
     pui-finance-manager: pui-finance-manager

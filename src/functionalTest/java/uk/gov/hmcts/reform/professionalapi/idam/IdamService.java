@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.idam.models.User;
 
 
-
 @Service
 @Slf4j
 public class IdamService {
@@ -40,6 +39,7 @@ public class IdamService {
     @Autowired
     public IdamService(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
+
         idamApi = Feign.builder()
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
@@ -50,8 +50,28 @@ public class IdamService {
     public User createUserWith(String userGroup, String... roles) {
         String email = nextUserEmail();
         CreateUserRequest userRequest = userRequest(email, userGroup, roles);
+        StringBuilder builder = new StringBuilder("UserRequest ::email");
+        builder.append(userRequest.getEmail())
+                .append(":Password:")
+                .append(userRequest.getPassword())
+                .append(":ID:")
+                .append(userRequest.getId())
+                .append(":SurName:")
+                .append(userRequest.getSurname());
+
+
+        for (IdamApi.Role role: userRequest.getRoles()) {
+            builder.append(role.getCode());
+            log.info("UserRequest::Role" + role);
+        }
+
+        builder.append("user code:")
+                .append(userRequest.getUserGroup().getCode());
+
+        log.info("user Request::" + builder.toString());
         idamApi.createUser(userRequest);
 
+        log.info("Password::" + testConfig.getTestUserPassword());
         String accessToken = authenticateUser(email, testConfig.getTestUserPassword());
 
         return User.userWith()
@@ -62,13 +82,22 @@ public class IdamService {
 
     public String authenticateUser(String username, String password) {
         String authorisation = username + ":" + password;
+
+        log.info("authorisation::" + authorisation);
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
+        log.info("base64Authorisation::" + base64Authorisation);
+        log.info("Client::ID::" + testConfig.getOauth2().getClientId());
+        log.info("Client::SECRET::" + testConfig.getOauth2().getClientSecret());
+        log.info("Client::URL::" + testConfig.getOauth2().getRedirectUrl());
         IdamApi.AuthenticateUserResponse authenticateUserResponse = idamApi.authenticateUser(
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl(), "create-user");
+                testConfig.getOauth2().getRedirectUrl());
+
+        log.info("authenticateUserResponse::" + authenticateUserResponse);
+        log.info("authenticateUserResponse::Code::" + authenticateUserResponse.getCode());
 
         TokenExchangeResponse tokenExchangeResponse = idamApi.exchangeCode(
                 authenticateUserResponse.getCode(),
@@ -78,6 +107,7 @@ public class IdamService {
                 testConfig.getOauth2().getRedirectUrl()
         );
 
+        log.info("tokenExchangeResponse::" + tokenExchangeResponse.getAccessToken());
         return BEARER + tokenExchangeResponse.getAccessToken();
     }
 
@@ -98,4 +128,3 @@ public class IdamService {
         return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
     }
 }
-

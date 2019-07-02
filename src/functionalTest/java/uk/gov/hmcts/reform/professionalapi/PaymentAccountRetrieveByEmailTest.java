@@ -12,14 +12,12 @@ import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Ignore
 public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
@@ -41,7 +39,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, puiCaseManager);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email, puiCaseManager);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);

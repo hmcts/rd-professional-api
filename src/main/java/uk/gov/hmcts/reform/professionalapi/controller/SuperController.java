@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -54,18 +55,18 @@ public abstract class SuperController {
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
 
     @Value("${exui.role.hmcts-admin:}")
-    private String roleName;
+    protected String prdAdmin;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-user-manager:}")
     protected String puiUserManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-organisation-manager:}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${exui.role.pui-case-manager:}")
     protected String puiCaseManager;
 
 
@@ -82,21 +83,35 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationOrById(String id) {
+    protected ResponseEntity<?> retrieveAllOrganisationOrById(String id, String status) {
 
-        Object organisationResponse;
-        if (id == null) {
+        Object organisationResponse = null;
+        if (StringUtils.isEmpty(id) && StringUtils.isEmpty(status)) {
             log.info("Received request to retrieve all organisations");
             organisationResponse =
                     organisationService.retrieveOrganisations();
-        } else {
-            log.info("Received request to retrieve organisation with ID " + id);
+
+        } else if (StringUtils.isEmpty(status) && StringUtils.isNotEmpty(id)
+                || (StringUtils.isNotEmpty(status) && StringUtils.isNotEmpty(id))) {
+            log.info("Received request to retrieve organisation with ID ");
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(id);
             organisationResponse =
                     organisationService.retrieveOrganisation(id);
-        }
 
+        } else if (StringUtils.isNotEmpty(status) && StringUtils.isEmpty(id)) {
+
+            log.info("Received request to retrieve organisation with status ");
+
+            if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
+
+                organisationResponse =
+                        organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
+            } else {
+                log.error("Invalid Request param for status field");
+                throw new InvalidRequest("400");
+            }
+        }
         log.debug("Received response to retrieve organisation details" + organisationResponse);
         return ResponseEntity
                 .status(200)
@@ -187,11 +202,8 @@ public abstract class SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-        if (null == showDeleted) {
-            log.info("Request param 'showDeleted' not provided or its value is null");
-        }
-
         boolean showDeletedFlag = false;
+
         if ("True".equalsIgnoreCase(showDeleted)) {
             showDeletedFlag = true;
         }

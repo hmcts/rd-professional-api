@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 public class ProfessionalApiSortTest {
 

@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class OrganisationEntityResponse  {
 

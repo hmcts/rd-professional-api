@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -43,14 +44,16 @@ public class ProfessionalApiClient {
 
     private final String professionalApiUrl;
     private final String s2sToken;
-    private final String authToken;
+    //private final String authToken;
+
+    protected IdamService idamService;
 
     public ProfessionalApiClient(
                                  String professionalApiUrl,
-                                 String s2sToken, String authToken) {
+                                 String s2sToken, IdamService idamService) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        this.authToken = authToken;
+        this.idamService = idamService;
     }
 
     public String getWelcomePage() {
@@ -172,7 +175,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations?id=" + id)
+                .get("/refdata/external/v1/organisations?id=" + id)
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -207,7 +210,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -224,7 +227,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/external/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -237,6 +240,7 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+
         Response response = getMultipleAuthHeaders(role)
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
@@ -256,7 +260,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
             .body(organisationCreationRequest)
-            .put("refdata/internal/v1/organisations/" + organisationIdentifier)
+            .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
@@ -284,7 +288,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("refdata/external/v1/organisations?status=" + status)
+                .get("/refdata/external/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
@@ -326,16 +330,18 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeaders(String role) {
 
-        log.info("authToken::" + authToken);
+        String userToken = idamService.createUserWith("", role).getAuthorisationToken();
+        log.info("authToken::" + userToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
                 .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
                 .header("Accepts", APPLICATION_JSON_UTF8_VALUE)
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
-                .header(AUTHORIZATION_HEADER, authToken);
+                .header(AUTHORIZATION_HEADER, userToken);
 
     }
+
 
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
