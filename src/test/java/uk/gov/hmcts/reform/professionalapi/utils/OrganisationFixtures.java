@@ -31,6 +31,19 @@ public class OrganisationFixtures {
                         .addressLine1("addressLine1").build()));
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest(String email) {
+
+        return anOrganisationCreationRequest()
+                .name("some-org-name")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(email)
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()));
+    }
+
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("pba123");

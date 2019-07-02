@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
+import static uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil.createProfessionalUser;
+
 @Service
 @Slf4j
 public class ProfessionalUserServiceImpl implements ProfessionalUserService {
@@ -51,12 +53,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-        ProfessionalUser newUser = new ProfessionalUser(
-                newUserCreationRequest.getFirstName(),
-                newUserCreationRequest.getLastName(),
-                newUserCreationRequest.getEmail().toLowerCase(),
-                ProfessionalUserStatus.PENDING,
-                theOrganisation);
+        ProfessionalUser newUser = createProfessionalUser(newUserCreationRequest, theOrganisation);
 
         ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
 

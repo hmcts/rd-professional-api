@@ -23,7 +23,7 @@ public class NewUserCreationRequest {
     @NotNull
     private final String lastName;
     @NotNull
-    @Pattern(regexp = emailRegex)
+//    @Pattern(regexp = emailRegex)
     private final String email;
     @NotNull
     private final String status;
