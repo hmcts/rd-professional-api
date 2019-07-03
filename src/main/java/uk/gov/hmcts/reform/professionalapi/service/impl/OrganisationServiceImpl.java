@@ -149,7 +149,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
 
-        if(userCreationRequest.getEmail() == null){
+        if (userCreationRequest.getEmail() == null) {
             throw new InvalidRequest("Email cannot be null");
         }
         ProfessionalUser newProfessionalUser = new ProfessionalUser(

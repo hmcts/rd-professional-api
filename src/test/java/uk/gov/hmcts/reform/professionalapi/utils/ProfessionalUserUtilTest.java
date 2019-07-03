@@ -3,15 +3,15 @@ package uk.gov.hmcts.reform.professionalapi.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProfessionalUserUtilTest {
 

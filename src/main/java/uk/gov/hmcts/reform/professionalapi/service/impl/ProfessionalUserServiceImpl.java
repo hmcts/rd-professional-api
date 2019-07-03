@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil.createProfessionalUser;
+
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import static uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil.createProfessionalUser;
 
 @Service
 @Slf4j

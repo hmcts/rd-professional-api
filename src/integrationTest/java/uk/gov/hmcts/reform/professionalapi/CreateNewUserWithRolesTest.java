@@ -29,18 +29,18 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     }
 
-    private String createNewOrganisationWithAdmin(OrganisationCreationRequest organisationCreationRequest){
+    private String createNewOrganisationWithAdmin(OrganisationCreationRequest organisationCreationRequest) {
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         return (String) organisationResponse.get("organisationIdentifier");
     }
 
-    private Map<String, Object> addNewUserToOrganisation(String orgIdentifierResponse, NewUserCreationRequest userCreationRequest){
+    private Map<String, Object> addNewUserToOrganisation(String orgIdentifierResponse, NewUserCreationRequest userCreationRequest) {
         return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, role);
     }
 
-    private Map<String, Object>  addNewUserToOrganisation(OrganisationCreationRequest organisationCreationRequest, NewUserCreationRequest userCreationRequest){
+    private Map<String, Object>  addNewUserToOrganisation(OrganisationCreationRequest organisationCreationRequest, NewUserCreationRequest userCreationRequest) {
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
