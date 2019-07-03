@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -148,6 +149,9 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
 
+        if(userCreationRequest.getEmail() == null){
+            throw new InvalidRequest("Email cannot be null");
+        }
         ProfessionalUser newProfessionalUser = new ProfessionalUser(
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
