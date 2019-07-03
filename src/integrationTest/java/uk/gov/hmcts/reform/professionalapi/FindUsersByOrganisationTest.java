@@ -1,15 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegrationTest {
@@ -60,6 +65,36 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
+    @Test
+    public void retrieve_newly_deleted_user_with_showDeleted_true(){
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+
+        //add new user here
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someDeletedName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .roles(userRoles)
+                .build();
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        ProfessionalUser userToDelete = professionalUserRepository.findByEmailAddress("some@email.com");
+        userToDelete.setDeleted(LocalDateTime.now());
+        assertThat(userToDelete.getDeleted() != null);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
+        validateUsers(response);
+
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+        HashMap professionalUsersResponse = professionalUsersResponses.get(1);
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("someDeletedName");
+
+    }
 
     private void validateUsers(Map<String, Object> response) {
 

@@ -135,7 +135,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
-
                 if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
                     throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters");
                 }
@@ -143,7 +142,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
-
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }

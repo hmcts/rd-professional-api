@@ -203,7 +203,6 @@ public abstract class SuperController {
         }
 
         boolean showDeletedFlag = false;
-
         if ("True".equalsIgnoreCase(showDeleted)) {
             showDeletedFlag = true;
         }
