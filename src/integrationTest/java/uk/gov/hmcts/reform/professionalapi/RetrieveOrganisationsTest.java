@@ -17,10 +17,10 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
-public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegrationTest {
+public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
@@ -29,7 +29,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
@@ -85,24 +85,22 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
                 .build());
 
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisations();
+                professionalReferenceDataClient.retrieveAllOrganisations(puiCaseManager);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }
 
     @Test
     public void error_if_organisation_id_invalid() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!");
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test
     public void error_if_organisation_id_not_found() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116");
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116", puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
-
-
 
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
@@ -110,7 +108,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.PENDING);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name(), puiCaseManager);
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
@@ -122,31 +120,31 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
-        assertThat(orgResponse.get("http_status").toString().contains("NOT_FOUND"));
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
 
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 
     @Test
-    public void persists_and_return_404_organisation_details_when_no_status_found_in_the_db() {
+    public void persists_and_return_empty_organisation_details_when_no_status_found_in_the_db() {
 
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name());
-        assertThat(orgResponse.get("http_status").toString().contains("NOT_FOUND"));
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 
     @Test
@@ -155,7 +153,7 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV");
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV", puiCaseManager);
         assertThat(orgResponse.get("http_status").toString().contains("404"));
     }
 
@@ -195,12 +193,12 @@ public class RetrieveOrganisationsTest extends Service2ServiceEnabledIntegration
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
         Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
         Map<String, Object> newUserResponse2 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse);
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);

@@ -156,7 +156,7 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchForUserByEmailAddress(String email) {
         Response response = withAuthenticatedRequest()
-                .param("email", email.toLowerCase())
+                .param("email", email)
                 .get("/v1/organisations/users/")
                 .andReturn();
         response.then()
@@ -205,7 +205,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrievePaymentAccountsByEmail(String email) {
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations/pbas?email=" + email.toLowerCase())
+                .get("v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -222,7 +222,7 @@ public class ProfessionalApiClient {
 
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("v1/organisations/pbas?email=" + email.toLowerCase())
+                .get("v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -296,7 +296,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveLegacyPbaNumbersByUserEmail(String email) {
         Response response = withAuthenticatedRequest()
                 .body("")
-                .get("/search/pba/" + email.toLowerCase())
+                .get("/search/pba/" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());

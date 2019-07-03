@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class UserEmailSearchTest extends FunctionalTestSuite {
+public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_find_a_user_by_their_email_address() {
@@ -34,9 +34,9 @@ public class UserEmailSearchTest extends FunctionalTestSuite {
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email, hmctsAdmin);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }

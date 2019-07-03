@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,15 +16,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     private static List<String> userRoles = new ArrayList<>();
+    private static final String role = "pui-user-manager";
 
     @BeforeClass
     public static void setUp() {
-        userRoles.add("pui-user-manager");
+        userRoles.add(role);
 
     }
 
@@ -35,7 +37,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
     }
 
     private Map<String, Object> addNewUserToOrganisation(String orgIdentifierResponse, NewUserCreationRequest userCreationRequest){
-        return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest);
+        return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, role);
     }
 
     private Map<String, Object>  addNewUserToOrganisation(OrganisationCreationRequest organisationCreationRequest, NewUserCreationRequest userCreationRequest){
@@ -44,7 +46,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
-        return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest);
+        return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, role);
     }
 
 
@@ -63,14 +65,21 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
                 .roles(userRoles)
                 .build();
 
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
         Map<String, Object> newUserResponse = addNewUserToOrganisation(organisationCreationRequest, userCreationRequest);
 
         assertThat(newUserResponse).isNotNull();
     }
 
 
+
     @Test
-    public void post_new_user_to_existing_organisation_with_email() {
+    public void create_new_active_organisation_with_super_user_and_additional_user() {
         final String orgAdminEmail = "ORG.ADMIN@EMAIL.COM";
         final String expectAdminEmail = "org.admin@email.com";
         final String newUserEmail = "SOME.OTHER@EMAIL.COM";
@@ -83,8 +92,11 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
         String organisationIdentifier = createNewOrganisationWithAdmin(organisationCreationRequest);
 
-        Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, organisationIdentifier);
+        assertThat(organisationIdentifier).isNotNull();
+
+        Map<String, Object> responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, "prd-admin", organisationIdentifier);
+
+        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
 
         NewUserCreationRequest anotherUserRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -94,13 +106,12 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
                 .roles(userRoles)
                 .build();
 
-        Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest);
+        Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest, role);
 
         assertThat(responseForNewUser.get("http_status")).isEqualTo("201 CREATED");
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
-
 
         assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
 
@@ -111,11 +122,12 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         assertThat(users.get(0).getEmailAddress()).isEqualTo(expectAdminEmail);
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail);
+                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, role);
 
         String actualEmail = (String) response.get("email");
 
         assertThat(actualEmail).isEqualTo(expectSecondUserEmail);
+
     }
 
     @Test
@@ -123,7 +135,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        //OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -135,7 +147,7 @@ public class CreateNewUserWithRolesTest extends Service2ServiceEnabledIntegratio
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, hmctsAdmin);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }

@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
+public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
     @Test
@@ -39,8 +39,8 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email, puiCaseManager);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
     }
@@ -62,7 +62,7 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                                 .build())
                         .build());
 
-        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email);
+        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, puiCaseManager);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {

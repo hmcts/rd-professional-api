@@ -18,16 +18,15 @@ import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguratio
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegrationTest {
+public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
 
     @Autowired
     ApplicationConfiguration configuration;
-
 
     @Test
     public void get_request_returns_correct_payment_accounts_associated_with_email() {
@@ -55,9 +54,9 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
         assertThat(orgResponse).isNotEmpty();
 
@@ -91,9 +90,9 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
         assertThat(orgResponse).isNotEmpty();
 
@@ -122,9 +121,9 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                 .status(OrganisationStatus.ACTIVE).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
         orgResponse.forEach((k,v) -> {
 
@@ -165,7 +164,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
 
         professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("404");
 
@@ -175,7 +174,7 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     public void returns_404_when_email_not_found() {
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com");
+                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com", puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }

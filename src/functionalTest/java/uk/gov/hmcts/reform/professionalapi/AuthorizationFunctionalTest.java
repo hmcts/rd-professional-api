@@ -5,21 +5,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
+import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+@ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-public abstract class FunctionalTestSuite {
+public abstract class AuthorizationFunctionalTest {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -33,7 +42,29 @@ public abstract class FunctionalTestSuite {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
+    @Value("${exui.role.hmcts-admin}")
+    protected String hmctsAdmin;
+
+    @Value("${exui.role.pui-user-manager}")
+    protected String puiUserManager;
+
+    @Value("${exui.role.pui-organisation-manager}")
+    protected String puiOrgManager;
+
+    @Value("${exui.role.pui-finance-manager}")
+    protected String puiFinanceManager;
+
+    @Value("${exui.role.pui-case-manager}")
+    protected String puiCaseManager;
+    
+
     protected ProfessionalApiClient professionalApiClient;
+
+    protected IdamService idamService;
+
+    @Autowired
+    protected TestConfigProperties configProperties;
+
 
     @Before
     public void setUp() {
@@ -41,23 +72,33 @@ public abstract class FunctionalTestSuite {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
+
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+
+        idamService = new IdamService(configProperties);
 
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
-                                                          s2sToken);
+                                                          s2sToken, idamService);
+    }
+
+
+    protected String getUserAccessToken(String role) {
+
+        idamService = new IdamService(configProperties);
+        return idamService.createUserWith("", role).getAuthorisationToken();
     }
 
     @After
     public void tearDown() {
     }
 
-    protected String createAndUpdateOrganisationToActive() {
+    protected String createAndUpdateOrganisationToActive(String role) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier);
+        professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
 
     }
