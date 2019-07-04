@@ -66,11 +66,10 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
     }
 
     @Test
-    public void retrieve_newly_deleted_user_with_showDeleted_true(){
+    public void retrieve_newly_deleted_user_with_showDeleted_true() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
 
-        //add new user here
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()

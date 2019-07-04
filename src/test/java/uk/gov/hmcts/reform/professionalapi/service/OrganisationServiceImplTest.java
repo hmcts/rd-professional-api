@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -389,6 +390,25 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepositoryMock,
                 times(1)).findByOrganisationIdentifier(any());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void throwInvalidRequestWhenInvalidPbaIsPassed() {
+
+        List<String> paymentAccountList = new ArrayList<>();
+
+        String pbaNumber = "GBA1234567";
+
+        paymentAccountList.add(pbaNumber);
+
+        organisationCreationRequest =
+                new OrganisationCreationRequest(
+                        "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "company-number", "company-url",
+                        superUser,
+                        paymentAccountList, contactInformationCreationRequests);
+
+        OrganisationResponse organisationResponse =
+                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
     }
 
 }
