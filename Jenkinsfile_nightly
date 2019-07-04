@@ -1,11 +1,10 @@
 #!groovy
-@Library("Infrastructure") 
 
 properties([
-    // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-    pipelineTriggers([cron('H 22 * * *')])
-])
+        pipelineTriggers([cron('21 01 * * *')]) // scheduling to trigger jenkins job
+]) 
 
+@Library("Infrastructure")
 
 def type = "java"
 def product = "rd"
@@ -39,7 +38,6 @@ withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
-    //enablePerformanceTest()
     enableSecurityScan() 
     enableMutationTest()
 }
