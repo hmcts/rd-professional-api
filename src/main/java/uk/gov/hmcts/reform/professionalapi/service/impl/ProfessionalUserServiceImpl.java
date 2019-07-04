@@ -54,15 +54,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-//<<<<<<< HEAD
         ProfessionalUser newUser = createProfessionalUser(newUserCreationRequest, theOrganisation);
-//=======
-//        ProfessionalUser newUser = new ProfessionalUser(
-//                newUserCreationRequest.getFirstName(),
-//                newUserCreationRequest.getLastName(),
-//                newUserCreationRequest.getEmail(),
-//                theOrganisation);
-//>>>>>>> 9306d91e11eca554bb0de96a067218d270e9a1cf
 
         ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
 

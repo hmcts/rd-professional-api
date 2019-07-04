@@ -157,12 +157,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         ProfessionalUser newProfessionalUser = new ProfessionalUser(
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
-//<<<<<<< HEAD
                 userCreationRequest.getEmail().toLowerCase(),
-//                ProfessionalUserStatus.PENDING,
-//=======
-//                userCreationRequest.getEmail(),
-//>>>>>>> 9306d91e11eca554bb0de96a067218d270e9a1cf
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
