@@ -99,7 +99,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest, role);
 
-        assertThat(responseForNewUser.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(responseForNewUser.get("http_status")).isEqualTo(200);
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
