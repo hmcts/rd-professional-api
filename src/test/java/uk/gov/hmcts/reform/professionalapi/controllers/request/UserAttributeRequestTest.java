@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controllers.request;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class UserAttributeRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void testHasMandatoryFieldsSpecified() {
         UserAttributeRequest userAttributeRequest =
                 new UserAttributeRequest(null);
 
@@ -26,7 +26,7 @@ public class UserAttributeRequestTest {
     }
 
     @Test
-    public void creates_new_user_creation_request_correctly() {
+    public void testCreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 

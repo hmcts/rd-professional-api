@@ -62,6 +62,7 @@ security:
     - "/swagger-resources/**"
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
+    - "/search/**"
   authorisedServices:
     - rd_professional_api
     - rd_user_profile
@@ -73,3 +74,7 @@ idam:
     totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: rd_professional_api
     url: ${S2S_URL:http://127.0.0.1:8502}
+    pbaFromUserAccountMap: false
+usermap:
+    pbaFromUserAccountMap:
+    - "false"

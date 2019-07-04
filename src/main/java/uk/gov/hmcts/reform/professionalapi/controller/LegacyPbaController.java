@@ -3,17 +3,15 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
-import javax.xml.ws.http.HTTPException;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.LegacyPbaAccountServiceI
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @RequestMapping(
-        path = "/search",
-        consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        path = "/search"
 )
 @RestController
 @Slf4j
@@ -42,10 +38,7 @@ public class LegacyPbaController {
     private ProfessionalUserServiceImpl professionalUserService;
 
     @ApiOperation(
-            value = "Retrieve pba numbers by user email address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization")
-            }
+            value = "Retrieve pba numbers by user email address"
     )
     @ApiResponses({
             @ApiResponse(
@@ -73,7 +66,7 @@ public class LegacyPbaController {
         ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(email);
         if (professionalUser == null) {
 
-            throw new HTTPException(404);
+            throw new EmptyResultDataAccessException(1);
         }
 
         pbaNumbers =  legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);

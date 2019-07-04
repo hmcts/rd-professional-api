@@ -5,36 +5,31 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import lombok.NoArgsConstructor;
+
+import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
-@NoArgsConstructor
+@Getter
 public class ContactInformationResponse {
 
     @JsonProperty
-    private  String addressLine1;
+    private final String addressLine1;
     @JsonProperty
-    private  String addressLine2;
+    private final String addressLine2;
     @JsonProperty
-    private  String addressLine3;
+    private final String addressLine3;
     @JsonProperty
-    private  String townCity;
+    private final String townCity;
     @JsonProperty
-    private  String county;
+    private final String county;
     @JsonProperty
-    private  String country;
+    private final String country;
     @JsonProperty
-    private  String postCode;
+    private final String postCode;
     @JsonProperty
-    private  List<DxAddressResponse> dxAddress;
+    private final List<DxAddressResponse> dxAddress;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
-
-        getContactInformationResponse(contactInfo);
-    }
-
-    private void getContactInformationResponse(ContactInformation contactInfo) {
-
         this.addressLine1 = contactInfo.getAddressLine1();
         this.addressLine2 = contactInfo.getAddressLine2();
         this.addressLine3 = contactInfo.getAddressLine3();
