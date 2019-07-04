@@ -10,7 +10,6 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil;
 
 public class ProfessionalUserUtilTest {
@@ -23,14 +22,13 @@ public class ProfessionalUserUtilTest {
         String firstName = "First";
         String lastName = "Last";
         String email = "FIRST.LAST@EMAIL.COM";
-        String status = ProfessionalUserStatus.PENDING.name();
         List<String> roles = new ArrayList<>();
 
         String expectedEmail = "first.last@email.com";
         String expectedFirstName = "First";
         String expectedLastName = "Last";
 
-        NewUserCreationRequest dummyNewUserCreationRequest = new NewUserCreationRequest(firstName, lastName, email, status, roles);
+        NewUserCreationRequest dummyNewUserCreationRequest = new NewUserCreationRequest(firstName, lastName, email, roles);
 
         ProfessionalUser professionalUser = ProfessionalUserUtil.createProfessionalUser(dummyNewUserCreationRequest, mockOrganisation);
 

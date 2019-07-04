@@ -27,7 +27,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
@@ -44,7 +44,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("some@email.com");
 
-        assertThat(orgResponse.get("payment_accounts").toString().equals("pbaNumber-1"));
+        assertThat(orgResponse.get("payment_accounts").toString().equals("PBA1234567"));
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 

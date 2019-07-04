@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -22,12 +21,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     private static List<String> userRoles = new ArrayList<>();
     private static final String role = "pui-user-manager";
-
-    @BeforeClass
-    public static void setUp() {
-        userRoles.add(role);
-
-    }
 
     private String createNewOrganisationWithAdmin(OrganisationCreationRequest organisationCreationRequest) {
         Map<String, Object> organisationResponse =
@@ -61,7 +54,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .firstName("someName")
                 .lastName("someLastName")
                 .email("SOME@EMAIL.COM")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 
@@ -102,7 +94,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .firstName("someName")
                 .lastName("someLastName")
                 .email(newUserEmail)
-                .status("ACTIVE")
                 .roles(userRoles)
                 .build();
 
@@ -141,7 +132,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .firstName("someName")
                 .lastName("someLastName")
                 .email("some@email.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 

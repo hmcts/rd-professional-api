@@ -12,7 +12,6 @@ public interface ProfessionalUserUtil {
                 newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName(),
                 newUserCreationRequest.getEmail().toLowerCase(),
-                ProfessionalUserStatus.PENDING,
                 organisation);
     }
 }

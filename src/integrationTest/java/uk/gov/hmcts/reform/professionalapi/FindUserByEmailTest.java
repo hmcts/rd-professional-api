@@ -11,7 +11,6 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
@@ -19,7 +18,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Before
     public void setUp() {
         Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", ProfessionalUserStatus.PENDING, organisation);
+        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", organisation);
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);
     }
@@ -28,7 +27,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void search_returns_valid_user_with_organisation_status_as_active() {
         Organisation activeOrganisation = new Organisation("some-active-org", OrganisationStatus.ACTIVE, "sraid", null, null, null);
-        ProfessionalUser activeSuperUser = new ProfessionalUser("some-fname", "some-lname", "activesomeone@here.com", ProfessionalUserStatus.PENDING, activeOrganisation);
+        ProfessionalUser activeSuperUser = new ProfessionalUser("some-fname", "some-lname", "activesomeone@here.com", activeOrganisation);
         organisationRepository.save(activeOrganisation);
         professionalUserRepository.save(activeSuperUser);
 

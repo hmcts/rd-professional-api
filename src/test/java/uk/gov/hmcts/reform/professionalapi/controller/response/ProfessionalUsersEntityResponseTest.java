@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 public class ProfessionalUsersEntityResponseTest {
 
@@ -22,13 +21,11 @@ public class ProfessionalUsersEntityResponseTest {
         final String dummyFirstName = "Joe";
         final String dummyLastName = "Bloggs";
         final String dummyEmail = "joe.bloggs@email.com";
-        final ProfessionalUserStatus dummyStatus = ProfessionalUserStatus.ACTIVE;
 
         ProfessionalUser professionalUser = new ProfessionalUser(
                 dummyFirstName,
                 dummyLastName,
                 dummyEmail,
-                dummyStatus,
                 new Organisation());
         List<ProfessionalUser> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalUser);

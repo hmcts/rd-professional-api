@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static uk.gov.hmcts.reform.professionalapi.util.ProfessionalUserUtil.createProfessionalUser;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -54,7 +54,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
+//<<<<<<< HEAD
         ProfessionalUser newUser = createProfessionalUser(newUserCreationRequest, theOrganisation);
+//=======
+//        ProfessionalUser newUser = new ProfessionalUser(
+//                newUserCreationRequest.getFirstName(),
+//                newUserCreationRequest.getLastName(),
+//                newUserCreationRequest.getEmail(),
+//                theOrganisation);
+//>>>>>>> 9306d91e11eca554bb0de96a067218d270e9a1cf
 
         ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
 
@@ -80,13 +88,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
         log.info("Into  ProfessionalService for get all users for organisation");
-        List<ProfessionalUser> professionalUsers = null;
+        List<ProfessionalUser> professionalUsers;
+
         if (showDeleted) {
-            log.info("Getting all users having any status");
+            log.info("Getting all users regardless of deleted status");
             professionalUsers = professionalUserRepository.findByOrganisation(organisation);
         } else {
             log.info("Excluding DELETED users for search");
-            professionalUsers = professionalUserRepository.findByOrganisationAndStatusNot(organisation, ProfessionalUserStatus.DELETED);
+            List<ProfessionalUser> listOfUsers = professionalUserRepository.findByOrganisation(organisation);
+            professionalUsers = listOfUsers.stream().filter(users -> users.getDeleted() == null).collect(Collectors.toList());
         }
 
         if (CollectionUtils.isEmpty(professionalUsers)) {

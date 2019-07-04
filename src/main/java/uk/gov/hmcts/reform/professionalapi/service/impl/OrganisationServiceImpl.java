@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
@@ -136,10 +135,13 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
+                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
+                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters");
+                }
+
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
-
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -155,8 +157,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         ProfessionalUser newProfessionalUser = new ProfessionalUser(
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
+//<<<<<<< HEAD
                 userCreationRequest.getEmail().toLowerCase(),
-                ProfessionalUserStatus.PENDING,
+//                ProfessionalUserStatus.PENDING,
+//=======
+//                userCreationRequest.getEmail(),
+//>>>>>>> 9306d91e11eca554bb0de96a067218d270e9a1cf
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);

@@ -121,7 +121,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
         PaymentAccount paymentAccount = pbaAccounts.get(0);
-        assertThat(paymentAccount.getPbaNumber()).isEqualTo("pba123");
+        assertThat(paymentAccount.getPbaNumber()).isEqualTo("PBA1234567");
 
         List<ProfessionalUser> professionalUsers = persistedOrganisation.getUsers();
         ProfessionalUser professionalUser = professionalUsers.get(0);

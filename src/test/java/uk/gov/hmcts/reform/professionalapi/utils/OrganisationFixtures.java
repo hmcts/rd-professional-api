@@ -46,7 +46,7 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
             .name("some-org-name")
@@ -77,7 +77,7 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
             .name("some-org-name1")

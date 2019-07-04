@@ -24,7 +24,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
     public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
         String prefix = UUID.randomUUID().toString();
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
