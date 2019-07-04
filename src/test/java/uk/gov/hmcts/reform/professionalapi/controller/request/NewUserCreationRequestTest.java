@@ -19,11 +19,11 @@ public class NewUserCreationRequestTest {
     @Test
     public void has_mandatory_fields_specified_not_null() {
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest(null, null, null, null, null);
+                new NewUserCreationRequest(null, null, null, null);
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(5);
+        assertThat(violations.size()).isEqualTo(4);
     }
 
     @Test
@@ -32,12 +32,11 @@ public class NewUserCreationRequestTest {
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", "PENDING", userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles);
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
         assertThat(newUserCreationRequest.getEmail()).isEqualTo("some@email.com");
-        assertThat(newUserCreationRequest.getStatus()).isEqualTo("PENDING");
         assertThat(newUserCreationRequest.getRoles()).hasSize(1);
     }
 
@@ -47,7 +46,7 @@ public class NewUserCreationRequestTest {
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", "PENDING", userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles);
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 
@@ -59,7 +58,6 @@ public class NewUserCreationRequestTest {
         String testFirstName = "Jane";
         String testLastName = "Doe";
         String testEmail = "jane.doe@email.com";
-        String testStatus = "Status";
         List<String> testRoles = new ArrayList<>();
         testRoles.add("a role");
 
@@ -67,14 +65,12 @@ public class NewUserCreationRequestTest {
                 .firstName(testFirstName)
                 .lastName(testLastName)
                 .email(testEmail)
-                .status(testStatus)
                 .roles(testRoles)
                 .build();
 
         assertThat(testNewUserCreationRequest.getFirstName()).isEqualTo(testFirstName);
         assertThat(testNewUserCreationRequest.getLastName()).isEqualTo(testLastName);
         assertThat(testNewUserCreationRequest.getEmail()).isEqualTo(testEmail);
-        assertThat(testNewUserCreationRequest.getStatus()).isEqualTo(testStatus);
         assertThat(testNewUserCreationRequest.getRoles()).isEqualTo(testRoles);
     }
 }

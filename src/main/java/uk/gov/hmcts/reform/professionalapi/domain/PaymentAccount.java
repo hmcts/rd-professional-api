@@ -37,7 +37,7 @@ public class PaymentAccount {
     private UUID id;
 
     @Column(name = "PBA_NUMBER")
-    @Size(max = 255)
+    @Size(min = 10, max = 10)
     private String pbaNumber;
 
     @ManyToOne

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;

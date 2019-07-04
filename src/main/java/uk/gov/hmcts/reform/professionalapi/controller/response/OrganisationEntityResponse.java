@@ -60,5 +60,4 @@ public class OrganisationEntityResponse  {
                     .collect(toList());
         }
     }
-
 }

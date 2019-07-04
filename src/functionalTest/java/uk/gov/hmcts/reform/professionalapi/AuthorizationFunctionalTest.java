@@ -113,7 +113,6 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(professionalUsersResponse.get("status")).isNotNull();
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 }

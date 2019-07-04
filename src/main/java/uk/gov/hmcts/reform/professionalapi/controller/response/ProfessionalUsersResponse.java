@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import lombok.Getter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Getter
 public class ProfessionalUsersResponse {
@@ -23,8 +22,6 @@ public class ProfessionalUsersResponse {
     @JsonProperty
     private final String email;
     @JsonProperty
-    private final ProfessionalUserStatus status;
-    @JsonProperty
     private final List<String> roles = new ArrayList<String>();
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
@@ -32,6 +29,5 @@ public class ProfessionalUsersResponse {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
-        this.status = user.getStatus();
     }
 }

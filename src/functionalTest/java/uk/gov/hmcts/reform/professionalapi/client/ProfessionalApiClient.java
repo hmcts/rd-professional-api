@@ -80,7 +80,7 @@ public class ProfessionalApiClient {
 
     private  OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(8));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
@@ -139,7 +139,6 @@ public class ProfessionalApiClient {
                 .firstName("someName")
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 

@@ -30,7 +30,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .firstName("someName")
                 .lastName("someLastName")
                 .email("some@email.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 
@@ -59,7 +58,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .firstName("someName")
                 .lastName("someLastName")
                 .email("some@email.com")
-                .status("PENDING")
                 .roles(userRoles)
                 .build();
 

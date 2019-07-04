@@ -26,8 +26,6 @@ public class NewUserCreationRequest {
     @Pattern(regexp = emailRegex)
     private final String email;
     @NotNull
-    private final String status;
-    @NotNull
     private final List<String> roles;
 
     @JsonCreator
@@ -35,13 +33,11 @@ public class NewUserCreationRequest {
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String email,
-            @JsonProperty("status") String status,
             @JsonProperty("roles") List<String> roles) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.status = status;
         this.roles = roles;
     }
 }

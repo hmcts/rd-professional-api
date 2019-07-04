@@ -26,7 +26,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
         String email = randomAlphabetic(10) + "@pbasearch.test";
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
@@ -50,7 +50,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
         String email = randomAlphabetic(10) + "@pbasearch.test";
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()

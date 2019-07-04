@@ -99,7 +99,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
         OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
                 .name("some-org-name1")
-                .sraId("sra-id-number")
+                .sraId("sra-id-number1")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
                 .companyNumber("company1")
@@ -181,7 +181,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_user_first_name_null() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -207,7 +207,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_user_LastName_null() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -233,7 +233,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_user_email_null() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -259,7 +259,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_contact_information_null() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")

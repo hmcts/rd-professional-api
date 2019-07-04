@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
@@ -135,10 +135,13 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
+                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
+                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters");
+                }
+
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
-
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
@@ -152,7 +155,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(),
                 userCreationRequest.getEmail(),
-                ProfessionalUserStatus.PENDING,
                 organisation);
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
