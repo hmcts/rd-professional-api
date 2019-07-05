@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -98,7 +98,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("hasAnyRole(['pui-case-manager','SuperUser'])")
+    @Secured("pui-case-manager")
     public ResponseEntity<?> retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
@@ -132,7 +132,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize("hasRole('pui-finance-manager')")
+    @Secured("pui-finance-manager")
     public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
@@ -156,7 +156,7 @@ public class OrganisationExternalController extends SuperController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize("hasRole('pui-case-manager')")
+    @Secured("pui-case-manager")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
@@ -189,7 +189,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize("hasRole('pui-case-manager')")
+    @Secured("pui-case-manager")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
