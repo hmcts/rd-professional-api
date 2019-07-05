@@ -108,7 +108,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -225,10 +225,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         organisations = organisations.stream()
-               .map(organisation -> {
-                   organisation.setUsers(sortUserListByCreatedDate(organisation));
-                   return organisation;
-               }).collect(Collectors.toList());
+                .map(organisation -> {
+                    organisation.setUsers(sortUserListByCreatedDate(organisation));
+                    return organisation;
+                }).collect(Collectors.toList());
 
         return new OrganisationsDetailResponse(organisations, true);
     }
@@ -282,4 +282,3 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
 }
-
