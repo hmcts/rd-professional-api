@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -54,5 +54,21 @@ public class PbaAccountUtilTest {
         List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccountFromUserMap(userMapPaymentAccount, paymentAccountsEntity);
 
         assertThat(paymentAccounts.size()).isGreaterThan(0);
+    }
+
+    @Test
+    public void shouldReturnPaymentAccountFromOrganisationUser() {
+
+        PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+
+        List<PaymentAccount> paymentAccountsEntity = new ArrayList<>();
+
+        paymentAccountsEntity.add(paymentAccountMock);
+
+        if (!paymentAccountsEntity.isEmpty()) {
+
+            List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccount(paymentAccountsEntity);
+            assertThat(paymentAccounts.size()).isGreaterThan(0);
+        }
     }
 }
