@@ -60,7 +60,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<?> createOrganisationUsingExternalController (
+    public ResponseEntity<?> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for external users..." + puiCaseManager);
@@ -99,7 +99,7 @@ public class OrganisationExternalController extends SuperController {
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Secured("pui-case-manager")
-    public ResponseEntity<?> retrieveOrganisationsUsingExternalController (
+    public ResponseEntity<?> retrieveOrganisationsUsingExternalController(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
 
