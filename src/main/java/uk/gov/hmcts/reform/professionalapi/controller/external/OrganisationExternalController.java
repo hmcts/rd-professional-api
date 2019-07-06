@@ -60,7 +60,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<?> createOrganisation(
+    public ResponseEntity<?> createOrganisationUsingExternalController (
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for external users..." + puiCaseManager);
@@ -99,7 +99,7 @@ public class OrganisationExternalController extends SuperController {
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Secured("pui-case-manager")
-    public ResponseEntity<?> retrieveOrganisations(
+    public ResponseEntity<?> retrieveOrganisationsUsingExternalController (
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
 
@@ -133,7 +133,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("pui-finance-manager")
-    public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
+    public ResponseEntity<?> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
         return retrievePaymentAccountByUserEmail(email);
@@ -157,7 +157,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-case-manager")
-    public ResponseEntity<?> updatesOrganisation(
+    public ResponseEntity<?> updatesOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
@@ -190,7 +190,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-case-manager")
-    public ResponseEntity<?> addUserToOrganisation(
+    public ResponseEntity<?> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
