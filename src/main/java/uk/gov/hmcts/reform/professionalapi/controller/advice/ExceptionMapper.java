@@ -114,11 +114,7 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
-        ErrorResponse errorDetails = ErrorResponse.builder()
-                .errorMessage(errorMsg)
-                .errorDescription(getRootException(ex).getLocalizedMessage())
-                .timeStamp(getTimeStamp())
-                .build();
+        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
         return new ResponseEntity<>(
                 errorDetails, httpStatus);

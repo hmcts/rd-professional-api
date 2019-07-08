@@ -4,9 +4,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import org.junit.After;
@@ -15,6 +17,7 @@ import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -27,8 +30,10 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
+import java.util.UUID;
+
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091"})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -59,6 +64,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Rule
     public WireMockRule sidamService = new WireMockRule(5000);
+
+    @Rule
+    public WireMockRule userProfileSerive = new WireMockRule(8091);
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
@@ -189,6 +197,26 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void updateOrganisation(String organisationIdentifier, String role, OrganisationStatus status) {
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public void userProfileCreateUserWireMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStaus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamRegistrationResponse\":\"201\""
+                    + "}";
+            returnHttpStaus = 201;
+
+        }
+
+        userProfileSerive.stubFor(WireMock.post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(returnHttpStaus)
+                ));
     }
 }
 

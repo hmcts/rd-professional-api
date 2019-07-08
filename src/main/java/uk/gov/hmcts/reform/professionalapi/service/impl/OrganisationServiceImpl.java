@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortU
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
 
 @Service
 @Slf4j
+@NoArgsConstructor
 public class OrganisationServiceImpl implements OrganisationService {
     OrganisationRepository organisationRepository;
     ProfessionalUserRepository professionalUserRepository;

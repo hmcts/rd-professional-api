@@ -2,13 +2,18 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import java.util.List;
 
+import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -17,20 +22,26 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdenti
 import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
+import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 
 
 @RestController
@@ -53,6 +64,8 @@ public abstract class SuperController {
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
+    @Autowired
+    private UserProfileFeignClient userProfileFeignClient;
 
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
@@ -149,10 +162,41 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
-        OrganisationResponse organisationResponse =
-                organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
-        log.info("Received response to update organisation..." + organisationResponse);
+        ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
+        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()) {
+            log.info("Organisation is getting activated");
+            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null);
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
+                log.info("Idam regitration success !! idamId = " + userProfileCreationResponse.getIdamId() );
+                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                professionalUserService.persistUser(professionalUser);
+            } else {
+                log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+                return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
+            }
+        }
+        OrganisationResponse organisationResponse = organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
         return ResponseEntity.status(200).build();
+    }
+
+    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles) {
+        log.info("Creating user...");
+        List<String> userRoles = CollectionUtils.isEmpty(roles) ? prdEnumService.getPrdEnumByEnumType("SIDAM_ROLE") : roles;
+        UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
+                professionalUser.getEmailAddress(),
+                professionalUser.getFirstName(),
+                professionalUser.getLastName(),
+                LanguagePreference.EN,
+                UserCategory.PROFESSIONAL,
+                UserType.EXTERNAL,
+                userRoles);
+
+        Response response = userProfileFeignClient.createUserProfile(userCreationRequest);
+
+        Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
+        return JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
     }
 
     protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {

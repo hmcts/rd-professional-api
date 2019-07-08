@@ -1,15 +1,24 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
 public class ErrorResponse {
 
-    private final String errorMessage;
+    private String errorMessage;
 
-    private final String errorDescription;
+    private String errorDescription;
 
-    private final String timeStamp;
+    private String timeStamp;
+
+    public ErrorResponse(String errorMessage, String errorDescription, String timeStamp) {
+        this.errorMessage = errorMessage;
+        this.errorDescription = errorDescription;
+        this.timeStamp = timeStamp;
+    }
 }

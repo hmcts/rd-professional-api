@@ -1,17 +1,19 @@
-package uk.gov.hmcts.reform.userprofileapi.util;
+package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+@SuppressWarnings("unchecked")
 public class JsonFeignResponseHelper {
     private static final ObjectMapper json = new ObjectMapper();
 
@@ -19,23 +21,21 @@ public class JsonFeignResponseHelper {
 
     }
 
-    public static <T> Optional<T> decode(Response response, Class<T> clazz) {
-        if (response.status() >= 200 && response.status() < 300 && clazz != null) {
-            try {
-                return Optional.of(json.readValue(response.body().asReader(), clazz));
-            } catch (IOException e) {
-                return Optional.empty();
-            }
-        } else {
+    public static Optional decode(Response response, Class clazz) {
+        try {
+            return Optional.of(json.readValue(response.body().asReader(), clazz));
+        } catch (IOException e) {
+            System.out.println("failed in parsing!!" );
+            e.printStackTrace();
             return Optional.empty();
         }
     }
 
-    public static <U> ResponseEntity<U> toResponseEntity(Response response, Class<U> clazz) {
-        Optional<U> payload = decode(response, clazz);
+    public static ResponseEntity toResponseEntity(Response response, Class clazz) {
+        Optional payload = decode(response, clazz);
 
-        return new ResponseEntity<U>(
-                payload.orElse(null),//didn't find a way to feed body with original content if payload is empty
+        return new ResponseEntity(
+                payload.orElse(null),
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
     }

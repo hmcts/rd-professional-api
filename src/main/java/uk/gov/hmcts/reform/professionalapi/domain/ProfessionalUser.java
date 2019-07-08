@@ -84,6 +84,5 @@ public class ProfessionalUser {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.organisation = organisation;
-        this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
 }

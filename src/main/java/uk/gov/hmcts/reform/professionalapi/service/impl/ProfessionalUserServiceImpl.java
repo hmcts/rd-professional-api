@@ -98,4 +98,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUsers;
     }
 
+    @Override
+    public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
+        log.info("Into updateUser");
+        return professionalUserRepository.save(updatedProfessionalUser);
+    }
+
 }

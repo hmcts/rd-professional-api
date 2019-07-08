@@ -14,5 +14,7 @@ public interface ProfessionalUserService {
 
     List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation existingOrganisation, boolean showDeleted);
 
+    ProfessionalUser persistUser(ProfessionalUser professionalUser);
+
 }
 

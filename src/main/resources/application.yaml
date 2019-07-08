@@ -63,25 +63,26 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
+    - "/refdata/internal/**"
   authorisedServices:
     - rd_professional_api
     - rd_user_profile
 
 
 ### dependency configuration
-auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8503}
 idam:
   s2s-auth:
     totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: rd_professional_api
-    url: ${S2S_URL:http://127.0.0.1:8502}
+    url: ${S2S_URL:http://127.0.0.1:8503}
     pbaFromUserAccountMap: false
 usermap:
     pbaFromUserAccountMap:
     - "false"
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
-#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+#auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
@@ -90,3 +91,5 @@ exui.role:
     pui-organisation-manager: pui-organisation-manager
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
+## user profile feign connection
+user.profile.api.url: ${USER_PROFILE_URL:rd-user-profile-api:8091}
