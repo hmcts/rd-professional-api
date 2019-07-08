@@ -379,6 +379,13 @@ public class OrganisationServiceImplTest {
         organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
     }
 
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testThrowsExceptionWhenOrganisationEmpty() {
+        Mockito.when(organisationRepositoryMock.findAll())
+                .thenReturn(new ArrayList<Organisation>());
+        organisationServiceImplMock.retrieveOrganisations();
+    }
+
     @Test
     public void getOrganisationByOrganisationIdentifier() {
 
