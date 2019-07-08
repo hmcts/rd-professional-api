@@ -208,5 +208,17 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     }
 
+    @Test
+    public void  persists_and_return_forbidden_when_no_role_associated_with_end_point() {
+
+        String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiUserManager);
+
+        assertThat(orgResponse.get("http_status").toString().contains("403"));
+
+    }
+
 
 }

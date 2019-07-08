@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,7 +60,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<?> createOrganisation(
+    public ResponseEntity<?> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for external users..." + puiCaseManager);
@@ -98,8 +98,8 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @PreAuthorize("hasAnyRole(['pui-case-manager','SuperUser'])")
-    public ResponseEntity<?> retrieveOrganisations(
+    @Secured("pui-case-manager")
+    public ResponseEntity<?> retrieveOrganisationsUsingExternalController(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
 
@@ -132,8 +132,8 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize("hasRole('pui-finance-manager')")
-    public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
+    @Secured("pui-finance-manager")
+    public ResponseEntity<?> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for external...");
 
         return retrievePaymentAccountByUserEmail(email);
@@ -156,8 +156,8 @@ public class OrganisationExternalController extends SuperController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize("hasRole('pui-case-manager')")
-    public ResponseEntity<?> updatesOrganisation(
+    @Secured("pui-case-manager")
+    public ResponseEntity<?> updatesOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
@@ -189,8 +189,8 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @PreAuthorize("hasRole('pui-case-manager')")
-    public ResponseEntity<?> addUserToOrganisation(
+    @Secured("pui-case-manager")
+    public ResponseEntity<?> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
