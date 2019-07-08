@@ -39,7 +39,7 @@ public class UserAttributeServiceTest {
 
     @Before
     public void setUp() {
-        PrdEnum anEnum = new PrdEnum(prdEnumId, "PUI_USER_MANAGER", "USER_ROLE");
+        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
 
         prdEnums.add(anEnum);
 
