@@ -9,7 +9,7 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,7 +65,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @PreAuthorize("hasRole('pui-case-manager')")
+    @Secured("pui-case-manager")
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId  String organisationIdentifier,
                                        @ApiParam(name = "showDeleted", required = false)@RequestParam(value = "showDeleted", required = false) String showDeleted,
                                        @ApiParam(name = "email", required = false) @RequestParam (value = "email", required = false) String email) {
