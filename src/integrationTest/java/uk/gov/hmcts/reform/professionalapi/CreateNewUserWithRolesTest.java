@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     private static final String role = "pui-user-manager";
