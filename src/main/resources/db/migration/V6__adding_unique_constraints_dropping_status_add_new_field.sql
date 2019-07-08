@@ -5,9 +5,11 @@ ALTER TABLE professional_user DROP COLUMN status;
 
 ALTER TABLE professional_user ADD COLUMN deleted timestamp;
 
+ALTER TABLE professional_user ADD COLUMN deleted_flag boolean;
+
 ALTER TABLE professional_user DROP CONSTRAINT EMAIL_ADDRESS_UQ1;
 
-ALTER TABLE professional_user ADD CONSTRAINT EMAIL_ADDRESS_UQ1 UNIQUE (EMAIL_ADDRESS, DELETED);
+ALTER TABLE professional_user ADD CONSTRAINT EMAIL_ADDRESS_UQ1 UNIQUE (EMAIL_ADDRESS, DELETED_FLAG);
 
 --RDCC-273 SIDAM roles format updated
 UPDATE  PRD_ENUM SET ENUM_NAME = 'pui-user-manager' , ENUM_TYPE = 'SIDAM_ROLE' WHERE ENUM_CODE = 0;

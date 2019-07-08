@@ -32,7 +32,7 @@ public interface ProfessionalApiSort {
 
         userList.forEach(user -> {
             user.getUserAttributes().forEach(userAttribute -> {
-                if (user.getDeleted() == null && userAttribute.getPrdEnum().getEnumName() == "organisation-admin") {
+                if (user.getDeleted() == null && userAttribute.getPrdEnum().getEnumName().equals("organisation-admin")) {
                     adminList.add(user);
                 }
             });

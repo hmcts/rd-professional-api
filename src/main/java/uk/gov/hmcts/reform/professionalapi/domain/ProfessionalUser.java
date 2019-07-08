@@ -59,6 +59,9 @@ public class ProfessionalUser {
     @Column(name = "DELETED")
     private LocalDateTime deleted;
 
+    @Column(name = "DELETED_FLAG")
+    private Boolean deleted_flag;
+
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
     private LocalDateTime lastUpdated;
