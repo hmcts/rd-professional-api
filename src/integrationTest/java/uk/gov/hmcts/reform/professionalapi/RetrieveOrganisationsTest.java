@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
@@ -69,15 +68,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations() {
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+        Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
+        Map<String, Object> orgResponse2 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .name("some-other-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
