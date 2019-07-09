@@ -115,7 +115,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(users.get(0).getEmailAddress()).isEqualTo(expectAdminEmail);
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, role);
+                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, "prd-admin");
 
         String actualEmail = (String) response.get("email");
 
