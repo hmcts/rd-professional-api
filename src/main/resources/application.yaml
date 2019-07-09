@@ -91,5 +91,5 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-#idamUrl: ${IDAM_SERVICE_URL:https://idam-api.preview.platform.hmcts.net}
-userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}
+userProfUrl: ${IDAM_SERVICE_URL:https://idam-api.preview.platform.hmcts.net}
+#userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}

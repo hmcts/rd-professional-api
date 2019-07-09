@@ -2,16 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseHelper {
