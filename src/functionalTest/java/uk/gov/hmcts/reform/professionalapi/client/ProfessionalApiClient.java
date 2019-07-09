@@ -49,8 +49,8 @@ public class ProfessionalApiClient {
     protected IdamService idamService;
 
     public ProfessionalApiClient(
-            String professionalApiUrl,
-            String s2sToken, IdamService idamService) {
+                                 String professionalApiUrl,
+                                 String s2sToken, IdamService idamService) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamService = idamService;

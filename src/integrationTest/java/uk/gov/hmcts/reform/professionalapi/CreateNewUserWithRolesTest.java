@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
-    private static final String role = "pui-user-manager";
+    private static final String userManagerRole = "pui-user-manager";
 
     private String createNewOrganisationWithAdmin(OrganisationCreationRequest organisationCreationRequest) {
         Map<String, Object> organisationResponse =
@@ -43,7 +43,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     public void post_request_adds_new_user_to_an_organisation() {
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(userManagerRole);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
@@ -76,9 +76,10 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         final String newUserEmail = "SOME.OTHER@EMAIL.COM";
         final String searchSecondUserEmail = "sOMe.OTHer@EmAiL.Com";
         final String expectSecondUserEmail = "some.other@email.com";
+        final String prdAdminRole = "prd-admin";
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(userManagerRole);
 
         OrganisationCreationRequest.OrganisationCreationRequestBuilder orgRequestBuilder = someMinimalOrganisationRequest(orgAdminEmail);
 
@@ -88,7 +89,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(organisationIdentifier).isNotNull();
 
-        Map<String, Object> responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, "prd-admin", organisationIdentifier);
+        Map<String, Object> responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, prdAdminRole, organisationIdentifier);
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
 
@@ -99,7 +100,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .roles(userRoles)
                 .build();
 
-        Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest, "prd-admin");
+        Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest, prdAdminRole);
 
         assertThat(responseForNewUser.get("http_status")).isEqualTo("201 CREATED");
 
@@ -115,7 +116,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(users.get(0).getEmailAddress()).isEqualTo(expectAdminEmail);
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, "prd-admin");
+                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, prdAdminRole);
 
         String actualEmail = (String) response.get("email");
 
@@ -126,7 +127,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     @Test
     public void returns_404_when_organisation_identifier_not_found() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(userManagerRole);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
