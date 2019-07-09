@@ -8,6 +8,7 @@ import io.swagger.annotations.Authorization;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
+@ConditionalOnExpression("${professional.user.controller.enabled:false}")
 @Slf4j
 @AllArgsConstructor
 public class ProfessionalUserController {

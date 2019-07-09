@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
 )
 @RestController
+@ConditionalOnExpression("${organisation.controller.enabled:false}")
 @Slf4j
 @AllArgsConstructor
 public class OrganisationController {
