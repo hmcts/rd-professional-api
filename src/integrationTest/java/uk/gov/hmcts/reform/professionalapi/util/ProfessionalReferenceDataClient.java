@@ -69,7 +69,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String,Object> retrieveAllOrganisations(String role) {
-        return getRequest(APP_EXT_BASE_PATH, role);
+        return getRequest(APP_EXT_BASE_PATH + "/", role);
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
