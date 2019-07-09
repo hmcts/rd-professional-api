@@ -25,6 +25,7 @@ spring:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.locations: classpath:db/migration,classpath:db/postgres
 
 ### database configuration
   datasource:

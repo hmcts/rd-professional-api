@@ -1,4 +1,5 @@
 spring:
+  flyway.locations: classpath:db/migration
 
   jpa:
     show-sql: true

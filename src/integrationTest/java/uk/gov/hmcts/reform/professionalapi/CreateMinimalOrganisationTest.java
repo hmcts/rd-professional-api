@@ -48,7 +48,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-
+        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
 
     }
