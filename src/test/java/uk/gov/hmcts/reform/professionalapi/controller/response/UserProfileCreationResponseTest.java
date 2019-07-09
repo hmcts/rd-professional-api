@@ -2,27 +2,21 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-public class ProfessionalUsersResponseTest {
+public class UserProfileCreationResponseTest {
 
 
     @Test
-    public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
+    public void has_mandatory_fields_specified_not_null() {
 
-        final String expectEmailAddress = "dummy@email.com";
-        final String expectFirstName = "Bob";
-        final String expectLastName = "Smith";
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        UUID testUuid = UUID.randomUUID();
+        userProfileCreationResponse.setIdamId(testUuid);
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
 
-        ProfessionalUser user = new ProfessionalUser();
-        user.setEmailAddress(expectEmailAddress);
-        user.setFirstName(expectFirstName);
-        user.setLastName(expectLastName);
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
-
-        assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
-        assertThat(professionalUsersResponse.getFirstName()).isEqualTo(expectFirstName);
-        assertThat(professionalUsersResponse.getLastName()).isEqualTo(expectLastName);
+        assertThat(userProfileCreationResponse.getIdamId()).isEqualTo(testUuid);
+        assertThat(userProfileCreationResponse.getIdamRegistrationResponse()).isEqualTo(201);
     }
 }

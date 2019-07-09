@@ -146,4 +146,16 @@ public class ProfessionalUserServiceTest {
 
         List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
     }
+
+    @Test
+    public void shouldPersistUser() {
+
+        when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
+
+        ProfessionalUser actualProfessionalUser = professionalUserService.persistUser(professionalUser);
+
+        assertThat(actualProfessionalUser).isNotNull();
+
+        verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
+    }
 }

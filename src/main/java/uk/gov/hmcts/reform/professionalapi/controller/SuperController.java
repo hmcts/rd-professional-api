@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import java.util.List;
-
 import feign.Response;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +40,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
-
 
 @RestController
 @Slf4j
@@ -168,7 +165,7 @@ public abstract class SuperController {
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-                log.info("Idam regitration success !! idamId = " + userProfileCreationResponse.getIdamId() );
+                log.info("Idam regitration success !! idamId = " + userProfileCreationResponse.getIdamId());
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {

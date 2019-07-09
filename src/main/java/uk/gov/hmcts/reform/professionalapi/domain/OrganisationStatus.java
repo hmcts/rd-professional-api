@@ -6,11 +6,11 @@ public enum OrganisationStatus {
    BLOCKED,
    DELETED;
 
-   public boolean isPending() {
-      return this == PENDING;
-   }
+    public boolean isPending() {
+        return this == PENDING;
+    }
 
-   public boolean isActive() {
-      return this == ACTIVE;
-   }
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
 }

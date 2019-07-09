@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 
 
 @FeignClient(name = "UserProfileClient", url = "${user.profile.api.url}")
-    public interface UserProfileFeignClient {
+public interface UserProfileFeignClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/userprofile")
     @RequestLine("POST /v1/userprofile")
