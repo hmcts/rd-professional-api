@@ -31,14 +31,18 @@ public interface ProfessionalApiSort {
         List<ProfessionalUser> adminList = new ArrayList<>();
 
         userList.forEach(user -> {
-            user.getUserAttributes().forEach(userAttribute -> {
-                if (user.getDeleted() == null && userAttribute.getPrdEnum().getEnumName().equals("organisation-admin")) {
-                    adminList.add(user);
-                }
-            });
+            if (user.getDeleted() == null) {
+                user.getUserAttributes().forEach(userAttribute -> {
+                    if (userAttribute.getPrdEnum().getEnumName().equals("organisation-admin")) {
+                        adminList.add(user);
+                    }
+                });
+            }
         });
 
-        List<ProfessionalUser> sortedAdminList = adminList.stream().sorted((Comparator.comparing(ProfessionalUser::getCreated))).collect(Collectors.toList());
+        List<ProfessionalUser> sortedAdminList = adminList.stream()
+                .sorted((Comparator.comparing(ProfessionalUser::getCreated)))
+                .collect(Collectors.toList());
 
         userList.forEach(user -> {
             if (!sortedAdminList.contains(user)) {
