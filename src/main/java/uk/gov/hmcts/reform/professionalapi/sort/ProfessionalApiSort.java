@@ -14,42 +14,42 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public interface ProfessionalApiSort {
 
     static List<ProfessionalUser> sortUsers(Organisation organisation) {
-        List<ProfessionalUser> userList = organisation.getUsers();
+        List<ProfessionalUser> users = organisation.getUsers();
 
-        userList = sortUserListByDeletedTimestamp(userList);
-        return sortUserListByOrgAdminsFirst(userList);
+        users = sortUserListByDeletedTimestamp(users);
+        return sortUserListByOrgAdminsFirst(users);
     }
 
-    static List<ProfessionalUser> sortUserListByDeletedTimestamp(List<ProfessionalUser> userList) {
-        userList.sort(nullsFirst(
+    static List<ProfessionalUser> sortUserListByDeletedTimestamp(List<ProfessionalUser> users) {
+        users.sort(nullsFirst(
                 comparing(ProfessionalUser::getDeleted, nullsFirst(naturalOrder()))));
 
-        return userList;
+        return users;
     }
 
-    static List<ProfessionalUser> sortUserListByOrgAdminsFirst(List<ProfessionalUser> userList) {
-        List<ProfessionalUser> adminList = new ArrayList<>();
+    static List<ProfessionalUser> sortUserListByOrgAdminsFirst(List<ProfessionalUser> users) {
+        List<ProfessionalUser> admins = new ArrayList<>();
 
-        userList.forEach(user -> {
+        users.forEach(user -> {
             if (user.getDeleted() == null) {
                 user.getUserAttributes().forEach(userAttribute -> {
                     if (userAttribute.getPrdEnum().getEnumName().equals("organisation-admin")) {
-                        adminList.add(user);
+                        admins.add(user);
                     }
                 });
             }
         });
 
-        List<ProfessionalUser> sortedAdminList = adminList.stream()
+        List<ProfessionalUser> sortedAdmins = admins.stream()
                 .sorted((Comparator.comparing(ProfessionalUser::getCreated)))
                 .collect(Collectors.toList());
 
-        userList.forEach(user -> {
-            if (!sortedAdminList.contains(user)) {
-                sortedAdminList.add(user);
+        users.forEach(user -> {
+            if (!sortedAdmins.contains(user)) {
+                sortedAdmins.add(user);
             }
         });
 
-        return sortedAdminList;
+        return sortedAdmins;
     }
 }
