@@ -79,3 +79,8 @@ services:
 
 volumes:
   rd-professional-db-volume:
+
+networks:
+  default:
+    external:
+      name: rduserprofileapi_default

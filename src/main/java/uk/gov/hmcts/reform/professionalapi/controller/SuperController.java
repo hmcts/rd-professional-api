@@ -101,10 +101,9 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(status) && StringUtils.isEmpty(id)) {
 
-            log.info("Received request to retrieve organisation with status ");
-
             if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
 
+                log.info("Received request to retrieve organisation with status " + status.toUpperCase());
                 organisationResponse =
                         organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
             } else {

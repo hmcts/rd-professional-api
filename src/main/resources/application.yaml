@@ -80,8 +80,8 @@ usermap:
     pbaFromUserAccountMap:
     - "false"
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
-#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+#auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
@@ -90,3 +90,6 @@ exui.role:
     pui-organisation-manager: pui-organisation-manager
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
+
+#idamUrl: ${IDAM_SERVICE_URL:https://idam-api.preview.platform.hmcts.net}
+userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}

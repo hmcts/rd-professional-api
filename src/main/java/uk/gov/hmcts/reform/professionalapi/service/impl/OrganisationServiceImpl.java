@@ -4,9 +4,11 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUserListByCreatedDate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -16,11 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -56,6 +60,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
+    @Autowired
+    UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -108,7 +114,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") ||
+                    prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -272,14 +279,37 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
+        log.debug("findByOrganisationStatus:: " + status);
         List<Organisation> organisations = organisationRepository.findByStatus(status);
 
         if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(1);
+
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
+
+            log.debug("getUserDetails::ACTIVE:: ");
+            organisations = organisations.stream()
+                    .map(organisation -> {
+                        organisation.setUsers(getUserId(organisation.getUsers()));
+                        return organisation;
+                    }).collect(Collectors.toList());
+
+
         }
         return new OrganisationsDetailResponse(organisations, true);
     }
 
+    private List<ProfessionalUser> getUserId(List<ProfessionalUser> users) {
+        log.debug("getUserId::ACTIVE:: ");
+        List<ProfessionalUser> userProfDtls = new ArrayList<>();
+        for (ProfessionalUser user: users) {
 
+            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getId().toString());
+            //JsonFeignResponseHelper.toResponseEntity(response, GetUserProfileResponse);
+            log.debug("getUserId::ACTIVE::response:: " + response);
+        }
+
+        return userProfDtls;
+    }
 }
 

@@ -14,9 +14,9 @@ public class UserCreationRequestValidator {
     static List<String> verifiedUserRoles;
 
     public static List<String> contains(List<String> roles, List<PrdEnum> prdEnumList) {
-        List<String> amendedRoles = roles.stream().map(role -> role.replace("-", "_").toUpperCase()).collect(Collectors.toList());
+       // List<String> amendedRoles = roles.stream().map(role -> role.replace("-", "_").toUpperCase()).collect(Collectors.toList());
 
-        verifiedUserRoles = amendedRoles.stream().map(role -> verifyRole(role, prdEnumList)).collect(Collectors.toList());
+        verifiedUserRoles = roles.stream().map(role -> verifyRole(role, prdEnumList)).collect(Collectors.toList());
 
         List<String> finalList = verifiedUserRoles.stream().filter(role -> !role.equals("false")).collect(Collectors.toList());
 
