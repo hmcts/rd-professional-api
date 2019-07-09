@@ -307,7 +307,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<ProfessionalUser> userProfDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
 
-            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getId().toString());
+            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, GetUserProfileResponse.class);
             mapUserInfo(user, responseResponseEntity);
             log.info("getUserId::ACTIVE::response:: " + response.body());
