@@ -157,7 +157,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-case-manager")
-    public ResponseEntity<?> updatesOrganisation(
+    public ResponseEntity<?> updatesOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
@@ -190,7 +190,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-case-manager")
-    public ResponseEntity<?> addUserToOrganisation(
+    public ResponseEntity<?> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @OrgId @NotBlank String organisationIdentifier) {
 
