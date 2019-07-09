@@ -60,7 +60,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<?> createOrganisation(
+    public ResponseEntity<?> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for external users..." + puiCaseManager);
