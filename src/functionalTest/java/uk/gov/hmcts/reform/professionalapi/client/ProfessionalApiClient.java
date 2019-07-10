@@ -332,6 +332,7 @@ public class ProfessionalApiClient {
 
         String userToken = idamService.createUserWith("", role).getAuthorisationToken();
         log.info("authToken::" + userToken);
+        log.info("S2SToken::" + s2sToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
