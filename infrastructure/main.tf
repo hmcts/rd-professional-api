@@ -52,8 +52,8 @@ data "azurerm_key_vault_secret" "idam_url" {
 }
 
 data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
-  name = "USER_PROFILE_URL"
-  vault_user_profile_uri = "${data.azurerm_key_vault.rd_key_vault.vault_user_profile_uri}"
+ name = "USER-PROFILE-URL"
+ vault_user_profile_uri = "${data.azurerm_key_vault.rd_key_vault.vault_user_profile_uri}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
