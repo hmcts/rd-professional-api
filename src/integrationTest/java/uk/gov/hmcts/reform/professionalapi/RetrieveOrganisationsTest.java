@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -120,7 +121,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE).build();
-
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 

@@ -17,6 +17,7 @@ locals {
   s2s_vault_name = "s2s-${local.local_env}"
   s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
   idam_url = "https://idam-api.${local.local_env}.platform.hmcts.net"
+  USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -48,6 +49,11 @@ data "azurerm_key_vault_secret" "s2s_url" {
 data "azurerm_key_vault_secret" "idam_url" {
   name = "idam-url"
   vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
+  name = "USER_PROFILE_URL"
+  vault_user_profile_uri = "${data.azurerm_key_vault.rd_key_vault.vault_user_profile_uri}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
@@ -124,6 +130,7 @@ module "rd_professional_api" {
 
     S2S_URL = "${local.s2s_url}"
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
+    USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
 
     ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
     LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"

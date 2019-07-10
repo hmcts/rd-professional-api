@@ -2,13 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.entities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_UUID;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
 import org.junit.Test;
-
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 

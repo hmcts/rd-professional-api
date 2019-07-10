@@ -64,10 +64,9 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
-    - "/refdata/internal/**"
   authorisedServices:
     - rd_professional_api
-    - rd_user_profile
+    - rd_user_profile_api
 
 
 ### dependency configuration

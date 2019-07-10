@@ -108,11 +108,11 @@ public class SecurityConfiguration  {
                     .disable()
                     .logout()
                     .disable()
-                    /*.authorizeRequests()
+                    .authorizeRequests()
                     .anyRequest()
                     .authenticated()
                     .and()
-                    .addFilter(authCheckerServiceAndUserFilter)*/;
+                    .addFilter(authCheckerServiceAndUserFilter);
         }
 
 

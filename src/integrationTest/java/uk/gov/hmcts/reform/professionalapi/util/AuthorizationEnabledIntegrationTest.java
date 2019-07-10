@@ -193,6 +193,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     public void updateOrganisation(String organisationIdentifier, String role, OrganisationStatus status) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
