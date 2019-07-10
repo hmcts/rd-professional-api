@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
+@Ignore
 public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Service2ServiceEnabledIntegrationTest {
 
     @Test

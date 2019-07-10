@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -21,7 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
 
-
+@Ignore
 public class CreateMinimalOrganisationTest extends Service2ServiceEnabledIntegrationTest {
 
     @Test

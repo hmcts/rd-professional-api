@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Ignore
 public class FindUsersByOrganisationTest extends FunctionalTestSuite {
 
     @Test

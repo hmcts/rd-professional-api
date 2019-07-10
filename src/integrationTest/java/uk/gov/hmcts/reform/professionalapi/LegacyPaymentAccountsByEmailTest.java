@@ -13,6 +13,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegratio
 public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegrationTest {
 
     @Test
+    @Ignore
     public void get_request_returns_correct_payment_accounts_for_user_email_address_ac1() {
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("pba123");
@@ -79,6 +81,7 @@ public class LegacyPaymentAccountsByEmailTest extends Service2ServiceEnabledInte
     }
 
     @Test
+    @Ignore
     public void get_request_returns_empty_when_no_payment_accounts_associated_with_user_email_address_ac4() {
 
         professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
