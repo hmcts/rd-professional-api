@@ -172,7 +172,8 @@ pitest {
     threads = 10
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
-    mutationThreshold = 90   
+    mutationThreshold = 90
+    useClasspathFile = true
 }
 
 project.tasks['pitest'].group = "Verification"
