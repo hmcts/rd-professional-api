@@ -94,7 +94,7 @@ public class IdamService {
                 BASIC + base64Authorisation,
                 CODE,
                 testConfig.getOauth2().getClientId(),
-                testConfig.getOauth2().getRedirectUrl(),"openid profile roles create-user manage-user search-user");
+                testConfig.getOauth2().getRedirectUrl());
 
         log.info("authenticateUserResponse::" + authenticateUserResponse);
         log.info("authenticateUserResponse::Code::" + authenticateUserResponse.getCode());
