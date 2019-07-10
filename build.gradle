@@ -181,6 +181,7 @@ pitest {
 
 project.tasks['pitest'].group = "Verification"
 
+/* DISABLED FOR LIMITED MVP RELEASE OF F.R. Legacy Endpoint ONLY
 sonarqube {
     properties {
         property "sonar.projectName", "RD :: Professional Reference Data api"
@@ -196,7 +197,7 @@ sonarqube {
 }
 
 project.tasks['sonarqube'].dependsOn test, integration
-project.tasks['sonarqube'].group = "Verification"
+project.tasks['sonarqube'].group = "Verification"*/
 
 repositories {
 
