@@ -25,8 +25,6 @@ public class JsonFeignResponseHelper {
         try {
             return Optional.of(json.readValue(response.body().asReader(), clazz));
         } catch (IOException e) {
-            System.out.println("failed in parsing!!");
-            e.printStackTrace();
             return Optional.empty();
         }
     }
