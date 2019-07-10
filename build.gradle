@@ -189,7 +189,7 @@ sonarqube {
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java" +
-                "uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/JsonFeignResponseHelper.java"
     }
 }
 
