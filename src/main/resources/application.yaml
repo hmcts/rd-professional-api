@@ -81,8 +81,8 @@ usermap:
     pbaFromUserAccountMap:
     - "false"
 
-#auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
-auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
+#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
