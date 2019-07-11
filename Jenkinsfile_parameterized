@@ -12,7 +12,7 @@ properties([
 ])
 
 
-def rd_secrets = [
+def secrets = [
     secret('s2s-secret', 'S2S_SECRET'),
     secret('s2s-url', 'S2S_URL'),
     secret('idam-url', 'IDAM_URL'),
