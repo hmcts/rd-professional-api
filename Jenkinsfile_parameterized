@@ -14,7 +14,12 @@ properties([
 def secrets = [
   's2s-${env}': [
     secret('microservicekey-rd-professional-api', 'S2S_SECRET')
-  ]
+  ],
+  secret('s2s-url', 'S2S_URL'),
+  secret('idam-url', 'IDAM_URL'),
+  secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+  secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+  secret('OAUTH2-REDIRECT-URI', 'OAUTH2_REDIRECT_URI')
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -44,7 +49,12 @@ withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.E
     enableDockerBuild()
     installCharts()
 
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-sandbox.service.core-compute-sandbox.internal"
+    env.S2S_URL_FOR_TESTS = params.S2S_URL
+    env.IDAM_URL = params.IDAM_URL
+    env.OAUTH2_CLIENT_ID = params.OAUTH2_CLIENT_ID
+    env.OAUTH2_CLIENT_SECRET = params.OAUTH2_CLIENT_SECRET
+    env.OAUTH2_REDIRECT_URI = params.OAUTH2_REDIRECT_URI
+    env.S2S_SECRET = params.S2S_SECRET
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
