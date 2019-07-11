@@ -11,6 +11,7 @@ properties([
   ])
 ])
 
+String type = "java"
 String product = "rd"
 String component = "professional-api"
 
@@ -37,7 +38,7 @@ def vaultOverrides = [
     'spreview': 'saat'
 ]
 
-withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+withPipeline(type, product, component) {
 
     after('smoketest:aat') {
         sh "rm -rf infrastructure/"
