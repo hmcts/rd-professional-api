@@ -15,13 +15,20 @@ String type = "java"
 String product = "rd"
 String component = "professional-api"
 
-List<LinkedHashMap<String, Object>> secrets = [
-    secret('s2s-secret', 'S2S_SECRET'),
+def secrets = [
+    's2s-${env}': [    
+    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+    ]
+]
+
+def rd_secrets = [
+  'rd-${env}': [
     secret('s2s-url', 'S2S_URL'),
     secret('idam-url', 'IDAM_URL'),
     secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
     secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
     secret('OAUTH2-REDIRECT-URI', 'OAUTH2_REDIRECT_URI')
+   ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
