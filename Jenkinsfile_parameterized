@@ -53,6 +53,7 @@ withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
     overrideVaultEnvironments(vaultOverrides)
     setVaultName('rd')
     loadVaultSecrets(secrets)
+    loadVaultSecrets(rd_secrets)  
 
     enableDbMigration()
     enableDockerBuild()
