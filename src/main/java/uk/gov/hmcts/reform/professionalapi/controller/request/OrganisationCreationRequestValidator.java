@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Component
@@ -38,6 +39,17 @@ public class OrganisationCreationRequestValidator {
             String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
             log.error(errorMessage);
             throw new EmptyResultDataAccessException(1);
+        }
+    }
+
+    public void isOrganisationActive(Organisation organisation) {
+
+        if (organisation == null) {
+            log.error("Organisation not found");
+            throw new EmptyResultDataAccessException("Organisation not found", 1);
+        } else if (!organisation.isOrganisationStatusActive()) {
+            log.error("Organisation is not active. Cannot add new users");
+            throw new EmptyResultDataAccessException("Organisation is not active. Cannot add new users", 1);
         }
     }
 }

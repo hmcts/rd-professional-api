@@ -162,6 +162,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void retrieve_organisation_should_have_single_super_user() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> user1Roles = new ArrayList<>();
         user1Roles.add("pui-user-manager");
 
@@ -171,27 +172,30 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
+        Map<String, Object> organisationResponse =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
+
+        professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build(), hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
                 .firstName("someName1")
                 .lastName("someLastName1")
                 .email("some@email.com")
                 .roles(user1Roles)
                 .build();
+        Map<String, Object> newUserResponse1 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
                 .firstName("someName2")
                 .lastName("someLastName2")
                 .email("some@email2.com")
                 .roles(user2Roles)
                 .build();
-
-        Map<String, Object> organisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
-
-        Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserRe
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -78,6 +76,8 @@ public abstract class SuperController {
 
     @Value("${exui.role.pui-case-manager:}")
     protected String puiCaseManager;
+
+    private static final String SIDAM_ROLE = "SIDAM_ROLE";
 
 
     protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
@@ -162,10 +162,10 @@ public abstract class SuperController {
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
         if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()) {
             log.info("Organisation is getting activated");
-            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null);
+            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-                log.info("Idam regitration success !! idamId = " + userProfileCreationResponse.getIdamId());
+                log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
@@ -177,9 +177,9 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles) {
+    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         log.info("Creating user...");
-        List<String> userRoles = CollectionUtils.isEmpty(roles) ? prdEnumService.getPrdEnumByEnumType("SIDAM_ROLE") : roles;
+        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(SIDAM_ROLE) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
                 professionalUser.getFirstName(),
@@ -193,7 +193,6 @@ public abstract class SuperController {
 
         Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
         return JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
     }
 
     protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {
@@ -213,23 +212,31 @@ public abstract class SuperController {
 
     protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
 
+        Object responseBody = null;
+        int responseStatus;
+
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
+        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
+        List<String> roles = newUserCreationRequest.getRoles();
+        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
 
-        if (UserCreationRequestValidator.contains(newUserCreationRequest.getRoles(), prdEnumList).isEmpty()) {
-            log.error("Invalid/No user role(s) provided");
-            throw new InvalidRequest("404");
+        ProfessionalUser newUser = new ProfessionalUser(newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName(), newUserCreationRequest.getEmail(), existingOrganisation);
+        ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
+            log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
+            newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {
-            NewUserResponse newUserResponse =
-                    professionalUserService.addNewUserToAnOrganisation(newUserCreationRequest, organisationIdentifier);
-
-            log.info("Received request to add a new user to an organisation..." + newUserResponse);
-            return ResponseEntity
-                    .status(201)
-                    .body(newUserResponse);
+            log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+            responseBody = responseEntity.getBody();
         }
+
+        return ResponseEntity
+                .status(responseEntity.getStatusCode().value())
+                .body(responseBody);
     }
 
     protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
