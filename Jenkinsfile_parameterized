@@ -15,7 +15,7 @@ String type = "java"
 String product = "rd"
 String component = "professional-api"
 
-def secrets = [
+List<LinkedHashMap<String, Object>> secrets = [
     secret('s2s-secret', 'S2S_SECRET'),
     secret('s2s-url', 'S2S_URL'),
     secret('idam-url', 'IDAM_URL'),
@@ -38,8 +38,7 @@ def vaultOverrides = [
     'spreview': 'saat'
 ]
 
-withPipeline(type, product, component) {
-
+withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
     after('smoketest:aat') {
         sh "rm -rf infrastructure/"
     }
