@@ -42,6 +42,7 @@ withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.E
     }
 
     overrideVaultEnvironments(vaultOverrides)
+    setVaultName('rd')
     loadVaultSecrets(secrets)
 
     enableDbMigration()
