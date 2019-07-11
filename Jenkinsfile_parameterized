@@ -11,6 +11,8 @@ properties([
   ])
 ])
 
+String product = "rd"
+String component = "professional-api"
 
 def secrets = [
     secret('s2s-secret', 'S2S_SECRET'),
