@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUserListByCreatedDate;
+import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUsers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,7 +108,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("PRD_ROLE")) {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -226,7 +226,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         organisations = organisations.stream()
                .map(organisation -> {
-                   organisation.setUsers(sortUserListByCreatedDate(organisation));
+                   organisation.setUsers(sortUsers(organisation));
                    return organisation;
                }).collect(Collectors.toList());
 
@@ -264,7 +264,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
         } else {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
+            organisation.setUsers(ProfessionalApiSort.sortUsers(organisation));
             return new OrganisationEntityResponse(organisation, true);
         }
     }
