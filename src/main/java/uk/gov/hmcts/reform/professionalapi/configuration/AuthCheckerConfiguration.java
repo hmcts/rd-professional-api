@@ -69,7 +69,7 @@ public class AuthCheckerConfiguration {
 
     @Bean
     @ConditionalOnProperty(
-            value="ssl.verification.enable",
+            value = "ssl.verification.enable",
             havingValue = "false",
             matchIfMissing = true)
     public HttpClient userTokenParserHttpClient()

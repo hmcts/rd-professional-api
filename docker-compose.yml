@@ -58,7 +58,6 @@ services:
     ports:
       - 8089:${SERVER_PORT:-8090}
 
-
 networks:
   default:
     external:

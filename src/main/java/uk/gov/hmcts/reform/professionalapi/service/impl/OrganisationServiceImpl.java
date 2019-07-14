@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUserListByCreatedDate;
 
-import feign.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -25,8 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -49,7 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
-import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Service
 @Slf4j
@@ -230,15 +224,21 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         log.debug("Retrieving all organisations...");
 
-        if (organisations.isEmpty()) {
+        if (CollectionUtils.isEmpty(organisations)) {
+
             throw new EmptyResultDataAccessException(1);
         }
 
         organisations = organisations.stream()
-               .map(organisation -> {
-                   organisation.setUsers(sortUserListByCreatedDate(organisation));
-                   return organisation;
-               }).collect(Collectors.toList());
+                .map(organisation -> {
+
+                    if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
+
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(), userProfileFeignClient));
+                        return organisation;
+                    }
+                    return organisation;
+                }).collect(Collectors.toList());
 
         return new OrganisationsDetailResponse(organisations, true);
     }
@@ -263,7 +263,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation getOrganisationByOrganisationIdentifier(String organisationIdentifier) {
+    public Organisation getOrganisationByOrgId(String organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
@@ -272,59 +272,34 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(1);
-        } else {
+
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(ProfessionalApiSort.sortUserListByCreatedDate(organisation));
-            return new OrganisationEntityResponse(organisation, true);
+            organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(),userProfileFeignClient));
         }
+        return new OrganisationEntityResponse(organisation, true);
     }
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-        log.info("findByOrganisationStatus:: " + status);
+        log.info("Inside findByOrganisationStatus::method: " + status);
         List<Organisation> organisations = organisationRepository.findByStatus(status);
-
         if (CollectionUtils.isEmpty(organisations)) {
+
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
-            log.info("getUserDetails::ACTIVE:: ");
+            log.info("for ACTIVE::Status:");
             organisations = organisations.stream()
                     .map(organisation -> {
-                        organisation.setUsers(getUserId(organisation.getUsers()));
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(), userProfileFeignClient));
                         return organisation;
                     }).collect(Collectors.toList());
-
-
         }
         return new OrganisationsDetailResponse(organisations, true);
     }
 
-    private List<ProfessionalUser> getUserId(List<ProfessionalUser> users) {
-        log.info("getUserId::ACTIVE:: ");
-        List<ProfessionalUser> userProfDtls = new ArrayList<>();
-        for (ProfessionalUser user: users) {
-
-            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, GetUserProfileResponse.class);
-            mapUserInfo(user, responseResponseEntity);
-            log.info("getUserId::ACTIVE::response:: " + response.body());
-
-            userProfDtls.add(user);
-        }
-
-        return userProfDtls;
-    }
-
-    private ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity) {
-
-        GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
-        user.setFirstName(userProfileResponse.getEmail());
-        user.setLastName(userProfileResponse.getLastName());
-        user.setEmailAddress(userProfileResponse.getEmail());
-        return user;
-    }
 }
 

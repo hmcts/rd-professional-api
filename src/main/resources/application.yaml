@@ -65,7 +65,7 @@ security:
     - "/search/**"
   authorisedServices:
     - rd_professional_api
-    - rd_user_profile
+    - rd_user_profile_api
 
 
 ### dependency configuration
@@ -80,8 +80,8 @@ usermap:
     pbaFromUserAccountMap:
     - "false"
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
-#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+#auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
+auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
@@ -91,5 +91,5 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-userProfUrl: ${IDAM_SERVICE_URL:http://localhost:8091}
-#userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}
+#userProfUrl: ${IDAM_SERVICE_URL:http://172.30.3.141::8091}
+userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}

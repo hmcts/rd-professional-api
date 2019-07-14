@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -23,6 +24,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     @Autowired
     ApplicationConfiguration configuration;
+    @Autowired
+    UserProfileFeignClient userProfileFeignClient;
 
     private ProfessionalUserRepository professionalUserRepository;
 
@@ -43,6 +46,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                         .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
 
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+
+                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUP(user.getOrganisation().getUsers(), userProfileFeignClient));
                 organisation = user.getOrganisation();
 
             } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
