@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Body;
+import feign.Request;
 import feign.Response;
 
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -101,9 +103,15 @@ public class OrganisationServiceImplTest {
     private List<UserAccountMap> userAccountMaps;
     private List<PaymentAccount> paymentAccounts;
 
+    private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
+
+    @InjectMocks
+    private OrganisationServiceImpl organisationService;
 
     @Before
     public void setUp() {
+
+        MockitoAnnotations.initMocks(this);
 
         superUser = new UserCreationRequest(
                 "some-fname",
@@ -150,7 +158,8 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
                 userAttributeRepositoryMock, prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock,
+                userProfileFeignClient);
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -361,7 +370,8 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock, contactInformationRepositoryMock,
                 userAttributeRepositoryMock,
                 prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock,
+                userProfileFeignClient);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
@@ -391,69 +401,38 @@ public class OrganisationServiceImplTest {
     @Test
     public void testRetrieveAnOrganisationsByOrgIdWhen() throws Exception{
 
-        MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
+        ProfessionalUser user = mock(ProfessionalUser.class);
 
-        ArrayList<String> values = new ArrayList<>();
-        values.add("/api/v1/users/" + UUID.randomUUID().toString());
+        UUID id = UUID.randomUUID();
 
-        responseEntityHeaders.put("Location", values);
+        when(user.getUserIdentifier()).thenReturn(id);
 
-        UserProfileFeignClient userProfileFeignClientMock =  mock(UserProfileFeignClient.class);
-        //GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(user);
 
-        ObjectMapper json = new ObjectMapper();
-        //Response responseMOck = mock(Response.class);
-
-        String bodyString = json.writeValueAsString("HTTP/1.1 200 OK\n" +
-                "content-type: application/json\n" +
-                "matched-stub-id: b6925c50-f1d7-4956-a9b1-1cb79b234de6\n" +
-                "server: Jetty(9.4.15.v20190215)\n" +
-                "transfer-encoding: chunked\n" +
-                "vary: Accept-Encoding, User-Agent\n" +
-                "\n" +
-                "feign.Response$InputStreamBody@70f76386");
-
-        Response responseMock = Response.builder().body(bodyString, StandardCharsets.UTF_8).status(200).build();
-
-        Reader readerMock = mock(Reader.class);
-
-        UserProfile userProfile = new UserProfile(UUID.randomUUID(),"kotla@gmail.com","prashanth","rao", IdamStatus.ACTIVE);
-        GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse(userProfile);
-        JsonFeignResponseHelper jsonHelperMock = mock(JsonFeignResponseHelper.class);
-
-        ResponseEntity responseEntityMock = mock(ResponseEntity.class);
-        ArrayList<ProfessionalUser> users = new ArrayList<>();
-        users.add(professionalUserMock);
-
-       // when(responseMock.body().asReader()).thenReturn();
-       // when(json.readValue(responseMock.body().asReader(), GetUserProfileResponse.class)).thenReturn(getUserProfileResponse);
-
-       // when(responseMOck.headers()).thenReturn(responseEntityHeaders);
-        InputStreamBody body = mock(InputStreamBody.class);
-        //when(responseMock.body()).thenReturn(responseMOck.body());
-        //when(responseMOck.body().asReader()).thenReturn(readerMock);
-        //when(jsonHelperMock.toResponseEntity(responseMock,GetUserProfileResponse.class)).thenReturn(responseEntityMock);
-        //when(responseMock.status()).thenReturn(200);
-        when(professionalUserMock.getUserIdentifier()).thenReturn(UUID.randomUUID());
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
 
-        when(userProfileFeignClientMock.getUserProfileByEmail(professionalUserMock.getUserIdentifier().toString())).thenReturn(responseMock);
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        userProfileFeignClientMock.getUserProfileByEmail(professionalUserMock.getUserIdentifier().toString());
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
 
-       List<ProfessionalUser>  usersFromUP = PbaAccountUtil.getUserIdFromUP(users, userProfileFeignClientMock);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileResponse);
 
-        assertThat(usersFromUP).isNotNull();
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
 
         OrganisationEntityResponse organisationEntityResponse =
-                organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
+                organisationService.retrieveOrganisation(organisationIdentifier);
+
+        //assertThat(usersFromUP).isNotNull();
 
         assertThat(organisationEntityResponse).isNotNull();
 
-        verify(
-                organisationRepositoryMock,
-                times(1)).findByOrganisationIdentifier(any());
+       // verify(
+         //       organisationService,
+          //      times(1)).findByOrganisationIdentifier(any());
 
         verify(
                 organisationMock,

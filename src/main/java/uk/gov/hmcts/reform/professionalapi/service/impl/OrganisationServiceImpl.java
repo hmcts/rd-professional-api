@@ -56,7 +56,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
-    @Autowired
     UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
@@ -68,7 +67,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository
+            UserAccountMapRepository userAccountMapRepository,
+            UserProfileFeignClient userProfileFeignClient
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -79,6 +79,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userAccountMapRepository = userAccountMapRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
+        this.userProfileFeignClient = userProfileFeignClient;
     }
 
     @Override
