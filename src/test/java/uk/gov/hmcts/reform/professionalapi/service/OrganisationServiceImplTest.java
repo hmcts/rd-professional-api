@@ -439,7 +439,7 @@ public class OrganisationServiceImplTest {
 
 
         OrganisationEntityResponse organisationEntityResponse =
-                organisationService.retrieveOrganisation(organisationIdentifier);
+                organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
 
         assertThat(organisationEntityResponse).isNotNull();
         verify(
