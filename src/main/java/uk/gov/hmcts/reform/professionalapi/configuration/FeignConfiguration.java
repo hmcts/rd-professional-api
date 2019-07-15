@@ -30,7 +30,6 @@ public class FeignConfiguration {
         return new SpringFormEncoder(new SpringEncoder(messageConverters));
     }
 
-    @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
             ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
