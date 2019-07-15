@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
+
 @Service
 @Slf4j
 public class OrganisationServiceImpl implements OrganisationService {
@@ -110,10 +111,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
-
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE")
-                    || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
+            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -225,8 +224,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         log.debug("Retrieving all organisations...");
 
-        if (CollectionUtils.isEmpty(organisations)) {
-
+        if (organisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
@@ -264,7 +262,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation getOrganisationByOrgId(String organisationIdentifier) {
+    public Organisation  getOrganisationByOrgIdentifier(String organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
@@ -283,11 +281,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-
-        log.info("Inside findByOrganisationStatus::method: " + status);
         List<Organisation> organisations = organisationRepository.findByStatus(status);
-        if (CollectionUtils.isEmpty(organisations)) {
 
+        if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
@@ -301,6 +297,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         return new OrganisationsDetailResponse(organisations, true);
     }
+
 
 }
 

@@ -10,7 +10,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -23,7 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
-@Ignore
+
 public class UserAttributeServiceTest {
 
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
@@ -41,14 +40,13 @@ public class UserAttributeServiceTest {
 
     @Before
     public void setUp() {
-        PrdEnum anEnum = new PrdEnum(prdEnumId, "PUI_USER_MANAGER", "USER_ROLE");
+        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
 
         prdEnums.add(anEnum);
 
         userRoles.add("pui-user-manager");
     }
 
-    @Ignore
     @Test
     public void adds_user_attributes_to_user_correctly() {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);

@@ -371,7 +371,6 @@ public class OrganisationServiceImplTest {
     @Test
     public void testRetrieveAllOrganisations()throws Exception {
 
-
         ProfessionalUser user = mock(ProfessionalUser.class);
         UUID id = UUID.randomUUID();
 
@@ -413,7 +412,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testRetrieveAnOrganisationsByOrgId() throws Exception {
+    public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
 
         ProfessionalUser user = mock(ProfessionalUser.class);
 
@@ -425,8 +424,6 @@ public class OrganisationServiceImplTest {
         users.add(user);
 
         when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
-
-
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
 
@@ -445,8 +442,6 @@ public class OrganisationServiceImplTest {
                 organisationService.retrieveOrganisation(organisationIdentifier);
 
         assertThat(organisationEntityResponse).isNotNull();
-
-
         verify(
                 organisationRepositoryMock,
                 times(1)).findByOrganisationIdentifier(any());
@@ -467,9 +462,6 @@ public class OrganisationServiceImplTest {
 
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(user);
-
-
-
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
         List<Organisation> organisations = new ArrayList<>();
@@ -513,18 +505,6 @@ public class OrganisationServiceImplTest {
         organisationServiceImplMock.retrieveOrganisations();
     }
 
-    @Test
-    public void getOrganisationByOrganisationIdentifier() {
-
-        Organisation organisation =
-                organisationServiceImplMock.getOrganisationByOrgId(organisationIdentifier);
-
-        assertThat(organisation).isNotNull();
-
-        verify(
-                organisationRepositoryMock,
-                times(1)).findByOrganisationIdentifier(any());
-    }
 
     @Test(expected = InvalidRequest.class)
     public void throwInvalidRequestWhenInvalidPbaIsPassed() {

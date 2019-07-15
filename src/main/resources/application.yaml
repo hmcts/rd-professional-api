@@ -25,6 +25,7 @@ spring:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.locations: classpath:db/migration,classpath:db/postgres
 
 ### database configuration
   datasource:
@@ -91,5 +92,4 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-#userProfUrl: ${IDAM_SERVICE_URL:http://172.30.3.141::8091}
 userProfUrl: ${IDAM_SERVICE_URL:http://172.31.28.145:8091}
