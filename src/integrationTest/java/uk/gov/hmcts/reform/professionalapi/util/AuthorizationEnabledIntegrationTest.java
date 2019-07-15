@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
-import java.util.UUID;
+
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091"})
@@ -61,7 +63,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
     @Autowired
-    protected UserProfileFeignClient userProfileFeignClient ;
+    protected UserProfileFeignClient userProfileFeignClient;
 
     @Rule
     public WireMockRule s2sService = new WireMockRule(8990);
@@ -189,12 +191,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                             .withHeader("Content-Type", "application/json")
                             .withStatus(200)
                             .withBody("{"
-                                       // + "  \"idamId\": \"{{request.requestLine.query.userId}}\","
                                         + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
                                         + "  \"firstName\": \"prashanth\","
                                         + "  \"lastName\": \"rao\","
                                         + "  \"email\": \"super.user@hmcts.net\","
-                                        + "  \"idamStatus\": \"" + IdamStatus.ACTIVE +"\""
+                                        + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
                                         + "}")));
     }
 

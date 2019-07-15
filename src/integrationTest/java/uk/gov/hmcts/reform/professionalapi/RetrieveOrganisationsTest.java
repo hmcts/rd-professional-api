@@ -9,8 +9,8 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -139,8 +139,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
-        Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
+        Map<String, Object> activeOrganisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
 
+        Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
         assertThat(superUser.get("firstName")).isEqualTo("prashanth");
         assertThat(superUser.get("lastName")).isEqualTo("rao");
         assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");

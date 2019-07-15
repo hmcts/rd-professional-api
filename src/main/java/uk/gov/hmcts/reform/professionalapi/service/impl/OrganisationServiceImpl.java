@@ -235,7 +235,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                     if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
 
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(), userProfileFeignClient));
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
                         return organisation;
                     }
                     return organisation;
@@ -276,7 +276,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(),userProfileFeignClient));
+            organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient));
         }
         return new OrganisationEntityResponse(organisation, true);
     }
@@ -295,7 +295,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.info("for ACTIVE::Status:");
             organisations = organisations.stream()
                     .map(organisation -> {
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUP(organisation.getUsers(), userProfileFeignClient));
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
                         return organisation;
                     }).collect(Collectors.toList());
         }

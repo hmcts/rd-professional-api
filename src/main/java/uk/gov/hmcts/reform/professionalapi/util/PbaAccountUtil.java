@@ -64,7 +64,7 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<ProfessionalUser> getUserIdFromUP(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient) {
+    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient) {
 
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
