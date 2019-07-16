@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
@@ -218,12 +219,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
-        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-
-        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(3);
-
-        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
-
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
 
@@ -231,9 +226,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
-        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
-        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
+        assertThat(superUser.get("lastName")).isEqualTo("rao");
+        assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
 
     }
 
@@ -253,6 +248,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void  persists_and_return_pending_from_prd_and_active_org_details_from_up_and_combine_both() {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationRequest = anOrganisationCreationRequest()
                 .name("org-name")
                 .superUser(aUserCreationRequest()

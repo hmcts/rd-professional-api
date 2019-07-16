@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
-
     @Autowired
     OrganisationRepository organisationRepository;
     @Autowired
@@ -35,12 +34,19 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     private OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
     private NewUserCreationRequest userCreationRequest;
-    List<String> userRoles = new ArrayList<>();
-
-
+    List<String> userRoles;
 
     @Before
     public void setUp() {
+        userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .build();
+    }
 
     @Test
     public void post_request_adds_new_user_to_an_organisation() {
@@ -132,9 +138,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     public void should_return_404_when_adding_new_user_to_an_pending_organisation() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);

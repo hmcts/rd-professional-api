@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -113,6 +114,7 @@ public class OrganisationExternalControllerTest {
 
 
     @Test
+    @Ignore
     public void testUpdatesOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
@@ -129,6 +131,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
+    @Ignore
     public void testAddUserToOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
 

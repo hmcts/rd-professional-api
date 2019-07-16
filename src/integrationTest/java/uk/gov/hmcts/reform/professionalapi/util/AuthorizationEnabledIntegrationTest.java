@@ -233,7 +233,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStaus = 201;
         }
 
-        userProfileSerive.stubFor(WireMock.post(urlEqualTo("/v1/userprofile"))
+        userProfileService.stubFor(WireMock.post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(body)
