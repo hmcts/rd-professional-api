@@ -4,10 +4,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestPropertySource;
 
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
@@ -27,8 +33,10 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
+
+
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091"})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -54,11 +62,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
+    @Autowired
+    protected UserProfileFeignClient userProfileFeignClient;
+
     @Rule
     public WireMockRule s2sService = new WireMockRule(8990);
 
     @Rule
     public WireMockRule sidamService = new WireMockRule(5000);
+
+    @Rule
+    public WireMockRule userProfileService = new WireMockRule(8091);
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
@@ -167,6 +181,22 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  ]"
                                 +  "}")));
 
+    }
+
+    @Before
+    public void userProfileGetUserWireMock() {
+
+        userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
+                .willReturn(aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withStatus(200)
+                            .withBody("{"
+                                        + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                        + "  \"firstName\": \"prashanth\","
+                                        + "  \"lastName\": \"rao\","
+                                        + "  \"email\": \"super.user@hmcts.net\","
+                                        + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
+                                        + "}")));
     }
 
     @After

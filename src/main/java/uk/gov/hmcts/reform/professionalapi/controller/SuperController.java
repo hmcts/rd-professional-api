@@ -101,10 +101,9 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(status) && StringUtils.isEmpty(id)) {
 
-            log.info("Received request to retrieve organisation with status ");
-
             if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
 
+                log.info("Received request to retrieve organisation with status " + status.toUpperCase());
                 organisationResponse =
                         organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
             } else {
@@ -137,6 +136,7 @@ public abstract class SuperController {
 
             throw new EmptyResultDataAccessException(1);
         }
+
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
@@ -146,7 +146,7 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         OrganisationResponse organisationResponse =
@@ -173,7 +173,7 @@ public abstract class SuperController {
     protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
 
@@ -194,7 +194,7 @@ public abstract class SuperController {
     protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {

@@ -47,12 +47,27 @@ data "azurerm_key_vault_secret" "s2s_url" {
 
 data "azurerm_key_vault_secret" "idam_url" {
   name = "idam-url"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
   key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_redirect_uri" {
+  name = "OAUTH2-REDIRECT-URI"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_client_id" {
+  name = "OAUTH2-CLIENT-ID"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_client_secret" {
+  name = "OAUTH2-CLIENT-SECRET"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
@@ -124,6 +139,10 @@ module "rd_professional_api" {
 
     S2S_URL = "${local.s2s_url}"
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
+
+    OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
+    OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"
+    OAUTH2_CLIENT_SECRET = "${data.azurerm_key_vault_secret.oauth2_client_secret.value}"
 
     ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
     LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"

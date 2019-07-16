@@ -31,6 +31,7 @@ public class OrganisationCreationRequest {
 
     private List<String> paymentAccount;
 
+    @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
     @JsonCreator

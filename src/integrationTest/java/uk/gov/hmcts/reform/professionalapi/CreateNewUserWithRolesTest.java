@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
+
     @Test
     public void post_request_adds_new_user_to_an_organisation() {
         List<String> userRoles = new ArrayList<>();

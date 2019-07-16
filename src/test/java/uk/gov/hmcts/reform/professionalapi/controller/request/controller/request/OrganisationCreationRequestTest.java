@@ -21,6 +21,6 @@ public class OrganisationCreationRequestTest {
 
         Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator.validate(organisationCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations.size()).isEqualTo(3);
     }
 }

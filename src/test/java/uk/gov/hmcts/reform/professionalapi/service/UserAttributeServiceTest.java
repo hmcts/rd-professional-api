@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
+
 public class UserAttributeServiceTest {
 
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
@@ -39,7 +40,7 @@ public class UserAttributeServiceTest {
 
     @Before
     public void setUp() {
-        PrdEnum anEnum = new PrdEnum(prdEnumId, "PUI_USER_MANAGER", "USER_ROLE");
+        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
 
         prdEnums.add(anEnum);
 
