@@ -1521,4 +1521,18 @@
         <sha1>ba18ca1aa0e40eb6f1865b324af2f4cbb691c1ec</sha1>
         <cve>CVE-2019-10103</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.17.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.17.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-core@.*$</packageUrl>
+        <vulnerabilityName>CVE-2019-10072</vulnerabilityName>
+    </suppress>
 </suppressions>
