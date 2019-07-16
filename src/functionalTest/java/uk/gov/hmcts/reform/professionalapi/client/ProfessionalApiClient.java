@@ -131,7 +131,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public  NewUserCreationRequest createNewUserCreationRequest() {
+    public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
