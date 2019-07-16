@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.reform.professionalapi.configuration.FeignInterceptorConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 
 
-@FeignClient(name = "UserProfileClient", url = "${userProfUrl}")
+@FeignClient(name = "UserProfileClient", url = "${userProfUrl}", configuration = FeignInterceptorConfiguration.class)
 public interface UserProfileFeignClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/v1/userprofile")
