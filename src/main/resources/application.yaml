@@ -93,3 +93,9 @@ exui.role:
     pui-case-manager: pui-case-manager
 
 userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
+
+feign:
+  allow:
+    headers:
+      - authorization
+      - serviceauthorization

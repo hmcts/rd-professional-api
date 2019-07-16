@@ -154,7 +154,7 @@ public class OrganisationInternalController extends SuperController {
     })
     @PutMapping(
             value = "/{orgId}",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
     @Secured("prd-admin")
