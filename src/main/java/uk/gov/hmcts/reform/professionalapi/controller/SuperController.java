@@ -216,10 +216,8 @@ public abstract class SuperController {
         int responseStatus;
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
-
+        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
         UserCreationRequestValidator.validateRoles(roles, prdEnumList);
