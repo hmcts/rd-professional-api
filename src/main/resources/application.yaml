@@ -92,4 +92,4 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview-staging.service.core-compute-preview.internal}
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
