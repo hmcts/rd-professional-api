@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +109,13 @@ public class ProfessionalUserServiceTest {
     @Test
     public void findUsersByOrganisation_with_non_deleted_users() {
 
+        ProfessionalUser professionalUserDeleted = new ProfessionalUser("some-fname",
+                "some-lname",
+                "some-email",
+                Mockito.mock(Organisation.class));
+        professionalUserDeleted.setDeleted(LocalDateTime.now());
+
+        usersNonEmptyList.add(professionalUserDeleted);
         usersNonEmptyList.add(professionalUser);
         Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(usersNonEmptyList);
@@ -118,6 +126,7 @@ public class ProfessionalUserServiceTest {
                 Mockito.times(1)).findByOrganisation(organisation);
 
         assertThat(usersFromDb).isNotNull();
+        assertThat(!usersFromDb.contains(professionalUserDeleted)).isTrue();
     }
 
     @Test

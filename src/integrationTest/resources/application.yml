@@ -17,7 +17,11 @@ security:
 
   authorisedServices:
     - "it"
+## IDAM feign connection
 auth.idam.client.baseUrl: ${IDAM_URL:http://127.0.0.1:5000}
+## user profile feign connection
+user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+
 exui.role:
   hmcts-admin: prd-admin
   pui-user-manager: pui-user-manager

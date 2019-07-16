@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
 
+
 public class UserAttributeServiceTest {
 
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);

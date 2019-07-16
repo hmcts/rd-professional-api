@@ -111,10 +111,9 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(status) && StringUtils.isEmpty(id)) {
 
-            log.info("Received request to retrieve organisation with status ");
-
             if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
 
+                log.info("Received request to retrieve organisation with status " + status.toUpperCase());
                 organisationResponse =
                         organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
             } else {
@@ -147,6 +146,7 @@ public abstract class SuperController {
 
             throw new EmptyResultDataAccessException(1);
         }
+
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
@@ -156,7 +156,7 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
@@ -216,8 +216,10 @@ public abstract class SuperController {
         int responseStatus;
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
-        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
+        
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, null, organisationIdentifier);
+
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
         UserCreationRequestValidator.validateRoles(roles, prdEnumList);
@@ -242,7 +244,7 @@ public abstract class SuperController {
     protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {

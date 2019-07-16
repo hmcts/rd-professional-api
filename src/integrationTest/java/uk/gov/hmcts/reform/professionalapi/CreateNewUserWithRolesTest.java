@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
+
     @Autowired
     OrganisationRepository organisationRepository;
     @Autowired
@@ -40,6 +41,10 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     @Before
     public void setUp() {
+
+    @Test
+    public void post_request_adds_new_user_to_an_organisation() {
+        List<String> userRoles = new ArrayList<>();
 
         userRoles.add("pui-user-manager");
 

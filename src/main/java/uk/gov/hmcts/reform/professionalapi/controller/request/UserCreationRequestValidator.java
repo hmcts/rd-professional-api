@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 @Slf4j
 public class UserCreationRequestValidator {
 
-    private UserCreationRequestValidator(){
+    private UserCreationRequestValidator() {
     }
 
     static List<String> verifiedUserRoles;

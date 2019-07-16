@@ -64,10 +64,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      * @return The user with the matching email address
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
-        return user;
+        return professionalUserRepository.findByEmailAddress(email);
     }
-
 
     @Override
     public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
