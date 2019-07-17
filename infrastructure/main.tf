@@ -106,10 +106,22 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+resource "azurerm_resource_group" "rg" {
+  name = "${var.product}-${var.env}"
+  location = "${var.location}"
+  tags {
+    "Deployment Environment" = "${var.env}"
+    "Team Name" = "${var.team_name}"
+    "Team Contact" = "${var.team_contact}"
+    "Destroy Me" = "${var.destroy_me}"
+  }
+}
+
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
+  subscription = "${var.subscription}"
   env = "${var.env}"
   postgresql_user = "dbrefdata"
   database_name = "dbrefdata"
