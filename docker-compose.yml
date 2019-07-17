@@ -83,4 +83,3 @@ networks:
 
 volumes:
   rd-professional-db-volume:
-

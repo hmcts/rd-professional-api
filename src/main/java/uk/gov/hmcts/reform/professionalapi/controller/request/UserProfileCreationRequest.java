@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 
-
 @Setter
 @Getter
 @Builder(builderMethodName = "anUserProfileCreationRequest")

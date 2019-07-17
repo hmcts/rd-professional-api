@@ -14,6 +14,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -31,6 +32,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     @Test
     public void get_request_returns_correct_payment_accounts_associated_with_email() {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA1234567");
 
@@ -66,6 +68,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     @Test
     public void returns_multiple_correct_payment_accounts_associated_with_email() {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA1234567");
         paymentAccounts.add("PBA1234568");
@@ -120,6 +123,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE).build();
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 

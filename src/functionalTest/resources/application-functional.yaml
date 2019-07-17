@@ -3,7 +3,9 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
 s2s-name: rd_professional_api
 #Idam oauth2 settings http://23.101.50.80:5000 :https://idam-api.aat.platform.hmcts.net
 #idam.api.url: ${IDAM_API_URL:http://23.101.50.80:5000}
+
 idam.api.url: ${IDAM_URL:https://idam-api.preview.platform.hmcts.net}
+
 generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
 test.url: ${TEST_URL:http://localhost:8000}
 test.user.password: ${TEST_USER_PASSWORD:Hmcts123}

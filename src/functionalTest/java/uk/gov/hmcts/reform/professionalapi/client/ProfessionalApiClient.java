@@ -131,7 +131,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public  NewUserCreationRequest createNewUserCreationRequest() {
+    public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -164,6 +164,7 @@ public class ProfessionalApiClient {
                 .param("email", email)
                 .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
+        log.info("Search For User By Email Response: " + response.asString());
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -332,6 +333,7 @@ public class ProfessionalApiClient {
 
         String userToken = idamService.createUserWith("", role).getAuthorisationToken();
         log.info("authToken::" + userToken);
+        log.info("S2SToken::" + s2sToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
