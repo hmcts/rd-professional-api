@@ -9,6 +9,7 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 @ActiveProfiles("functional")
 public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
+    @Ignore
     @Test
     public void can_find_a_user_by_their_email_address() {
 

@@ -164,6 +164,7 @@ public class ProfessionalApiClient {
                 .param("email", email)
                 .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
+        log.info("Search For User By Email Response: " + response.asString());
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
