@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -148,6 +149,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void can_not_update_entities_other_than_organisation_should_returns_status_200() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE)
@@ -178,27 +180,39 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     }
 
     public Organisation updateAndValidateOrganisation(String organisationIdentifier, OrganisationStatus status, Integer httpStatus) {
+        userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
         Organisation persistedOrganisation = null;
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
 
-        if (httpStatus == 200) {
-            persistedOrganisation = organisationRepository
-                    .findByOrganisationIdentifier(organisationIdentifier);
+        persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(organisationIdentifier);
 
+        if (httpStatus == 200) {
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
             assertThat(persistedOrganisation.getStatus()).isEqualTo(status);
             assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
             assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
             assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+            if (OrganisationStatus.ACTIVE == status) {
+                ProfessionalUser professionalUser = persistedOrganisation.getUsers().get(0);
+                assertThat(professionalUser.getUserIdentifier()).isNotNull();
+                assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+            }
         } else {
             if (responseForOrganisationUpdate.get("http_status") instanceof String) {
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(String.valueOf(httpStatus.intValue()));
             } else {
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
+            }
+
+            if (persistedOrganisation != null && !(OrganisationStatus.PENDING == status)) {
+                ProfessionalUser professionalUser = persistedOrganisation.getUsers().get(0);
+                assertThat(professionalUser.getUserIdentifier()).isNull();
+                assertThat(persistedOrganisation.getStatus()).isNotEqualTo(OrganisationStatus.ACTIVE);
             }
         }
         return persistedOrganisation;

@@ -17,6 +17,7 @@ locals {
   s2s_vault_name = "s2s-${local.local_env}"
   s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
   idam_url = "https://idam-api.${local.local_env}.platform.hmcts.net"
+  USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -48,6 +49,11 @@ data "azurerm_key_vault_secret" "s2s_url" {
 data "azurerm_key_vault_secret" "idam_url" {
   name = "idam-url"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
+ name = "USER-PROFILE-URL"
+ vault_user_profile_uri = "${data.azurerm_key_vault.rd_key_vault.vault_user_profile_uri}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
@@ -139,6 +145,7 @@ module "rd_professional_api" {
 
     S2S_URL = "${local.s2s_url}"
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
+    USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
 
     OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
     OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"
