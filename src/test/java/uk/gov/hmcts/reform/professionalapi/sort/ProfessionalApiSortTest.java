@@ -20,6 +20,7 @@ public class ProfessionalApiSortTest {
 
     @Test
     public void shouldSortProfessionalUserListByOrgAdminRoleFirst() {
+
         ProfessionalUser user1 = new ProfessionalUser("firstName1",
                 "lastName1",
                 "emailAddress1@org.com",

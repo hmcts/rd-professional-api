@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_UUID;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -42,16 +41,15 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
-        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
 
-        assertThat(persistedSuperUser.getUserIdentifier()).isNotNull();
-        assertThat(persistedSuperUser.getUserIdentifier().toString().length()).isEqualTo(LENGTH_OF_UUID);
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
         assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
+
     }
 
     @Test

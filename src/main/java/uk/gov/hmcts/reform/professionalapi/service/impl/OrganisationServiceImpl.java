@@ -14,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.util.CollectionUtils;
+
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -43,7 +44,8 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
-import uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+
 
 @Service
 @Slf4j
@@ -56,6 +58,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
+    UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -66,7 +69,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository
+            UserAccountMapRepository userAccountMapRepository,
+            UserProfileFeignClient userProfileFeignClient
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -77,6 +81,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userAccountMapRepository = userAccountMapRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
+        this.userProfileFeignClient = userProfileFeignClient;
     }
 
     @Override
@@ -225,10 +230,15 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         organisations = organisations.stream()
-               .map(organisation -> {
-                   organisation.setUsers(sortUsers(organisation));
-                   return organisation;
-               }).collect(Collectors.toList());
+                .map(organisation -> {
+
+                    if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
+
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
+                        return organisation;
+                    }
+                    return organisation;
+                }).collect(Collectors.toList());
 
         return new OrganisationsDetailResponse(organisations, true);
     }
@@ -253,7 +263,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation getOrganisationByOrganisationIdentifier(String organisationIdentifier) {
+    public Organisation  getOrganisationByOrgIdentifier(String organisationIdentifier) {
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
@@ -262,20 +272,29 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
             throw new EmptyResultDataAccessException(1);
-        } else {
+
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(ProfessionalApiSort.sortUsers(organisation));
-            return new OrganisationEntityResponse(organisation, true);
+            organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient));
         }
+        return new OrganisationEntityResponse(organisation, true);
     }
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-
         List<Organisation> organisations = organisationRepository.findByStatus(status);
 
         if (CollectionUtils.isEmpty(organisations)) {
             throw new EmptyResultDataAccessException(1);
+
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
+
+            log.info("for ACTIVE::Status:");
+            organisations = organisations.stream()
+                    .map(organisation -> {
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
+                        return organisation;
+                    }).collect(Collectors.toList());
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

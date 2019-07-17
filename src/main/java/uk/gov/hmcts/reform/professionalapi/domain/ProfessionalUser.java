@@ -24,7 +24,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -84,6 +83,5 @@ public class ProfessionalUser {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.organisation = organisation;
-        this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
 }
