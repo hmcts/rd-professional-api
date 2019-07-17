@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.sort.ProfessionalApiSort.sortUsers;
 
 import java.util.List;
 import java.util.stream.Collectors;

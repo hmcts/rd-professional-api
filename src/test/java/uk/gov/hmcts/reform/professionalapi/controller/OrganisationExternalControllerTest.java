@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
-
 public class OrganisationExternalControllerTest {
 
     private OrganisationResponse organisationResponseMock;
