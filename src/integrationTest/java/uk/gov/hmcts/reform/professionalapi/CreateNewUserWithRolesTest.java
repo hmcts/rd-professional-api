@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         userRoles.add("pui-user-manager");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().build();
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -34,12 +36,14 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        Map<String, Object> updateResponse =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, orgIdentifierResponse);
+        assertThat(updateResponse).isNotNull();
 
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
-
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
         assertThat(newUserResponse).isNotNull();
@@ -67,5 +71,28 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
+    @Test
+    public void returns_400_when_organisation_is_not_active() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
 
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().build();
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .roles(userRoles)
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+    }
 }

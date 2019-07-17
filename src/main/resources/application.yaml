@@ -25,8 +25,9 @@ spring:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.locations: classpath:db/migration,classpath:db/postgres
 
-### database configuration
+  ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:rd-professional-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
@@ -77,7 +78,7 @@ idam:
     url: ${S2S_URL:http://127.0.0.1:8502}
     pbaFromUserAccountMap: false
 usermap:
-    pbaFromUserAccountMap:
+  pbaFromUserAccountMap:
     - "false"
 
 auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
@@ -85,8 +86,8 @@ auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
-    hmcts-admin: prd-admin
-    pui-user-manager: pui-user-manager
-    pui-organisation-manager: pui-organisation-manager
-    pui-finance-manager: pui-finance-manager
-    pui-case-manager: pui-case-manager
+  hmcts-admin: prd-admin
+  pui-user-manager: pui-user-manager
+  pui-organisation-manager: pui-organisation-manager
+  pui-finance-manager: pui-finance-manager
+  pui-case-manager: pui-case-manager

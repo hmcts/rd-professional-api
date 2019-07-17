@@ -20,6 +20,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
 
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserCreationRequest();
         assertThat(newUserCreationRequest).isNotNull();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest);

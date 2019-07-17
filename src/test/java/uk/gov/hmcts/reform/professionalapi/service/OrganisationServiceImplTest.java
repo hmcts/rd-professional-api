@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -34,9 +33,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -64,16 +65,14 @@ public class OrganisationServiceImplTest {
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
-    private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
-    private final OrganisationResponse organisationResponseMock = mock(OrganisationResponse.class);
-    private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
-    private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
+    private final UserAttribute userAttributeMock = mock(UserAttribute.class);
+    private List<String> userRoles = new ArrayList<>();
+    private List<PrdEnum> prdEnums = new ArrayList<>();
+
     private UserCreationRequest superUser;
-    private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
-    private PbaAccountCreationRequest pbaAccountCreationRequest;
     private List<ContactInformationCreationRequest> contactInformationCreationRequests;
     private List<DxAddressCreationRequest> dxAddressRequests;
     private DxAddressCreationRequest dxAddressRequest;
@@ -86,7 +85,6 @@ public class OrganisationServiceImplTest {
 
     @Before
     public void setUp() {
-
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
@@ -409,6 +407,31 @@ public class OrganisationServiceImplTest {
 
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+    }
+
+    @Test
+    public void testAllAttributesAddedToSuperUser() {
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+
+        userRoles.add("pui-user-manager");
+        userRoles.add("pui-organisation-manager");
+        userRoles.add("pui-finance-manager");
+        userRoles.add("pui-case-manager");
+        userRoles.add("organisation-admin");
+
+        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
+        when(userAttributeRepositoryMock.save(any(UserAttribute.class))).thenReturn(userAttributeMock);
+
+        OrganisationResponse organisationResponse =
+                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+
+        verify(
+                userAttributeRepositoryMock,
+                times(5)).save(any(UserAttribute.class));
     }
 
 }

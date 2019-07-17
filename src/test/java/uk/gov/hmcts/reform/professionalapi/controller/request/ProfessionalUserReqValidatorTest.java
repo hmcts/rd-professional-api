@@ -8,10 +8,14 @@ public class ProfessionalUserReqValidatorTest {
     ProfessionalUserReqValidator profUserReqValidator = new ProfessionalUserReqValidator();
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void testValidateRequest() {
-
+    public void testValidateRequestAllNull() {
         profUserReqValidator
                 .validateRequest(null,null,null);
+    }
 
+    @Test
+    public void testValidateRequestNoneNull() {
+        profUserReqValidator
+                .validateRequest("ordId","true","some@email.com");
     }
 }

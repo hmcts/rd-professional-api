@@ -70,7 +70,7 @@ public class OrganisationControllerTest {
 
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequestMock)).thenReturn(organisationResponseMock);
 
-        ResponseEntity<?> actual = organisationController.createOrganisation(organisationCreationRequestMock);
+        ResponseEntity<?> actual = organisationController.createOrganisationUsingExternalController(organisationCreationRequestMock);
 
         verify(organisationCreationRequestValidatorMock,
                 times(1))

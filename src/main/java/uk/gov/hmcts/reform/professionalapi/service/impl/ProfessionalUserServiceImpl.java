@@ -10,9 +10,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
@@ -51,6 +53,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
         Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
+        if (theOrganisation.getStatus() != OrganisationStatus.ACTIVE) {
+            throw new InvalidRequest("New users can only be added to ACTIVE organistions");
+        }
+
         ProfessionalUser newUser = new ProfessionalUser(
                 newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName(),
@@ -73,8 +79,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      * @return The user with the matching email address
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
-        return user;
+        return professionalUserRepository.findByEmailAddress(email);
     }
 
 

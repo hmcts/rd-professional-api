@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
@@ -16,7 +15,9 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
@@ -67,15 +68,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations() {
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+        Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
+        Map<String, Object> orgResponse2 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .name("some-other-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
@@ -166,8 +161,12 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void retrieve_organisation_should_have_single_super_user() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        List<String> user1Roles = new ArrayList<>();
+        user1Roles.add("pui-user-manager");
+
+        List<String> user2Roles = new ArrayList<>();
+        user2Roles.add("pui-user-manager");
+        user2Roles.add("organisation-admin");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
@@ -175,14 +174,14 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .firstName("someName1")
                 .lastName("someLastName1")
                 .email("some@email.com")
-                .roles(userRoles)
+                .roles(user1Roles)
                 .build();
 
         NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
                 .firstName("someName2")
                 .lastName("someLastName2")
                 .email("some@email2.com")
-                .roles(userRoles)
+                .roles(user2Roles)
                 .build();
 
         Map<String, Object> organisationResponse =
@@ -190,10 +189,25 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, orgIdentifierResponse);
+
+        assertThat(responseForOrganisationUpdate).isNotNull();
+
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
+
+        assertThat(newUserResponse1).isNotNull();
+        assertThat(newUserResponse2).isNotNull();
+
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(3);
+
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
@@ -219,6 +233,4 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("http_status").toString().contains("403"));
 
     }
-
-
 }

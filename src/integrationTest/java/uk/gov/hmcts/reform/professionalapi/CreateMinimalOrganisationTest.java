@@ -42,6 +42,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
+        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
 
         assertThat(persistedSuperUser.getUserIdentifier()).isNotNull();
         assertThat(persistedSuperUser.getUserIdentifier().toString().length()).isEqualTo(LENGTH_OF_UUID);
@@ -50,14 +51,11 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-
-        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
-
+        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
     }
 
     @Test
     public void returns_400_when_mandatory_data_not_present() {
-
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
                 .superUser(aUserCreationRequest()
@@ -78,7 +76,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void returns_500_when_database_constraint_violated() {
-
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
