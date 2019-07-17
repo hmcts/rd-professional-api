@@ -10,13 +10,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-@ActiveProfiles("functional")
 @Slf4j
+@Ignore
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
@@ -28,6 +27,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
+    @Ignore
     @Test
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
