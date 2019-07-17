@@ -11,7 +11,7 @@ services:
     image: hmcts/rd-professional-api
     container_name: rd-professional-api
     environment:
-      - JAVA_OPTS= ${JAVA_OPTS}
+      - JAVA_OPTS=-Dhttps.proxyHost=proxyout.reform.hmcts.net -Dhttps.proxyPort=8080
       - POSTGRES_USERNAME=dbrefdata
       - POSTGRES_PASSWORD=dbrefdata
       - POSTGRES_HOST=rd-professional-db
@@ -44,7 +44,6 @@ services:
     container_name: rd-professional-db
     volumes:
       - rd-professional-db-volume:/var/lib/postgresql/data
-
     environment:
       - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
     ports:
@@ -76,6 +75,11 @@ services:
       - 8089:${SERVER_PORT:-8090}
     depends_on:
       - service-auth-provider-api
+
+networks:
+  default:
+    external:
+      name: rd-user-profile-api_default
 
 volumes:
   rd-professional-db-volume:
