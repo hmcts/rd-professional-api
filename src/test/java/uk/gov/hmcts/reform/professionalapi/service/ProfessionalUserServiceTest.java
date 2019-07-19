@@ -39,7 +39,6 @@ public class ProfessionalUserServiceTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
-
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -116,6 +115,7 @@ public class ProfessionalUserServiceTest {
         professionalUserDeleted.setDeleted(LocalDateTime.now());
 
         usersNonEmptyList.add(professionalUserDeleted);
+        usersNonEmptyList.add(professionalUserDeleted);
         usersNonEmptyList.add(professionalUser);
         Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(usersNonEmptyList);
@@ -133,7 +133,6 @@ public class ProfessionalUserServiceTest {
     public void addNewUserToAnOrganisation() {
 
         when(organisation.getOrganisationIdentifier()).thenReturn(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
-        when(organisationRepository.findByOrganisationIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
         NewUserResponse newUserResponse = professionalUserService.addNewUserToAnOrganisation(professionalUser, userRoles, prdEnums);

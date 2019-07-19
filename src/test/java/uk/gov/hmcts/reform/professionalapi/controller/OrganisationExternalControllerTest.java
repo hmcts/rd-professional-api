@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
-
 public class OrganisationExternalControllerTest {
 
     private OrganisationResponse organisationResponseMock;
@@ -88,8 +87,8 @@ public class OrganisationExternalControllerTest {
         updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
-        MockitoAnnotations.initMocks(this);
 
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test

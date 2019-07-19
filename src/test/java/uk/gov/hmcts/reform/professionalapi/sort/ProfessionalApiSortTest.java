@@ -25,6 +25,7 @@ public class ProfessionalApiSortTest {
                 "lastName1",
                 "emailAddress1@org.com",
                 organisationMock);
+
         ProfessionalUser user2 = new ProfessionalUser("firstName2",
                 "lastName2",
                 "emailAddress2@org.com",
