@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -12,7 +13,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 
-    List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation existingOrganisation, boolean showDeleted);
+    ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted);
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 

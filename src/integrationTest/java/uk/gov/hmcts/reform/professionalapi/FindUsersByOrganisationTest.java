@@ -22,7 +22,7 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
-
+        userProfileGetMultipleUsersWireMock();
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);

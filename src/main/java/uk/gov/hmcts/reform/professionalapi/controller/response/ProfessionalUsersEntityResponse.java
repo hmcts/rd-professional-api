@@ -10,11 +10,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Getter
 public class ProfessionalUsersEntityResponse {
-    @JsonProperty
-    private final List<ProfessionalUsersResponse> users;
+    @JsonProperty("users")
+    private final List<ProfessionalUsersResponse> userProfiles;
 
     public ProfessionalUsersEntityResponse(List<ProfessionalUser> professionalUsers) {
-        this.users = professionalUsers.stream()
+        this.userProfiles = professionalUsers.stream()
             .map(professionalUser -> new ProfessionalUsersResponse(professionalUser))
             .collect(toList());
     }

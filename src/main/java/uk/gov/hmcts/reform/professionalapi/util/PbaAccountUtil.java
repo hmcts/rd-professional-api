@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static java.util.stream.Collectors.toList;
 
 import feign.Response;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public interface PbaAccountUtil {
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
         userMapPaymentAccount = userAccountMaps.stream().map(
-            userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
+                userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
                 .collect(toList());
 
         return userMapPaymentAccount;
@@ -67,27 +66,38 @@ public interface PbaAccountUtil {
 
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
-
-            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
-
-            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
-            mapUserInfo(user, responseResponseEntity);
+            getSingleUserByIdFromUserProfile(user, userProfileFeignClient);
             userProfileDtls.add(user);
         }
 
         return userProfileDtls;
     }
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity) {
+    public static ProfessionalUser getSingleUserByIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient) {
+        Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString());
+
+        Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+        ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
+        mapUserInfo(user, responseResponseEntity, false);
+
+        return user;
+    }
+
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
-
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
+            if(isRequiredRoles){
+                user.setUserIdentifier(userProfileResponse.getIdamId());
+                user.setIdamStatus(userProfileResponse.getIdamStatus());
+                user.setRoles(userProfileResponse.getRoles());
+                user.setIdamErrorStatusCode(userProfileResponse.getIdamErrorStatusCode());
+                user.setIdamErrorMessage(userProfileResponse.getIdamErrorMessage());
+            }
         }
         return user;
     }

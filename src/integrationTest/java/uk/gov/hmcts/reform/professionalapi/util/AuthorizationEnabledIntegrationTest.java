@@ -240,5 +240,41 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(returnHttpStaus)
                 ));
     }
+
+    public void userProfileGetMultipleUsersWireMock() {
+
+        userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody(
+                                  " {"
+                                + "  \"userProfiles\": ["
+                                + "  \"{\""
+                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"prashanth\","
+                                + "  \"lastName\": \"rao\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                                + "  \"roles\": \"[\""
+                                + "  \"pui-organisation-manager\","
+                                + "  \"pui-user-manager\""
+                                + "  \"]\" "
+                                + " \"}\","
+                                + " \"{\""
+                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"adil\","
+                                + "  \"lastName\": \"oozeerally\","
+                                + "  \"email\": \"adil.ooze@hmcts.net\","
+                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                                + "  \"roles\": \"[]\","
+                                + "  \"idamErrorStatusCode\": \"404\","
+                                + "  \"idamErrorMessage\": \"16 Resource not found\""
+                                + "  \"}\" "
+                                + " \"]\" "
+                                + "\"}\" "
+                        )));
+
+    }
 }
 

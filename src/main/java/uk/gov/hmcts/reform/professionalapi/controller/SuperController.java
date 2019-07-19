@@ -127,16 +127,19 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
+    protected ResponseEntity<?> retrieveUserByEmail(String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
         }
+
+        Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString());
+
         return ResponseEntity
-                .status(200)
-                .body(new ProfessionalUsersResponse(user));
+                .status(response.status())
+                .body(response.body());
     }
 
     protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
@@ -239,8 +242,9 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
+    protected ResponseEntity<?> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
 
+        Object body = null;
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
@@ -250,14 +254,22 @@ public abstract class SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-        boolean showDeletedFlag = false;
         if ("True".equalsIgnoreCase(showDeleted)) {
-            showDeletedFlag = true;
+            showDeleted = "true";
+        } else {
+            showDeleted = "false";
+        }
+
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            log.info("Successfully retrieved User Profiles");
+        } else {
+            log.error("User Profiles retrieval failed with status code : " + responseEntity.getStatusCode());
         }
 
         return ResponseEntity
-                .status(200)
-                .body(new ProfessionalUsersEntityResponse(professionalUserService
-                        .findProfessionalUsersByOrganisation(existingOrganisation, showDeletedFlag)));
+                .status(responseEntity.getStatusCode().value())
+                .body(responseEntity.getBody());
     }
 }

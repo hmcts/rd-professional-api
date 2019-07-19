@@ -386,7 +386,7 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -429,7 +429,7 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -471,7 +471,7 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
