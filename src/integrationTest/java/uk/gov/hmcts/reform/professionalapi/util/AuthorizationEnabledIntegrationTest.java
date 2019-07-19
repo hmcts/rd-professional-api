@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
@@ -186,7 +188,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void userProfileGetUserWireMock() {
 
-        userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
+        /*userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withStatus(200)
@@ -196,7 +198,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                         + "  \"lastName\": \"rao\","
                                         + "  \"email\": \"super.user@hmcts.net\","
                                         + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
-                                        + "}")));
+                                        + "}")));*/
     }
 
     @After
@@ -239,41 +241,82 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));
+
+        String usersBody = " {"
+                + "  \"userProfiles\": ["
+                + "  {"
+                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"prashanth\","
+                + "  \"lastName\": \"rao\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": ["
+                + "  \"pui-organisation-manager\""
+                + "  ]"
+                + "  },"
+                + " {"
+                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"adil\","
+                + "  \"lastName\": \"oozeerally\","
+                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": [],"
+                + "  \"idamErrorStatusCode\": \"404\","
+                + "  \"idamErrorMessage\": \"16 Resource not found\""
+                + "  } "
+                + " ]"
+                + "}";
+
+
+        userProfileService.stubFor(
+                WireMock.post(urlPathMatching("/v1/userprofile/users.*"))
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Test-Code", "Adils machine")
+                                        .withBody(usersBody)
+                                        .withStatus(200)
+                        )
+        );
     }
 
     public void userProfileGetMultipleUsersWireMock() {
+        //userProfileService.resetMappings();
+        String body = " {"
+                + "  \"userProfiles\": ["
+                + "  {"
+                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"prashanth\","
+                + "  \"lastName\": \"rao\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": ["
+                + "  \"pui-organisation-manager\""
+                + "  ]"
+                + "  },"
+                + " {"
+                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"adil\","
+                + "  \"lastName\": \"oozeerally\","
+                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": [],"
+                + "  \"idamErrorStatusCode\": \"404\","
+                + "  \"idamErrorMessage\": \"16 Resource not found\""
+                + "  } "
+                + " ]"
+                + "}";
 
-        userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+
+       /* userProfileService.stubFor(
+                WireMock.post(anyUrl())
+                .willReturn(
+                        aResponse()
+                        .withHeader("Test-Code", "Adils machine")
+                        .withBody(body)
                         .withStatus(200)
-                        .withBody(
-                                  " {"
-                                + "  \"userProfiles\": ["
-                                + "  \"{\""
-                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"prashanth\","
-                                + "  \"lastName\": \"rao\","
-                                + "  \"email\": \"super.user@hmcts.net\","
-                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                                + "  \"roles\": \"[\""
-                                + "  \"pui-organisation-manager\","
-                                + "  \"pui-user-manager\""
-                                + "  \"]\" "
-                                + " \"}\","
-                                + " \"{\""
-                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"adil\","
-                                + "  \"lastName\": \"oozeerally\","
-                                + "  \"email\": \"adil.ooze@hmcts.net\","
-                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                                + "  \"roles\": \"[]\","
-                                + "  \"idamErrorStatusCode\": \"404\","
-                                + "  \"idamErrorMessage\": \"16 Resource not found\""
-                                + "  \"}\" "
-                                + " \"]\" "
-                                + "\"}\" "
-                        )));
+                )
+        );*/
+
 
     }
 }

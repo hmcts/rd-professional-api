@@ -59,7 +59,7 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, false)).thenReturn(users);
+//        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "false")).thenReturn(users);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
 

@@ -132,6 +132,7 @@ public abstract class SuperController {
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            log.info("The organisation the user belongs to must be active");
             throw new EmptyResultDataAccessException(1);
         }
 
@@ -146,7 +147,6 @@ public abstract class SuperController {
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
-
             throw new EmptyResultDataAccessException(1);
         }
 

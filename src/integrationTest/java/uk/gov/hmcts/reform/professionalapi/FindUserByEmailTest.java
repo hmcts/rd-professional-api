@@ -26,6 +26,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void search_returns_valid_user_with_organisation_status_as_active() {
+        userProfileGetUserWireMock();
         Organisation activeOrganisation = new Organisation("some-active-org", OrganisationStatus.ACTIVE, "sraid", null, null, null);
         ProfessionalUser activeSuperUser = new ProfessionalUser("some-fname", "some-lname", "activesomeone@here.com", activeOrganisation);
         organisationRepository.save(activeOrganisation);

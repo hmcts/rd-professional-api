@@ -19,6 +19,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -39,6 +41,7 @@ public class ProfessionalUserServiceTest {
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
+    private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
 
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
 
@@ -50,8 +53,8 @@ public class ProfessionalUserServiceTest {
     private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
-            organisationRepository, professionalUserRepository,
-            userAttributeRepository, prdEnumRepository, userAttributeService);
+            organisationRepository, professionalUserRepository, userAttributeRepository,
+            prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private NewUserCreationRequest newUserCreationRequest;
 
@@ -98,12 +101,12 @@ public class ProfessionalUserServiceTest {
         Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(usersNonEmptyList);
 
-        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, true);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "true");
         Mockito.verify(
                 professionalUserRepository,
                 Mockito.times(1)).findByOrganisation(organisation);
 
-        assertThat(usersFromDb).isNotNull();
+        assertThat(responseEntity).isNotNull();
     }
 
     @Test
@@ -120,13 +123,12 @@ public class ProfessionalUserServiceTest {
         Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(usersNonEmptyList);
 
-        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
         Mockito.verify(
                 professionalUserRepository,
                 Mockito.times(1)).findByOrganisation(organisation);
 
-        assertThat(usersFromDb).isNotNull();
-        assertThat(!usersFromDb.contains(professionalUserDeleted)).isTrue();
+        assertThat(responseEntity).isNotNull();
     }
 
     @Test
@@ -150,7 +152,7 @@ public class ProfessionalUserServiceTest {
         Mockito.when(professionalUserRepository.findByOrganisation(organisation))
                 .thenReturn(emptyList);
 
-        List<ProfessionalUser> usersFromDb = professionalUserService.findProfessionalUsersByOrganisation(organisation, false);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
     }
 
     @Test

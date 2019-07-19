@@ -84,10 +84,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(usersId);
 
-        Response getUserProfilesResponse = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted);
+        Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted);
 
-        Class clazz = getUserProfilesResponse.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-        ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(getUserProfilesResponse, clazz);
+        Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+        ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
         return responseResponseEntity;
     }

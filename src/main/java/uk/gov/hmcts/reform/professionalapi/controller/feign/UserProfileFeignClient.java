@@ -29,8 +29,8 @@ public interface UserProfileFeignClient {
     @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response getUserProfileById(@RequestParam("userId") String userId);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/v1/userprofile", params = "showdeleted")
-    @RequestLine("POST /v1/userprofile")
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/userprofile/users", params = "showdeleted")
+    @RequestLine("POST /v1/userprofile/users")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                                      @RequestParam(value = "showdeleted") String showDeleted);
