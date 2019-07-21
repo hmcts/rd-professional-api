@@ -57,7 +57,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
-        return getRequest("/refdata/external/v1/organisations" + "/pbas?email={email}", role,email);
+        return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role,email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
@@ -65,15 +65,15 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String,Object> retrieveSingleOrganisation(String id, String role) {
-        return getRequest(APP_EXT_BASE_PATH + "?id={id}", role, id);
+        return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
 
     public Map<String,Object> retrieveAllOrganisations(String role) {
-        return getRequest(APP_EXT_BASE_PATH + "/", role);
+        return getRequest(APP_INT_BASE_PATH + "/", role);
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
-        return getRequest(APP_EXT_BASE_PATH + "?status={status}", role, status);
+        return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
     }
 
     public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {

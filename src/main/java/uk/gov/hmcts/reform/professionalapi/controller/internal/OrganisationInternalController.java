@@ -98,7 +98,6 @@ public class OrganisationInternalController extends SuperController {
     })
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @Secured("prd-admin")
     public ResponseEntity<?> retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {

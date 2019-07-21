@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -26,5 +27,17 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
             log.error(errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
+    }
+
+    public void verifyExtUserOrgIdentifier(Organisation organisation, String extOrgIdentifier) {
+
+        if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
+
+            throw new EmptyResultDataAccessException(1);
+        } else if (!extOrgIdentifier.trim().equals(organisation.getOrganisationIdentifier().trim())) {
+
+            throw new AccessDeniedException("403 Forbidden");
+        }
+
     }
 }

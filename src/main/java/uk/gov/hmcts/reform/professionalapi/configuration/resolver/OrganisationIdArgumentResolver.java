@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -46,12 +47,11 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
         String orgId = null;
         ProfessionalUser professionalUser;
         Organisation organisation;
-        log.info("professionalUserRepository Object::" + professionalUserRepository);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
-        userId = serviceAndUserDetails.getUsername();
-        if (null != serviceAndUserDetails && StringUtils.isNotEmpty(userId)) {
 
+        if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
+            userId = serviceAndUserDetails.getUsername();
             professionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId.trim()));
             if (null != professionalUser && null != professionalUser.getOrganisation()) {
 
@@ -61,11 +61,17 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
             } else {
                 log.error("ProfessionalUserUser info null::");
-                throw new EmptyResultDataAccessException(1);
+                throw new AccessDeniedException("403 Forbidden");
             }
 
         }
 
+        if (null == serviceAndUserDetails || null == serviceAndUserDetails.getAuthorities()
+                || StringUtils.isEmpty(orgId)) {
+
+            log.error(" ServiceAndUserDetails or OrganisationIdentifier is Null::");
+            throw new AccessDeniedException("403 Forbidden");
+        }
         return orgId;
     }
 }

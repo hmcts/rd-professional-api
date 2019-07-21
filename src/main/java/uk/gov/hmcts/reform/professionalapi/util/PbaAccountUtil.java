@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -53,13 +55,10 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
-        if (!paymentAccounts.isEmpty()) {
+       // if (paymentAccounts.size() > 0) {
 
-            paymentAccounts.forEach(paymentAccount -> {
-
-                paymentAccountsFromOrg.add(paymentAccount);
-            });
-        }
+           paymentAccountsFromOrg.addAll(paymentAccounts);
+       // }
         return paymentAccounts;
     }
 
@@ -84,11 +83,20 @@ public interface PbaAccountUtil {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
-
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
         }
         return user;
+    }
+
+
+    public static void validateOrgIdentifier(String extOrgId, String orgId) {
+
+        if (!extOrgId.trim().equals(orgId.trim())) {
+
+            throw new AccessDeniedException("403 Forbidden");
+        }
+
     }
 }

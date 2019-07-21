@@ -160,7 +160,8 @@ public abstract class SuperController {
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()) {
+        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+             && organisationCreationRequest.getStatus().isActive()) {
             log.info("Organisation is getting activated");
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {

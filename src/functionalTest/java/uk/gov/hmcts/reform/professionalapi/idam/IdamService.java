@@ -39,7 +39,7 @@ public class IdamService {
     @Autowired
     public IdamService(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
-
+        log.info("IDAM_API_URL::" + testConfig.getIdamApiUrl());
         idamApi = Feign.builder()
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
