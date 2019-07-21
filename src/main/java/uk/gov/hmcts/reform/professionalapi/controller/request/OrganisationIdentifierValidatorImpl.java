@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import java.util.Collection;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Component
 @Slf4j
@@ -39,5 +43,26 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
             throw new AccessDeniedException("403 Forbidden");
         }
 
+    }
+
+    public void verifyNonPuiFinanceManagerOrgIdentifier(Collection<GrantedAuthority> authorities, Organisation organisation, String extOrgIdentifier) {
+
+        boolean isPuiFinanceManExist = false;
+        for (GrantedAuthority authority : authorities) {
+
+            if (!StringUtils.isEmpty(authority.getAuthority()) && "pui-finance-manager".equals(authority.getAuthority().trim())) {
+
+                isPuiFinanceManExist = true;
+                break;
+            }
+
+        }
+
+        if (!isPuiFinanceManExist) {
+            authorities.forEach(role
+                -> {
+                PbaAccountUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier());
+            });
+        }
     }
 }

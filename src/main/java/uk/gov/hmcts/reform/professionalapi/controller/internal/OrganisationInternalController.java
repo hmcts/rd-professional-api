@@ -59,7 +59,7 @@ public class OrganisationInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    public ResponseEntity<?> createOrganisation(
+    public ResponseEntity<OrganisationResponse> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
         log.info("Received request to create a new organisation for internal users...");

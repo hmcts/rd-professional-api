@@ -81,8 +81,8 @@ usermap:
     pbaFromUserAccountMap:
     - "true"
 
-#auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
-auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
+#auth.idam.client.baseUrl: ${IDAM_URL:http://23.101.50.80:5000}
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
 exui.role:
@@ -92,8 +92,8 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-#userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
-userProfUrl: ${USER_PROFILE_URL:http://172.31.28.145:8091}
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
+#userProfUrl: ${USER_PROFILE_URL:http://172.31.28.145:8091}
 feign:
   allow:
     headers:

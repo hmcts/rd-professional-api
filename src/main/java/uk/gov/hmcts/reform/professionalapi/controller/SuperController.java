@@ -80,7 +80,7 @@ public abstract class SuperController {
     private static final String SIDAM_ROLE = "SIDAM_ROLE";
 
 
-    protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+    protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
