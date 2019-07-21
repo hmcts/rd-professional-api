@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -55,10 +54,7 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
-       // if (paymentAccounts.size() > 0) {
-
-           paymentAccountsFromOrg.addAll(paymentAccounts);
-       // }
+        paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
 

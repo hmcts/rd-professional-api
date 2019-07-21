@@ -175,6 +175,4 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
-
-
 }
