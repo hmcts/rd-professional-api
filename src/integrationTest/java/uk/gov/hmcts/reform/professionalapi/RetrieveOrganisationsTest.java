@@ -103,6 +103,26 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
+    public void forbidden_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    public void forbidden_if_pui_user_manager_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiUserManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    public void forbidden_if_pui_finance_manager_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiFinanceManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+
+
+    @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
 
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.PENDING);
@@ -242,7 +262,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("http_status").toString().contains("403"));
 
     }
-
 
     @Test
     public void  persists_and_return_pending_from_prd_and_active_org_details_from_up_and_combine_both() {
