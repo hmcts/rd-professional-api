@@ -45,7 +45,7 @@ withNightlyPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
-    enableSecurityScan() 
     enableMutationTest()
     enableFullFunctionalTest()
+    enableSecurityScan()
 }
