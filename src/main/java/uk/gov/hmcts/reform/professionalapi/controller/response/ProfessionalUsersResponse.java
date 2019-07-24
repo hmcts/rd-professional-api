@@ -1,21 +1,25 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ProfessionalUsersResponse {
 
-    @JsonProperty("userIdentifier")
     private UUID idamId;
+    
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -31,4 +35,15 @@ public class ProfessionalUsersResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
     }
+   
+    @JsonGetter("userIdentifier")
+    public UUID getUserIdentifier() {
+        return idamId;
+    }
+
+    @JsonSetter("idamId")
+    public void setUserIdentifier(UUID idamId) {
+        this.idamId = idamId;
+    }
+
 }

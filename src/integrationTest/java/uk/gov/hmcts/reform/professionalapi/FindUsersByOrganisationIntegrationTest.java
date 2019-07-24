@@ -115,6 +115,6 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(1);
     }
 }
