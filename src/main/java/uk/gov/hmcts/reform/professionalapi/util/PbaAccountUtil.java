@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
 
+import feign.FeignException;
 import feign.Response;
 
 import java.util.ArrayList;
@@ -63,13 +64,18 @@ public interface PbaAccountUtil {
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
 
-            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
+            try (Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString())) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+                Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+                ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-            mapUserInfo(user, responseResponseEntity);
-            userProfileDtls.add(user);
+                mapUserInfo(user, responseResponseEntity);
+                userProfileDtls.add(user);
+
+            }  catch (FeignException ex) {
+
+                throw new RuntimeException();
+            }
         }
 
         return userProfileDtls;

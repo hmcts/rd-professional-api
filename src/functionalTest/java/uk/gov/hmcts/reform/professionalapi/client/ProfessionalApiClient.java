@@ -32,7 +32,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -44,16 +44,16 @@ public class ProfessionalApiClient {
 
     private final String professionalApiUrl;
     private final String s2sToken;
-    //private final String authToken;
 
-    protected IdamService idamService;
+
+    protected IdamClient idamClient;
 
     public ProfessionalApiClient(
                                  String professionalApiUrl,
-                                 String s2sToken, IdamService idamService) {
+                                 String s2sToken, IdamClient idamClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        this.idamService = idamService;
+        this.idamClient = idamClient;
     }
 
     public String getWelcomePage() {
@@ -149,6 +149,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeaders(role)
                 .body(newUserCreationRequest)
+                .proxy("proxyout.reform.hmcts.net", 8080)
                 .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
@@ -331,7 +332,7 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeaders(String role) {
 
-        String userToken = idamService.createUserWith("", role).getAuthorisationToken();
+        String userToken = idamClient.getBearerToken();
         log.info("authToken::" + userToken);
         log.info("S2SToken::" + s2sToken);
         return SerenityRest.given()
