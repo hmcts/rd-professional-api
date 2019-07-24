@@ -83,6 +83,7 @@ module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
+  subscription = "${var.subscription}"
   env = "${var.env}"
   postgresql_user = "dbrefdata"
   database_name = "dbrefdata"
