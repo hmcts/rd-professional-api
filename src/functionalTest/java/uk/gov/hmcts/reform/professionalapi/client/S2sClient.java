@@ -41,7 +41,7 @@ public class S2sClient {
 
         Response response = RestAssured
                 .given()
-                // .proxy("proxyout.reform.hmcts.net", 8080)
+                .proxy("proxyout.reform.hmcts.net", 8080)
                 .relaxedHTTPSValidation()
                 .baseUri(this.s2sUrl)
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)

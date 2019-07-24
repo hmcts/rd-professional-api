@@ -10,7 +10,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-//import net.serenitybdd.rest.SerenityRest;
+import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -79,8 +79,9 @@ public abstract class AuthorizationFunctionalTest {
 
         IdamClient idamClient = new IdamClient(configProperties);
 
-        //SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        //RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
+        log.info("idamClient: " + idamClient);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
