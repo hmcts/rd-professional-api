@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Ignore
 public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFunctionalTest {
 
     @Test
