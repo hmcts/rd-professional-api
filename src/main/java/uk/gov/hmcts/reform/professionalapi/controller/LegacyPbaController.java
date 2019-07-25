@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.LegacyPbaResponse
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.impl.LegacyPbaAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @RequestMapping(
         path = "/search"
@@ -61,9 +62,10 @@ public class LegacyPbaController {
     )
     @ResponseBody
     public ResponseEntity<LegacyPbaResponse> retrievePbaAccountsByEmail(@PathVariable("email") @NotBlank String email) {
+        String accEmail = PbaAccountUtil.removeAllSpaces(email);
 
         List<String> pbaNumbers;
-        ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(email);
+        ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(accEmail);
         if (professionalUser == null) {
 
             throw new EmptyResultDataAccessException(1);

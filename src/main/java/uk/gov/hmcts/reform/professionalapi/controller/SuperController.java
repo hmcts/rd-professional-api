@@ -94,29 +94,31 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationOrById(String orgId, String status) {
-        String id = PbaAccountUtil.removeEmptySpaces(orgId);
+    protected ResponseEntity<?> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+        String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
+        String orgStatus = PbaAccountUtil.removeEmptySpaces(status);
+
         Object organisationResponse = null;
-        if (StringUtils.isEmpty(id) && StringUtils.isEmpty(status)) {
+        if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             log.info("Received request to retrieve all organisations");
             organisationResponse =
                     organisationService.retrieveOrganisations();
 
-        } else if (StringUtils.isEmpty(status) && StringUtils.isNotEmpty(id)
-                || (StringUtils.isNotEmpty(status) && StringUtils.isNotEmpty(id))) {
+        } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
+                || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
             log.info("Received request to retrieve organisation with ID ");
 
-            organisationCreationRequestValidator.validateOrganisationIdentifier(id);
+            organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
             organisationResponse =
-                    organisationService.retrieveOrganisation(id);
+                    organisationService.retrieveOrganisation(orgId);
 
-        } else if (StringUtils.isNotEmpty(status) && StringUtils.isEmpty(id)) {
+        } else if (StringUtils.isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
-            if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
+            if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
-                log.info("Received request to retrieve organisation with status " + status.toUpperCase());
+                log.info("Received request to retrieve organisation with status " + orgStatus.toUpperCase());
                 organisationResponse =
-                        organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
+                        organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
             } else {
                 log.error("Invalid Request param for status field");
                 throw new InvalidRequest("400");
@@ -129,8 +131,9 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
+        String userEmail = PbaAccountUtil.removeEmptySpaces(email);
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(PbaAccountUtil.removeEmptySpaces(email));
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(userEmail);
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
@@ -141,8 +144,9 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
+        String userEmail = PbaAccountUtil.removeEmptySpaces(email);
 
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(PbaAccountUtil.removeEmptySpaces(email));
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(userEmail);
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);
@@ -154,11 +158,12 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
-        
+        String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
+
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), orgId);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
         if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()) {
@@ -174,7 +179,7 @@ public abstract class SuperController {
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
-        OrganisationResponse organisationResponse = organisationService.updateOrganisation(organisationCreationRequest, organisationIdentifier);
+        OrganisationResponse organisationResponse = organisationService.updateOrganisation(organisationCreationRequest, orgId);
         return ResponseEntity.status(200).build();
     }
 
@@ -197,12 +202,13 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {
+        String orgStatus = PbaAccountUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
-        if (organisationCreationRequestValidator.contains(status.toUpperCase())) {
+        if (organisationCreationRequestValidator.contains(PbaAccountUtil.removeEmptySpaces(orgStatus.toUpperCase()))) {
 
             organisationsDetailResponse =
-                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(status.toUpperCase()));
+                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(PbaAccountUtil.removeEmptySpaces(orgStatus.toUpperCase())));
         } else {
             log.error("Invalid Request param for status field");
             throw new InvalidRequest("400");
@@ -212,12 +218,13 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
+        String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;
         int responseStatus;
 
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
@@ -241,10 +248,11 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
+        String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, orgId);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.error("Organisation is not Active hence not returning any users");
@@ -252,7 +260,7 @@ public abstract class SuperController {
         }
 
         boolean showDeletedFlag = false;
-        if ("True".equalsIgnoreCase(showDeleted)) {
+        if ("True".equalsIgnoreCase(PbaAccountUtil.removeEmptySpaces(showDeleted))) {
             showDeletedFlag = true;
         }
 
