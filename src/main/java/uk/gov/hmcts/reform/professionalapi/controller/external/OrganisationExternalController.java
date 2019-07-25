@@ -140,11 +140,11 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-        value = "Updates an organisation",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        })
+            value = "Updates an organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Updated an organisation for external"),
             @ApiResponse(code = 404, message = "If Organisation is not found"),
@@ -166,11 +166,11 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-        value = "Add a external user to an organisation",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        }
+            value = "Add a external user to an organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
     )
     @ApiResponses({
             @ApiResponse(

@@ -6,4 +6,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 public interface PrdEnumService {
 
     List<PrdEnum> findAllPrdEnums();
+
+    List<String> getPrdEnumByEnumType(String enumType);
 }

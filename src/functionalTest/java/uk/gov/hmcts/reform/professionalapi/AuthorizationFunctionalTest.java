@@ -82,13 +82,6 @@ public abstract class AuthorizationFunctionalTest {
                                                           s2sToken, idamService);
     }
 
-
-    protected String getUserAccessToken(String role) {
-
-        idamService = new IdamService(configProperties);
-        return idamService.createUserWith("", role).getAuthorisationToken();
-    }
-
     @After
     public void tearDown() {
     }

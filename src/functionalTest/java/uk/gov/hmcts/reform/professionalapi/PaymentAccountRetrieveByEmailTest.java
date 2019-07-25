@@ -12,15 +12,18 @@ import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
+    @Ignore
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
         String email = randomAlphabetic(10) + "@pbasearch.test";

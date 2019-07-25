@@ -3,16 +3,19 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-@ActiveProfiles("functional")
+@Slf4j
+@Ignore
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
@@ -24,6 +27,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
+    @Ignore
     @Test
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -41,6 +45,24 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
+    @Ignore
+    @Test
+    public void can_retrieve_Pending_and_Active_organisations() {
+
+        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
+        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
+        assertThat(orgIdentifierOne).isNotEmpty();
+        Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
+        String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
+        assertThat(orgIdentifierTwo).isNotEmpty();
+
+        professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(puiCaseManager);
+
+        assertThat(finalResponse.get("organisations")).isNotNull();
+        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+    }
+
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
@@ -49,6 +71,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
+    @Ignore
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 

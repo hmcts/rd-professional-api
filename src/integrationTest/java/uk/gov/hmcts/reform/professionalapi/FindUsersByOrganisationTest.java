@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -67,6 +68,7 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
 
     @Test
     public void retrieve_newly_deleted_user_with_showDeleted_true() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
 
@@ -79,6 +81,7 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
                 .roles(userRoles)
                 .build();
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 

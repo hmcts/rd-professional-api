@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_UUID;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -43,8 +42,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
-        assertThat(persistedSuperUser.getUserIdentifier()).isNotNull();
-        assertThat(persistedSuperUser.getUserIdentifier().toString().length()).isEqualTo(LENGTH_OF_UUID);
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
@@ -57,7 +54,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void returns_400_when_mandatory_data_not_present() {
-
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
                 .superUser(aUserCreationRequest()
@@ -78,7 +74,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void returns_500_when_database_constraint_violated() {
-
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()

@@ -154,4 +154,8 @@ public class Organisation {
     public void setOrganisationIdentifier(String organisationIdentifier) {
         this.organisationIdentifier = organisationIdentifier;
     }
+
+    public boolean isOrganisationStatusActive() {
+        return OrganisationStatus.ACTIVE == getStatus();
+    }
 }

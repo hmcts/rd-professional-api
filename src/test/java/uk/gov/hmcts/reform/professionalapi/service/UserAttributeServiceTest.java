@@ -12,7 +12,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
+
 
 public class UserAttributeServiceTest {
 
@@ -50,22 +50,12 @@ public class UserAttributeServiceTest {
     public void adds_user_attributes_to_user_correctly() {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
 
-        userAttributeService.addUserAttributesToUser(professionalUser, userRoles);
+        userAttributeService.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
 
         assertThat(professionalUser.getUserAttributes()).isNotNull();
 
         verify(
-                prdEnumService,
-                times(1)).findAllPrdEnums();
-        verify(
                 userAttributeRepository,
                 times(1)).save(any(UserAttribute.class));
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void addUserToOrganisationWithInvalidValues() {
-        List<String> emptyUserRoles = new ArrayList<>();
-
-        userAttributeService.addUserAttributesToUser(professionalUser, emptyUserRoles);
     }
 }

@@ -36,18 +36,6 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void should_handle_http_status_code_exception() {
-
-        HttpStatusCodeException exception = mock(HttpStatusCodeException.class);
-        HttpStatus httpStatus = mock(HttpStatus.class);
-        when(exception.getStatusCode()).thenReturn(httpStatus);
-        ResponseEntity<Object> responseEntity =
-                exceptionMapper.handleHttpStatusException(exception);
-        assertNotNull(responseEntity.getStatusCode());
-
-    }
-
-    @Test
     public void should_handle_illegal_argument_exception() {
 
         IllegalArgumentException exception = mock(IllegalArgumentException.class);
@@ -92,6 +80,18 @@ public class ExceptionMapperTest {
                 exceptionMapper.handleForbiddenException(exception);
 
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_http_status_code_exception() {
+
+        HttpStatusCodeException exception = mock(HttpStatusCodeException.class);
+        HttpStatus httpStatus = mock(HttpStatus.class);
+        when(exception.getStatusCode()).thenReturn(httpStatus);
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.handleHttpStatusException(exception);
+        assertNotNull(responseEntity.getStatusCode());
 
     }
 

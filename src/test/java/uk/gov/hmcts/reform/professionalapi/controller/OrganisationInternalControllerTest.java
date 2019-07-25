@@ -8,58 +8,53 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
-import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
-
 
 public class OrganisationInternalControllerTest {
     private OrganisationResponse organisationResponseMock;
+    private OrganisationsDetailResponse organisationsDetailResponseMock;
+    private OrganisationEntityResponse organisationEntityResponseMock;
     private OrganisationService organisationServiceMock;
-    private ProfessionalUserService professionalUserServiceMock;
-    private UserAttributeService userAttributeServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
-    private PrdEnumServiceImpl prdEnumServiceMock;
-
+    private Organisation organisationMock;
     private OrganisationCreationRequest organisationCreationRequestMock;
-
-    private UpdateOrganisationRequestValidator updateOrganisationRequestValidatorMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
-
-    private ResponseEntity responseEntity;
 
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
-
 
     @Before
     public void setUp() throws Exception {
         organisationResponseMock = mock(OrganisationResponse.class);
         organisationServiceMock = mock(OrganisationService.class);
-        professionalUserServiceMock = mock(ProfessionalUserService.class);
-        userAttributeServiceMock = mock(UserAttributeService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
-        prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-
+        organisationMock = mock(Organisation.class);
+        organisationsDetailResponseMock = mock(OrganisationsDetailResponse.class);
+        organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
         organisationCreationRequestMock = mock(OrganisationCreationRequest.class);
-
-        updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
-
-        responseEntity = mock(ResponseEntity.class);
 
         MockitoAnnotations.initMocks(this);
     }
@@ -76,11 +71,88 @@ public class OrganisationInternalControllerTest {
                 times(1))
                 .validate(any(OrganisationCreationRequest.class));
 
-        assertThat(actual).isNotNull();
-        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
-
         verify(organisationServiceMock,
                 times(1))
                 .createOrganisationFrom(eq(organisationCreationRequestMock));
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisations() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveOrganisations()).thenReturn(organisationsDetailResponseMock);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisationByIdWithStatusNull() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponseMock);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisationByIdWithStatusNotNull() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponseMock);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), "PENDING");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisationByStatusWithIdNull() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponseMock);
+
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testRetrieveOrganisationThrows400WhenStatusInvalid() {
+        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponseMock);
+
+        organisationInternalController.retrieveOrganisations(null, "this is not a status");
+    }
+
+    @Test
+    public void testRetrievePaymentAccountByEmail() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email")).thenReturn(organisationMock);
+
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
     }
 }

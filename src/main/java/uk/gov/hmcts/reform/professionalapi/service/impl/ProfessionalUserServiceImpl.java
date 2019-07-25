@@ -10,9 +10,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
@@ -48,20 +48,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Transactional
     @Override
-    public NewUserResponse addNewUserToAnOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
-        Organisation theOrganisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+    public NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles, List<PrdEnum> prdEnumList) {
 
-        ProfessionalUser newUser = new ProfessionalUser(
-                newUserCreationRequest.getFirstName(),
-                newUserCreationRequest.getLastName(),
-                newUserCreationRequest.getEmail(),
-                theOrganisation);
+        ProfessionalUser persistedNewUser = persistUser(newUser);
 
-        ProfessionalUser persistedNewUser = professionalUserRepository.save(newUser);
-
-        userAttributeService.addUserAttributesToUser(persistedNewUser, newUserCreationRequest.getRoles());
-
-        theOrganisation.addProfessionalUser(persistedNewUser);
+        userAttributeService.addUserAttributesToUser(persistedNewUser, roles, prdEnumList);
 
         return new NewUserResponse(persistedNewUser);
     }
@@ -73,10 +64,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      * @return The user with the matching email address
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
-        return user;
+        return professionalUserRepository.findByEmailAddress(email);
     }
-
 
     @Override
     public List<ProfessionalUser> findProfessionalUsersByOrganisation(Organisation organisation, boolean showDeleted) {
@@ -96,6 +85,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new EmptyResultDataAccessException(1);
         }
         return professionalUsers;
+    }
+
+    @Override
+    public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
+        log.info("Persisting user with emailId: " + updatedProfessionalUser.getEmailAddress());
+        return professionalUserRepository.save(updatedProfessionalUser);
     }
 
 }
