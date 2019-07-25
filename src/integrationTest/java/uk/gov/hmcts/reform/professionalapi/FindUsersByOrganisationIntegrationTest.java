@@ -1,23 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
-
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -26,14 +18,12 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
-        userProfileGetMultipleUsersWireMock();
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
         validateUsers(response);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
-        userProfileGetMultipleUsersWireMock();
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
@@ -42,7 +32,6 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
 
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
-        userProfileGetMultipleUsersWireMock();
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null, hmctsAdmin);
@@ -52,7 +41,6 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
 
     @Test
     public void retrieve_users_with_pending_organisation_status_should_return_no_users_and_return_status_404() {
-        userProfileGetMultipleUsersWireMock();
         String organisationIdentifier = createOrganisationRequest();
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
@@ -77,29 +65,21 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
 
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someDeletedName")
-                .lastName("someLastName")
-                .email("some@email.com")
-                .roles(userRoles)
-                .build();
-
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        ProfessionalUser userToDelete = professionalUserRepository.findByEmailAddress("some@email.com");
-        userToDelete.setDeleted(LocalDateTime.now());
-        assertThat(userToDelete.getDeleted() != null);
 
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
-        validateUsers(response);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(1);
-        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("someDeletedName");
+
+        assertThat(professionalUsersResponse.get("idamId")).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("adil");
+        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("oozeerally");
+        assertThat(professionalUsersResponse.get("email")).isEqualTo("adil.ooze@hmcts.net");
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
 
     }
 
