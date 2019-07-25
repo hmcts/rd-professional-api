@@ -77,8 +77,8 @@ public abstract class SuperController {
     @Value("${exui.role.pui-case-manager:}")
     protected String puiCaseManager;
 
-    private static final String SIDAM_ROLE = "SIDAM_ROLE";
-
+    @Value("${prdEnumRoleType}")
+    protected String prdEnumRoleType;
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
@@ -180,7 +180,7 @@ public abstract class SuperController {
 
     private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         log.info("Creating user...");
-        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(SIDAM_ROLE) : roles;
+        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
                 professionalUser.getFirstName(),
