@@ -58,4 +58,22 @@ public interface PbaAccountUtil {
         }
         return paymentAccounts;
     }
+
+    public static String removeEmptySpaces(String value) {
+        String modValue = "";
+        if (null != value && !value.trim().isEmpty()) {
+            modValue = value.trim();
+            modValue = modValue.replaceAll("\\s+", " ");
+        }
+        return modValue;
+    }
+
+    public static String removeAllSpaces(String value) {
+        String modValue = "";
+        if (null != value && !value.trim().isEmpty()) {
+            modValue = value.trim();
+            modValue = modValue.replaceAll("\\s+", "");
+        }
+        return modValue;
+    }
 }
