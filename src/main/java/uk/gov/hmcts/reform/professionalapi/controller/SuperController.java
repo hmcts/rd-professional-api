@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @RestController
 @Slf4j
@@ -93,8 +94,8 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationOrById(String id, String status) {
-
+    protected ResponseEntity<?> retrieveAllOrganisationOrById(String orgId, String status) {
+        String id = PbaAccountUtil.removeEmptySpaces(orgId);
         Object organisationResponse = null;
         if (StringUtils.isEmpty(id) && StringUtils.isEmpty(status)) {
             log.info("Received request to retrieve all organisations");
@@ -129,7 +130,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(email);
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(PbaAccountUtil.removeEmptySpaces(email));
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
@@ -141,7 +142,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
 
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(PbaAccountUtil.removeEmptySpaces(email));
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);
@@ -153,7 +154,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
-
+        
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -181,9 +182,9 @@ public abstract class SuperController {
         log.info("Creating user...");
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(SIDAM_ROLE) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
-                professionalUser.getEmailAddress(),
-                professionalUser.getFirstName(),
-                professionalUser.getLastName(),
+                PbaAccountUtil.removeAllSpaces(professionalUser.getEmailAddress()),
+                PbaAccountUtil.removeEmptySpaces(professionalUser.getFirstName()),
+                PbaAccountUtil.removeEmptySpaces(professionalUser.getLastName()),
                 LanguagePreference.EN,
                 UserCategory.PROFESSIONAL,
                 UserType.EXTERNAL,

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Service
 @Slf4j
@@ -64,7 +65,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
      * @return The user with the matching email address
      */
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        return professionalUserRepository.findByEmailAddress(email);
+        return professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
     }
 
     @Override
