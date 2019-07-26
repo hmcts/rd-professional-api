@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
 
-import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +101,5 @@ public interface PbaAccountUtil {
 
             throw new AccessDeniedException("403 Forbidden");
         }
-
     }
 }
