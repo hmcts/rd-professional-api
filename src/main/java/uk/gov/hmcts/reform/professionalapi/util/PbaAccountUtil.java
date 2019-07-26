@@ -22,9 +22,7 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
-        userMapPaymentAccount = userAccountMaps.stream().map(
-                userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
-                .collect(toList());
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
 
         return userMapPaymentAccount;
     }
@@ -98,8 +96,7 @@ public interface PbaAccountUtil {
             modValue = value.trim();
             modValue = modValue.replaceAll("\\s+", " ");
             return modValue;
-        }
-        else {
+        } else {
             return value;
         }
     }
