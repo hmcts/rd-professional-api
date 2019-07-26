@@ -31,30 +31,47 @@ public class OrganisationFixtures {
                         .addressLine1("addressLine1").build()));
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+                .name("  some-  org -name  ")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname    b    ")
+                        .lastName(" some-         lname  ")
+                        .email(" someone@s omewh ere.com ")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()));
+
+
+    }
+
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
-            .name("some-org-name")
+            .name(" some-org-name ")
             .status(OrganisationStatus.PENDING)
             .sraId("sra-id")
             .sraRegulated(Boolean.FALSE)
-            .companyUrl("company-url")
+            .companyUrl(" company -url")
             .companyNumber("company")
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
-                .email("someone@somewhere.com")
+                .firstName(" some-fname")
+                .lastName("some-lname ")
+                .email("someone @s   omewhere.com")
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("country")
-                .county("county")
-                .townCity("town-city")
+                .addressLine1(" addressLine1 ")
+                .addressLine2(" addressLine2 ")
+                .addressLine3(" addressLine3 ")
+                .country("country ")
+                .county("county ")
+                .townCity("town-city ")
                 .postCode("some-post-code")
                     .dxAddress(Arrays.asList(dxAddressCreationRequest()
                         .dxNumber("DX 1234567890")
@@ -77,7 +94,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
-                .email("someone1@somewhere.com")
+                .email("someone1@s     omewhere.com")
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")
