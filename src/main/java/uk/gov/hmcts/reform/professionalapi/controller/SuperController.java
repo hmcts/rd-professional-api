@@ -245,8 +245,8 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
-        String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
+    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String orgId, String showDeleted) {
+        //String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
@@ -258,7 +258,7 @@ public abstract class SuperController {
         }
 
         boolean showDeletedFlag = false;
-        if ("True".equalsIgnoreCase(PbaAccountUtil.removeEmptySpaces(showDeleted))) {
+        if ("True".equalsIgnoreCase(showDeleted)) {
             showDeletedFlag = true;
         }
 
