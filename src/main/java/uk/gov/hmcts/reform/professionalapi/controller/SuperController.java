@@ -245,12 +245,10 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String orgId, String showDeleted) {
-        //String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
-
-        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, orgId);
+    protected ResponseEntity<ProfessionalUsersEntityResponse> searchUsersByOrganisation(String organisationIdentifier, String showDeleted) {
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
 
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.error("Organisation is not Active hence not returning any users");
