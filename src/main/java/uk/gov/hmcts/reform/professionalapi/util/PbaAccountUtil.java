@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
 
+import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -49,13 +51,7 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
-        if (!paymentAccounts.isEmpty()) {
-
-            paymentAccounts.forEach(paymentAccount -> {
-
-                paymentAccountsFromOrg.add(paymentAccount);
-            });
-        }
+        paymentAccountsFromOrg.addAll(paymentAccounts);
         return paymentAccounts;
     }
 
@@ -97,5 +93,15 @@ public interface PbaAccountUtil {
             }
         }
         return user;
+    }
+
+
+    public static void validateOrgIdentifier(String extOrgId, String orgId) {
+
+        if (!extOrgId.trim().equals(orgId.trim())) {
+
+            throw new AccessDeniedException("403 Forbidden");
+        }
+
     }
 }

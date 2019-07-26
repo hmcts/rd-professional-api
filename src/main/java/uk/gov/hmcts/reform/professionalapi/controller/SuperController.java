@@ -75,10 +75,10 @@ public abstract class SuperController {
     @Value("${exui.role.pui-case-manager:}")
     protected String puiCaseManager;
 
-    private static final String SIDAM_ROLE = "SIDAM_ROLE";
+    @Value("${prdEnumRoleType}")
+    protected String prdEnumRoleType;
 
-
-    protected ResponseEntity<?>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+    protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
@@ -161,7 +161,8 @@ public abstract class SuperController {
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), organisationIdentifier);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus().isActive()) {
+        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+             && organisationCreationRequest.getStatus().isActive()) {
             log.info("Organisation is getting activated");
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -180,7 +181,7 @@ public abstract class SuperController {
 
     private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         log.info("Creating user...");
-        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(SIDAM_ROLE) : roles;
+        List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
                 professionalUser.getFirstName(),

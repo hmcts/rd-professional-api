@@ -18,9 +18,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Ignore
 public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
-    @Ignore
+
     @Test
     public void can_find_a_user_by_their_email_address() {
 

@@ -10,12 +10,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
-@ActiveProfiles("functional")
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
@@ -23,7 +22,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     public void can_retrieve_all_organisations() {
         professionalApiClient.createOrganisation();
 
-        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(puiCaseManager);
+        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -45,7 +44,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
-    @Ignore
     @Test
     public void can_retrieve_Pending_and_Active_organisations() {
 
@@ -57,7 +55,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
-        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(puiCaseManager);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
@@ -67,16 +65,15 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), puiCaseManager);
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), hmctsAdmin);
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
-    @Ignore
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), puiCaseManager);
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -85,7 +82,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
 
         professionalApiClient
-                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", puiCaseManager);
+                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
     }
 
 }

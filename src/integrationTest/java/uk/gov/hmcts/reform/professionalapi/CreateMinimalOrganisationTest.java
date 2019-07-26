@@ -54,7 +54,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void returns_400_when_mandatory_data_not_present() {
-
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(null)
                 .superUser(aUserCreationRequest()
@@ -75,7 +74,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void returns_500_when_database_constraint_violated() {
-
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
