@@ -16,7 +16,6 @@ public class UserCreationRequest {
     @NotNull
     private final String lastName;
 
-    @NotNull
     private final String email;
 
     @JsonCreator
@@ -28,6 +27,6 @@ public class UserCreationRequest {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email =  emailAddress.toLowerCase();
+        this.email = emailAddress.toLowerCase();
     }
 }

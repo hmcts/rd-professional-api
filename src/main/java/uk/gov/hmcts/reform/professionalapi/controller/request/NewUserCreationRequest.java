@@ -23,10 +23,8 @@ public class NewUserCreationRequest {
     @NotNull
     private final String lastName;
 
-    @NotNull
     @Pattern(regexp = emailRegex)
     private final String email;
-
     @NotNull
     private final List<String> roles;
 
