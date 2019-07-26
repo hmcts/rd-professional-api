@@ -23,11 +23,11 @@ public class UserCreationRequest {
     public UserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String email
+            @JsonProperty("email") String emailAddress
     ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
+        this.email =  emailAddress == null ? null : emailAddress.toLowerCase();
     }
 }
