@@ -28,6 +28,6 @@ public class UserCreationRequest {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email =  emailAddress == null ? null : emailAddress.toLowerCase();
+        this.email =  emailAddress.toLowerCase();
     }
 }

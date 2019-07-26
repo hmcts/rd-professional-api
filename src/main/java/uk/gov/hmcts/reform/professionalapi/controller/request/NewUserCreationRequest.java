@@ -39,7 +39,7 @@ public class NewUserCreationRequest {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = emailAddress == null ? null : emailAddress.toLowerCase();
+        this.email = emailAddress.toLowerCase();
         this.roles = roles;
     }
 }
