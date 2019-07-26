@@ -23,7 +23,7 @@ public interface PbaAccountUtil {
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
         userMapPaymentAccount = userAccountMaps.stream().map(
-            userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
+                userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
                 .collect(toList());
 
         return userMapPaymentAccount;
@@ -66,9 +66,9 @@ public interface PbaAccountUtil {
     public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient) {
 
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
-        for (ProfessionalUser user: users) {
+        for (ProfessionalUser user : users) {
 
-            Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
+            Response response = userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString());
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
@@ -94,19 +94,24 @@ public interface PbaAccountUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = "";
-        if (null != value && !value.trim().isEmpty()) {
+        if (value != null && !value.trim().isEmpty()) {
             modValue = value.trim();
             modValue = modValue.replaceAll("\\s+", " ");
+            return modValue;
         }
-        return modValue;
+        else {
+            return value;
+        }
     }
 
     public static String removeAllSpaces(String value) {
         String modValue = "";
-        if (null != value && !value.trim().isEmpty()) {
+        if (value != null && !value.trim().isEmpty()) {
             modValue = value.trim();
             modValue = modValue.replaceAll("\\s+", "");
+            return modValue;
+        } else {
+            return value;
         }
-        return modValue;
     }
 }
