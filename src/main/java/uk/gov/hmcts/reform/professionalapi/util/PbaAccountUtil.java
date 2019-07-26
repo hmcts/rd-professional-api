@@ -91,25 +91,19 @@ public interface PbaAccountUtil {
     }
 
     public static String removeEmptySpaces(String value) {
-        String modValue = "";
-        if (value != null && !value.trim().isEmpty()) {
-            modValue = value.trim();
-            modValue = modValue.replaceAll("\\s+", " ");
-            return modValue;
-        } else {
-            return value;
+        String modValue = value;
+        if (!StringUtils.isEmpty(modValue)) {
+            modValue = value.trim().replaceAll("\\s+", " ");
         }
+        return modValue;
     }
 
     public static String removeAllSpaces(String value) {
-        String modValue = "";
-        if (value != null && !value.trim().isEmpty()) {
-            modValue = value.trim();
+        String modValue = value;
+        if (!StringUtils.isEmpty(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
-            return modValue;
-        } else {
-            return value;
         }
+        return modValue;
     }
 
     public static void validateOrgIdentifier(String extOrgId, String orgId) {

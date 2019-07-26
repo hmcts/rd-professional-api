@@ -186,9 +186,9 @@ public abstract class SuperController {
         log.info("Creating user...");
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
-                PbaAccountUtil.removeAllSpaces(professionalUser.getEmailAddress()),
-                PbaAccountUtil.removeEmptySpaces(professionalUser.getFirstName()),
-                PbaAccountUtil.removeEmptySpaces(professionalUser.getLastName()),
+                professionalUser.getEmailAddress(),
+                professionalUser.getFirstName(),
+                professionalUser.getLastName(),
                 LanguagePreference.EN,
                 UserCategory.PROFESSIONAL,
                 UserType.EXTERNAL,
@@ -229,7 +229,11 @@ public abstract class SuperController {
         List<String> roles = newUserCreationRequest.getRoles();
         UserCreationRequestValidator.validateRoles(roles, prdEnumList);
 
-        ProfessionalUser newUser = new ProfessionalUser(newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName(), newUserCreationRequest.getEmail(), existingOrganisation);
+        ProfessionalUser newUser = new ProfessionalUser(
+                PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getFirstName()),
+                PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getLastName()),
+                PbaAccountUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
+                existingOrganisation);
         ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
