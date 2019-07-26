@@ -270,50 +270,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 WireMock.post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Test-Code", "Adils machine")
+                                        .withHeader("Content-Type", "application/json")
                                         .withBody(usersBody)
                                         .withStatus(200)
                         )
         );
     }
-
-
-//    public void userProfileGetMultipleUsersWireMock() {
-//        String usersBody = " {"
-//                + "  \"userProfiles\": ["
-//                + "  {"
-//                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-//                + "  \"firstName\": \"prashanth\","
-//                + "  \"lastName\": \"rao\","
-//                + "  \"email\": \"super.user@hmcts.net\","
-//                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-//                + "  \"roles\": ["
-//                + "  \"pui-organisation-manager\""
-//                + "  ]"
-//                + "  },"
-//                + " {"
-//                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-//                + "  \"firstName\": \"adil\","
-//                + "  \"lastName\": \"oozeerally\","
-//                + "  \"email\": \"adil.ooze@hmcts.net\","
-//                + "  \"idamStatus\": \"" + IdamStatus.DELETED + "\","
-//                + "  \"roles\": [],"
-//                + "  \"idamErrorStatusCode\": \"404\","
-//                + "  \"idamErrorMessage\": \"16 Resource not found\""
-//                + "  } "
-//                + " ]"
-//                + "}";
-//
-//
-//        userProfileService.stubFor(
-//                WireMock.post(urlPathMatching("/v1/userprofile/users.*"))
-//                        .willReturn(
-//                                aResponse()
-//                                        .withHeader("Test-Code", "Adils machine")
-//                                        .withBody(usersBody)
-//                                        .withStatus(200)
-//                        )
-//        );
-//    }
 }
 

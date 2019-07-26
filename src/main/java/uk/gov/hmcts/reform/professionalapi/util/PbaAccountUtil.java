@@ -21,13 +21,10 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
-        userMapPaymentAccount = userAccountMaps.stream().map(
-                userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
-                .collect(toList());
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
 
         return userMapPaymentAccount;
     }
-
 
     public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
 
@@ -91,7 +88,7 @@ public interface PbaAccountUtil {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
-            if(isRequiredRoles){
+            if (isRequiredRoles) {
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());

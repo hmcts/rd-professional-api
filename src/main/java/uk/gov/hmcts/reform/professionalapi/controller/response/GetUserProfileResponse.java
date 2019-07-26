@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Setter
 @Getter
@@ -34,7 +34,7 @@ public class GetUserProfileResponse {
         this.lastName = userProfile.getLastName();
         this.email = userProfile.getEmail();
         this.idamStatus = userProfile.getIdamStatus();
-        if(isRequiredRoles){
+        if (isRequiredRoles) {
             this.roles = getRoles();
             this.idamErrorStatusCode = getIdamErrorStatusCode();
             this.idamErrorMessage = getIdamErrorMessage();

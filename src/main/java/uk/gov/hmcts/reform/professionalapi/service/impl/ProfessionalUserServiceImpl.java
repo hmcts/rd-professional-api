@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import feign.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 
-import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
