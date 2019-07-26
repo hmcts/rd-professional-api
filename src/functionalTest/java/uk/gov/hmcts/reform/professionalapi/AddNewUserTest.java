@@ -11,9 +11,9 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Ignore
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
 

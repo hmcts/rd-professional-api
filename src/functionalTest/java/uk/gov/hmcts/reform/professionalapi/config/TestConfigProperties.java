@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,9 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration
 public class TestConfigProperties {
-
-    @Autowired
-    public Oauth2 oauth2;
 
     @Value("${test.url}")
     public String baseTestUrl;
@@ -25,5 +21,14 @@ public class TestConfigProperties {
 
     @Value("${idam.api.url}")
     public String idamApiUrl;
+
+    @Value("${idam.auth.tokenAuth}")
+    public String tokenAuthorization;
+
+    @Value("${idam.auth.redirectUrl}")
+    public String oauthRedirectUrl;
+
+    @Value("${idam.auth.clientId:rd-professional-api}")
+    public String clientId;
 
 }
