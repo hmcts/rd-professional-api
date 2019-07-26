@@ -90,7 +90,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
-                .email("someone@somewhere.com")
+                .email("someone1@somewhere.com")
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")

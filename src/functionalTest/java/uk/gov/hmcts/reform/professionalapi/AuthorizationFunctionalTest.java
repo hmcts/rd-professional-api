@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+//import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -20,8 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
-
+import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
@@ -60,7 +62,6 @@ public abstract class AuthorizationFunctionalTest {
 
     protected ProfessionalApiClient professionalApiClient;
 
-    protected IdamService idamService;
 
     @Autowired
     protected TestConfigProperties configProperties;
@@ -68,25 +69,23 @@ public abstract class AuthorizationFunctionalTest {
 
     @Before
     public void setUp() {
+        RestAssured.useRelaxedHTTPSValidation();
+
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
-        idamService = new IdamService(configProperties);
+        IdamClient idamClient = new IdamClient(configProperties);
+
+        log.info("idamClient: " + idamClient);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
-                                                          s2sToken, idamService);
-    }
-
-
-    protected String getUserAccessToken(String role) {
-
-        idamService = new IdamService(configProperties);
-        return idamService.createUserWith("", role).getAuthorisationToken();
+                                                          s2sToken, idamClient);
     }
 
     @After

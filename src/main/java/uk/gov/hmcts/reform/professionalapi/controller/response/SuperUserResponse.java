@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class SuperUserResponse {
 
-    @JsonProperty
-    private String userIdentifier;
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -23,8 +20,6 @@ public class SuperUserResponse {
     }
 
     private void getSuperUserResponse(ProfessionalUser professionalUser) {
-        this.userIdentifier = StringUtils.isEmpty(professionalUser.getUserIdentifier())
-                ? "" : professionalUser.getUserIdentifier().toString();
         this.firstName = professionalUser.getFirstName();
         this.lastName = professionalUser.getLastName();
         this.email = professionalUser.getEmailAddress();

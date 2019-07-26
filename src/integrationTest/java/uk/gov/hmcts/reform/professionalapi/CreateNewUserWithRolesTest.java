@@ -1,133 +1,164 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
-    private static final String userManagerRole = "pui-user-manager";
+    @Autowired
+    OrganisationRepository organisationRepository;
+    @Autowired
+    ProfessionalUserRepository professionalUserRepository;
 
-    private String createNewOrganisationWithAdmin(OrganisationCreationRequest organisationCreationRequest) {
-        Map<String, Object> organisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+    private OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+    private NewUserCreationRequest userCreationRequest;
+    List<String> userRoles;
 
-        return (String) organisationResponse.get("organisationIdentifier");
+    @Before
+    public void setUp() {
+        userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .build();
     }
-
-    private Map<String, Object>  addNewUserToOrganisation(OrganisationCreationRequest organisationCreationRequest, NewUserCreationRequest userCreationRequest) {
-        Map<String, Object> organisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
-
-        return professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
-    }
-
 
     @Test
     public void post_request_adds_new_user_to_an_organisation() {
-
         List<String> userRoles = new ArrayList<>();
-        userRoles.add(userManagerRole);
+
+        userRoles.add("pui-user-manager");
+
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .build();
+    }
+
+    @Test
+    public void post_request_adds_new_user_to_an_active_organisation() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-
-        String organisationIdentifier = createNewOrganisationWithAdmin(organisationCreationRequest);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email("SOME@EMAIL.COM")
+                .email("somenewuser@email.com")
                 .roles(userRoles)
                 .build();
-
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
-        Map<String, Object> newUserResponse = addNewUserToOrganisation(organisationCreationRequest, userCreationRequest);
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
         assertThat(newUserResponse).isNotNull();
+        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(2);
+
+        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
+        assertThat(persistedProfessionalUser).isNotNull();
     }
 
-
-
     @Test
-    public void create_new_active_organisation_with_super_user_and_additional_user() {
-        final String orgAdminEmail = "ORG.ADMIN@EMAIL.COM";
-        final String expectAdminEmail = "org.admin@email.com";
-        final String newUserEmail = "SOME.OTHER@EMAIL.COM";
-        final String searchSecondUserEmail = "sOMe.OTHer@EmAiL.Com";
-        final String expectSecondUserEmail = "some.other@email.com";
-        final String prdAdminRole = "prd-admin";
+    public void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
 
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(userManagerRole);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        OrganisationCreationRequest.OrganisationCreationRequestBuilder orgRequestBuilder = someMinimalOrganisationRequest(orgAdminEmail);
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
-        OrganisationCreationRequest organisationCreationRequest = orgRequestBuilder.status(OrganisationStatus.ACTIVE).build();
-
-        String organisationIdentifier = createNewOrganisationWithAdmin(organisationCreationRequest);
-
-        assertThat(organisationIdentifier).isNotNull();
-
-        Map<String, Object> responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, prdAdminRole, organisationIdentifier);
-
-        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
-
-        NewUserCreationRequest anotherUserRequest = aNewUserCreationRequest()
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(newUserEmail)
+                .email("somenewuser@email.com")
                 .roles(userRoles)
                 .build();
 
-        Map<String, Object> responseForNewUser = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, anotherUserRequest, prdAdminRole);
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        assertThat(responseForNewUser.get("http_status")).isEqualTo("201 CREATED");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
-        Organisation persistedOrganisation = organisationRepository
-                .findByOrganisationIdentifier(organisationIdentifier);
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
-        assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
+        userProfileCreateUserWireMock(HttpStatus.BAD_REQUEST);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
-        List<ProfessionalUser> users = persistedOrganisation.getUsers();
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
-        assertThat(users).isNotNull();
+        assertThat(newUserResponse).isNotNull();
 
-        assertThat(users.get(0).getEmailAddress()).isEqualTo(expectAdminEmail);
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void should_return_404_when_adding_new_user_to_an_pending_organisation() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findUserByEmail(searchSecondUserEmail, prdAdminRole);
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String actualEmail = (String) response.get("email");
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
-        assertThat(actualEmail).isEqualTo(expectSecondUserEmail);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
+
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
     }
 
     @Test
     public void returns_404_when_organisation_identifier_not_found() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add(userManagerRole);
+        userRoles.add("pui-user-manager");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
@@ -144,5 +175,4 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
-
 }

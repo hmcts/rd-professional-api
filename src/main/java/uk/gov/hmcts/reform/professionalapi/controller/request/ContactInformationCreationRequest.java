@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
@@ -14,7 +15,7 @@ import lombok.Getter;
 @Builder(builderMethodName = "aContactInformationCreationRequest")
 public class ContactInformationCreationRequest {
 
-    @NotNull
+    @NotNull@NotEmpty
     private final String addressLine1;
 
     private final String addressLine2;

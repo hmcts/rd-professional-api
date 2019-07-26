@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -14,9 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
@@ -29,7 +36,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
@@ -41,7 +48,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
-        assertThat(superUser.get("userIdentifier")).isNotNull();
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
         assertThat(superUser.get("lastName")).isEqualTo("some-lname");
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
@@ -67,15 +73,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations() {
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
+        Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
-        professionalReferenceDataClient.createOrganisation(anOrganisationCreationRequest()
+        Map<String, Object> orgResponse2 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .name("some-other-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
@@ -85,22 +85,42 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .build());
 
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisations(puiCaseManager);
+                professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }
 
     @Test
     public void error_if_organisation_id_invalid() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!", puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test
     public void error_if_organisation_id_not_found() {
-        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116", puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("11AA116", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
+
+    @Test
+    public void forbidden_if_pui_case_manager_user_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    public void forbidden_if_pui_user_manager_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiUserManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    public void forbidden_if_pui_finance_manager_try_access_organisation_id_without_role_access() {
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiFinanceManager);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+
 
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
@@ -108,7 +128,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.PENDING);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name(), puiCaseManager);
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name(), hmctsAdmin);
         assertThat(orgResponse.get("organisations")).isNotNull();
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
@@ -120,21 +140,28 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status(OrganisationStatus.ACTIVE).build();
-
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
         orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
 
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
+
+        Map<String, Object> activeOrganisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+
+        Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
+        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
+        assertThat(superUser.get("lastName")).isEqualTo("rao");
+        assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
     }
 
     @Test
@@ -153,7 +180,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV", puiCaseManager);
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV", hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("404"));
     }
 
@@ -166,45 +193,61 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void retrieve_organisation_should_have_single_super_user() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        List<String> user1Roles = new ArrayList<>();
+        user1Roles.add("pui-user-manager");
+
+        List<String> user2Roles = new ArrayList<>();
+        user2Roles.add("pui-user-manager");
+        user2Roles.add("organisation-admin");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-
-        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
-                .firstName("someName1")
-                .lastName("someLastName1")
-                .email("some@email.com")
-                .roles(userRoles)
-                .build();
-
-        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
-                .firstName("someName2")
-                .lastName("someLastName2")
-                .email("some@email2.com")
-                .roles(userRoles)
-                .build();
 
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
+        professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build(), hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
+                .firstName("someName1")
+                .lastName("someLastName1")
+                .email("some@email.com")
+                .roles(user1Roles)
+                .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
+                .firstName("someName2")
+                .lastName("someLastName2")
+                .email("some@email2.com")
+                .roles(user2Roles)
+                .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(3);
+
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiCaseManager);
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("some-fname");
-        assertThat(superUser.get("lastName")).isEqualTo("some-lname");
-        assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
+        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
+        assertThat(superUser.get("lastName")).isEqualTo("rao");
+        assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
 
     }
 
@@ -214,11 +257,61 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, puiUserManager);
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         assertThat(orgResponse.get("http_status").toString().contains("403"));
 
     }
 
+    @Test
+    public void  persists_and_return_pending_from_prd_and_active_org_details_from_up_and_combine_both() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        OrganisationCreationRequest organisationRequest = anOrganisationCreationRequest()
+                .name("org-name")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname")
+                        .lastName("lname1")
+                        .email("someone11@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine2").build())).build();
+
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationRequest);
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
+
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgId = (String) response.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, orgId);
+
+        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
+
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200"));
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        Map<String, Object> organisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+
+        Map<String, Object> superUser = ((Map<String, Object>) organisation.get("superUser"));
+
+        assertThat(superUser.get("firstName")).isEqualTo("fname");
+        assertThat(superUser.get("lastName")).isEqualTo("lname1");
+        assertThat(superUser.get("email")).isEqualTo("someone11@somewhere.com");
+
+        Map<String, Object> organisationSecond = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+
+        Map<String, Object> superUserSecond = ((Map<String, Object>) organisationSecond.get("superUser"));
+
+        assertThat(superUserSecond.get("firstName")).isEqualTo("prashanth");
+        assertThat(superUserSecond.get("lastName")).isEqualTo("rao");
+        assertThat(superUserSecond.get("email")).isEqualTo("super.user@hmcts.net");
+    }
 
 }

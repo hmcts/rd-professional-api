@@ -32,7 +32,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamService;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -44,16 +44,16 @@ public class ProfessionalApiClient {
 
     private final String professionalApiUrl;
     private final String s2sToken;
-    //private final String authToken;
 
-    protected IdamService idamService;
+
+    protected IdamClient idamClient;
 
     public ProfessionalApiClient(
                                  String professionalApiUrl,
-                                 String s2sToken, IdamService idamService) {
+                                 String s2sToken, IdamClient idamClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        this.idamService = idamService;
+        this.idamClient = idamClient;
     }
 
     public String getWelcomePage() {
@@ -131,7 +131,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public  NewUserCreationRequest createNewUserCreationRequest() {
+    public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -149,6 +149,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeaders(role)
                 .body(newUserCreationRequest)
+                .proxy("proxyout.reform.hmcts.net", 8080)
                 .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
@@ -164,6 +165,7 @@ public class ProfessionalApiClient {
                 .param("email", email)
                 .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
+        log.info("Search For User By Email Response: " + response.asString());
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -175,7 +177,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations?id=" + id)
+                .get("/refdata/internal/v1/organisations?id=" + id)
                 .andReturn();
 
         if (response.statusCode() != OK.value()) {
@@ -194,7 +196,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrieveAllOrganisations(String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations")
+                .get("/refdata/internal/v1/organisations")
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -210,7 +212,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/internal/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -227,7 +229,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations/pbas?email=" + email)
+                .get("/refdata/internal/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
         log.info("Retrieve organisation response: " + response.asString());
@@ -274,7 +276,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations?status=" + status)
+                .get("/refdata/internal/v1/organisations?status=" + status)
                 .andReturn();
         log.debug("Retrieve organisation response by status: " + response.getStatusCode());
         response.then()
@@ -288,7 +290,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeaders(role)
                 .body("")
-                .get("/refdata/external/v1/organisations?status=" + status)
+                .get("/refdata/internal/v1/organisations?status=" + status)
                 .andReturn();
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
@@ -330,8 +332,9 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeaders(String role) {
 
-        String userToken = idamService.createUserWith("", role).getAuthorisationToken();
+        String userToken = idamClient.getBearerToken();
         log.info("authToken::" + userToken);
+        log.info("S2SToken::" + s2sToken);
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)

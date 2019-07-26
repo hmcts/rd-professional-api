@@ -17,12 +17,7 @@ locals {
   s2s_vault_name = "s2s-${local.local_env}"
   s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
   idam_url = "https://idam-api.${local.local_env}.platform.hmcts.net"
-}
-
-resource "azurerm_resource_group" "rg" {
-  name = "${var.product}-${var.component}-${var.env}"
-  location = "${var.location}"
-  tags = "${merge(var.common_tags, map("lastUpdated", "${timestamp()}"))}"
+  USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -47,12 +42,32 @@ data "azurerm_key_vault_secret" "s2s_url" {
 
 data "azurerm_key_vault_secret" "idam_url" {
   name = "idam-url"
-  vault_uri = "${data.azurerm_key_vault.rd_key_vault.vault_uri}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
+ name = "USER-PROFILE-URL"
+ key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
   key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_redirect_uri" {
+  name = "OAUTH2-REDIRECT-URI"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_client_id" {
+  name = "OAUTH2-CLIENT-ID"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "oauth2_client_secret" {
+  name = "OAUTH2-CLIENT-SECRET"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
@@ -85,10 +100,23 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+resource "azurerm_resource_group" "rg" {
+  name = "${var.product}-${var.component}-${var.env}"
+  location = "${var.location}"
+  tags {
+    "Deployment Environment" = "${var.env}"
+    "Team Name" = "${var.team_name}"
+    "Team Contact" = "${var.team_contact}"
+    "Destroy Me" = "${var.destroy_me}"
+    "lastUpdated" = "${timestamp()}"
+  }
+}
+
 module "db-professional-ref-data" {
   source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product = "${var.product}-${var.component}-postgres-db"
   location = "${var.location}"
+  subscription = "${var.subscription}"
   env = "${var.env}"
   postgresql_user = "dbrefdata"
   database_name = "dbrefdata"
@@ -124,6 +152,11 @@ module "rd_professional_api" {
 
     S2S_URL = "${local.s2s_url}"
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
+    USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
+
+    OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
+    OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"
+    OAUTH2_CLIENT_SECRET = "${data.azurerm_key_vault_secret.oauth2_client_secret.value}"
 
     ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
     LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"
