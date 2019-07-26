@@ -131,9 +131,8 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
-        String userEmail = PbaAccountUtil.removeEmptySpaces(email);
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(userEmail);
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(PbaAccountUtil.removeEmptySpaces(email));
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
@@ -144,9 +143,8 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
-        String userEmail = PbaAccountUtil.removeEmptySpaces(email);
 
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(userEmail);
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(PbaAccountUtil.removeEmptySpaces(email));
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);
@@ -205,10 +203,10 @@ public abstract class SuperController {
         String orgStatus = PbaAccountUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
-        if (organisationCreationRequestValidator.contains(PbaAccountUtil.removeEmptySpaces(orgStatus.toUpperCase()))) {
+        if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
             organisationsDetailResponse =
-                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(PbaAccountUtil.removeEmptySpaces(orgStatus.toUpperCase())));
+                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
         } else {
             log.error("Invalid Request param for status field");
             throw new InvalidRequest("400");
