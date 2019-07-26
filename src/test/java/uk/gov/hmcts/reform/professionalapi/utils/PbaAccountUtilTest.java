@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.Test;
-
+import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
@@ -87,5 +87,11 @@ public class PbaAccountUtilTest {
         assertThat(PbaAccountUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
         assertThat(PbaAccountUtil.removeAllSpaces(null)).isEqualTo(null);
 
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void shouldReturnTrueValidateOrgIdentifier() {
+        String uuid = UUID.randomUUID().toString();
+        PbaAccountUtil.validateOrgIdentifier(uuid,UUID.randomUUID().toString());
     }
 }
