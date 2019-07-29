@@ -191,7 +191,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
                         .withBody("{"
-                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
                                 + "  \"firstName\": \"prashanth\","
                                 + "  \"lastName\": \"rao\","
                                 + "  \"email\": \"super.user@hmcts.net\","
@@ -243,7 +243,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String usersBody = " {"
                 + "  \"userProfiles\": ["
                 + "  {"
-                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
                 + "  \"firstName\": \"prashanth\","
                 + "  \"lastName\": \"rao\","
                 + "  \"email\": \"super.user@hmcts.net\","
@@ -253,7 +253,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  ]"
                 + "  },"
                 + " {"
-                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
