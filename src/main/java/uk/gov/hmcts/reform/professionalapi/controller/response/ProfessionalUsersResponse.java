@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public class ProfessionalUsersResponse {
 
     private UUID idamId;
-    
+
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -40,10 +40,4 @@ public class ProfessionalUsersResponse {
     public UUID getUserIdentifier() {
         return idamId;
     }
-
-    @JsonSetter("idamId")
-    public void setUserIdentifier(UUID idamId) {
-        this.idamId = idamId;
-    }
-
 }
