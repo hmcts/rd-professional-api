@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
 
+import feign.FeignException;
 import feign.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +24,13 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
+        userMapPaymentAccount = userAccountMaps.stream().map(
+            userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
+                .collect(toList());
 
         return userMapPaymentAccount;
     }
+
 
     public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
 
@@ -54,26 +59,26 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient) {
+    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
-            getSingleUserByIdFromUserProfile(user, userProfileFeignClient);
-            userProfileDtls.add(user);
+
+            try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
+
+                Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+                ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
+                mapUserInfo(user, responseResponseEntity, isRequiredRoles);
+                userProfileDtls.add(user);
+
+            }  catch (FeignException ex) {
+
+                throw new RuntimeException();
+            }
         }
 
         return userProfileDtls;
-    }
-
-    public static ProfessionalUser getSingleUserByIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient) {
-        Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString());
-
-        Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-        ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
-        mapUserInfo(user, responseResponseEntity, false);
-
-        return user;
     }
 
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
@@ -101,5 +106,6 @@ public interface PbaAccountUtil {
 
             throw new AccessDeniedException("403 Forbidden");
         }
+
     }
 }
