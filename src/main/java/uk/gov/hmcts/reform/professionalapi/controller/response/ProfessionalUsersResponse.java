@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
