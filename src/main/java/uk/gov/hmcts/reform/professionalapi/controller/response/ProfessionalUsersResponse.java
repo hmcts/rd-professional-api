@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @NoArgsConstructor
 public class ProfessionalUsersResponse {
 
+    @JsonProperty("userIdentifier")
     private UUID idamId;
-
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -35,8 +35,8 @@ public class ProfessionalUsersResponse {
         this.email = user.getEmailAddress();
     }
    
-    @JsonGetter("userIdentifier")
-    public UUID getUserIdentifier() {
-        return idamId;
-    }
+//    @JsonGetter("userIdentifier")
+//    public UUID getUserIdentifier() {
+//        return idamId;
+//    }
 }
