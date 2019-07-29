@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +31,11 @@ public class PrdEnumServiceImpl implements PrdEnumService {
     }
 
     public List<String> getPrdEnumByEnumType(String enumType) {
+        List<String> ignoreEnumList = Arrays.asList(enumType.split(","));
         List<String> enumNameList = new ArrayList<String>();
         List<PrdEnum> prdEnumList = findAllPrdEnums();
         prdEnumList.forEach(prdEnum -> {
-            if (!prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase(enumType)) {
+            if (!ignoreEnumList.contains(prdEnum.getPrdEnumId().getEnumType())) {
                 enumNameList.add(prdEnum.getEnumName());
             }
         });

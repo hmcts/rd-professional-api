@@ -19,11 +19,11 @@ public class NewUserCreationRequestTest {
     @Test
     public void has_mandatory_fields_specified_not_null() {
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest(null, null, null, null);
+                new NewUserCreationRequest(null, null, "some@email.com", null);
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(4);
+        assertThat(violations.size()).isEqualTo(3);
     }
 
     @Test

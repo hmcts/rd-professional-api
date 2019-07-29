@@ -22,7 +22,7 @@ public class NewUserCreationRequest {
     private final String firstName;
     @NotNull
     private final String lastName;
-    @NotNull
+
     @Pattern(regexp = emailRegex)
     private final String email;
     @NotNull
@@ -32,12 +32,12 @@ public class NewUserCreationRequest {
     public NewUserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String email,
+            @JsonProperty("email") String emailAddress,
             @JsonProperty("roles") List<String> roles) {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
+        this.email = emailAddress.toLowerCase();
         this.roles = roles;
     }
 }
