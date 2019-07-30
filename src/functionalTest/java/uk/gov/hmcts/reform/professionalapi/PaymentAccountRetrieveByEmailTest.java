@@ -38,6 +38,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
+                                .jurisdictions(createJurisdictions())
                                 .build())
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
@@ -62,6 +63,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
+                                .jurisdictions(createJurisdictions())
                                 .build())
                         .build());
 

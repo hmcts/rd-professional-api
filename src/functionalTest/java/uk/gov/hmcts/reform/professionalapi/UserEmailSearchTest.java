@@ -31,6 +31,7 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);

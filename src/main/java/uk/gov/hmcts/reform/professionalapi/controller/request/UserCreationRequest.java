@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 @Getter
 @Builder(builderMethodName = "aUserCreationRequest")
 public class UserCreationRequest {
@@ -19,11 +23,14 @@ public class UserCreationRequest {
 
     private  String email;
 
+    private List<Map<String,String>> jurisdictions;
+
     @JsonCreator
     public UserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String emailAddress
+            @JsonProperty("email") String emailAddress,
+            @JsonProperty("jurisdictions") List<Map<String,String>> jurisdictions
     ) {
 
         this.firstName = firstName;
@@ -32,6 +39,7 @@ public class UserCreationRequest {
 
             this.email = emailAddress.toLowerCase().trim();
         }
+        this.jurisdictions = jurisdictions;
 
     }
 }

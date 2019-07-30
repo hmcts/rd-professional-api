@@ -39,6 +39,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
                            .firstName("some-fname")
                            .lastName("some-lname")
                            .email(email)
+                           .jurisdictions(createJurisdictions())
                            .build())
                 .build());
 
