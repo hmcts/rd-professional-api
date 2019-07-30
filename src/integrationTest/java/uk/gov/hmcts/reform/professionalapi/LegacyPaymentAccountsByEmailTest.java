@@ -83,7 +83,6 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
     @Test
     public void get_request_returns_empty_when_no_payment_accounts_associated_with_user_email_address_ac4() {
-
         professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("someone@somewhere.com");

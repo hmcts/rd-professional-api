@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.GetUserProfileException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -57,35 +58,51 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient) {
+    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
 
-            try (Response response =  userProfileFeignClient.getUserProfileByEmail(user.getUserIdentifier().toString())) {
-
-                Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-                ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
-                mapUserInfo(user, responseResponseEntity);
-                userProfileDtls.add(user);
-
-            }  catch (FeignException ex) {
-
-                throw new RuntimeException();
-            }
+            userProfileDtls.add(getSingleUserIdFromUserProfile(user, userProfileFeignClient, isRequiredRoles));
         }
-
         return userProfileDtls;
     }
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity) {
+
+    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+        try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
+
+            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
+            if (response.status() > 300) {
+                ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                throw new GetUserProfileException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+            }
+
+            mapUserInfo(user, responseResponseEntity, isRequiredRoles);
+
+        }  catch (FeignException ex) {
+            throw new RuntimeException();
+        }
+
+        return user;
+    }
+
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
+            if (isRequiredRoles) {
+                user.setUserIdentifier(userProfileResponse.getIdamId());
+                user.setIdamStatus(userProfileResponse.getIdamStatus());
+                user.setRoles(userProfileResponse.getRoles());
+                user.setIdamErrorStatusCode(userProfileResponse.getIdamErrorStatusCode());
+                user.setIdamErrorMessage(userProfileResponse.getIdamErrorMessage());
+            }
         }
         return user;
     }
