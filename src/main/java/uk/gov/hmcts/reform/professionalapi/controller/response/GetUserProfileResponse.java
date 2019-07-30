@@ -23,7 +23,7 @@ public class GetUserProfileResponse {
     private IdamStatus idamStatus;
     private List<String> roles;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer idamErrorStatusCode;
+    private String idamErrorStatusCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String idamErrorMessage;
 

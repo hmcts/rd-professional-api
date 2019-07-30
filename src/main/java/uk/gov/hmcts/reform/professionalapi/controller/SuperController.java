@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import feign.FeignException;
 import feign.Response;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -130,18 +132,12 @@ public abstract class SuperController {
 
     protected ResponseEntity<?> retrieveUserByEmail(String email) {
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress(PbaAccountUtil.removeEmptySpaces(email));
+        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(PbaAccountUtil.removeEmptySpaces(email));
 
-        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            log.info("The organisation the user belongs to must be active");
-            throw new EmptyResultDataAccessException(1);
-        }
-
-        Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString());
-
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
         return ResponseEntity
-                .status(response.status())
-                .body(response.body());
+                .status(200)
+                .body(professionalUsersResponse);
     }
 
     protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
@@ -196,10 +192,13 @@ public abstract class SuperController {
                 UserType.EXTERNAL,
                 userRoles);
 
-        Response response = userProfileFeignClient.createUserProfile(userCreationRequest);
+        try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
+            Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
+            return JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-        Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
-        return JsonFeignResponseHelper.toResponseEntity(response, clazz);
+        } catch (FeignException ex) {
+            throw new RuntimeException();
+        }
     }
 
     protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {

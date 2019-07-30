@@ -82,7 +82,7 @@ public class ProfessionalUser {
     private IdamStatus idamStatus;
 
     @Transient
-    private Integer idamErrorStatusCode;
+    private String idamErrorStatusCode;
 
     @Transient
     private String idamErrorMessage;

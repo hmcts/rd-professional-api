@@ -393,7 +393,6 @@ public class OrganisationServiceImplTest {
 
         when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-
         OrganisationsDetailResponse organisationsDetailResponse =
                 organisationServiceImplMock.retrieveOrganisations();
 

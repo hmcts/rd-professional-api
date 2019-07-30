@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import feign.FeignException;
 import feign.Response;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -74,11 +77,24 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
     }
 
+    public ProfessionalUser findProfessionalUserProfileByEmailAddress(String email) {
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
+
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            log.info("The organisation the user belongs to must be active");
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        return PbaAccountUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, true);
+    }
+
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted) {
         log.info("Into  ProfessionalService for get all users for organisation");
         List<ProfessionalUser> professionalUsers;
         List<UUID> usersId = new ArrayList<>();
+
+        ResponseEntity responseResponseEntity;
 
         professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
@@ -86,10 +102,16 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(usersId);
 
-        Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted);
+        try {
+            Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted);
 
-        Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-        ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+            responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
+        }  catch (FeignException ex) {
+
+            throw new RuntimeException();
+        }
 
         return responseResponseEntity;
     }

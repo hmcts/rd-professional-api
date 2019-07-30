@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,8 +11,12 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
 import feign.Response;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +27,18 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -47,11 +57,15 @@ public class ProfessionalUserServiceTest {
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
+    private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
 
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
 
+    private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
     private final RetrieveUserProfilesRequest retrieveUserProfilesRequest = mock(RetrieveUserProfilesRequest.class);
     private final Response responseMock = mock(Response.class);
+    private final GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
@@ -84,21 +98,45 @@ public class ProfessionalUserServiceTest {
     }
 
     @Test
-    public void retrieveUserByEmail() {
-        Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
+    public void retrieveUserByEmail() throws JsonProcessingException {
+        UUID id = UUID.randomUUID();
+        professionalUser.setUserIdentifier(id);
+
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUser);
+        List<String> roles = new ArrayList<>();
+        roles.add("pui-case-manager");
+        PowerMockito.when(professionalUser.getOrganisation().getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        PowerMockito.when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        PowerMockito.when(organisation.getUsers()).thenReturn(users);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some-email");
-        assertEquals(professionalUser.getFirstName(), user.getFirstName());
-        assertEquals(professionalUser.getLastName(), user.getLastName());
-        assertEquals(professionalUser.getEmailAddress(), user.getEmailAddress());
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        PowerMockito.when(getUserProfileResponseMock.getRoles()).thenReturn(roles);
+
+        PowerMockito.when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress("email@org.com");
+        assertEquals(professionalUser.getFirstName(), user1.getFirstName());
+        assertEquals(professionalUser.getLastName(), user1.getLastName());
+        assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
     }
 
     public void retrieveUserByEmailNotFound() {
         Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
 
-        assertThat(professionalUserService.findProfessionalUserByEmailAddress("some-email")).isNull();
+        assertThat(professionalUserService.findProfessionalUserProfileByEmailAddress("some-email")).isNull();
     }
 
 
@@ -183,5 +221,13 @@ public class ProfessionalUserServiceTest {
         assertThat(actualProfessionalUser).isNotNull();
 
         verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
+    }
+
+    @Test
+    public void shouldReturnProfessionalUserByEmail() {
+        when(professionalUserRepository.findByEmailAddress("some@email.com")).thenReturn(professionalUserMock);
+
+        ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some@email.com");
+        assertThat(user).isNotNull();
     }
 }

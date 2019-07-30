@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.GetUserProfileException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -24,9 +25,7 @@ public interface PbaAccountUtil {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
-        userMapPaymentAccount = userAccountMaps.stream().map(
-            userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
-                .collect(toList());
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
 
         return userMapPaymentAccount;
     }
@@ -64,21 +63,30 @@ public interface PbaAccountUtil {
         List<ProfessionalUser> userProfileDtls = new ArrayList<>();
         for (ProfessionalUser user: users) {
 
-            try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
+            userProfileDtls.add(getSingleUserIdFromUserProfile(user, userProfileFeignClient, isRequiredRoles));
+        }
+        return userProfileDtls;
+    }
 
-                Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-                ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-                mapUserInfo(user, responseResponseEntity, isRequiredRoles);
-                userProfileDtls.add(user);
+    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+        try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
 
-            }  catch (FeignException ex) {
+            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-                throw new RuntimeException();
+            if (response.status() > 300) {
+                ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                throw new GetUserProfileException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
             }
+
+            mapUserInfo(user, responseResponseEntity, isRequiredRoles);
+
+        }  catch (FeignException ex) {
+            throw new RuntimeException();
         }
 
-        return userProfileDtls;
+        return user;
     }
 
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {

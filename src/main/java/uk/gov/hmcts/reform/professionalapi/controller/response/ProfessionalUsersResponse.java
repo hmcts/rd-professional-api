@@ -29,7 +29,7 @@ public class ProfessionalUsersResponse {
     @JsonProperty
     private IdamStatus idamStatus;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer idamErrorStatusCode;
+    private String idamErrorStatusCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String idamErrorMessage;
 

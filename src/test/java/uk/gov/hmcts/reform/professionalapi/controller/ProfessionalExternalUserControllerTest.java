@@ -68,7 +68,7 @@ public class ProfessionalExternalUserControllerTest {
         when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
         when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("emailAddress")).thenReturn(superUser);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(superUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "true")).thenReturn(responseEntity);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));

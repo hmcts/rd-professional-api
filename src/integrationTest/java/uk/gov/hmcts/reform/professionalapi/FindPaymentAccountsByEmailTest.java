@@ -175,7 +175,5 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         assertThat(superUser.get("firstName")).isEqualTo("prashanth");
         assertThat(superUser.get("lastName")).isEqualTo("rao");
         assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
-
-
     }
 }

@@ -80,7 +80,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(professionalUsersResponse.get("lastName")).isEqualTo("oozeerally");
         assertThat(professionalUsersResponse.get("email")).isEqualTo("adil.ooze@hmcts.net");
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");
-        assertThat(professionalUsersResponse.get("idamErrorStatusCode")).isEqualTo(404);
+        assertThat(professionalUsersResponse.get("idamErrorStatusCode")).isEqualTo("404");
         assertThat(professionalUsersResponse.get("idamErrorMessage")).isEqualTo("16 Resource not found");
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
 

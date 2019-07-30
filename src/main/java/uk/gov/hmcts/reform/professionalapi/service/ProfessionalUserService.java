@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public interface ProfessionalUserService {
     NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles, List<PrdEnum> prdEnums);
 
-    ProfessionalUser findProfessionalUserByEmailAddress(String email);
+    ProfessionalUser findProfessionalUserProfileByEmailAddress(String email);
 
     ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted);
 
