@@ -95,7 +95,7 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
-prdEnumRoleType: ADMIN_ROLE,CCD_ROLE
+prdEnumRoleType: ADMIN_ROLE
 
 userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
 #userProfUrl: ${USER_PROFILE_URL:http://172.31.28.145:8091}

@@ -1,33 +1,45 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private final UUID userIdentifier;
+    private UUID userIdentifier;
     @JsonProperty
-    private final String firstName;
+    private String firstName;
     @JsonProperty
-    private final String lastName;
+    private String lastName;
     @JsonProperty
-    private final String email;
+    private String email;
     @JsonProperty
-    private final List<String> roles = new ArrayList<String>();
+    private List<String> roles;
+    @JsonProperty
+    private IdamStatus idamStatus;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String idamErrorStatusCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String idamErrorMessage;
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = Optional.ofNullable(user.getUserIdentifier()).orElse(user.getUserIdentifier());
+        this.userIdentifier = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
+        this.idamStatus = user.getIdamStatus();
+        this.idamErrorStatusCode = user.getIdamErrorStatusCode();
+        this.idamErrorMessage = user.getIdamErrorMessage();
     }
 }
