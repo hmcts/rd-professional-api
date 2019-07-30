@@ -72,6 +72,23 @@ public class PbaAccountUtilTest {
         }
     }
 
+    @Test
+    public void removeEmptyWhiteSpacesTest() {
+
+        assertThat(PbaAccountUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
+        assertThat(PbaAccountUtil.removeEmptySpaces(null)).isEqualTo(null);
+        assertThat(PbaAccountUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
+
+    }
+
+    @Test
+    public void removeAllWhiteSpacesTest() {
+
+        assertThat(PbaAccountUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
+        assertThat(PbaAccountUtil.removeAllSpaces(null)).isEqualTo(null);
+
+    }
+
     @Test(expected = AccessDeniedException.class)
     public void shouldReturnTrueValidateOrgIdentifier() {
         String uuid = UUID.randomUUID().toString();

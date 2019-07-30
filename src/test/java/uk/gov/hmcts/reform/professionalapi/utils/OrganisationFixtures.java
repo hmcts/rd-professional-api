@@ -34,6 +34,23 @@ public class OrganisationFixtures {
                         .addressLine1("addressLine1").build()));
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+                .name("  some-  org -name  ")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname    b    ")
+                        .lastName(" some-         lname  ")
+                        .email(" someone@s omewh ere.com ")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()));
+
+
+    }
+
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA1234567");
@@ -43,7 +60,7 @@ public class OrganisationFixtures {
             .status(OrganisationStatus.PENDING)
             .sraId("sra-id")
             .sraRegulated(Boolean.FALSE)
-            .companyUrl("company-url")
+            .companyUrl("company -url")
             .companyNumber("company")
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
