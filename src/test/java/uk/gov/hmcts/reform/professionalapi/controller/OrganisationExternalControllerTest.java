@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -117,11 +116,7 @@ public class OrganisationExternalControllerTest {
         String id = UUID.randomUUID().toString().substring(0,7);
         when(organisationServiceMock.retrieveOrganisation(id)).thenReturn(organisationEntityResponseMock);
 
-        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, id);
-
-        verify(organisationCreationRequestValidatorMock,
-                times(1))
-                .validateOrganisationIdentifier(id);
+        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -129,21 +124,6 @@ public class OrganisationExternalControllerTest {
         verify(organisationServiceMock,
                 times(1))
                 .retrieveOrganisation(eq(id));
-    }
-
-
-    @Test(expected = AccessDeniedException.class)
-    public void testRetrieveOrganisationByIdentifierNotMatchesThrowException() {
-
-        String id = UUID.randomUUID().toString().substring(0,7);
-        when(organisationServiceMock.retrieveOrganisation(id)).thenReturn(organisationEntityResponseMock);
-
-        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id, UUID.randomUUID().toString());
-
-        verify(organisationCreationRequestValidatorMock,
-                times(1))
-                .validateOrganisationIdentifier(id);
-
     }
 
 }

@@ -26,7 +26,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
     @Ignore
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -50,7 +50,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
 
     @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));

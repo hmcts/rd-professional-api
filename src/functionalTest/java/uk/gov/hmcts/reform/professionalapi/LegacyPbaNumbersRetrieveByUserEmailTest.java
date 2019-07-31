@@ -25,7 +25,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
     @Test
     public void can_retrieve_payment_numbers_by_user_email() {
 
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
     @Test
     public void can_retrieve_no_payment_numbers_if_no_payment_account_associated_with_user_email() {
 
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
         professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
                         .superUser(aUserCreationRequest()
