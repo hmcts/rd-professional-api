@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import org.junit.Test;
 
 public class MultipleUserProfilesResponseTest {
 

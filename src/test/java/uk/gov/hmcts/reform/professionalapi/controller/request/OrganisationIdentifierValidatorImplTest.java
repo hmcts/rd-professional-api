@@ -4,16 +4,18 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.access.AccessDeniedException;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.junit.Test;
+
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.AccessDeniedException;
+
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 public class OrganisationIdentifierValidatorImplTest {
 
