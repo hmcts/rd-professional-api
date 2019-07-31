@@ -59,6 +59,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAccountMapRepository userAccountMapRepository;
     UserProfileFeignClient userProfileFeignClient;
 
+    private static final String SIDAM_ROLE = "SIDAM_ROLE";
+    private static final String ADMIN_ROLE = "ADMIN_ROLE";
+    private static final String JURISD_ID = "JURISD_ID";
+
     @Autowired
     public OrganisationServiceImpl(
             OrganisationRepository organisationRepository,
@@ -110,9 +114,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
+            String enumType = prdEnum.getPrdEnumId().getEnumType();
+            if (enumType.equalsIgnoreCase(SIDAM_ROLE)
+                    || enumType.equalsIgnoreCase(ADMIN_ROLE)
+                    || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -161,9 +168,11 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PbaAccountUtil.removeAllSpaces(userCreationRequest.getEmail()),
                 organisation);
 
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(jurisdiction -> jurisdiction.get("id")).collect(Collectors.toList());
+
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
-        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser);
+        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser, jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());

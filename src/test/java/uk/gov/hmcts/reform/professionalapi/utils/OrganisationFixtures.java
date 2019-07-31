@@ -44,6 +44,7 @@ public class OrganisationFixtures {
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
                         .email(" someone@s omewh ere.com ")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
@@ -94,11 +95,12 @@ public class OrganisationFixtures {
             .sraRegulated(Boolean.TRUE)
             .companyUrl("company-url1")
             .companyNumber("company1")
-                .paymentAccount(paymentAccounts)
-                .superUser(aUserCreationRequest()
+            .paymentAccount(paymentAccounts)
+            .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
                 .email("someone1@somewhere.com")
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")
@@ -118,9 +120,9 @@ public class OrganisationFixtures {
 
         List<Map<String,String>> jurisdictions = new ArrayList<>();
         Map<String,String> jurisdictionId1 = new HashMap<>();
-        jurisdictionId1.put("id", "jid1");
+        jurisdictionId1.put("id", "PROBATE");
         Map<String,String> jurisdictionId2 = new HashMap<>();
-        jurisdictionId2.put("id", "jid2");
+        jurisdictionId2.put("id", "BULKSCAN");
 
         jurisdictions.add(jurisdictionId1);
         jurisdictions.add(jurisdictionId2);
