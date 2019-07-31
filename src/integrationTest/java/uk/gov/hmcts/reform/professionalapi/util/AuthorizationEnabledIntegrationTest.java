@@ -188,15 +188,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
-                            .withHeader("Content-Type", "application/json")
-                            .withStatus(200)
-                            .withBody("{"
-                                        + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                                        + "  \"firstName\": \"prashanth\","
-                                        + "  \"lastName\": \"rao\","
-                                        + "  \"email\": \"super.user@hmcts.net\","
-                                        + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
-                                        + "}")));
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("{"
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"prashanth\","
+                                + "  \"lastName\": \"rao\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
+                                + "}")));
     }
 
     @After
@@ -239,6 +239,42 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));
+
+        String usersBody = " {"
+                + "  \"userProfiles\": ["
+                + "  {"
+                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"prashanth\","
+                + "  \"lastName\": \"rao\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": ["
+                + "  \"pui-organisation-manager\""
+                + "  ]"
+                + "  },"
+                + " {"
+                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"firstName\": \"adil\","
+                + "  \"lastName\": \"oozeerally\","
+                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.DELETED + "\","
+                + "  \"roles\": [],"
+                + "  \"idamErrorStatusCode\": \"404\","
+                + "  \"idamErrorMessage\": \"16 Resource not found\""
+                + "  } "
+                + " ]"
+                + "}";
+
+
+        userProfileService.stubFor(
+                WireMock.post(urlPathMatching("/v1/userprofile/users.*"))
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(usersBody)
+                                        .withStatus(200)
+                        )
+        );
     }
 }
 

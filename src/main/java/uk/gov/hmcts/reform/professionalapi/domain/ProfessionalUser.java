@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -24,6 +25,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -72,6 +74,18 @@ public class ProfessionalUser {
 
     @Column(name = "USER_IDENTIFIER")
     private UUID userIdentifier;
+
+    @Transient
+    private List<String> roles;
+
+    @Transient
+    private IdamStatus idamStatus;
+
+    @Transient
+    private String idamErrorStatusCode;
+
+    @Transient
+    private String idamErrorMessage;
 
     public ProfessionalUser(
                             String firstName,

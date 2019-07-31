@@ -93,7 +93,7 @@ public class ProfessionalApiClient {
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")
-                .email(randomAlphabetic(10) + "@somewhere.com")
+                .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -138,7 +138,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(randomAlphabetic(10) + "@hotmail.com")
+                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
                 .build();
 

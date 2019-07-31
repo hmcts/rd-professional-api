@@ -1,28 +1,21 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegrationTest {
+public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
-
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
@@ -72,30 +65,28 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
 
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someDeletedName")
-                .lastName("someLastName")
-                .email("some@email.com")
-                .roles(userRoles)
-                .build();
-
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        ProfessionalUser userToDelete = professionalUserRepository.findByEmailAddress("some@email.com");
-        userToDelete.setDeleted(LocalDateTime.now());
-        assertThat(userToDelete.getDeleted() != null);
 
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
-        validateUsers(response);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(1);
-        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("someDeletedName");
 
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("adil");
+        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("oozeerally");
+        assertThat(professionalUsersResponse.get("email")).isEqualTo("adil.ooze@hmcts.net");
+        assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");
+        assertThat(professionalUsersResponse.get("idamErrorStatusCode")).isEqualTo("404");
+        assertThat(professionalUsersResponse.get("idamErrorMessage")).isEqualTo("16 Resource not found");
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
+
+        HashMap professionalUsersResponse1 = professionalUsersResponses.get(0);
+        assertThat(professionalUsersResponse1.get("idamErrorStatusCode")).isNull();
+        assertThat(professionalUsersResponse1.get("idamErrorMessage")).isNull();
     }
 
     private void validateUsers(Map<String, Object> response) {
@@ -110,6 +101,6 @@ public class FindUsersByOrganisationTest extends AuthorizationEnabledIntegration
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(1);
     }
 }
