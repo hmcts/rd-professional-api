@@ -267,7 +267,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
                            .lastName("some-lname")
-                           .email(null)
+                           .email("some@email.com")
                            .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                                                   .build()))

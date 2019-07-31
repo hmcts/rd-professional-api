@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 @Getter
 @Builder(builderMethodName = "aUserCreationRequest")
@@ -17,18 +18,21 @@ public class UserCreationRequest {
     @NotNull
     private final String lastName;
 
-    @NotNull
-    private final String email;
+    private  String email;
 
     @JsonCreator
     public UserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String email
+            @JsonProperty("email") String emailAddress
     ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
+        if (!StringUtils.isEmpty(emailAddress)) {
+
+            this.email = emailAddress.toLowerCase().trim();
+        }
+
     }
 }

@@ -29,12 +29,12 @@ public class UserCreationRequestTest {
     public void hasMandatoryFieldsSpecifiedNotNull() {
 
         UserCreationRequest userCreationRequest =
-                new UserCreationRequest(null, null, null);
+                new UserCreationRequest(null, null, "some@email.com");
 
         Set<ConstraintViolation<UserCreationRequest>> violations =
                 validator.validate(userCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(3);
+        assertThat(violations.size()).isEqualTo(2);
     }
 
     @Test

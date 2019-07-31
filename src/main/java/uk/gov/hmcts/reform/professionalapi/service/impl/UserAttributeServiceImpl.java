@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Service
 @Slf4j
@@ -36,7 +37,10 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         userRoles.forEach(role -> {
             for (PrdEnum prdEnum : prdEnums) {
                 if (prdEnum.getEnumName().equals(role)) {
-                    PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                    PrdEnum newPrdEnum = new PrdEnum(
+                            prdEnum.getPrdEnumId(),
+                            PbaAccountUtil.removeEmptySpaces(prdEnum.getEnumName()),
+                            PbaAccountUtil.removeEmptySpaces(prdEnum.getEnumDescription()));
                     UserAttribute userAttribute = new UserAttribute(newUser, newPrdEnum);
                     userAttributeRepository.save(userAttribute);
                 }
