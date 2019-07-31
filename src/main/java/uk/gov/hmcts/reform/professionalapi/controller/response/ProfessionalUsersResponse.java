@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -28,10 +27,10 @@ public class ProfessionalUsersResponse {
     private List<String> roles;
     @JsonProperty
     private IdamStatus idamStatus;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String idamErrorStatusCode;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String idamErrorMessage;
+    @JsonProperty
+    private String idamStatusCode;
+    @JsonProperty
+    private String idamMessage;
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
         this.userIdentifier = user.getUserIdentifier();
@@ -39,7 +38,7 @@ public class ProfessionalUsersResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.idamStatus = user.getIdamStatus();
-        this.idamErrorStatusCode = user.getIdamErrorStatusCode();
-        this.idamErrorMessage = user.getIdamErrorMessage();
+        this.idamStatusCode = user.getIdamStatusCode();
+        this.idamMessage = user.getIdamMessage();
     }
 }

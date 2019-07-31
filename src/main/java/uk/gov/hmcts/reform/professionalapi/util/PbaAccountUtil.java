@@ -100,8 +100,8 @@ public interface PbaAccountUtil {
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
-                user.setIdamErrorStatusCode(userProfileResponse.getIdamErrorStatusCode());
-                user.setIdamErrorMessage(userProfileResponse.getIdamErrorMessage());
+                user.setIdamStatusCode(userProfileResponse.getIdamErrorStatusCode());
+                user.setIdamMessage(userProfileResponse.getIdamErrorMessage());
             }
         }
         return user;
