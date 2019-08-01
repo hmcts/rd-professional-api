@@ -98,9 +98,7 @@ public class OrganisationCreationRequestValidator {
                 log.error("::error::" + value);
                 throw new InvalidRequest("Empty input value" + value);
             }
-
         }
-
     }
 
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
@@ -115,6 +113,7 @@ public class OrganisationCreationRequestValidator {
                         || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
                         || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
 
+                    log.info("throwing exception");
                     throw new InvalidRequest("Empty contactInformation value");
                 }
                 if (null != contactInformation.getDxAddress()) {
