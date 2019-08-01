@@ -98,6 +98,7 @@ public class OrganisationCreationRequestValidatorTest {
         ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
+
         
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
