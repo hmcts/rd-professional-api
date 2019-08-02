@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
@@ -157,7 +158,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("company")
+                .companyNumber(randomAlphabetic(8))
                 .build();
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
@@ -170,7 +171,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
         assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
         assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
-        assertThat(persistedOrganisation.getCompanyNumber()).isEqualTo("company");
+        assertThat(persistedOrganisation.getCompanyNumber()).isNotNull();
     }
 
     public String createOrganisationRequest() {

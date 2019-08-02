@@ -159,7 +159,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "company-number", "company-url",
+                        "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "number01", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
@@ -251,7 +251,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testSavesOrganisationWithConstraintViolationException() {
+    public void testSavesOrganisationWithInvalidRequest() {
 
         when(organisationRepositoryMock.save(any(Organisation.class)))
                 .thenThrow(ConstraintViolationException.class);

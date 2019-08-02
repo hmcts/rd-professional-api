@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -37,6 +38,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
                 .name("  some-  org -name  ")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
@@ -58,7 +60,7 @@ public class OrganisationFixtures {
             .sraId("sra-id")
             .sraRegulated(Boolean.FALSE)
             .companyUrl("company -url")
-            .companyNumber("company")
+            .companyNumber(randomAlphabetic(8))
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
@@ -89,7 +91,7 @@ public class OrganisationFixtures {
             .sraId("sra-id1")
             .sraRegulated(Boolean.TRUE)
             .companyUrl("company-url1")
-            .companyNumber("company1")
+            .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")

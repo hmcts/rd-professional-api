@@ -45,7 +45,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
         assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
         assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
-        assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
+        assertThat(orgResponse.get("companyNumber")).isNotNull();
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");

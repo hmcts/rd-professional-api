@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -29,7 +30,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("companyn")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -53,14 +54,14 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     }
 
     @Test
-    public void persists_and_returns_500_organisation_with_invalid_length_of_company_number() {
+    public void persists_and_returns_400_organisation_with_invalid_length_of_company_number() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("companyno")
+                .companyNumber(randomAlphabetic(9))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -74,7 +75,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
@@ -85,7 +86,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId("sra-id-number")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("companyn")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -102,7 +103,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId("sra-id-number1")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("company1")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -125,7 +126,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("companyn")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -154,7 +155,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId("sra-id")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("companyn")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                            .firstName("some-fname")
                            .lastName("some-lname")
@@ -211,6 +212,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
+                .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                            .firstName("firstname")
