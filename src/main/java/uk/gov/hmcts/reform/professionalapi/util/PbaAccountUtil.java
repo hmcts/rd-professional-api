@@ -101,6 +101,11 @@ public interface PbaAccountUtil {
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
                 user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
+                if (userProfileResponse.getIdamStatusCode() == null || userProfileResponse.getIdamStatusCode().isEmpty()) {
+                    user.setIdamStatusCode(" ");
+                } else {
+                    user.setIdamMessage(userProfileResponse.getIdamMessage());
+                }
                 if (userProfileResponse.getIdamMessage() == null || userProfileResponse.getIdamMessage().isEmpty()) {
                     user.setIdamMessage(" ");
                 } else {
