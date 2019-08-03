@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -81,6 +82,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someoneElse@somewhere.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .build());
 
@@ -218,6 +220,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .lastName("someLastName1")
                 .email("some@email.com")
                 .roles(user1Roles)
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
@@ -228,6 +231,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 .lastName("someLastName2")
                 .email("some@email2.com")
                 .roles(user2Roles)
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
@@ -273,6 +277,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .firstName("fname")
                         .lastName("lname1")
                         .email("someone11@somewhere.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine2").build())).build();

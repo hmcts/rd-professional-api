@@ -52,7 +52,8 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     public void callCcd(JurisdictionUserCreationRequest request, String userId) {
-        try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, authTokenGenerator.generate(), request)) {
+        String s2sToken = authTokenGenerator.generate();
+        try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             log.info("Jurisdiction create user profile success!!");
         } catch (FeignException ex) {
             String errorMessage = "Jurisdiction create user profile failed with status code: " + ex.status() + "reason: " + ex.getMessage();
