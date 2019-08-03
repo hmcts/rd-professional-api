@@ -215,6 +215,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
+
+
     @After
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
@@ -266,7 +268,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\""
-                + "  ]"
+                + "  ],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
                 + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
@@ -275,8 +279,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"email\": \"adil.ooze@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.DELETED + "\","
                 + "  \"roles\": [],"
-                + "  \"idamErrorStatusCode\": \"404\","
-                + "  \"idamErrorMessage\": \"16 Resource not found\""
+                + "  \"idamStatusCode\": \"404\","
+                + "  \"idamMessage\": \"16 Resource not found\""
                 + "  } "
                 + " ]"
                 + "}";

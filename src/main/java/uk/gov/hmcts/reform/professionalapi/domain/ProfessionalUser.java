@@ -82,10 +82,10 @@ public class ProfessionalUser {
     private IdamStatus idamStatus;
 
     @Transient
-    private String idamErrorStatusCode;
+    private String idamStatusCode;
 
     @Transient
-    private String idamErrorMessage;
+    private String idamMessage;
 
     public ProfessionalUser(
                             String firstName,

@@ -22,7 +22,7 @@ public class UserCreationRequestTest {
 
     private String firstName = "Joe";
     private String lastName = "Bloggs";
-    private String email = "joe.bloggs@email.com";
+    private String email = "joe.BLOGGS@Email.Com";
 
     @Before
     public void setUp() {
@@ -30,7 +30,7 @@ public class UserCreationRequestTest {
     }
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void hasMandatoryFieldsSpecifiedNotNull() {
 
         UserCreationRequest userCreationRequest =
                 new UserCreationRequest(null, null, "some@email.com", createJurisdictions());

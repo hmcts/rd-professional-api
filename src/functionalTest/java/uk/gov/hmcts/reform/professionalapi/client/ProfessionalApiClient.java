@@ -247,8 +247,8 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
-                    .assertThat()
-                    .statusCode(status.value());
+                .assertThat()
+                .statusCode(status.value());
         if (HttpStatus.OK == status) {
             return response.body().as(Map.class);
         } else {
@@ -261,15 +261,15 @@ public class ProfessionalApiClient {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
 
         Response response = getMultipleAuthHeaders(role)
-            .body(organisationCreationRequest)
-            .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
-            .andReturn();
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
 
         response.then()
-            .assertThat()
-            .statusCode(OK.value());
+                .assertThat()
+                .statusCode(OK.value());
     }
 
     public Map<String, Object> retrieveOrganisationDetailsByStatus(String status, String role) {

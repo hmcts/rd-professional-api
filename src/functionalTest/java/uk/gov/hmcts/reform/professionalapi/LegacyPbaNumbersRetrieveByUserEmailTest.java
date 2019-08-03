@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 
 import org.junit.Ignore;
 import org.junit.Test;
