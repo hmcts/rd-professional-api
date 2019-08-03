@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.GetUserProfileException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -77,11 +77,9 @@ public interface PbaAccountUtil {
 
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                throw new GetUserProfileException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+                throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
             }
-
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
-
         }  catch (FeignException ex) {
             throw new RuntimeException();
         }

@@ -63,9 +63,9 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
-    @ExceptionHandler(GetUserProfileException.class)
+    @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<Object> getUserProfileExceptionError(
-            GetUserProfileException ex) {
+            ExternalApiException ex) {
         return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
     }
 

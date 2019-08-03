@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import feign.FeignException;
 import feign.Response;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
@@ -62,6 +64,9 @@ public abstract class SuperController {
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    private JurisdictionServiceImpl jurisdictionService;
+
 
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
@@ -81,9 +86,13 @@ public abstract class SuperController {
     @Value("${prdEnumRoleType}")
     protected String prdEnumRoleType;
 
+    @Value("${jurisdictionIdType}")
+    private String jurisdictionIds;
+
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
+        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest, prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
@@ -153,7 +162,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+    protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
@@ -162,9 +171,12 @@ public abstract class SuperController {
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), orgId);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+        if (existingOrganisation.getStatus().isPending()
+                && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().isActive()) {
             log.info("Organisation is getting activated");
+
+            jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
@@ -195,9 +207,8 @@ public abstract class SuperController {
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
         } catch (FeignException ex) {
-            throw new RuntimeException();
+            throw new RuntimeException("UserProfile api failed!!");
         }
     }
 
@@ -217,7 +228,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier) {
+    protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;
@@ -226,6 +237,9 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
+
+        organisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest, prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
         UserCreationRequestValidator.validateRoles(roles, prdEnumList);
@@ -235,6 +249,9 @@ public abstract class SuperController {
                 PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getLastName()),
                 PbaAccountUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
+
+        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+
         ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();

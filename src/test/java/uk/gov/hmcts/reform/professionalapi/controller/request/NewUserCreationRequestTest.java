@@ -19,7 +19,7 @@ public class NewUserCreationRequestTest {
     @Test
     public void has_mandatory_fields_specified_not_null() {
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest(null, null, "some@email.com", null);
+                new NewUserCreationRequest(null, null, "some@email.com", null, new ArrayList<>());
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 
@@ -32,7 +32,7 @@ public class NewUserCreationRequestTest {
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, new ArrayList<>());
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
@@ -46,7 +46,7 @@ public class NewUserCreationRequestTest {
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles, new ArrayList<>());
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 

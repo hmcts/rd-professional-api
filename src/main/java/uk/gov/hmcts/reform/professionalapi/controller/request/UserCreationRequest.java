@@ -2,14 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Builder(builderMethodName = "aUserCreationRequest")

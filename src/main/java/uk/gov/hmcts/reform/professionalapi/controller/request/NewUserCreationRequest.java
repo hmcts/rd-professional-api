@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -28,16 +29,20 @@ public class NewUserCreationRequest {
     @NotNull
     private final List<String> roles;
 
+    private final List<Map<String, String>> jurisdictions;
+
     @JsonCreator
     public NewUserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String emailAddress,
-            @JsonProperty("roles") List<String> roles) {
+            @JsonProperty("roles") List<String> roles,
+            @JsonProperty("jurisdictions") List<Map<String, String>> jurisdictions) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = emailAddress.toLowerCase();
         this.roles = roles;
+        this.jurisdictions = jurisdictions;
     }
 }

@@ -94,7 +94,8 @@ public class ProfessionalUserServiceTest {
         newUserCreationRequest = new NewUserCreationRequest("first",
                 "last",
                 "domain@hotmail.com",
-                userRoles);
+                userRoles,
+                new ArrayList<>());
     }
 
     @Test
@@ -211,7 +212,6 @@ public class ProfessionalUserServiceTest {
     }
 
     @Test
-    @Ignore
     public void shouldPersistUser() {
 
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
