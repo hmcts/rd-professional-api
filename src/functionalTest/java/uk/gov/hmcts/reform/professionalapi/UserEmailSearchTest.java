@@ -25,12 +25,13 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
     @Test
     public void can_find_a_user_by_their_email_address() {
 
-        String email = randomAlphabetic(10) + "@usersearch.test";
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);

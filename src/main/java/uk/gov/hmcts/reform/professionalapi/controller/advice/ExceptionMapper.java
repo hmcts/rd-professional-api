@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstan
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import javax.validation.ConstraintViolationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+
 
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
@@ -61,18 +63,26 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<Object> getUserProfileExceptionError(
+            ExternalApiException ex) {
+        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
 
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> dataIntegrityViolationError(ConstraintViolationException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
 
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
@@ -83,17 +93,13 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-
     public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
-
         return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON.getErrorMessage());
 
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-            IllegalArgumentException ex) {
-
+    public ResponseEntity<Object> handleHttpMediaTypeNotSupported(IllegalArgumentException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, UNSUPPORTED_MEDIA_TYPES.getErrorMessage());
     }
 
@@ -124,7 +130,6 @@ public class ExceptionMapper {
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
-        return new ResponseEntity<>(
-                errorDetails, httpStatus);
+        return new ResponseEntity<>(errorDetails, httpStatus);
     }
 }

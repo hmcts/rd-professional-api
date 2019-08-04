@@ -59,6 +59,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAccountMapRepository userAccountMapRepository;
     UserProfileFeignClient userProfileFeignClient;
 
+    private static final String SIDAM_ROLE = "SIDAM_ROLE";
+    private static final String ADMIN_ROLE = "ADMIN_ROLE";
+    private static final String JURISD_ID = "JURISD_ID";
+
     @Autowired
     public OrganisationServiceImpl(
             OrganisationRepository organisationRepository,
@@ -89,12 +93,12 @@ public class OrganisationServiceImpl implements OrganisationService {
             OrganisationCreationRequest organisationCreationRequest) {
 
         Organisation newOrganisation = new Organisation(
-                organisationCreationRequest.getName(),
+                PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getName()),
                 OrganisationStatus.PENDING,
-                organisationCreationRequest.getSraId(),
-                organisationCreationRequest.getCompanyNumber(),
+                PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraId()),
+                PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()),
                 organisationCreationRequest.getSraRegulated(),
-                organisationCreationRequest.getCompanyUrl()
+                PbaAccountUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
         Organisation organisation = saveOrganisation(newOrganisation);
@@ -110,9 +114,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user) {
+    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
-            if (prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("SIDAM_ROLE") || prdEnum.getPrdEnumId().getEnumType().equalsIgnoreCase("ADMIN_ROLE")) {
+            String enumType = prdEnum.getPrdEnumId().getEnumType();
+            if (enumType.equalsIgnoreCase(SIDAM_ROLE)
+                    || enumType.equalsIgnoreCase(ADMIN_ROLE)
+                    || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
                 UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
@@ -155,15 +162,20 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
 
+        if (userCreationRequest.getEmail() == null) {
+            throw new InvalidRequest("Email cannot be null");
+        }
         ProfessionalUser newProfessionalUser = new ProfessionalUser(
-                userCreationRequest.getFirstName(),
-                userCreationRequest.getLastName(),
-                userCreationRequest.getEmail(),
+                PbaAccountUtil.removeEmptySpaces(userCreationRequest.getFirstName()),
+                PbaAccountUtil.removeEmptySpaces(userCreationRequest.getLastName()),
+                PbaAccountUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
+
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(jurisdiction -> jurisdiction.get("id")).collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
-        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser);
+        List<UserAttribute> attributes = addAllAttributes(newProfessionalUser.getUserAttributes(), persistedSuperUser, jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
@@ -178,13 +190,14 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
-                ContactInformation newContactInformation = new ContactInformation(contactInfo.getAddressLine1(),
-                        contactInfo.getAddressLine2(),
-                        contactInfo.getAddressLine3(),
-                        contactInfo.getTownCity(),
-                        contactInfo.getCounty(),
-                        contactInfo.getCountry(),
-                        contactInfo.getPostCode(),
+                ContactInformation newContactInformation = new ContactInformation(
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getAddressLine1()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getAddressLine2()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getAddressLine3()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getTownCity()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getCounty()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getCountry()),
+                        PbaAccountUtil.removeEmptySpaces(contactInfo.getPostCode()),
                         organisation);
 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
@@ -200,7 +213,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             dxAddressCreationRequest.forEach(dxAdd -> {
-                DxAddress dxAddress = new DxAddress(dxAdd.getDxNumber(), dxAdd.getDxExchange(), contactInformation);
+                DxAddress dxAddress = new DxAddress(
+                        PbaAccountUtil.removeEmptySpaces(dxAdd.getDxNumber()),
+                        PbaAccountUtil.removeEmptySpaces(dxAdd.getDxExchange()),
+                        contactInformation);
                 dxAddress = dxAddressRepository.save(dxAddress);
                 contactInformation.addDxAddress(dxAddress);
             });
@@ -233,7 +249,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                     if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
 
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
                         return organisation;
                     }
                     return organisation;
@@ -249,12 +265,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
         log.info("Into update Organisation service");
-        organisation.setName(organisationCreationRequest.getName());
+        organisation.setName(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(organisationCreationRequest.getStatus());
-        organisation.setSraId(organisationCreationRequest.getSraId());
-        organisation.setCompanyNumber(organisationCreationRequest.getCompanyNumber());
+        organisation.setSraId(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+        organisation.setCompanyNumber(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
         organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
-        organisation.setCompanyUrl(organisationCreationRequest.getCompanyUrl());
+        organisation.setCompanyUrl(PbaAccountUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
         organisationRepository.save(organisation);
         log.info("Update Organisation service done...");
 
@@ -263,6 +279,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public Organisation  getOrganisationByOrgIdentifier(String organisationIdentifier) {
+        PbaAccountUtil.removeAllSpaces(organisationIdentifier);
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
 
@@ -274,7 +291,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient));
+            organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);
     }
@@ -291,7 +308,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             log.info("for ACTIVE::Status:");
             organisations = organisations.stream()
                     .map(organisation -> {
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient));
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
                         return organisation;
                     }).collect(Collectors.toList());
         }

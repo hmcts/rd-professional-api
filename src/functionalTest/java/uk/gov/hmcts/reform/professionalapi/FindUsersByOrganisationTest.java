@@ -15,20 +15,17 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("functional")
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
-    @Ignore
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
 
         validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK));
     }
 
-    @Ignore
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
         validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK));
     }
 
-    @Ignore
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
         validateUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK));

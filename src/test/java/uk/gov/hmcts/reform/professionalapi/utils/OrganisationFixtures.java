@@ -7,7 +7,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -26,9 +28,28 @@ public class OrganisationFixtures {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
+    }
+
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+                .name("  some-  org -name  ")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname    b    ")
+                        .lastName(" some-         lname  ")
+                        .email(" someone@s omewh ere.com ")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()));
+
+
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
@@ -40,13 +61,14 @@ public class OrganisationFixtures {
             .status(OrganisationStatus.PENDING)
             .sraId("sra-id")
             .sraRegulated(Boolean.FALSE)
-            .companyUrl("company-url")
+            .companyUrl("company -url")
             .companyNumber("company")
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email("someone@somewhere.com")
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -73,11 +95,12 @@ public class OrganisationFixtures {
             .sraRegulated(Boolean.TRUE)
             .companyUrl("company-url1")
             .companyNumber("company1")
-                .paymentAccount(paymentAccounts)
-                .superUser(aUserCreationRequest()
+            .paymentAccount(paymentAccounts)
+            .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
                 .email("someone1@somewhere.com")
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")
@@ -91,5 +114,18 @@ public class OrganisationFixtures {
                         .dxNumber("NI 1234567890")
                         .dxExchange("dxExchange1").build()))
                 .build()));
+    }
+
+    public static List<Map<String,String>> createJurisdictions() {
+
+        List<Map<String,String>> jurisdictions = new ArrayList<>();
+        Map<String,String> jurisdictionId1 = new HashMap<>();
+        jurisdictionId1.put("id", "PROBATE");
+        Map<String,String> jurisdictionId2 = new HashMap<>();
+        jurisdictionId2.put("id", "BULKSCAN");
+
+        jurisdictions.add(jurisdictionId1);
+        jurisdictions.add(jurisdictionId2);
+        return jurisdictions;
     }
 }

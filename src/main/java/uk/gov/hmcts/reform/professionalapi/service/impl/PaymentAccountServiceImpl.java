@@ -31,7 +31,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(email);
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
 
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
@@ -47,7 +47,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
 
-                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient));
+                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
                 organisation = user.getOrganisation();
 
             } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {

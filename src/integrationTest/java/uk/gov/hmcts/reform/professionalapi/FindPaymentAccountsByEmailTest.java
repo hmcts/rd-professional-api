@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -58,7 +60,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiFinanceManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
@@ -80,6 +82,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -95,7 +98,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiFinanceManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
 
@@ -111,6 +114,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -127,7 +131,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiFinanceManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
         assertThat(orgResponse.get("http_status")).isEqualTo("404");
 
     }
@@ -145,13 +149,14 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", puiFinanceManager);
+        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
 
@@ -161,7 +166,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     public void returns_404_when_email_not_found() {
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com", puiFinanceManager);
+                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }

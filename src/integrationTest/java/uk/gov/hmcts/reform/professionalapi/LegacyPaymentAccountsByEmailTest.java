@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -83,7 +85,6 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
     @Test
     public void get_request_returns_empty_when_no_payment_accounts_associated_with_user_email_address_ac4() {
-
         professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("someone@somewhere.com");

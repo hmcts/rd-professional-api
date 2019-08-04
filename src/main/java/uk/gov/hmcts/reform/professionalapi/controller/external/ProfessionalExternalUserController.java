@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
-            value = "Retrieves the external users with the given organisation based user with the given email address if organisation is active or showDeleted flag ",
+            value = "Retrieves the given organisation based on user with the given email address if organisation is active or showDeleted flag ",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -65,7 +65,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("pui-case-manager")
+    @Secured("pui-user-manager")
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId  String organisationIdentifier,
                                        @ApiParam(name = "showDeleted", required = false)@RequestParam(value = "showDeleted", required = false) String showDeleted,
                                        @ApiParam(name = "email", required = false) @RequestParam (value = "email", required = false) String email) {
@@ -75,15 +75,18 @@ public class ProfessionalExternalUserController extends SuperController {
         profExtUsrReqValidator.validateRequest(organisationIdentifier,showDeleted,email);
 
         if (StringUtils.isEmpty(showDeleted) && !StringUtils.isEmpty(email)) {
-
+            log.info("email not empty");
             profUsersEntityResponse = retrieveUserByEmail(email);
 
         } else if (StringUtils.isEmpty(email) && !StringUtils.isEmpty(showDeleted)) {
-
+            log.info("showDeleted not empty");
             profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
 
+        } else  if (StringUtils.isEmpty(email) && StringUtils.isEmpty(showDeleted)) {
+            log.info("showDeleted not empty");
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
         }
 
-        return profUsersEntityResponse;
+        return  profUsersEntityResponse;
     }
 }

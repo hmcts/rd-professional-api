@@ -4,42 +4,48 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
+
 
 public class OrganisationExternalControllerTest {
 
@@ -63,8 +69,29 @@ public class OrganisationExternalControllerTest {
 
     private ResponseEntity responseEntity;
 
+    private PrdEnumRepository prdEnumRepository;
+
     @InjectMocks
     private OrganisationExternalController organisationExternalController;
+
+    private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
+
+    private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
+    private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
+    private final PrdEnumId prdEnumId3 = new PrdEnumId(3, "PRD_ROLE");
+
+    private final ProfessionalUser user = Mockito.mock(ProfessionalUser.class);
+    private final List<UserAttribute> attributeList = new ArrayList<>();
+    private final PrdEnum anEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "JURISD_ID");
+    private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
+    private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
+    private UserCreationRequest userCreationRequestMock;
+
+    private List<PrdEnum> prdEnumList;
+    private List<String> jurisdEnumIds;
+    private List<Map<String, String>> jurisdictions;
+    private Map<String,String> jid1;
+    private Map<String,String> jid2;
 
 
     @Before
@@ -86,16 +113,38 @@ public class OrganisationExternalControllerTest {
         newUserCreationRequestMock = mock(NewUserCreationRequest.class);
         updateOrganisationRequestValidatorMock = mock(UpdateOrganisationRequestValidator.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
+        prdEnumRepository = mock(PrdEnumRepository.class);
         responseEntity = mock(ResponseEntity.class);
+        prdEnumList = new ArrayList<PrdEnum>();
+        prdEnumList.add(anEnum1);
+        prdEnumList.add(anEnum2);
+        prdEnumList.add(anEnum3);
+
+        jurisdEnumIds = new ArrayList<String>();
+        jurisdEnumIds.add("PROBATE");
+        jurisdEnumIds.add("BULKSCAN");
+        jurisdictions = new ArrayList<Map<String, String>>();
+        jid1 = new HashMap<String,String>();
+        jid1.put("id", "PROBATE");
+        jid2 = new HashMap<String,String>();
+        jid2.put("id", "BULKSCAN");
+        jurisdictions.add(jid1);
+        jurisdictions.add(jid2);
+        userCreationRequestMock = mock(UserCreationRequest.class);
 
         MockitoAnnotations.initMocks(this);
+
     }
 
     @Test
     public void testCreateOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
 
+        when(organisationCreationRequestMock.getSuperUser()).thenReturn(userCreationRequestMock);
+        when(userCreationRequestMock.getJurisdictions()).thenReturn(jurisdictions);
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequestMock)).thenReturn(organisationResponseMock);
+        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
+        when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationExternalController.createOrganisationUsingExternalController(organisationCreationRequestMock);
 
@@ -111,47 +160,22 @@ public class OrganisationExternalControllerTest {
                 .createOrganisationFrom(eq(organisationCreationRequestMock));
     }
 
-
     @Test
-    @Ignore
-    public void testUpdatesOrganisation() {
+    public void testRetrieveOrganisationByIdentifier() {
+
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        doNothing().when(organisationCreationRequestValidatorMock).validate(any(OrganisationCreationRequest.class));
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(updateOrganisationRequestValidatorMock).validateStatus(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
+        String id = UUID.randomUUID().toString().substring(0,7);
+        when(organisationServiceMock.retrieveOrganisation(id)).thenReturn(organisationEntityResponseMock);
 
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
-
-        ResponseEntity<?> actual = organisationExternalController.updatesOrganisationUsingExternalController(organisationCreationRequestMock, organisationMock.getOrganisationIdentifier());
+        ResponseEntity<?> actual = organisationExternalController.retrieveOrganisationUsingOrgIdentifier(id);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
-    }
 
-    @Test
-    @Ignore
-    public void testAddUserToOrganisation() {
-        final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
-
-        PrdEnumId prdEnumId = new PrdEnumId(5, "ADMIN_ROLE");
-        PrdEnum prdEnumMock = new PrdEnum(prdEnumId, "organisation-admin", "enum-desc");
-        List<PrdEnum> prdEnumList = new ArrayList<PrdEnum>(){};
-        prdEnumList.add(prdEnumMock);
-
-        List<String> roles = new ArrayList<String>();
-        roles.add("organisation-admin");
-
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(updateOrganisationRequestValidatorMock).validateStatus(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
-        when(newUserCreationRequestMock.getRoles()).thenReturn(roles);
-        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
-
-        ResponseEntity<?> actual = organisationExternalController.addUserToOrganisationUsingExternalController(newUserCreationRequestMock, organisationMock.getOrganisationIdentifier());
-
-        assertThat(actual).isNotNull();
-        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        verify(organisationServiceMock,
+                times(1))
+                .retrieveOrganisation(eq(id));
     }
 
 }

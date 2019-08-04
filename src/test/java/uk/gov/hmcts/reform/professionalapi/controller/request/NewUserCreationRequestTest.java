@@ -17,22 +17,22 @@ public class NewUserCreationRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void testHasMandatoryFieldsSpecified() {
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest(null, null, null, null);
+                new NewUserCreationRequest(null, null, "some@email.com", null, new ArrayList<>());
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(4);
+        assertThat(violations.size()).isEqualTo(3);
     }
 
     @Test
-    public void creates_new_user_creation_request_correctly() {
+    public void testCreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, new ArrayList<>());
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
@@ -41,12 +41,12 @@ public class NewUserCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_new_user_creation_request_when_email_is_not_valid() {
+    public void testDoesNotCreateNewUserWhenEmailIsInvalid() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles);
+                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles, new ArrayList<>());
 
         Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
 

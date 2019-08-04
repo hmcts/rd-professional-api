@@ -112,7 +112,8 @@ public class OrganisationServiceImplTest {
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email"
+                "some-email",
+                new ArrayList<>()
         );
 
         List<String> paymentAccountList = new ArrayList<>();
@@ -385,14 +386,13 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
 
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationsDetailResponse =
                 organisationServiceImplMock.retrieveOrganisations();
@@ -428,13 +428,13 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
 
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
 
         OrganisationEntityResponse organisationEntityResponse =
@@ -470,12 +470,12 @@ public class OrganisationServiceImplTest {
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
 
         OrganisationsDetailResponse organisationDetailResponse =

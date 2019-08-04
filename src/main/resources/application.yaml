@@ -27,7 +27,7 @@ spring:
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
 
-  ### database configuration
+### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
@@ -64,18 +64,22 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
+    - "/csrf"
+    - "/error"
+    - "/favicon.ico"
   authorisedServices:
     - rd_professional_api
     - rd_user_profile_api
+    - xui_webapp
 
 
 ### dependency configuration
-auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8503}
+auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
+    totp_secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
     microservice: rd_professional_api
-    url: ${S2S_URL:http://127.0.0.1:8503}
+    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: true
 usermap:
     pbaFromUserAccountMap:
@@ -92,7 +96,12 @@ exui.role:
     pui-finance-manager: pui-finance-manager
     pui-case-manager: pui-case-manager
 
+prdEnumRoleType: ADMIN_ROLE,JURISD_ID
+jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
+
 userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
+#userProfUrl: ${USER_PROFILE_URL:http://172.31.28.145:8091}
+ccdUrl: ${CCD_URL:https://ccd-user-profile-api-aat.service.core-compute-aat.internal}
 
 feign:
   allow:
