@@ -100,16 +100,8 @@ public interface PbaAccountUtil {
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
-                if (userProfileResponse.getIdamStatusCode() == null || userProfileResponse.getIdamStatusCode().isEmpty()) {
-                    user.setIdamStatusCode(" ");
-                } else {
-                    user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
-                }
-                if (userProfileResponse.getIdamMessage() == null || userProfileResponse.getIdamMessage().isEmpty()) {
-                    user.setIdamMessage(" ");
-                } else {
-                    user.setIdamMessage(userProfileResponse.getIdamMessage());
-                }
+                user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
+                user.setIdamMessage(userProfileResponse.getIdamMessage());
             }
         }
         return user;

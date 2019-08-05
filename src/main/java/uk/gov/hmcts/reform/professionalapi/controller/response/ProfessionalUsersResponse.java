@@ -39,7 +39,7 @@ public class ProfessionalUsersResponse {
         this.email = user.getEmailAddress();
         this.roles = user.getRoles();
         this.idamStatus = user.getIdamStatus();
-        this.idamStatusCode = user.getIdamStatusCode();
-        this.idamMessage = user.getIdamMessage();
+        this.idamStatusCode = user.getIdamStatusCode() == null || user.getIdamStatusCode().isEmpty() ? " " : user.getIdamStatusCode();
+        this.idamMessage = user.getIdamMessage() == null || user.getIdamMessage().isEmpty() ? " " : user.getIdamMessage();
     }
 }
