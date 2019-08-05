@@ -159,7 +159,7 @@ public abstract class SuperController {
 
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
-        
+
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);

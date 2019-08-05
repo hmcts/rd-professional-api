@@ -149,9 +149,6 @@ public class OrganisationExternalController extends SuperController {
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @ApiParam(hidden = true)@OrgId  String organisationIdentifier) {
 
-        organisationCreationRequest.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus().toString().toUpperCase()));
-
-
         log.info("Received request to update organisation for external ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }

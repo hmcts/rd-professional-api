@@ -162,8 +162,6 @@ public class OrganisationInternalController extends SuperController {
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-        organisationCreationRequest.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus().toString().toUpperCase()));
-
         log.info("Received request to update organisation for organisationIdentifier: ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
