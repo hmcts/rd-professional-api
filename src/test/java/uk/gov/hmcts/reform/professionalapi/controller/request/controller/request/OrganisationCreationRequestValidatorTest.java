@@ -150,5 +150,4 @@ public class OrganisationCreationRequestValidatorTest {
                 .hasMessage("Jurisdiction id not valid : id2");
 
     }
-
 }

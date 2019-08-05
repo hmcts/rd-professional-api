@@ -123,7 +123,6 @@ public class OrganisationFixtures {
         jurisdictionId1.put("id", "Probate");
         Map<String,String> jurisdictionId2 = new HashMap<>();
         jurisdictionId2.put("id", "Bulk Scanning");
-
         jurisdictions.add(jurisdictionId1);
         jurisdictions.add(jurisdictionId2);
         return jurisdictions;
