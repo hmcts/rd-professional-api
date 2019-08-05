@@ -49,7 +49,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
-        this.status = OrganisationStatus.valueOf(status.toString().toUpperCase());
+        this.status = status;
         this.sraId = sraId;
         this.sraRegulated = sraRegulated;
         this.companyNumber = companyNumber;

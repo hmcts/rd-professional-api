@@ -32,7 +32,7 @@ public class OrganisationCreationRequestValidator {
 
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
-            if (type.name().equalsIgnoreCase(status)) {
+            if (type.name().equals(status.toUpperCase())) {
                 return true;
             }
         }
