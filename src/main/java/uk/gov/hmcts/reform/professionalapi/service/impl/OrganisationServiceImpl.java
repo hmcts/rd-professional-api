@@ -257,7 +257,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         log.info("Into update Organisation service");
         organisation.setName(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getName()));
-        organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus().toString().toUpperCase()));
+        organisation.setStatus(organisationCreationRequest.getStatus());
         organisation.setSraId(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         organisation.setCompanyNumber(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
         organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
