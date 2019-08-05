@@ -58,7 +58,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
                 .sraId("sra-id-number")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl("company-url")
-                .companyNumber("12345678")
+                .companyNumber("same1010")
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
