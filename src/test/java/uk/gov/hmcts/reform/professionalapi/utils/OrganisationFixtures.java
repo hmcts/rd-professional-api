@@ -120,7 +120,7 @@ public class OrganisationFixtures {
 
         List<Map<String,String>> jurisdictions = new ArrayList<>();
         Map<String,String> jurisdictionId1 = new HashMap<>();
-        jurisdictionId1.put("id", "PROBATE");
+        jurisdictionId1.put("id", "Probate");
         Map<String,String> jurisdictionId2 = new HashMap<>();
         jurisdictionId2.put("id", "Bulk Scanning");
 
