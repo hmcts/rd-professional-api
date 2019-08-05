@@ -7,16 +7,18 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Getter
+@Setter
 @Builder(builderMethodName = "anOrganisationCreationRequest")
 public class OrganisationCreationRequest {
 
     @NotNull
     private final String name;
 
-    private final OrganisationStatus status;
+    private OrganisationStatus status;
 
     private final String sraId;
 
