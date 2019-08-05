@@ -37,6 +37,7 @@ public class ProfessionalUsersResponse {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
+        this.roles = user.getRoles();
         this.idamStatus = user.getIdamStatus();
         this.idamStatusCode = user.getIdamStatusCode();
         this.idamMessage = user.getIdamMessage();
