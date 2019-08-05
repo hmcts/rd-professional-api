@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 
 @RequestMapping(
@@ -160,6 +161,8 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        organisationCreationRequest.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus().toString().toUpperCase()));
 
         log.info("Received request to update organisation for organisationIdentifier: ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
