@@ -92,6 +92,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        System.out.println(response2);
         assertThat(response2.get("http_status")).isEqualTo("400");
     }
 }
