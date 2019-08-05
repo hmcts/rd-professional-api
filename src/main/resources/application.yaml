@@ -67,7 +67,6 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
-    - "v1/**"
   authorisedServices:
     - rd_professional_api
     - rd_user_profile_api
