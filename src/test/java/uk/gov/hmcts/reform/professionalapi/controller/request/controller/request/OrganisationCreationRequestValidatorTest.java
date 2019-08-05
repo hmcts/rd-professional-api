@@ -99,7 +99,6 @@ public class OrganisationCreationRequestValidatorTest {
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
-        
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
 }
