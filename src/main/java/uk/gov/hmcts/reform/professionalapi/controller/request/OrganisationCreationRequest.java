@@ -39,7 +39,7 @@ public class OrganisationCreationRequest {
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
-            @JsonProperty("status") String status,
+            @JsonProperty("status") OrganisationStatus status,
             @JsonProperty("sraId") String sraId,
             @JsonProperty("sraRegulated") Boolean sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
@@ -49,7 +49,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
-        this.status = OrganisationStatus.valueOf(status.toUpperCase());
+        this.status = OrganisationStatus.valueOf(status.toString().toUpperCase());
         this.sraId = sraId;
         this.sraRegulated = sraRegulated;
         this.companyNumber = companyNumber;
