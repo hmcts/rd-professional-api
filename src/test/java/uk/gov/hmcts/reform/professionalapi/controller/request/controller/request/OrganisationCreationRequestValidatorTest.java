@@ -34,8 +34,9 @@ public class OrganisationCreationRequestValidatorTest {
 
     public List<String> getEnumList() {
         ArrayList<String> enumStringList = new ArrayList<>();
-        enumStringList.add("PROBATE");
+        enumStringList.add("Probate");
         enumStringList.add("BULKSCAN");
+        enumStringList.add("Civil Money Claims");
         return enumStringList;
     }
 
@@ -43,7 +44,7 @@ public class OrganisationCreationRequestValidatorTest {
 
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
         Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("id", "PROBATE");
+        jid1.put("id", "Probate");
         Map<String,String> jid2 = new HashMap<String,String>();
         jid2.put("id", "BULKSCAN");
         maps.add(jid1);
@@ -149,4 +150,5 @@ public class OrganisationCreationRequestValidatorTest {
                 .hasMessage("Jurisdiction id not valid : id2");
 
     }
+
 }
