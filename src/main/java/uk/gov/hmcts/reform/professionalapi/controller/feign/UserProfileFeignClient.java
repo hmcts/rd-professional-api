@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.professionalapi.configuration.FeignInterceptorConfiguration;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
-
 
 @FeignClient(name = "UserProfileClient", url = "${userProfUrl}", configuration = FeignInterceptorConfiguration.class)
 public interface UserProfileFeignClient {
@@ -23,6 +23,11 @@ public interface UserProfileFeignClient {
     @RequestMapping(method = RequestMethod.GET, value = "/v1/userprofile", params = "userId")
     @RequestLine("GET /v1/userprofile")
     @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
-    Response getUserProfileByEmail(@RequestParam("userId") String userId);
+    Response getUserProfileById(@RequestParam("userId") String userId);
 
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/userprofile/users", params = "showdeleted")
+    @RequestLine("POST /v1/userprofile/users")
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                             @RequestParam(value = "showdeleted") String showDeleted);
 }

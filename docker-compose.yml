@@ -1,4 +1,5 @@
 version: '2.1'
+
 services:
   rd-professional-api:
     build:
@@ -10,7 +11,7 @@ services:
     image: hmcts/rd-professional-api
     container_name: rd-professional-api
     environment:
-      - JAVA_OPTS= ${JAVA_OPTS}
+      - JAVA_OPTS=-Dhttps.proxyHost=proxyout.reform.hmcts.net -Dhttps.proxyPort=8080
       - POSTGRES_USERNAME=dbrefdata
       - POSTGRES_PASSWORD=dbrefdata
       - POSTGRES_HOST=rd-professional-db
@@ -35,6 +36,7 @@ services:
     depends_on:
       - rd-professional-db
       - service-auth-provider-api
+
   rd-professional-db:
     build:
       context: database
@@ -46,6 +48,7 @@ services:
       - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
     ports:
       - 5428:5432
+
   service-auth-provider-api:
     image: hmcts/service-auth-provider-app
     container_name: service-auth-provider-api
@@ -60,6 +63,7 @@ services:
       SERVER_PORT: 8080
       MICROSERVICEKEYS_RD_PROFESSIONAL_API: "${S2S_SECRET}"
       TESTING_SUPPORT_ENABLED: "true"
+
   service-token-provider:
     image: hmcts/service-token-provider
     container_name: service-token-provider
@@ -71,5 +75,6 @@ services:
       - 8089:${SERVER_PORT:-8090}
     depends_on:
       - service-auth-provider-api
+
 volumes:
   rd-professional-db-volume:

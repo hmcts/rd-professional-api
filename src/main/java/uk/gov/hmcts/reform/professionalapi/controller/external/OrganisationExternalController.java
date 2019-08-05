@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -78,10 +77,6 @@ public class OrganisationExternalController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
-    @ApiParam(
-            allowEmptyValue = true,
-            required = true
-    )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -102,16 +97,11 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @Secured("pui-organisation-manager")
+    @Secured({"pui-organisation-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-          @RequestParam(value = "id", required = true) String id, @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+           @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
-        organisationCreationRequestValidator.validateOrganisationIdentifier(id);
-        if (!extOrgIdentifier.trim().equals(id.trim())) {
-
-            throw new AccessDeniedException("403 Forbidden");
-        }
-        return retrieveOrganisationOrById(id);
+        return retrieveOrganisationOrById(extOrgIdentifier);
     }
 
     @ApiOperation(

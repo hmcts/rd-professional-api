@@ -75,15 +75,18 @@ public class ProfessionalExternalUserController extends SuperController {
         profExtUsrReqValidator.validateRequest(organisationIdentifier,showDeleted,email);
 
         if (StringUtils.isEmpty(showDeleted) && !StringUtils.isEmpty(email)) {
-
+            log.info("email not empty");
             profUsersEntityResponse = retrieveUserByEmail(email);
 
         } else if (StringUtils.isEmpty(email) && !StringUtils.isEmpty(showDeleted)) {
-
+            log.info("showDeleted not empty");
             profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
 
+        } else  if (StringUtils.isEmpty(email) && StringUtils.isEmpty(showDeleted)) {
+            log.info("showDeleted not empty");
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
         }
 
-        return profUsersEntityResponse;
+        return  profUsersEntityResponse;
     }
 }

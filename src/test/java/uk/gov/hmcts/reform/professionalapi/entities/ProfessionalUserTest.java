@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -13,6 +15,8 @@ public class ProfessionalUserTest {
 
     @Test
     public void creates_professional_user_correctly() {
+        List<String> roles = new ArrayList<>();
+        roles.add("role");
 
         Organisation organisation = mock(Organisation.class);
 
@@ -35,6 +39,10 @@ public class ProfessionalUserTest {
         professionalUser.setLastUpdated(LocalDateTime.now());
 
         professionalUser.setCreated(LocalDateTime.now());
+
+        professionalUser.setRoles(roles);
+
+        assertThat(professionalUser.getRoles().size()).isEqualTo(1);
 
         assertThat(professionalUser.getLastUpdated()).isNotNull();
 

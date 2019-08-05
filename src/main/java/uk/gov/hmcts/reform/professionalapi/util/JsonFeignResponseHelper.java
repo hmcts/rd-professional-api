@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseHelper {
-    private static final ObjectMapper json = new ObjectMapper();
+    private static final ObjectMapper json = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private JsonFeignResponseHelper() {
 

@@ -93,7 +93,7 @@ public class ProfessionalApiClient {
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
                 .lastName("some-lname")
-                .email(randomAlphabetic(10) + "@somewhere.com")
+                .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -138,7 +138,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(randomAlphabetic(10) + "@hotmail.com")
+                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
                 .build();
 
@@ -247,8 +247,8 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
-                    .assertThat()
-                    .statusCode(status.value());
+                .assertThat()
+                .statusCode(status.value());
         if (HttpStatus.OK == status) {
             return response.body().as(Map.class);
         } else {
@@ -261,15 +261,15 @@ public class ProfessionalApiClient {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
 
         Response response = getMultipleAuthHeaders(role)
-            .body(organisationCreationRequest)
-            .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
-            .andReturn();
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
 
         response.then()
-            .assertThat()
-            .statusCode(OK.value());
+                .assertThat()
+                .statusCode(OK.value());
     }
 
     public Map<String, Object> retrieveOrganisationDetailsByStatus(String status, String role) {
