@@ -85,10 +85,6 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
-        if (organisationCreationRequest.getCompanyNumber() != null) {
-            organisationCreationRequestValidator.isCompanyNumberValid(organisationCreationRequest);
-        }
-
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
