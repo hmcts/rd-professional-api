@@ -14,7 +14,9 @@ import java.util.Map;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
@@ -75,6 +77,57 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("500");
+    }
+
+    @Test
+    public void returns_bad_request_when_dx_num_invalid() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyno")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void returns_bad_request_when_address_line1_empty() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl("company-url")
+                .companyNumber("companyno")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+
     }
 
     @Test
@@ -280,5 +333,57 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(paymentAccountRepository.findAll().size()).isEqualTo(0);
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void persists_organisation_with_white_spaces_removed() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name(" some-org-name ")
+                .sraId(" sra-id ")
+                .sraRegulated(Boolean.FALSE)
+                .companyUrl(" company-url ")
+                .companyNumber(" companyn ")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname ")
+                        .lastName(" some-lname ")
+                        .email(" someone @somewhere.com ")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1(" addressLine1 ").addressLine2(" ad  2 ").addressLine3(" ad3 ")
+                        .country(" Ireland ")
+                        .county(" Laois ")
+                        .postCode(" W127AE ")
+                        .townCity(" Dublin ")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
+
+        assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
+        assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
+        assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
+        assertThat(persistedOrganisation.getCompanyNumber()).isEqualTo("companyn");
+
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+
+        assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
+        assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
+        assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
+        List<ContactInformation> cont = persistedOrganisation.getContactInformations();
+        assertThat(cont.get(0).getAddressLine1()).isEqualTo("addressLine1");
+        assertThat(cont.get(0).getAddressLine2()).isEqualTo("ad 2");
+        assertThat(cont.get(0).getAddressLine3()).isEqualTo("ad3");
+        assertThat(cont.get(0).getCountry()).isEqualTo("Ireland");
+        assertThat(cont.get(0).getCounty()).isEqualTo("Laois");
+        assertThat(cont.get(0).getPostCode()).isEqualTo("W127AE");
+        assertThat(cont.get(0).getTownCity()).isEqualTo("Dublin");
     }
 }
