@@ -4,6 +4,9 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
-import java.util.ArrayList;
-import java.util.List;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
