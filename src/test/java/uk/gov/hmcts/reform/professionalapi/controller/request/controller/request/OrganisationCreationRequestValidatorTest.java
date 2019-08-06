@@ -12,11 +12,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-
 import java.util.ArrayList;
 import java.util.List;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
@@ -38,7 +37,7 @@ public class OrganisationCreationRequestValidatorTest {
 
 
     @Before
-    public void Setup() {
+    public void setup() {
         organisationCreationRequestValidator =
                 new OrganisationCreationRequestValidator(asList(validator1, validator2));
     }
@@ -70,10 +69,10 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(org);
     }
 
-//    @Test(expected = InvalidRequest.class)
-//    public void requestValuesTest() {
-//        organisationCreationRequestValidator.requestValues("");
-//    }
+    /*@Test(expected = InvalidRequest.class)
+    public void requestValuesTest() {
+        organisationCreationRequestValidator.requestValues("");
+    }*/
 
     @Test //empty value should throw invalid request
     public void requestValuesTest() {
@@ -91,7 +90,7 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class) //invalid dx number should throw invalid request
-    public void requestContactInformationDXAddTest() {
+    public void requestContactInformationDxAddTest() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234591", "DxExchange");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
