@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -81,7 +80,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
-        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -119,7 +118,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
-        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
         userProfileCreateUserWireMock(HttpStatus.BAD_REQUEST);

@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-
 
 public class OrganisationFixtures {
 
@@ -56,7 +54,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
             .name("some-org-name")
-            .status(OrganisationStatus.PENDING)
+            .status("PENDING")
             .sraId("sra-id")
             .sraRegulated(Boolean.FALSE)
             .companyUrl("company -url")
@@ -87,7 +85,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
             .name("some-org-name1")
-            .status(OrganisationStatus.ACTIVE)
+            .status("ACTIVE")
             .sraId("sra-id1")
             .sraRegulated(Boolean.TRUE)
             .companyUrl("company-url1")

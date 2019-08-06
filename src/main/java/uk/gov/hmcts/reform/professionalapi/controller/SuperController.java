@@ -160,14 +160,16 @@ public abstract class SuperController {
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
+        organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
+
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), orgId);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
         if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
-                && organisationCreationRequest.getStatus().isActive()) {
+                && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             log.info("Organisation is getting activated");
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
