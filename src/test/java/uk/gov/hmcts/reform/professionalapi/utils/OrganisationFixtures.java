@@ -124,7 +124,6 @@ public class OrganisationFixtures {
         jurisdiction2.setId("Bulk Scanning");
         jurisdictions.add(jurisdiction1);
         jurisdictions.add(jurisdiction2);
-
         return jurisdictions;
     }
 }

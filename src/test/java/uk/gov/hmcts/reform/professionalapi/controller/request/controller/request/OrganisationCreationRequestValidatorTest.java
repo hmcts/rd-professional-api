@@ -48,7 +48,6 @@ public class OrganisationCreationRequestValidatorTest {
         jurisdiction2.setId("BULKSCAN");
         jurisdictions.add(jurisdiction1);
         jurisdictions.add(jurisdiction2);
-
         return jurisdictions;
     }
 
