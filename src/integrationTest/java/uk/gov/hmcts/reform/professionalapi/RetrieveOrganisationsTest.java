@@ -33,7 +33,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void persists_and_returns_organisation_details() {
 
-        String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
+        String orgIdentifierResponse = createOrganisationRequest("PENDING");
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
@@ -45,7 +45,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
         assertThat(orgResponse.get("sraRegulated")).isEqualTo(false);
         assertThat(orgResponse.get("companyUrl")).isEqualTo("company-url");
-        assertThat(orgResponse.get("companyNumber")).isEqualTo("company");
+        assertThat(orgResponse.get("companyNumber")).isNotNull();
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("firstName")).isEqualTo("some-fname");
@@ -125,7 +125,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {
 
-        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.PENDING);
+        String organisationIdentifier = createOrganisationRequest("PENDING");
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.PENDING.name(), hmctsAdmin);
@@ -137,14 +137,14 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void persists_and_returns_all_organisations_details_by_active_status() {
         Map<String, Object> orgResponse;
-        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
+        String organisationIdentifier = createOrganisationRequest("ACTIVE");
         assertThat(organisationIdentifier).isNotEmpty();
         orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
@@ -167,7 +167,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void persists_and_return_empty_organisation_details_when_no_status_found_in_the_db() {
 
-        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
+        String organisationIdentifier = createOrganisationRequest("ACTIVE");
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), puiCaseManager);
@@ -177,14 +177,14 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void return_404_when_invalid_status_send_in_the_request_param() {
 
-        String organisationIdentifier = createOrganisationRequest(OrganisationStatus.ACTIVE);
+        String organisationIdentifier = createOrganisationRequest("ACTIVE");
         assertThat(organisationIdentifier).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest("ACTIV", hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("404"));
     }
 
-    private String createOrganisationRequest(OrganisationStatus status) {
+    private String createOrganisationRequest(String status) {
         OrganisationCreationRequest organisationCreationRequest = null;
         organisationCreationRequest = organisationRequestWithAllFields().status(status).build();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -210,7 +210,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
-        professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status(OrganisationStatus.ACTIVE).build(), hmctsAdmin, orgIdentifierResponse);
+        professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
@@ -254,7 +254,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void  persists_and_return_forbidden_when_no_role_associated_with_end_point() {
 
-        String orgIdentifierResponse = createOrganisationRequest(OrganisationStatus.PENDING);
+        String orgIdentifierResponse = createOrganisationRequest("PENDING");
         assertThat(orgIdentifierResponse).isNotEmpty();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
@@ -284,7 +284,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         String orgId = (String) response.get("organisationIdentifier");
 
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, orgId);

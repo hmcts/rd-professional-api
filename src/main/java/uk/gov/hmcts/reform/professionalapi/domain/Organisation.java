@@ -68,7 +68,6 @@ public class Organisation {
     private Boolean sraRegulated;
 
     @Column(name = "COMPANY_NUMBER")
-    @Size(max = 8)
     private String companyNumber;
 
     @Column(name = "COMPANY_URL")

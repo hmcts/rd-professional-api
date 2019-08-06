@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -30,7 +29,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     public void search_returns_valid_user_with_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
