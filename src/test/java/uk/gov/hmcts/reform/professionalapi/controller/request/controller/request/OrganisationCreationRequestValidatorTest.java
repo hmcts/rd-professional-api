@@ -7,14 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
@@ -40,17 +39,17 @@ public class OrganisationCreationRequestValidatorTest {
         return enumStringList;
     }
 
-    public List<Map<String,String>> createJurisdictions() {
+    public List<Jurisdiction> createJurisdictions() {
 
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("id", "Probate");
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        maps.add(jid1);
-        maps.add(jid2);
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("Probate");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("BULKSCAN");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
 
-        return maps;
+        return jurisdictions;
     }
 
     @Test
@@ -80,72 +79,38 @@ public class OrganisationCreationRequestValidatorTest {
         assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(new ArrayList<>(), getEnumList()))
                 .isInstanceOf(InvalidRequest.class)
             .hasMessage("Jurisdictions not present");
-
-
     }
 
-    @Test
-    public void should_throw_exception_when_jurisdictions_has_empty_jurisdiction_id() {
-
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        maps.add(jid1);
-        maps.add(jid2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(maps, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdiction id should have at least 1 element");
-
-    }
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_has_invalid_jurisdiction_id_key() {
-
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("if", "PROBATE");
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        maps.add(jid1);
-        maps.add(jid2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(maps, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdictions key value should be 'id'");
-
-    }
 
     @Test
     public void should_throw_exception_when_jurisdictions_id_has_null() {
 
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("id", "");
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        maps.add(jid1);
-        maps.add(jid2);
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction1.setId("BULKSCAN");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
 
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(maps, getEnumList()))
+        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
                 .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdictions value should not be blank or null");
+                .hasMessage("Jurisdiction value should not be blank or null");
 
     }
 
     @Test
     public void should_throw_exception_when_jurisdictions_id_has_invalid_value() {
 
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("id", "BULKSCAN");
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "id2");
-        maps.add(jid1);
-        maps.add(jid2);
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("id2");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("BULKSCAN");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
 
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(maps, getEnumList()))
+        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
                 .isInstanceOf(InvalidRequest.class)
                 .hasMessage("Jurisdiction id not valid : id2");
 

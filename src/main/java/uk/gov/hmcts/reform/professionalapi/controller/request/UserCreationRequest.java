@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,14 +20,14 @@ public class UserCreationRequest {
 
     private  String email;
 
-    private List<Map<String,String>> jurisdictions;
+    private List<Jurisdiction> jurisdictions;
 
     @JsonCreator
     public UserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
             @JsonProperty("email") String emailAddress,
-            @JsonProperty("jurisdictions") List<Map<String,String>> jurisdictions
+            @JsonProperty("jurisdictions") List<Jurisdiction> jurisdictions
     ) {
 
         this.firstName = firstName;

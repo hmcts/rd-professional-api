@@ -16,6 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -38,7 +39,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
-                                .jurisdictions(createJurisdictions())
+                                .jurisdictions(OrganisationFixtures.createJurisdictions())
                                 .build())
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
@@ -63,7 +64,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
-                                .jurisdictions(createJurisdictions())
+                                .jurisdictions(OrganisationFixtures.createJurisdictions())
                                 .build())
                         .build());
 

@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -31,7 +32,7 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
-                        .jurisdictions(createJurisdictions())
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
