@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -20,8 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
-
+@Slf4j
 public class CreateOrganisationWithContactInformationDxAddress extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -344,7 +344,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .sraId(" sra-id ")
                 .sraRegulated(Boolean.FALSE)
                 .companyUrl(" company-url ")
-                .companyNumber(" companyn ")
+                .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
@@ -366,9 +366,9 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
+        log.info("Response::" + persistedOrganisation );
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
-
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
         assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id");
         assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
@@ -379,13 +379,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
-        List<ContactInformation> cont = persistedOrganisation.getContactInformations();
-        assertThat(cont.get(0).getAddressLine1()).isEqualTo("addressLine1");
-        assertThat(cont.get(0).getAddressLine2()).isEqualTo("ad 2");
-        assertThat(cont.get(0).getAddressLine3()).isEqualTo("ad3");
-        assertThat(cont.get(0).getCountry()).isEqualTo("Ireland");
-        assertThat(cont.get(0).getCounty()).isEqualTo("Laois");
-        assertThat(cont.get(0).getPostCode()).isEqualTo("W127AE");
-        assertThat(cont.get(0).getTownCity()).isEqualTo("Dublin");
+
+        List<ContactInformation> contactInformation = persistedOrganisation.getContactInformations();
+
+        assertThat(contactInformation.get(0).getAddressLine1()).isEqualTo("addressLine1");
+        assertThat(contactInformation.get(0).getAddressLine2()).isEqualTo("ad 2");
+        assertThat(contactInformation.get(0).getAddressLine3()).isEqualTo("ad3");
+        assertThat(contactInformation.get(0).getCountry()).isEqualTo("Ireland");
+        assertThat(contactInformation.get(0).getCounty()).isEqualTo("Laois");
+        assertThat(contactInformation.get(0).getPostCode()).isEqualTo("W127AE");
+        assertThat(contactInformation.get(0).getTownCity()).isEqualTo("Dublin");
     }
 }
