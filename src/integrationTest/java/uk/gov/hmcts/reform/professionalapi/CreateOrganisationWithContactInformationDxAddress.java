@@ -366,7 +366,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
-        log.info("Response::" + persistedOrganisation );
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getContactInformation().size()).isEqualTo(1);
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
