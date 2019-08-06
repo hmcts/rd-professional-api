@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.JurisdictionUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.JurisdictionService;
@@ -34,18 +33,18 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     @Override
-    public void propagateJurisdictionIdsForNewUserToCcd(List<Map<String, String>> jurisdictions, String userId, String email) {
+    public void propagateJurisdictionIdsForNewUserToCcd(List<Jurisdiction> jurisdictions, String userId, String email) {
         JurisdictionUserCreationRequest request = new JurisdictionUserCreationRequest(email, jurisdictions);
         callCcd(request, userId);
     }
 
     public JurisdictionUserCreationRequest createJurisdictionUserProfileRequestForSuperUser(ProfessionalUser user) {
-        List<Map<String,String>> jurisdictions = new ArrayList<Map<String,String>>();
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
         user.getUserAttributes().forEach(userAttribute -> {
             if (userAttribute.getPrdEnum().getPrdEnumId().getEnumType().equalsIgnoreCase("JURISD_ID")) {
-                Map<String,String> jurisdIdMap = new HashMap<>();
-                jurisdIdMap.put("id", userAttribute.getPrdEnum().getEnumName());
-                jurisdictions.add(jurisdIdMap);
+                Jurisdiction jurisdiction = new Jurisdiction();
+                jurisdiction.setId(userAttribute.getPrdEnum().getEnumName());
+                jurisdictions.add(jurisdiction);
             }
         });
         return new JurisdictionUserCreationRequest(user.getEmailAddress(), jurisdictions);

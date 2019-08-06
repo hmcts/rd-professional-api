@@ -7,10 +7,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -116,15 +115,15 @@ public class OrganisationFixtures {
                 .build()));
     }
 
-    public static List<Map<String,String>> createJurisdictions() {
+    public static List<Jurisdiction> createJurisdictions() {
 
-        List<Map<String,String>> jurisdictions = new ArrayList<>();
-        Map<String,String> jurisdictionId1 = new HashMap<>();
-        jurisdictionId1.put("id", "Probate");
-        Map<String,String> jurisdictionId2 = new HashMap<>();
-        jurisdictionId2.put("id", "Bulk Scanning");
-        jurisdictions.add(jurisdictionId1);
-        jurisdictions.add(jurisdictionId2);
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("Probate");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("Bulk Scanning");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
         return jurisdictions;
     }
 }

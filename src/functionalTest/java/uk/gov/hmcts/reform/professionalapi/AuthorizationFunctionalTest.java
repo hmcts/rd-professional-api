@@ -4,14 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-//import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -116,16 +114,4 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 
-    public List<Map<String,String>> createJurisdictions() {
-
-        List<Map<String,String>> jurisdictions = new ArrayList<>();
-        Map<String,String> jurisdictionId1 = new HashMap<>();
-        jurisdictionId1.put("id", "jid1");
-        Map<String,String> jurisdictionId2 = new HashMap<>();
-        jurisdictionId2.put("id", "jid2");
-
-        jurisdictions.add(jurisdictionId1);
-        jurisdictions.add(jurisdictionId2);
-        return jurisdictions;
-    }
 }

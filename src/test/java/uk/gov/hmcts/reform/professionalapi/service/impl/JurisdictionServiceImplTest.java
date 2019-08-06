@@ -7,9 +7,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class JurisdictionServiceImplTest {
 
@@ -115,17 +114,10 @@ public class JurisdictionServiceImplTest {
 
     @Test(expected = Test.None.class)
     public void should_propagate_jurisdiction_ids_for_new_user_to_ccd_without_exception() {
-        List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
-        Map<String,String> jid1 = new HashMap<String,String>();
-        jid1.put("id", "PROBATE");
-        Map<String,String> jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        maps.add(jid1);
-        maps.add(jid2);
 
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net","s2stoken", request)).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
-        jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(maps, "some@hmcts.net", "some@hmcts.net");
+        jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(OrganisationFixtures.createJurisdictions(), "some@hmcts.net", "some@hmcts.net");
 
     }
 }

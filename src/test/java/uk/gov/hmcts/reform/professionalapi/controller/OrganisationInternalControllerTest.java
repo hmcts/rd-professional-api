@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -67,7 +67,7 @@ public class OrganisationInternalControllerTest {
     private PrdEnumServiceImpl prdEnumServiceMock;
     private List<PrdEnum> prdEnumList;
     private List<String> jurisdEnumIds;
-    private List<Map<String, String>> jurisdictions;
+    private List<Jurisdiction> jurisdictions;
     private Map<String,String> jid1;
     private Map<String,String> jid2;
 
@@ -93,15 +93,15 @@ public class OrganisationInternalControllerTest {
         prdEnumList.add(anEnum3);
 
         jurisdEnumIds = new ArrayList<String>();
-        jurisdEnumIds.add("PROBATE");
-        jurisdEnumIds.add("BULKSCAN");
-        jurisdictions = new ArrayList<Map<String, String>>();
-        jid1 = new HashMap<String,String>();
-        jid1.put("id", "PROBATE");
-        jid2 = new HashMap<String,String>();
-        jid2.put("id", "BULKSCAN");
-        jurisdictions.add(jid1);
-        jurisdictions.add(jid2);
+        jurisdEnumIds.add("Probate");
+        jurisdEnumIds.add("Bulk Scanning");
+        jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("Probate");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("Bulk Scanning");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
         userCreationRequestMock = mock(UserCreationRequest.class);
 
         MockitoAnnotations.initMocks(this);
