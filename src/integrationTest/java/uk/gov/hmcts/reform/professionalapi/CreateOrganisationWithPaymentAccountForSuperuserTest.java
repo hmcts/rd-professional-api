@@ -48,6 +48,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier())
                 .isEqualTo(orgIdentifierResponse);
+        
     }
 
     @Test
