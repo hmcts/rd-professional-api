@@ -59,7 +59,7 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    public void isCompanyNumberValid(OrganisationCreationRequest organisationCreationRequest) {
+    public void validateCompanyNumber(OrganisationCreationRequest organisationCreationRequest) {
         log.info("validating Company Number");
         if (organisationCreationRequest.getCompanyNumber().length() != 8) {
             throw new InvalidRequest("Company number must be 8 characters long");
