@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Getter
@@ -37,8 +38,9 @@ public class ProfessionalUsersResponse {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
+        this.roles = user.getRoles();
         this.idamStatus = user.getIdamStatus();
-        this.idamStatusCode = user.getIdamStatusCode();
-        this.idamMessage = user.getIdamMessage();
+        this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
+        this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
     }
 }

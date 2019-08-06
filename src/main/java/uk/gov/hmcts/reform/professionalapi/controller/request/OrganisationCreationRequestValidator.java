@@ -8,16 +8,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 
 @Component
 @Slf4j
 public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
+
+    @Autowired
+    OrganisationRepository organisationRepository;
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -30,7 +36,7 @@ public class OrganisationCreationRequestValidator {
 
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
-            if (type.name().equalsIgnoreCase(status)) {
+            if (type.name().equals(status.toUpperCase())) {
                 return true;
             }
         }
@@ -54,6 +60,17 @@ public class OrganisationCreationRequestValidator {
         } else if (!organisation.isOrganisationStatusActive()) {
             log.error("Organisation is not active. Cannot add new users");
             throw new EmptyResultDataAccessException("Organisation is not active. Cannot add new users", 1);
+        }
+    }
+
+    public void validateCompanyNumber(OrganisationCreationRequest organisationCreationRequest) {
+        log.info("validating Company Number");
+        if (organisationCreationRequest.getCompanyNumber().length() != 8) {
+            throw new InvalidRequest("Company number must be 8 characters long");
+        }
+
+        if (organisationRepository.findByCompanyNumber(organisationCreationRequest.getCompanyNumber()) != null) {
+            throw new DuplicateKeyException("The company number provided already belongs to a created Organisation");
         }
     }
 

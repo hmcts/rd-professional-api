@@ -9,7 +9,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -17,7 +16,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
         validateUsers(response);
     }
@@ -25,7 +24,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
         validateUsers(response);
     }
@@ -33,7 +32,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null, hmctsAdmin);
         validateUsers(response);
 
@@ -63,7 +62,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_newly_deleted_user_with_showDeleted_true() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, OrganisationStatus.ACTIVE);
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
