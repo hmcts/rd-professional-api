@@ -8,19 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.jruby.RubyBoolean;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
@@ -66,11 +62,13 @@ public class OrganisationCreationRequestValidatorTest {
     public void validateOrganisationIdentifierNullTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier(null);
     }
-    //@Test(expected = EmptyResultDataAccessException.class) //value less than 7 char in length should throw empty exception
+
+    @Test(expected = EmptyResultDataAccessException.class) //value less than 7 char in length should throw empty exception
     public void validateOrganisationIdentifierTooShortTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
     }
-    //@Test(expected = EmptyResultDataAccessException.class) //incorrect format should throw empty exception
+
+    @Test(expected = EmptyResultDataAccessException.class) //incorrect format should throw empty exception
     public void validateOrganisationIdentifierWrongFormatTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");
     }
@@ -80,9 +78,10 @@ public class OrganisationCreationRequestValidatorTest {
         myExceptionalException = null;
         try {
             organisationCreationRequestValidator.validateOrganisationIdentifier("Q90SB9S");
-        } catch (Exception e){
+        } catch (Exception e) {
             myExceptionalException = e;
         }
+
         assertThat(myExceptionalException).isEqualTo(null);
     }
 
