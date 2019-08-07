@@ -42,7 +42,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @ApiOperation(
-            value = "Creates an Internal Organisation",
+            value = "Creates an Organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -97,6 +97,7 @@ public class OrganisationInternalController extends SuperController {
             )
     })
 
+    @Secured("prd-admin")
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
