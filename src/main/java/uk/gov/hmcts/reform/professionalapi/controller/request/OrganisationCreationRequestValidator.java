@@ -44,10 +44,8 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
-
         if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
             String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
-            log.error(errorMessage);
             throw new EmptyResultDataAccessException(1);
         }
     }
@@ -55,10 +53,8 @@ public class OrganisationCreationRequestValidator {
     public void isOrganisationActive(Organisation organisation) {
 
         if (organisation == null) {
-            log.error("Organisation not found");
             throw new EmptyResultDataAccessException("Organisation not found", 1);
         } else if (!organisation.isOrganisationStatusActive()) {
-            log.error("Organisation is not active. Cannot add new users");
             throw new EmptyResultDataAccessException("Organisation is not active. Cannot add new users", 1);
         }
     }
@@ -75,25 +71,16 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationRequest(OrganisationCreationRequest request) {
-
-        log.info("Inside validateOrganisationRequest::");
         requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
-        log.info("after org req ::");
         requestPaymentAccount(request.getPaymentAccount());
-        log.info("after payment req ::");
         requestContactInformation(request.getContactInformation());
-
     }
 
     private void requestPaymentAccount(List<String> paymentAccounts) {
 
-        log.info("Inside requestPaymentAccount::" + paymentAccounts);
-
         if (paymentAccounts != null) {
 
             for (String paymentAccount : paymentAccounts) {
-
-                log.info("Inside requestPaymentAccount::for::");
 
                 if (isEmptyValue(paymentAccount)) {
 
@@ -107,12 +94,9 @@ public class OrganisationCreationRequestValidator {
 
     public void requestValues(String... values) {
 
-        log.info("Inside requestValues::" + values);
-
         for (String value : values) {
 
             if (isEmptyValue(value)) {
-                log.error("::error::" + value);
                 throw new InvalidRequest("Empty input value" + value);
             }
         }
@@ -120,22 +104,18 @@ public class OrganisationCreationRequestValidator {
 
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
 
-        log.info("Inside requestContactInformation::" + contactInformations);
         if (null != contactInformations) {
 
             for (ContactInformationCreationRequest contactInformation : contactInformations) {
 
-                log.info("Inside requestContactInformation::for:");
                 if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
                         || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
                         || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
 
-                    log.info("throwing exception");
                     throw new InvalidRequest("Empty contactInformation value");
                 }
                 if (null != contactInformation.getDxAddress()) {
 
-                    log.info("Inside requestDxAddress::for:");
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
 
                         if (isEmptyValue(dxAddress.getDxNumber()) || !isDxNumberValid(dxAddress.getDxNumber()) || isEmptyValue(dxAddress.getDxExchange())) {
@@ -149,12 +129,10 @@ public class OrganisationCreationRequestValidator {
 
     public boolean isEmptyValue(String value) {
 
-        log.info("Inside isEmptyValue::" + value);
         boolean isEmpty = false;
         if (value != null && value.trim().isEmpty()) {
             isEmpty = true;
         }
-        log.info("Inside isEmptyValue end::" + isEmpty);
         return isEmpty;
     }
 
