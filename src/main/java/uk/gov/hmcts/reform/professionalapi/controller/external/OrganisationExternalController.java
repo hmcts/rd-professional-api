@@ -99,7 +99,7 @@ public class OrganisationExternalController extends SuperController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-           @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+            @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
         return retrieveOrganisationOrById(extOrgIdentifier);
     }
@@ -153,11 +153,11 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-        value = "Add a external user to an organisation",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        }
+            value = "Add a external user to an organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
     )
     @ApiResponses({
             @ApiResponse(

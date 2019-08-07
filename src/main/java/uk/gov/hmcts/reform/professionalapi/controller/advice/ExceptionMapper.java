@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ACCESS_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.CONFLICT_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST;
@@ -22,6 +24,7 @@ import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +66,12 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<Object> duplicateKeyException(
+            DuplicateKeyException ex) {
+        return errorDetailsResponseEntity(ex, CONFLICT, CONFLICT_EXCEPTION.getErrorMessage());
+    }
+
     @ExceptionHandler(GetUserProfileException.class)
     public ResponseEntity<Object> getUserProfileExceptionError(
             GetUserProfileException ex) {
@@ -76,7 +85,7 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> dataIntegrityViolationError(ConstraintViolationException ex) {
+    public ResponseEntity<Object> constraintViolationError(ConstraintViolationException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
 
     }

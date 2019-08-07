@@ -18,8 +18,17 @@ public class UserCreationRequestValidator {
 
     public static List<String> validateRoles(List<String> roles, List<PrdEnum> prdEnumList) {
 
-        verifiedUserRoles = roles.stream().map(role -> verifyRole(role, prdEnumList)).collect(Collectors.toList());
-        List<String> finalList = verifiedUserRoles.stream().filter(role -> !role.equals("false")).collect(Collectors.toList());
+        List<String> rolesWithoutDuplicates = roles.stream()
+                .distinct()
+                .collect(Collectors.toList());
+
+        verifiedUserRoles = rolesWithoutDuplicates.stream()
+                .map(role -> verifyRole(role, prdEnumList))
+                .collect(Collectors.toList());
+
+        List<String> finalList = verifiedUserRoles.stream()
+                .filter(role -> !role.equals("false"))
+                .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(finalList)) {
             log.error("Invalid/No user role(s) provided");
@@ -39,4 +48,3 @@ public class UserCreationRequestValidator {
         return verifiedRole.get();
     }
 }
-

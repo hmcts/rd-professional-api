@@ -81,6 +81,10 @@ public class ProfessionalExternalUserController extends SuperController {
         } else if (StringUtils.isEmpty(email) && StringUtils.isEmpty(showDeleted)) {
             log.info("showDeleted not empty");
             profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
+
+        } else  if (StringUtils.isEmpty(email) && StringUtils.isEmpty(showDeleted)) {
+            log.info("showDeleted not empty");
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
         }
 
         return  profUsersEntityResponse;
