@@ -234,19 +234,19 @@ public abstract class SuperController {
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
+        List<String> validatedRoles = UserCreationRequestValidator.validateRoles(roles, prdEnumList);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getFirstName()),
                 PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getLastName()),
                 PbaAccountUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
-        ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
+        ResponseEntity responseEntity = createUserProfileFor(newUser, validatedRoles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
             newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
+            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, validatedRoles, prdEnumList);
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
             responseBody = responseEntity.getBody();
