@@ -51,6 +51,8 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
+    protected ProfessionalUserReqValidator profExtUsrReqValidator;
+    @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
     @Value("${exui.role.hmcts-admin:}")
