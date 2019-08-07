@@ -81,7 +81,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            log.info("The organisation the user belongs to must be active");
             throw new EmptyResultDataAccessException(1);
         }
 
@@ -90,7 +89,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted) {
-        log.info("Into  ProfessionalService for get all users for organisation");
         List<ProfessionalUser> professionalUsers;
         List<UUID> usersId = new ArrayList<>();
 
@@ -118,7 +116,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
-        log.info("Persisting user with emailId: " + updatedProfessionalUser.getEmailAddress());
         return professionalUserRepository.save(updatedProfessionalUser);
     }
 }

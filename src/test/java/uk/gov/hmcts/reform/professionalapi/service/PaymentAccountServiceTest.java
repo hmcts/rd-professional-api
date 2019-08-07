@@ -79,6 +79,10 @@ public class PaymentAccountServiceTest {
 
         verify(
                 organisationMock,
+                times(1)).setUsers(any());
+
+        verify(
+                organisationMock,
                 times(1)).setPaymentAccounts(any());
 
     }
