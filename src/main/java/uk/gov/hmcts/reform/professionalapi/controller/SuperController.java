@@ -12,15 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -58,8 +50,6 @@ public abstract class SuperController {
     protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
     protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
-    @Autowired
-    protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
@@ -234,19 +224,19 @@ public abstract class SuperController {
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        List<String> validatedRoles = UserCreationRequestValidator.validateRoles(roles, prdEnumList);
+        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getFirstName()),
                 PbaAccountUtil.removeEmptySpaces(newUserCreationRequest.getLastName()),
                 PbaAccountUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
-        ResponseEntity responseEntity = createUserProfileFor(newUser, validatedRoles, false);
+        ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
             newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, validatedRoles, prdEnumList);
+            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
             responseBody = responseEntity.getBody();
