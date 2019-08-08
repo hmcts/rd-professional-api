@@ -98,7 +98,7 @@ public class OrganisationExternalController extends SuperController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-           @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+            @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
         return retrieveOrganisationOrById(extOrgIdentifier);
     }
