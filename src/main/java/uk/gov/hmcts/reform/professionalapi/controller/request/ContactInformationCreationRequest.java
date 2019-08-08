@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Getter
 @Builder(builderMethodName = "aContactInformationCreationRequest")
@@ -45,13 +46,13 @@ public class ContactInformationCreationRequest {
             @JsonProperty("postCode") String postCode,
             @JsonProperty("dxAddress") List<DxAddressCreationRequest> dxAddress) {
 
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
-        this.addressLine3 = addressLine3;
-        this.townCity = townCity;
-        this.county = county;
-        this.country = country;
-        this.postCode = postCode;
+        this.addressLine1 = PbaAccountUtil.removeEmptySpaces(addressLine1);
+        this.addressLine2 = PbaAccountUtil.removeEmptySpaces(addressLine2);
+        this.addressLine3 = PbaAccountUtil.removeEmptySpaces(addressLine3);
+        this.townCity = PbaAccountUtil.removeEmptySpaces(townCity);
+        this.county = PbaAccountUtil.removeEmptySpaces(county);
+        this.country = PbaAccountUtil.removeEmptySpaces(country);
+        this.postCode = PbaAccountUtil.removeEmptySpaces(postCode);
         this.dxAddress = dxAddress;
     }
 }

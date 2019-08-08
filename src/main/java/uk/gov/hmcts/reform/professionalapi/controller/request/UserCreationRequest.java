@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
-
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 
 @Getter
@@ -36,12 +36,12 @@ public class UserCreationRequest {
             @JsonProperty("email") String emailAddress
     ) {
 
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = PbaAccountUtil.removeEmptySpaces(firstName);
+        this.lastName = PbaAccountUtil.removeEmptySpaces(lastName);
 
         if (!StringUtils.isEmpty(emailAddress)) {
 
-            this.email = emailAddress.toLowerCase().trim();
+            this.email = PbaAccountUtil.removeAllSpaces(emailAddress.toLowerCase().trim());
         }
 
     }
