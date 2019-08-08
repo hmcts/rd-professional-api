@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
@@ -181,10 +182,35 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
+
+    @Test(expected = InvalidRequest.class)
+    public void add_new_user_with_invalid_roles_returns_400_bad_request() {
+        List<String> userRolesDuplicate = new ArrayList<>();
+        userRolesDuplicate.add("pui-uer-manager");
+        userRolesDuplicate.add("pui-user-manager");
+        userRolesDuplicate.add("pui-case-manager");
+
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+
+        userCreationRequestValidator.validateRoles(userRolesDuplicate, prdEnums);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void add_new_user_with_invalid_roles_with_empty_space_returns_400_bad_request() {
+        List<String> userRolesDuplicate = new ArrayList<>();
+        userRolesDuplicate.add(" ");
+        userRolesDuplicate.add("pui-user-manager");
+        userRolesDuplicate.add("pui-case-manager");
+
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
+
+        userCreationRequestValidator.validateRoles(userRolesDuplicate, prdEnums);
+    }
+
     @Test
     public void add_new_user_with_same_role_multiple_times_in_request_only_returns_role_once() {
         List<String> userRolesDuplicate = new ArrayList<>();
-        userRolesDuplicate.add("pui-user-manager");
+        userRolesDuplicate.add("PUI-CASE-MANAGER ");
         userRolesDuplicate.add("pui-user-manager");
         userRolesDuplicate.add("pui-user-manager");
 
@@ -225,6 +251,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
-        assertThat(persistedProfessionalUser.getUserAttributes().size()).isEqualTo(1);
+        assertThat(persistedProfessionalUser.getUserAttributes().size()).isEqualTo(2);
     }
 }
