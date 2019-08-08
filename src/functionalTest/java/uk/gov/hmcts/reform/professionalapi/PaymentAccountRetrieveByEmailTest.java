@@ -12,21 +12,24 @@ import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
+public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
+    @Ignore
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
@@ -39,18 +42,18 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                         .build());
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email, hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
     }
 
     @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
@@ -62,7 +65,7 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                                 .build())
                         .build());
 
-        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email);
+        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, hmctsAdmin);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {

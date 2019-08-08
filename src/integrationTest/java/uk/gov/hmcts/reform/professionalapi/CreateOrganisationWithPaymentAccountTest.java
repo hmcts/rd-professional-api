@@ -17,14 +17,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -52,9 +52,9 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pbaNumber-1");
-        paymentAccounts.add("pbaNumber-2");
-        paymentAccounts.add("pbaNumber-3");
+        paymentAccounts.add("PBA1234567");
+        paymentAccounts.add("PBA2345678");
+        paymentAccounts.add("PBA3456789");
 
 
         OrganisationCreationRequest organisationCreationRequest =
@@ -69,9 +69,9 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
 
         assertThat(persistedPaymentAccounts).extracting(acc -> acc.getPbaNumber())
                 .containsExactlyInAnyOrder(
-                        "pbaNumber-1",
-                        "pbaNumber-2",
-                        "pbaNumber-3");
+                        "PBA1234567",
+                        "PBA2345678",
+                        "PBA3456789");
 
         assertThat(persistedPaymentAccounts)
                 .extracting(paymentAccount -> paymentAccount.getOrganisation().getName())
@@ -168,10 +168,10 @@ public class CreateOrganisationWithPaymentAccountTest extends Service2ServiceEna
     @Test
     public void persists_and_returns_a_multiple_pba_accounts_number_for_multiple_organisations() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         List<String> paymentAccounts2 = new ArrayList<>();
-        paymentAccounts.add("pba456");
+        paymentAccounts.add("PBA7654321");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")

@@ -2,12 +2,21 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import static org.powermock.api.mockito.PowerMockito.when;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import feign.Request;
+import feign.Response;
+
+import java.nio.charset.Charset;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,24 +27,34 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
 import org.springframework.dao.EmptyResultDataAccessException;
+
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAccountCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -63,16 +82,14 @@ public class OrganisationServiceImplTest {
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
-    private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
-    private final OrganisationResponse organisationResponseMock = mock(OrganisationResponse.class);
-    private final OrganisationsDetailResponse organisationDetailResponseMock = mock(OrganisationsDetailResponse.class);
-    private final OrganisationEntityResponse organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
+    private final UserAttribute userAttributeMock = mock(UserAttribute.class);
+    private List<String> userRoles = new ArrayList<>();
+    private List<PrdEnum> prdEnums = new ArrayList<>();
+
     private UserCreationRequest superUser;
-    private List<PbaAccountCreationRequest> pbaAccountCreationRequests;
-    private PbaAccountCreationRequest pbaAccountCreationRequest;
     private List<ContactInformationCreationRequest> contactInformationCreationRequests;
     private List<DxAddressCreationRequest> dxAddressRequests;
     private DxAddressCreationRequest dxAddressRequest;
@@ -82,9 +99,15 @@ public class OrganisationServiceImplTest {
     private List<UserAccountMap> userAccountMaps;
     private List<PaymentAccount> paymentAccounts;
 
+    private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
+
+    @InjectMocks
+    private OrganisationServiceImpl organisationService;
 
     @Before
     public void setUp() {
+
+        MockitoAnnotations.initMocks(this);
 
         superUser = new UserCreationRequest(
                 "some-fname",
@@ -94,7 +117,7 @@ public class OrganisationServiceImplTest {
 
         List<String> paymentAccountList = new ArrayList<>();
 
-        String pbaNumber = "pbaNumber-1";
+        String pbaNumber = "PBA1234567";
 
         paymentAccountList.add(pbaNumber);
 
@@ -131,11 +154,12 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
                 userAttributeRepositoryMock, prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock,
+                userProfileFeignClient);
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name", OrganisationStatus.PENDING, "sra-id", Boolean.FALSE, "company-number", "company-url",
+                        "some-org-name", "PENDING", "sra-id", "false", "number01", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
@@ -227,7 +251,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testSavesOrganisationWithConstraintViolationException() {
+    public void testSavesOrganisationWithInvalidRequest() {
 
         when(organisationRepositoryMock.save(any(Organisation.class)))
                 .thenThrow(ConstraintViolationException.class);
@@ -269,10 +293,6 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepositoryMock,
                 times(1)).findAll();
-
-        verify(
-                organisationMock,
-                times(1)).setUsers(any());
     }
 
     @Test
@@ -342,27 +362,125 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock, contactInformationRepositoryMock,
                 userAttributeRepositoryMock,
                 prdEnumRepositoryMock,
-                userAccountMapRepositoryMock);
+                userAccountMapRepositoryMock,
+                userProfileFeignClient);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
     @Test
-    public void testRetrieveAnOrganisationsByOrganisationIdentifier() {
+    public void testRetrieveAllOrganisations()throws Exception {
 
-        ArrayList<ProfessionalUser> users = new ArrayList<>();
-        users.add(professionalUserMock);
+        ProfessionalUser user = mock(ProfessionalUser.class);
+        UUID id = UUID.randomUUID();
 
-        when(organisationMock.getUsers())
-                .thenReturn(users);
+        when(user.getUserIdentifier()).thenReturn(id);
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(user);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationMock.getUsers()).thenReturn(users);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisationMock);
+        when(organisationRepositoryMock.findAll())
+                .thenReturn(organisations);
+
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        OrganisationsDetailResponse organisationsDetailResponse =
+                organisationServiceImplMock.retrieveOrganisations();
+
+        assertThat(organisationsDetailResponse).isNotNull();
+
+        assertThat(organisationMock.getUsers()).isNotNull();
+        verify(
+                organisationRepositoryMock,
+                times(1)).findAll();
+
+        verify(
+                organisationMock,
+                times(1)).setUsers(any());
+
+    }
+
+    @Test
+    public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
+
+        ProfessionalUser user = mock(ProfessionalUser.class);
+
+        UUID id = UUID.randomUUID();
+
+        when(user.getUserIdentifier()).thenReturn(id);
+
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(user);
+
+        when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationMock.getUsers()).thenReturn(users);
+
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
 
         OrganisationEntityResponse organisationEntityResponse =
                 organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
 
         assertThat(organisationEntityResponse).isNotNull();
-
         verify(
                 organisationRepositoryMock,
                 times(1)).findByOrganisationIdentifier(any());
+
+        verify(
+                organisationMock,
+                times(1)).setUsers(any());
+    }
+
+    @Test
+    public void testRetrieveAnOrganisationsByWhenStatusActive() throws Exception {
+
+        ProfessionalUser user = mock(ProfessionalUser.class);
+
+        UUID id = UUID.randomUUID();
+
+        when(user.getUserIdentifier()).thenReturn(id);
+
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(user);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationMock.getUsers()).thenReturn(users);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisationMock);
+
+        when(organisationRepositoryMock.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
+
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+
+        assertThat(organisationDetailResponse).isNotNull();
 
         verify(
                 organisationMock,
@@ -378,17 +496,56 @@ public class OrganisationServiceImplTest {
         organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
     }
 
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testThrowsExceptionWhenOrganisationEmpty() {
+        Mockito.when(organisationRepositoryMock.findAll())
+                .thenReturn(new ArrayList<Organisation>());
+        organisationServiceImplMock.retrieveOrganisations();
+    }
+
+
+    @Test(expected = InvalidRequest.class)
+    public void throwInvalidRequestWhenInvalidPbaIsPassed() {
+
+        List<String> paymentAccountList = new ArrayList<>();
+
+        String pbaNumber = "GBA1234567";
+
+        paymentAccountList.add(pbaNumber);
+
+        organisationCreationRequest =
+                new OrganisationCreationRequest(
+                        "some-org-name", "PENDING", "sra-id", "false", "company-number", "company-url",
+                        superUser,
+                        paymentAccountList, contactInformationCreationRequests);
+
+        OrganisationResponse organisationResponse =
+                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+    }
+
     @Test
-    public void getOrganisationByOrganisationIdentifier() {
+    public void testAllAttributesAddedToSuperUser() {
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
 
-        Organisation organisation =
-                organisationServiceImplMock.getOrganisationByOrganisationIdentifier(organisationIdentifier);
+        userRoles.add("pui-user-manager");
+        userRoles.add("pui-organisation-manager");
+        userRoles.add("pui-finance-manager");
+        userRoles.add("pui-case-manager");
+        userRoles.add("organisation-admin");
 
-        assertThat(organisation).isNotNull();
+        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
+        when(userAttributeRepositoryMock.save(any(UserAttribute.class))).thenReturn(userAttributeMock);
+
+        OrganisationResponse organisationResponse =
+                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         verify(
-                organisationRepositoryMock,
-                times(1)).findByOrganisationIdentifier(any());
+                userAttributeRepositoryMock,
+                times(5)).save(any(UserAttribute.class));
     }
 
 }

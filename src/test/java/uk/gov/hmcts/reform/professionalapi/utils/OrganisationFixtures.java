@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -10,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-
 
 public class OrganisationFixtures {
 
@@ -31,17 +30,35 @@ public class OrganisationFixtures {
                         .addressLine1("addressLine1").build()));
     }
 
+    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
+        List<String> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add("PBA1234567");
+
+        return anOrganisationCreationRequest()
+                .name("  some-  org -name  ")
+                .companyNumber(randomAlphabetic(8))
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname    b    ")
+                        .lastName(" some-         lname  ")
+                        .email(" someone@s omewh ere.com ")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()));
+
+
+    }
+
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
             .name("some-org-name")
-            .status(OrganisationStatus.PENDING)
+            .status("PENDING")
             .sraId("sra-id")
-            .sraRegulated(Boolean.FALSE)
-            .companyUrl("company-url")
-            .companyNumber("company")
+            .sraRegulated("false")
+            .companyUrl("company -url")
+            .companyNumber(randomAlphabetic(8))
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
@@ -64,20 +81,20 @@ public class OrganisationFixtures {
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
             .name("some-org-name1")
-            .status(OrganisationStatus.ACTIVE)
+            .status("ACTIVE")
             .sraId("sra-id1")
-            .sraRegulated(Boolean.TRUE)
+            .sraRegulated("true")
             .companyUrl("company-url1")
-            .companyNumber("company1")
+            .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
-                .email("someone@somewhere.com")
+                .email("someone1@somewhere.com")
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")

@@ -2,24 +2,35 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.RestAssured;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+//import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
-
+import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
+import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+@ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-public abstract class FunctionalTestSuite {
+public abstract class AuthorizationFunctionalTest {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -33,31 +44,60 @@ public abstract class FunctionalTestSuite {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
+    @Value("${exui.role.hmcts-admin}")
+    protected String hmctsAdmin;
+
+    @Value("${exui.role.pui-user-manager}")
+    protected String puiUserManager;
+
+    @Value("${exui.role.pui-organisation-manager}")
+    protected String puiOrgManager;
+
+    @Value("${exui.role.pui-finance-manager}")
+    protected String puiFinanceManager;
+
+    @Value("${exui.role.pui-case-manager}")
+    protected String puiCaseManager;
+    
+
     protected ProfessionalApiClient professionalApiClient;
+
+
+    @Autowired
+    protected TestConfigProperties configProperties;
+
 
     @Before
     public void setUp() {
+        RestAssured.useRelaxedHTTPSValidation();
+
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
+        IdamClient idamClient = new IdamClient(configProperties);
+
+        log.info("idamClient: " + idamClient);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+
         professionalApiClient = new ProfessionalApiClient(
                                                           professionalApiUrl,
-                                                          s2sToken);
+                                                          s2sToken, idamClient);
     }
 
     @After
     public void tearDown() {
     }
 
-    protected String createAndUpdateOrganisationToActive() {
+    protected String createAndUpdateOrganisationToActive(String role) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier);
+        professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
 
     }
@@ -72,7 +112,6 @@ public abstract class FunctionalTestSuite {
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(professionalUsersResponse.get("status")).isNotNull();
         assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 }

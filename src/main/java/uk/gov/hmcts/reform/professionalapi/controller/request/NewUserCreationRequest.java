@@ -16,17 +16,17 @@ import lombok.Getter;
 public class NewUserCreationRequest {
 
     @JsonIgnore
-    private final String emailRegex = "\\A(?=[a-zA-Z0-9@.!#$%&'*+/=?^_`{|}~-]{6,254}\\z)(?=[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?=[a-zA-Z0-9-]{1,63}\\.)[a-zA-Z0-9](?:[a-z0-9-]*[a-zA-Z0-9])?\\.)+(?=[a-zA-Z0-9-]{1,63}\\z)[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\z";
+    private final String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
 
     @NotNull
     private final String firstName;
     @NotNull
     private final String lastName;
+
     @NotNull
     @Pattern(regexp = emailRegex)
     private final String email;
-    @NotNull
-    private final String status;
+
     @NotNull
     private final List<String> roles;
 
@@ -34,14 +34,12 @@ public class NewUserCreationRequest {
     public NewUserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String email,
-            @JsonProperty("status") String status,
+            @JsonProperty("email") String emailAddress,
             @JsonProperty("roles") List<String> roles) {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
-        this.status = status;
+        this.email = emailAddress.toLowerCase();
         this.roles = roles;
     }
 }
