@@ -55,7 +55,7 @@ public class OrganisationCreationRequestValidator {
         if (organisation == null) {
             throw new EmptyResultDataAccessException("Organisation not found", 1);
         } else if (!organisation.isOrganisationStatusActive()) {
-            throw new EmptyResultDataAccessException("Organisation is not active. Cannot add new users", 1);
+            throw new InvalidRequest("Organisation is not active. Cannot add new users");
         }
     }
 
