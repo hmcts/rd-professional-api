@@ -57,7 +57,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber("same1010")
                 .superUser(aUserCreationRequest()

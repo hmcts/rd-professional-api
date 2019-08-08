@@ -85,7 +85,7 @@ public class ProfessionalApiClient {
             .name(randomAlphabetic(10))
             .status("PENDING")
             .sraId(randomAlphabetic(10) + "sra-id-number1")
-            .sraRegulated(Boolean.FALSE)
+            .sraRegulated("false")
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
             .paymentAccount(paymentAccounts)

@@ -91,7 +91,7 @@ public class OrganisationCreationRequestValidatorTest {
         assertThat(OrganisationCreationRequestValidator.contains("PENDING")).isTrue();
     }
 
-    @Test (expected = EmptyResultDataAccessException.class) //Pending value should not throw empty exception
+    @Test (expected = InvalidRequest.class) //Pending value should not throw empty exception
     public void isOrganisationActive_Pending_Test() {
         Organisation myOrgg = new Organisation();
         myOrgg.setStatus(OrganisationStatus.PENDING);
@@ -118,7 +118,7 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(null);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //empty value should throw empty exception
+    @Test(expected = InvalidRequest.class) //empty value should throw empty exception
     public void isOrganisationActive_Empty_Test() {
         organisationCreationRequestValidator.isOrganisationActive(org);
     }
@@ -132,7 +132,7 @@ public class OrganisationCreationRequestValidatorTest {
     public void validateOrganisationRequestTest() {
         List<String> list = new ArrayList<>();
         list.add("");
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", Boolean.TRUE, "","",null, list,null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "","",null, list,null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 

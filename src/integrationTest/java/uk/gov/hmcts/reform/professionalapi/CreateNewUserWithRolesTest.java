@@ -154,7 +154,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("404");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);

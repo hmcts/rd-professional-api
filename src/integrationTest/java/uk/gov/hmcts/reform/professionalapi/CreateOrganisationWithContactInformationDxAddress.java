@@ -30,7 +30,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
@@ -61,7 +61,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(9))
                 .superUser(aUserCreationRequest()
@@ -86,7 +86,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber("companyno")
                 .superUser(aUserCreationRequest()
@@ -111,7 +111,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber("companyno")
                 .superUser(aUserCreationRequest()
@@ -137,7 +137,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
@@ -154,7 +154,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
                 .name("some-org-name1")
                 .sraId("sra-id-number1")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
@@ -177,7 +177,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
@@ -206,7 +206,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
@@ -342,7 +342,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name(" some-org-name ")
                 .sraId(" sra-id ")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl(" company-url ")
                 .companyNumber("companyn")
                 .superUser(aUserCreationRequest()
@@ -388,5 +388,63 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(contactInformation.get(0).getCounty()).isEqualTo("Laois");
         assertThat(contactInformation.get(0).getPostCode()).isEqualTo("W127AE");
         assertThat(contactInformation.get(0).getTownCity()).isEqualTo("Dublin");
+    }
+
+    @Test
+    public void persists_organisation_with_sraRegulated_true_case_insensitive() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated("TrUe")
+                .companyUrl("company-url")
+                .companyNumber(randomAlphabetic(8))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getSraRegulated()).isTrue();
+    }
+
+    @Test
+    public void persists_organisation_with_sraRegulated_false_case_insensitive() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated("FaLsE")
+                .companyUrl("company-url")
+                .companyNumber(randomAlphabetic(8))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getSraRegulated()).isFalse();
     }
 }
