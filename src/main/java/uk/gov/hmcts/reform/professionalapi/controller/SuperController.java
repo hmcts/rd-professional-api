@@ -89,6 +89,10 @@ public abstract class SuperController {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
 
+        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+            organisationCreationRequest.setSraRegulated("false");
+        }
+
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
@@ -158,9 +162,13 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+        organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
+
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
-        organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
+        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+            organisationCreationRequest.setSraRegulated("false");
+        }
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);

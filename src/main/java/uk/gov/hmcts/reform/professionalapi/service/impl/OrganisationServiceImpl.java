@@ -93,7 +93,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 OrganisationStatus.PENDING,
                 PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraId()),
                 PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()),
-                organisationCreationRequest.getSraRegulated(),
+                Boolean.parseBoolean(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())),
                 PbaAccountUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
@@ -260,7 +260,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
         organisation.setSraId(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         organisation.setCompanyNumber(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
-        organisation.setSraRegulated(organisationCreationRequest.getSraRegulated());
+        organisation.setSraRegulated(Boolean.parseBoolean(PbaAccountUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(PbaAccountUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
         organisationRepository.save(organisation);
         log.info("Update Organisation service done...");

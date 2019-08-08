@@ -209,7 +209,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
-        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+        Map<String, Object> response1 = professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =

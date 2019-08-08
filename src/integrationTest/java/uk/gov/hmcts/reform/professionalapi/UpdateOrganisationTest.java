@@ -156,7 +156,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 .status("ACTIVE")
                 .name("some-org-name")
                 .sraId("sra-id")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .build();

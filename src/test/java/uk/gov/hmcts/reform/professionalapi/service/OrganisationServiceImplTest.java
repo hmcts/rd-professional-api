@@ -159,7 +159,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name", "PENDING", "sra-id", Boolean.FALSE, "number01", "company-url",
+                        "some-org-name", "PENDING", "sra-id", "false", "number01", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
@@ -515,7 +515,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
-                        "some-org-name", "PENDING", "sra-id", Boolean.FALSE, "company-number", "company-url",
+                        "some-org-name", "PENDING", "sra-id", "false", "company-number", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
