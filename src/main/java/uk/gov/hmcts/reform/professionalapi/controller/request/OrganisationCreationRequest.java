@@ -21,7 +21,7 @@ public class OrganisationCreationRequest {
 
     private final String sraId;
 
-    private final Boolean sraRegulated;
+    private String sraRegulated;
 
     private final String companyNumber;
 
@@ -40,7 +40,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("name") String name,
             @JsonProperty("status") String status,
             @JsonProperty("sraId") String sraId,
-            @JsonProperty("sraRegulated") Boolean sraRegulated,
+            @JsonProperty("sraRegulated") String sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,

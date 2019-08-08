@@ -132,7 +132,7 @@ public class OrganisationCreationRequestValidatorTest {
     public void validateOrganisationRequestTest() {
         List<String> list = new ArrayList<>();
         list.add("");
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", Boolean.TRUE, "","",null, list,null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "","",null, list,null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 
