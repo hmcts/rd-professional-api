@@ -283,4 +283,62 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(organisationRepository.findAll().size()).isEqualTo(0);
         assertThat(professionalUserRepository.findAll().size()).isEqualTo(0);
     }
+
+    @Test
+    public void persists_organisation_with_sraRegulated_true_case_insensitive() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated("TrUe")
+                .companyUrl("company-url")
+                .companyNumber(randomAlphabetic(8))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getSraRegulated()).isTrue();
+    }
+
+    @Test
+    public void persists_organisation_with_sraRegulated_false_case_insensitive() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .sraRegulated("FaLsE")
+                .companyUrl("company-url")
+                .companyNumber(randomAlphabetic(8))
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
+        assertThat(persistedOrganisation.getSraRegulated()).isFalse();
+    }
 }
