@@ -75,7 +75,6 @@ public class ProfessionalExternalUserController extends SuperController {
         profExtUsrReqValidator.validateRequest(organisationIdentifier,showDeleted,email);
 
         if (!StringUtils.isEmpty(email)) {
-
             log.info("email not empty");
             profUsersEntityResponse = retrieveUserByEmail(email);
 
