@@ -84,7 +84,7 @@ public class OrganisationCreationRequestValidator {
 
                 if (isEmptyValue(paymentAccount)) {
 
-                    throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
+                    throw new InvalidRequest("Empty paymentAccount value: " + paymentAccount);
                 }
 
             }
@@ -97,7 +97,7 @@ public class OrganisationCreationRequestValidator {
         for (String value : values) {
 
             if (isEmptyValue(value)) {
-                throw new InvalidRequest("Empty input value" + value);
+                throw new InvalidRequest("Empty input value: " + value);
             }
         }
     }

@@ -41,7 +41,7 @@ public class UserCreationRequest {
 
         if (!StringUtils.isEmpty(emailAddress)) {
 
-            this.email = PbaAccountUtil.removeAllSpaces(emailAddress.toLowerCase().trim());
+            this.email = emailAddress.toLowerCase().trim();
         }
 
     }
