@@ -77,6 +77,8 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
+        organisationCreationRequestValidator.checkingMandatoryFields(organisationCreationRequest);
+
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }

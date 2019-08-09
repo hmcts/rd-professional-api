@@ -3,15 +3,18 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -41,6 +44,25 @@ public class OrganisationCreationRequestValidator {
             }
         }
         return false;
+    }
+
+    public void checkingMandatoryFields(OrganisationCreationRequest organisationCreationRequest) {
+        List<String> mandatoryFields = new ArrayList<>();
+
+        mandatoryFields.add(organisationCreationRequest.getName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getFirstName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getLastName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getEmail());
+        mandatoryFields.add(organisationCreationRequest.getContactInformation().stream().map(x -> x.getAddressLine1()).toString());
+        mandatoryFields.add(organisationCreationRequest.getContactInformation().stream().map(x -> x.getPostCode()).toString());
+
+        mandatoryFields.forEach(field -> isFieldEmpty(field));
+    }
+
+    public void isFieldEmpty(String field) {
+        if (StringUtils.isEmpty(field)) {
+            throw new InvalidRequest("This field cannot contain and empty string");
+        }
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
