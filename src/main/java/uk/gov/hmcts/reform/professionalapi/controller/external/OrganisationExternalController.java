@@ -19,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -100,7 +99,7 @@ public class OrganisationExternalController extends SuperController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Secured({"pui-organisation-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-           @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+            @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
         return retrieveOrganisationOrById(extOrgIdentifier);
     }
@@ -139,23 +138,8 @@ public class OrganisationExternalController extends SuperController {
     }
 
 
-    @PutMapping(
-            value = "/",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    @ResponseBody
-    @Secured("prd-admin")
-    public ResponseEntity<?> updatesOrganisationUsingExternalController(
-            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-            @ApiParam(hidden = true)@OrgId  String organisationIdentifier,
-            @ApiParam(hidden = true)@UserId String userId) {
-
-        log.info("Received request to update organisation for external ");
-        return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
-    }
-
     @ApiOperation(
-        value = "Add a external user to an organisation",
+        value = "Add an user to an organisation",
         authorizations = {
             @Authorization(value = "ServiceAuthorization"),
             @Authorization(value = "Authorization")

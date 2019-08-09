@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 
 @Slf4j
@@ -14,29 +15,31 @@ public class UserCreationRequestValidator {
     private UserCreationRequestValidator() {
     }
 
-    static List<String> verifiedUserRoles;
 
     public static List<String> validateRoles(List<String> roles, List<PrdEnum> prdEnumList) {
 
-        verifiedUserRoles = roles.stream().map(role -> verifyRole(role, prdEnumList)).collect(Collectors.toList());
-        List<String> finalList = verifiedUserRoles.stream().filter(role -> !role.equals("false")).collect(Collectors.toList());
+        List<String> rolesWithoutDuplicates = roles.stream()
+                .distinct()
+                .collect(Collectors.toList());
+        List<String> verifiedUserRoles = rolesWithoutDuplicates.stream()
+                .map(role -> verifyRole(role, prdEnumList))
+                .collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(finalList)) {
+        if (CollectionUtils.isEmpty(verifiedUserRoles) || verifiedUserRoles.contains("false")) {
             log.error("Invalid/No user role(s) provided");
             throw new InvalidRequest("Invalid roles provided");
         }
-        return finalList;
+
+        return verifiedUserRoles;
     }
 
     public static String verifyRole(String amendedRole, List<PrdEnum> prdEnumList) {
         AtomicReference<String> verifiedRole = new AtomicReference<>("false");
-
         prdEnumList.forEach(prdEnum -> {
-            if (prdEnum.getEnumName().equals(amendedRole)) {
-                verifiedRole.set(amendedRole);
+            if (!StringUtils.isEmpty(amendedRole) && prdEnum.getEnumName().equals(amendedRole.toLowerCase().trim())) {
+                verifiedRole.set(amendedRole.toLowerCase().trim());
             }
         });
         return verifiedRole.get();
     }
 }
-
