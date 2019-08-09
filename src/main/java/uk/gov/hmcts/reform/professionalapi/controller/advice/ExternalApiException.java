@@ -4,13 +4,13 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class GetUserProfileException extends RuntimeException {
+public class ExternalApiException extends RuntimeException {
 
     private HttpStatus httpStatus;
 
     private String errorMessage;
 
-    public GetUserProfileException(HttpStatus httpStatus, String errorMessage) {
+    public ExternalApiException(HttpStatus httpStatus, String errorMessage) {
         super(errorMessage);
         this.httpStatus = httpStatus;
         this.errorMessage = errorMessage;

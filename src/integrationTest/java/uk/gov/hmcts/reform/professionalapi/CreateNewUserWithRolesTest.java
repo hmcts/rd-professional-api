@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
@@ -80,6 +82,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
         Map<String, Object> response =
@@ -118,6 +121,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> response =
@@ -173,6 +177,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("some@email.com")
                 .roles(userRoles)
+                .jurisdictions(createJurisdictions())
                 .build();
 
 
@@ -227,6 +232,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(validatedRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
         Map<String, Object> response =

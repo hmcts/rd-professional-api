@@ -29,3 +29,6 @@ exui.role:
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+
+## ccd jurisdiction feign connection
+ccdUrl: ${CCD_URL:http://127.0.0.1:8092}

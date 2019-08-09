@@ -66,16 +66,16 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<Object> getUserProfileExceptionError(
+            ExternalApiException ex) {
+        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<Object> duplicateKeyException(
             DuplicateKeyException ex) {
         return errorDetailsResponseEntity(ex, CONFLICT, CONFLICT_EXCEPTION.getErrorMessage());
-    }
-
-    @ExceptionHandler(GetUserProfileException.class)
-    public ResponseEntity<Object> getUserProfileExceptionError(
-            GetUserProfileException ex) {
-        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
