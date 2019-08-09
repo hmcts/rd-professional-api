@@ -66,7 +66,7 @@ public class OrganisationCreationRequestValidator {
 
     public void isFieldEmpty(String field) {
         if (StringUtils.isEmpty(field)) {
-            throw new InvalidRequest("This field cannot contain and empty string");
+            throw new InvalidRequest("The field " + field + " cannot contain and empty string");
         }
     }
 
