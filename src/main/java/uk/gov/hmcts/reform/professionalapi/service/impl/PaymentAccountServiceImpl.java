@@ -54,6 +54,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
                 paymentAccountsEntity =  PbaAccountUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
                 organisation = user.getOrganisation();
             }
 

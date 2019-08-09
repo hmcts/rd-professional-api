@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import feign.FeignException;
 import feign.Response;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -94,6 +85,14 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
+        if (organisationCreationRequest.getCompanyNumber() != null) {
+            organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
+        }
+
+        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+            organisationCreationRequest.setSraRegulated("false");
+        }
+
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
@@ -163,17 +162,22 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
+        organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
+
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
+
+        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+            organisationCreationRequest.setSraRegulated("false");
+        }
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, organisationCreationRequest.getStatus(), orgId);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
 
         ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
-        if (existingOrganisation.getStatus().isPending()
-                && organisationCreationRequest.getStatus() != null
-                && organisationCreationRequest.getStatus().isActive()) {
+        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+                && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             log.info("Organisation is getting activated");
 
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);

@@ -99,10 +99,25 @@ public class PbaAccountUtilTest {
         PbaAccountUtil.validateOrgIdentifier(uuid,UUID.randomUUID().toString());
     }
 
+    @Test
+    public void mapUserInfoCorrectly() {
+
+        ProfessionalUser professionalUser = new ProfessionalUser();
+        professionalUser.setFirstName("abc");
+        professionalUser.setLastName("bcd");
+        professionalUser.setEmailAddress("a@b.co.uk");
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
+
+        //GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse(profile, Boolean.TRUE);
+
+        ProfessionalUser mappedUser = PbaAccountUtil.mapUserInfo(professionalUser, responseEntity, true);
+
+        assertThat(mappedUser).isNotNull();
+
+    }
 
     @Test
     public void test_mapUserInfo() {
-
         UUID id = UUID.randomUUID();
         ProfessionalUser userMock = new ProfessionalUser();
         ResponseEntity responseResponseEntityMock = mock(ResponseEntity.class);
@@ -114,11 +129,9 @@ public class PbaAccountUtilTest {
         when(getUserProfileResponseMock.getIdamStatus()).thenReturn(IdamStatus.ACTIVE);
         when(getUserProfileResponseMock.getIdamId()).thenReturn(id);
         when(getUserProfileResponseMock.getRoles()).thenReturn(new ArrayList<String>());
-        when(getUserProfileResponseMock.getIdamErrorStatusCode()).thenReturn("code");
-        when(getUserProfileResponseMock.getIdamErrorMessage()).thenReturn("test error message");
-
+        when(getUserProfileResponseMock.getIdamStatusCode()).thenReturn("code");
+        when(getUserProfileResponseMock.getIdamMessage()).thenReturn("test error message");
         ProfessionalUser responseUser = PbaAccountUtil.mapUserInfo(userMock, responseResponseEntityMock, true);
-
         assertThat(responseUser).isNotNull();
         assertThat(responseUser.getEmailAddress()).isEqualTo("some@hmcts.net");
         assertThat(responseUser.getFirstName()).isEqualTo("fname");
@@ -127,33 +140,7 @@ public class PbaAccountUtilTest {
         assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
         assertThat(responseUser.getRoles()).isNotNull();
         assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
-        assertThat(getUserProfileResponseMock.getIdamErrorStatusCode()).isEqualTo("code");
-        assertThat(getUserProfileResponseMock.getIdamErrorMessage()).isEqualTo("test error message");
-
-
-
-
-
-
+        assertThat(getUserProfileResponseMock.getIdamStatusCode()).isEqualTo("code");
+        assertThat(getUserProfileResponseMock.getIdamMessage()).isEqualTo("test error message");
     }
-
-
-
-    /*public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
-
-        GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
-        if (!StringUtils.isEmpty(userProfileResponse)) {
-            user.setFirstName(userProfileResponse.getFirstName());
-            user.setLastName(userProfileResponse.getLastName());
-            user.setEmailAddress(userProfileResponse.getEmail());
-            if (isRequiredRoles) {
-                user.setUserIdentifier(userProfileResponse.getIdamId());
-                user.setIdamStatus(userProfileResponse.getIdamStatus());
-                user.setRoles(userProfileResponse.getRoles());
-                user.setIdamErrorStatusCode(userProfileResponse.getIdamErrorStatusCode());
-                user.setIdamErrorMessage(userProfileResponse.getIdamErrorMessage());
-            }
-        }
-        return user;
-    }*/
 }

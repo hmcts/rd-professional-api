@@ -26,7 +26,6 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
@@ -234,7 +233,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public void updateOrganisation(String organisationIdentifier, String role, OrganisationStatus status) {
+    public void updateOrganisation(String organisationIdentifier, String role, String status) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -11,8 +12,6 @@ import java.util.List;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-
 
 public class OrganisationFixtures {
 
@@ -39,6 +38,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
                 .name("  some-  org -name  ")
+                .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
@@ -57,11 +57,11 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
             .name("some-org-name")
-            .status(OrganisationStatus.PENDING)
+            .status("PENDING")
             .sraId("sra-id")
-            .sraRegulated(Boolean.FALSE)
+            .sraRegulated("false")
             .companyUrl("company -url")
-            .companyNumber("company")
+            .companyNumber(randomAlphabetic(8))
             .paymentAccount(paymentAccounts)
             .superUser(aUserCreationRequest()
                 .firstName("some-fname")
@@ -89,13 +89,13 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
             .name("some-org-name1")
-            .status(OrganisationStatus.ACTIVE)
+            .status("ACTIVE")
             .sraId("sra-id1")
-            .sraRegulated(Boolean.TRUE)
+            .sraRegulated("true")
             .companyUrl("company-url1")
-            .companyNumber("company1")
-            .paymentAccount(paymentAccounts)
-            .superUser(aUserCreationRequest()
+            .companyNumber(randomAlphabetic(8))
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
                 .firstName("somefname")
                 .lastName("somelname")
                 .email("someone1@somewhere.com")

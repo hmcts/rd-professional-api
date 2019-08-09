@@ -31,7 +31,6 @@ import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @Slf4j
@@ -84,9 +83,9 @@ public class ProfessionalApiClient {
 
         return someMinimalOrganisationRequest()
             .name(randomAlphabetic(10))
-            .status(OrganisationStatus.PENDING)
+            .status("PENDING")
             .sraId(randomAlphabetic(10) + "sra-id-number1")
-            .sraRegulated(Boolean.FALSE)
+            .sraRegulated("false")
             .companyUrl(randomAlphabetic(10) + "company-url")
             .companyNumber(randomAlphabetic(5) + "com")
             .paymentAccount(paymentAccounts)
@@ -258,7 +257,7 @@ public class ProfessionalApiClient {
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
 
         Response response = getMultipleAuthHeaders(role)
                 .body(organisationCreationRequest)

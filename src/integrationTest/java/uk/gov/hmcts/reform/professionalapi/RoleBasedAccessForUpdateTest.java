@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
@@ -18,7 +17,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
     public void can_not_update_entities_other_than_hmcts_admin_organisation_should_returns_status_403() {
 
         String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiCaseManager, organisationIdentifier);
@@ -30,7 +29,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
     public void can_not_update_entities_pui_user_manager_organisation_should_returns_status_403() {
 
         String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiUserManager, organisationIdentifier);
@@ -42,7 +41,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
     public void can_not_update_entities_pui_organisation_manager_should_returns_status_403() {
 
         String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiOrgManager, organisationIdentifier);
@@ -54,7 +53,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
     public void can_not_update_entities_pui_finance_manager_should_returns_status_403() {
 
         String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiFinanceManager, organisationIdentifier);
@@ -66,7 +65,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
     public void can_not_update_entities_pui_case_manager_should_returns_status_403() {
 
         String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(OrganisationStatus.ACTIVE).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, puiCaseManager, organisationIdentifier);

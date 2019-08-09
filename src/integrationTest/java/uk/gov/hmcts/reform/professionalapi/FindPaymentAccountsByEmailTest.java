@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -55,7 +54,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
@@ -93,7 +92,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
@@ -125,7 +124,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =

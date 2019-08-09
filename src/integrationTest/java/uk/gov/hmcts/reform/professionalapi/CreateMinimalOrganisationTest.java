@@ -88,6 +88,46 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    public void returns_400_when_email_not_valid() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("somename")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("@@someone@somewhere.com")
+                        .build())
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body").toString().contains("Bad Request"));
+
+        assertThat(organisationRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void returns_400_when_email_minus_not_valid() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("-someone@somewhere.com")
+                        .build())
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body").toString().contains("Bad Request"));
+
+        assertThat(organisationRepository.findAll()).isEmpty();
+    }
+
+    @Test
     public void returns_500_when_database_constraint_violated() {
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
