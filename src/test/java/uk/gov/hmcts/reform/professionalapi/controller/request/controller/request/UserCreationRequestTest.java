@@ -10,6 +10,7 @@ import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class UserCreationRequestTest {
 
@@ -22,14 +23,14 @@ public class UserCreationRequestTest {
 
     @Before
     public void setUp() {
-        userCreationRequest = new UserCreationRequest(firstName, lastName, email);
+        userCreationRequest = new UserCreationRequest(firstName, lastName, email, OrganisationFixtures.createJurisdictions());
     }
 
     @Test
     public void hasMandatoryFieldsSpecifiedNotNull() {
 
         UserCreationRequest userCreationRequest =
-                new UserCreationRequest(null, null, "some@email.com");
+                new UserCreationRequest(null, null, "some@email.com", OrganisationFixtures.createJurisdictions());
 
         Set<ConstraintViolation<UserCreationRequest>> violations =
                 validator.validate(userCreationRequest);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 public class OrganisationFixtures {
@@ -25,6 +26,7 @@ public class OrganisationFixtures {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
@@ -41,6 +43,7 @@ public class OrganisationFixtures {
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
                         .email(" someone@s omewh ere.com ")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()));
@@ -64,6 +67,7 @@ public class OrganisationFixtures {
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email("someone@somewhere.com")
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -95,6 +99,7 @@ public class OrganisationFixtures {
                 .firstName("somefname")
                 .lastName("somelname")
                 .email("someone1@somewhere.com")
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine3")
@@ -108,5 +113,17 @@ public class OrganisationFixtures {
                         .dxNumber("NI 1234567890")
                         .dxExchange("dxExchange1").build()))
                 .build()));
+    }
+
+    public static List<Jurisdiction> createJurisdictions() {
+
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("Probate");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("Bulk Scanning");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
+        return jurisdictions;
     }
 }
