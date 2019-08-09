@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.controller.reques
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,13 @@ public class OrganisationCreationRequestValidatorTest {
     @Mock
     Organisation org;
 
+    @Mock
+    UserCreationRequest userCreationRequest;
+
     Organisation myOrg;
     Exception myExceptionalException;
+
+
 
 
     @Before
@@ -49,6 +55,9 @@ public class OrganisationCreationRequestValidatorTest {
     @Test
     public void testCallsAllValidators() {
 
+        when(orgCreateRequest.getSuperUser()).thenReturn(userCreationRequest);
+
+        when(userCreationRequest.getEmail()).thenReturn("some@gmail.com");
         organisationCreationRequestValidator.validate(orgCreateRequest);
 
         verify(validator1, times(1)).validate(orgCreateRequest);

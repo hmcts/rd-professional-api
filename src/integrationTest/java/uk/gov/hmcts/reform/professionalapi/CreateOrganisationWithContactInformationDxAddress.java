@@ -348,7 +348,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
-                        .email(" someone @somewhere.com ")
+                        .email("someone@somewhere.com")
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1(" addressLine1 ").addressLine2(" ad  2 ").addressLine3(" ad3 ")
                         .country(" Ireland ")

@@ -20,10 +20,13 @@ import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 @Slf4j
 public class OrganisationCreationRequestValidator {
 
+
     private final List<RequestValidator> validators;
 
     @Autowired
     OrganisationRepository organisationRepository;
+
+    public final static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -32,6 +35,14 @@ public class OrganisationCreationRequestValidator {
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
         validators.forEach(v -> v.validate(organisationCreationRequest));
         validateOrganisationRequest(organisationCreationRequest);
+        validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+
+    }
+
+    public static void validateEmail(String email) {
+        if (email != null && !email.matches(emailRegex)) {
+            throw new InvalidRequest("Email format invalid");
+        }
     }
 
     public static boolean contains(String status) {
@@ -72,8 +83,19 @@ public class OrganisationCreationRequestValidator {
 
     public void validateOrganisationRequest(OrganisationCreationRequest request) {
         requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
+        requestSuperUserValidateAccount(request.getSuperUser());
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
+    }
+
+    private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
+
+        if (superUser == null || isEmptyValue(superUser.getFirstName())
+                || isEmptyValue(superUser.getEmail()) || isEmptyValue(superUser.getLastName())) {
+
+            throw new InvalidRequest("UserCreationRequest is not valid");
+        }
+
     }
 
     private void requestPaymentAccount(List<String> paymentAccounts) {
