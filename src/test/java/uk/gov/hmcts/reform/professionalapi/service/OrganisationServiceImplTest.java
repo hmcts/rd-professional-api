@@ -112,7 +112,8 @@ public class OrganisationServiceImplTest {
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
-                "some-email"
+                "some-email",
+                new ArrayList<>()
         );
 
         List<String> paymentAccountList = new ArrayList<>();

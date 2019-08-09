@@ -25,6 +25,11 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
+data "azurerm_key_vault_secret" "CCD_URL" {
+name = "CCD-URL"
+key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 data "azurerm_key_vault" "s2s_key_vault" {
   name = "s2s-${local.local_env}"
   resource_group_name = "rpe-service-auth-provider-${local.local_env}"
@@ -150,9 +155,11 @@ module "rd_professional_api" {
     POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
     POSTGRES_CONNECTION_OPTIONS = "?"
 
-    S2S_URL = "${local.s2s_url}"
+    S2S_URL = "${data.azurerm_key_vault_secret.s2s_url.value}"
+    S2S_SECRET = "${data.azurerm_key_vault_secret.s2s_secret.value}"
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
     USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
+    CCD_URL = "${data.azurerm_key_vault_secret.CCD_URL.value}"
 
     OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
     OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"
