@@ -20,6 +20,11 @@ locals {
   USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
 }
 
+data "azurerm_key_vault_secret" "CCD_URL" {
+name = "CCD-URL"
+key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 data "azurerm_key_vault" "rd_key_vault" {
   name = "${local.key_vault_name}"
   resource_group_name = "${local.key_vault_name}"
