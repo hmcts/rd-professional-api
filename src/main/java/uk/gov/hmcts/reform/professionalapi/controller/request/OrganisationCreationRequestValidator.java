@@ -52,9 +52,14 @@ public class OrganisationCreationRequestValidator {
         mandatoryFields.add(organisationCreationRequest.getSuperUser().getFirstName());
         mandatoryFields.add(organisationCreationRequest.getSuperUser().getLastName());
         mandatoryFields.add(organisationCreationRequest.getSuperUser().getEmail());
-        String adr1 = organisationCreationRequest.getContactInformation().stream().map(x -> x.getAddressLine1()).toString();
-        mandatoryFields.add(adr1);
-        mandatoryFields.add(organisationCreationRequest.getContactInformation().stream().map(x -> x.getPostCode()).toString());
+
+        List<ContactInformationCreationRequest> contactInformation = organisationCreationRequest.getContactInformation();
+        contactInformation.forEach(x -> mandatoryFields.add(x.getAddressLine1()));
+        contactInformation.forEach(x -> {
+            if (x.getPostCode() != null) {
+                mandatoryFields.add(x.getPostCode());
+            }
+        });
 
         mandatoryFields.forEach(field -> isFieldEmpty(field));
     }
