@@ -72,7 +72,6 @@ security:
     - rd_user_profile_api
     - xui_webapp
 
-
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
