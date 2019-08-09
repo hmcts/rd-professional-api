@@ -25,6 +25,11 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
+data "azurerm_key_vault_secret" "CCD_URL" {
+name = "CCD-URL"
+key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 data "azurerm_key_vault" "s2s_key_vault" {
   name = "s2s-${local.local_env}"
   resource_group_name = "rpe-service-auth-provider-${local.local_env}"
@@ -47,11 +52,6 @@ data "azurerm_key_vault_secret" "idam_url" {
 
 data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
  name = "USER-PROFILE-URL"
- key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "CCD_URL" {
- name = "CCD-URL"
  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
