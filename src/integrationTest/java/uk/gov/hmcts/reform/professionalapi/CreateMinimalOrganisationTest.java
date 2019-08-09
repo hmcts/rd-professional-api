@@ -15,7 +15,10 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
@@ -48,8 +51,19 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
         assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name");
+
+        PrdEnumId prdEnumId1 = new PrdEnumId(10,"JURISD_ID");
+        PrdEnumId prdEnumId2 = new PrdEnumId(13,"JURISD_ID");
+        PrdEnum prdEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "PROBATE");
+        PrdEnum prdEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "BULKSCAN");
+        UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
+        UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
+
+        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute1));
+        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute2));
+
 
     }
 
@@ -61,6 +75,46 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
+                        .build())
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body").toString().contains("Bad Request"));
+
+        assertThat(organisationRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void returns_400_when_email_not_valid() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("somename")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("@@someone@somewhere.com")
+                        .build())
+                .build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body").toString().contains("Bad Request"));
+
+        assertThat(organisationRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void returns_400_when_email_minus_not_valid() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("-someone@somewhere.com")
                         .build())
                 .build();
 

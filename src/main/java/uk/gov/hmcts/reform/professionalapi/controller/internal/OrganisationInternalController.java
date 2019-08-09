@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -42,7 +43,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @ApiOperation(
-            value = "Creates an Internal Organisation",
+            value = "Creates an Organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -97,6 +98,7 @@ public class OrganisationInternalController extends SuperController {
             )
     })
 
+    @Secured("prd-admin")
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
@@ -159,10 +161,11 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<?> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
 
         log.info("Received request to update organisation for organisationIdentifier: ");
-        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
 
     @ApiOperation(
@@ -195,11 +198,12 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<?> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
 
         log.info("Received request to add a internal new user to an organisation...");
 
-        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }
 

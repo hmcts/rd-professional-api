@@ -19,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -138,26 +138,12 @@ public class OrganisationExternalController extends SuperController {
     }
 
 
-    @PutMapping(
-            value = "/",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    @ResponseBody
-    @Secured("prd-admin")
-    public ResponseEntity<?> updatesOrganisationUsingExternalController(
-            @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-            @ApiParam(hidden = true)@OrgId  String organisationIdentifier) {
-
-        log.info("Received request to update organisation for external ");
-        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
-    }
-
     @ApiOperation(
-            value = "Add a external user to an organisation",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
+        value = "Add an user to an organisation",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization"),
+            @Authorization(value = "Authorization")
+        }
     )
     @ApiResponses({
             @ApiResponse(
@@ -179,11 +165,12 @@ public class OrganisationExternalController extends SuperController {
     @Secured("pui-user-manager")
     public ResponseEntity<?> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @ApiParam(hidden = true)@OrgId String organisationIdentifier) {
+            @ApiParam(hidden = true)@OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
 
         log.info("Received request to add a new user to an organisation for external...");
 
-        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier);
+        return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }
 
