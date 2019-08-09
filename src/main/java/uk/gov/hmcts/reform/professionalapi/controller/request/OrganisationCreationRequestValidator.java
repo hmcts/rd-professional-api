@@ -28,10 +28,16 @@ public class OrganisationCreationRequestValidator {
     @Autowired
     OrganisationRepository organisationRepository;
 
-    public final static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private  static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
+    }
+
+    public static void validateEmail(String email) {
+        if (email != null && !email.matches(emailRegex)) {
+            throw new InvalidRequest("Email format invalid");
+        }
     }
 
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
@@ -39,12 +45,6 @@ public class OrganisationCreationRequestValidator {
         validateOrganisationRequest(organisationCreationRequest);
         validateEmail(organisationCreationRequest.getSuperUser().getEmail());
 
-    }
-
-    public static void validateEmail(String email) {
-        if (email != null && !email.matches(emailRegex)) {
-            throw new InvalidRequest("Email format invalid");
-        }
     }
 
     public static boolean contains(String status) {
