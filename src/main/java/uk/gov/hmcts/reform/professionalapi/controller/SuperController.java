@@ -93,6 +93,20 @@ public abstract class SuperController {
             organisationCreationRequest.setSraRegulated("false");
         }
 
+        if (organisationCreationRequest.getSuperUser() != null) {
+            organisationCreationRequestValidator.validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+        }
+
+        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+
+        if (organisationCreationRequest.getCompanyNumber() != null) {
+            organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
+        }
+
+        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+            organisationCreationRequest.setSraRegulated("false");
+        }
+
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
@@ -237,7 +251,7 @@ public abstract class SuperController {
 
         Object responseBody = null;
         int responseStatus;
-
+        OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);

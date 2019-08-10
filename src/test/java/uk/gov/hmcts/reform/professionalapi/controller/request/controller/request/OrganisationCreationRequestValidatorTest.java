@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,9 @@ public class OrganisationCreationRequestValidatorTest {
     @Mock
     Organisation org;
 
+    @Mock
+    UserCreationRequest userCreationRequest;
+
     Organisation myOrg;
     Exception myExceptionalException;
 
@@ -76,6 +80,9 @@ public class OrganisationCreationRequestValidatorTest {
     @Test
     public void testCallsAllValidators() {
 
+        when(orgCreateRequest.getSuperUser()).thenReturn(userCreationRequest);
+
+        when(userCreationRequest.getEmail()).thenReturn("some@gmail.com");
         organisationCreationRequestValidator.validate(orgCreateRequest);
 
         verify(validator1, times(1)).validate(orgCreateRequest);
@@ -150,10 +157,6 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(org);
     }
 
-    /*@Test(expected = InvalidRequest.class)
-    public void requestValuesTest() {
-        organisationCreationRequestValidator.requestValues("");
-    }*/
 
     @Test(expected = InvalidRequest.class)
     public void validateOrganisationRequestTest() {
