@@ -46,7 +46,6 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
         assertThat(response.get("http_status")).asString().contains("400");
-        
     }
 
     @Test

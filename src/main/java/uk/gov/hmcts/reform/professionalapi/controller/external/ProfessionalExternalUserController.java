@@ -66,13 +66,13 @@ public class ProfessionalExternalUserController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("pui-user-manager")
-    public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId  String organisationIdentifier,
-                                       @ApiParam(name = "showDeleted", required = false)@RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                       @ApiParam(name = "email", required = false) @RequestParam (value = "email", required = false) String email) {
+    public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
+                                                     @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
 
         ResponseEntity<?> profUsersEntityResponse = null;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
-        profExtUsrReqValidator.validateRequest(organisationIdentifier,showDeleted,email);
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email);
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
@@ -82,6 +82,6 @@ public class ProfessionalExternalUserController extends SuperController {
             profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
         }
 
-        return  profUsersEntityResponse;
+        return profUsersEntityResponse;
     }
 }

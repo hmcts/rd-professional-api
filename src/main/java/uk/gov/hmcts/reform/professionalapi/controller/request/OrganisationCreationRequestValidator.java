@@ -28,6 +28,7 @@ public class OrganisationCreationRequestValidator {
     @Autowired
     OrganisationRepository organisationRepository;
 
+
     private  static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
@@ -86,6 +87,7 @@ public class OrganisationCreationRequestValidator {
     public void validateOrganisationRequest(OrganisationCreationRequest request) {
         requestValues(request.getName(), request.getSraId(), request.getCompanyNumber(), request.getCompanyUrl());
         requestSuperUserValidateAccount(request.getSuperUser());
+
         requestPaymentAccount(request.getPaymentAccount());
         requestContactInformation(request.getContactInformation());
     }

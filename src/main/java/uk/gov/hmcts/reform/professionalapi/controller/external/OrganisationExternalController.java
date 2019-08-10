@@ -162,7 +162,7 @@ public class OrganisationExternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
-    @Secured({"pui-user-manager"})
+    @Secured("pui-user-manager")
     public ResponseEntity<?> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true)@OrgId String organisationIdentifier,

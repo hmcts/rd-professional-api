@@ -157,10 +157,6 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(org);
     }
 
-    /*@Test(expected = InvalidRequest.class)
-    public void requestValuesTest() {
-        organisationCreationRequestValidator.requestValues("");
-    }*/
 
     @Test(expected = InvalidRequest.class)
     public void validateOrganisationRequestTest() {
