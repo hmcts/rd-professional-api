@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -36,10 +40,12 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
+        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<GrantedAuthority> authorities =  serviceAndUserDetails.getAuthorities();
         if (null != user
                 && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
 
-            if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+            if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap()) && !authorities.contains("pui-finance-manager")) {
 
                 List<PaymentAccount> userMapPaymentAccount =  PbaAccountUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
                 paymentAccountsEntity = PbaAccountUtil
@@ -50,7 +56,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
                 organisation = user.getOrganisation();
 
-            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
+            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap()) || authorities.contains("pui-finance-manager,prd-admin")) {
 
                 paymentAccountsEntity =  PbaAccountUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);

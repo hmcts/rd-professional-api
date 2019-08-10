@@ -178,10 +178,10 @@ public class OrganisationExternalController extends SuperController {
 
         log.info("In retrievePaymentAccountByUserEmail method:");
         boolean isPuiFinanceManExist = false;
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Collection<GrantedAuthority>  authorities =  serviceAndUserDetails.getAuthorities();
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
+        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
         return ResponseEntity
