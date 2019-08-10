@@ -50,10 +50,6 @@ data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "CCD_URL" {
- name = "CCD-URL"
- key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   name = "microservicekey-rd-professional-api"
