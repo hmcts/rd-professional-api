@@ -83,6 +83,11 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
+
+        if (organisationCreationRequest.getSuperUser() != null) {
+            organisationCreationRequestValidator.validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+        }
+
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
@@ -237,7 +242,7 @@ public abstract class SuperController {
 
         Object responseBody = null;
         int responseStatus;
-
+        OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);

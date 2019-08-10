@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 public class CreateOrganisationWithPaymentAccountForSuperuserTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
+    public void return_400_invalid_organisation_with_invalid_email() {
         String prefix = UUID.randomUUID().toString();
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA1234567");
@@ -45,12 +45,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
-
-
-        assertThat(response.get("http_status")).asString().contains("201");
-        assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier())
-                .isEqualTo(orgIdentifierResponse);
+        assertThat(response.get("http_status")).asString().contains("400");
         
     }
 

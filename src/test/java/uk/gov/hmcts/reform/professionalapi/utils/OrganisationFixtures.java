@@ -42,7 +42,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName(" some-fname    b    ")
                         .lastName(" some-         lname  ")
-                        .email(" someone@s omewh ere.com ")
+                        .email(" someone@somewhere.com ")
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
