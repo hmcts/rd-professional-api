@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,31 @@ public class OrganisationCreationRequestValidator {
             }
         }
         return false;
+    }
+
+    public void checkingMandatoryFields(OrganisationCreationRequest organisationCreationRequest) {
+        List<String> mandatoryFields = new ArrayList<>();
+
+        mandatoryFields.add(organisationCreationRequest.getName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getFirstName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getLastName());
+        mandatoryFields.add(organisationCreationRequest.getSuperUser().getEmail());
+
+        List<ContactInformationCreationRequest> contactInformation = organisationCreationRequest.getContactInformation();
+        contactInformation.forEach(x -> mandatoryFields.add(x.getAddressLine1()));
+        contactInformation.forEach(x -> {
+            if (x.getPostCode() != null) {
+                mandatoryFields.add(x.getPostCode());
+            }
+        });
+
+        mandatoryFields.forEach(field -> isFieldEmpty(field));
+    }
+
+    public void isFieldEmpty(String field) {
+        if (StringUtils.isEmpty(field)) {
+            throw new InvalidRequest("The field " + field + " cannot contain and empty string");
+        }
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
@@ -108,7 +134,7 @@ public class OrganisationCreationRequestValidator {
 
                 if (isEmptyValue(paymentAccount)) {
 
-                    throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
+                    throw new InvalidRequest("Empty paymentAccount value: " + paymentAccount);
                 }
 
             }
@@ -121,7 +147,7 @@ public class OrganisationCreationRequestValidator {
         for (String value : values) {
 
             if (isEmptyValue(value)) {
-                throw new InvalidRequest("Empty input value" + value);
+                throw new InvalidRequest("Empty input value: " + value);
             }
         }
     }

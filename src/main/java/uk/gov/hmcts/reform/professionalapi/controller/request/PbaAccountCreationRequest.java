@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Getter
 @Builder(builderMethodName = "aPbaPaymentAccount")
@@ -17,7 +18,7 @@ public class PbaAccountCreationRequest {
     @JsonCreator
     public PbaAccountCreationRequest(
             @JsonProperty("pbaAccounts") String pbaNumber) {
-        this.pbaNumber = pbaNumber;
+        this.pbaNumber = PbaAccountUtil.removeEmptySpaces(pbaNumber);
     }
 
     public String getPbaNumber() {

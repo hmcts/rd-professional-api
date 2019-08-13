@@ -8,6 +8,7 @@ import javax.validation.constraints.Pattern;
 
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Getter
 @Builder(builderMethodName = "dxAddressCreationRequest")
@@ -23,7 +24,7 @@ public class DxAddressCreationRequest {
     public DxAddressCreationRequest(@JsonProperty("dxNumber") String dxNumber,
                                     @JsonProperty("dxExchange") String dxExchange) {
 
-        this.dxNumber = dxNumber;
-        this.dxExchange = dxExchange;
+        this.dxNumber = PbaAccountUtil.removeEmptySpaces(dxNumber);
+        this.dxExchange = PbaAccountUtil.removeEmptySpaces(dxExchange);
     }
 }

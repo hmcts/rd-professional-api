@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Getter
 @Builder(builderMethodName = "aNewUserCreationRequest")
@@ -34,9 +35,9 @@ public class NewUserCreationRequest {
             @JsonProperty("roles") List<String> roles,
             @JsonProperty("jurisdictions") List<Jurisdiction> jurisdictions) {
 
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = emailAddress.toLowerCase();
+        this.firstName = PbaAccountUtil.removeEmptySpaces(firstName);
+        this.lastName = PbaAccountUtil.removeEmptySpaces(lastName);
+        this.email = PbaAccountUtil.removeAllSpaces(emailAddress.toLowerCase());
         this.roles = roles;
         this.jurisdictions = jurisdictions;
     }

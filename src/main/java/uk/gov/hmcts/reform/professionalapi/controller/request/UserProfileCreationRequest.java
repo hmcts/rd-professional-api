@@ -14,6 +14,7 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Setter
 @Getter
@@ -53,9 +54,9 @@ public class UserProfileCreationRequest  {
                                       @JsonProperty(value = "userType") UserType userType,
                                       @JsonProperty(value = "roles") List<String> roles) {
 
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.email = PbaAccountUtil.removeAllSpaces(email);
+        this.firstName = PbaAccountUtil.removeEmptySpaces(firstName);
+        this.lastName = PbaAccountUtil.removeEmptySpaces(lastName);
         this.languagePreference = languagePreference;
         this.userCategory = userCategory;
         this.userType = userType;

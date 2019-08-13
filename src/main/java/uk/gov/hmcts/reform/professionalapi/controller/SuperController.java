@@ -90,6 +90,8 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
+        organisationCreationRequestValidator.checkingMandatoryFields(organisationCreationRequest);
+
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }

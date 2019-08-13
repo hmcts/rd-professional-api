@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
 
 @Getter
 @Setter
@@ -47,12 +48,12 @@ public class OrganisationCreationRequest {
             @JsonProperty("paymentAccount") List<String> paymentAccount,
             @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
-        this.name = name;
+        this.name = PbaAccountUtil.removeEmptySpaces(name);
         this.status = status;
-        this.sraId = sraId;
+        this.sraId = PbaAccountUtil.removeEmptySpaces(sraId);
         this.sraRegulated = sraRegulated;
-        this.companyNumber = companyNumber;
-        this.companyUrl = companyUrl;
+        this.companyNumber = PbaAccountUtil.removeEmptySpaces(companyNumber);
+        this.companyUrl = PbaAccountUtil.removeAllSpaces(companyUrl);
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
