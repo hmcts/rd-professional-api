@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
@@ -93,6 +94,7 @@ public class ProfessionalApiClient {
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
+                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -106,6 +108,18 @@ public class ProfessionalApiClient {
                     .dxNumber("DX 1234567890")
                     .dxExchange("dxExchange").build()))
                 .build()));
+    }
+
+    public static List<Jurisdiction> createJurisdictions() {
+
+        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        Jurisdiction jurisdiction1 = new Jurisdiction();
+        jurisdiction1.setId("Probate");
+        Jurisdiction jurisdiction2 = new Jurisdiction();
+        jurisdiction2.setId("Bulk Scanning");
+        jurisdictions.add(jurisdiction1);
+        jurisdictions.add(jurisdiction2);
+        return jurisdictions;
     }
 
     public Map<String, Object> createOrganisation() {
