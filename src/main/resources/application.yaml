@@ -25,11 +25,12 @@ spring:
     name: Professional Reference Data API
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.locations: classpath:db/migration,classpath:db/postgres
 
 ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:rd-professional-postgresql}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
     properties:
@@ -63,18 +64,45 @@ security:
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
     - "/search/**"
+    - "/csrf"
+    - "/error"
+    - "/favicon.ico"
   authorisedServices:
     - rd_professional_api
-    - rd_user_profile
+    - rd_user_profile_api
+    - xui_webapp
+
 
 ### dependency configuration
-auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8502}
+auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAC}
+    totp_secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
     microservice: rd_professional_api
-    url: ${S2S_URL:http://127.0.0.1:8502}
+    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: false
 usermap:
     pbaFromUserAccountMap:
     - "false"
+
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.preview.platform.hmcts.net}
+auth.idam.client.detailsUri: "/details"
+## Secure roles configuration
+exui.role:
+    hmcts-admin: prd-admin
+    pui-user-manager: pui-user-manager
+    pui-organisation-manager: pui-organisation-manager
+    pui-finance-manager: pui-finance-manager
+    pui-case-manager: pui-case-manager
+
+prdEnumRoleType: ADMIN_ROLE,JURISD_ID
+jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
+
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
+ccdUrl: ${CCD_URL:https://ccd-user-profile-api-aat.service.core-compute-aat.internal}
+
+feign:
+  allow:
+    headers:
+      - authorization
+      - serviceauthorization

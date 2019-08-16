@@ -9,34 +9,39 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class UserEmailSearchTest extends FunctionalTestSuite {
+@Ignore
+public class UserEmailSearchTest extends AuthorizationFunctionalTest {
+
 
     @Test
     public void can_find_a_user_by_their_email_address() {
 
-        String email = randomAlphabetic(10) + "@usersearch.test";
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
 
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email, hmctsAdmin);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }

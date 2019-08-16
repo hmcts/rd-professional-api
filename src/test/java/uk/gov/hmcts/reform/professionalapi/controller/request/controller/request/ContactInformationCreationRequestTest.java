@@ -28,8 +28,7 @@ public class ContactInformationCreationRequestTest {
 
         Set<ConstraintViolation<ContactInformationCreationRequest>> violations = validator
                 .validate(contactInformationCreationRequest);
-
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(violations.size()).isEqualTo(2);
     }
 
     @Test
