@@ -82,7 +82,7 @@ public class ExceptionMapper {
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
         String fieldName = null;
-        if(ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
+        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
             String message = ex.getCause().getCause().getMessage();
             if (message.contains("SRA_ID")) {
                 errorMessage = errorMessage + "for field SRA_ID";
