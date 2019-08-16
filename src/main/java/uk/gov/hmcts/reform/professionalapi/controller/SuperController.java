@@ -235,7 +235,7 @@ public abstract class SuperController {
             }
             return JsonFeignResponseHelper.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
-            throw new RuntimeException("UserProfile api failed!!");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
     }
 
