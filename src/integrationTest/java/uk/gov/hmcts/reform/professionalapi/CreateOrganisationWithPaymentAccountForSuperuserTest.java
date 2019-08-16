@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,15 +17,16 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
-public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Service2ServiceEnabledIntegrationTest {
+public class CreateOrganisationWithPaymentAccountForSuperuserTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void persists_organisation_with_valid_pbaAccount_super_user_contact_Info() {
+    public void return_400_invalid_organisation_with_invalid_email() {
         String prefix = UUID.randomUUID().toString();
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
@@ -33,6 +35,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(String.format("%s@somewhere.com", prefix))
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -42,27 +45,23 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
-
-
-        assertThat(response.get("http_status")).asString().contains("201");
-        assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
-        assertThat(persistedPaymentAccounts.get(0).getOrganisation().getOrganisationIdentifier())
-                .isEqualTo(orgIdentifierResponse);
+        assertThat(response.get("http_status")).asString().contains("400");
     }
 
     @Test
-    public void persists_and_returns_400_user_email_is_not_unique() {
+    public void persists_and_returns_409_company_number_is_not_unique() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .sraId("sra-id-number")
-                .sraRegulated(Boolean.FALSE)
+                .sraRegulated("false")
                 .companyUrl("company-url")
-                .companyNumber("companyn")
+                .companyNumber("same1010")
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
+                        .firstName(" some-fname ")
+                        .lastName(" some-lname ")
                         .email("someone@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
@@ -73,25 +72,11 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Servic
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .sraId("sra-id-number1")
-                .sraRegulated(Boolean.FALSE)
-                .companyUrl("company-url")
-                .companyNumber("company")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()))
-                .build();
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        assertThat(response2.get("http_status")).isEqualTo("400");
+
+        assertThat(response2.get("http_status")).isEqualTo("409");
     }
 }

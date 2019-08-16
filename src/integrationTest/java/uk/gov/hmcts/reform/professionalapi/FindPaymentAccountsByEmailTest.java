@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.ArrayList;
@@ -14,13 +15,13 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.Service2ServiceEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegrationTest {
+public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
@@ -28,20 +29,21 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     @Autowired
     ApplicationConfiguration configuration;
 
-
     @Test
     public void get_request_returns_correct_payment_accounts_associated_with_email() {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-")
+                .name("some-org-name")
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -52,32 +54,34 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
-
         responseValidate(orgResponse);
+
     }
 
     @Test
     public void returns_multiple_correct_payment_accounts_associated_with_email() {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
-        paymentAccounts.add("pba124");
+        paymentAccounts.add("PBA1234567");
+        paymentAccounts.add("PBA1234568");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-")
+                .name("some-org-name")
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -88,12 +92,12 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
 
@@ -101,14 +105,15 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     }
 
     @Test
-    public void returns_200_organisation_user_accounts_associated_with_email_and_no_payment_account() {
+    public void returns_404_organisation_user_accounts_associated_with_email_and_no_payment_account() {
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-")
+                .name("some-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
@@ -119,38 +124,22 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
         String uuid = (String)organisationResponse.get("organisationIdentifier");
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(OrganisationStatus.ACTIVE).build();
+                .status("ACTIVE").build();
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, uuid);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
-        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> orgResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
+        assertThat(orgResponse.get("http_status")).isEqualTo("404");
 
-        orgResponse.forEach((k,v) -> {
-
-            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) &&  "status".equals(k) && "sraId".equals(k)
-                    && "sraRegulated".equals(k) && "companyNumber".equals(k)
-                    && "companyUrl".equals(k) &&  "superUser".equals(k)) {
-
-                assertThat(v.toString()).isNotEmpty();
-                assertThat(v.toString().contains("Ok"));
-                assertThat(v.toString().contains("some-org-name1"));
-                assertThat(v.toString().equals("ACTIVE"));
-                assertThat(v.toString().equals("sra-id1"));
-                assertThat(v.toString().equals("true"));
-                assertThat(v.toString().equals("company1"));
-                assertThat(v.toString().equals("company-url1"));
-            }
-
-        });
     }
 
     @Test
     public void return_404_when_organisation_status_pending_for_pba_user_email_address() {
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add("pba123");
+        paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-")
@@ -159,13 +148,14 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
                 .build();
 
         professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com");
+        Map<String, Object> response = professionalReferenceDataClient.findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
 
@@ -175,33 +165,19 @@ public class FindPaymentAccountsByEmailTest extends Service2ServiceEnabledIntegr
     public void returns_404_when_email_not_found() {
 
         Map<String, Object> response =
-                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com");
+                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {
 
-        orgResponse.forEach((k,v) -> {
+        assertThat(orgResponse.get("http_status").toString().contains("200"));
+        Map<String, Object> activeOrganisation = (Map<String, Object>) orgResponse.get("organisationEntityResponse");
 
-            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) &&  "status".equals(k)
-                    && "sraId".equals(k) && "sraRegulated".equals(k)
-                    && "companyNumber".equals(k) && "companyUrl".equals(k)
-                    &&  "superUser".equals(k) && "paymentAccount".equals(k)) {
-
-                assertThat(v.toString()).isNotEmpty();
-                assertThat(v.toString().contains("Ok"));
-                assertThat(v.toString().contains("some-org-name1"));
-                assertThat(v.toString().equals("ACTIVE"));
-                assertThat(v.toString().equals("sra-id1"));
-                assertThat(v.toString().equals("true"));
-                assertThat(v.toString().equals("company1"));
-                assertThat(v.toString().equals("company-url1"));
-                assertThat(v.toString().contains("pba123,pba124"));
-            }
-
-        });
-
+        Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
+        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
+        assertThat(superUser.get("lastName")).isEqualTo("rao");
+        assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
     }
 }

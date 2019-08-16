@@ -3,21 +3,28 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class UpdateOrganisationTest extends FunctionalTestSuite {
+@Slf4j
+public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
-
+    @Ignore
     @Test
     public void can_update_an_organisation() {
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
+        log.info("hmctsAdmin::" + hmctsAdmin);
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
     }
 }

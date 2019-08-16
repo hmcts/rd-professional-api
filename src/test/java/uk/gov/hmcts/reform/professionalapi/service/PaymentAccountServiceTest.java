@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -30,8 +31,9 @@ public class PaymentAccountServiceTest {
 
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
+    UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
 
-    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, professionalUserRepositoryMock);
+    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,professionalUserRepositoryMock);
 
     private Organisation organisationMock;
 
@@ -74,6 +76,10 @@ public class PaymentAccountServiceTest {
         Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
 
         assertThat(organisation).isNotNull();
+
+        verify(
+                organisationMock,
+                times(1)).setUsers(any());
 
         verify(
                 organisationMock,

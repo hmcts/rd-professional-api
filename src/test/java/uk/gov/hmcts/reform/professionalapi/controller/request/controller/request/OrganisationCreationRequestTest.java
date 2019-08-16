@@ -17,10 +17,10 @@ public class OrganisationCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest(null,null,null, Boolean.FALSE,null,null,null,null, null);
+                new OrganisationCreationRequest(null,null,null, "false",null,null,null,null, null);
 
         Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator.validate(organisationCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(2);
+        assertThat(violations.size()).isEqualTo(3);
     }
 }
