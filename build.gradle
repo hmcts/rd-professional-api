@@ -49,6 +49,21 @@ version = '0.0.1'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.85
+
+            }
+
+        }
+    }
+}
+
+
 compileJava {
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
@@ -104,6 +119,8 @@ configurations {
     functionalTestCompile.extendsFrom testCompile
     functionalTestRuntime.extendsFrom testRuntime
 }
+
+check.dependsOn jacocoTestReport
 
 checkstyle {
     maxWarnings = 0
