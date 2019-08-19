@@ -18,16 +18,6 @@ public class NewUserCreationRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void testHasMandatoryFieldsSpecified() {
-        NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest(null, null, "some@email.com", null, new ArrayList<>());
-
-        Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
-
-        assertThat(violations.size()).isEqualTo(3);
-    }
-
-    @Test
     public void testCreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");

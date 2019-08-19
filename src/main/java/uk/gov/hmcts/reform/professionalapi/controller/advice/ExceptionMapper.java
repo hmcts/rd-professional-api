@@ -80,8 +80,19 @@ public class ExceptionMapper {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
-
+        String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
+        String fieldName = null;
+        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
+            String message = ex.getCause().getCause().getMessage();
+            if (message.contains("SRA_ID")) {
+                errorMessage = errorMessage + "for field SRA_ID";
+            } else if (message.contains("COMPANY_NUMBER")) {
+                errorMessage = errorMessage + "for field COMPANY_NUMBER";
+            } else if (message.contains("EMAIL")) {
+                errorMessage = errorMessage + "for field EMAIL";
+            }
+        }
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
