@@ -28,8 +28,7 @@ public class OrganisationCreationRequestValidator {
     @Autowired
     OrganisationRepository organisationRepository;
 
-
-    private  static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -37,7 +36,13 @@ public class OrganisationCreationRequestValidator {
 
     public static void validateEmail(String email) {
         if (email != null && !email.matches(emailRegex)) {
-            throw new InvalidRequest("Email format invalid");
+            throw new InvalidRequest("Email format invalid for email: " + email);
+        }
+    }
+
+    public static void validateNewUserCreationRequestForMandatoryFields(NewUserCreationRequest request) {
+        if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName()) || StringUtils.isBlank(request.getEmail())) {
+            throw new InvalidRequest("Manadatory fields are blank or null");
         }
     }
 

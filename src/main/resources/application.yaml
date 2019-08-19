@@ -99,7 +99,7 @@ prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
 userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-preview.service.core-compute-preview.internal}
-ccdUrl: ${CCD_URL:https://ccd-user-profile-api-aat.service.core-compute-aat.internal}
+ccdUrl: ${CCD_URL:https://ccd-user-profile-api-preview.service.core-compute-preview.internal}
 
 feign:
   allow:

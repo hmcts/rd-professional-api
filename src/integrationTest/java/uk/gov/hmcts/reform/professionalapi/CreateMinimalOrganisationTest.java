@@ -131,6 +131,26 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    public void returns_200_when_email_has_underscore() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some_one_gh@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+
+    }
+
+    @Test
     public void returns_500_when_database_constraint_violated() {
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
@@ -198,29 +218,4 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(response1.get("http_status")).isEqualTo("400");
         assertThat(response1.get("response_body").toString().contains("SRA_ID"));
     }
-
-    /*@Test
-    public void returns_400_when_email_is_duplicate() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build()))
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        Map<String, Object> response1 =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        assertThat(response1.get("http_status")).isEqualTo("400");
-        assertThat(response1.get("response_body").toString().contains("EMAIL"));
-    }*/
-
 }

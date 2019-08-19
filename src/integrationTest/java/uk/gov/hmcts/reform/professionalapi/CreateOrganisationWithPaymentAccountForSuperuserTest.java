@@ -34,7 +34,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(String.format("%s@somewhere.com", prefix))
+                        .email(String.format("s@-somewhere.com", prefix))
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))

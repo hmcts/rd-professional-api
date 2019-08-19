@@ -254,6 +254,7 @@ public abstract class SuperController {
 
         Object responseBody = null;
         int responseStatus;
+        OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
