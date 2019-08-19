@@ -15,42 +15,47 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
+public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTest {
 
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
-        Map<String, Object> response =  professionalApiClient.createOrganisation(
-                someMinimalOrganisationRequest()
-                        .paymentAccount(paymentAccounts)
-                        .superUser(aUserCreationRequest()
-                                .firstName("some-fname")
-                                .lastName("some-lname")
-                                .email(email)
-                                .build())
-                        .build());
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(email)
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .build();
+
+        Map<String, Object> response =  professionalApiClient.createOrganisation(request);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email);
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(), hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
     }
 
     @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test";
+        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(randomAlphabetic(10));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
@@ -59,10 +64,11 @@ public class PaymentAccountRetrieveByEmailTest extends FunctionalTestSuite {
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
+                                .jurisdictions(OrganisationFixtures.createJurisdictions())
                                 .build())
                         .build());
 
-        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email);
+        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, hmctsAdmin);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {

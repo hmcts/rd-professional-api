@@ -167,16 +167,16 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.Application',
+            'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
     ]
     threads = 10
     enableDefaultIncrementalAnalysis = true
     historyInputLocation = ['build/reports/pitest/fastermutationtesting']
     historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
-    timestampedReports = true
+    timestampedReports = false
     mutationThreshold = 90
-      
    }
 
 project.tasks['pitest'].group = "Verification"
@@ -191,7 +191,8 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java" +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/JsonFeignResponseHelper.java"
     }
 }
 
