@@ -52,3 +52,8 @@ variable "log_level_spring_web" {
 variable "log_level_rd" {
   default = "INFO"
 }
+
+variable "managed_identity_object_id" {
+  default = ""
+}
+
