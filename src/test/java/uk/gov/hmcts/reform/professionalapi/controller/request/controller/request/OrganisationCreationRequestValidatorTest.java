@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
@@ -46,6 +47,12 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Mock
     UserCreationRequest userCreationRequest;
+
+    @Mock
+    Organisation organisation;
+
+    @Mock
+    OrganisationRepository organisationRepository;
 
     Organisation myOrg;
     Exception myExceptionalException;
@@ -308,5 +315,12 @@ public class OrganisationCreationRequestValidatorTest {
     public void should_validate_mandatory_user_fields_and_throw_exception() {
         NewUserCreationRequest request = new NewUserCreationRequest(null, null, "a@hmcts.net", new ArrayList<String>(), new ArrayList<>());
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void should_validate_company_no_length_and_throw_if_length_more_than_8() {
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "123456789","",null, new ArrayList<>(),null);
+
+        organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 }
