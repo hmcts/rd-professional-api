@@ -274,7 +274,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void returns_200_when_company_number_length_greater_than_8() {
+    public void returns_400_when_company_number_length_greater_than_8() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some")
                 .companyNumber("123456789")
