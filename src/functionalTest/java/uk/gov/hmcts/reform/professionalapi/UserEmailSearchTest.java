@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 @ActiveProfiles("functional")
 public class UserEmailSearchTest extends FunctionalTestSuite {
 
-    //@Test
+    @Test
     public void can_find_a_user_by_their_email_address() {
 
         String email = randomAlphabetic(10) + "@usersearch.test";
