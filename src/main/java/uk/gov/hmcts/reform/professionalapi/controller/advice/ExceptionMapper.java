@@ -83,13 +83,13 @@ public class ExceptionMapper {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
         String fieldName = null;
         if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
-            String message = ex.getCause().getCause().getMessage();
+            String message = ex.getCause().getCause().getMessage().toUpperCase();
             if (message.contains("SRA_ID")) {
-                errorMessage = errorMessage + "for field SRA_ID";
+                errorMessage = errorMessage + " for field SRA_ID";
             } else if (message.contains("COMPANY_NUMBER")) {
-                errorMessage = errorMessage + "for field COMPANY_NUMBER";
-            } else if (message.contains("EMAIL")) {
-                errorMessage = errorMessage + "for field EMAIL";
+                errorMessage = errorMessage + " for field COMPANY_NUMBER";
+            } else if (message.contains("EMAIL_ADDRESS")) {
+                errorMessage = errorMessage + " for field EMAIL";
             }
         }
         return errorDetailsResponseEntity(ex, BAD_REQUEST, errorMessage);
