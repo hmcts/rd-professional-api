@@ -7,6 +7,8 @@ import feign.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,11 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
@@ -79,6 +85,7 @@ public interface PbaAccountUtil {
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
@@ -87,6 +94,54 @@ public interface PbaAccountUtil {
 
         return user;
     }
+
+    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
+                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                         String showDeleted, Map<UUID, Organisation> activeOrganisationDtls) {
+        List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
+
+        try {
+            Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false");
+
+            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            if (response.status() < 300) {
+
+                modifiedOrgProfUserDtls = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDtls);
+            }
+
+            return modifiedOrgProfUserDtls;
+        }  catch (FeignException ex) {
+
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+        }
+
+    }
+
+    public static  List<Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity, Map<UUID, Organisation> activeOrganisationDtls) {
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
+        List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUserProfiles();
+        List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
+
+        modifiedOrgProfUserDtls = userProfiles.stream().map( userProfile -> {
+            Organisation organisation = null;
+            if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
+
+                organisation = activeOrganisationDtls.get(userProfile.getUserIdentifier());
+
+                organisation.getUsers().get(0).setFirstName(userProfile.getFirstName());
+                organisation.getUsers().get(0).setLastName(userProfile.getLastName());
+                organisation.getUsers().get(0).setEmailAddress(userProfile.getEmail());
+
+            }
+            return organisation;
+
+        }).collect(toList());
+
+        return modifiedOrgProfUserDtls;
+    }
+
 
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 

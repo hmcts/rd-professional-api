@@ -229,6 +229,7 @@ public abstract class SuperController {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseHelper.toResponseEntity(response, clazz);
         }  catch (FeignException ex) {
+            log.error("UserProfile api failed:: status code ::" + ex.status());
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
     }

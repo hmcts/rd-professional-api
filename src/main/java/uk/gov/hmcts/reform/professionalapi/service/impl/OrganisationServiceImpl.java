@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -236,26 +241,33 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
-        List<Organisation> organisations = organisationRepository.findAll();
+        List<Organisation> pendingOrganisation = organisationRepository.findByStatus(OrganisationStatus.PENDING);
 
+        List<Organisation> activeOrganisation = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+
+        Map<UUID,Organisation> activeOrganisationDtls = new HashMap<UUID,Organisation>();
+
+        List<UUID> userIdentifiers = new ArrayList<>();
         log.debug("Retrieving all organisations...");
 
-        if (organisations.isEmpty()) {
+        if (activeOrganisation.isEmpty() && pendingOrganisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        organisations = organisations.stream()
-                .map(organisation -> {
+        activeOrganisation.forEach(
+                organisation -> {
+                        userIdentifiers.add(organisation.getUsers().get(0).getUserIdentifier());
+                        activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                });
 
-                    if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(userIdentifiers);
+        List<Organisation> updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest ,
+                "false", activeOrganisationDtls);
 
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
-                        return organisation;
-                    }
-                    return organisation;
-                }).collect(Collectors.toList());
 
-        return new OrganisationsDetailResponse(organisations, true);
+        updatedOrganisationDetails.addAll(pendingOrganisation);
+
+        return new OrganisationsDetailResponse(updatedOrganisationDetails, true);
     }
 
     @Override
