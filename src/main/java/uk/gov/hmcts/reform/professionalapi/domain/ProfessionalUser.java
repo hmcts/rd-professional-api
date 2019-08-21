@@ -9,14 +9,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -26,7 +25,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
@@ -51,16 +50,15 @@ public class ProfessionalUser {
     @Size(max = 255)
     private String emailAddress;
 
-    @Column(name = "STATUS")
-    @Enumerated(EnumType.STRING)
-    private ProfessionalUserStatus status;
-
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
     @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
+
+    @Column(name = "DELETED")
+    private LocalDateTime deleted;
 
     @LastModifiedDate
     @Column(name = "LAST_UPDATED")
@@ -77,18 +75,27 @@ public class ProfessionalUser {
     @Column(name = "USER_IDENTIFIER")
     private UUID userIdentifier;
 
+    @Transient
+    private List<String> roles;
+
+    @Transient
+    private IdamStatus idamStatus;
+
+    @Transient
+    private String idamStatusCode;
+
+    @Transient
+    private String idamMessage;
+
     public ProfessionalUser(
                             String firstName,
                             String lastName,
                             String emailAddress,
-                            ProfessionalUserStatus status,
                             Organisation organisation) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
-        this.status = status;
         this.organisation = organisation;
-        this.userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
     }
 }

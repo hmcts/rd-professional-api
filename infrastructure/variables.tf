@@ -55,5 +55,6 @@ variable "log_level_rd" {
 
 variable "managed_identity_object_id" {
   default = ""
+
 }
 

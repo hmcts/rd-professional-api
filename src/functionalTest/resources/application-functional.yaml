@@ -1,8 +1,27 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
-s2s-url: ${S2S_URL_FOR_TESTS:http://127.0.0.1:8502}
+targetInstance: ${TEST_URL:http://rd-professional-api-preview.service.core-compute-preview.internal}
+s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+
 s2s-name: rd_professional_api
-# Test key - not used in any deployed vaults or services
-s2s-secret: ${S2S_SECRET:SZDUA3L7N32PE2IS}
-spring:
-  flyway:
-    enabled: false
+
+idam.api.url: ${IDAM_URL:https://idam-api.preview.platform.hmcts.net}
+generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
+test.url: ${TEST_URL:http://rd-professional-api-preview.service.core-compute-preview.internal}
+test.user.password: ${TEST_USER_PASSWORD:Hmcts123}
+#oauth2.redirect.uri: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-preview.service.core-compute-preview.internal/oauth2redirect}
+oauth2.client.id: ${OAUTH2_CLIENT_ID:rd-professional-api}
+oauth2.client.secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64}
+idam.auth.clientId: xuiwebapp
+
+idam.auth.tokenAuth: ${IDAM_TOKEN_ATUH:eHVpd2ViYXBwOnlCNzFtblBleXBQM0hsY04=}
+idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth2/callback}
+s2s-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
+
+spring.flyway.enabled: false
+## Secure roles configuration 1
+exui.role.hmcts-admin: prd-admin
+exui.role.pui-user-manager: pui-user-manager
+exui.role.pui-organisation-manager: pui-organisation-manager
+exui.role.pui-finance-manager: pui-finance-manager
+exui.role.pui-case-manager: pui-case-manager
+
+
