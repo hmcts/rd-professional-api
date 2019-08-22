@@ -7,3 +7,4 @@ java:
 postgresql:
   #Whether to deploy the Postgres Chart or not
   enabled: true
+
