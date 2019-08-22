@@ -8,7 +8,6 @@ import feign.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.StringUtils;
@@ -82,7 +81,7 @@ public interface PbaAccountUtil {
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new RuntimeException();
         }
 
         return user;

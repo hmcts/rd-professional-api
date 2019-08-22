@@ -53,6 +53,10 @@ variable "log_level_rd" {
   default = "INFO"
 }
 
+variable "team_name" {
+  default     = "RD"
+}
+
 variable "managed_identity_object_id" {
   default = ""
 
