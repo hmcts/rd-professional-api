@@ -2,36 +2,45 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUserStatus;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private final UUID userIdentifier;
+    private UUID userIdentifier;
     @JsonProperty
-    private final String firstName;
+    private String firstName;
     @JsonProperty
-    private final String lastName;
+    private String lastName;
     @JsonProperty
-    private final String email;
+    private String email;
     @JsonProperty
-    private final ProfessionalUserStatus status;
+    private List<String> roles;
     @JsonProperty
-    private final List<String> roles = new ArrayList<String>();
+    private IdamStatus idamStatus;
+    @JsonProperty
+    private String idamStatusCode;
+    @JsonProperty
+    private String idamMessage;
 
     public ProfessionalUsersResponse(ProfessionalUser user) {
-        this.userIdentifier = Optional.ofNullable(user.getUserIdentifier()).orElse(user.getUserIdentifier());
+        this.userIdentifier = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
-        this.status = user.getStatus();
+        this.roles = user.getRoles();
+        this.idamStatus = user.getIdamStatus();
+        this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
+        this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
     }
 }

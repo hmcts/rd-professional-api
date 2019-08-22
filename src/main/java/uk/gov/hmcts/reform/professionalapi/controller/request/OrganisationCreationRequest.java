@@ -4,22 +4,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Getter;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder(builderMethodName = "anOrganisationCreationRequest")
 public class OrganisationCreationRequest {
 
     @NotNull
     private final String name;
 
-    private final OrganisationStatus status;
+    private String status;
 
     private final String sraId;
 
-    private final Boolean sraRegulated;
+    private String sraRegulated;
 
     private final String companyNumber;
 
@@ -30,14 +32,15 @@ public class OrganisationCreationRequest {
 
     private List<String> paymentAccount;
 
+    @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
-            @JsonProperty("status") OrganisationStatus status,
+            @JsonProperty("status") String status,
             @JsonProperty("sraId") String sraId,
-            @JsonProperty("sraRegulated") Boolean sraRegulated,
+            @JsonProperty("sraRegulated") String sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,

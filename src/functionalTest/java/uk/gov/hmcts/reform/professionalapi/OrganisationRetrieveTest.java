@@ -3,23 +3,24 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-@ActiveProfiles("functional")
-public class OrganisationRetrieveTest extends FunctionalTestSuite {
+@Slf4j
+public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_all_organisations() {
         professionalApiClient.createOrganisation();
 
-        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations();
+        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -28,7 +29,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
-        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"));
+        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager);
         assertThat(response.get("name")).isNotNull();
         assertThat(response.get("status")).isEqualTo("PENDING");
         assertThat(response.get("sraId")).isNotNull();
@@ -42,10 +43,27 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     }
 
     @Test
+    public void can_retrieve_Pending_and_Active_organisations() {
+
+        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
+        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
+        assertThat(orgIdentifierOne).isNotEmpty();
+        Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
+        String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
+        assertThat(orgIdentifierTwo).isNotEmpty();
+
+        professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
+
+        assertThat(finalResponse.get("organisations")).isNotNull();
+        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.PENDING.name(), hmctsAdmin);
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
@@ -53,7 +71,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
         Map<String, Object> response = professionalApiClient
-                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name());
+                .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
@@ -62,7 +80,7 @@ public class OrganisationRetrieveTest extends FunctionalTestSuite {
     public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
 
         professionalApiClient
-                .retrieveOrganisationDetailsByUnknownStatus("ACTIV");
+                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
     }
 
 }

@@ -21,11 +21,13 @@ public class OrganisationTest {
     @Test
     public void creates_organisation_correctly() {
 
-        Organisation organisation = new Organisation("some-name", OrganisationStatus.PENDING,
+        Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
                 "sra-id","company-number",Boolean.FALSE,"company-url");
 
+        assertThat(organisation.isOrganisationStatusActive()).isTrue();
+
         assertThat(organisation.getName()).isEqualTo("some-name");
-        assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.PENDING);
+        assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
         assertThat(organisation.getSraId()).isEqualTo("sra-id");
         assertThat(organisation.getCompanyNumber()).isEqualTo("company-number");
         assertThat(organisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
@@ -75,6 +77,17 @@ public class OrganisationTest {
 
         assertThat(organisation.getPaymentAccounts())
                 .containsExactly(paymentAccount);
+    }
+
+    @Test
+    public void adds_contact_information_correctly() {
+        ContactInformation contactInformation = mock(ContactInformation.class);
+
+        Organisation organisation = new Organisation();
+        organisation.addContactInformation(contactInformation);
+
+        assertThat(organisation.getContactInformation())
+                .containsExactly(contactInformation);
     }
 
 }
