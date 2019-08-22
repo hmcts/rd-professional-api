@@ -38,7 +38,6 @@ withPipeline(type, product, component) {
     enableDbMigration()
     enableDockerBuild()
     installCharts()
-    enableAksStagingDeployment()
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
