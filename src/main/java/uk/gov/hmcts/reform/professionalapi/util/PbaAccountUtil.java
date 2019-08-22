@@ -81,7 +81,7 @@ public interface PbaAccountUtil {
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
-            throw new RuntimeException();
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
         return user;

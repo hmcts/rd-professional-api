@@ -3,6 +3,7 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
 
 postgresql:
   #Whether to deploy the Postgres Chart or not
