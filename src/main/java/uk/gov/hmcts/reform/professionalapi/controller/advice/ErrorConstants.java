@@ -17,7 +17,11 @@ public enum ErrorConstants {
 
     ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
 
-    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception");
+    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
+
+    ACCESS_EXCEPTION("9 : Access Denied"),
+
+    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception");
 
     private final String errorMessage;
 

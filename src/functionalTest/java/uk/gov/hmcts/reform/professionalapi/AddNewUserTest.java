@@ -12,7 +12,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class AddNewUserTest extends FunctionalTestSuite {
+public class AddNewUserTest extends AuthorizationFunctionalTest {
+
 
     @Test
     public void add_new_user_to_organisation() {
@@ -20,9 +21,12 @@ public class AddNewUserTest extends FunctionalTestSuite {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserCreationRequest();
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         assertThat(newUserCreationRequest).isNotNull();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, newUserCreationRequest);
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest);
 
         assertThat(newUserResponse).isNotNull();
     }

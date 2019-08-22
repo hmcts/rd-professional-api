@@ -8,9 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
+
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-public class OrganisationCreationsTest extends FunctionalTestSuite {
+public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
 
     @Test
