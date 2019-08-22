@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -139,9 +140,30 @@ public interface PbaAccountUtil {
 
         }).collect(toList());
 
+        findMissingOrganisationFromUp(modifiedOrgProfUserDtls, activeOrganisationDtls);
         return modifiedOrgProfUserDtls;
     }
 
+    public static List<Organisation> findMissingOrganisationFromUp(List<Organisation> modifiedOrgProfUserDtls,
+                                                                   Map<UUID, Organisation> activeOrganisationDtls) {
+
+
+       List<Organisation>  totalActOrganisations = activeOrganisationDtls.values().stream().collect(Collectors.toList());
+
+        totalActOrganisations.forEach(
+                organisation -> {
+                  verifyTheOrganisation(modifiedOrgProfUserDtls,organisation);
+                });
+
+       return modifiedOrgProfUserDtls;
+    }
+
+    public static Organisation verifyTheOrganisation( List<Organisation>  totalActOrganisations,Organisation organisation) {
+
+
+
+        return new Organisation();
+    }
 
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
