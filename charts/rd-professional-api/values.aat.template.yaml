@@ -19,4 +19,3 @@ java:
         - professional-api-POSTGRES-PASS
         - professional-api-POSTGRES-PORT
         - professional-api-POSTGRES-USER
-        - CCD-URL
