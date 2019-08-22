@@ -15,3 +15,5 @@ COPY build/libs/$APP /opt/app/
 WORKDIR /opt/app
 
 EXPOSE 8090
+
+CMD [ "rd-professional-api.jar" ]
