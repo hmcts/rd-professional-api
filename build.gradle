@@ -171,14 +171,10 @@ pitest {
             'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
     ]
     threads = 10
-    enableDefaultIncrementalAnalysis = true
-    historyInputLocation = ['build/reports/pitest/fastermutationtesting']
-    historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
     mutationThreshold = 90
 }
-
 
 project.tasks['pitest'].group = "Verification"
 
