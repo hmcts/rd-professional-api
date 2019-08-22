@@ -171,10 +171,14 @@ pitest {
             'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
     ]
     threads = 10
+    enableDefaultIncrementalAnalysis = true
+    historyInputLocation = ['build/reports/pitest/fastermutationtesting']
+    historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
-    timestampedReports = false
+    timestampedReports = true
     mutationThreshold = 90
 }
+
 
 project.tasks['pitest'].group = "Verification"
 
@@ -304,7 +308,11 @@ dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-    suppressionFile = 'config/owasp/suppressions.xml'
+    suppressionFile = 'config/
+    
+    
+    
+    /suppressions.xml'
 }
 
 dependencyUpdates.resolutionStrategy = {
