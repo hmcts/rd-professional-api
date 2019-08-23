@@ -4,10 +4,10 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -241,33 +241,45 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
-        List<Organisation> pendingOrganisation = organisationRepository.findByStatus(OrganisationStatus.PENDING);
 
-        List<Organisation> activeOrganisation = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING);
 
-        Map<UUID,Organisation> activeOrganisationDtls = new HashMap<UUID,Organisation>();
+        List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
 
-        List<UUID> userIdentifiers = new ArrayList<>();
-        log.debug("Retrieving all organisations...");
+        if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
 
-        if (activeOrganisation.isEmpty() && pendingOrganisation.isEmpty()) {
+            log.info("No Organisations Retrieved...");
             throw new EmptyResultDataAccessException(1);
         }
 
-        activeOrganisation.forEach(
-                organisation -> {
-                        userIdentifiers.add(organisation.getUsers().get(0).getUserIdentifier());
-                        activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
-                });
+        activeOrganisations.addAll(pendingOrganisations);
 
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(userIdentifiers);
-        List<Organisation> updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest ,
-                "false", activeOrganisationDtls);
+        log.info("Retrieving all organisations..." + activeOrganisations.size());
+        return new OrganisationsDetailResponse(activeOrganisations, true);
+    }
 
+    public List<Organisation> retrieveActiveOrganisationDetails() {
 
-        updatedOrganisationDetails.addAll(pendingOrganisation);
+        // List<UUID> userIdentifiers = new ArrayList<>();
+        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
+        Map<UUID,Organisation> activeOrganisationDtls = new ConcurrentHashMap<UUID,Organisation>();
 
-        return new OrganisationsDetailResponse(updatedOrganisationDetails, true);
+        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+
+        activeOrganisations.forEach(
+            organisation -> {
+                // userIdentifiers.add(organisation.getUsers().get(0).getUserIdentifier());
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+            });
+
+        if (!CollectionUtils.isEmpty(activeOrganisationDtls)) {
+
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
+            updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+                    "false", activeOrganisationDtls);
+
+        }
+        return updatedOrganisationDetails;
     }
 
     @Override
@@ -313,16 +325,14 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> organisations = organisationRepository.findByStatus(status);
 
         if (CollectionUtils.isEmpty(organisations)) {
+
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             log.info("for ACTIVE::Status:");
-            organisations = organisations.stream()
-                    .map(organisation -> {
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
-                        return organisation;
-                    }).collect(Collectors.toList());
+
+            organisations = retrieveActiveOrganisationDetails();
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

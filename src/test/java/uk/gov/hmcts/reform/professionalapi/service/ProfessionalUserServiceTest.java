@@ -153,7 +153,7 @@ public class ProfessionalUserServiceTest {
 
         RetrieveUserProfilesRequest retrieveUserProfilesRequest1 = new RetrieveUserProfilesRequest(usersId);
 
-        Mockito.when(userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest1, "true")).thenReturn(any(Response.class));
+        Mockito.when(userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest1, "true","false")).thenReturn(any(Response.class));
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "true");
         Mockito.verify(

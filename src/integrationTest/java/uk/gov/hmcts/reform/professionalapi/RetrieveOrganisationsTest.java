@@ -138,6 +138,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations_details_by_active_status() {
+
         Map<String, Object> orgResponse;
         String organisationIdentifier = createOrganisationRequest("ACTIVE");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -151,7 +152,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
+
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
+
         orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
 
