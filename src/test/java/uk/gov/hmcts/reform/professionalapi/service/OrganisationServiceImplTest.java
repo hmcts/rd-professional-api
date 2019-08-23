@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -249,7 +250,7 @@ public class OrganisationServiceImplTest {
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
         verify(
                 organisationMock,
-                times(1)).addProfessionalUser(any(ProfessionalUser.class));
+                times(1)).addProfessionalUser(any(SuperUser.class));
         verify(
                 userAccountMapRepositoryMock,
                 times(1)).save(any(UserAccountMap.class));
@@ -288,8 +289,8 @@ public class OrganisationServiceImplTest {
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(user);
+        List<SuperUser> users = new ArrayList<>();
+        users.add(user.toSuperUser());
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
         List<Organisation> pendOrganisations = new ArrayList<>();
@@ -426,13 +427,13 @@ public class OrganisationServiceImplTest {
     @Test
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
 
-        ProfessionalUser user = mock(ProfessionalUser.class);
+        SuperUser user = mock(SuperUser.class);
 
         UUID id = UUID.randomUUID();
 
         when(user.getUserIdentifier()).thenReturn(id);
 
-        List<ProfessionalUser> users = new ArrayList<>();
+        List<SuperUser> users = new ArrayList<>();
         users.add(user);
 
         when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
@@ -467,14 +468,14 @@ public class OrganisationServiceImplTest {
     @Test
     public void testRetrieveAnOrganisationsByWhenStatusActive() throws Exception {
 
-        ProfessionalUser user = mock(ProfessionalUser.class);
+        SuperUser user = mock(SuperUser.class);
 
         UUID id = UUID.randomUUID();
         List<UUID> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
-        List<ProfessionalUser> users = new ArrayList<>();
+        List<SuperUser> users = new ArrayList<>();
         users.add(user);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);

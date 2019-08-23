@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -70,6 +71,11 @@ public class ProfessionalUserServiceTest {
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
             "some-email",
+            Mockito.mock(Organisation.class));
+
+    private final SuperUser superUser = new SuperUser("some-fname",
+            "some-lname",
+            "some-super-email",
             Mockito.mock(Organisation.class));
 
     private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
@@ -101,10 +107,10 @@ public class ProfessionalUserServiceTest {
     @Test
     public void retrieveUserByEmail() throws JsonProcessingException {
         UUID id = UUID.randomUUID();
-        professionalUser.setUserIdentifier(id);
+        superUser.setUserIdentifier(id);
 
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(professionalUser);
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
         List<String> roles = new ArrayList<>();
         roles.add("pui-case-manager");
         PowerMockito.when(professionalUser.getOrganisation().getStatus()).thenReturn(OrganisationStatus.ACTIVE);

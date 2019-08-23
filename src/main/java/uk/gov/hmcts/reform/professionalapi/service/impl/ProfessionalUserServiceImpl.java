@@ -5,6 +5,7 @@ import feign.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
 
@@ -87,6 +88,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         return PbaAccountUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, true);
+    }
+
+    @Override
+    public ProfessionalUser findProfessionalUserById(UUID id) {
+        return professionalUserRepository.findById(id).get();
     }
 
     @Override

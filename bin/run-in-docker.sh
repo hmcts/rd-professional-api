@@ -36,13 +36,13 @@ execute_script() {
 
   clean_old_docker_artifacts
 
-  build_s2s_image
+  #build_s2s_image
 
   cd $(dirname "$0")/..
 
   ./gradlew clean assemble
 
-  export SERVER_PORT="${SERVER_PORT:-8090}"
+  #export SERVER_PORT="${SERVER_PORT:-8090}"
 
   chmod +x bin/*
 

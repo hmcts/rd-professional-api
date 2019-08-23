@@ -40,7 +40,7 @@ public class Organisation {
     private String name;
 
     @OneToMany(mappedBy = "organisation")
-    private List<ProfessionalUser> users = new ArrayList<>();
+    private List<SuperUser> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -94,8 +94,8 @@ public class Organisation {
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
-    public void addProfessionalUser(ProfessionalUser professionalUser) {
-        users.add(professionalUser);
+    public void addProfessionalUser(SuperUser superUser) {
+        users.add(superUser);
     }
 
     public void addPaymentAccount(PaymentAccount paymentAccount) {
@@ -114,7 +114,7 @@ public class Organisation {
         return name;
     }
 
-    public List<ProfessionalUser> getUsers() {
+    public List<SuperUser> getUsers() {
         return users;
     }
 

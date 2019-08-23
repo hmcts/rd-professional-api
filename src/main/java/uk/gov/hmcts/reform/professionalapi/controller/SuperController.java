@@ -25,12 +25,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.SuperUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
@@ -191,7 +193,8 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
 
-        ProfessionalUser professionalUser = existingOrganisation.getUsers().get(0);
+        SuperUser superUser = existingOrganisation.getUsers().get(0);
+        ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
         if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             log.info("Organisation is getting activated");
@@ -202,6 +205,7 @@ public abstract class SuperController {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
@@ -254,7 +258,6 @@ public abstract class SuperController {
         String orgId = PbaAccountUtil.removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;
-        int responseStatus;
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);

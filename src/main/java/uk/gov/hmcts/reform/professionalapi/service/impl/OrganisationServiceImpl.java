@@ -114,7 +114,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        organisationRepository.save(organisation);
+        //organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
     }
@@ -185,7 +185,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
-        organisation.addProfessionalUser(persistedSuperUser);
+        organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
     }
 

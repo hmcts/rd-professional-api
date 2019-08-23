@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
 public interface PbaAccountUtil {
@@ -68,12 +69,13 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
-        List<ProfessionalUser> userProfileDtls = new ArrayList<>();
-        for (ProfessionalUser user: users) {
-
-            userProfileDtls.add(getSingleUserIdFromUserProfile(user, userProfileFeignClient, isRequiredRoles));
+        List<SuperUser> userProfileDtls = new ArrayList<>();
+        ProfessionalUser professionalUser = null;
+        for (SuperUser user: users) {
+            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient, isRequiredRoles);
+            userProfileDtls.add(professionalUser.toSuperUser());
         }
         return userProfileDtls;
     }

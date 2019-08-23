@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
@@ -44,7 +45,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
 
-        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0).toProfessionalUser();
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -180,7 +181,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
 
-        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(persistedSuperUser.getUserIdentifier());
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -191,7 +193,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some- lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some- org -name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
         assertThat(persistedOrganisation.getName()).isEqualTo("some- org -name");
 
     }
