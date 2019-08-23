@@ -504,6 +504,9 @@ public class OrganisationServiceImplTest {
         verify(
                 organisationRepositoryMock,
                 times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(
+                organisationMock,
+                times(6)).getUsers();
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -528,16 +531,16 @@ public class OrganisationServiceImplTest {
                 times(1)).findByStatus(OrganisationStatus.PENDING);
     }
 
-    @Ignore
+
     @Test
     public void retrieveAnPendingOrganisation() {
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
 
-        when(organisationRepositoryMock.findByStatus(any())).thenReturn(organisations);
+        when(organisationRepositoryMock.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
         OrganisationsDetailResponse organisationDetailResponse =
-                organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.PENDING);
+                organisationServiceImplMock.retrieveOrganisations();
 
         assertThat(organisationDetailResponse).isNotNull();
 
