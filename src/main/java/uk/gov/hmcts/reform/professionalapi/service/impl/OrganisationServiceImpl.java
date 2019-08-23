@@ -322,17 +322,25 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-        List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-        if (CollectionUtils.isEmpty(organisations)) {
 
-            throw new EmptyResultDataAccessException(1);
+        List<Organisation> organisations = null;
+
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+
+            organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             log.info("for ACTIVE::Status:");
 
             organisations = retrieveActiveOrganisationDetails();
+        }
+
+        if (CollectionUtils.isEmpty(organisations)) {
+
+            throw new EmptyResultDataAccessException(1);
+
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

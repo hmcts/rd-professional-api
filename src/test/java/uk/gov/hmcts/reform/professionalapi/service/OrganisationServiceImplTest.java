@@ -491,19 +491,19 @@ public class OrganisationServiceImplTest {
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(id);
         userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
-        //retrieveUserProfilesRequest,eq("false"),eq("false")
+
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-
         OrganisationsDetailResponse organisationDetailResponse =
                 organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.ACTIVE);
 
         assertThat(organisationDetailResponse).isNotNull();
 
-
+        verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.ACTIVE);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -514,6 +514,51 @@ public class OrganisationServiceImplTest {
 
         organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
     }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
+
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.PENDING);
+
+        assertThat(organisationDetailResponse).isNull();
+
+        verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.PENDING);
+    }
+
+    @Ignore
+    @Test
+    public void retrieveAnPendingOrganisation() {
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisationMock);
+
+        when(organisationRepositoryMock.findByStatus(any())).thenReturn(organisations);
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.PENDING);
+
+        assertThat(organisationDetailResponse).isNotNull();
+
+        verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.PENDING);
+    }
+
+    @Test
+    public void retrieveAnOrganisationByOrgId() {
+
+        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier))
+                .thenReturn(organisationMock);
+
+        Organisation organisation = organisationServiceImplMock.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        assertThat(organisation).isNotNull();
+        verify(organisationRepositoryMock,times(1)).findByOrganisationIdentifier(organisationIdentifier);
+    }
+
+
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testThrowsExceptionWhenOrganisationEmpty() {

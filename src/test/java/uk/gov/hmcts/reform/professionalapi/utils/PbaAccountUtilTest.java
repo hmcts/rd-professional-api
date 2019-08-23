@@ -106,9 +106,9 @@ public class PbaAccountUtilTest {
         professionalUser.setFirstName("abc");
         professionalUser.setLastName("bcd");
         professionalUser.setEmailAddress("a@b.co.uk");
+        professionalUser.setIdamStatusCode("200");
+        professionalUser.setIdamMessage("Success");
         ResponseEntity responseEntity = mock(ResponseEntity.class);
-
-        //GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse(profile, Boolean.TRUE);
 
         ProfessionalUser mappedUser = PbaAccountUtil.mapUserInfo(professionalUser, responseEntity, true);
 
