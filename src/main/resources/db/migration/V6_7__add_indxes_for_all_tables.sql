@@ -2,14 +2,14 @@ CREATE UNIQUE INDEX organisation_identifier_idx ON organisation (organisation_id
 CREATE UNIQUE INDEX status_idx ON organisation (status);
 CREATE UNIQUE INDEX organisation_id_idx1 ON professional_user (organisation_id);
 CREATE UNIQUE INDEX user_identifier_idx ON professional_user (user_identifier);
+CREATE UNIQUE INDEX email_address_idx ON professional_user (email_address);
 CREATE UNIQUE INDEX organisation_id_idx2 ON payment_account (organisation_id);
 CREATE UNIQUE INDEX organisation_id_idx3 ON contact_information (organisation_id);
 CREATE UNIQUE INDEX contact_information_id_idx ON dx_address (contact_information_id);
 CREATE UNIQUE INDEX professional_user_id_idx1 ON user_attribute (professional_user_id);
-CREATE UNIQUE INDEX prd_enum_type_idx ON user_attribute (prd_enum_type);
-CREATE INDEX enum_type_idx ON prd_enum (enum_type);
 CREATE UNIQUE INDEX professional_user_id_idx2 ON user_account_map (professional_user_id);
 CREATE UNIQUE INDEX payment_account_id_idx ON user_account_map (payment_account_id);
 CREATE UNIQUE INDEX professional_user_id_idx3 ON user_address_map (professional_user_id);
 CREATE UNIQUE INDEX contact_address_id_idx ON user_address_map (contact_address_id);
 CREATE UNIQUE INDEX organisation_id_idx4 ON domain (organisation_id);
+CREATE UNIQUE INDEX idx_user_profile_idam_id ON user_profile (IDAM_ID);
