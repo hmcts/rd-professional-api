@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +17,6 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.h2.api.Trigger;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,7 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class SuperUser implements Trigger {
+public class SuperUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -108,23 +104,4 @@ public class SuperUser implements Trigger {
         return professionalUser;
     }
 
-    @Override
-    public void init(Connection conn, String schemaName, String triggerName, String tableName, boolean before, int type) throws SQLException {
-
-    }
-
-    @Override
-    public void fire(Connection conn, Object[] oldRow, Object[] newRow) throws SQLException {
-
-    }
-
-    @Override
-    public void close() throws SQLException {
-
-    }
-
-    @Override
-    public void remove() throws SQLException {
-
-    }
 }

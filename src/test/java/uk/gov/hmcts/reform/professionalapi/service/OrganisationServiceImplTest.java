@@ -26,7 +26,6 @@ import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.mockito.InjectMocks;
@@ -395,19 +394,16 @@ public class OrganisationServiceImplTest {
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
 
         SuperUser user = mock(SuperUser.class);
-        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
 
         UUID id = UUID.randomUUID();
-
         when(user.getUserIdentifier()).thenReturn(id);
-
         ProfessionalUser userProf = mock(ProfessionalUser.class);
         when(user.toProfessionalUser()).thenReturn(userProf);
         when(userProf.getUserIdentifier()).thenReturn(id);
 
         List<SuperUser> users = new ArrayList<>();
         users.add(user);
-
+        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
         when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);

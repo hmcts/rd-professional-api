@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.SuperUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.SuperUserService;
 
-public class SuperUserServiceImp implements SuperUserService {
+public class SuperUserServiceImpl implements SuperUserService {
 
     @Autowired
     private SuperUserRepository superUserRepository;
