@@ -8,7 +8,7 @@ java:
     POSTGRES_PORT: 5432
     LOGBACK_REQUIRE_ALERT_LEVEL: 'false'
     LOGBACK_REQUIRE_ERROR_CODE: 'false'
-  image: 'https://hmcts.azurecr.io/hmcts/draft-store-service:latest'
+  image: 'https://hmctspublic.azurecr.io/hmcts/draft-store-service:latest'
   postgresql:
     image:
       tag: 10.7.0-r68
