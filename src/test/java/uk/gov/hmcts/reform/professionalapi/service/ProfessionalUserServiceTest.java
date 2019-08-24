@@ -110,6 +110,10 @@ public class ProfessionalUserServiceTest {
     public void retrieveUserByEmail() throws JsonProcessingException {
         UUID id = UUID.randomUUID();
         superUser.setUserIdentifier(id);
+        SuperUser superUserMock = mock(SuperUser.class);
+
+        professionalUser.setUserIdentifier(id);
+        PowerMockito.when(superUserMock.toProfessionalUser()).thenReturn(professionalUser);
 
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);

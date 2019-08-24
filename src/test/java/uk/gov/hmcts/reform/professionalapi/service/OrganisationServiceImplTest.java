@@ -219,10 +219,15 @@ public class OrganisationServiceImplTest {
     @Test
     public void testSavesAnOrganisation() {
 
+        SuperUser superUserMock = mock(SuperUser.class);
+
+        when(professionalUserMock.toSuperUser()).thenReturn(superUserMock);
+
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
+
 
         verify(
                 organisationRepositoryMock,
@@ -277,45 +282,6 @@ public class OrganisationServiceImplTest {
 
         organisationMock.setOrganisationIdentifier("1XCDFG3");
         assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
-    }
-
-    @Ignore
-    @Test
-    public void testRetrieveOrganisations() {
-
-        ProfessionalUser user = mock(ProfessionalUser.class);
-
-        UUID id = UUID.randomUUID();
-        List<UUID> ids = new ArrayList<>();
-        when(user.getUserIdentifier()).thenReturn(id);
-        ids.add(id);
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
-        List<SuperUser> users = new ArrayList<>();
-        users.add(user.toSuperUser());
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationMock.getUsers()).thenReturn(users);
-        List<Organisation> pendOrganisations = new ArrayList<>();
-        pendOrganisations.add(organisationMock);
-
-        List<Organisation> activeOrganisations = new ArrayList<>();
-        activeOrganisations.add(organisationMock);
-
-        /*ArrayList<ProfessionalUser> users = new ArrayList<>();
-        ArrayList<Organisation> organisations = new ArrayList<>();
-        users.add(professionalUserMock);
-        organisations.add(organisationMock);*/
-
-        when(organisationRepositoryMock.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(activeOrganisations);
-        when(organisationRepositoryMock.findByStatus(OrganisationStatus.PENDING)).thenReturn(pendOrganisations);
-
-        OrganisationsDetailResponse organisationDetailResponse =
-                organisationServiceImplMock.retrieveOrganisations();
-
-        assertThat(organisationDetailResponse).isNotNull();
-
-        verify(
-                organisationRepositoryMock,
-                times(2)).findByStatus(any());
     }
 
     @Test
@@ -429,6 +395,7 @@ public class OrganisationServiceImplTest {
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
 
         SuperUser user = mock(SuperUser.class);
+        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
 
         UUID id = UUID.randomUUID();
 
@@ -444,6 +411,8 @@ public class OrganisationServiceImplTest {
         when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
+        when(professionalUser.getUserIdentifier()).thenReturn(id);
+        when(user.toProfessionalUser()).thenReturn(professionalUser);
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
