@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -240,8 +241,8 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-
-        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(3);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(users.size()).isEqualTo(3);
 
         SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 

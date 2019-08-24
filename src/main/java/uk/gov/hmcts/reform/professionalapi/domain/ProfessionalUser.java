@@ -106,13 +106,7 @@ public class ProfessionalUser {
         superUser.setCreated(this.getCreated());
         superUser.setDeleted(this.getDeleted());
         superUser.setId(this.getId());
-        superUser.setIdamMessage(this.getIdamMessage());
-        superUser.setIdamStatusCode(this.getIdamStatusCode());
-        superUser.setIdamStatus(this.getIdamStatus());
         superUser.setLastUpdated(this.getLastUpdated());
-        superUser.setRoles(this.getRoles());
-        /*superUser.setUserAccountMap(this.getUserAccountMap());
-        superUser.setUserAttributes(this.getUserAttributes());*/
         superUser.setUserIdentifier(this.getUserIdentifier());
 
         return superUser;

@@ -8,14 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +32,9 @@ public class Organisation {
     @Size(max = 255)
     private String name;
 
-    @OneToMany(mappedBy = "organisation")
+    //@OneToMany(mappedBy = "organisation")
+    @OneToMany
+    @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
     private List<SuperUser> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "organisation")

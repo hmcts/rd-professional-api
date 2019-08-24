@@ -33,47 +33,36 @@ public class SuperUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "FIRST_NAME")
+    @Column(name = "FIRST_NAME", insertable = false, updatable = false)
     @Size(max = 255)
     private String firstName;
 
-    @Column(name = "LAST_NAME")
+    @Column(name = "LAST_NAME", insertable = false, updatable = false)
     @Size(max = 255)
     private String lastName;
 
-    @Column(name = "EMAIL_ADDRESS")
+    @Column(name = "EMAIL_ADDRESS", insertable = false, updatable = false)
     @Size(max = 255)
     private String emailAddress;
 
     @ManyToOne
-    @JoinColumn(name = "ORGANISATION_ID", nullable = false)
+    @JoinColumn(name = "ORGANISATION_ID", nullable = false, insertable = false, updatable = false)
     private Organisation organisation;
 
-    @Column(name = "DELETED")
+    @Column(name = "DELETED", insertable = false, updatable = false)
     private LocalDateTime deleted;
 
     @LastModifiedDate
-    @Column(name = "LAST_UPDATED")
+    @Column(name = "LAST_UPDATED", insertable = false, updatable = false)
     private LocalDateTime lastUpdated;
 
     @CreatedDate
-    @Column(name = "CREATED")
+    @Column(name = "CREATED", insertable = false, updatable = false)
     private LocalDateTime created;
 
-    @Column(name = "USER_IDENTIFIER")
+    @Column(name = "USER_IDENTIFIER", insertable = false, updatable = false)
     private UUID userIdentifier;
 
-    @Transient
-    private List<String> roles;
-
-    @Transient
-    private IdamStatus idamStatus;
-
-    @Transient
-    private String idamStatusCode;
-
-    @Transient
-    private String idamMessage;
 
     public SuperUser(
                             String firstName,
@@ -94,11 +83,7 @@ public class SuperUser {
         professionalUser.setCreated(this.getCreated());
         professionalUser.setDeleted(this.getDeleted());
         professionalUser.setId(this.getId());
-        professionalUser.setIdamMessage(this.getIdamMessage());
-        professionalUser.setIdamStatusCode(this.getIdamStatusCode());
-        professionalUser.setIdamStatus(this.getIdamStatus());
         professionalUser.setLastUpdated(this.getLastUpdated());
-        professionalUser.setRoles(this.getRoles());
         professionalUser.setUserIdentifier(this.getUserIdentifier());
 
         return professionalUser;

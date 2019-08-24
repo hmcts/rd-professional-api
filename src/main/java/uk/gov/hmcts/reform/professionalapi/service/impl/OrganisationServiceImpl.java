@@ -252,10 +252,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
         }
 
-        activeOrganisations.addAll(pendingOrganisations);
+        pendingOrganisations.addAll(activeOrganisations);
 
-        log.info("Retrieving all organisations..." + activeOrganisations.size());
-        return new OrganisationsDetailResponse(activeOrganisations, true);
+        log.info("Retrieving all organisations..." + pendingOrganisations.size());
+        return new OrganisationsDetailResponse(pendingOrganisations, true);
     }
 
     public List<Organisation> retrieveActiveOrganisationDetails() {

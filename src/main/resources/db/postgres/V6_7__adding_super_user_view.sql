@@ -1,7 +1,5 @@
-CREATE VIEW super_user_view as select * from professional_user
-where id in (select professional_user_id from user_attribute where prd_enum_code = 4 AND prd_enum_type like 'ADMIN_ROLE');
-
 CREATE INDEX organisation_identifier_idx ON organisation (organisation_identifier);
+
 CREATE INDEX status_idx ON organisation (status);
 
 CREATE INDEX organisation_id_idx1 ON professional_user (organisation_id);
