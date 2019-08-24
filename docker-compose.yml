@@ -1,6 +1,42 @@
 version: '2.1'
 
 services:
+  rd-professional-api:
+    build:
+      context: .
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    image: hmcts/rd-professional-api
+    container_name: rd-professional-api
+    environment:
+      - JAVA_OPTS=-Dhttps.proxyHost=proxyout.reform.hmcts.net -Dhttps.proxyPort=8080
+      - POSTGRES_USERNAME=dbrefdata
+      - POSTGRES_PASSWORD=dbrefdata
+      - POSTGRES_HOST=rd-professional-db
+      - POSTGRES_PORT=5432
+      # these environment variables are used by java-logging library
+      - JSON_CONSOLE_PRETTY_PRINT
+      - ROOT_APPENDER
+      - ROOT_LOGGING_LEVEL
+      - REFORM_SERVICE_TYPE
+      - REFORM_SERVICE_NAME
+      - REFORM_TEAM
+      - REFORM_ENVIRONMENT
+      - LOGBACK_DATE_FORMAT
+      - LOGBACK_REQUIRE_THREAD
+      - LOGBACK_REQUIRE_ALERT_LEVEL=false
+      - LOGBACK_REQUIRE_ERROR_CODE=false
+      - S2S_URL=http://service-auth-provider-api:8080
+      - S2S_SECRET=${S2S_SECRET}
+    ports:
+      - 8000:8000
+      - ${SERVER_PORT:-8090}:${SERVER_PORT:-8090}
+    depends_on:
+      - rd-professional-db
+      - service-auth-provider-api
+
   rd-professional-db:
     build:
       context: database
@@ -13,6 +49,37 @@ services:
     ports:
       - 5428:5432
 
+  service-auth-provider-api:
+    image: hmcts/service-auth-provider-app
+    container_name: service-auth-provider-api
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ports:
+      - 8502:8080
+    environment:
+      JAVA_OPTS: -Xmx384m
+      SERVER_PORT: 8080
+      MICROSERVICEKEYS_RD_PROFESSIONAL_API: "${S2S_SECRET}"
+      TESTING_SUPPORT_ENABLED: "true"
+
+  service-token-provider:
+    image: hmcts/service-token-provider
+    container_name: service-token-provider
+    environment:
+      - S2S_URL=http://service-auth-provider-api:8080
+      - S2S_MICROSERVICE=rd_professional_api
+      - S2S_SECRET=${S2S_SECRET}
+    ports:
+      - 8089:${SERVER_PORT:-8090}
+    depends_on:
+      - service-auth-provider-api
+
+networks:
+  default:
+    external:
+      name: rd-user-profile-api_default
 
 volumes:
   rd-professional-db-volume:
