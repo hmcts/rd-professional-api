@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -133,13 +134,23 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getFirstName(), user1.getFirstName());
         assertEquals(professionalUser.getLastName(), user1.getLastName());
         assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
+
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByEmailAddress("email@org.com");
     }
 
+    @Test(expected= EmptyResultDataAccessException.class)
     public void retrieveUserByEmailNotFound() {
         Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(null);
+        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress("some-email");
 
-        assertThat(professionalUserService.findProfessionalUserProfileByEmailAddress("some-email")).isNull();
+        assertThat(user).isNull();
+
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByEmailAddress(any());
     }
 
 
