@@ -260,7 +260,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
-        // List<UUID> userIdentifiers = new ArrayList<>();
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<UUID,Organisation> activeOrganisationDtls = new ConcurrentHashMap<UUID,Organisation>();
 
@@ -268,11 +267,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         activeOrganisations.forEach(
             organisation -> {
-                // userIdentifiers.add(organisation.getUsers().get(0).getUserIdentifier());
+
                 activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
             });
 
-        if (!CollectionUtils.isEmpty(activeOrganisationDtls)) {
+        if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
             updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
@@ -322,17 +321,25 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-        List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-        if (CollectionUtils.isEmpty(organisations)) {
 
-            throw new EmptyResultDataAccessException(1);
+        List<Organisation> organisations = null;
+
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+
+            organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             log.info("for ACTIVE::Status:");
 
             organisations = retrieveActiveOrganisationDetails();
+        }
+
+        if (CollectionUtils.isEmpty(organisations)) {
+
+            throw new EmptyResultDataAccessException(1);
+
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

@@ -108,8 +108,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(usersId);
 
-        try {
-            Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"true");
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"true")) {
+
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
