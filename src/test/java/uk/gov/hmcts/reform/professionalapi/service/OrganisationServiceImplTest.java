@@ -83,6 +83,7 @@ public class OrganisationServiceImplTest {
     private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+    private final SuperUser superUserMock = mock(SuperUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
@@ -399,6 +400,10 @@ public class OrganisationServiceImplTest {
         UUID id = UUID.randomUUID();
 
         when(user.getUserIdentifier()).thenReturn(id);
+
+        ProfessionalUser userProf = mock(ProfessionalUser.class);
+        when(user.toProfessionalUser()).thenReturn(userProf);
+        when(userProf.getUserIdentifier()).thenReturn(id);
 
         List<SuperUser> users = new ArrayList<>();
         users.add(user);
