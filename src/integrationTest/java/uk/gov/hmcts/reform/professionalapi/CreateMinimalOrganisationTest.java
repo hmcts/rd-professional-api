@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -64,10 +65,10 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         PrdEnum prdEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "BULKSCAN");
         UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
         UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
-
-        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
-        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute1));
-        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute2));
+        List<ProfessionalUser> professionalUser = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute1));
+        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute2));
 
 
     }
