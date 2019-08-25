@@ -118,6 +118,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
+
+
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
             if (enumType.equalsIgnoreCase(SIDAM_ROLE)
@@ -125,10 +127,15 @@ public class OrganisationServiceImpl implements OrganisationService {
                     || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
-                attributes.add(persistedAttribute);
+
+                attributes.add(userAttribute);
             }
         });
+
+        if (!CollectionUtils.isEmpty(attributes)) {
+
+            userAttributeRepository.saveAll(attributes);
+        }
         return attributes;
     }
 
