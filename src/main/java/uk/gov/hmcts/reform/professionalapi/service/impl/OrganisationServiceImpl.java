@@ -114,7 +114,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        //organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
     }
@@ -268,7 +267,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         activeOrganisations.forEach(
             organisation -> {
 
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+
+                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                }
+
             });
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {

@@ -477,7 +477,7 @@ public class OrganisationServiceImplTest {
                 times(1)).findByStatus(OrganisationStatus.ACTIVE);
         verify(
                 organisationMock,
-                times(6)).getUsers();
+                times(8)).getUsers();
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
