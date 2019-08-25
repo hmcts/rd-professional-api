@@ -153,7 +153,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void addPbaAccountToOrganisation(
             List<String> paymentAccounts,
             Organisation organisation) {
-        List<PaymentAccount> paymentAccountsToPersist = new ArrayList<>();
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
@@ -163,13 +162,9 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
-                //PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
-                paymentAccountsToPersist.add(paymentAccount);
-                //organisation.addPaymentAccount(persistedPaymentAccount);
+                PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+                organisation.addPaymentAccount(persistedPaymentAccount);
             });
-            if (CollectionUtils.isEmpty(paymentAccountsToPersist)) {
-                paymentAccountRepository.saveAll(paymentAccountsToPersist);
-            }
         }
     }
 
