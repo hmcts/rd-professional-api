@@ -114,11 +114,12 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-
         return new OrganisationResponse(organisation);
     }
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
+
+
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
             if (enumType.equalsIgnoreCase(SIDAM_ROLE)
@@ -126,10 +127,15 @@ public class OrganisationServiceImpl implements OrganisationService {
                     || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
-                attributes.add(persistedAttribute);
+
+                attributes.add(userAttribute);
             }
         });
+
+        if (!CollectionUtils.isEmpty(attributes)) {
+
+            userAttributeRepository.saveAll(attributes);
+        }
         return attributes;
     }
 
@@ -208,33 +214,35 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
-                contactInformationRepository.save(contactInformation);
-                organisation.addContactInformation(contactInformation);
             });
         }
     }
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
+            List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
                 DxAddress dxAddress = new DxAddress(
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxNumber()),
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxExchange()),
                         contactInformation);
-                dxAddress = dxAddressRepository.save(dxAddress);
-                contactInformation.addDxAddress(dxAddress);
+                dxAddresses.add(dxAddress);
             });
+            dxAddressRepository.saveAll(dxAddresses);
         }
     }
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
         if (!paymentAccounts.isEmpty()) {
+            List<UserAccountMap> userAccountMaps = new ArrayList<>();
             log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
-
-                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
+                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
+            if (!CollectionUtils.isEmpty(userAccountMaps)) {
+                userAccountMapRepository.saveAll(userAccountMaps);
+            }
         }
     }
 

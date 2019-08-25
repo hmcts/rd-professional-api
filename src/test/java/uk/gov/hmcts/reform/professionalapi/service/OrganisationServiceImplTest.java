@@ -236,29 +236,19 @@ public class OrganisationServiceImplTest {
                 times(1)).save(any(ProfessionalUser.class));
         verify(
                 paymentAccountRepositoryMock,
-                times(1)).save(any(PaymentAccount.class));
+                times(1)).save(any());
         verify(
                 contactInformationRepositoryMock,
-                times(2)).save(any(ContactInformation.class));
+                times(1)).save(any(ContactInformation.class));
         verify(
                 dxAddressRepositoryMock,
-                times(1)).save(any(DxAddress.class));
-
-        verify(
-                contactInformationMock,
-                times(1)).addDxAddress(any(DxAddress.class));
-        verify(
-                organisationMock,
-                times(1)).addContactInformation(any(ContactInformation.class));
-        verify(
-                organisationMock,
-                times(1)).addPaymentAccount(any(PaymentAccount.class));
+                times(1)).saveAll(any());
         verify(
                 organisationMock,
                 times(1)).addProfessionalUser(superUserMock);
         verify(
                 userAccountMapRepositoryMock,
-                times(1)).save(any(UserAccountMap.class));
+                times(1)).saveAll(any());
 
     }
 
@@ -575,15 +565,17 @@ public class OrganisationServiceImplTest {
         userRoles.add("pui-case-manager");
         userRoles.add("organisation-admin");
 
+        List<UserAttribute> attributes = new ArrayList<>();
+        attributes.add(userAttributeMock);
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
-        when(userAttributeRepositoryMock.save(any(UserAttribute.class))).thenReturn(userAttributeMock);
+        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
 
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         verify(
                 userAttributeRepositoryMock,
-                times(5)).save(any(UserAttribute.class));
+                times(1)).saveAll(any());
     }
 
 }
