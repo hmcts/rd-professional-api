@@ -48,6 +48,12 @@ public class UserAttributeServiceTest {
 
     @Test
     public void adds_user_attributes_to_user_correctly() {
+
+        List<UserAttribute> userAttributes =  new ArrayList<>();
+        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
+
+        UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
+        userAttributes.add(userAttribute);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
 
         userAttributeService.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
@@ -56,6 +62,7 @@ public class UserAttributeServiceTest {
 
         verify(
                 userAttributeRepository,
-                times(1)).save(any(UserAttribute.class));
+                times(1)).saveAll(any());
+
     }
 }

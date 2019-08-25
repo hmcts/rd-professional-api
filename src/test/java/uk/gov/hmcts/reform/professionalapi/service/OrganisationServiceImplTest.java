@@ -575,15 +575,17 @@ public class OrganisationServiceImplTest {
         userRoles.add("pui-case-manager");
         userRoles.add("organisation-admin");
 
+        List<UserAttribute> attributes = new ArrayList<>();
+        attributes.add(userAttributeMock);
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
-        when(userAttributeRepositoryMock.save(any(UserAttribute.class))).thenReturn(userAttributeMock);
+        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
 
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         verify(
                 userAttributeRepositoryMock,
-                times(5)).save(any(UserAttribute.class));
+                times(1)).saveAll(any());
     }
 
 }
