@@ -214,8 +214,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
-                //contactInformationRepository.save(contactInformation);
-                //organisation.addContactInformation(contactInformation);
             });
         }
     }
@@ -228,9 +226,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxNumber()),
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxExchange()),
                         contactInformation);
-                //dxAddress = dxAddressRepository.save(dxAddress);
                 dxAddresses.add(dxAddress);
-                //contactInformation.addDxAddress(dxAddress);
             });
             dxAddressRepository.saveAll(dxAddresses);
         }
