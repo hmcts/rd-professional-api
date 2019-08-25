@@ -5,6 +5,7 @@ import feign.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
 
@@ -91,7 +92,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ProfessionalUser findProfessionalUserById(UUID id) {
-        return professionalUserRepository.findById(id).get();
+        Optional<ProfessionalUser> professionalUser = professionalUserRepository.findById(id);
+        if (professionalUser.isPresent()) {
+            return professionalUser.get();
+        }
+        return null;
     }
 
     @Override
