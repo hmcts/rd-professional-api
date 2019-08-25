@@ -114,7 +114,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-
         return new OrganisationResponse(organisation);
     }
 
@@ -147,6 +146,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void addPbaAccountToOrganisation(
             List<String> paymentAccounts,
             Organisation organisation) {
+        List<PaymentAccount> paymentAccountsToPersist = new ArrayList<>();
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
@@ -156,9 +156,13 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
-                PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
-                organisation.addPaymentAccount(persistedPaymentAccount);
+                //PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+                paymentAccountsToPersist.add(paymentAccount);
+                //organisation.addPaymentAccount(persistedPaymentAccount);
             });
+            if (CollectionUtils.isEmpty(paymentAccountsToPersist)) {
+                paymentAccountRepository.saveAll(paymentAccountsToPersist);
+            }
         }
     }
 
@@ -208,33 +212,39 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
-                contactInformationRepository.save(contactInformation);
-                organisation.addContactInformation(contactInformation);
+                //contactInformationRepository.save(contactInformation);
+                //organisation.addContactInformation(contactInformation);
             });
         }
     }
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
+            List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
                 DxAddress dxAddress = new DxAddress(
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxNumber()),
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxExchange()),
                         contactInformation);
-                dxAddress = dxAddressRepository.save(dxAddress);
-                contactInformation.addDxAddress(dxAddress);
+                //dxAddress = dxAddressRepository.save(dxAddress);
+                dxAddresses.add(dxAddress);
+                //contactInformation.addDxAddress(dxAddress);
             });
+            dxAddressRepository.saveAll(dxAddresses);
         }
     }
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
         if (!paymentAccounts.isEmpty()) {
+            List<UserAccountMap> userAccountMaps = new ArrayList<>();
             log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
-
-                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
+                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
+            if (!CollectionUtils.isEmpty(userAccountMaps)) {
+                userAccountMapRepository.saveAll(userAccountMaps);
+            }
         }
     }
 
