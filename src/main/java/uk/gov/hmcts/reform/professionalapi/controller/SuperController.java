@@ -88,10 +88,6 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
-        if (organisationCreationRequest.getCompanyNumber() != null) {
-            organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
-        }
-
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated("false");
         }
