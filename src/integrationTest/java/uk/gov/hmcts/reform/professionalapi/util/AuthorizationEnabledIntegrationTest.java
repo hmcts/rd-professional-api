@@ -9,10 +9,18 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.extension.Parameters;
+import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,7 +79,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public WireMockRule sidamService = new WireMockRule(5000);
 
     @Rule
-    public WireMockRule userProfileService = new WireMockRule(8091);
+    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+            .extensions(new MultipleUsersResponseTransformer()));
 
     @Rule
     public WireMockRule ccdService = new WireMockRule(8092);
@@ -260,7 +269,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String usersBody = " {"
                 + "  \"userProfiles\": ["
                 + "  {"
-                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"userIdentifier\":\" %s" + "\","
                 + "  \"firstName\": \"prashanth\","
                 + "  \"lastName\": \"rao\","
                 + "  \"email\": \"super.user@hmcts.net\","
@@ -272,7 +281,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
-                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"userIdentifier\":\" %s"  + "\","
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
@@ -291,9 +300,60 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 aResponse()
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(usersBody)
+                                        .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
                         )
         );
+    }
+
+    public static class MultipleUsersResponseTransformer extends ResponseTransformer {
+        @Override
+        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
+            String requestBodyAsString = request.getBodyAsString();
+            ObjectMapper mapper = new ObjectMapper();
+            Optional<HashMap<String, List<String>>> ids = Optional.empty();
+            try {
+                ids =  Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
+            } catch (IOException e) {
+               //Do Nothing
+            }
+            String formatResponse = response.getBodyAsString();
+            int replaceParams = formatResponse.split("%s").length - 1;
+            List<String> userIds = new ArrayList<>();
+
+            if (ids.isPresent()) {
+                userIds = ids.get().get("userIds");
+            }
+
+            if (replaceParams > 0) {
+                if (replaceParams > userIds.size()) {
+                    while (replaceParams != userIds.size()) {
+                        userIds.add(UUID.randomUUID().toString());
+                    }
+                }
+
+                if (replaceParams < userIds.size()) {
+                    while (replaceParams != userIds.size()) {
+                        userIds.remove(userIds.size() - 1);
+                    }
+                }
+            }
+
+            formatResponse = String.format(formatResponse, userIds.toArray());
+
+            return Response.Builder.like(response)
+                    .but().body(formatResponse)
+                    .build();
+        }
+
+        @Override
+        public String getName() {
+            return "transformer-multi-user-response";
+        }
+
+        public boolean applyGlobally() {
+            return false;
+        }
     }
 }
 

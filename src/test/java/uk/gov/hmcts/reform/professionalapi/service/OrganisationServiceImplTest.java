@@ -6,11 +6,11 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import static org.powermock.api.mockito.PowerMockito.when;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import feign.Request;
@@ -19,6 +19,7 @@ import feign.Response;
 import java.nio.charset.Charset;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,12 +39,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
@@ -53,6 +57,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -77,6 +82,7 @@ public class OrganisationServiceImplTest {
     private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+    private final SuperUser superUserMock = mock(SuperUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
@@ -212,14 +218,19 @@ public class OrganisationServiceImplTest {
     @Test
     public void testSavesAnOrganisation() {
 
+        SuperUser superUserMock = mock(SuperUser.class);
+
+        when(professionalUserMock.toSuperUser()).thenReturn(superUserMock);
+
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
 
+
         verify(
                 organisationRepositoryMock,
-                times(2)).save(any(Organisation.class));
+                times(1)).save(any(Organisation.class));
         verify(
                 professionalUserRepositoryMock,
                 times(1)).save(any(ProfessionalUser.class));
@@ -244,7 +255,7 @@ public class OrganisationServiceImplTest {
                 times(1)).addPaymentAccount(any(PaymentAccount.class));
         verify(
                 organisationMock,
-                times(1)).addProfessionalUser(any(ProfessionalUser.class));
+                times(1)).addProfessionalUser(superUserMock);
         verify(
                 userAccountMapRepositoryMock,
                 times(1)).save(any(UserAccountMap.class));
@@ -270,30 +281,6 @@ public class OrganisationServiceImplTest {
 
         organisationMock.setOrganisationIdentifier("1XCDFG3");
         assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
-    }
-
-    @Test
-    public void testRetrieveOrganisations() {
-
-        ArrayList<ProfessionalUser> users = new ArrayList<>();
-        ArrayList<Organisation> organisations = new ArrayList<>();
-        users.add(professionalUserMock);
-        organisations.add(organisationMock);
-
-        when(organisationMock.getUsers())
-                .thenReturn(users);
-
-        when(organisationRepositoryMock.findAll())
-                .thenReturn(organisations);
-
-        OrganisationsDetailResponse organisationDetailResponse =
-                organisationServiceImplMock.retrieveOrganisations();
-
-        assertThat(organisationDetailResponse).isNotNull();
-
-        verify(
-                organisationRepositoryMock,
-                times(1)).findAll();
     }
 
     @Test
@@ -368,21 +355,17 @@ public class OrganisationServiceImplTest {
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
-    @Test
-    public void testRetrieveAllOrganisations()throws Exception {
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testRetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty()throws Exception {
 
         ProfessionalUser user = mock(ProfessionalUser.class);
         UUID id = UUID.randomUUID();
 
         when(user.getUserIdentifier()).thenReturn(id);
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(user);
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationMock.getUsers()).thenReturn(users);
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisationMock);
-        when(organisationRepositoryMock.findAll())
-                .thenReturn(organisations);
+        List<String> users = new ArrayList<>();
+        users.add(id.toString());
+        List<Organisation> pendOrganisations = new ArrayList<>();
+        pendOrganisations.add(organisationMock);
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
@@ -397,34 +380,35 @@ public class OrganisationServiceImplTest {
         OrganisationsDetailResponse organisationsDetailResponse =
                 organisationServiceImplMock.retrieveOrganisations();
 
-        assertThat(organisationsDetailResponse).isNotNull();
+        assertThat(organisationsDetailResponse).isNull();
 
-        assertThat(organisationMock.getUsers()).isNotNull();
         verify(
                 organisationRepositoryMock,
-                times(1)).findAll();
+                times(1)).findByStatus(OrganisationStatus.PENDING);
 
-        verify(
-                organisationMock,
-                times(1)).setUsers(any());
+        verify(organisationRepositoryMock, times(1)).findByStatus(OrganisationStatus.ACTIVE);
 
     }
 
     @Test
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
 
-        ProfessionalUser user = mock(ProfessionalUser.class);
+        SuperUser user = mock(SuperUser.class);
 
         UUID id = UUID.randomUUID();
-
         when(user.getUserIdentifier()).thenReturn(id);
+        ProfessionalUser userProf = mock(ProfessionalUser.class);
+        when(user.toProfessionalUser()).thenReturn(userProf);
+        when(userProf.getUserIdentifier()).thenReturn(id);
 
-        List<ProfessionalUser> users = new ArrayList<>();
+        List<SuperUser> users = new ArrayList<>();
         users.add(user);
-
+        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
         when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
+        when(professionalUser.getUserIdentifier()).thenReturn(id);
+        when(user.toProfessionalUser()).thenReturn(professionalUser);
 
         UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
@@ -434,7 +418,8 @@ public class OrganisationServiceImplTest {
 
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty()))
+                .body(body, Charset.defaultCharset()).status(200).build());
 
 
         OrganisationEntityResponse organisationEntityResponse =
@@ -453,13 +438,14 @@ public class OrganisationServiceImplTest {
     @Test
     public void testRetrieveAnOrganisationsByWhenStatusActive() throws Exception {
 
-        ProfessionalUser user = mock(ProfessionalUser.class);
+        SuperUser user = mock(SuperUser.class);
 
         UUID id = UUID.randomUUID();
-
+        List<UUID> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
-
-        List<ProfessionalUser> users = new ArrayList<>();
+        ids.add(id);
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
+        List<SuperUser> users = new ArrayList<>();
         users.add(user);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
@@ -468,24 +454,30 @@ public class OrganisationServiceImplTest {
 
         when(organisationRepositoryMock.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisationMock);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(userProfileResponse);
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(id);
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-
+        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         OrganisationsDetailResponse organisationDetailResponse =
                 organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.ACTIVE);
 
         assertThat(organisationDetailResponse).isNotNull();
 
         verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(
                 organisationMock,
-                times(1)).setUsers(any());
+                times(6)).getUsers();
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -496,6 +488,51 @@ public class OrganisationServiceImplTest {
 
         organisationServiceImplMock.retrieveOrganisation(organisationIdentifier);
     }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
+
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImplMock.findByOrganisationStatus(OrganisationStatus.PENDING);
+
+        assertThat(organisationDetailResponse).isNull();
+
+        verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.PENDING);
+    }
+
+
+    @Test
+    public void retrieveAnPendingOrganisation() {
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisationMock);
+
+        when(organisationRepositoryMock.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
+        OrganisationsDetailResponse organisationDetailResponse =
+                organisationServiceImplMock.retrieveOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+
+        verify(
+                organisationRepositoryMock,
+                times(1)).findByStatus(OrganisationStatus.PENDING);
+    }
+
+    @Test
+    public void retrieveAnOrganisationByOrgId() {
+
+        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier))
+                .thenReturn(organisationMock);
+
+        Organisation organisation = organisationServiceImplMock.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        assertThat(organisation).isNotNull();
+        verify(organisationRepositoryMock,times(1)).findByOrganisationIdentifier(organisationIdentifier);
+    }
+
+
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testThrowsExceptionWhenOrganisationEmpty() {

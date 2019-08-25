@@ -85,11 +85,13 @@ public class ExceptionMapper {
         if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
             String message = ex.getCause().getCause().getMessage().toUpperCase();
             if (message.contains("SRA_ID")) {
-                errorMessage = errorMessage + " for field SRA_ID";
+                errorMessage = String.format(errorMessage, "SRA_ID");
             } else if (message.contains("COMPANY_NUMBER")) {
-                errorMessage = errorMessage + " for field COMPANY_NUMBER";
+                errorMessage = String.format(errorMessage, "COMPANY_NUMBER");
             } else if (message.contains("EMAIL_ADDRESS")) {
-                errorMessage = errorMessage + " for field EMAIL";
+                errorMessage = String.format(errorMessage, "EMAIL");
+            } else if (message.contains("PBA_NUMBER")) {
+                errorMessage = String.format(errorMessage, "PBA_NUMBER");
             }
         }
         return errorDetailsResponseEntity(ex, BAD_REQUEST, errorMessage);
@@ -147,7 +149,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
+        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);

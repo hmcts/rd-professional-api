@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -109,7 +114,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
-        organisationRepository.save(organisation);
+        //organisationRepository.save(organisation);
 
         return new OrganisationResponse(organisation);
     }
@@ -180,7 +185,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
-        organisation.addProfessionalUser(persistedSuperUser);
+        organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
     }
 
@@ -236,26 +241,44 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
-        List<Organisation> organisations = organisationRepository.findAll();
 
-        log.debug("Retrieving all organisations...");
+        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING);
 
-        if (organisations.isEmpty()) {
+        List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
+
+        if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
+
+            log.info("No Organisations Retrieved...");
             throw new EmptyResultDataAccessException(1);
         }
 
-        organisations = organisations.stream()
-                .map(organisation -> {
+        pendingOrganisations.addAll(activeOrganisations);
 
-                    if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
+        log.info("Retrieving all organisations..." + pendingOrganisations.size());
+        return new OrganisationsDetailResponse(pendingOrganisations, true);
+    }
 
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
-                        return organisation;
-                    }
-                    return organisation;
-                }).collect(Collectors.toList());
+    public List<Organisation> retrieveActiveOrganisationDetails() {
 
-        return new OrganisationsDetailResponse(organisations, true);
+        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
+        Map<UUID,Organisation> activeOrganisationDtls = new ConcurrentHashMap<UUID,Organisation>();
+
+        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+
+        activeOrganisations.forEach(
+            organisation -> {
+
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+            });
+
+        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
+            updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+                    "false", activeOrganisationDtls);
+
+        }
+        return updatedOrganisationDetails;
     }
 
     @Override
@@ -298,19 +321,25 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-        List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-        if (CollectionUtils.isEmpty(organisations)) {
-            throw new EmptyResultDataAccessException(1);
+
+        List<Organisation> organisations = null;
+
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+
+            organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             log.info("for ACTIVE::Status:");
-            organisations = organisations.stream()
-                    .map(organisation -> {
-                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
-                        return organisation;
-                    }).collect(Collectors.toList());
+
+            organisations = retrieveActiveOrganisationDetails();
+        }
+
+        if (CollectionUtils.isEmpty(organisations)) {
+
+            throw new EmptyResultDataAccessException(1);
+
         }
         return new OrganisationsDetailResponse(organisations, true);
     }
