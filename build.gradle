@@ -177,6 +177,7 @@ pitest {
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
     mutationThreshold = 90
+    useClasspathFile = true
 }
 
 

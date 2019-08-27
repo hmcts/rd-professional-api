@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserRe
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -58,17 +59,17 @@ public class ProfessionalExternalUserControllerTest {
     @Ignore
     public void testFindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser superUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(superUser);
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
         when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(superUser);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "true")).thenReturn(responseEntity);
 
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
