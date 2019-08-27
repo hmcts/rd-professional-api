@@ -103,7 +103,8 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(2);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(users.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
@@ -251,12 +252,118 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse).isNotNull();
         assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
-
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(2);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(users.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
         assertThat(persistedProfessionalUser).isNotNull();
         assertThat(persistedProfessionalUser.getUserAttributes().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void should_return_400_when_mandatory_fields_are_blank_while_adding_new_user() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("")
+                .lastName("someLastName")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName("")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse1 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse1.get("http_status")).isEqualTo("400");
+
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName("lname")
+                .email("")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse2 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void should_return_400_when_mandatory_fields_are_null_while_adding_new_user() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(null)
+                .lastName("someLastName")
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName(null)
+                .email("somenewuser@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse1 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse1.get("http_status")).isEqualTo("400");
+
+        userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName("lname")
+                .email(null)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse2 =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
 }

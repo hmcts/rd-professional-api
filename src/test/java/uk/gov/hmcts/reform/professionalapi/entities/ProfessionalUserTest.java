@@ -6,10 +6,12 @@ import static org.mockito.Mockito.mock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 public class ProfessionalUserTest {
 
@@ -55,6 +57,36 @@ public class ProfessionalUserTest {
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
+    }
+
+    @Test
+    public void test_toSuperUser() {
+
+        Organisation organisation = mock(Organisation.class);
+        ProfessionalUser professionalUser = new ProfessionalUser(
+                "some-fname",
+                "some-lname",
+                "some-email-address",
+                organisation);
+
+        UUID id = UUID.randomUUID();
+        professionalUser.setUserIdentifier(id);
+
+        professionalUser.setUserIdentifier(id);
+        professionalUser.setId(id);
+        professionalUser.setCreated(LocalDateTime.now());
+        professionalUser.setLastUpdated(LocalDateTime.now());
+        professionalUser.setDeleted(LocalDateTime.now());
+
+        SuperUser superUser = professionalUser.toSuperUser();
+        assertThat(superUser.getFirstName()).isEqualTo("some-fname");
+        assertThat(superUser.getLastName()).isEqualTo("some-lname");
+        assertThat(superUser.getEmailAddress()).isEqualTo("some-email-address");
+        assertThat(superUser.getCreated()).isNotNull();
+        assertThat(superUser.getDeleted()).isNotNull();
+        assertThat(superUser.getId()).isNotNull();
+        assertThat(superUser.getLastUpdated()).isNotNull();
+        assertThat(superUser.getUserIdentifier()).isEqualTo(id);
     }
 
 }

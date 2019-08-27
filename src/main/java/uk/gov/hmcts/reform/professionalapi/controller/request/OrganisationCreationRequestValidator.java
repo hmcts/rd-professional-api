@@ -9,14 +9,11 @@ import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 
 @Component
 @Slf4j
@@ -25,11 +22,7 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    @Autowired
-    OrganisationRepository organisationRepository;
-
-
-    private  static String emailRegex = "^[A-Za-z0-9\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -37,7 +30,13 @@ public class OrganisationCreationRequestValidator {
 
     public static void validateEmail(String email) {
         if (email != null && !email.matches(emailRegex)) {
-            throw new InvalidRequest("Email format invalid");
+            throw new InvalidRequest("Email format invalid for email: " + email);
+        }
+    }
+
+    public static void validateNewUserCreationRequestForMandatoryFields(NewUserCreationRequest request) {
+        if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName()) || StringUtils.isBlank(request.getEmail())) {
+            throw new InvalidRequest("Manadatory fields are blank or null");
         }
     }
 
@@ -75,12 +74,8 @@ public class OrganisationCreationRequestValidator {
 
     public void validateCompanyNumber(OrganisationCreationRequest organisationCreationRequest) {
         log.info("validating Company Number");
-        if (organisationCreationRequest.getCompanyNumber().length() != 8) {
-            throw new InvalidRequest("Company number must be 8 characters long");
-        }
-
-        if (organisationRepository.findByCompanyNumber(organisationCreationRequest.getCompanyNumber()) != null) {
-            throw new DuplicateKeyException("The company number provided already belongs to a created Organisation");
+        if (organisationCreationRequest.getCompanyNumber().length() > 8) {
+            throw new InvalidRequest("Company number must not be greater than 8 characters long");
         }
     }
 

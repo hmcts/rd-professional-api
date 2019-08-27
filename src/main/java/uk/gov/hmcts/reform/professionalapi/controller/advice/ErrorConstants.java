@@ -13,7 +13,7 @@ public enum ErrorConstants {
 
     METHOD_ARG_NOT_VALID("5 : validation on an argument failed"),
 
-    DATA_INTEGRITY_VIOLATION("6 : attempt to insert or update data resulted in violation of an integrity constraint"),
+    DATA_INTEGRITY_VIOLATION("6 : %s Invalid or already exists"),
 
     ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
 

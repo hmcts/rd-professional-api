@@ -22,6 +22,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
 
     @Autowired
     private JurisdictionFeignClient jurisdictionFeignClient;
+
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 

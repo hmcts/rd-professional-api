@@ -31,7 +31,7 @@ public class ProfessionalUserInternalController extends SuperController {
 
 
     @ApiOperation(
-            value = "Retrieves the internal users with the given organisation",
+            value = "Retrieves the users with the given organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -72,7 +72,7 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves the internal user with the given email address if organisation is active",
+            value = "Retrieves the user with the given email address if organisation is active",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")

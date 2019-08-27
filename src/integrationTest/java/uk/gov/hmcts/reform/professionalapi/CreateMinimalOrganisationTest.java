@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
@@ -8,6 +10,8 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -18,8 +22,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
@@ -40,7 +46,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
 
-        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0).toProfessionalUser();
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -59,10 +65,10 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         PrdEnum prdEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "BULKSCAN");
         UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
         UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
-
-        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
-        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute1));
-        assertThat(persistedSuperUser.getUserAttributes().contains(jurisAttribute2));
+        List<ProfessionalUser> professionalUser = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute1));
+        assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute2));
 
 
     }
@@ -128,6 +134,26 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    public void returns_200_when_email_has_underscore() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some_one_gh@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+
+    }
+
+    @Test
     public void returns_500_when_database_constraint_violated() {
         String organisationNameViolatingDatabaseMaxLengthConstraint = RandomStringUtils.random(256);
 
@@ -156,7 +182,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
 
-        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(persistedSuperUser.getUserIdentifier());
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -167,8 +194,105 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some- lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some- org -name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-        assertThat(persistedSuperUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
         assertThat(persistedOrganisation.getName()).isEqualTo("some- org -name");
 
+    }
+
+    @Test
+    public void returns_400_when_sraid_is_duplicate() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        Map<String, Object> response1 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response1.get("http_status")).isEqualTo("400");
+        assertThat(response1.get("response_body").toString().contains("attempt to insert or update data resulted in violation of an integrity constraint for field SRA_ID"));
+    }
+
+    @Test
+    public void persists_and_returns_400_company_number_is_not_unique() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated("false")
+                .companyUrl("company-url")
+                .companyNumber("same1010")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname ")
+                        .lastName(" some-lname ")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response2.get("http_status")).isEqualTo("400");
+        assertThat(response2.get("response_body").toString().contains("attempt to insert or update data resulted in violation of an integrity constraint for field COMPANY_NUMBER"));
+    }
+
+    @Test
+    public void returns_200_when_company_number_length_less_than_8() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .companyNumber("123456")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some_one_gh@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+    }
+
+    @Test
+    public void returns_400_when_company_number_length_greater_than_8() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some")
+                .companyNumber("123456789")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some_one_gh@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 }
