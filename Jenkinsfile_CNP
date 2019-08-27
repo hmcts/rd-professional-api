@@ -28,6 +28,9 @@ def vaultOverrides = [
 
 withPipeline(type, product, component) {
 
+    after('smoketest:aat') {
+        sh "rm -rf infrastructure/"
+    }
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
