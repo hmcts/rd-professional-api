@@ -5,6 +5,7 @@ import feign.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
 
@@ -12,10 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -88,6 +91,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
+    public ProfessionalUser findProfessionalUserById(UUID id) {
+        Optional<ProfessionalUser> professionalUser = professionalUserRepository.findById(id);
+        if (professionalUser.isPresent()) {
+            return professionalUser.get();
+        }
+        return null;
+    }
+
+    @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted) {
         List<ProfessionalUser> professionalUsers;
         List<UUID> usersId = new ArrayList<>();
@@ -100,15 +112,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(usersId);
 
-        try {
-            Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted);
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"true")) {
+
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
         }  catch (FeignException ex) {
 
-            throw new RuntimeException();
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
         return responseResponseEntity;
