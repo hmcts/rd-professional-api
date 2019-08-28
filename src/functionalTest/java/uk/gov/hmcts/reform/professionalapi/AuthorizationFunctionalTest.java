@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -57,7 +59,7 @@ public abstract class AuthorizationFunctionalTest {
 
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
-    
+
 
     protected ProfessionalApiClient professionalApiClient;
 
@@ -82,8 +84,8 @@ public abstract class AuthorizationFunctionalTest {
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         professionalApiClient = new ProfessionalApiClient(
-                                                          professionalApiUrl,
-                                                          s2sToken, idamClient);
+                professionalApiUrl,
+                s2sToken, idamClient);
     }
 
     @After
@@ -93,14 +95,24 @@ public abstract class AuthorizationFunctionalTest {
     protected String createAndUpdateOrganisationToActive(String role) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
-        String organisationIdentifier = (String) response.get("organisationIdentifier");
+        return activateOrganisation(response, role);
+    }
+
+    protected String createAndUpdateOrganisationToActive(String role, OrganisationCreationRequest organisationCreationRequest) {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        return activateOrganisation(response, role);
+    }
+
+    protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
-
     }
 
-    protected void validateUsers(Map<String, Object> searchResponse) {
+    protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
+        assertThat(searchResponse.get("idamStatus")).isNotNull();
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
@@ -110,7 +122,10 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(professionalUsersResponse.get("roles")).isNull();
+        if (rolesRequired) {
+            assertThat(professionalUsersResponse.get("roles")).isNotNull();
+        } else {
+            assertThat(professionalUsersResponse.get("roles")).isNull();
+        }
     }
-
 }
