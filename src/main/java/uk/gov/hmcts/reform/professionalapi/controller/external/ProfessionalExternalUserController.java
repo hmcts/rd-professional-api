@@ -81,7 +81,7 @@ public class ProfessionalExternalUserController extends SuperController {
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
 
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
+        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
