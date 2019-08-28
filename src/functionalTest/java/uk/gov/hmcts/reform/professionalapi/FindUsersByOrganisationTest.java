@@ -72,44 +72,46 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
+    public void ac1_find_all_active_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
+        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
         response.get("idamStatus").equals(IdamStatus.ACTIVE.toString());
         validateUsers(response, false);
     }
 
     @Test
-    public void find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
+    public void ac2_find_all_status_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
+        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
+        response.get("idamStatus").equals(IdamStatus.ACTIVE.toString());
+        validateUsers(response, false);
+    }
+
+    @Test
+    public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
         response.get("idamStatus").equals(IdamStatus.ACTIVE.toString());
         validateUsers(response, false);
     }
 
     @Test
-    public void find_all_active_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
+    public void ac4_find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
+        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
         response.get("idamStatus").equals(IdamStatus.ACTIVE.toString());
         validateUsers(response, false);
     }
 
 
     @Test
-    public void find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
+    public void ac5_find_all_pending_users_for_an_organisation_with_pui_user_manager_when_no_pending_user_exists_should_return_404() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Pending");
     }
 
     @Test
-    public void find_all_pending_users_for_an_organisation_with_pui_user_manager_when_no_pending_user_exists_should_return_404() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForNonPuiManager(), "Pending");
+    public void ac6_find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForPuiManager(), "INVALID");
     }
 
     @Test
-    public void find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
-    }
-
-    @Test
-    public void find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
+    public void ac7_find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
 
         String invalidBearerToken = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiS0N4QmRlaHNIVUY2OTc4U2l6dklTRXhjWDBFP"
                 + "SIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmcmVnLXRlc3QtdXNlci0xdTdGTm9kQ0tYQGZlZW1haWwuY29tIiwiYXV0aF9sZXZlbCI6MCwiYX"
@@ -128,7 +130,12 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void find_all_active_users_for_an_organisation_with_user_profile_unavailable_should_return_500() {
+    public void ac8_find_all_active_users_for_an_organisation_with_user_profile_unavailable_should_return_500() {
         //cannot be tested
+    }
+
+    @Test
+    public void ac9_find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
     }
 }

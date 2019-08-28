@@ -68,7 +68,8 @@ public class ProfessionalExternalUserController extends SuperController {
     @Secured("pui-user-manager")
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
+                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
+                                                     @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
         ResponseEntity<?> profUsersEntityResponse = null;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
