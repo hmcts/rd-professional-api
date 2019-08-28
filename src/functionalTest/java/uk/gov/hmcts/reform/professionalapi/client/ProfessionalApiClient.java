@@ -50,8 +50,8 @@ public class ProfessionalApiClient {
     protected IdamClient idamClient;
 
     public ProfessionalApiClient(
-                                 String professionalApiUrl,
-                                 String s2sToken, IdamClient idamClient) {
+            String professionalApiUrl,
+            String s2sToken, IdamClient idamClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamClient = idamClient;
@@ -84,31 +84,31 @@ public class ProfessionalApiClient {
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         return someMinimalOrganisationRequest()
-            .name(randomAlphabetic(10))
-            .status("PENDING")
-            .sraId(randomAlphabetic(10) + "sra-id-number1")
-            .sraRegulated("false")
-            .companyUrl(randomAlphabetic(10) + "company-url")
-            .companyNumber(randomAlphabetic(5) + "com")
-            .paymentAccount(paymentAccounts)
-            .superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
-                .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
-                .jurisdictions(createJurisdictions())
-                .build())
-            .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .country("some-country")
-                .county("some-county")
-                .townCity("some-town-city")
-                .postCode("some-post-code")
-                .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                    .dxNumber("DX 1234567890")
-                    .dxExchange("dxExchange").build()))
-                .build()));
+                .name(randomAlphabetic(10))
+                .status("PENDING")
+                .sraId(randomAlphabetic(10) + "sra-id-number1")
+                .sraRegulated("false")
+                .companyUrl(randomAlphabetic(10) + "company-url")
+                .companyNumber(randomAlphabetic(5) + "com")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1")
+                        .addressLine2("addressLine2")
+                        .addressLine3("addressLine3")
+                        .country("some-country")
+                        .county("some-county")
+                        .townCity("some-town-city")
+                        .postCode("some-post-code")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()));
     }
 
     public static List<Jurisdiction> createJurisdictions() {
@@ -376,11 +376,11 @@ public class ProfessionalApiClient {
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
 
-    private RequestSpecification getMultipleAuthHeadersInternal(){
+    private RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
-    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email){
+    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
         return getMultipleAuthHeaders(idamClient.getExternalBearerToken(role, firstName, lastName, email));
     }
 

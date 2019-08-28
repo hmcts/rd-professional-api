@@ -1,21 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import io.restassured.specification.RequestSpecification;
+
 import java.util.Map;
 
-import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-
-import static com.sun.javaws.JnlpxArgs.verify;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -109,26 +105,26 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
-        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
     }
 
     @Test
     public void find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
 
-        String invalidBearerToken = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiS0N4QmRlaHNIVUY2OTc4U2l6dklTRXhjWDBFP" +
-                "SIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmcmVnLXRlc3QtdXNlci0xdTdGTm9kQ0tYQGZlZW1haWwuY29tIiwiYXV0aF9sZXZlbCI6MCwiYX" +
-                "VkaXRUcmFja2luZ0lkIjoiNWRjMmVlYjQtZjc2OS00ZWM3LTliZjgtZDE0YjNlMTMzMGE5IiwiaXNzIjoiaHR0cHM6Ly9mb3JnZXJvY2stYW0" +
-                "uc2VydmljZS5jb3JlLWNvbXB1dGUtaWRhbS1kZW1vLmludGVybmFsOjg0NDMvb3BlbmFtL29hdXRoMi9obWN0cyIsInRva2VuTmFtZSI6ImFjY" +
-                "2Vzc190b2tlbiIsInRva2VuX3R5cGUiOiJCZWFyZXIiLCJhdXRoR3JhbnRJZCI6ImE4NGYxOWNiLTI4NzQtNGE4Zi04MTJlLTkzYjQ4YWEyYzd" +
-                "lNyIsImF1ZCI6InJkLXByb2Zlc3Npb25hbC1hcGkiLCJuYmYiOjE1NjY3MjI3NzIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUi" +
-                "LCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsIm1hbmFnZS11c2VyIl0sImF1dGhfdGltZSI6MTU2Njcy" +
-                "Mjc1NTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NjY3NTE1NzIsImlhdCI6MTU2NjcyMjc3MiwiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6I" +
-                "jRlOTg5ZDIxLWU5MjUtNGE4NS04MDI4LTc0MDI4Nzg5N2EyMiJ9.UhLAn6SVZOSz0BIdKXsgfoCHeVX0QfBlpXWwaS8rYlzo56P5kvW7hHG3rhiz8Z" +
-                "L68Q2rUUb-KnhQHWaJ7tHTLelH1j4pMIVGORj6k1fk0ib4gKSTj6-Y9y7SCaBnZqCX5ahBIKBnG9xGbWo7w6Jv4QPhxtQmHzMHhhWnD_4NVyKaFW-P3" +
-                "uLEOK4d-z4FEDFKgQvlYOMAqrjMjvS-XivSLpKf__FcQ4uXT87x5NkLvFJsVyF_QZmJmmZWUB51Oh7XsrCswRDWua6d6cJK-3nuRwhEoOUGpLobuLKH" +
-                "JpX1O5y_hrudPCq_q0m5W1Iqq_xEcNaOg-dqrtpEPXtebfCVZw";
+        String invalidBearerToken = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiS0N4QmRlaHNIVUY2OTc4U2l6dklTRXhjWDBFP"
+                + "SIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmcmVnLXRlc3QtdXNlci0xdTdGTm9kQ0tYQGZlZW1haWwuY29tIiwiYXV0aF9sZXZlbCI6MCwiYX"
+                + "VkaXRUcmFja2luZ0lkIjoiNWRjMmVlYjQtZjc2OS00ZWM3LTliZjgtZDE0YjNlMTMzMGE5IiwiaXNzIjoiaHR0cHM6Ly9mb3JnZXJvY2stYW0"
+                + "uc2VydmljZS5jb3JlLWNvbXB1dGUtaWRhbS1kZW1vLmludGVybmFsOjg0NDMvb3BlbmFtL29hdXRoMi9obWN0cyIsInRva2VuTmFtZSI6ImFjY"
+                + "2Vzc190b2tlbiIsInRva2VuX3R5cGUiOiJCZWFyZXIiLCJhdXRoR3JhbnRJZCI6ImE4NGYxOWNiLTI4NzQtNGE4Zi04MTJlLTkzYjQ4YWEyYzd"
+                + "lNyIsImF1ZCI6InJkLXByb2Zlc3Npb25hbC1hcGkiLCJuYmYiOjE1NjY3MjI3NzIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUi"
+                + "LCJzY29wZSI6WyJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsIm1hbmFnZS11c2VyIl0sImF1dGhfdGltZSI6MTU2Njcy"
+                + "Mjc1NTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NjY3NTE1NzIsImlhdCI6MTU2NjcyMjc3MiwiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6I"
+                + "jRlOTg5ZDIxLWU5MjUtNGE4NS04MDI4LTc0MDI4Nzg5N2EyMiJ9.UhLAn6SVZOSz0BIdKXsgfoCHeVX0QfBlpXWwaS8rYlzo56P5kvW7hHG3rhiz8Z"
+                + "L68Q2rUUb-KnhQHWaJ7tHTLelH1j4pMIVGORj6k1fk0ib4gKSTj6-Y9y7SCaBnZqCX5ahBIKBnG9xGbWo7w6Jv4QPhxtQmHzMHhhWnD_4NVyKaFW-P3"
+                + "uLEOK4d-z4FEDFKgQvlYOMAqrjMjvS-XivSLpKf__FcQ4uXT87x5NkLvFJsVyF_QZmJmmZWUB51Oh7XsrCswRDWua6d6cJK-3nuRwhEoOUGpLobuLKH"
+                + "JpX1O5y_hrudPCq_q0m5W1Iqq_xEcNaOg-dqrtpEPXtebfCVZw";
 
-        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.FORBIDDEN, professionalApiClient.getMultipleAuthHeaders(invalidBearerToken), "");
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.FORBIDDEN, professionalApiClient.getMultipleAuthHeaders(invalidBearerToken), "");
     }
 
     @Test
