@@ -19,9 +19,7 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
         log.info("Into Organisation identifier validator...");
-
         checkOrganisationDoesNotExist(existingOrganisation, inputOrganisationIdentifier);
-
         log.info("Validation completed for identifier Organisation...");
     }
 
@@ -36,33 +34,32 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
     public void verifyExtUserOrgIdentifier(Organisation organisation, String extOrgIdentifier) {
 
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
-
             throw new EmptyResultDataAccessException(1);
-        } else if (!extOrgIdentifier.trim().equals(organisation.getOrganisationIdentifier().trim())) {
 
+        } else if (!extOrgIdentifier.trim().equals(organisation.getOrganisationIdentifier().trim())) {
             throw new AccessDeniedException("403 Forbidden");
         }
-
     }
 
     public void verifyNonPuiFinanceManagerOrgIdentifier(Collection<GrantedAuthority> authorities, Organisation organisation, String extOrgIdentifier) {
 
-        boolean isPuiFinanceManExist = false;
-        for (GrantedAuthority authority : authorities) {
-
-            if (!StringUtils.isEmpty(authority.getAuthority()) && "pui-finance-manager".equals(authority.getAuthority().trim())) {
-
-                isPuiFinanceManExist = true;
-                break;
-            }
-
-        }
+        boolean isPuiFinanceManExist = ifUserRoleExists(authorities, "pui-finance-manager");
 
         if (!isPuiFinanceManExist) {
             authorities.forEach(role
-                -> {
-                PbaAccountUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier());
-            });
+                    -> PbaAccountUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
         }
+    }
+
+    public boolean ifUserRoleExists(Collection<GrantedAuthority> authorities, String role) {
+        boolean doesRoleExist = false;
+        for (GrantedAuthority authority : authorities) {
+
+            if (!StringUtils.isEmpty(authority.getAuthority()) && role.equals(authority.getAuthority().trim())) {
+                doesRoleExist = true;
+                break;
+            }
+        }
+        return doesRoleExist;
     }
 }

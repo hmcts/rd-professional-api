@@ -10,15 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+
+import java.util.Collection;
 
 
 @RequestMapping(
@@ -65,7 +70,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("pui-user-manager")
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                      @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
@@ -73,7 +78,10 @@ public class ProfessionalExternalUserController extends SuperController {
 
         ResponseEntity<?> profUsersEntityResponse = null;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
-        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email);
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
+
+        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");

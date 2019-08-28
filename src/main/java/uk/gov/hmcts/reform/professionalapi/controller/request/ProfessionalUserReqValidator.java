@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 
 @Component
 @Slf4j
@@ -20,14 +22,25 @@ public class ProfessionalUserReqValidator {
         return false;
     }
 
-    public void validateRequest(String orgId, String showDeleted, String email) {
+    public void validateRequest(String orgId, String showDeleted, String email, String status) {
+        if (null == orgId  && null == email && null == showDeleted && null == status) {
+            throw new InvalidRequest("No input values given for the request");
+        }
+        validateUserStatus(status);
+        isValidEmail(email);
+    }
 
+    public static void validateUserStatus(String status) {
+        boolean valid = false;
 
-        if (null == orgId && null == showDeleted && null == email) {
-            log.error("No input values for the request");
-            throw new EmptyResultDataAccessException(1);
+        for (IdamStatus idamStatus : IdamStatus.values()) {
+            if(status.toUpperCase().equals(idamStatus.toString())) {
+                valid = true;
+            }
         }
 
-        isValidEmail(email);
+        if(!valid) {
+            throw new InvalidRequest("Status provided is invalid");
+        }
     }
 }
