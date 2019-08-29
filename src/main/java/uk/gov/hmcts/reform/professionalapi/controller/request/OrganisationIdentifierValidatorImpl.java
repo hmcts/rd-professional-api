@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Component
 @Slf4j
@@ -47,7 +47,7 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
 
         if (!isPuiFinanceManExist) {
             authorities.forEach(role
-                    -> PbaAccountUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
+                    -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
         }
     }
 
@@ -61,5 +61,12 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
             }
         }
         return doesRoleExist;
+    }
+
+    public void validateOrganisationIsActive(Organisation existingOrganisation) {
+        if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+            log.error("Organisation is not Active hence not returning any users");
+            throw new EmptyResultDataAccessException(1);
+        }
     }
 }

@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-public class PbaAccountUtilTest {
+public class RefDataUtilTest {
 
     @Test
     public void shouldReturnPaymentAccountsFromUserAccountMap() {
@@ -34,7 +34,7 @@ public class PbaAccountUtilTest {
 
         when(userAccountMap.getUserAccountMapId()).thenReturn(userAccountMapId);
         when(userAccountMapId.getPaymentAccount()).thenReturn(paymentAccount);
-        List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
+        List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
         assertThat(paymentAccounts.size()).isGreaterThan(0);
     }
 
@@ -55,7 +55,7 @@ public class PbaAccountUtilTest {
 
         paymentAccountsEntity.add(paymentAccountMock);
 
-        List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccountFromUserMap(userMapPaymentAccount, paymentAccountsEntity);
+        List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountFromUserMap(userMapPaymentAccount, paymentAccountsEntity);
 
         assertThat(paymentAccounts.size()).isGreaterThan(0);
     }
@@ -71,7 +71,7 @@ public class PbaAccountUtilTest {
 
         if (!paymentAccountsEntity.isEmpty()) {
 
-            List<PaymentAccount> paymentAccounts = PbaAccountUtil.getPaymentAccount(paymentAccountsEntity);
+            List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccount(paymentAccountsEntity);
             assertThat(paymentAccounts.size()).isGreaterThan(0);
         }
     }
@@ -79,24 +79,24 @@ public class PbaAccountUtilTest {
     @Test
     public void removeEmptyWhiteSpacesTest() {
 
-        assertThat(PbaAccountUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
-        assertThat(PbaAccountUtil.removeEmptySpaces(null)).isEqualTo(null);
-        assertThat(PbaAccountUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
+        assertThat(RefDataUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
+        assertThat(RefDataUtil.removeEmptySpaces(null)).isEqualTo(null);
+        assertThat(RefDataUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
 
     }
 
     @Test
     public void removeAllWhiteSpacesTest() {
 
-        assertThat(PbaAccountUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
-        assertThat(PbaAccountUtil.removeAllSpaces(null)).isEqualTo(null);
+        assertThat(RefDataUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
+        assertThat(RefDataUtil.removeAllSpaces(null)).isEqualTo(null);
 
     }
 
     @Test(expected = AccessDeniedException.class)
     public void shouldReturnTrueValidateOrgIdentifier() {
         String uuid = UUID.randomUUID().toString();
-        PbaAccountUtil.validateOrgIdentifier(uuid,UUID.randomUUID().toString());
+        RefDataUtil.validateOrgIdentifier(uuid,UUID.randomUUID().toString());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class PbaAccountUtilTest {
         professionalUser.setIdamMessage("Success");
         ResponseEntity responseEntity = mock(ResponseEntity.class);
 
-        ProfessionalUser mappedUser = PbaAccountUtil.mapUserInfo(professionalUser, responseEntity, true);
+        ProfessionalUser mappedUser = RefDataUtil.mapUserInfo(professionalUser, responseEntity, true);
 
         assertThat(mappedUser).isNotNull();
 
@@ -131,7 +131,7 @@ public class PbaAccountUtilTest {
         when(getUserProfileResponseMock.getRoles()).thenReturn(new ArrayList<String>());
         when(getUserProfileResponseMock.getIdamStatusCode()).thenReturn("code");
         when(getUserProfileResponseMock.getIdamMessage()).thenReturn("test error message");
-        ProfessionalUser responseUser = PbaAccountUtil.mapUserInfo(userMock, responseResponseEntityMock, true);
+        ProfessionalUser responseUser = RefDataUtil.mapUserInfo(userMock, responseResponseEntityMock, true);
         assertThat(responseUser).isNotNull();
         assertThat(responseUser.getEmailAddress()).isEqualTo("some@hmcts.net");
         assertThat(responseUser.getFirstName()).isEqualTo("fname");

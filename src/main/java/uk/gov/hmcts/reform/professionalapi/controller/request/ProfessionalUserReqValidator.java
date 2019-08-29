@@ -40,7 +40,13 @@ public class ProfessionalUserReqValidator {
         }
 
         if(!valid) {
-            throw new InvalidRequest("Status provided is invalid");
+            throw new InvalidRequest("The status provided is invalid");
+        }
+    }
+
+    public void validateStatusIsActive(String status) {
+        if (!status.equalsIgnoreCase(IdamStatus.ACTIVE.toString())) {
+            throw new InvalidRequest("Your role does not permit you to search for users that are not active");
         }
     }
 }

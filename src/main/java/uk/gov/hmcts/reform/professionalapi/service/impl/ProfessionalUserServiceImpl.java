@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
 @Slf4j
@@ -77,17 +78,17 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        return professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
+        return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
     }
 
     public ProfessionalUser findProfessionalUserProfileByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        return PbaAccountUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, true);
+        return RefDataUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, true);
     }
 
     @Override
@@ -100,30 +101,37 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted) {
-        List<ProfessionalUser> professionalUsers;
-        List<UUID> usersId = new ArrayList<>();
+    public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
+        ResponseEntity responseEntity;
 
-        ResponseEntity responseResponseEntity;
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest = generateRetrieveUserProfilesRequest(organisation);
 
-        professionalUsers = professionalUserRepository.findByOrganisation(organisation);
-
-        professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
-
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(usersId);
-
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"true")) {
-
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
         }  catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
-        return responseResponseEntity;
+        if(!StringUtils.isBlank(status)) {
+            responseEntity = RefDataUtil.filterUsersByStatus(responseEntity, status);
+        }
+
+        return responseEntity;
+    }
+
+    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(Organisation organisation) {
+        List<ProfessionalUser> professionalUsers;
+        List<UUID> usersId = new ArrayList<>();
+
+        professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+
+        professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
+
+        return new RetrieveUserProfilesRequest(usersId);
     }
 
     @Override

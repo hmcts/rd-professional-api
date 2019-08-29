@@ -16,7 +16,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
-    ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted);
+    ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status);
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 

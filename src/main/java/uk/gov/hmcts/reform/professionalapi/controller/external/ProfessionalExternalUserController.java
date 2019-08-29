@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 
 import java.util.Collection;
@@ -80,16 +82,25 @@ public class ProfessionalExternalUserController extends SuperController {
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
 
-        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
             profUsersEntityResponse = retrieveUserByEmail(email);
+
         } else {
-            log.info("showDeleted not empty");
-            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
+            ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
+
+            if (isRolePuiUserManager) {
+                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
+
+            } else if (!isRolePuiUserManager) {
+                profExtUsrReqValidator.validateStatusIsActive(status);
+                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
+
+            }
         }
+
 
         return profUsersEntityResponse;
     }

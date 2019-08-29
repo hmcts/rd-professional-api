@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
 
 import feign.FeignException;
 import feign.Response;
@@ -30,7 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
-public interface PbaAccountUtil {
+public interface RefDataUtil {
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -101,8 +102,8 @@ public interface PbaAccountUtil {
     }
 
     public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                         String showDeleted, Map<UUID, Organisation> activeOrganisationDtls) {
+                                                                   RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                                   String showDeleted, Map<UUID, Organisation> activeOrganisationDtls) {
         List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
         Map<UUID, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
@@ -195,6 +196,24 @@ public interface PbaAccountUtil {
             throw new AccessDeniedException("403 Forbidden");
         }
 
+    }
+
+    public static ResponseEntity filterUsersByStatus(ResponseEntity responseEntity, String status) {
+
+        if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
+
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+
+            List<ProfessionalUsersResponse> filteredUsers =  professionalUsersEntityResponse.getUserProfiles().stream()
+                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus().toString()))
+                    .collect(Collectors.toList());
+
+            professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+
+            return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
+        }
+
+        return responseEntity;
     }
 
 }
