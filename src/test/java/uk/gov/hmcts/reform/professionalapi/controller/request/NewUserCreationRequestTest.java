@@ -4,13 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class NewUserCreationRequestTest {
@@ -31,19 +28,6 @@ public class NewUserCreationRequestTest {
         assertThat(newUserCreationRequest.getRoles()).hasSize(1);
     }
 
-    @Test
-    @Ignore
-    public void testDoesNotCreateNewUserWhenEmailIsInvalid() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-
-        NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "someemail.com", userRoles, new ArrayList<>());
-
-        Set<ConstraintViolation<NewUserCreationRequest>> violations = validator.validate(newUserCreationRequest);
-
-        assertThat(violations.size()).isEqualTo(1);
-    }
 
     @Test
     public void newUserCreationBuilderTest() {

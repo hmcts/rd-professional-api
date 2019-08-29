@@ -5,8 +5,3 @@ spring:
       aliases:
         s2s.microservicekey-rd-professional-api: S2S_SECRET
         rd.s2s-url: S2S_URL
-        rd.professional-api-POSTGRES-DATABASE: POSTGRES_DATABASE
-        rd.professional-api-POSTGRES-HOST: POSTGRES_HOST
-        rd.professional-api-POSTGRES-PASS: POSTGRES_PASSWORD
-        rd.professional-api-POSTGRES-PORT: POSTGRES_PORT
-        rd.professional-api-POSTGRES-USER: POSTGRES_USER
