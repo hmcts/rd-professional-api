@@ -70,13 +70,13 @@ public class ProfessionalExternalUserControllerTest {
         when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "true")).thenReturn(responseEntity);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "true", true, "")).thenReturn(responseEntity);
 
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class), any(String.class));
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, "");
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
