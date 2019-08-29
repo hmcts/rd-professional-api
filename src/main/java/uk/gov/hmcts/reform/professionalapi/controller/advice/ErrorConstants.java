@@ -13,11 +13,15 @@ public enum ErrorConstants {
 
     METHOD_ARG_NOT_VALID("5 : validation on an argument failed"),
 
-    DATA_INTEGRITY_VIOLATION("6 : attempt to insert or update data resulted in violation of an integrity constraint"),
+    DATA_INTEGRITY_VIOLATION("6 : %s Invalid or already exists"),
 
     ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
 
-    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception");
+    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
+
+    ACCESS_EXCEPTION("9 : Access Denied"),
+
+    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception");
 
     private final String errorMessage;
 

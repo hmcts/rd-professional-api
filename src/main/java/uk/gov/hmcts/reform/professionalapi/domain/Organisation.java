@@ -8,14 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,8 +32,10 @@ public class Organisation {
     @Size(max = 255)
     private String name;
 
-    @OneToMany(mappedBy = "organisation")
-    private List<ProfessionalUser> users = new ArrayList<>();
+    //@OneToMany(mappedBy = "organisation")
+    @OneToMany
+    @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
+    private List<SuperUser> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -68,7 +63,6 @@ public class Organisation {
     private Boolean sraRegulated;
 
     @Column(name = "COMPANY_NUMBER")
-    @Size(max = 8)
     private String companyNumber;
 
     @Column(name = "COMPANY_URL")
@@ -95,8 +89,8 @@ public class Organisation {
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
-    public void addProfessionalUser(ProfessionalUser professionalUser) {
-        users.add(professionalUser);
+    public void addProfessionalUser(SuperUser superUser) {
+        users.add(superUser);
     }
 
     public void addPaymentAccount(PaymentAccount paymentAccount) {
@@ -115,7 +109,7 @@ public class Organisation {
         return name;
     }
 
-    public List<ProfessionalUser> getUsers() {
+    public List<SuperUser> getUsers() {
         return users;
     }
 
@@ -153,5 +147,9 @@ public class Organisation {
 
     public void setOrganisationIdentifier(String organisationIdentifier) {
         this.organisationIdentifier = organisationIdentifier;
+    }
+
+    public boolean isOrganisationStatusActive() {
+        return OrganisationStatus.ACTIVE == getStatus();
     }
 }

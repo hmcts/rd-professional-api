@@ -14,18 +14,20 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 public class OrganisationTest {
 
     @Test
     public void creates_organisation_correctly() {
 
-        Organisation organisation = new Organisation("some-name", OrganisationStatus.PENDING,
+        Organisation organisation = new Organisation("some-name", OrganisationStatus.ACTIVE,
                 "sra-id","company-number",Boolean.FALSE,"company-url");
 
+        assertThat(organisation.isOrganisationStatusActive()).isTrue();
+
         assertThat(organisation.getName()).isEqualTo("some-name");
-        assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.PENDING);
+        assertThat(organisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
         assertThat(organisation.getSraId()).isEqualTo("sra-id");
         assertThat(organisation.getCompanyNumber()).isEqualTo("company-number");
         assertThat(organisation.getSraRegulated()).isEqualTo(Boolean.FALSE);
@@ -56,13 +58,13 @@ public class OrganisationTest {
     @Test
     public void adds_users_correctly() {
 
-        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
+        SuperUser superUser = mock(SuperUser.class);
 
         Organisation organisation = new Organisation();
-        organisation.addProfessionalUser(professionalUser);
+        organisation.addProfessionalUser(superUser);
 
         assertThat(organisation.getUsers())
-                .containsExactly(professionalUser);
+                .containsExactly(superUser);
     }
 
     @Test
@@ -75,6 +77,17 @@ public class OrganisationTest {
 
         assertThat(organisation.getPaymentAccounts())
                 .containsExactly(paymentAccount);
+    }
+
+    @Test
+    public void adds_contact_information_correctly() {
+        ContactInformation contactInformation = mock(ContactInformation.class);
+
+        Organisation organisation = new Organisation();
+        organisation.addContactInformation(contactInformation);
+
+        assertThat(organisation.getContactInformation())
+                .containsExactly(contactInformation);
     }
 
 }

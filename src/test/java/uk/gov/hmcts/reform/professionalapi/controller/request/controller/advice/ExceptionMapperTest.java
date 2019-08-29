@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.controller.advice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -64,6 +68,30 @@ public class ExceptionMapperTest {
                 exceptionMapper.handleHttpMediaTypeNotSupported(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_forbidden_error_exception() {
+
+        AccessDeniedException exception = mock(AccessDeniedException.class);
+
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.handleForbiddenException(exception);
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_http_status_code_exception() {
+
+        HttpStatusCodeException exception = mock(HttpStatusCodeException.class);
+        HttpStatus httpStatus = mock(HttpStatus.class);
+        when(exception.getStatusCode()).thenReturn(httpStatus);
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.handleHttpStatusException(exception);
+        assertNotNull(responseEntity.getStatusCode());
 
     }
 
