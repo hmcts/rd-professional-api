@@ -146,3 +146,47 @@ into the pre-script window.  Also add a header as follows:
 ```
 ServiceAuthorization: Bearer {{token}}
 ```
+
+### Testing AKS Deployment in Preview
+
+Every Pull-Request (P.R.) raised against master branch will automatically trigger an AKS build and deployment in Preview.
+
+Pre-requisites: 
+A1. Install Helm CLI tool on local machine AND verify that it is installed
+```
+$helm version
+```    
+A2. Install Kubectl CLI tool on local machine AND verify that it is installed
+```
+$kubectl version
+```
+    
+A3. Log-in to the azure group (you will need to two-factor authenticate into your hmcts mail account first)
+```
+az aks get-credentials --resource-group cnp-aks-rg --name cnp-aks-cluster --subscription 1c4f0704-a29e-403d-b719-b90c34ef14c9 --overwrite
+```
+
+B1. Checking helm deployment, this will show all reference data application deployments
+```
+$helm ls --namespace rd
+```
+
+B2. Checking an individual deployment
+```
+$helm status [NAME (FROM STEP B1)] e.g. rd-professional-api-pr-189
+```
+
+C1. Checking the kubernetes pods
+```
+$kubectl -n rd get pods
+```
+
+C2. Check the AKS logs
+```
+$kubectl -n rd logs [NAME (FROM STEP C1)] e.g. rd-professional-api-pr-212-java-786bcbbd79-gvcn9
+```
+
+C3. Deleting a deployment, this may be necessary if running Jenkins again
+```
+$helm del [name (FROM STEP C1)] e.g. rd-professional-api-pr-212 --purge
+```
