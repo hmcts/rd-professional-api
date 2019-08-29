@@ -76,5 +76,10 @@ services:
     depends_on:
       - service-auth-provider-api
 
+networks:
+  default:
+    external:
+      name: rd-user-profile-api_default
+
 volumes:
   rd-professional-db-volume:

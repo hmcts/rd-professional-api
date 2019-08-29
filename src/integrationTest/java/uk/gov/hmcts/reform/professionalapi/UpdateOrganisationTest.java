@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
@@ -125,8 +125,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         PaymentAccount paymentAccount = pbaAccounts.get(0);
         assertThat(paymentAccount.getPbaNumber()).isEqualTo("PBA1234567");
 
-        List<ProfessionalUser> professionalUsers = persistedOrganisation.getUsers();
-        ProfessionalUser professionalUser = professionalUsers.get(0);
+        List<SuperUser> professionalUsers = persistedOrganisation.getUsers();
+        SuperUser professionalUser = professionalUsers.get(0);
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
         assertThat(professionalUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
@@ -199,7 +199,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
             assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
             if (OrganisationStatus.ACTIVE.toString() == status) {
-                ProfessionalUser professionalUser = persistedOrganisation.getUsers().get(0);
+                SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNotNull();
                 assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.ACTIVE);
             }
@@ -211,7 +211,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
             }
 
             if (persistedOrganisation != null && !(OrganisationStatus.PENDING.toString() == status)) {
-                ProfessionalUser professionalUser = persistedOrganisation.getUsers().get(0);
+                SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNull();
                 assertThat(persistedOrganisation.getStatus()).isNotEqualTo(OrganisationStatus.ACTIVE);
             }

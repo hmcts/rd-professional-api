@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 public class OrganisationTest {
 
@@ -58,13 +58,13 @@ public class OrganisationTest {
     @Test
     public void adds_users_correctly() {
 
-        ProfessionalUser professionalUser = mock(ProfessionalUser.class);
+        SuperUser superUser = mock(SuperUser.class);
 
         Organisation organisation = new Organisation();
-        organisation.addProfessionalUser(professionalUser);
+        organisation.addProfessionalUser(superUser);
 
         assertThat(organisation.getUsers())
-                .containsExactly(professionalUser);
+                .containsExactly(superUser);
     }
 
     @Test
