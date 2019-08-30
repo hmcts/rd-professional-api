@@ -13,10 +13,12 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 
 public class PrdEnumServiceImplTest {
 
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
+    private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
     private final PrdEnumId prdEnumId = new PrdEnumId(1, "SIDAM_ROLE");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(5, "CCD_ROLE");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(4, "ADMIN_ROLE");
@@ -39,9 +41,6 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(2);
-        verify(
-                prdEnumRepository,
-                times(1)).findAll();
     }
 
     @Test
@@ -56,8 +55,5 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(0);
-        verify(
-                prdEnumRepository,
-                times(1)).findAll();
     }
 }

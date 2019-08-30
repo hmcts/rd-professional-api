@@ -82,7 +82,6 @@ public class ProfessionalExternalUserController extends SuperController {
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
 
-
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
             profUsersEntityResponse = retrieveUserByEmail(email);
@@ -97,10 +96,8 @@ public class ProfessionalExternalUserController extends SuperController {
             } else if (!isRolePuiUserManager) {
                 profExtUsrReqValidator.validateStatusIsActive(status);
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
-
             }
         }
-
 
         return profUsersEntityResponse;
     }

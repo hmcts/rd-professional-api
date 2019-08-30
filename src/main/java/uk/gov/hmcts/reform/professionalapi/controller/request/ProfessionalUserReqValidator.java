@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 
 @Component
@@ -26,7 +27,11 @@ public class ProfessionalUserReqValidator {
         if (null == orgId  && null == email && null == showDeleted && null == status) {
             throw new InvalidRequest("No input values given for the request");
         }
-        validateUserStatus(status);
+
+        if (!StringUtils.isEmpty(status)) {
+            validateUserStatus(status);
+        }
+
         isValidEmail(email);
     }
 

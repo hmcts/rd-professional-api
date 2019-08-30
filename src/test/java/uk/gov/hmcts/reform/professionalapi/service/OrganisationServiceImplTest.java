@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -90,6 +91,8 @@ public class OrganisationServiceImplTest {
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+    private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
+    private final PrdEnumId prdEnumId = mock(PrdEnumId.class);
 
     private final UserAttribute userAttributeMock = mock(UserAttribute.class);
     private List<String> userRoles = new ArrayList<>();
@@ -170,6 +173,8 @@ public class OrganisationServiceImplTest {
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
+
+
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
@@ -217,15 +222,20 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesAnOrganisation() {
+        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
+        prdEnums.add(anEnum);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
         SuperUser superUserMock = mock(SuperUser.class);
 
         when(professionalUserMock.toSuperUser()).thenReturn(superUserMock);
 
+
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
+
 
 
         verify(
@@ -565,9 +575,11 @@ public class OrganisationServiceImplTest {
         userRoles.add("pui-case-manager");
         userRoles.add("organisation-admin");
 
+
         List<UserAttribute> attributes = new ArrayList<>();
         attributes.add(userAttributeMock);
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
 
         OrganisationResponse organisationResponse =

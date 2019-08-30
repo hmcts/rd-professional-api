@@ -7,7 +7,7 @@ public class ProfessionalUserReqValidatorTest {
 
     ProfessionalUserReqValidator profUserReqValidator = new ProfessionalUserReqValidator();
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test(expected = InvalidRequest.class)
     public void testValidateRequestAllNull() {
         profUserReqValidator
                 .validateRequest(null,null,null, null);
