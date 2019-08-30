@@ -179,7 +179,7 @@ public class ProfessionalUserServiceTest {
 
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
         Mockito.verify(
                 professionalUserRepository,
                 Mockito.times(1)).findByOrganisation(organisation);
@@ -219,7 +219,7 @@ public class ProfessionalUserServiceTest {
 
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenThrow(exceptionMock);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
         Mockito.verify(
                 professionalUserRepository,
                 Mockito.times(1)).findByOrganisation(organisation);

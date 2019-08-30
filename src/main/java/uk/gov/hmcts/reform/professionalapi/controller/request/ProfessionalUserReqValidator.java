@@ -34,7 +34,7 @@ public class ProfessionalUserReqValidator {
         boolean valid = false;
 
         for (IdamStatus idamStatus : IdamStatus.values()) {
-            if(status.toUpperCase().equals(idamStatus.toString())) {
+            if(status.equalsIgnoreCase(idamStatus.toString())) {
                 valid = true;
             }
         }

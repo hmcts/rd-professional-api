@@ -92,6 +92,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
+    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role) {
+        return getRequest(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}", role, showDeleted, status);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role) {
 

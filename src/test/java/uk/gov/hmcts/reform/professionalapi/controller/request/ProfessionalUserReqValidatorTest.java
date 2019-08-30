@@ -10,12 +10,12 @@ public class ProfessionalUserReqValidatorTest {
     @Test(expected = EmptyResultDataAccessException.class)
     public void testValidateRequestAllNull() {
         profUserReqValidator
-                .validateRequest(null,null,null);
+                .validateRequest(null,null,null, null);
     }
 
     @Test
     public void testValidateRequestNoneNull() {
         profUserReqValidator
-                .validateRequest("ordId","true","some@email.com");
+                .validateRequest("ordId","true","some@email.com", "");
     }
 }
