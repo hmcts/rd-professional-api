@@ -176,6 +176,11 @@ B2. Checking an individual deployment
 $helm status [NAME (FROM STEP B1)] e.g. rd-professional-api-pr-189
 ```
 
+B3. Deleting a deployment, this may be necessary if running Jenkins again
+```
+$helm del [name (FROM STEP B1)] e.g. rd-professional-api-pr-212 --purge
+```
+
 C1. Checking the kubernetes pods
 ```
 $kubectl -n rd get pods
@@ -184,9 +189,4 @@ $kubectl -n rd get pods
 C2. Check the AKS logs
 ```
 $kubectl -n rd logs [NAME (FROM STEP C1)] e.g. rd-professional-api-pr-212-java-786bcbbd79-gvcn9
-```
-
-C3. Deleting a deployment, this may be necessary if running Jenkins again
-```
-$helm del [name (FROM STEP C1)] e.g. rd-professional-api-pr-212 --purge
 ```
