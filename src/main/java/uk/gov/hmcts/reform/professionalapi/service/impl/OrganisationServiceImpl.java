@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 
@@ -63,6 +64,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
     UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    PrdEnumService prdEnumService;
 
     private static final String SIDAM_ROLE = "SIDAM_ROLE";
     private static final String ADMIN_ROLE = "ADMIN_ROLE";
@@ -120,7 +123,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
 
 
-        prdEnumRepository.findAll().stream().forEach(prdEnum -> {
+        prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
             if (enumType.equalsIgnoreCase(SIDAM_ROLE)
                     || enumType.equalsIgnoreCase(ADMIN_ROLE)
