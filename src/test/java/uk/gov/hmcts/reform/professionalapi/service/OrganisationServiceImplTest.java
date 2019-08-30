@@ -165,7 +165,8 @@ public class OrganisationServiceImplTest {
                 contactInformationRepositoryMock,
                 userAttributeRepositoryMock, prdEnumRepositoryMock,
                 userAccountMapRepositoryMock,
-                userProfileFeignClient);
+                userProfileFeignClient,
+                prdEnumServiceMock);
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -222,21 +223,17 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesAnOrganisation() {
-        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
-        prdEnums.add(anEnum);
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
         SuperUser superUserMock = mock(SuperUser.class);
 
         when(professionalUserMock.toSuperUser()).thenReturn(superUserMock);
 
-
         OrganisationResponse organisationResponse =
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
         assertThat(organisationResponse).isNotNull();
-
-
 
         verify(
                 organisationRepositoryMock,
@@ -351,7 +348,8 @@ public class OrganisationServiceImplTest {
                 userAttributeRepositoryMock,
                 prdEnumRepositoryMock,
                 userAccountMapRepositoryMock,
-                userProfileFeignClient);
+                userProfileFeignClient,
+                prdEnumServiceMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
