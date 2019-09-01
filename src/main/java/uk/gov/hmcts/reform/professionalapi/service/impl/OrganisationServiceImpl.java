@@ -64,7 +64,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     PrdEnumRepository prdEnumRepository;
     UserAccountMapRepository userAccountMapRepository;
     UserProfileFeignClient userProfileFeignClient;
-    @Autowired
     PrdEnumService prdEnumService;
 
     private static final String SIDAM_ROLE = "SIDAM_ROLE";
@@ -81,7 +80,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserAttributeRepository userAttributeRepository,
             PrdEnumRepository prdEnumRepository,
             UserAccountMapRepository userAccountMapRepository,
-            UserProfileFeignClient userProfileFeignClient
+            UserProfileFeignClient userProfileFeignClient,
+            PrdEnumService prdEnumService
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -93,6 +93,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
         this.userProfileFeignClient = userProfileFeignClient;
+        this.prdEnumService = prdEnumService;
     }
 
     @Override
