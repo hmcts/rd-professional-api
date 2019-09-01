@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -92,8 +93,8 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
-    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role) {
-        return getRequest(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}", role, showDeleted, status);
+    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, UUID id) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",role, id, showDeleted, status);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -151,6 +152,28 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    private Map<String, Object> getRequestForExternal(String uriPath,String role, UUID userId, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
     public Map<String, Object> updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest,String role, String organisationIdentifier) {
 
@@ -171,15 +194,26 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
-    private HttpHeaders getMultipleAuthHeaders(String role) {
+    private HttpHeaders getMultipleAuthHeaders(String role, UUID userId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
-        headers.add("Authorization", sidamTokenMap.get(role));
+        String bearerToken = sidamTokenMap.get(role);
+        if (userId != null) {
+            bearerToken = userId + " " + bearerToken;
+        } else {
+            bearerToken = "1f5f2769-90ca-4216-9987-3fe87f0e7641" + " " + bearerToken;
+        }
+        headers.add("Authorization", bearerToken);
 
         return headers;
+    }
+
+    private HttpHeaders getMultipleAuthHeaders(String role) {
+
+        return getMultipleAuthHeaders(role, null);
     }
 
     private HttpHeaders getS2sTokenHeaders() {
