@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -118,11 +119,17 @@ public class OrganisationServiceImplTest {
 
         MockitoAnnotations.initMocks(this);
 
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("PROBATE");
+
+        List<Jurisdiction> jurisdictionIds = new ArrayList<>();
+        jurisdictionIds.add(jurisdiction);
+
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
                 "some-email",
-                new ArrayList<>()
+                jurisdictionIds
         );
 
         List<String> paymentAccountList = new ArrayList<>();
@@ -224,6 +231,9 @@ public class OrganisationServiceImplTest {
     @Test
     public void testSavesAnOrganisation() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
+
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
         SuperUser superUserMock = mock(SuperUser.class);
@@ -566,13 +576,13 @@ public class OrganisationServiceImplTest {
         prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         userRoles.add("pui-user-manager");
         userRoles.add("pui-organisation-manager");
         userRoles.add("pui-finance-manager");
         userRoles.add("pui-case-manager");
         userRoles.add("organisation-admin");
-
 
         List<UserAttribute> attributes = new ArrayList<>();
         attributes.add(userAttributeMock);

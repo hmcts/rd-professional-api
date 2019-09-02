@@ -6,13 +6,21 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
@@ -26,7 +34,6 @@ public class RefDataUtilTest {
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
         UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
-
         UserAccountMap userAccountMap = mock(UserAccountMap.class);
 
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
@@ -34,8 +41,24 @@ public class RefDataUtilTest {
 
         when(userAccountMap.getUserAccountMapId()).thenReturn(userAccountMapId);
         when(userAccountMapId.getPaymentAccount()).thenReturn(paymentAccount);
+
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
         assertThat(paymentAccounts.size()).isGreaterThan(0);
+    }
+
+    @Test
+    public void shouldReturnPaymentAccountsFromUserAccountMapWhenListIsEmpty() {
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
+        UserAccountMap userAccountMap = mock(UserAccountMap.class);
+
+        List<UserAccountMap> userAccountMaps = new ArrayList<>();
+
+        when(userAccountMap.getUserAccountMapId()).thenReturn(userAccountMapId);
+        when(userAccountMapId.getPaymentAccount()).thenReturn(paymentAccount);
+
+        List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
+        assertThat(paymentAccounts.size()).isEqualTo(0);
     }
 
     @Test
@@ -101,7 +124,6 @@ public class RefDataUtilTest {
 
     @Test
     public void mapUserInfoCorrectly() {
-
         ProfessionalUser professionalUser = new ProfessionalUser();
         professionalUser.setFirstName("abc");
         professionalUser.setLastName("bcd");
@@ -111,9 +133,7 @@ public class RefDataUtilTest {
         ResponseEntity responseEntity = mock(ResponseEntity.class);
 
         ProfessionalUser mappedUser = RefDataUtil.mapUserInfo(professionalUser, responseEntity, true);
-
         assertThat(mappedUser).isNotNull();
-
     }
 
     @Test
@@ -140,7 +160,84 @@ public class RefDataUtilTest {
         assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
         assertThat(responseUser.getRoles()).isNotNull();
         assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
+        assertThat(responseUser.getIdamStatusCode()).isEqualTo("code");
+        assertThat(responseUser.getIdamMessage()).isEqualTo("test error message");
         assertThat(getUserProfileResponseMock.getIdamStatusCode()).isEqualTo("code");
         assertThat(getUserProfileResponseMock.getIdamMessage()).isEqualTo("test error message");
+    }
+
+    @Test
+    public void test_filterUsersByStatus() {
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
+        Organisation organisationMock = mock(Organisation.class);
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2","lName2", "some2@email.com", organisationMock));
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE);
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE);
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING);
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(professionalUsersResponse);
+        userProfiles.add(professionalUsersResponse1);
+        userProfiles.add(professionalUsersResponse2);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
+
+        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        assertThat(response).isNotNull();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map mappedResponse = objectMapper.convertValue(response.getBody(), Map.class);
+        assertThat(mappedResponse.get("users")).asList().hasSize(2);
+    }
+
+    @Test
+    public void test_filterUsersByStatusWhenStatusCodeIsNot200() {
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
+        Organisation organisationMock = mock(Organisation.class);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2","lName2", "some2@email.com", organisationMock));
+
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE);
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE);
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING);
+
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(professionalUsersResponse);
+        userProfiles.add(professionalUsersResponse1);
+        userProfiles.add(professionalUsersResponse2);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
+
+        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+
+        assertThat(response).isNotNull();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map mappedResponse = objectMapper
+                .convertValue(
+                        response.getBody(),
+                        Map.class);
+
+        assertThat(mappedResponse.get("users")).asList().hasSize(3);
     }
 }

@@ -21,6 +21,7 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -245,5 +246,30 @@ public class ProfessionalUserServiceTest {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some@email.com");
         assertThat(user).isNotNull();
+    }
+
+    @Test
+    public void shouldReturnProfessionalUserById() {
+
+        UUID id = UUID.randomUUID();
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        Optional<ProfessionalUser> professionalUserOptional = Optional.of(professionalUserMock);
+
+        when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);
+//        when(professionalUserOptional.isPresent()).thenReturn(true);
+
+        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
+        assertThat(professionalUserResponse).isNotNull();
+    }
+
+    @Test
+    public void shouldReturnProfessionalUserByIdShouldReturnNullIfUserNotFound() {
+        UUID id = UUID.randomUUID();
+        Optional<ProfessionalUser> professionalUserOptional = Optional.empty();
+
+        when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);
+
+        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
+        assertThat(professionalUserResponse).isNull();
     }
 }
