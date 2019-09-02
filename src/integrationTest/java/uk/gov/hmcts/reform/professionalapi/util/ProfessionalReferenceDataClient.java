@@ -206,6 +206,7 @@ public class ProfessionalReferenceDataClient {
         } else {
             bearerToken = "1f5f2769-90ca-4216-9987-3fe87f0e7641" + " " + bearerToken;
         }
+
         headers.add("Authorization", bearerToken);
 
         return headers;

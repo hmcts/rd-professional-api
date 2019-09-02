@@ -321,39 +321,39 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String usersBodyWithoutRoles = " {"
                 + "  \"userProfiles\": ["
                 + "  {"
-                + "  \"userIdentifier\":\" %s" + "\","
+                + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"prashanth\","
                 + "  \"lastName\": \"rao\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": \"null\","
+                + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + "  {"
-                + "  \"userIdentifier\":\" %s" + "\","
+                + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"Shreedhar\","
                 + "  \"lastName\": \"Lomte\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": \"null\","
+                + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
-                + "  \"userIdentifier\":\" %s"  + "\","
+                + "  \"userIdentifier\":\"%s"  + "\","
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\","
-                + "  \"roles\": \"null\","
+                + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
                 + "  \"idamMessage\": \"\""
                 + "  } "
                 + " ]"
                 + "}";
 
-        /*userProfileService.stubFor(
+        userProfileService.stubFor(
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .withQueryParam("rolesRequired", equalTo("false"))
                         .willReturn(
@@ -363,7 +363,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
                         )
-        );*/
+        );
     }
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
