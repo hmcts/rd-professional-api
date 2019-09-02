@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -72,12 +71,12 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         Authentication authentication = mock(Authentication.class);
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         when(grantedAuthority.getAuthority()).thenReturn("pui-user-manager");
         authorities.add(grantedAuthority);
 
+        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
@@ -112,12 +111,12 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         Authentication authentication = mock(Authentication.class);
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         when(grantedAuthority.getAuthority()).thenReturn("pui-user-manager");
         authorities.add(grantedAuthority);
 
+        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);

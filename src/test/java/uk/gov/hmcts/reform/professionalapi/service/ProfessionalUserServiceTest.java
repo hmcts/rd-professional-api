@@ -256,7 +256,6 @@ public class ProfessionalUserServiceTest {
         Optional<ProfessionalUser> professionalUserOptional = Optional.of(professionalUserMock);
 
         when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);
-//        when(professionalUserOptional.isPresent()).thenReturn(true);
 
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNotNull();

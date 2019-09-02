@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import org.junit.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 public class ProfessionalUserReqValidatorTest {
 

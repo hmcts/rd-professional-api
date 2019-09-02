@@ -116,7 +116,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
-        if(!StringUtils.isBlank(status)) {
+        if (!StringUtils.isBlank(status)) {
             responseEntity = RefDataUtil.filterUsersByStatus(responseEntity, status);
         }
 

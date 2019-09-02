@@ -4,12 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -168,7 +169,6 @@ public class RefDataUtilTest {
 
     @Test
     public void test_filterUsersByStatus() {
-        ResponseEntity responseEntity = mock(ResponseEntity.class);
         Organisation organisationMock = mock(Organisation.class);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
@@ -188,6 +188,7 @@ public class RefDataUtilTest {
         header.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
 
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
@@ -201,13 +202,11 @@ public class RefDataUtilTest {
 
     @Test
     public void test_filterUsersByStatusWhenStatusCodeIsNot200() {
-        ResponseEntity responseEntity = mock(ResponseEntity.class);
         Organisation organisationMock = mock(Organisation.class);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
@@ -221,10 +220,13 @@ public class RefDataUtilTest {
         userProfiles.add(professionalUsersResponse);
         userProfiles.add(professionalUsersResponse1);
         userProfiles.add(professionalUsersResponse2);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
 
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
 
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 

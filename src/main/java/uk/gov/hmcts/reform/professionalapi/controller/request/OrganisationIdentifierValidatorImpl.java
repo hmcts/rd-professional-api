@@ -46,8 +46,7 @@ public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationVa
         boolean isPuiFinanceManExist = ifUserRoleExists(authorities, "pui-finance-manager");
 
         if (!isPuiFinanceManExist) {
-            authorities.forEach(role
-                    -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
+            authorities.forEach(role -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
         }
     }
 

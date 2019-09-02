@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -39,12 +37,12 @@ public class ProfessionalUserReqValidator {
         boolean valid = false;
 
         for (IdamStatus idamStatus : IdamStatus.values()) {
-            if(status.equalsIgnoreCase(idamStatus.toString())) {
+            if (status.equalsIgnoreCase(idamStatus.toString())) {
                 valid = true;
             }
         }
 
-        if(!valid) {
+        if (!valid) {
             throw new InvalidRequest("The status provided is invalid");
         }
     }

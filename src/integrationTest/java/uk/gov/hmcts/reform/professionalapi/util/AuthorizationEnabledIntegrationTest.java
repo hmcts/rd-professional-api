@@ -17,7 +17,6 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.io.IOException;
 import java.util.*;
 
-import com.github.tomakehurst.wiremock.matching.StringValuePattern;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -135,22 +134,22 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "}")
                         .withTransformers("external_user-token-response")));
 
-            sidamService.stubFor(get(urlEqualTo("/details"))
-                    .withHeader("Authorization", containing("pui-case-manager"))
-                    .willReturn(aResponse()
-                            .withStatus(200)
-                            .withHeader("Content-Type", "application/json")
-                            .withBody("{"
-                                    +  "  \"id\": \"%s\","
-                                    +  "  \"forename\": \"Super\","
-                                    +  "  \"surname\": \"User\","
-                                    +  "  \"email\": \"super.user@hmcts.net\","
-                                    +  "  \"accountStatus\": \"active\","
-                                    +  "  \"roles\": ["
-                                    +  "  \"pui-case-manager\""
-                                    +  "  ]"
-                                    +  "}")
-                            .withTransformers("external_user-token-response")));
+        sidamService.stubFor(get(urlEqualTo("/details"))
+                .withHeader("Authorization", containing("pui-case-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"id\": \"%s\","
+                                +  "  \"forename\": \"Super\","
+                                +  "  \"surname\": \"User\","
+                                +  "  \"email\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-case-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
 
         sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing("prd-admin"))
                 .willReturn(aResponse()
@@ -375,7 +374,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             try {
                 ids =  Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
             } catch (IOException e) {
-               //Do Nothing
+                //Do Nothing
             }
             String formatResponse = response.getBodyAsString();
             int replaceParams = formatResponse.split("%s").length - 1;

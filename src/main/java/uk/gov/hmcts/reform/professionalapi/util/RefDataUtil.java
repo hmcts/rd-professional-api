@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.util.stream.Collectors.toList;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
 
 import feign.FeignException;
 import feign.Response;
