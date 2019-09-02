@@ -59,9 +59,5 @@ variable "team_name" {
 
 variable "managed_identity_object_id" {
   default = ""
-<<<<<<< HEAD
-
-=======
->>>>>>> b30f09b452cb3dc0638fbc3341c0e0871745329c
 }
 
