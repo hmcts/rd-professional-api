@@ -93,7 +93,7 @@ public class ProfessionalExternalUserController extends SuperController {
             if (isRolePuiUserManager) {
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
 
-            } else if (!isRolePuiUserManager) {
+            } else {
                 profExtUsrReqValidator.validateStatusIsActive(status);
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
