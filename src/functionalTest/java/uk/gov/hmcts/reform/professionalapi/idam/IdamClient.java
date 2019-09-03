@@ -71,6 +71,7 @@ public class IdamClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
+        log.info(createdUserResponse.getBody().toString());
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -83,7 +84,7 @@ public class IdamClient {
 
     public String getExternalBearerToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, firstName, lastName, email);
-        return getBearerToken(email);
+        return getBearerToken(userEmail);
     }
 
     public String getBearerToken(String userEmail) {
