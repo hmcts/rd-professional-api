@@ -295,6 +295,10 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
 
+        log.info("REQUEST SPEC::::" + requestSpecification);
+        log.info("GET, PATH:::::::" + "/refdata/external/v1/organisations/users?status=" + userStatus);
+
+
         return response.body().as(Map.class);
     }
 
