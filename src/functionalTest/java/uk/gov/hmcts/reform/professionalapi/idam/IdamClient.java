@@ -62,6 +62,15 @@ public class IdamClient {
 
         String serializedUser = gson.toJson(user);
 
+        log.info("USER Name:::::::::::" + firstName);
+        log.info("USER Email::::::::::" + userEmail);
+        log.info("USER Last Name::::::" + lastName);
+        log.info("USER Password:::::::" + password);
+        log.info("USER Roles::::::::::" + roles);
+        log.info("USER Group::::::::::" + group);
+        log.info("USER id:::::::::::::" + id);
+        log.info("SERIALISED USER:::::" + serializedUser);
+
         Response createdUserResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
@@ -71,7 +80,7 @@ public class IdamClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
-        log.info(createdUserResponse.getBody().toString());
+        log.info("BODY::::::" + createdUserResponse.getBody().toString());
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -97,6 +106,12 @@ public class IdamClient {
         authorizeParams.put("response_type", "code");
         authorizeParams.put("scope", "openid profile roles create-user manage-user");
 
+        log.info("CLIENT ID:::::::::::::" +  testConfig.getClientId());
+        log.info("redirect_uri::::::::::" + testConfig.getOauthRedirectUrl());
+        log.info("IDAM URL::::::::::::::" + testConfig.getIdamApiUrl());
+        log.info("CODE AUTH:::::::::::::" + BASIC + codeAuthorization);
+
+
         Response authorizeResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
@@ -106,6 +121,8 @@ public class IdamClient {
                 .params(authorizeParams)
                 .post("/oauth2/authorize")
                 .andReturn();
+
+
 
         assertThat(authorizeResponse.getStatusCode()).isEqualTo(200);
 
