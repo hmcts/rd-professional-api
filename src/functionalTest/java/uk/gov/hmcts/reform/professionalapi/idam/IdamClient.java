@@ -80,7 +80,7 @@ public class IdamClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
-        log.info("BODY::::::" + createdUserResponse.getBody().toString());
+        log.info("BODY::::::" + createdUserResponse.getBody().prettyPrint());
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -99,6 +99,7 @@ public class IdamClient {
     public String getBearerToken(String userEmail) {
 
         String codeAuthorization = Base64.getEncoder().encodeToString((userEmail + ":" + password).getBytes());
+        log.info("CODE AUTH:::::::::::::" + BASIC + codeAuthorization);
 
         Map<String, String> authorizeParams = new HashMap<>();
         authorizeParams.put("client_id", testConfig.getClientId());
@@ -109,7 +110,6 @@ public class IdamClient {
         log.info("CLIENT ID:::::::::::::" +  testConfig.getClientId());
         log.info("redirect_uri::::::::::" + testConfig.getOauthRedirectUrl());
         log.info("IDAM URL::::::::::::::" + testConfig.getIdamApiUrl());
-        log.info("CODE AUTH:::::::::::::" + BASIC + codeAuthorization);
 
 
         Response authorizeResponse = RestAssured
