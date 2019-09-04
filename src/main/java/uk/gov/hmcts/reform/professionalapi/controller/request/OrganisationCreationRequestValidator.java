@@ -139,7 +139,7 @@ public class OrganisationCreationRequestValidator {
 
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
 
-                        if (isEmptyValue(dxAddress.getDxNumber()) || !isDxNumberValid(dxAddress.getDxNumber()) || isEmptyValue(dxAddress.getDxExchange())) {
+                        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || !isDxNumberValid(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
                             throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
                         }
                     }
@@ -158,19 +158,15 @@ public class OrganisationCreationRequestValidator {
     }
 
     private Boolean isDxNumberValid(String dxNumber) {
-
         Boolean numberIsValid = true;
 
         if (dxNumber != null) {
-
-            String regex = "^(?:DX|NI) [0-9]{10}+$";
+            String regex = "^[a-zA-Z0-9 ]*$";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(dxNumber);
             numberIsValid = matcher.matches();
         }
-
         return numberIsValid;
-
     }
 
 
