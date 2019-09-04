@@ -28,11 +28,9 @@ public class DxAddress {
     private UUID id;
 
     @Column(name = "DX_NUMBER")
-    @Size(max = 13)
     private String dxNumber;
 
     @Column(name = "DX_EXCHANGE")
-    @Size(max = 20)
     private String dxExchange;
 
     @ManyToOne
