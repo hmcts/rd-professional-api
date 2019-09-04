@@ -108,7 +108,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("someone@somewhere.com")
+                        .email(randomAlphabetic(10) + "@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
