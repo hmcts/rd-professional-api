@@ -139,7 +139,7 @@ public class OrganisationCreationRequestValidator {
 
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
 
-                        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || !isDxNumberValid(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
+                        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || dxAddress.getDxNumber().length() < 14 || !isDxNumberValid(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange()) || dxAddress.getDxExchange().length() < 21) {
                             throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
                         }
                     }
