@@ -145,7 +145,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
+    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
@@ -156,8 +156,6 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
-
-        return response.body().as(Map.class);
     }
 
     public  NewUserCreationRequest createNewUserRequest() {

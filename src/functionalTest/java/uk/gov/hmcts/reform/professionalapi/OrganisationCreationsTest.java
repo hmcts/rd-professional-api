@@ -40,29 +40,25 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
     @Test
     public void ac2_create_an_organisation_with_Dx_Number_longer_than_13_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10) + "&" + randomAlphabetic(9));
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
     public void ac3_create_an_organisation_with_Dx_Exchange_longer_than_20_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(10));
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
     public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&" + randomAlphabetic(9));
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
     public void ac5_create_an_organisation_with_Dx_Exchange_empty_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), "");
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
@@ -82,8 +78,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                         .build()))
                 .build();
 
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
@@ -104,8 +99,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                         .build()))
                 .build();
 
-        Map<String, Object> response = professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     private OrganisationCreationRequest createOrganisationWithDxEntity(String dxNumber, String dxExchange) {
