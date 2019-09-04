@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -29,7 +30,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac1_can_create_an_organisation_with_valid_Dx_Number_and_valid_Dx_Exchange() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("DX1A3B5C7D9E0", "Th1s 1s v@l1d");
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -38,28 +39,28 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac2_create_an_organisation_with_Dx_Number_longer_than_13_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("this is too many characters", "Th1s 1s v@l1d");
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10) + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
     public void ac3_create_an_organisation_with_Dx_Exchange_longer_than_20_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("DX1234567890", "this is too many characters");
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(10));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
     public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("", "Th1s 1s v@l1d");
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
     public void ac5_create_an_organisation_with_Dx_Exchange_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("DX1234567890", "");
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), "");
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
@@ -77,7 +78,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxExchange("Th1s 1s v@l1d").build()))
+                                .dxExchange(randomAlphabetic(20)).build()))
                         .build()))
                 .build();
 
@@ -98,7 +99,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX1234567890X")
+                                .dxNumber(randomAlphabetic(13))
                                 .build()))
                         .build()))
                 .build();
