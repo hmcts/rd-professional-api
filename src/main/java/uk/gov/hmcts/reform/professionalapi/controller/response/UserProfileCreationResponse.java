@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,7 @@ public class UserProfileCreationResponse {
         this.idamRegistrationResponse = idamRegistrationResponse;
     }
 
-    private UUID idamId;
+    private String idamId;
     private Integer idamRegistrationResponse;
 
     public boolean isUserCreated() {

@@ -35,12 +35,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -114,12 +109,17 @@ public class OrganisationServiceImplTest {
     public void setUp() {
 
         MockitoAnnotations.initMocks(this);
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("PROBATE");
+
+        List<Jurisdiction> jurisdictionIds = new ArrayList<>();
+        jurisdictionIds.add(jurisdiction);
 
         superUser = new UserCreationRequest(
                 "some-fname",
                 "some-lname",
                 "some-email",
-                new ArrayList<>()
+                jurisdictionIds
         );
 
         List<String> paymentAccountList = new ArrayList<>();
@@ -217,6 +217,10 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesAnOrganisation() {
+
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
 
         SuperUser superUserMock = mock(SuperUser.class);
 
@@ -349,7 +353,7 @@ public class OrganisationServiceImplTest {
     public void testRetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty()throws Exception {
 
         ProfessionalUser user = mock(ProfessionalUser.class);
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
 
         when(user.getUserIdentifier()).thenReturn(id);
         List<String> users = new ArrayList<>();
@@ -357,7 +361,7 @@ public class OrganisationServiceImplTest {
         List<Organisation> pendOrganisations = new ArrayList<>();
         pendOrganisations.add(organisationMock);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -385,7 +389,7 @@ public class OrganisationServiceImplTest {
 
         SuperUser user = mock(SuperUser.class);
 
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         when(user.getUserIdentifier()).thenReturn(id);
         ProfessionalUser userProf = mock(ProfessionalUser.class);
         when(user.toProfessionalUser()).thenReturn(userProf);
@@ -400,7 +404,7 @@ public class OrganisationServiceImplTest {
         when(professionalUser.getUserIdentifier()).thenReturn(id);
         when(user.toProfessionalUser()).thenReturn(professionalUser);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -430,8 +434,8 @@ public class OrganisationServiceImplTest {
 
         SuperUser user = mock(SuperUser.class);
 
-        UUID id = UUID.randomUUID();
-        List<UUID> ids = new ArrayList<>();
+        String id = UUID.randomUUID().toString();
+        List<String> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
@@ -558,6 +562,7 @@ public class OrganisationServiceImplTest {
         prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         userRoles.add("pui-user-manager");
         userRoles.add("pui-organisation-manager");

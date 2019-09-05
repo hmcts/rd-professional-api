@@ -118,7 +118,7 @@ public class PbaAccountUtilTest {
 
     @Test
     public void test_mapUserInfo() {
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         ProfessionalUser userMock = new ProfessionalUser();
         ResponseEntity responseResponseEntityMock = mock(ResponseEntity.class);
         GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
@@ -127,7 +127,7 @@ public class PbaAccountUtilTest {
         when(getUserProfileResponseMock.getLastName()).thenReturn("lname");
         when(getUserProfileResponseMock.getEmail()).thenReturn("some@hmcts.net");
         when(getUserProfileResponseMock.getIdamStatus()).thenReturn(IdamStatus.ACTIVE);
-        when(getUserProfileResponseMock.getIdamId()).thenReturn(id);
+        when(getUserProfileResponseMock.getIdamId()).thenReturn(id.toString());
         when(getUserProfileResponseMock.getRoles()).thenReturn(new ArrayList<String>());
         when(getUserProfileResponseMock.getIdamStatusCode()).thenReturn("code");
         when(getUserProfileResponseMock.getIdamMessage()).thenReturn("test error message");
