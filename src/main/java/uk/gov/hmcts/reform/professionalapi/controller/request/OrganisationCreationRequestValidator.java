@@ -153,8 +153,16 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
-        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
-            throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
+        if (StringUtils.isEmpty(dxAddress.getDxNumber())) {
+            throw new InvalidRequest("DX Number cannot be null, empty or greater than 13");
+        }
+
+        if (StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("DX Exchange cannot be null, empty or greater than 20");
+        }
+
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) && StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("Invalid DX Number provided, it cannot be null, empty or greater than 13, and invalid DX Exchange provided, it cannot be null, empty or greater than 20");
         }
 
         if (dxAddress.getDxNumber() != null) {
@@ -162,7 +170,7 @@ public class OrganisationCreationRequestValidator {
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(dxAddress.getDxNumber());
             if (!matcher.matches()) {
-                throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber());
+                throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
             }
         }
 
@@ -172,6 +180,10 @@ public class OrganisationCreationRequestValidator {
 
         if (dxAddress.getDxExchange().length() > 20) {
             throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+        }
+
+        if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
+            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters" + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
         }
 
     }
