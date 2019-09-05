@@ -73,7 +73,7 @@ public class ProfessionalUser {
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     @Column(name = "USER_IDENTIFIER")
-    private UUID userIdentifier;
+    private String userIdentifier;
 
     @Transient
     private List<String> roles;
