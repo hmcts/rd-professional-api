@@ -36,12 +36,18 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
-
     @Test
     public void ac2_create_an_organisation_with_Dx_Number_longer_than_13_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10) + "&" + randomAlphabetic(9));
         professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
+
+    @Test
+    public void ac2__create_an_organisation_with_Dx_Number_less_than_13_throws_400() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(6), randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+    }
+
 
     @Test
     public void ac3_create_an_organisation_with_Dx_Exchange_longer_than_20_throws_400() {

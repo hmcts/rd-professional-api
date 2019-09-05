@@ -153,7 +153,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
-        if(StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
             throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
         }
 
@@ -166,11 +166,11 @@ public class OrganisationCreationRequestValidator {
             }
         }
 
-        if(dxAddress.getDxNumber().length() > 13) {
+        if (dxAddress.getDxNumber().length() > 13) {
             throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters");
         }
 
-        if(dxAddress.getDxExchange().length() > 20) {
+        if (dxAddress.getDxExchange().length() > 20) {
             throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
         }
 
