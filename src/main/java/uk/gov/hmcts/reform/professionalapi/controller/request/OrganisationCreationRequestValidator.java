@@ -153,6 +153,10 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) && StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("Invalid DX Number provided, it cannot be null, empty or greater than 13, and invalid DX Exchange provided, it cannot be null, empty or greater than 20");
+        }
+
         if (StringUtils.isEmpty(dxAddress.getDxNumber())) {
             throw new InvalidRequest("DX Number cannot be null, empty or greater than 13");
         }
@@ -161,9 +165,6 @@ public class OrganisationCreationRequestValidator {
             throw new InvalidRequest("DX Exchange cannot be null, empty or greater than 20");
         }
 
-        if (StringUtils.isEmpty(dxAddress.getDxNumber()) && StringUtils.isEmpty(dxAddress.getDxExchange())) {
-            throw new InvalidRequest("Invalid DX Number provided, it cannot be null, empty or greater than 13, and invalid DX Exchange provided, it cannot be null, empty or greater than 20");
-        }
 
         if (dxAddress.getDxNumber() != null) {
             String regex = "^[a-zA-Z0-9 ]*$";
@@ -174,6 +175,10 @@ public class OrganisationCreationRequestValidator {
             }
         }
 
+        if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
+            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters" + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+        }
+
         if (dxAddress.getDxNumber().length() > 13) {
             throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters");
         }
@@ -181,11 +186,6 @@ public class OrganisationCreationRequestValidator {
         if (dxAddress.getDxExchange().length() > 20) {
             throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
         }
-
-        if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
-            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters" + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
-        }
-
     }
 
 
