@@ -124,7 +124,6 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
-
         if (null != contactInformations) {
 
             for (ContactInformationCreationRequest contactInformation : contactInformations) {
@@ -136,12 +135,8 @@ public class OrganisationCreationRequestValidator {
                     throw new InvalidRequest("Empty contactInformation value");
                 }
                 if (null != contactInformation.getDxAddress()) {
-
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
-
-                        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || dxAddress.getDxNumber().length() > 14 || !isDxNumberValid(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange()) || dxAddress.getDxExchange().length() > 21) {
-                            throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
-                        }
+                        isDxAddressValid(dxAddress);
                     }
                 }
             }
@@ -157,16 +152,28 @@ public class OrganisationCreationRequestValidator {
         return isEmpty;
     }
 
-    private Boolean isDxNumberValid(String dxNumber) {
-        Boolean numberIsValid = true;
+    private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
+        if(StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
+        }
 
-        if (dxNumber != null) {
+        if (dxAddress.getDxNumber() != null) {
             String regex = "^[a-zA-Z0-9 ]*$";
             Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(dxNumber);
-            numberIsValid = matcher.matches();
+            Matcher matcher = pattern.matcher(dxAddress.getDxNumber());
+            if (!matcher.matches()) {
+                throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber());
+            }
         }
-        return numberIsValid;
+
+        if(dxAddress.getDxNumber().length() > 13) {
+            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters");
+        }
+
+        if(dxAddress.getDxExchange().length() > 20) {
+            throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+        }
+
     }
 
 
