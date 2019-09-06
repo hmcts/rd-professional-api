@@ -294,7 +294,6 @@ public class ProfessionalApiClient {
 
         log.info("ENDPOINT RESPONSE::::" + response);
         log.info("REQUEST SPEC::::" + requestSpecification.toString());
-        log.info("GET, PATH:::::::" + "/refdata/external/v1/organisations/users?status=" + userStatus);
 
         response.then()
                 .assertThat()
