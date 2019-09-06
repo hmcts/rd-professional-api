@@ -188,7 +188,6 @@ public class ProfessionalUserServiceTest {
         assertThat(responseEntity).isNotNull();
     }
 
-
     @Test
     public void addNewUserToAnOrganisation() {
 
