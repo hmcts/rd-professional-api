@@ -291,12 +291,15 @@ public class ProfessionalApiClient {
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
                 .andReturn();
+
+        log.info("ENDPOINT RESPONSE::::" + response);
+        log.info("REQUEST SPEC::::" + requestSpecification.toString());
+        log.info("GET, PATH:::::::" + "/refdata/external/v1/organisations/users?status=" + userStatus);
+
         response.then()
                 .assertThat()
                 .statusCode(status.value());
 
-        log.info("REQUEST SPEC::::" + requestSpecification);
-        log.info("GET, PATH:::::::" + "/refdata/external/v1/organisations/users?status=" + userStatus);
 
 
         return response.body().as(Map.class);

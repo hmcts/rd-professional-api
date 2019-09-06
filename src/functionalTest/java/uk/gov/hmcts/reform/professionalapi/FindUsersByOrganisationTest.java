@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.junit.Test;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Slf4j
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     RequestSpecification bearerTokenForPuiUserManager;
@@ -29,8 +31,12 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     public RequestSpecification generateBearerTokenForPuiManager() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
+        log.info("RESPONSE:::::" + response);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        log.info("RESPONSE AFTER UPDATE");
+
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
@@ -40,6 +46,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
+        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager.body());
+
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -47,7 +55,10 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        log.info("NEW USER RESPONSE::::::::::" + newUserResponse);
+
 
         return bearerTokenForNonPuiUserManager;
     }
@@ -56,8 +67,11 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         if (bearerTokenForNonPuiUserManager == null) {
 
             Map<String, Object> response = professionalApiClient.createOrganisation();
+            log.info("RESPONSE:::::" + response);
             String orgIdentifierResponse = (String) response.get("organisationIdentifier");
             professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+            log.info("RESPONSE AFTER UPDATE");
 
             List<String> userRoles = new ArrayList<>();
             userRoles.add("pui-case-manager");
@@ -67,6 +81,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
             bearerTokenForNonPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, userEmail);
 
+            log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForNonPuiUserManager);
+
             NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -74,7 +90,9 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                     .roles(userRoles)
                     .jurisdictions(OrganisationFixtures.createJurisdictions())
                     .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+            Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+            log.info("NEW USER RESPONSE::::::::::" + newUserResponse);
 
             return bearerTokenForNonPuiUserManager;
         } else {
