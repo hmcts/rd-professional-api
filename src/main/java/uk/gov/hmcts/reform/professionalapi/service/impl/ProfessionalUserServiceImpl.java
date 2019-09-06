@@ -102,7 +102,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted) {
         List<ProfessionalUser> professionalUsers;
-        List<UUID> usersId = new ArrayList<>();
+        List<String> usersId = new ArrayList<>();
 
         ResponseEntity responseResponseEntity;
 

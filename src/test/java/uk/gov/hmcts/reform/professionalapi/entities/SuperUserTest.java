@@ -48,7 +48,6 @@ public class SuperUserTest {
 
         assertThat(superUser.getCreated()).isNotNull();
 
-
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
     }
@@ -63,7 +62,7 @@ public class SuperUserTest {
                 "some-email-address",
                 organisation);
         UUID id = UUID.randomUUID();
-        superUser.setUserIdentifier(id);
+        superUser.setUserIdentifier(id.toString());
         superUser.setId(id);
         superUser.setCreated(LocalDateTime.now());
         superUser.setLastUpdated(LocalDateTime.now());
@@ -78,6 +77,6 @@ public class SuperUserTest {
         assertThat(professionalUser.getDeleted()).isNotNull();
         assertThat(professionalUser.getId()).isNotNull();
         assertThat(professionalUser.getLastUpdated()).isNotNull();
-        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id);
+        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id.toString());
     }
 }

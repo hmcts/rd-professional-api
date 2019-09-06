@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GetUserProfileResponse {
 
-    private UUID idamId;
+    private String idamId;
     private String firstName;
     private String lastName;
     private String email;
