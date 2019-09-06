@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -139,7 +141,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void ac1_find_all_active_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
         response.get("idamStatus").equals(IdamStatus.ACTIVE.toString());
-        validateUsers(response, false);
+        validateRetrievedUsers(response, false);
     }
 
     @Test
@@ -151,14 +153,14 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
-        validateUsers(response, false);
+        validateRetrievedUsers(response, false);
     }
 
     @Test
     @Ignore
     public void ac4_find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
-        validateUsers(response, false);
+        validateRetrievedUsers(response, false);
     }
 
     @Test
@@ -201,5 +203,23 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Ignore
     public void ac9_find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
+    }
+
+    void validateRetrievedUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
+
+        assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
+        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
+        assertThat(professionalUsersResponse.get("email")).isNotNull();
+        if (rolesRequired) {
+            assertThat(professionalUsersResponse.get("roles")).isNotNull();
+        } else {
+            assertThat(professionalUsersResponse.get("roles")).isNull();
+        }
     }
 }
