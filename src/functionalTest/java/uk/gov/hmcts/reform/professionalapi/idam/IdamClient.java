@@ -81,6 +81,7 @@ public class IdamClient {
                 .andReturn();
 
         log.info("BODY::::::" + createdUserResponse.getBody().prettyPrint());
+        log.info("STATUS::::::" + createdUserResponse.getStatusCode());
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
