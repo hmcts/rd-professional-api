@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -101,10 +100,10 @@ public interface RefDataUtil {
     }
 
     public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                                   RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                                   String showDeleted, Map<UUID, Organisation> activeOrganisationDtls) {
+                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                         String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
         List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
-        Map<UUID, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
+        Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
 
@@ -124,8 +123,8 @@ public interface RefDataUtil {
 
     }
 
-    public  static Map<UUID, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                                  Map<UUID, Organisation> activeOrganisationDtls) {
+    public  static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+                                                                                  Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse

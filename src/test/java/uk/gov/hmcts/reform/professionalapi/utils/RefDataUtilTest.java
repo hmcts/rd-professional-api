@@ -148,7 +148,7 @@ public class RefDataUtilTest {
         when(getUserProfileResponseMock.getLastName()).thenReturn("lname");
         when(getUserProfileResponseMock.getEmail()).thenReturn("some@hmcts.net");
         when(getUserProfileResponseMock.getIdamStatus()).thenReturn(IdamStatus.ACTIVE);
-        when(getUserProfileResponseMock.getIdamId()).thenReturn(id);
+        when(getUserProfileResponseMock.getIdamId()).thenReturn(id.toString());
         when(getUserProfileResponseMock.getRoles()).thenReturn(new ArrayList<String>());
         when(getUserProfileResponseMock.getIdamStatusCode()).thenReturn("code");
         when(getUserProfileResponseMock.getIdamMessage()).thenReturn("test error message");
@@ -158,9 +158,9 @@ public class RefDataUtilTest {
         assertThat(responseUser.getFirstName()).isEqualTo("fname");
         assertThat(responseUser.getLastName()).isEqualTo("lname");
         assertThat(responseUser.getIdamStatus()).isEqualTo(IdamStatus.ACTIVE);
-        assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
+        assertThat(responseUser.getUserIdentifier()).isEqualTo(id.toString());
         assertThat(responseUser.getRoles()).isNotNull();
-        assertThat(responseUser.getUserIdentifier()).isEqualTo(id);
+        assertThat(responseUser.getUserIdentifier()).isEqualTo(id.toString());
         assertThat(responseUser.getIdamStatusCode()).isEqualTo("code");
         assertThat(responseUser.getIdamMessage()).isEqualTo("test error message");
         assertThat(getUserProfileResponseMock.getIdamStatusCode()).isEqualTo("code");

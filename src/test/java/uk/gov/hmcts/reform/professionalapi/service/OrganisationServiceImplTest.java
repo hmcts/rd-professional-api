@@ -366,7 +366,7 @@ public class OrganisationServiceImplTest {
     public void testRetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty()throws Exception {
 
         ProfessionalUser user = mock(ProfessionalUser.class);
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
 
         when(user.getUserIdentifier()).thenReturn(id);
         List<String> users = new ArrayList<>();
@@ -374,7 +374,7 @@ public class OrganisationServiceImplTest {
         List<Organisation> pendOrganisations = new ArrayList<>();
         pendOrganisations.add(organisationMock);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -402,7 +402,7 @@ public class OrganisationServiceImplTest {
 
         SuperUser user = mock(SuperUser.class);
 
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         when(user.getUserIdentifier()).thenReturn(id);
         ProfessionalUser userProf = mock(ProfessionalUser.class);
         when(user.toProfessionalUser()).thenReturn(userProf);
@@ -417,7 +417,7 @@ public class OrganisationServiceImplTest {
         when(professionalUser.getUserIdentifier()).thenReturn(id);
         when(user.toProfessionalUser()).thenReturn(professionalUser);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -447,8 +447,8 @@ public class OrganisationServiceImplTest {
 
         SuperUser user = mock(SuperUser.class);
 
-        UUID id = UUID.randomUUID();
-        List<UUID> ids = new ArrayList<>();
+        String id = UUID.randomUUID().toString();
+        List<String> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);

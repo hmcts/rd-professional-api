@@ -109,7 +109,7 @@ public class ProfessionalUserServiceTest {
 
     @Test
     public void retrieveUserByEmail() throws JsonProcessingException {
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         superUser.setUserIdentifier(id);
         SuperUser superUserMock = mock(SuperUser.class);
 
@@ -128,7 +128,7 @@ public class ProfessionalUserServiceTest {
         PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -158,8 +158,8 @@ public class ProfessionalUserServiceTest {
     public void findUsersByOrganisation_with_deleted_users() throws Exception {
 
         ProfessionalUser user = mock(ProfessionalUser.class);
-        UUID id = UUID.randomUUID();
-        List<UUID> ids = new ArrayList<>();
+        String id = UUID.randomUUID().toString();
+        List<String> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
@@ -205,8 +205,8 @@ public class ProfessionalUserServiceTest {
     @Test(expected = ExternalApiException.class)
     public void findUsersByOrganisationEmptyResultExceptionTest()throws Exception {
         ProfessionalUser user = mock(ProfessionalUser.class);
-        UUID id = UUID.randomUUID();
-        List<UUID> ids = new ArrayList<>();
+        String id = UUID.randomUUID().toString();
+        List<String> ids = new ArrayList<>();
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
@@ -253,6 +253,7 @@ public class ProfessionalUserServiceTest {
 
         UUID id = UUID.randomUUID();
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
         Optional<ProfessionalUser> professionalUserOptional = Optional.of(professionalUserMock);
 
         when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);

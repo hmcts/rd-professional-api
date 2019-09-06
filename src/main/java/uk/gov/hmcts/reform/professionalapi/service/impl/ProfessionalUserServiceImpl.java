@@ -125,7 +125,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(Organisation organisation) {
         List<ProfessionalUser> professionalUsers;
-        List<UUID> usersId = new ArrayList<>();
+        List<String> usersId = new ArrayList<>();
 
         professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 

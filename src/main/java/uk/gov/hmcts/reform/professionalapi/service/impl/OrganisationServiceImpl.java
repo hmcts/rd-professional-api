@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -272,7 +271,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<UUID,Organisation> activeOrganisationDtls = new ConcurrentHashMap<UUID,Organisation>();
+        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
