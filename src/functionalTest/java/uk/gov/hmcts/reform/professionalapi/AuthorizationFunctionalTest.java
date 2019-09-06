@@ -78,10 +78,11 @@ public abstract class AuthorizationFunctionalTest {
 
         IdamClient idamClient = new IdamClient(configProperties);
 
-        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         log.info("idamClient: " + idamClient);
         SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
+
+        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
         professionalApiClient = new ProfessionalApiClient(
                 professionalApiUrl,
