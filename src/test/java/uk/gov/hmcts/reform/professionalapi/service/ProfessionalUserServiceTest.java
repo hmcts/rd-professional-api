@@ -109,7 +109,9 @@ public class ProfessionalUserServiceTest {
 
     @Test
     public void retrieveUserByEmail() throws JsonProcessingException {
+
         String id = UUID.randomUUID().toString();
+
         superUser.setUserIdentifier(id);
         SuperUser superUserMock = mock(SuperUser.class);
 
@@ -129,6 +131,7 @@ public class ProfessionalUserServiceTest {
                 .thenReturn(professionalUser);
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -160,6 +163,7 @@ public class ProfessionalUserServiceTest {
         ProfessionalUser user = mock(ProfessionalUser.class);
         String id = UUID.randomUUID().toString();
         List<String> ids = new ArrayList<>();
+
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
@@ -205,8 +209,10 @@ public class ProfessionalUserServiceTest {
     @Test(expected = ExternalApiException.class)
     public void findUsersByOrganisationEmptyResultExceptionTest()throws Exception {
         ProfessionalUser user = mock(ProfessionalUser.class);
+
         String id = UUID.randomUUID().toString();
         List<String> ids = new ArrayList<>();
+
         when(user.getUserIdentifier()).thenReturn(id);
         ids.add(id);
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
@@ -272,4 +278,5 @@ public class ProfessionalUserServiceTest {
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNull();
     }
+
 }

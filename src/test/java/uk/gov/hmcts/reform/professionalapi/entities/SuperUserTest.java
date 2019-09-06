@@ -62,7 +62,9 @@ public class SuperUserTest {
                 "some-email-address",
                 organisation);
         UUID id = UUID.randomUUID();
+
         superUser.setUserIdentifier(id.toString());
+
         superUser.setId(id);
         superUser.setCreated(LocalDateTime.now());
         superUser.setLastUpdated(LocalDateTime.now());
@@ -78,5 +80,6 @@ public class SuperUserTest {
         assertThat(professionalUser.getId()).isNotNull();
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getUserIdentifier()).isEqualTo(id.toString());
+
     }
 }

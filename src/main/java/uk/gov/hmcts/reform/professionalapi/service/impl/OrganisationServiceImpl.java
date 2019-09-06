@@ -267,6 +267,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
+
         Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);

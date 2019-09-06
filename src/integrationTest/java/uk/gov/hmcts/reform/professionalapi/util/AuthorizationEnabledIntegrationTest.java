@@ -269,7 +269,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String usersBody = " {"
                 + "  \"userProfiles\": ["
                 + "  {"
+
                 + "  \"userIdentifier\":\"%s" + "\","
+
                 + "  \"firstName\": \"prashanth\","
                 + "  \"lastName\": \"rao\","
                 + "  \"email\": \"super.user@hmcts.net\","
@@ -281,7 +283,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
+
                 + "  \"userIdentifier\":\"%s"  + "\","
+
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","

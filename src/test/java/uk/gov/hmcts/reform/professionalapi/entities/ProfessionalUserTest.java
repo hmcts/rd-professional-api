@@ -71,6 +71,7 @@ public class ProfessionalUserTest {
 
         UUID id = UUID.randomUUID();
         professionalUser.setUserIdentifier(id.toString());
+
         professionalUser.setId(id);
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setLastUpdated(LocalDateTime.now());
@@ -85,6 +86,7 @@ public class ProfessionalUserTest {
         assertThat(superUser.getId()).isNotNull();
         assertThat(superUser.getLastUpdated()).isNotNull();
         assertThat(superUser.getUserIdentifier()).isEqualTo(id.toString());
+
     }
 
 }

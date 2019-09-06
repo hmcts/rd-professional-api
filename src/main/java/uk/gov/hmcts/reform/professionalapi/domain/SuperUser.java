@@ -58,8 +58,8 @@ public class SuperUser {
     private LocalDateTime created;
 
     @Column(name = "USER_IDENTIFIER", insertable = false, updatable = false)
-    private String userIdentifier;
 
+    private String userIdentifier;
 
     public SuperUser(
                             String firstName,

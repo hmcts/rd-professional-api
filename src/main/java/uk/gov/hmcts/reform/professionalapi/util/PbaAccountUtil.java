@@ -101,6 +101,7 @@ public interface PbaAccountUtil {
 
     public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
                                                          RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+
                                                          String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
         List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
@@ -123,8 +124,10 @@ public interface PbaAccountUtil {
 
     }
 
+
     public  static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
                                                                                   Map<String, Organisation> activeOrganisationDtls) {
+
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse

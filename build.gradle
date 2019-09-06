@@ -176,8 +176,7 @@ pitest {
     historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
-    mutationThreshold = 90   
-
+    mutationThreshold = 90
 }
 
 
