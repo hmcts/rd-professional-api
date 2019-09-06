@@ -32,6 +32,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void persists_and_returns_valid_minimal_organisation() {
+
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         Map<String, Object> response =

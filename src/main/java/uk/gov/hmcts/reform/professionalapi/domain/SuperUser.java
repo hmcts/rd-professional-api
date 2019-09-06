@@ -58,7 +58,7 @@ public class SuperUser {
     private LocalDateTime created;
 
     @Column(name = "USER_IDENTIFIER", insertable = false, updatable = false)
-    private UUID userIdentifier;
+    private String userIdentifier;
 
 
     public SuperUser(
