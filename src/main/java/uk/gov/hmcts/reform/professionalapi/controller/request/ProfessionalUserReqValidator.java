@@ -22,7 +22,7 @@ public class ProfessionalUserReqValidator {
     }
 
     public void validateRequest(String orgId, String showDeleted, String email, String status) {
-        if (null == orgId  && null == email && null == showDeleted && null == status) {
+        if (null == orgId  && null == email && null == showDeleted) {
             throw new InvalidRequest("No input values given for the request");
         }
 
