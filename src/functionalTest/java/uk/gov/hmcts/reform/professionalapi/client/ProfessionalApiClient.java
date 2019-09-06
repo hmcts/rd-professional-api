@@ -300,8 +300,6 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
 
-
-
         return response.body().as(Map.class);
     }
 
@@ -388,13 +386,14 @@ public class ProfessionalApiClient {
     }
 
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
-        return getMultipleAuthHeaders(idamClient.getExternalBearerToken(role, firstName, lastName, email));
+        String bearerTokenForSuperUser = idamClient.getExternalBearerToken(role, firstName, lastName, email);
+        return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
         log.info("authToken::" + userToken);
         log.info("S2SToken::" + s2sToken);
-        return SerenityRest.given()
+        return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
                 .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)

@@ -150,6 +150,8 @@ public class IdamClient {
         assertThat(bearerTokenResponse.getStatusCode()).isEqualTo(200);
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
+
+        log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
         return accessTokenResponse.getAccessToken();
     }
 
