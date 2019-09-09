@@ -2,7 +2,7 @@ targetInstance: ${TEST_URL:http://rd-professional-api-demo.service.core-compute-
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 s2s-name: rd_professional_api
-s2s-secret: ${S2S_SECRET:OLMEJQA7UHU6EZKG}
+s2s-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
