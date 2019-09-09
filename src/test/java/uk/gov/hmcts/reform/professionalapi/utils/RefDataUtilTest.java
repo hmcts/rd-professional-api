@@ -12,11 +12,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -241,5 +243,23 @@ public class RefDataUtilTest {
                         Map.class);
 
         assertThat(mappedResponse.get("users")).asList().hasSize(3);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void test_filterUsersByStatusWhereNoUsersFoundThrowsResourceNotFoundException() {
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
+
+                ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        assertThat(response).isNotNull();
     }
 }

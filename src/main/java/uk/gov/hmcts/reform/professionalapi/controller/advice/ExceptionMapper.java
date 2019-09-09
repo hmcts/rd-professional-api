@@ -55,7 +55,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFoundException(
-            EmptyResultDataAccessException ex) {
+            ResourceNotFoundException ex) {
         return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
