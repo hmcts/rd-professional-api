@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -259,7 +258,7 @@ public class RefDataUtilTest {
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
-                ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
         assertThat(response).isNotNull();
     }
 }
