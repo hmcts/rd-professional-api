@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
@@ -206,12 +207,20 @@ public interface RefDataUtil {
                     .filter(user -> status.equalsIgnoreCase(user.getIdamStatus().toString()))
                     .collect(Collectors.toList());
 
+            if (CollectionUtils.isEmpty(filteredUsers)) {
+                throw new ResourceNotFoundException("No users found with status :" + status);
+            }
             professionalUsersEntityResponse.setUserProfiles(filteredUsers);
 
             return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
         }
 
         return responseEntity;
+    }
+
+    public static void main(String[] args) {
+        String status = "Active";
+        System.out.println(status.equalsIgnoreCase("ACTIVE"));
     }
 
 }

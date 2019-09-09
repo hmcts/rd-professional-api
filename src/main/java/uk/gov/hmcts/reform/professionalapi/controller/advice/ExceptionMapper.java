@@ -53,6 +53,12 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(
+            EmptyResultDataAccessException ex) {
+        return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
 
     public ResponseEntity<Object> annotationDrivenValidationError(
