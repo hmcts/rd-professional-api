@@ -117,6 +117,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if (!StringUtils.isBlank(status)) {
+            log.info("INTO FILTERING USERS BY STATUS: " + status);
             responseEntity = RefDataUtil.filterUsersByStatus(responseEntity, status);
         }
 
