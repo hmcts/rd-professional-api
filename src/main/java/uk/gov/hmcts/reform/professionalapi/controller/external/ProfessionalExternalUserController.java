@@ -88,7 +88,9 @@ public class ProfessionalExternalUserController extends SuperController {
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
 
             } else {
-                profExtUsrReqValidator.validateStatusIsActive(status);
+                if (status != null) {
+                    profExtUsrReqValidator.validateStatusIsActive(status);
+                }
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
         }
