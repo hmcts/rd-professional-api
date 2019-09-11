@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -160,6 +161,20 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
+    public  NewUserCreationRequest createNewUserRequest(String email) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("caseworker");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someFirstName")
+                .lastName("someLastName")
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+    }
     @SuppressWarnings("unchecked")
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeadersInternal()
@@ -367,6 +382,23 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String,Object> modifyUserRoleToExistingUser(ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .andReturn();
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
@@ -405,4 +437,6 @@ public class ProfessionalApiClient {
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
     }
+
+
 }
