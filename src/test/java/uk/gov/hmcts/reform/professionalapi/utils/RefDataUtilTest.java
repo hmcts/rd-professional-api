@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -17,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -193,21 +192,18 @@ public class RefDataUtilTest {
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
-        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
-        assertThat(response).isNotNull();
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        assertThat(professionalUsersEntityResponse1).isNotNull();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map mappedResponse = objectMapper.convertValue(response.getBody(), Map.class);
-        assertThat(mappedResponse.get("users")).asList().hasSize(2);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
     }
 
-    @Test
+    @Test(expected = ExternalApiException.class)
     public void test_filterUsersByStatusWhenStatusCodeIsNot200() {
         Organisation organisationMock = mock(Organisation.class);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
-
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
@@ -231,17 +227,10 @@ public class RefDataUtilTest {
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
-        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+        assertThat(professionalUsersEntityResponse1).isNotNull();
 
-        assertThat(response).isNotNull();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map mappedResponse = objectMapper
-                .convertValue(
-                        response.getBody(),
-                        Map.class);
-
-        assertThat(mappedResponse.get("users")).asList().hasSize(3);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(3);
     }
 
     @Test(expected = ResourceNotFoundException.class)
@@ -258,7 +247,6 @@ public class RefDataUtilTest {
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
-        ResponseEntity response = RefDataUtil.filterUsersByStatus(responseEntity, "Active");
-        assertThat(response).isNotNull();
+        RefDataUtil.filterUsersByStatus(responseEntity, "Active");
     }
 }

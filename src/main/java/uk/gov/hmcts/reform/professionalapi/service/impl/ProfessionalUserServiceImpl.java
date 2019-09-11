@@ -103,7 +103,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
         ResponseEntity responseEntity;
-
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = generateRetrieveUserProfilesRequest(organisation);
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
@@ -112,13 +111,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
         }  catch (FeignException ex) {
-
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
         if (!StringUtils.isBlank(status)) {
             log.info("INTO FILTERING USERS BY STATUS: " + status);
-            responseEntity = RefDataUtil.filterUsersByStatus(responseEntity, status);
+
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
+            return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
         }
 
         return responseEntity;

@@ -14,7 +14,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -119,7 +118,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void find_users_for_non_active_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
@@ -127,7 +125,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void find_users_for_non_existing_organisation() {
         professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,"False", HttpStatus.NOT_FOUND);
     }
@@ -143,13 +140,11 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void ac2_find_all_status_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), " ");
     }
 
     @Test
-    @Ignore
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
         validateRetrievedUsers(response, false);
@@ -162,25 +157,21 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void ac5_find_all_suspended_users_for_an_organisation_with_pui_user_manager_when_no_suspended_user_exists_should_return_404() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Suspended");
     }
 
     @Test
-    @Ignore
     public void ac5_2_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_404() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Deleted");
     }
 
     @Test
-    @Ignore
     public void ac6_find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForPuiManager(), "INVALID");
     }
 
     @Test
-    @Ignore
     public void ac7_find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
         String invalidBearerToken = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiS0N4QmRlaHNIVUY2OTc4U2l6dklTRXhjWDBFP"
                 + "SIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJmcmVnLXRlc3QtdXNlci0xdTdGTm9kQ0tYQGZlZW1haWwuY29tIiwiYXV0aF9sZXZlbCI6MCwiYX"
@@ -199,13 +190,11 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void ac8_find_all_active_users_for_an_organisation_with_user_profile_unavailable_should_return_500() {
         //cannot be tested
     }
 
     @Test
-    @Ignore
     public void ac9_find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
     }

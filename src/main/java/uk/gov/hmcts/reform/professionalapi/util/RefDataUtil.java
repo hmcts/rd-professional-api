@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
 public interface RefDataUtil {
 
-    public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
+    static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
@@ -42,7 +42,7 @@ public interface RefDataUtil {
     }
 
 
-    public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+    static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
 
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public interface RefDataUtil {
         return paymentAccounts;
     }
 
-    public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
+    static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
@@ -69,7 +69,7 @@ public interface RefDataUtil {
         return paymentAccounts;
     }
 
-    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
@@ -81,7 +81,7 @@ public interface RefDataUtil {
     }
 
 
-    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -100,9 +100,9 @@ public interface RefDataUtil {
         return user;
     }
 
-    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                         String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
+    static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
+                                                            RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                            String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
         List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
@@ -124,8 +124,8 @@ public interface RefDataUtil {
 
     }
 
-    public  static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                                  Map<String, Organisation> activeOrganisationDtls) {
+    static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+                                                                            Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse
@@ -154,7 +154,7 @@ public interface RefDataUtil {
 
 
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -172,7 +172,7 @@ public interface RefDataUtil {
         return user;
     }
 
-    public static String removeEmptySpaces(String value) {
+    static String removeEmptySpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
@@ -180,7 +180,7 @@ public interface RefDataUtil {
         return modValue;
     }
 
-    public static String removeAllSpaces(String value) {
+    static String removeAllSpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
@@ -188,7 +188,7 @@ public interface RefDataUtil {
         return modValue;
     }
 
-    public static void validateOrgIdentifier(String extOrgId, String orgId) {
+    static void validateOrgIdentifier(String extOrgId, String orgId) {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
 
@@ -197,7 +197,7 @@ public interface RefDataUtil {
 
     }
 
-    public static ResponseEntity filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
 
@@ -210,17 +210,12 @@ public interface RefDataUtil {
             if (CollectionUtils.isEmpty(filteredUsers)) {
                 throw new ResourceNotFoundException("No users found with status :" + status);
             }
+
             professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+            return professionalUsersEntityResponse;
 
-            return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
+        } else {
+            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve Users from UP");
         }
-
-        return responseEntity;
     }
-
-    public static void main(String[] args) {
-        String status = "Active";
-        System.out.println(status.equalsIgnoreCase("ACTIVE"));
-    }
-
 }

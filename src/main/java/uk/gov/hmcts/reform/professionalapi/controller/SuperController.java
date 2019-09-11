@@ -306,6 +306,8 @@ public abstract class SuperController {
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
 
-        return responseEntity;
+        return ResponseEntity
+                .status(responseEntity.getStatusCode().value())
+                .body(responseEntity.getBody());
     }
 }
