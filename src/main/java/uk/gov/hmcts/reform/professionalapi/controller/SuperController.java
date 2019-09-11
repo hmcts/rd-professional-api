@@ -296,8 +296,6 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
 
-        log.info("STATUS:::" + status);
-
         if ("True".equalsIgnoreCase(showDeleted)) {
             showDeleted = "true";
         } else {

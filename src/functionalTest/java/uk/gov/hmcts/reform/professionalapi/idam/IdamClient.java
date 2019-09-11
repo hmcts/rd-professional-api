@@ -62,15 +62,6 @@ public class IdamClient {
 
         String serializedUser = gson.toJson(user);
 
-        log.info("USER Name:::::::::::" + firstName);
-        log.info("USER Email::::::::::" + userEmail);
-        log.info("USER Last Name::::::" + lastName);
-        log.info("USER Password:::::::" + password);
-        log.info("USER Roles::::::::::" + roles);
-        log.info("USER Group::::::::::" + group);
-        log.info("USER id:::::::::::::" + id);
-        log.info("SERIALISED USER:::::" + serializedUser);
-
         Response createdUserResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
@@ -80,8 +71,6 @@ public class IdamClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
-        log.info("BODY::::::" + createdUserResponse.getBody().prettyPrint());
-        log.info("STATUS::::::" + createdUserResponse.getStatusCode());
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -100,18 +89,12 @@ public class IdamClient {
     public String getBearerToken(String userEmail) {
 
         String codeAuthorization = Base64.getEncoder().encodeToString((userEmail + ":" + password).getBytes());
-        log.info("CODE AUTH:::::::::::::" + BASIC + codeAuthorization);
 
         Map<String, String> authorizeParams = new HashMap<>();
         authorizeParams.put("client_id", testConfig.getClientId());
         authorizeParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         authorizeParams.put("response_type", "code");
         authorizeParams.put("scope", "openid profile roles create-user manage-user");
-
-        log.info("CLIENT ID:::::::::::::" +  testConfig.getClientId());
-        log.info("redirect_uri::::::::::" + testConfig.getOauthRedirectUrl());
-        log.info("IDAM URL::::::::::::::" + testConfig.getIdamApiUrl());
-
 
         Response authorizeResponse = RestAssured
                 .given()
@@ -122,8 +105,6 @@ public class IdamClient {
                 .params(authorizeParams)
                 .post("/oauth2/authorize")
                 .andReturn();
-
-
 
         assertThat(authorizeResponse.getStatusCode()).isEqualTo(200);
 
@@ -151,7 +132,6 @@ public class IdamClient {
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
 
-        log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
         return accessTokenResponse.getAccessToken();
     }
 

@@ -89,13 +89,13 @@ public class ProfessionalExternalUserController extends SuperController {
         } else {
 
             if (isRolePuiUserManager) {
-                log.info("FOR PUI USER MANAGER");
+                log.info("Searching for users with Pui User Manager role");
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
 
             } else {
                 profExtUsrReqValidator.validateStatusIsActive(status);
 
-                log.info("FOR NON PUI USER MANAGER");
+                log.info("Searching for users with NON Pui User Manager role");
                 status = "Active";
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
