@@ -9,6 +9,7 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 
 @RequestMapping(
@@ -84,7 +84,7 @@ public class ProfessionalExternalUserController extends SuperController {
             if (isRolePuiUserManager) {
                 profUsersEntityResponse = retrieveUserByEmail(email);
             } else {
-                throw new InvalidRequest("Your role does not permit you to search for a user by email");
+                throw new AccessDeniedException("403 Forbidden");
             }
         } else {
 
@@ -94,9 +94,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
             } else {
                 profExtUsrReqValidator.validateStatusIsActive(status);
-
                 log.info("Searching for users with NON Pui User Manager role");
-                status = "Active";
                 profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
         }

@@ -174,11 +174,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac8_find_all_active_users_for_an_organisation_with_user_profile_unavailable_should_return_500() {
-        //cannot be tested
-    }
-
-    @Test
     public void ac9_find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
     }

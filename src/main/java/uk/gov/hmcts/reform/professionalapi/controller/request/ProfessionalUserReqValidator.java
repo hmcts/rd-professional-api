@@ -49,7 +49,7 @@ public class ProfessionalUserReqValidator {
 
     public void validateStatusIsActive(String status) {
         if (!IdamStatus.ACTIVE.toString().equalsIgnoreCase(status)) {
-            throw new InvalidRequest("Your role does not permit you to search for users that are not active. Required status param value equal to 'Active'");
+            throw new InvalidRequest("Required status param value equal to 'Active'");
         }
     }
 }
