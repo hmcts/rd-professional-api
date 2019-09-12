@@ -184,15 +184,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
-        assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-        assertThat(professionalUsersResponse.get("email")).isNotNull();
-        if (rolesRequired) {
-            assertThat(professionalUsersResponse.get("roles")).isNotNull();
-        } else {
-            assertThat(professionalUsersResponse.get("roles")).isNull();
-        }
+        professionalUsersResponses.stream().forEach(user -> {
+            assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
+            assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+            assertThat(professionalUsersResponse.get("firstName")).isNotNull();
+            assertThat(professionalUsersResponse.get("lastName")).isNotNull();
+            assertThat(professionalUsersResponse.get("email")).isNotNull();
+            if (rolesRequired && professionalUsersResponse.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                assertThat(professionalUsersResponse.get("roles")).isNotNull();
+            } else {
+                assertThat(professionalUsersResponse.get("roles")).isNull();
+            }
+        });
     }
 }
