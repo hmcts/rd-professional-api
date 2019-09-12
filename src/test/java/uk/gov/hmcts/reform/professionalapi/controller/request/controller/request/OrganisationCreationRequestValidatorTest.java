@@ -190,7 +190,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class) //invalid dx number should throw invalid request
     public void requestContactInformationDxAddTest() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234591", "DxExchange");
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1*2$3&4@", "DxExchange");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);

@@ -145,6 +145,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v1/organisations")
+                .andReturn();
+
+        log.info("Create organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value());
+    }
+
     public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
