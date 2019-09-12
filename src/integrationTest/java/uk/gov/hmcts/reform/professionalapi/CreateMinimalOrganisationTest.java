@@ -307,10 +307,10 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         Arrays.stream(emails).forEach(email -> {
 
-            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").build());
+            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(OrganisationFixtures.createJurisdictions()).build());
             Map<String, Object> response =
                     professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
-            assertThat(response.get("http_status")).isEqualTo("200 OK");
+            assertThat(response.get("http_status")).isEqualTo("201 CREATED");
         });
 
 
