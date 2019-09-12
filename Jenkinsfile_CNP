@@ -31,7 +31,7 @@ withPipeline(type, product, component) {
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
-    enableDbMigration()
+    enableDbMigration('rd')
     enableDockerBuild()
     installCharts()
 
