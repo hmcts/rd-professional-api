@@ -300,7 +300,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
     @Test
     public void returns_200_when_valid_email_is_passed() {
 
-        String[] emails = new String[] {"v.green@ashfords.co.uk", "j.johnson@timms-law.com"};
+        String[] emails = new String[] {"v.greeny@ashfords.co.uk", "j.johnson@timms-law.com"};
 
 
         OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationCreationRequest = someMinimalOrganisationRequest();
