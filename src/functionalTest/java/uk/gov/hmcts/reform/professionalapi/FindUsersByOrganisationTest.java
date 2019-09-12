@@ -131,7 +131,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
-        validateRetrievedUsers(response, false);
+        validateRetrievedUsers(response, true);
     }
 
     @Test
