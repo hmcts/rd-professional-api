@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
@@ -29,9 +30,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
-public interface PbaAccountUtil {
+public interface RefDataUtil {
 
-    public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
+    static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
 
@@ -41,7 +42,7 @@ public interface PbaAccountUtil {
     }
 
 
-    public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+    static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
 
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
@@ -60,7 +61,7 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
+    static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
@@ -68,7 +69,7 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
@@ -80,7 +81,7 @@ public interface PbaAccountUtil {
     }
 
 
-    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -99,9 +100,9 @@ public interface PbaAccountUtil {
         return user;
     }
 
-    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                         String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
+    static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
+                                                            RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                            String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
         List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
@@ -123,8 +124,8 @@ public interface PbaAccountUtil {
 
     }
 
-    public  static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                                  Map<String, Organisation> activeOrganisationDtls) {
+    static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+                                                                            Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse
@@ -153,7 +154,7 @@ public interface PbaAccountUtil {
 
 
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -171,7 +172,7 @@ public interface PbaAccountUtil {
         return user;
     }
 
-    public static String removeEmptySpaces(String value) {
+    static String removeEmptySpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
@@ -179,7 +180,7 @@ public interface PbaAccountUtil {
         return modValue;
     }
 
-    public static String removeAllSpaces(String value) {
+    static String removeAllSpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
@@ -187,7 +188,7 @@ public interface PbaAccountUtil {
         return modValue;
     }
 
-    public static void validateOrgIdentifier(String extOrgId, String orgId) {
+    static void validateOrgIdentifier(String extOrgId, String orgId) {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
 
@@ -196,4 +197,25 @@ public interface PbaAccountUtil {
 
     }
 
+    static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+
+        if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
+
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+
+            List<ProfessionalUsersResponse> filteredUsers =  professionalUsersEntityResponse.getUserProfiles().stream()
+                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus().toString()))
+                    .collect(Collectors.toList());
+
+            if (CollectionUtils.isEmpty(filteredUsers)) {
+                throw new ResourceNotFoundException("No users found with status :" + status);
+            }
+
+            professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+            return professionalUsersEntityResponse;
+
+        } else {
+            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve Users from UP");
+        }
+    }
 }

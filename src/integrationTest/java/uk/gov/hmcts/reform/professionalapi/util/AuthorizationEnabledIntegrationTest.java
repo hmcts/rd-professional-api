@@ -1,11 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
@@ -76,7 +71,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public WireMockRule s2sService = new WireMockRule(8990);
 
     @Rule
-    public WireMockRule sidamService = new WireMockRule(5000);
+    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+            .extensions(new ExternalTransformer()));
 
     @Rule
     public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
@@ -121,30 +117,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withHeader("Content-Type", "application/json")
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
 
-
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", equalTo("Bearer pui-case-manager-eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ"))
+                .withHeader("Authorization", containing("pui-finance-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
-                                +  "  \"id\": \"ef4fac86-d3e8-47b6-88a7-c7477fb69d3f\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-case-manager\""
-                                +  "  ]"
-                                +  "}")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", equalTo("Bearer pui-finance-manager-eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"ef4fac86-d3e8-47b6-88a7-c7477fb69d3f\","
+                                +  "  \"id\": \"%s\","
                                 +  "  \"forename\": \"Super\","
                                 +  "  \"surname\": \"User\","
                                 +  "  \"email\": \"super.user@hmcts.net\","
@@ -152,14 +131,32 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"roles\": ["
                                 +  "  \"pui-finance-manager\""
                                 +  "  ]"
-                                +  "}")));
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
 
-        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", equalTo("Bearer prd-admin-eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ"))
+        sidamService.stubFor(get(urlEqualTo("/details"))
+                .withHeader("Authorization", containing("pui-case-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
-                                +  "  \"id\": \"ef4fac86-d3e8-47b6-88a7-c7477fb69d3f\","
+                                +  "  \"id\": \"%s\","
+                                +  "  \"forename\": \"Super\","
+                                +  "  \"surname\": \"User\","
+                                +  "  \"email\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-case-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing("prd-admin"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"id\": \"%s\","
                                 +  "  \"forename\": \"Super\","
                                 +  "  \"surname\": \"User\","
                                 +  "  \"email\": \"super.user@hmcts.net\","
@@ -167,14 +164,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"roles\": ["
                                 +  "  \"prd-admin\""
                                 +  "  ]"
-                                +  "}")));
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", equalTo("Bearer pui-organisation-manager-eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ"))
+                .withHeader("Authorization", containing("pui-organisation-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
-                                +  "  \"id\": \"ef4fac86-d3e8-47b6-88a7-c7477fb69d3f\","
+                                +  "  \"id\": \"%s\","
                                 +  "  \"forename\": \"Super\","
                                 +  "  \"surname\": \"User\","
                                 +  "  \"email\": \"super.user@hmcts.net\","
@@ -182,15 +181,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"roles\": ["
                                 +  "  \"pui-organisation-manager\""
                                 +  "  ]"
-                                +  "}")));
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
 
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", equalTo("Bearer pui-user-manager-eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVaTlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJzdXBlci51c2VyQGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsImF1ZGl0VHJhY2tpbmdJZCI6IjZiYTdkYTk4LTRjMGYtNDVmNy04ZjFmLWU2N2NlYjllOGI1OCIsImlzcyI6Imh0dHA6Ly9mci1hbTo4MDgwL29wZW5hbS9vYXV0aDIvaG1jdHMiLCJ0b2tlbk5hbWUiOiJhY2Nlc3NfdG9rZW4iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwiYXV0aEdyYW50SWQiOiI0NjAzYjVhYS00Y2ZhLTRhNDQtYWQzZC02ZWI0OTI2YjgxNzYiLCJhdWQiOiJteV9yZWZlcmVuY2VfZGF0YV9jbGllbnRfaWQiLCJuYmYiOjE1NTk4OTgxNzMsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJhY3IiLCJvcGVuaWQiLCJwcm9maWxlIiwicm9sZXMiLCJjcmVhdGUtdXNlciIsImF1dGhvcml0aWVzIl0sImF1dGhfdGltZSI6MTU1OTg5ODEzNTAwMCwicmVhbG0iOiIvaG1jdHMiLCJleHAiOjE1NTk5MjY5NzMsImlhdCI6MTU1OTg5ODE3MywiZXhwaXJlc19pbiI6Mjg4MDAsImp0aSI6IjgxN2ExNjE0LTVjNzAtNGY4YS05OTI3LWVlYjFlYzJmYWU4NiJ9.RLJyLEKldHeVhQEfSXHhfOpsD_b8dEBff7h0P4nZVLVNzVkNoiPdXYJwBTSUrXl4pyYJXEhdBwkInGp3OfWQKhHcp73_uE6ZXD0eIDZRvCn1Nvi9FZRyRMFQWl1l3Dkn2LxLMq8COh1w4lFfd08aj-VdXZa5xFqQefBeiG_xXBxWkJ-nZcW3tTXU0gUzarGY0xMsFTtyRRilpcup0XwVYhs79xytfbq0WklaMJ-DBTD0gux97KiWBrM8t6_5PUfMDBiMvxKfRNtwGD8gN8Vct9JUgVTj9DAIwg0KPPm1rEETRPszYI2wWvD2lpH2AwUtLBlRDANIkN9SdfiHSETvoQ"))
+                .withHeader("Authorization", containing("pui-user-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
-                                +  "  \"id\": \"ef4fac86-d3e8-47b6-88a7-c7477fb69d3f\","
+                                +  "  \"id\": \"%s\","
                                 +  "  \"forename\": \"Super\","
                                 +  "  \"surname\": \"User\","
                                 +  "  \"email\": \"super.user@hmcts.net\","
@@ -198,7 +198,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"roles\": ["
                                 +  "  \"pui-user-manager\""
                                 +  "  ]"
-                                +  "}")));
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
 
     }
 
@@ -266,7 +267,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(returnHttpStaus)
                 ));
 
-        String usersBody = " {"
+        String usersBody = "{"
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
@@ -276,6 +277,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
                 + "  \"pui-organisation-manager\""
+                + "  ],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
+                + "  },"
+                + "  {"
+                + "  \"userIdentifier\":\" %s" + "\","
+                + "  \"firstName\": \"Shreedhar\","
+                + "  \"lastName\": \"Lomte\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": ["
+                + "  \"pui-case-manager\""
                 + "  ],"
                 + "  \"idamStatusCode\": \"0\","
                 + "  \"idamMessage\": \"\""
@@ -293,13 +306,59 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + " ]"
                 + "}";
 
-
         userProfileService.stubFor(
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(usersBody)
+                                        .withTransformers("transformer-multi-user-response")
+                                        .withStatus(200)
+                        )
+        );
+
+        String usersBodyWithoutRoles = " {"
+                + "  \"userProfiles\": ["
+                + "  {"
+                + "  \"userIdentifier\":\"%s" + "\","
+                + "  \"firstName\": \"prashanth\","
+                + "  \"lastName\": \"rao\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": [],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
+                + "  },"
+                + "  {"
+                + "  \"userIdentifier\":\"%s" + "\","
+                + "  \"firstName\": \"Shreedhar\","
+                + "  \"lastName\": \"Lomte\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": [],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
+                + "  },"
+                + " {"
+                + "  \"userIdentifier\":\"%s"  + "\","
+                + "  \"firstName\": \"adil\","
+                + "  \"lastName\": \"oozeerally\","
+                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\","
+                + "  \"roles\": [],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
+                + "  } "
+                + " ]"
+                + "}";
+
+        userProfileService.stubFor(
+                post(urlPathMatching("/v1/userprofile/users.*"))
+                        .withQueryParam("rolesRequired", equalTo("false"))
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(usersBodyWithoutRoles)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
                         )
@@ -315,7 +374,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             try {
                 ids =  Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
             } catch (IOException e) {
-               //Do Nothing
+                //Do Nothing
             }
             String formatResponse = response.getBodyAsString();
             int replaceParams = formatResponse.split("%s").length - 1;
@@ -349,6 +408,32 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         @Override
         public String getName() {
             return "transformer-multi-user-response";
+        }
+
+        public boolean applyGlobally() {
+            return false;
+        }
+    }
+
+    public static class ExternalTransformer extends ResponseTransformer {
+        @Override
+        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
+
+            String formatResponse = response.getBodyAsString();
+
+            String token = request.getHeader("Authorization");
+            String userId = token.split(" ")[1];
+
+            formatResponse = String.format(formatResponse, userId);
+
+            return Response.Builder.like(response)
+                    .but().body(formatResponse)
+                    .build();
+        }
+
+        @Override
+        public String getName() {
+            return "external_user-token-response";
         }
 
         public boolean applyGlobally() {

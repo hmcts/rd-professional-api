@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
 @Slf4j
@@ -31,7 +31,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(PbaAccountUtil.removeAllSpaces(email));
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
 
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
@@ -41,20 +41,20 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
             if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
-                List<PaymentAccount> userMapPaymentAccount =  PbaAccountUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
-                paymentAccountsEntity = PbaAccountUtil
+                List<PaymentAccount> userMapPaymentAccount =  RefDataUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
+                paymentAccountsEntity = RefDataUtil
                         .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
 
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
 
-                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
+                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
                 organisation = user.getOrganisation();
 
             } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
-                paymentAccountsEntity =  PbaAccountUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
+                paymentAccountsEntity =  RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-                user.getOrganisation().setUsers(PbaAccountUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
+                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
                 organisation = user.getOrganisation();
             }
 

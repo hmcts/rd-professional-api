@@ -9,17 +9,19 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -65,21 +67,36 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("pui-user-manager")
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
+                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
+                                                     @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
-        ResponseEntity<?> profUsersEntityResponse = null;
+        ResponseEntity<?> profUsersEntityResponse;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
-        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email);
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
+        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
-            profUsersEntityResponse = retrieveUserByEmail(email);
+            if (isRolePuiUserManager) {
+                profUsersEntityResponse = retrieveUserByEmail(email);
+            } else {
+                throw new AccessDeniedException("403 Forbidden");
+            }
         } else {
-            log.info("showDeleted not empty");
-            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
+
+            if (isRolePuiUserManager) {
+                log.info("Searching for users with Pui User Manager role");
+                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
+
+            } else {
+                profExtUsrReqValidator.validateStatusIsActive(status);
+                log.info("Searching for users with NON Pui User Manager role");
+                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
+            }
         }
 
         return profUsersEntityResponse;
