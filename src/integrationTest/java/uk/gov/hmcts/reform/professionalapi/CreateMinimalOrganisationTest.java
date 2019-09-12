@@ -296,4 +296,24 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         assertThat(response.get("http_status")).isEqualTo("400");
     }
+
+    @Test
+    public void returns_200_when_valid_email_is_passed() {
+
+        String[] emails = new String[] {"v.green@ashfords.co.uk", "j.johnson@timms-law.com"};
+
+
+        OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationCreationRequest = someMinimalOrganisationRequest();
+
+        Arrays.stream(emails).forEach(email -> {
+
+            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").build());
+            Map<String, Object> response =
+                    professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
+            assertThat(response.get("http_status")).isEqualTo("200 OK");
+        });
+
+
+
+    }
 }
