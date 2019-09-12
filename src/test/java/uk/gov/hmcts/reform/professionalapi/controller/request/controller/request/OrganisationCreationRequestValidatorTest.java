@@ -269,7 +269,6 @@ public class OrganisationCreationRequestValidatorTest {
                 "j.robinson@timms-law.com",
                 "あいうえお@example.com",
                 "emAil@1.com",
-                "email@111",
                 "email@.com.my",
                 "email123@gmail.",
                 "email123@.com",
@@ -303,7 +302,8 @@ public class OrganisationCreationRequestValidatorTest {
                 "email.com",
                 "email@com",
                 "@hotmail.com",
-                "email@"
+                "email@",
+                "@"
         };
 
         for (String email : validEmails) {
