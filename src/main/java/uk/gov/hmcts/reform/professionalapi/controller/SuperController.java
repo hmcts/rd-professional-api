@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import feign.FeignException;
 import feign.Response;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-
-import java.util.List;
 
 @RestController
 @Slf4j

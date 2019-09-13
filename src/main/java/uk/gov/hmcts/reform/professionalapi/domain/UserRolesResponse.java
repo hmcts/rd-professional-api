@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class UserRolesResponse {
 
     private String statusCode;
