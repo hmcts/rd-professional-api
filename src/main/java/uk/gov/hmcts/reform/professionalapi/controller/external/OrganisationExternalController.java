@@ -1,32 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-
+import io.swagger.annotations.*;
 import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
@@ -37,12 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
-@RequestMapping(
-        path = "refdata/external/v1/organisations"
-)
+
+
 @RestController
 @Slf4j
 public class OrganisationExternalController extends SuperController {
@@ -174,46 +156,6 @@ public class OrganisationExternalController extends SuperController {
         log.info("Received request to add a new user to an organisation for external...");
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
-
-    }
-
-    @ApiOperation(
-            value = "Modify roles for user",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 201,
-                    message = "User Roles has been added",
-                    response = OrganisationResponse.class
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found"
-            )
-    })
-    @PutMapping(
-            path = "/users/{userId}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-    )
-    @ResponseBody
-    @Secured("prd-admin")
-    public ResponseEntity<?> modifyRolesForExistingUserOfOrganisationForExternal(
-            @Valid @RequestBody ModifyUserProfileData modifyUserProfileData,
-            @PathVariable("orgId")  String organisationIdentifier,
-            @PathVariable("userId") String userId
-    ) {
-
-        log.info("Received request to update user roles of an organisation...");
-
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, organisationIdentifier, userId);
 
     }
 
