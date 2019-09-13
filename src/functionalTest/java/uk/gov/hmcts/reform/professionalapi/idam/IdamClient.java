@@ -92,6 +92,7 @@ public class IdamClient {
         return getBearerToken(userEmail);
     }
 
+
     public String getExternalBearerToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);
         return getBearerToken(userEmail);

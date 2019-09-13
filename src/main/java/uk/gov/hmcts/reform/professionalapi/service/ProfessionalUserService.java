@@ -5,9 +5,11 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
 
 public interface ProfessionalUserService {
     NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles, List<PrdEnum> prdEnums);
@@ -20,5 +22,6 @@ public interface ProfessionalUserService {
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
+    UserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId);
 }
 

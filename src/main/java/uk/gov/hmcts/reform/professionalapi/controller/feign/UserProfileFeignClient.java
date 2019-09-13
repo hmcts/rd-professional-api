@@ -4,6 +4,7 @@ import feign.Headers;
 import feign.RequestLine;
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,4 +31,9 @@ public interface UserProfileFeignClient {
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                              @RequestParam(value = "showdeleted") String showDeleted,  @RequestParam(value = "rolesRequired")String rolesRequired);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/userprofile/users")
+    @RequestLine("PUT /v1/userprofile/users")
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    Response modifyUserRoles(@RequestBody Object modifyRoles, @PathVariable("userId") String userId);
 }

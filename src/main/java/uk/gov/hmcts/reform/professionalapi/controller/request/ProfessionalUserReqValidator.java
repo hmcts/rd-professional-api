@@ -5,8 +5,10 @@ import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 
 @Component
 @Slf4j
@@ -50,6 +52,14 @@ public class ProfessionalUserReqValidator {
     public void validateStatusIsActive(String status) {
         if (!IdamStatus.ACTIVE.toString().equalsIgnoreCase(status)) {
             throw new InvalidRequest("Your role does not permit you to search for users that are not active. Required status param value equal to 'Active'");
+        }
+    }
+
+    public void validateModifyRolesRequest(ModifyUserProfileData modifyUserProfileData, String userId) {
+
+        if (null == modifyUserProfileData || StringUtils.isEmpty(userId) || CollectionUtils.isEmpty(modifyUserProfileData.getRolesAdd())) {
+
+            throw new InvalidRequest("The Request provided is invalid for modify the roles for user");
         }
     }
 }

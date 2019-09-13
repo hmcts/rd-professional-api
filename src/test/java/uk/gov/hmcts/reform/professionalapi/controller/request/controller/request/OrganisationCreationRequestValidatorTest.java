@@ -264,7 +264,8 @@ public class OrganisationCreationRequestValidatorTest {
             "email-100@yahoo.com",
             "email-100@email.net",
             "email+100@gmail.com",
-            "emAil-100@yahoo-test.com"};
+            "emAil-100@yahoo-test.com",
+            "e.mAil-100@yahoo-test.com"};
 
         for (String email : validEmails) {
             OrganisationCreationRequestValidator.validateEmail(email);

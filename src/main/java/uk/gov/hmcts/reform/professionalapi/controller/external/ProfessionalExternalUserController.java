@@ -13,15 +13,23 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+
+import javax.validation.Valid;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -102,5 +110,45 @@ public class ProfessionalExternalUserController extends SuperController {
         }
 
         return profUsersEntityResponse;
+    }
+
+    @ApiOperation(
+            value = "Modify roles for user",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User Roles has been added",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            )
+    })
+    @PutMapping(
+            path = "/users/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    @Secured("pui-user-manager")
+    public ResponseEntity<?> modifyRolesForExistingUserOfExternalOrganisation(
+            @Valid @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @OrgId String organisationIdentifier,
+            @PathVariable("userId") String userId
+    ) {
+
+        log.info("Received request to update user roles of an organisation...");
+        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, organisationIdentifier, userId);
+
     }
 }

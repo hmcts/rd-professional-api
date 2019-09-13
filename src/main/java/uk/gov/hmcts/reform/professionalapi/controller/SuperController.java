@@ -21,12 +21,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -309,5 +311,18 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(responseEntity.getStatusCode().value())
                 .body(responseEntity.getBody());
+    }
+
+    protected ResponseEntity<?> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
+
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
+        UserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData,userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(rolesResponse);
     }
 }

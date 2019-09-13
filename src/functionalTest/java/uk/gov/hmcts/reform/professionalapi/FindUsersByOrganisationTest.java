@@ -31,39 +31,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     RequestSpecification bearerTokenForNonPuiUserManager;
 
 
-    public RequestSpecification generateBearerTokenForPuiManager() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        log.info("RESPONSE:::::" + response);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        log.info("RESPONSE AFTER UPDATE");
-
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
-
-        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
-
-        log.info("NEW USER RESPONSE::::::::::" + newUserResponse);
-
-
-        return bearerTokenForPuiUserManager;
-    }
 
     public RequestSpecification generateBearerTokenForNonPuiManager() {
         if (bearerTokenForNonPuiUserManager == null) {

@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 
 
 @RequestMapping(
@@ -206,5 +207,47 @@ public class OrganisationInternalController extends SuperController {
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }
+
+    @ApiOperation(
+            value = "Modify roles for user",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User Roles has been added",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/users/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    @Secured("prd-admin")
+    public ResponseEntity<?> modifyRolesForExistingUserOfOrganisation(
+            @Valid @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @PathVariable("orgId")  String organisationIdentifier,
+            @PathVariable("userId") String userId
+    ) {
+
+        log.info("Received request to update user roles of an organisation...");
+
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, organisationIdentifier, userId);
+
+    }
+
+
 
 }

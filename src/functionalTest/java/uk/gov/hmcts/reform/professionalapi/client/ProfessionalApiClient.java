@@ -189,6 +189,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
         Response response = getMultipleAuthHeadersInternal()
@@ -382,18 +384,49 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUser(ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+    public Map<String,Object> modifyUserRoleToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body("")
+                .body(modifyUserProfileData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
                 .andReturn();
-        log.info("Retrieve organisation response: " + response.asString());
+        log.info("ModifyUserRole response for internal:: " + response.asString());
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
+        return response.body().as(Map.class);
+
+    }
+
+    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(modifyUserProfileData)
+                .put("/refdata/external/v1/organisations/users" + userId)
+                .andReturn();
+        log.info("ModifyUserRole response for external: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+    public Map<String,Object> modifyUserRoleToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+
+        Response response = requestSpecification
+                .body(modifyUserProfileData)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .andReturn();
+        log.info("ModifyUserRole response for internal: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
         return response.body().as(Map.class);
 
     }
