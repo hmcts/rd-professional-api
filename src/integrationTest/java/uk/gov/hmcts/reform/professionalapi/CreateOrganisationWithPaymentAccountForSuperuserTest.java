@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -19,6 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 public class CreateOrganisationWithPaymentAccountForSuperuserTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
+    @Ignore
+    // ignored since we are allowing all emails to persist as a part of RDCC-497 (prod issue)
+    // this test should be enabled once we have proper regex implemented
     public void return_400_invalid_organisation_with_invalid_email() {
         String prefix = UUID.randomUUID().toString();
         List<String> paymentAccounts = new ArrayList<>();
