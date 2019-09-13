@@ -28,6 +28,6 @@ public class ProfessionalUserReqValidator {
             throw new EmptyResultDataAccessException(1);
         }
 
-        isValidEmail(email);
+        OrganisationCreationRequestValidator.validateEmail(email);
     }
 }
