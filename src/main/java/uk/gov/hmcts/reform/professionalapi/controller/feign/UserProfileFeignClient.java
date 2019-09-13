@@ -32,8 +32,8 @@ public interface UserProfileFeignClient {
     Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
                              @RequestParam(value = "showdeleted") String showDeleted,  @RequestParam(value = "rolesRequired")String rolesRequired);
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/v1/userprofile/users")
-    @RequestLine("PUT /v1/userprofile/users")
+    @RequestMapping(method = RequestMethod.PUT, value = "/v1/userprofile/{userId}")
+    @RequestLine("PUT /v1/userprofile/{userId}")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response modifyUserRoles(@RequestBody Object modifyRoles, @PathVariable("userId") String userId);
 }

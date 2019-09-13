@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import feign.FeignException;
 import feign.Response;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,21 +14,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
-import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.UserType;
+import uk.gov.hmcts.reform.professionalapi.controller.response.*;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -37,6 +23,8 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -316,10 +304,11 @@ public abstract class SuperController {
     protected ResponseEntity<?> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
-        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
+
         UserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData,userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
