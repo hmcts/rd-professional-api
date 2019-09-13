@@ -128,20 +128,16 @@ public class OrganisationCreationRequestValidator {
         if (null != contactInformations) {
 
             for (ContactInformationCreationRequest contactInformation : contactInformations) {
-
-                if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
-                        || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
-                        || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
-
-                    throw new InvalidRequest("Empty contactInformation value");
-                }
+                requestValues(contactInformation.getAddressLine1(), contactInformation.getPostCode());
                 if (null != contactInformation.getDxAddress()) {
 
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
 
-                        if (isEmptyValue(dxAddress.getDxNumber()) || !isDxNumberValid(dxAddress.getDxNumber()) || isEmptyValue(dxAddress.getDxExchange())) {
-                            throw new InvalidRequest("Invalid dxAddress value: " + dxAddress.getDxExchange() + ", DxNumber: " + dxAddress.getDxNumber());
+                        requestValues(dxAddress.getDxNumber(), dxAddress.getDxExchange());
+                        if ((!isDxNumberValid(dxAddress.getDxNumber()))) {
+                            throw new InvalidRequest(", DxNumber: " + dxAddress.getDxNumber());
                         }
+
                     }
                 }
             }
