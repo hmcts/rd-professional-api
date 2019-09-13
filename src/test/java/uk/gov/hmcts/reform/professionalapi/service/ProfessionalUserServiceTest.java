@@ -19,10 +19,7 @@ import feign.Request;
 import feign.Response;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,12 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -188,6 +180,33 @@ public class ProfessionalUserServiceTest {
         assertThat(responseEntity).isNotNull();
     }
 
+    @Test
+    public void modify_user_roles() throws Exception {
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        Set<RoleName> roles = new HashSet<RoleName>();
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-case-organisation");
+        roles.add(roleName1);
+        roles.add(roleName2);
+        modifyUserProfileData.setRolesAdd(roles);
+        String id = UUID.randomUUID().toString();
+
+        UserRolesResponse userRolesResponse = new UserRolesResponse("200","Success");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userRolesResponse);
+
+        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body1 = mapper.writeValueAsString(userRolesResponse);
+
+        when(userProfileFeignClient.modifyUserRoles(any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+
+        assertThat(response).isNotNull();
+    }
 
     @Test
     public void addNewUserToAnOrganisation() {
