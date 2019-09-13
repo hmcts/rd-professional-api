@@ -8,7 +8,6 @@ import io.swagger.annotations.Authorization;
 
 import java.util.Collection;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;

@@ -175,7 +175,7 @@ public class ProfessionalApiClient {
 
         return userCreationRequest;
     }
-    @SuppressWarnings("unchecked")
+
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)

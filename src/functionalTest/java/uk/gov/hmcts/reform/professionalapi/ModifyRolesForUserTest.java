@@ -21,12 +21,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
 public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
-
 
     @Test
     public void ac1_modify_role_existing_user_to_organisation_internal() {
@@ -154,14 +152,11 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         RoleName role1 = new RoleName("pui-user-manager");
 
-
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
 
         modifyUserProfileData.setRolesAdd(roles);
-        Map<String, Object> modifiedUserResponse =  professionalApiClient.
-                modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST,modifyUserProfileData,orgIdentifier,"");
-
+        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST,modifyUserProfileData,orgIdentifier,"");
     }
 
 }

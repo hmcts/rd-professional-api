@@ -5,14 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
@@ -66,16 +67,13 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerTokenForPuiUserManager;
     protected RequestSpecification bearerTokenForNonPuiUserManager;
 
-
     @Autowired
     protected TestConfigProperties configProperties;
-
 
     @Before
     public void setUp() {
