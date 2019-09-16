@@ -30,6 +30,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
+
         String orgIdentifier = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifier).isNotEmpty();
 

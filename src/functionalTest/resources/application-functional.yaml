@@ -1,5 +1,5 @@
 #targetInstance: ${TEST_URL:http://rd-professional-api-aat.service.core-compute-aat.internal}
-targetInstance: ${TEST_URL:https://rd-professional-api-pr-216.service.core-compute-preview.internal}
+targetInstance: ${TEST_URL:http://localhost:8090}
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 s2s-name: rd_professional_api
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}

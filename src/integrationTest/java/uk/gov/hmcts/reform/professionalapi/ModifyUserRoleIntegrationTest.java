@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @Slf4j
 public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private UUID settingUpOrganisation(String role) {
+    private String settingUpOrganisation(String role) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -38,7 +38,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
-        return UUID.fromString((String) newUserResponse.get("userIdentifier"));
+        return ((String) newUserResponse.get("userIdentifier"));
     }
 
 
@@ -84,9 +84,11 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(response.get("statusMessage")).isEqualTo("200");
     }
 
-    @Ignore
+
     @Test
     public void modify_roles_of_active_users_for_an_active_organisation_with_pui_user_manager_role_should_return_200() {
+
+        String userIdentifier = settingUpOrganisation("pui-user-manager");
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
 
@@ -96,11 +98,11 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         roles.add(roleName1);
         roles.add(roleName2);
 
-        UUID userIdentifier = settingUpOrganisation("pui-user-manager");
-
         modifyUserProfileData.setRolesAdd(roles);
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier.toString(), puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
+        assertThat(response.get("statusCode")).isNotNull();
+        assertThat(response.get("statusMessage")).isEqualTo("200");
     }
 }

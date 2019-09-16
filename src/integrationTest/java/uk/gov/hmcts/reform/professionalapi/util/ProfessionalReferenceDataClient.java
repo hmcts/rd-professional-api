@@ -168,6 +168,30 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    private Map<String, Object> getRequestForExternalRoles(String uriPath,String role, String userId, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeadersForExternal(role, userId));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+
+
     public Map<String, Object> updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest,String role, String organisationIdentifier) {
 
@@ -188,7 +212,25 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
-    private HttpHeaders getMultipleAuthHeaders(String role, UUID userId) {
+    private HttpHeaders getMultipleAuthHeaders(String role,  UUID userId) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+        String bearerToken = sidamTokenMap.get(role);
+        if (userId != null) {
+            bearerToken = userId + " " + bearerToken;
+        } else {
+            bearerToken = "1f5f2769-90ca-4216-9987-3fe87f0e7641" + " " + bearerToken;
+        }
+
+        headers.add("Authorization", bearerToken);
+
+        return headers;
+    }
+
+    private HttpHeaders getMultipleAuthHeadersForExternal(String role, String userId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -249,12 +291,12 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public  Map<String, Object> modifyUserRolesOfOrganisationExternal(ModifyUserProfileData modifyUserProfileData, String userIdentifier, String hmctsAdmin) {
+    public  Map<String, Object> modifyUserRolesOfOrganisationExternal(ModifyUserProfileData modifyUserProfileData, String userIdentifier, String externalRole) {
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "/users/" + userIdentifier;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH  + "/users/" + userIdentifier;
 
         try {
-            HttpEntity<ModifyUserProfileData> requestEntity = new HttpEntity<>(modifyUserProfileData,getMultipleAuthHeaders(hmctsAdmin));
+            HttpEntity<ModifyUserProfileData> requestEntity = new HttpEntity<>(modifyUserProfileData,getMultipleAuthHeadersForExternal(externalRole,userIdentifier));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);

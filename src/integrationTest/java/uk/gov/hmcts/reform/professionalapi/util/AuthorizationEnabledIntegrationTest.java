@@ -461,6 +461,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
+
+
     }
 }
 
