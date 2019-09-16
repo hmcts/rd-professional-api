@@ -35,6 +35,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -117,7 +118,6 @@ public class OrganisationServiceImplTest {
     public void setUp() {
 
         MockitoAnnotations.initMocks(this);
-
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId("PROBATE");
 
@@ -179,8 +179,6 @@ public class OrganisationServiceImplTest {
                         "some-org-name", "PENDING", "sra-id", "false", "number01", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
-
-
 
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 

@@ -128,6 +128,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         List<ProfessionalUser> professionalUsers;
         List<String> usersId = new ArrayList<>();
 
+        ResponseEntity responseResponseEntity;
+
         professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
