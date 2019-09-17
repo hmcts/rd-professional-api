@@ -173,7 +173,7 @@ public class ProfessionalUserServiceTest {
 
         PowerMockito.when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress("email@org.com");
+        professionalUserService.findProfessionalUserProfileByEmailAddress("email@org.com");
     }
 
     @Test
