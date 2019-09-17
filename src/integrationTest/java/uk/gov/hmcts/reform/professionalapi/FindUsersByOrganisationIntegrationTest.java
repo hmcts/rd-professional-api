@@ -122,7 +122,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_active_users_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
         UUID id = settingUpOrganisation("pui-case-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiCaseManager, id);
-        validateUsers(response, 2, IdamStatus.ACTIVE.toString(), false);
+        validateUsers(response, 2, IdamStatus.ACTIVE.toString(), true);
     }
 
     @Test
@@ -154,12 +154,9 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             assertThat(professionalUsersResponse.get("email")).isNotNull();
             if (expectedUserStatus.equalsIgnoreCase(IdamStatus.ACTIVE.toString())) {
                 assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo(expectedUserStatus);
-            } else {
-                assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
-            }
-            if (isRolesRequired) {
                 assertThat(((List) professionalUsersResponse.get("roles")).size()).isEqualTo(1);
             } else {
+                assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
                 assertThat(((List) professionalUsersResponse.get("roles"))).isEmpty();
             }
         });

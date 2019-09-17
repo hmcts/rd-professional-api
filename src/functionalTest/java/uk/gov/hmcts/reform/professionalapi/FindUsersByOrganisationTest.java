@@ -88,17 +88,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), false);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK), false);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK));
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK), false);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo(IdamStatus.ACTIVE.toString());
-        validateRetrievedUsers(response, false);
+        validateRetrievedUsers(response);
     }
 
     @Test
@@ -129,15 +129,30 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void ac2_1_should_return_200_and_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_when_no_status_provided() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
+    }
+
+    @Test
+    public void ac2_2_find_pending_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "Pending");
+    }
+
+    @Test
+    public void ac2_3_find_suspended_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "Suspended");
+    }
+
+    @Test
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
-        validateRetrievedUsers(response, true);
+        validateRetrievedUsers(response);
     }
 
     @Test
     public void ac4_find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
-        validateRetrievedUsers(response, true);
+        validateRetrievedUsers(response);
     }
 
     @Test
@@ -178,7 +193,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
     }
 
-    void validateRetrievedUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
+    void validateRetrievedUsers(Map<String, Object> searchResponse) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
@@ -190,7 +205,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             assertThat(professionalUsersResponse.get("firstName")).isNotNull();
             assertThat(professionalUsersResponse.get("lastName")).isNotNull();
             assertThat(professionalUsersResponse.get("email")).isNotNull();
-            if (rolesRequired && professionalUsersResponse.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+            if (professionalUsersResponse.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
                 assertThat(professionalUsersResponse.get("roles")).isNotNull();
             } else {
                 assertThat(professionalUsersResponse.get("roles")).isNull();
