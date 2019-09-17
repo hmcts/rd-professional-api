@@ -21,11 +21,13 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.util.*;
 
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -53,14 +55,13 @@ public class ProfessionalUserServiceTest {
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
-    private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
 
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
 
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
-    private final RetrieveUserProfilesRequest retrieveUserProfilesRequest = mock(RetrieveUserProfilesRequest.class);
-    private final Response responseMock = mock(Response.class);
+    private final FeignException feignExceptionMock = mock(FeignException.class);
+
     private final GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -138,14 +139,6 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
     }
 
-    public void retrieveUserByEmailNotFound() {
-        Mockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
-                .thenReturn(null);
-
-        assertThat(professionalUserService.findProfessionalUserProfileByEmailAddress("some-email")).isNull();
-    }
-
-
     @Test
     public void findUsersByOrganisation_with_deleted_users() throws Exception {
 
@@ -206,6 +199,59 @@ public class ProfessionalUserServiceTest {
         UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void modify_user_roles_bad_request() throws Exception {
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        Set<RoleName> roles = new HashSet<>();
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-case-organisation");
+        roles.add(roleName1);
+        roles.add(roleName2);
+        modifyUserProfileData.setRolesAdd(roles);
+        String id = UUID.randomUUID().toString();
+
+        UserRolesResponse userRolesResponse = new UserRolesResponse(400, "Fail");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userRolesResponse);
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
+
+        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusMessage()).isEqualTo("Fail");
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void modify_user_roles_server_error() throws Exception {
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        Set<RoleName> roles = new HashSet<>();
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-case-organisation");
+        roles.add(roleName1);
+        roles.add(roleName2);
+        modifyUserProfileData.setRolesAdd(roles);
+        String id = UUID.randomUUID().toString();
+
+        UserRolesResponse userRolesResponse = new UserRolesResponse(500, "Fail");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userRolesResponse);
+
+        when(feignExceptionMock.status()).thenReturn(500);
+        when(userProfileFeignClient.modifyUserRoles(any(), any())).thenThrow(feignExceptionMock);
+
+        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusMessage()).isEqualTo("Fail");
     }
 
     @Test
@@ -291,4 +337,6 @@ public class ProfessionalUserServiceTest {
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNull();
     }
+
+
 }
