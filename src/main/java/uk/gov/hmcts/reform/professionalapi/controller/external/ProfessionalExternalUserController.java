@@ -88,15 +88,14 @@ public class ProfessionalExternalUserController extends SuperController {
             }
         } else {
 
-            if (isRolePuiUserManager) {
-                log.info("Searching for users with Pui User Manager role");
-                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
-
-            } else {
+            if (!isRolePuiUserManager) {
+                if (StringUtils.isEmpty(status)) {
+                    status = "Active";
+                }
                 profExtUsrReqValidator.validateStatusIsActive(status);
-                log.info("Searching for users with NON Pui User Manager role");
-                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
+
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
         }
 
         return profUsersEntityResponse;

@@ -88,17 +88,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK));
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), null);
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK));
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK), null);
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK));
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK), null);
     }
 
     @Test
@@ -114,45 +114,27 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac1_find_all_active_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
+    public void ac1_find_all_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
-        assertThat(response.get("users")).asList().isNotEmpty();
-        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
-        assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo(IdamStatus.ACTIVE.toString());
-        validateRetrievedUsers(response);
+        validateRetrievedUsers(response, "ACTIVE");
     }
 
     @Test
-    public void ac2_find_all_status_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), " ");
-    }
-
-    @Test
-    public void ac2_1_should_return_200_and_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_when_no_status_provided() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
-    }
-
-    @Test
-    public void ac2_2_find_pending_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "Pending");
-    }
-
-    @Test
-    public void ac2_3_find_suspended_users_without_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "Suspended");
+    public void ac2_should_return_200_and_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_when_no_status_provided() {
+        Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
+        validateRetrievedUsers(response, "ACTIVE");
     }
 
     @Test
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
-        validateRetrievedUsers(response);
+        validateRetrievedUsers(response, "any");
     }
 
     @Test
     public void ac4_find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
-        validateRetrievedUsers(response);
+        validateRetrievedUsers(response, "ACTIVE");
     }
 
     @Test
@@ -161,7 +143,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac5_2_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_404() {
+    public void ac5_1_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_404() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Deleted");
     }
 
@@ -189,26 +171,28 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac9_find_all_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "");
+    public void ac9_find_non_active_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
+        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
     }
 
-    void validateRetrievedUsers(Map<String, Object> searchResponse) {
+    void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
         professionalUsersResponses.stream().forEach(user -> {
-            assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
-            assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-            assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-            assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-            assertThat(professionalUsersResponse.get("email")).isNotNull();
-            if (professionalUsersResponse.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                assertThat(professionalUsersResponse.get("roles")).isNotNull();
+            assertThat(user.get("idamStatus")).isNotNull();
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("firstName")).isNotNull();
+            assertThat(user.get("lastName")).isNotNull();
+            assertThat(user.get("email")).isNotNull();
+            if (!expectedStatus.equals("any")) {
+                assertThat(user.get("idamStatus").equals(expectedStatus));
+            }
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                assertThat(user.get("roles")).isNotNull();
             } else {
-                assertThat(professionalUsersResponse.get("roles")).isNull();
+                assertThat(user.get("roles")).isNull();
             }
         });
     }

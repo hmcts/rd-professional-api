@@ -298,7 +298,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.DELETED + "\","
+                + "  \"idamStatus\": \"DELETED\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"404\","
                 + "  \"idamMessage\": \"16 Resource not found\""

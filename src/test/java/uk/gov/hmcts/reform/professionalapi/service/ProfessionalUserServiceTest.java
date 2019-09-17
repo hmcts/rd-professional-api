@@ -197,9 +197,9 @@ public class ProfessionalUserServiceTest {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2","lName2", "some2@email.com", organisationMock));
-        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE);
-        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE);
-        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING);
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
         userProfiles.add(professionalUsersResponse);
         userProfiles.add(professionalUsersResponse1);

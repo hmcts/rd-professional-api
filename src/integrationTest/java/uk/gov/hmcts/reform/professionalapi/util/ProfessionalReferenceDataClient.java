@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -93,7 +92,7 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
-    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, UUID id) {
+    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, String id) {
         return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",role, id, showDeleted, status);
     }
 
@@ -152,7 +151,7 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    private Map<String, Object> getRequestForExternal(String uriPath,String role, UUID userId, Object... params) {
+    private Map<String, Object> getRequestForExternal(String uriPath,String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -194,7 +193,7 @@ public class ProfessionalReferenceDataClient {
         return organisationResponse;
     }
 
-    private HttpHeaders getMultipleAuthHeaders(String role, UUID userId) {
+    private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
