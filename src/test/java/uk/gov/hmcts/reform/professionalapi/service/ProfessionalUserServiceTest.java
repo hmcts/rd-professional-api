@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
@@ -137,6 +138,42 @@ public class ProfessionalUserServiceTest {
         assertEquals(professionalUser.getFirstName(), user1.getFirstName());
         assertEquals(professionalUser.getLastName(), user1.getLastName());
         assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void retrieveUserByEmail_EmptyData() throws JsonProcessingException {
+        String id = UUID.randomUUID().toString();
+        superUser.setUserIdentifier(id);
+        SuperUser superUserMock = mock(SuperUser.class);
+
+        professionalUser.setUserIdentifier(id);
+        PowerMockito.when(superUserMock.toProfessionalUser()).thenReturn(professionalUser);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+        List<String> roles = new ArrayList<>();
+        roles.add("pui-case-manager");
+        PowerMockito.when(professionalUser.getOrganisation().getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        PowerMockito.when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        PowerMockito.when(organisation.getUsers()).thenReturn(users);
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation);
+        PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
+                .thenReturn(null);
+
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        PowerMockito.when(getUserProfileResponseMock.getRoles()).thenReturn(roles);
+
+        PowerMockito.when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress("email@org.com");
     }
 
     @Test
