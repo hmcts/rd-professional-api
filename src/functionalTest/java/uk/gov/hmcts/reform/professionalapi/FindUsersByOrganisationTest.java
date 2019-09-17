@@ -141,12 +141,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void ac5_find_all_suspended_users_for_an_organisation_with_pui_user_manager_when_no_suspended_user_exists_should_return_404() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Suspended");
     }
-
-    @Test
-    public void ac5_1_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_40() {
-        professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Deleted");
-    }
-
+    
     @Test
     public void ac6_find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForPuiManager(), "INVALID");
