@@ -192,7 +192,7 @@ public class ProfessionalUserServiceTest {
         modifyUserProfileData.setRolesAdd(roles);
         String id = UUID.randomUUID().toString();
 
-        UserRolesResponse userRolesResponse = new UserRolesResponse("200","Success");
+        UserRolesResponse userRolesResponse = new UserRolesResponse(200,"Success");
 
         ObjectMapper mapper = new ObjectMapper();
 

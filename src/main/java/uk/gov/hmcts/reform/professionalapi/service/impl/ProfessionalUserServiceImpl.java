@@ -147,12 +147,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         UserRolesResponse userRolesResponse;
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : UserRolesResponse.class;
+            Class clazz = UserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
-                ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+                UserRolesResponse userProfileErrorResponse = (UserRolesResponse) responseResponseEntity.getBody();
+                throw new ExternalApiException(HttpStatus.valueOf(userProfileErrorResponse.getStatusCode()), userProfileErrorResponse.getStatusMessage());
 
             }
             userRolesResponse = (UserRolesResponse)responseResponseEntity.getBody();

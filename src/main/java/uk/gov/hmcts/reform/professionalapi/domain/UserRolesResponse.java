@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRolesResponse {
 
-    private String statusCode;
+    private int statusCode;
     private String statusMessage;
 
-    public UserRolesResponse(String statusCode, String statusMessage) {
+    public UserRolesResponse(int statusCode, String statusMessage) {
         this.statusCode = statusCode;
         this.statusMessage = statusMessage;
     }

@@ -361,10 +361,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"statusCode\":\"" + UUID.randomUUID().toString() + "\","
-                    + "  \"statusMessage\":\"200\""
+                    + "  \"statusCode\":\"200\","
+                    + "  \"statusMessage\":\"success\""
                     + "}";
             returnHttpStatus = 200;
+        } else if (status.is4xxClientError()) {
+            body = "{"
+                    + "  \"statusCode\":\"400\","
+                    + "  \"statusMessage\":\"Bad Request\""
+                    + "}";
+            returnHttpStatus = 400;
+        } else if (status.is5xxServerError()) {
+
+            body = "{"
+                    + "  \"statusCode\":\"500\","
+                    + "  \"statusMessage\":\"Internal Server Error\""
+                    + "}";
+            returnHttpStatus = 500;
+
         }
 
         userProfileService.stubFor(
@@ -376,14 +390,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         )
         );
 
-        userProfileService.stubFor(
-                put(urlPathMatching("/v1/userprofile/.*"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
 
     }
 
