@@ -88,17 +88,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), null);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), "any");
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK), null);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK), "any");
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK), null);
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK), "any");
     }
 
     @Test
@@ -143,7 +143,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac5_1_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_404() {
+    public void ac5_1_find_all_deleted_users_for_an_organisation_with_pui_user_manager_when_no_deleted_user_exists_should_return_40() {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.NOT_FOUND, generateBearerTokenForPuiManager(), "Deleted");
     }
 
