@@ -9,6 +9,7 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
@@ -90,21 +90,18 @@ public class ProfessionalExternalUserController extends SuperController {
             if (isRolePuiUserManager) {
                 profUsersEntityResponse = retrieveUserByEmail(email);
             } else {
-                throw new InvalidRequest("Your role does not permit you to search for a user by email");
+                throw new AccessDeniedException("403 Forbidden");
             }
         } else {
 
-            if (isRolePuiUserManager) {
-                log.info("FOR PUI USER MANAGER");
-                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
-
-            } else {
+            if (!isRolePuiUserManager) {
+                if (StringUtils.isEmpty(status)) {
+                    status = "Active";
+                }
                 profExtUsrReqValidator.validateStatusIsActive(status);
-
-                log.info("FOR NON PUI USER MANAGER");
-                status = "Active";
-                profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, false, status);
             }
+
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
         }
 
         return profUsersEntityResponse;

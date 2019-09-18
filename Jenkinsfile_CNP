@@ -28,10 +28,6 @@ def vaultOverrides = [
 
 withPipeline(type, product, component) {
   
-    after('smoketest:aat') {
-        sh "rm -rf infrastructure/"
-    }
-
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
@@ -40,7 +36,7 @@ withPipeline(type, product, component) {
     installCharts()
     enableAksStagingDeployment()
 
-    //enableAksStagingDeployment()
+
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"

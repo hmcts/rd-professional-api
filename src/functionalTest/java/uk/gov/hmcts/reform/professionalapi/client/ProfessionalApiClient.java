@@ -146,6 +146,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
+        Response response = getS2sTokenHeaders()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v1/organisations")
+                .andReturn();
+
+        log.info("Create organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value());
+    }
+
     public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
@@ -309,9 +322,6 @@ public class ProfessionalApiClient {
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
                 .andReturn();
 
-        log.info("ENDPOINT RESPONSE::::" + response);
-        log.info("REQUEST SPEC::::" + requestSpecification.toString());
-
         response.then()
                 .assertThat()
                 .statusCode(status.value());
@@ -471,6 +481,4 @@ public class ProfessionalApiClient {
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
     }
-
-
 }

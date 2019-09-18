@@ -38,7 +38,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
-        return ((String) newUserResponse.get("userIdentifier"));
+        return (String) newUserResponse.get("userIdentifier");
     }
 
 
@@ -47,7 +47,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
-        validateUsers(response, 3, "any", true);
+        validateUsers(response, 3);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
-        validateUsers(response, 3, "any", true);
+        validateUsers(response, 3);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null, hmctsAdmin);
-        validateUsers(response, 3, "any", true);
+        validateUsers(response, 3);
 
     }
 
@@ -121,45 +121,46 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_active_users_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-case-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiCaseManager, id);
-        validateUsers(response, 2, IdamStatus.ACTIVE.toString(), false);
+        validateUsers(response, 2);
     }
 
     @Test
     public void retrieve_active_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiUserManager, id);
-        validateUsers(response, 2, IdamStatus.ACTIVE.toString(), true);
+        validateUsers(response, 2);
+    }
+
+    @Test
+    public void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Deleted", puiUserManager, id);
+
     }
 
     @Test
     public void retrieve_all_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","", puiUserManager, id);
-        validateUsers(response, 3, "any", true);
+        validateUsers(response, 3);
     }
 
-    private void validateUsers(Map<String, Object> response, int expectedUserCount, String expectedUserStatus, boolean isRolesRequired) {
+    private void validateUsers(Map<String, Object> response, int expectedUserCount) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
-
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
         professionalUsersResponses.stream().forEach(user -> {
-            assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-            assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-            assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-            assertThat(professionalUsersResponse.get("email")).isNotNull();
-            if (expectedUserStatus.equalsIgnoreCase(IdamStatus.ACTIVE.toString())) {
-                assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo(expectedUserStatus);
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("firstName")).isNotNull();
+            assertThat(user.get("lastName")).isNotNull();
+            assertThat(user.get("email")).isNotNull();
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                assertThat(((List) user.get("roles")).size()).isEqualTo(1);
             } else {
-                assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
-            }
-            if (isRolesRequired) {
-                assertThat(((List) professionalUsersResponse.get("roles")).size()).isEqualTo(1);
-            } else {
-                assertThat(((List) professionalUsersResponse.get("roles"))).isEmpty();
+                assertThat(user.get("idamStatus")).isNotNull();
+                assertThat(((List) user.get("roles"))).isEmpty();
             }
         });
     }

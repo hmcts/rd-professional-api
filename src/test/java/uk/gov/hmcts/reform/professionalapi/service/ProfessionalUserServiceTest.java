@@ -27,6 +27,9 @@ import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -38,7 +41,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -174,6 +186,7 @@ public class ProfessionalUserServiceTest {
         professionalUserService.findProfessionalUserProfileByEmailAddress("email@org.com");
     }
 
+
     @Test
     public void findUsersByOrganisation_with_deleted_users() throws Exception {
 
@@ -201,6 +214,41 @@ public class ProfessionalUserServiceTest {
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByOrganisation(organisation);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test
+    public void findUsersByOrganisation_with_status_active() throws Exception {
+        Organisation organisationMock = mock(Organisation.class);
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2","lName2", "some2@email.com", organisationMock));
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(professionalUsersResponse);
+        userProfiles.add(professionalUsersResponse1);
+        userProfiles.add(professionalUsersResponse2);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+
+        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(response);
+
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
         Mockito.verify(
                 professionalUserRepository,
                 Mockito.times(1)).findByOrganisation(organisation);
@@ -289,6 +337,7 @@ public class ProfessionalUserServiceTest {
         assertThat(response.getStatusMessage()).isEqualTo("Fail");
     }
 
+
     @Test
     public void addNewUserToAnOrganisation() {
 
@@ -372,6 +421,4 @@ public class ProfessionalUserServiceTest {
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNull();
     }
-
-
 }

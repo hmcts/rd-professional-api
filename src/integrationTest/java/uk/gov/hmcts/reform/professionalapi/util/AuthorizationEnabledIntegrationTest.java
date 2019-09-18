@@ -13,8 +13,10 @@ import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
 import java.io.IOException;
 import java.util.*;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +28,13 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.*;
+import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -289,7 +297,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.DELETED + "\","
+                + "  \"idamStatus\": \"DELETED\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"404\","
                 + "  \"idamMessage\": \"16 Resource not found\""
@@ -383,10 +391,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(
                 put(urlPathMatching("/v1/userprofile/.*"))
-                       .willReturn(aResponse()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody(body)
-                                        .withStatus(returnHttpStatus)
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
                         )
         );
 
@@ -467,8 +475,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
-
-
     }
 }
 

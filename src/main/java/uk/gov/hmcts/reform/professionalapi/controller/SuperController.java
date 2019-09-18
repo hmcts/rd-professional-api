@@ -15,7 +15,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
-import uk.gov.hmcts.reform.professionalapi.controller.response.*;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -284,8 +288,6 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
-
-        log.info("STATUS:::" + status);
 
         if ("True".equalsIgnoreCase(showDeleted)) {
             showDeleted = "true";
