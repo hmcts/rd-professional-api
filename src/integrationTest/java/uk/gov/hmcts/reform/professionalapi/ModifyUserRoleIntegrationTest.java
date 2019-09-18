@@ -192,6 +192,26 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
+    public void ac4_modify_roles_of_active_users_with_other_role_should_return_403() {
+
+        updateUserProfileRolesMock(HttpStatus.OK);
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-organisation-manager");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName1);
+        roles.add(roleName2);
+
+        modifyUserProfileData.setRolesAdd(roles);
+        String userIdentifier = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiCaseManager);
+
+        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat(response.get("response_body")).isNotNull();
+    }
+
+    @Test
     public void ac6_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);

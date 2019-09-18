@@ -388,7 +388,7 @@ public class ProfessionalApiClient {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(modifyUserProfileData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
         log.info("ModifyUserRole response for internal:: " + response.asString());
 
@@ -441,6 +441,7 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getS2sTokenHeaders() {
+        log.info("S2SToken::" + s2sToken);
         return withUnauthenticatedRequest()
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }

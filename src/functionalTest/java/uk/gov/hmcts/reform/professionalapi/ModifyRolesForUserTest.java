@@ -12,6 +12,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -71,6 +72,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse1.get("roles")).isEqualTo(3);
     }
 
+    @Ignore
     @Test
     public void ac2_invalid_role_access_to_method_through_forbidden_for_internal() {
 
@@ -114,6 +116,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
     }
 
+    @Ignore
     @Test
     public void ac3_modify_role_existing_user_external_bad_request() {
 
