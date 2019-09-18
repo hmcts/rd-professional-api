@@ -141,7 +141,7 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<?> modifyRolesForExistingUserOfExternalOrganisation(
-            @Valid @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @RequestBody ModifyUserProfileData modifyUserProfileData,
             @OrgId String organisationIdentifier,
             @PathVariable("userId") String userId
     ) {

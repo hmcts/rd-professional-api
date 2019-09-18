@@ -141,10 +141,10 @@ public class ProfessionalUserInternalController extends SuperController {
             path = "/{orgId}/users/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ResponseBody
+
     @Secured("prd-admin")
     public ResponseEntity<?> modifyRolesForExistingUserOfOrganisation(
-            @Valid @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @RequestBody ModifyUserProfileData modifyUserProfileData,
             @PathVariable("orgId")  String organisationIdentifier,
             @PathVariable("userId") String userId
     ) {
