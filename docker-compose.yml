@@ -1,0 +1,19 @@
+version: '2.1'
+
+services:
+
+  rd-professional-db:
+    build:
+      context: database
+    image: hmcts/rd-professional-db
+    container_name: rd-professional-db
+    volumes:
+      - rd-professional-db-volume:/var/lib/postgresql/data
+
+    environment:
+      - POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-dbrefdata}"
+    ports:
+      - 5428:5432
+
+volumes:
+  rd-professional-db-volume:
