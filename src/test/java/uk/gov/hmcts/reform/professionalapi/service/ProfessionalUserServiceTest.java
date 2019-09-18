@@ -21,14 +21,12 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import org.apache.tools.ant.taskdefs.condition.Http;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;

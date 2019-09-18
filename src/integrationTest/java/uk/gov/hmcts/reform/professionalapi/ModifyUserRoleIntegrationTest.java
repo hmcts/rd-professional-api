@@ -130,48 +130,6 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     }
 
     @Test
-    public void ac9_modify_roles_with_prd_admin_role_should_return_500_internal_server_error() {
-
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-case-manager");
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-
-        updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-
-        RoleName roleName1 = new RoleName("pui-case-manager");
-        RoleName roleName2 = new RoleName("pui-case-organisation");
-        Set<RoleName> roles = new HashSet<>();
-        roles.add(roleName1);
-        roles.add(roleName2);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
-
-        modifyUserProfileData.setRolesAdd(roles);
-
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
-
-        assertThat(response.get("http_status")).isEqualTo("500");
-        assertThat(response.get("response_body")).isNotNull();
-    }
-
-    @Test
     public void ac5_modify_roles_of_active_users_for_an_active_organisation_with_pui_user_manager_role_should_return_200() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
@@ -226,6 +184,48 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         modifyUserProfileData.setRolesAdd(roles);
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
+
+        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("response_body")).isNotNull();
+    }
+
+    @Test
+    public void ac9_modify_roles_with_prd_admin_role_should_return_500_internal_server_error() {
+
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-case-manager");
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-case-organisation");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName1);
+        roles.add(roleName2);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5) + "@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+
+        modifyUserProfileData.setRolesAdd(roles);
+
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("500");
         assertThat(response.get("response_body")).isNotNull();
