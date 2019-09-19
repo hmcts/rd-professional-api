@@ -183,7 +183,7 @@ public class OrganisationExternalController extends SuperController {
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Collection<GrantedAuthority>  authorities =  serviceAndUserDetails.getAuthorities();
 
-        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
+
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
