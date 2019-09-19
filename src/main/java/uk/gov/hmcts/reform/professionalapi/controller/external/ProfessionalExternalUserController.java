@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -135,7 +136,7 @@ public class ProfessionalExternalUserController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<?> modifyRolesForExistingUserOfExternalOrganisation(
+    public ResponseEntity<UserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
             @OrgId String orgId,
             @PathVariable("userId") String userId

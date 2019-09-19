@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
@@ -140,7 +141,7 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?> modifyRolesForExistingUserOfOrganisation(
+    public ResponseEntity<UserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
             @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId
