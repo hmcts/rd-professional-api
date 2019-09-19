@@ -71,6 +71,7 @@ security:
     - rd_professional_api
     - rd_user_profile_api
     - xui_webapp
+    - finrem_payment_service
 
 
 ### dependency configuration
