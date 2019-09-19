@@ -139,17 +139,16 @@ public class ProfessionalUserInternalController extends SuperController {
             path = "/{orgId}/users/{userId}",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-
     @Secured("prd-admin")
     public ResponseEntity<?> modifyRolesForExistingUserOfOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
-            @PathVariable("orgId")  String organisationIdentifier,
+            @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId
     ) {
 
         log.info("Received request to update user roles of an organisation...");
         profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, organisationIdentifier, userId);
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
 
     }
 }

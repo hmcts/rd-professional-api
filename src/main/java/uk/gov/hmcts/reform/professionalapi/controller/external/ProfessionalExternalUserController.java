@@ -137,13 +137,13 @@ public class ProfessionalExternalUserController extends SuperController {
     @Secured("pui-user-manager")
     public ResponseEntity<?> modifyRolesForExistingUserOfExternalOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
-            @OrgId String organisationIdentifier,
+            @OrgId String orgId,
             @PathVariable("userId") String userId
     ) {
 
         log.info("Received request to update user roles of an organisation...");
         profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, organisationIdentifier, userId);
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
 
     }
 }

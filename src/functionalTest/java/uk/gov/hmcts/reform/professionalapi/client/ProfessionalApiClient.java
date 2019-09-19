@@ -325,8 +325,12 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
+        if (HttpStatus.OK == status) {
 
-        return response.body().as(Map.class);
+            return response.body().as(Map.class);
+        } else {
+            return new HashMap<String, Object>();
+        }
     }
 
     public void updateOrganisation(String organisationIdentifier, String role) {
@@ -410,11 +414,11 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
 
-        Response response = getMultipleAuthHeadersInternal()
+        Response response = requestSpecification
                 .body(modifyUserProfileData)
-                .put("/refdata/external/v1/organisations/users" + userId)
+                .put("/refdata/external/v1/organisations/users/" + userId)
                 .andReturn();
         log.info("ModifyUserRole response for external: " + response.asString());
 
