@@ -96,6 +96,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    protected static final String ACTIVE = "ACTIVE";
+
     @Before
     public void setUpClient() {
         professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);

@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -114,8 +113,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(1);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = professionalUsersResponses.get(1);
 
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
@@ -131,8 +130,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
 
         Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<HashMap> professionalUsersResponses1 = (List<HashMap>) searchResponse1.get("users");
-        HashMap professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
+        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
         ArrayList<String> rolesSize = ( ArrayList<String>)professionalUsersResponse1.get("roles");
@@ -144,8 +143,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     public void ac2_add_role_existing_user_using_pui_user_manager_for_external_200() {
 
         Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK,generateBearerTokenForPuiManager(),"Active");
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = professionalUsersResponses.get(0);
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
@@ -157,8 +156,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         modifyUserProfileData.setRolesAdd(roles);
         Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,modifyUserProfileData,bearerTokenForPuiUserManager,userId);
         Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
-        List<HashMap> professionalUsersResponses1 = (List<HashMap>) searchResponse1.get("users");
-        HashMap professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
+        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
         ArrayList<String> rolesSize = ( ArrayList<String>)professionalUsersResponse1.get("roles");
