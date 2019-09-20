@@ -304,9 +304,6 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
         return response.body().as(Map.class);
     }
 
