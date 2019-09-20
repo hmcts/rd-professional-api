@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -71,7 +73,8 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                      @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
-                                                     @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
+                                                     @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status,
+                                                     @PageableDefault Pageable pageable) {
 
         ResponseEntity<?> profUsersEntityResponse;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
@@ -95,7 +98,7 @@ public class ProfessionalExternalUserController extends SuperController {
                 profExtUsrReqValidator.validateStatusIsActive(status);
             }
 
-            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status);
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, pageable);
         }
 
         return profUsersEntityResponse;

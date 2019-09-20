@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -18,7 +19,8 @@ public interface ProfessionalUserService {
 
     ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status);
 
-    ProfessionalUser persistUser(ProfessionalUser professionalUser);
+    ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable);
 
+    ProfessionalUser persistUser(ProfessionalUser professionalUser);
 }
 

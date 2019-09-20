@@ -180,6 +180,7 @@ public class ProfessionalUserServiceTest {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
@@ -214,6 +215,11 @@ public class ProfessionalUserServiceTest {
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+
+        ProfessionalUser user = mock(ProfessionalUser.class);
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(user);
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
 
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(response);
 
@@ -256,6 +262,7 @@ public class ProfessionalUserServiceTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenThrow(exceptionMock);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");

@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -217,5 +220,27 @@ public interface RefDataUtil {
         } else {
             throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve Users from UP");
         }
+    }
+
+    static ResponseEntity<?> generateResponseEntityWithHeaderFromPage(Pageable pageable, Page page, ResponseEntity responseEntity) {
+        HttpHeaders headers = new HttpHeaders();
+
+        final StringBuilder pageInformation = new StringBuilder();
+        pageInformation.append("totalElements = " + page.getTotalElements());
+        pageInformation.append(",");
+        pageInformation.append("totalPages = " + page.getTotalPages());
+        pageInformation.append(",");
+        pageInformation.append("currentPage = " + pageable.getPageNumber());
+        pageInformation.append(",");
+        pageInformation.append("size = " + pageable.getPageSize());
+
+        if (responseEntity == null) {
+            headers.add("paginationInfo", pageInformation.toString());
+            
+        } else {
+            headers.addAll(responseEntity.getHeaders());
+            headers.add("paginationInfo", pageInformation.toString());
+        }
+        return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 }

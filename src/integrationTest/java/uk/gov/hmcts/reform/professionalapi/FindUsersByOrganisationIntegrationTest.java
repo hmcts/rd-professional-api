@@ -135,7 +135,6 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Deleted", puiUserManager, id);
-
     }
 
     @Test
@@ -143,6 +142,39 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","", puiUserManager, id);
         validateUsers(response, 3);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_pagination() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email(randomAlphabetic(5) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest().firstName("someName1").lastName("someLastName1").email(randomAlphabetic(6) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest1, hmctsAdmin);
+
+        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest().firstName("someName2").lastName("someLastName2").email(randomAlphabetic(7) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest2, hmctsAdmin);
+
+        NewUserCreationRequest userCreationRequest3 = aNewUserCreationRequest().firstName("someName3").lastName("someLastName3").email(randomAlphabetic(8) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest3, hmctsAdmin);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
+
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(3);
+
+        Map<String, Object> response2 = professionalReferenceDataClient.findUsersByOrganisationWithPaginationInformation(organisationIdentifier,"False", hmctsAdmin);
+
+        assertThat(((List<ProfessionalUsersResponse>) response2.get("users")).size()).isEqualTo(3);
+
     }
 
     private void validateUsers(Map<String, Object> response, int expectedUserCount) {

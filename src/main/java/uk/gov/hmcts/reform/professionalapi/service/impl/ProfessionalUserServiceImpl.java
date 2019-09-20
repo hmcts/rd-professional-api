@@ -14,12 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -94,16 +97,29 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ProfessionalUser findProfessionalUserById(UUID id) {
         Optional<ProfessionalUser> professionalUser = professionalUserRepository.findById(id);
-        if (professionalUser.isPresent()) {
-            return professionalUser.get();
-        }
-        return null;
+        return professionalUser.orElse(null);
+    }
+
+    @Override
+    public ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
+        Page<ProfessionalUser> professionalUsers = generatePagedListOfUsers(organisation, pageable);
+
+        List<String> usersId = new ArrayList<>();
+        professionalUsers.getContent().forEach(user -> usersId.add(user.getUserIdentifier()));
+
+        ResponseEntity responseEntity = retrieveUserProfiles(new RetrieveUserProfilesRequest(usersId), showDeleted, rolesRequired, status);
+
+        return RefDataUtil.generateResponseEntityWithHeaderFromPage(pageable, professionalUsers, responseEntity);
     }
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
-        ResponseEntity responseEntity;
         RetrieveUserProfilesRequest retrieveUserProfilesRequest = generateRetrieveUserProfilesRequest(organisation);
+        return retrieveUserProfiles(retrieveUserProfilesRequest, showDeleted, rolesRequired, status);
+    }
+
+    private ResponseEntity retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
+        ResponseEntity responseEntity;
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
@@ -124,16 +140,33 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return responseEntity;
     }
 
+    private Page<ProfessionalUser> generatePagedListOfUsers(Organisation organisation, Pageable pageable) {
+        Page<ProfessionalUser> professionalUsers;
+
+        professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
+
+        if (professionalUsers.getContent().size() == 0) {
+            throw new ResourceNotFoundException("No Users were found for the given organisation");
+        }
+
+        return professionalUsers;
+    }
+
     private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(Organisation organisation) {
         List<ProfessionalUser> professionalUsers;
         List<String> usersId = new ArrayList<>();
 
         professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
+        if (professionalUsers.size() == 0) {
+            throw new ResourceNotFoundException("No Users were found for the given organisation");
+        }
+
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
 
         return new RetrieveUserProfilesRequest(usersId);
     }
+
 
     @Override
     public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {
