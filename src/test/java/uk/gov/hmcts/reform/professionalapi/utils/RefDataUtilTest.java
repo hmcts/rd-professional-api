@@ -1,18 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -23,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
@@ -269,7 +260,7 @@ public class RefDataUtilTest {
         when(responseEntityMock.getHeaders()).thenReturn(responseHeader);
 
         Page pageMock = mock(Page.class);
-        when(pageMock.getTotalElements()).thenReturn(1l);
+        when(pageMock.getTotalElements()).thenReturn(1L);
         when(pageMock.getTotalPages()).thenReturn(2);
 
         Pageable pageableMock = mock(Pageable.class);
@@ -281,17 +272,17 @@ public class RefDataUtilTest {
         assertThat(httpHeaders.containsKey("fakeHeader"));
         assertThat(httpHeaders.containsKey("paginationInfo"));
 
-//        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-//        HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
-//
-//        verify(httpHeadersMock, times(1)).addAll(multiValueMap);
-//        verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
+        //MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        //HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
+
+        //verify(httpHeadersMock, times(1)).addAll(multiValueMap);
+        //verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
     }
 
     @Test
     public void test_shouldGenerateResponseEntityWithHeaderFromPageWhenResponseEntityIsNull() {
         Page pageMock = mock(Page.class);
-        when(pageMock.getTotalElements()).thenReturn(1l);
+        when(pageMock.getTotalElements()).thenReturn(1L);
         when(pageMock.getTotalPages()).thenReturn(2);
 
         Pageable pageableMock = mock(Pageable.class);
@@ -303,6 +294,6 @@ public class RefDataUtilTest {
         HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
 
         assertThat(httpHeaders.containsKey("paginationInfo"));
-//        verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
+        //verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
     }
 }

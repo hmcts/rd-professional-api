@@ -170,6 +170,12 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
     }
 
+    @Test
+    public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
+        Map<String, Object> response = professionalApiClient.searchUsersByOrganisationWithPagination(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK);
+        validateRetrievedUsers(response, "any");
+    }
+
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 

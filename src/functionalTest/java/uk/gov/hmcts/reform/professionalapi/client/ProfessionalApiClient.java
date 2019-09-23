@@ -284,6 +284,21 @@ public class ProfessionalApiClient {
         }
     }
 
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=1&size=3")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.body().as(Map.class);
+        } else {
+            return new HashMap<String, Object>();
+        }
+    }
+
     public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
