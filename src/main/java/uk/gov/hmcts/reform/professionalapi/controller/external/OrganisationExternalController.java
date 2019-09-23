@@ -186,6 +186,4 @@ public class OrganisationExternalController extends SuperController {
                 .status(200)
                 .body(organisationResponse);
     }
-
-
 }

@@ -21,7 +21,6 @@ import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -294,11 +293,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        if (HttpStatus.OK == status) {
-            return response.body().as(Map.class);
-        } else {
-            return new HashMap<String, Object>();
-        }
+        return response.body().as(Map.class);
     }
 
     public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
@@ -309,11 +304,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        if (HttpStatus.OK == status) {
-            return response.body().as(Map.class);
-        } else {
-            return new HashMap<String, Object>();
-        }
+        return response.body().as(Map.class);
     }
 
     public Map<String, Object> searchAllActiveUsersByOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
@@ -325,7 +316,6 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
         return response.body().as(Map.class);
     }
 
@@ -410,11 +400,11 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
 
-        Response response = getMultipleAuthHeadersInternal()
+        Response response = requestSpecification
                 .body(modifyUserProfileData)
-                .put("/refdata/external/v1/organisations/users" + userId)
+                .put("/refdata/external/v1/organisations/users/" + userId)
                 .andReturn();
         log.info("ModifyUserRole response for external: " + response.asString());
 
