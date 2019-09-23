@@ -171,7 +171,6 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response2 = professionalReferenceDataClient.findUsersByOrganisationWithPaginationInformation(organisationIdentifier,"False", hmctsAdmin);
 
         assertThat(((List<ProfessionalUsersResponse>) response2.get("users")).size()).isEqualTo(3);
-
     }
 
     private void validateUsers(Map<String, Object> response, int expectedUserCount) {

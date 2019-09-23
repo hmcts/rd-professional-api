@@ -200,6 +200,9 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         //Check response is 200
         validateRetrievedUsers(searchResponse, "any");
+
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
