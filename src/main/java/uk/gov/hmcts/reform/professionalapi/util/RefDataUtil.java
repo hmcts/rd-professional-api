@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 
 import feign.FeignException;
@@ -37,7 +38,7 @@ public interface RefDataUtil {
 
     static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
-        List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
+        List<PaymentAccount> userMapPaymentAccount;
 
         userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
 
@@ -85,7 +86,7 @@ public interface RefDataUtil {
 
 
     static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
-        try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier().toString())) {
+        try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
@@ -105,8 +106,7 @@ public interface RefDataUtil {
 
     static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
                                                             RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                            String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
-        List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
+                                                            String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
@@ -116,7 +116,7 @@ public interface RefDataUtil {
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
             if (response.status() < 300) {
 
-                modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDtls);
+                modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDetails);
             }
 
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
@@ -164,7 +164,7 @@ public interface RefDataUtil {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
-            if (isRequiredRoles) {
+            if (TRUE.equals(isRequiredRoles)) {
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
@@ -207,7 +207,7 @@ public interface RefDataUtil {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
 
             List<ProfessionalUsersResponse> filteredUsers =  professionalUsersEntityResponse.getUserProfiles().stream()
-                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus().toString()))
+                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
                     .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(filteredUsers)) {

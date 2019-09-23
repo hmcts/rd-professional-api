@@ -24,6 +24,10 @@ public class OrganisationCreationRequestValidator {
 
     private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
+    public static final String CHARACTERS = " characters";
+
+    public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
+
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
     }
@@ -176,15 +180,15 @@ public class OrganisationCreationRequestValidator {
         }
 
         if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
-            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters" + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+            throw new InvalidRequest("DX Number " + THIRTEEN_OR_LESS + dxAddress.getDxNumber().length() + CHARACTERS + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + CHARACTERS);
         }
 
         if (dxAddress.getDxNumber().length() > 13) {
-            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters");
+            throw new InvalidRequest("DX Number " + THIRTEEN_OR_LESS + dxAddress.getDxNumber().length() + CHARACTERS);
         }
 
         if (dxAddress.getDxExchange().length() > 20) {
-            throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+            throw new InvalidRequest("DX Exchange " + THIRTEEN_OR_LESS + dxAddress.getDxExchange().length() + CHARACTERS);
         }
     }
 

@@ -172,21 +172,33 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
+        //Create & update organisation to active
         String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add("pui-case-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "1Aaron";
+
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5).toLowerCase() + "@hotmail.com")
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        Map<String, Object> addUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        //Get user registered with IDAM
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
+        //Add user to our created active organisation
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        //Search for the organisations users
         Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK);
+
+        //Check response is 200
         validateRetrievedUsers(searchResponse, "any");
     }
 

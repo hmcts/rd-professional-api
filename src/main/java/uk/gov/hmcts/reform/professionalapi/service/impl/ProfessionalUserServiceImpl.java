@@ -137,7 +137,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             log.info("Filtering users by status: " + status);
 
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
-            return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
+            responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
         }
 
         return responseEntity;
@@ -148,7 +148,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
 
-        if (professionalUsers.getContent().size() == 0) {
+        if (professionalUsers.getContent().isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
@@ -161,7 +161,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
-        if (professionalUsers.size() == 0) {
+        if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
