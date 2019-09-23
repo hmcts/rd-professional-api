@@ -172,8 +172,22 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchUsersByOrganisationWithPagination(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK);
-        validateRetrievedUsers(response, "any");
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5).toLowerCase() + "@hotmail.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        Map<String, Object> addUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK);
+        validateRetrievedUsers(searchResponse, "any");
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {

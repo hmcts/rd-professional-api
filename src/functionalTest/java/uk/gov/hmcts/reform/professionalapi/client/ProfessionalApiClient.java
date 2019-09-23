@@ -287,7 +287,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=1&size=3")
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=0&size=3")
                 .andReturn();
         response.then()
                 .assertThat()
