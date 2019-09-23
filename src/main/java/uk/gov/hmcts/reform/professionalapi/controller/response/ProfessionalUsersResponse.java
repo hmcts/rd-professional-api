@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private String userIdentifier;
+    private UUID userIdentifier;
     @JsonProperty
     private String firstName;
     @JsonProperty

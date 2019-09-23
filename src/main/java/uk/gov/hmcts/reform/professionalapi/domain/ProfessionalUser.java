@@ -73,7 +73,7 @@ public class ProfessionalUser {
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     @Column(name = "USER_IDENTIFIER")
-    private String userIdentifier;
+    private UUID userIdentifier;
 
     @Transient
     private List<String> roles;
@@ -97,18 +97,5 @@ public class ProfessionalUser {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.organisation = organisation;
-    }
-
-    public SuperUser toSuperUser() {
-        SuperUser superUser =
-                new SuperUser(this.getFirstName(), this.getLastName(), this.getEmailAddress(), this.getOrganisation());
-
-        superUser.setCreated(this.getCreated());
-        superUser.setDeleted(this.getDeleted());
-        superUser.setId(this.getId());
-        superUser.setLastUpdated(this.getLastUpdated());
-        superUser.setUserIdentifier(this.getUserIdentifier());
-
-        return superUser;
     }
 }

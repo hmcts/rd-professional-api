@@ -80,21 +80,8 @@ public class ExceptionMapper {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
-        String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
-        String fieldName = null;
-        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
-            String message = ex.getCause().getCause().getMessage().toUpperCase();
-            if (message.contains("SRA_ID")) {
-                errorMessage = String.format(errorMessage, "SRA_ID");
-            } else if (message.contains("COMPANY_NUMBER")) {
-                errorMessage = String.format(errorMessage, "COMPANY_NUMBER");
-            } else if (message.contains("EMAIL_ADDRESS")) {
-                errorMessage = String.format(errorMessage, "EMAIL");
-            } else if (message.contains("PBA_NUMBER")) {
-                errorMessage = String.format(errorMessage, "PBA_NUMBER");
-            }
-        }
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, errorMessage);
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
+
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -149,7 +136,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage());
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);

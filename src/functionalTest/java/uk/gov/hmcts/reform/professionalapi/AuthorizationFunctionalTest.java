@@ -74,9 +74,10 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
+        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+
         IdamClient idamClient = new IdamClient(configProperties);
 
-        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         log.info("idamClient: " + idamClient);
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
@@ -110,7 +111,7 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(professionalUsersResponse.get("roles")).isNull();
+        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(0);
     }
 
 }

@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
@@ -139,7 +138,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations_details_by_active_status() {
-
         Map<String, Object> orgResponse;
         String organisationIdentifier = createOrganisationRequest("ACTIVE");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -153,9 +151,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
-
         assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(200);
-
         orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
 
@@ -241,10 +237,10 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(users.size()).isEqualTo(3);
 
-        SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        assertThat(persistedOrganisation.getUsers().size()).isEqualTo(3);
+
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);

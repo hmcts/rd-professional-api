@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
@@ -12,18 +13,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.Test;
+
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class CreateOrganisationWithPaymentAccountForSuperuserTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    @Ignore
-    // ignored since we are allowing all emails to persist as a part of RDCC-497 (prod issue)
-    // this test should be enabled once we have proper regex implemented
     public void return_400_invalid_organisation_with_invalid_email() {
         String prefix = UUID.randomUUID().toString();
         List<String> paymentAccounts = new ArrayList<>();
@@ -35,7 +34,7 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(String.format("s@-somewhere.com", prefix))
+                        .email(String.format("%s@somewhere.com", prefix))
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
@@ -49,4 +48,35 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
         assertThat(response.get("http_status")).asString().contains("400");
     }
 
+    @Test
+    public void persists_and_returns_409_company_number_is_not_unique() {
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .sraId("sra-id-number")
+                .sraRegulated("false")
+                .companyUrl("company-url")
+                .companyNumber("same1010")
+                .superUser(aUserCreationRequest()
+                        .firstName(" some-fname ")
+                        .lastName(" some-lname ")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+
+        Map<String, Object> response2 =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        assertThat(response2.get("http_status")).isEqualTo("409");
+    }
 }

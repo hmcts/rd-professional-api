@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFunctionalTest {
@@ -42,7 +45,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
                            .build())
                 .build());
 
-        Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
+        Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email);
         assertThat(emailResponse.get("payment_accounts")).asList().isNotEmpty();
         assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber);
     }
@@ -51,18 +54,16 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
     public void can_retrieve_no_payment_numbers_if_no_payment_account_associated_with_user_email() {
 
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+        professionalApiClient.createOrganisation(
+                someMinimalOrganisationRequest()
+                        .superUser(aUserCreationRequest()
+                                .firstName("some-fname")
+                                .lastName("some-lname")
+                                .email(email)
+                                .build())
+                        .build());
 
-        OrganisationCreationRequest request =  someMinimalOrganisationRequest()
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email(email)
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
-                        .build())
-                .build();
-        professionalApiClient.createOrganisation(request);
-
-        Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
+        Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email);
         assertThat(emailResponse.get("payment_accounts")).asList().isEmpty();
 
     }

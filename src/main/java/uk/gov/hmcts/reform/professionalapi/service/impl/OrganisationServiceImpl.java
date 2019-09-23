@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -113,12 +109,12 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addContactInformationToOrganisation(organisationCreationRequest.getContactInformation(), organisation);
 
+        organisationRepository.save(organisation);
+
         return new OrganisationResponse(organisation);
     }
 
     private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
-
-
         prdEnumRepository.findAll().stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
             if (enumType.equalsIgnoreCase(SIDAM_ROLE)
@@ -126,15 +122,10 @@ public class OrganisationServiceImpl implements OrganisationService {
                     || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
                 PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                 UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-
-                attributes.add(userAttribute);
+                UserAttribute persistedAttribute = userAttributeRepository.save(userAttribute);
+                attributes.add(persistedAttribute);
             }
         });
-
-        if (!CollectionUtils.isEmpty(attributes)) {
-
-            userAttributeRepository.saveAll(attributes);
-        }
         return attributes;
     }
 
@@ -189,7 +180,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
-        organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
+        organisation.addProfessionalUser(persistedSuperUser);
 
     }
 
@@ -213,82 +204,58 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 addDxAddressToContactInformation(contactInfo.getDxAddress(), contactInformation);
 
+                contactInformationRepository.save(contactInformation);
+                organisation.addContactInformation(contactInformation);
             });
         }
     }
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
-            List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
                 DxAddress dxAddress = new DxAddress(
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxNumber()),
                         PbaAccountUtil.removeEmptySpaces(dxAdd.getDxExchange()),
                         contactInformation);
-                dxAddresses.add(dxAddress);
+                dxAddress = dxAddressRepository.save(dxAddress);
+                contactInformation.addDxAddress(dxAddress);
             });
-            dxAddressRepository.saveAll(dxAddresses);
         }
     }
 
     private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
         if (!paymentAccounts.isEmpty()) {
-            List<UserAccountMap> userAccountMaps = new ArrayList<>();
             log.debug("PaymentAccount is not empty");
             paymentAccounts.forEach(paymentAccount -> {
-                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
+
+                userAccountMapRepository.save(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
             });
-            if (!CollectionUtils.isEmpty(userAccountMaps)) {
-                userAccountMapRepository.saveAll(userAccountMaps);
-            }
         }
     }
 
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
+        List<Organisation> organisations = organisationRepository.findAll();
 
-        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING);
+        log.debug("Retrieving all organisations...");
 
-        List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
-
-        if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
-
-            log.info("No Organisations Retrieved...");
+        if (organisations.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        pendingOrganisations.addAll(activeOrganisations);
+        organisations = organisations.stream()
+                .map(organisation -> {
 
-        log.info("Retrieving all organisations..." + pendingOrganisations.size());
-        return new OrganisationsDetailResponse(pendingOrganisations, true);
-    }
+                    if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
 
-    public List<Organisation> retrieveActiveOrganisationDetails() {
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
+                        return organisation;
+                    }
+                    return organisation;
+                }).collect(Collectors.toList());
 
-        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
-
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
-
-        activeOrganisations.forEach(
-            organisation -> {
-
-                if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-
-                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
-                }
-
-            });
-
-        if (!CollectionUtils.isEmpty(activeOrganisations)) {
-
-            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = PbaAccountUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
-                    "false", activeOrganisationDtls);
-
-        }
-        return updatedOrganisationDetails;
+        return new OrganisationsDetailResponse(organisations, true);
     }
 
     @Override
@@ -331,25 +298,19 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
+        List<Organisation> organisations = organisationRepository.findByStatus(status);
 
-
-        List<Organisation> organisations = null;
-
-        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
-
-            organisations = organisationRepository.findByStatus(status);
+        if (CollectionUtils.isEmpty(organisations)) {
+            throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             log.info("for ACTIVE::Status:");
-
-            organisations = retrieveActiveOrganisationDetails();
-        }
-
-        if (CollectionUtils.isEmpty(organisations)) {
-
-            throw new EmptyResultDataAccessException(1);
-
+            organisations = organisations.stream()
+                    .map(organisation -> {
+                        organisation.setUsers(PbaAccountUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
+                        return organisation;
+                    }).collect(Collectors.toList());
         }
         return new OrganisationsDetailResponse(organisations, true);
     }

@@ -6,27 +6,17 @@ import feign.FeignException;
 import feign.Response;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
 public interface PbaAccountUtil {
@@ -68,13 +58,12 @@ public interface PbaAccountUtil {
         return paymentAccounts;
     }
 
-    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static List<ProfessionalUser> getUserIdFromUserProfile(List<ProfessionalUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
-        List<SuperUser> userProfileDtls = new ArrayList<>();
-        ProfessionalUser professionalUser = null;
-        for (SuperUser user: users) {
-            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient, isRequiredRoles);
-            userProfileDtls.add(professionalUser.toSuperUser());
+        List<ProfessionalUser> userProfileDtls = new ArrayList<>();
+        for (ProfessionalUser user: users) {
+
+            userProfileDtls.add(getSingleUserIdFromUserProfile(user, userProfileFeignClient, isRequiredRoles));
         }
         return userProfileDtls;
     }
@@ -89,69 +78,14 @@ public interface PbaAccountUtil {
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
-
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new RuntimeException();
         }
 
         return user;
     }
-
-    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                         RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                         String showDeleted, Map<String, Organisation> activeOrganisationDtls) {
-        List<Organisation> modifiedOrgProfUserDtls = new ArrayList<>();
-        Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
-
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
-
-
-            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
-            if (response.status() < 300) {
-
-                modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDtls);
-            }
-
-            return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
-        }  catch (FeignException ex) {
-
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
-        }
-
-    }
-
-    public  static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                                  Map<String, Organisation> activeOrganisationDtls) {
-
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
-        if (null != professionalUsersEntityResponse
-                && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
-
-            List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUserProfiles();
-            userProfiles.stream().forEach(userProfile -> {
-
-                if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
-
-                    Organisation organisation = activeOrganisationDtls.get(userProfile.getUserIdentifier());
-
-                    organisation.getUsers().get(0).setFirstName(userProfile.getFirstName());
-                    organisation.getUsers().get(0).setLastName(userProfile.getLastName());
-                    organisation.getUsers().get(0).setEmailAddress(userProfile.getEmail());
-
-                    activeOrganisationDtls.put(userProfile.getUserIdentifier(), organisation);
-
-                }
-
-            });
-
-        }
-        return activeOrganisationDtls;
-    }
-
-
 
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
@@ -195,5 +129,4 @@ public interface PbaAccountUtil {
         }
 
     }
-
 }

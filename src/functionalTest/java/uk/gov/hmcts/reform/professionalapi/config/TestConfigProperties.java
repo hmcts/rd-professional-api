@@ -28,7 +28,7 @@ public class TestConfigProperties {
     @Value("${idam.auth.redirectUrl}")
     public String oauthRedirectUrl;
 
-    @Value("${idam.auth.clientId:xuiwebapp}")
+    @Value("${idam.auth.clientId:rd-professional-api}")
     public String clientId;
 
 }

@@ -110,7 +110,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @ApiOperation(
-            value = "Retrieves an organisations payment accounts by super user email for user",
+            value = "Retrieves an organisations payment accounts by super user email for internal user",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -169,7 +169,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Add an user to an organisation",
+            value = "Add an internal user to an organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")

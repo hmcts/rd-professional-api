@@ -19,7 +19,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -388,7 +388,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url");
         assertThat(persistedOrganisation.getCompanyNumber()).isEqualTo("companyn");
 
-        SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
+        ProfessionalUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
 
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");

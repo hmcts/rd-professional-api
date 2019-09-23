@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class SuperUserResponse {
 
@@ -13,13 +13,13 @@ public class SuperUserResponse {
     private String email;
 
 
-    public SuperUserResponse(SuperUser professionalUser) {
+    public SuperUserResponse(ProfessionalUser professionalUser) {
 
         getSuperUserResponse(professionalUser);
 
     }
 
-    private void getSuperUserResponse(SuperUser professionalUser) {
+    private void getSuperUserResponse(ProfessionalUser professionalUser) {
         this.firstName = professionalUser.getFirstName();
         this.lastName = professionalUser.getLastName();
         this.email = professionalUser.getEmailAddress();

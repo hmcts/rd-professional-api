@@ -12,40 +12,36 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
 import feign.Request;
 import feign.Response;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -76,11 +72,6 @@ public class ProfessionalUserServiceTest {
             "some-email",
             Mockito.mock(Organisation.class));
 
-    private final SuperUser superUser = new SuperUser("some-fname",
-            "some-lname",
-            "some-super-email",
-            Mockito.mock(Organisation.class));
-
     private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
@@ -109,15 +100,11 @@ public class ProfessionalUserServiceTest {
 
     @Test
     public void retrieveUserByEmail() throws JsonProcessingException {
-        String id = UUID.randomUUID().toString();
-        superUser.setUserIdentifier(id);
-        SuperUser superUserMock = mock(SuperUser.class);
-
+        UUID id = UUID.randomUUID();
         professionalUser.setUserIdentifier(id);
-        PowerMockito.when(superUserMock.toProfessionalUser()).thenReturn(professionalUser);
 
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUser);
         List<String> roles = new ArrayList<>();
         roles.add("pui-case-manager");
         PowerMockito.when(professionalUser.getOrganisation().getStatus()).thenReturn(OrganisationStatus.ACTIVE);
@@ -128,7 +115,7 @@ public class ProfessionalUserServiceTest {
         PowerMockito.when(professionalUserRepository.findByEmailAddress(any(String.class)))
                 .thenReturn(professionalUser);
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
@@ -155,30 +142,41 @@ public class ProfessionalUserServiceTest {
 
 
     @Test
-    public void findUsersByOrganisation_with_deleted_users() throws Exception {
+    @Ignore
+    public void findUsersByOrganisation_with_deleted_users() {
+        usersNonEmptyList.add(professionalUser);
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
+                .thenReturn(usersNonEmptyList);
 
-        ProfessionalUser user = mock(ProfessionalUser.class);
-        String id = UUID.randomUUID().toString();
-        List<String> ids = new ArrayList<>();
-        when(user.getUserIdentifier()).thenReturn(id);
-        ids.add(id);
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(user);
+        List<UUID> usersId = new ArrayList<>();
+        usersId.add(UUID.randomUUID());
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest1 = new RetrieveUserProfilesRequest(usersId);
 
-        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
+        Mockito.when(userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest1, "true")).thenReturn(any(Response.class));
 
-        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
-        userProfileResponse.setUserIdentifier(id);
-        userProfiles.add(userProfileResponse);
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
-        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "true");
+        Mockito.verify(
+                professionalUserRepository,
+                Mockito.times(1)).findByOrganisation(organisation);
 
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test
+    @Ignore
+    public void findUsersByOrganisation_with_non_deleted_users() {
+
+        ProfessionalUser professionalUserDeleted = new ProfessionalUser("some-fname",
+                "some-lname",
+                "some-email",
+                Mockito.mock(Organisation.class));
+        professionalUserDeleted.setDeleted(LocalDateTime.now());
+
+        usersNonEmptyList.add(professionalUserDeleted);
+        usersNonEmptyList.add(professionalUser);
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
+                .thenReturn(usersNonEmptyList);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
         Mockito.verify(
@@ -201,30 +199,15 @@ public class ProfessionalUserServiceTest {
         verify(userAttributeService, times(1)).addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()), (Mockito.anyList()));
     }
 
-    @Test(expected = ExternalApiException.class)
-    public void findUsersByOrganisationEmptyResultExceptionTest()throws Exception {
-        ProfessionalUser user = mock(ProfessionalUser.class);
-        String id = UUID.randomUUID().toString();
-        List<String> ids = new ArrayList<>();
-        when(user.getUserIdentifier()).thenReturn(id);
-        ids.add(id);
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(ids);
-        List<ProfessionalUser> users = new ArrayList<>();
-        users.add(user);
+    @Test(expected = EmptyResultDataAccessException.class)
+    @Ignore
+    public void findUsersByOrganisationEmptyResultExceptionTest() {
+        List<ProfessionalUser> emptyList = new ArrayList<>();
 
-        FeignException exceptionMock = mock(FeignException.class);
-        when(exceptionMock.status()).thenReturn(500);
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
-
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenThrow(exceptionMock);
+        Mockito.when(professionalUserRepository.findByOrganisation(organisation))
+                .thenReturn(emptyList);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false");
-        Mockito.verify(
-                professionalUserRepository,
-                Mockito.times(1)).findByOrganisation(organisation);
-
-        assertThat(responseEntity).isNotNull();
     }
 
     @Test
@@ -245,30 +228,5 @@ public class ProfessionalUserServiceTest {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserByEmailAddress("some@email.com");
         assertThat(user).isNotNull();
-    }
-
-    @Test
-    public void shouldReturnProfessionalUserById() {
-
-        UUID id = UUID.randomUUID();
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-
-        Optional<ProfessionalUser> professionalUserOptional = Optional.of(professionalUserMock);
-
-        when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);
-
-        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
-        assertThat(professionalUserResponse).isNotNull();
-    }
-
-    @Test
-    public void shouldReturnProfessionalUserByIdShouldReturnNullIfUserNotFound() {
-        UUID id = UUID.randomUUID();
-        Optional<ProfessionalUser> professionalUserOptional = Optional.empty();
-
-        when(professionalUserRepository.findById(id)).thenReturn(professionalUserOptional);
-
-        ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
-        assertThat(professionalUserResponse).isNull();
     }
 }

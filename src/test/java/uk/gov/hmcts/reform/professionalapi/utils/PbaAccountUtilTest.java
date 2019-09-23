@@ -106,9 +106,9 @@ public class PbaAccountUtilTest {
         professionalUser.setFirstName("abc");
         professionalUser.setLastName("bcd");
         professionalUser.setEmailAddress("a@b.co.uk");
-        professionalUser.setIdamStatusCode("200");
-        professionalUser.setIdamMessage("Success");
         ResponseEntity responseEntity = mock(ResponseEntity.class);
+
+        //GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse(profile, Boolean.TRUE);
 
         ProfessionalUser mappedUser = PbaAccountUtil.mapUserInfo(professionalUser, responseEntity, true);
 
@@ -118,7 +118,7 @@ public class PbaAccountUtilTest {
 
     @Test
     public void test_mapUserInfo() {
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
         ProfessionalUser userMock = new ProfessionalUser();
         ResponseEntity responseResponseEntityMock = mock(ResponseEntity.class);
         GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
@@ -127,7 +127,7 @@ public class PbaAccountUtilTest {
         when(getUserProfileResponseMock.getLastName()).thenReturn("lname");
         when(getUserProfileResponseMock.getEmail()).thenReturn("some@hmcts.net");
         when(getUserProfileResponseMock.getIdamStatus()).thenReturn(IdamStatus.ACTIVE);
-        when(getUserProfileResponseMock.getIdamId()).thenReturn(id.toString());
+        when(getUserProfileResponseMock.getIdamId()).thenReturn(id);
         when(getUserProfileResponseMock.getRoles()).thenReturn(new ArrayList<String>());
         when(getUserProfileResponseMock.getIdamStatusCode()).thenReturn("code");
         when(getUserProfileResponseMock.getIdamMessage()).thenReturn("test error message");

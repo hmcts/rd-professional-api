@@ -4,8 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.NoArgsConstructor;
@@ -14,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @NoArgsConstructor
 public class ProfessionalUsersEntityResponse {
-    private List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+    private List<ProfessionalUsersResponse> userProfiles;
 
     public ProfessionalUsersEntityResponse(List<ProfessionalUser> professionalUsers) {
         this.userProfiles = professionalUsers.stream()

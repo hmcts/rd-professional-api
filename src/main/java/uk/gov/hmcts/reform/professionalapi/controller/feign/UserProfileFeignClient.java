@@ -29,5 +29,5 @@ public interface UserProfileFeignClient {
     @RequestLine("POST /v1/userprofile/users")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                             @RequestParam(value = "showdeleted") String showDeleted,  @RequestParam(value = "rolesRequired")String rolesRequired);
+                             @RequestParam(value = "showdeleted") String showDeleted);
 }

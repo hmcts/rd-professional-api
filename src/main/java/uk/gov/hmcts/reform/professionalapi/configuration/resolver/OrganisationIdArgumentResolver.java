@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
         if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
             userId = serviceAndUserDetails.getUsername();
-            professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
+            professionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userId.trim()));
             if (null != professionalUser && null != professionalUser.getOrganisation()) {
 
                 organisation = professionalUser.getOrganisation();

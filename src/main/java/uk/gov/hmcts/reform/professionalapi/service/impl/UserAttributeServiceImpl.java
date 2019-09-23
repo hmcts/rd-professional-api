@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
@@ -36,8 +34,6 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums) {
 
-        List<UserAttribute> userAttributes =  new ArrayList<>();
-
         userRoles.forEach(role -> {
             for (PrdEnum prdEnum : prdEnums) {
                 if (prdEnum.getEnumName().equals(role)) {
@@ -45,18 +41,11 @@ public class UserAttributeServiceImpl implements UserAttributeService {
                             prdEnum.getPrdEnumId(),
                             PbaAccountUtil.removeEmptySpaces(prdEnum.getEnumName()),
                             PbaAccountUtil.removeEmptySpaces(prdEnum.getEnumDescription()));
-
                     UserAttribute userAttribute = new UserAttribute(newUser, newPrdEnum);
-                    userAttributes.add(userAttribute);
+                    userAttributeRepository.save(userAttribute);
                 }
             }
         });
-
-        if (!CollectionUtils.isEmpty(userAttributes)) {
-
-            userAttributeRepository.saveAll(userAttributes);
-        }
-
     }
 
 }

@@ -4,18 +4,26 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import javax.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
 
 @Getter
 @Builder(builderMethodName = "aNewUserCreationRequest")
 public class NewUserCreationRequest {
 
+    @NotNull
     private final String firstName;
+    @NotNull
     private final String lastName;
+
+    @NotNull
     private final String email;
+
+    @NotNull
     private final List<String> roles;
+
     private final List<Jurisdiction> jurisdictions;
 
     @JsonCreator
@@ -28,7 +36,7 @@ public class NewUserCreationRequest {
 
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = StringUtils.isBlank(emailAddress) ? emailAddress : emailAddress.toLowerCase();
+        this.email = emailAddress.toLowerCase();
         this.roles = roles;
         this.jurisdictions = jurisdictions;
     }

@@ -29,11 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
 
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -95,7 +93,6 @@ public class ProfessionalApiClient {
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
-                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
@@ -109,18 +106,6 @@ public class ProfessionalApiClient {
                     .dxNumber("DX 1234567890")
                     .dxExchange("dxExchange").build()))
                 .build()));
-    }
-
-    public static List<Jurisdiction> createJurisdictions() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("PROBATE");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("SSCS");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-        return jurisdictions;
     }
 
     public Map<String, Object> createOrganisation() {
@@ -154,7 +139,6 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -178,7 +162,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
         Response response = getMultipleAuthHeaders(role)
                 .param("email", email)
-                .get("/refdata/internal/v1/organisations/users")
+                .get("/refdata/internal/v1/organisations/users/")
                 .andReturn();
         log.info("Search For User By Email Response: " + response.asString());
         response.then()
@@ -275,11 +259,6 @@ public class ProfessionalApiClient {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
 
-        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
-    }
-
-    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
-
         Response response = getMultipleAuthHeaders(role)
                 .body(organisationCreationRequest)
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
@@ -361,7 +340,7 @@ public class ProfessionalApiClient {
                 .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
                 .header("Accepts", APPLICATION_JSON_UTF8_VALUE)
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
-                .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+                .header(AUTHORIZATION_HEADER, userToken);
 
     }
 

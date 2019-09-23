@@ -18,5 +18,5 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
-    ProfessionalUser findByUserIdentifier(String userIdentifier);
+    ProfessionalUser findByUserIdentifier(UUID userIdentifier);
 }
