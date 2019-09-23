@@ -154,15 +154,12 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email(randomAlphabetic(5) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest().firstName("someName1").lastName("someLastName1").email(randomAlphabetic(6) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest1, hmctsAdmin);
-
         NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest().firstName("someName2").lastName("someLastName2").email(randomAlphabetic(7) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest2, hmctsAdmin);
-
         NewUserCreationRequest userCreationRequest3 = aNewUserCreationRequest().firstName("someName3").lastName("someLastName3").email(randomAlphabetic(8) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest3, hmctsAdmin);

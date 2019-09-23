@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -109,7 +110,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         ResponseEntity responseEntity = retrieveUserProfiles(new RetrieveUserProfilesRequest(usersId), showDeleted, rolesRequired, status);
 
-        return RefDataUtil.generateResponseEntityWithHeaderFromPage(pageable, professionalUsers, responseEntity);
+        HttpHeaders headers = RefDataUtil.generateResponseEntityWithHeaderFromPage(pageable, professionalUsers, responseEntity);
+
+        return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
     @Override

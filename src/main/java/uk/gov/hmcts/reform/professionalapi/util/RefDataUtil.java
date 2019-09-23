@@ -222,7 +222,7 @@ public interface RefDataUtil {
         }
     }
 
-    static ResponseEntity<?> generateResponseEntityWithHeaderFromPage(Pageable pageable, Page page, ResponseEntity responseEntity) {
+    static HttpHeaders generateResponseEntityWithHeaderFromPage(Pageable pageable, Page page, ResponseEntity responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -236,11 +236,10 @@ public interface RefDataUtil {
 
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
-            
         } else {
             headers.addAll(responseEntity.getHeaders());
             headers.add("paginationInfo", pageInformation.toString());
         }
-        return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
+        return headers;
     }
 }
