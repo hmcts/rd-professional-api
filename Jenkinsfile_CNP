@@ -27,7 +27,7 @@ def vaultOverrides = [
 ]
 
 withPipeline(type, product, component) {
-  
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 

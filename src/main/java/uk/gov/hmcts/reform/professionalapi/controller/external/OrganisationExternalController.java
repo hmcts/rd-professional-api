@@ -23,8 +23,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
-
-
+@RequestMapping(
+        path = "refdata/external/v1/organisations"
+)
 @RestController
 @Slf4j
 public class OrganisationExternalController extends SuperController {
