@@ -293,7 +293,7 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
         if (HttpStatus.OK == status) {
-            return response.body().as(Map.class);
+            return response.as(Map.class);
         } else {
             return new HashMap<String, Object>();
         }
