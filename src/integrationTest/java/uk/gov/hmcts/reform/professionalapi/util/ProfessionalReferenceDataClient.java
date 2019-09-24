@@ -237,6 +237,7 @@ public class ProfessionalReferenceDataClient {
 
         response.put("http_status", responseEntity.getStatusCode().toString());
 
+
         return response;
     }
 }
