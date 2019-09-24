@@ -172,7 +172,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
-        //Create & update organisation to active
         String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
@@ -189,20 +188,21 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        //Get user registered with IDAM
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
-
-        //Add user to our created active organisation
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
 
-        //Search for the organisations users
-        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK);
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "0", "1");
 
-        //Check response is 200
         validateRetrievedUsers(searchResponse, "any");
-
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsersResponses.size()).isEqualTo(1);
         assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
+
+        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "1", "5");
+
+        validateRetrievedUsers(searchResponse2, "any");
+        List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
+        assertThat(professionalUsersResponses2.size()).isGreaterThan(1);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
