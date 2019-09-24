@@ -233,6 +233,8 @@ public interface RefDataUtil {
         pageInformation.append("currentPage = " + pageable.getPageNumber());
         pageInformation.append(",");
         pageInformation.append("size = " + pageable.getPageSize());
+        pageInformation.append(",");
+        pageInformation.append("sortedBy = " + pageable.getSort());
 
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());

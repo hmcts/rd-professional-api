@@ -68,7 +68,7 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                      @PageableDefault(page = 0, size = 2, sort = "firstName", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                      @PageableDefault(page = 0, size = 2, sort = "firstName", direction = Sort.Direction.ASC) Pageable pageable) {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 

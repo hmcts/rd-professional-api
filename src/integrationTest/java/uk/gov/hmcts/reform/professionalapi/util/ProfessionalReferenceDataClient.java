@@ -236,6 +236,7 @@ public class ProfessionalReferenceDataClient {
                         Map.class);
 
         response.put("http_status", responseEntity.getStatusCode().toString());
+        response.put("headers", responseEntity.getHeaders().toString());
 
 
         return response;

@@ -313,6 +313,7 @@ public abstract class SuperController {
 
         return ResponseEntity
                 .status(responseEntity.getStatusCode().value())
+                .headers(responseEntity.getHeaders())
                 .body(responseEntity.getBody());
     }
 }
