@@ -6,10 +6,7 @@ import static java.util.stream.Collectors.toList;
 import feign.FeignException;
 import feign.Response;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
@@ -239,8 +237,14 @@ public interface RefDataUtil {
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
-            headers.addAll(responseEntity.getHeaders());
-            headers.add("paginationInfo", pageInformation.toString());
+            // since Headers are read only , its cant be modified and hence copied all existing heards into new one and added new header for pagination
+            MultiValueMap<String, String> orginalHeaders = responseEntity.getHeaders();
+            orginalHeaders.forEach((key, value) -> {
+                if (!(key.equalsIgnoreCase("request-context") || key.equalsIgnoreCase("x-powered-by") || key.equalsIgnoreCase("content-length"))) {
+                    headers.put(key, value);
+                }
+            });
+            headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
     }
