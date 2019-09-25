@@ -26,7 +26,7 @@ public class ProfessionalUsersResponse {
     @JsonProperty
     private List<String> roles;
     @JsonProperty
-    private IdamStatus idamStatus;
+    private String idamStatus;
     @JsonProperty
     private String idamStatusCode;
     @JsonProperty
@@ -38,7 +38,7 @@ public class ProfessionalUsersResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.roles = user.getRoles();
-        this.idamStatus = user.getIdamStatus();
+        this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
         this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
     }

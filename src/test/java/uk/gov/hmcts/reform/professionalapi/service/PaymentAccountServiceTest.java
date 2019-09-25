@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.PbaAccountUtil;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 
 public class PaymentAccountServiceTest {
@@ -68,7 +68,7 @@ public class PaymentAccountServiceTest {
 
         when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
 
-        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
+        List<PaymentAccount> paymentAccounts1 = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
 
         when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
                 .thenReturn(professionalUserMock);
@@ -109,7 +109,7 @@ public class PaymentAccountServiceTest {
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        List<PaymentAccount> paymentAccounts1 = PbaAccountUtil.getPaymentAccount(paymentAccounts);
+        List<PaymentAccount> paymentAccounts1 = RefDataUtil.getPaymentAccount(paymentAccounts);
 
         when(professionalUserRepositoryMock.findByEmailAddress("some-email"))
                 .thenReturn(professionalUserMock);
