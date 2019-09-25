@@ -7,16 +7,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
@@ -56,7 +61,6 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    @Ignore
     public void testFindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
@@ -66,17 +70,72 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
+        Authentication authentication = mock(Authentication.class);
+        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
+        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        when(grantedAuthority.getAuthority()).thenReturn("pui-user-manager");
+        authorities.add(grantedAuthority);
+
+        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+        SecurityContextHolder.setContext(securityContext);
+
         when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
         when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(organisation, "true")).thenReturn(responseEntity);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, "pui-user-manager")).thenReturn(true);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
 
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class), any(String.class));
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, "");
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+    }
+
+    @Test
+    public void testFindUsersByOrganisationWithPuiCaseManager() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        Authentication authentication = mock(Authentication.class);
+        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
+        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        when(grantedAuthority.getAuthority()).thenReturn("pui-user-manager");
+        authorities.add(grantedAuthority);
+
+        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
+        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
+        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, "pui-case-manager")).thenReturn(true);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class), any(String.class));
+        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
+        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
+
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, "Pending");
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }

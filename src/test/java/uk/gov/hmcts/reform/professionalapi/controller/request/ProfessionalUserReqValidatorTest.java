@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import org.junit.Test;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 public class ProfessionalUserReqValidatorTest {
 
     ProfessionalUserReqValidator profUserReqValidator = new ProfessionalUserReqValidator();
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test(expected = InvalidRequest.class)
     public void testValidateRequestAllNull() {
         profUserReqValidator
-                .validateRequest(null,null,null);
+                .validateRequest(null,null,null, null);
     }
 
     @Test(expected = Test.None.class)
@@ -55,7 +54,7 @@ public class ProfessionalUserReqValidatorTest {
 
         for (String email : validEmails) {
             profUserReqValidator
-                    .validateRequest("1ASDFG2","false", email);
+                    .validateRequest("1ASDFG2","false", email, null);
         }
 
     }
@@ -73,7 +72,7 @@ public class ProfessionalUserReqValidatorTest {
 
         for (String email : validEmails) {
             profUserReqValidator
-                    .validateRequest("1ASDFG2","false", email);
+                    .validateRequest("1ASDFG2","false", email, null);
         }
     }
 }
