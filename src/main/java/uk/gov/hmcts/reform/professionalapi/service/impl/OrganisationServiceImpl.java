@@ -351,7 +351,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         if (CollectionUtils.isEmpty(organisations)) {
-
             throw new EmptyResultDataAccessException(1);
 
         }

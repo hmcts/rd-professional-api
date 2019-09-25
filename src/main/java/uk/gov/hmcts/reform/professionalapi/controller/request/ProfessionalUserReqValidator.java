@@ -30,7 +30,7 @@ public class ProfessionalUserReqValidator {
             validateUserStatus(status);
         }
 
-        isValidEmail(email);
+        OrganisationCreationRequestValidator.validateEmail(email);
     }
 
     public static void validateUserStatus(String status) {

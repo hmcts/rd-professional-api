@@ -180,8 +180,6 @@ public class OrganisationServiceImplTest {
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
-
-
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);

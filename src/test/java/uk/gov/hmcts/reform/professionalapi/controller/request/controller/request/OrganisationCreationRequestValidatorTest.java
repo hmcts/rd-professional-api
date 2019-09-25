@@ -211,7 +211,7 @@ public class OrganisationCreationRequestValidatorTest {
 
         assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(new ArrayList<>(), getEnumList()))
                 .isInstanceOf(InvalidRequest.class)
-            .hasMessage("Jurisdictions not present");
+                .hasMessage("Jurisdictions not present");
     }
 
 
@@ -264,21 +264,11 @@ public class OrganisationCreationRequestValidatorTest {
             "email-100@yahoo.com",
             "email-100@email.net",
             "email+100@gmail.com",
-            "emAil-100@yahoo-test.com"};
-
-        for (String email : validEmails) {
-            OrganisationCreationRequestValidator.validateEmail(email);
-        }
-
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void should_validate_valid_email_and_should_throw_exception() {
-
-        String[] validEmails = new String[] {
+            "emAil-100@yahoo-test.com",
+            "v.green@ashfords.co.uk",
+            "j.robinson@timms-law.com",
             "あいうえお@example.com",
             "emAil@1.com",
-            "email@111",
             "email@.com.my",
             "email123@gmail.",
             "email123@.com",
@@ -297,7 +287,23 @@ public class OrganisationCreationRequestValidatorTest {
             "!email@email.com",
             "+@Adil61371@gmail.com",
             "_email.23@email.com",
-            "email.23@-email.com"
+            "email.23@-email.com"};
+
+        for (String email : validEmails) {
+            OrganisationCreationRequestValidator.validateEmail(email);
+        }
+
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void should_validate_valid_email_and_should_throw_exception() {
+
+        String[] validEmails = new String[] {
+            "email.com",
+            "email@com",
+            "@hotmail.com",
+            "email@",
+            "@"
         };
 
         for (String email : validEmails) {
@@ -307,7 +313,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = Test.None.class)
     public void should_validate_mandatory_user_fields_and_not_throw_exception() {
-        NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname", "a@hmcts.net", new ArrayList<String>(), new ArrayList<>());
+        NewUserCreationRequest request = new NewUserCreationRequest("fname", "lastname", "a@hmcts.net", new ArrayList<String>(), new ArrayList<>());
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 
