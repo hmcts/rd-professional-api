@@ -103,22 +103,24 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
-        Page<ProfessionalUser> professionalUsers = generatePagedListOfUsers(organisation, pageable);
+        Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
-        List<String> usersId = new ArrayList<>();
-        professionalUsers.getContent().forEach(user -> usersId.add(user.getUserIdentifier()));
+        ResponseEntity responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status);
 
-        ResponseEntity responseEntity = retrieveUserProfiles(new RetrieveUserProfilesRequest(usersId), showDeleted, rolesRequired, status);
-
-        HttpHeaders headers = RefDataUtil.generateResponseEntityWithHeaderFromPage(pageable, professionalUsers, responseEntity);
+        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers, responseEntity);
 
         return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = generateRetrieveUserProfilesRequest(organisation);
-        return retrieveUserProfiles(retrieveUserProfilesRequest, showDeleted, rolesRequired, status);
+        List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+
+        if (professionalUsers.isEmpty()) {
+            throw new ResourceNotFoundException("No Users were found for the given organisation");
+        }
+
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
     }
 
     private ResponseEntity retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
@@ -143,10 +145,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return responseEntity;
     }
 
-    private Page<ProfessionalUser> generatePagedListOfUsers(Organisation organisation, Pageable pageable) {
-        Page<ProfessionalUser> professionalUsers;
-
-        professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
+    private Page<ProfessionalUser> getPagedListOfUsers(Organisation organisation, Pageable pageable) {
+        Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
 
         if (professionalUsers.getContent().isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
@@ -155,15 +155,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUsers;
     }
 
-    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(Organisation organisation) {
-        List<ProfessionalUser> professionalUsers;
+    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
         List<String> usersId = new ArrayList<>();
-
-        professionalUsers = professionalUserRepository.findByOrganisation(organisation);
-
-        if (professionalUsers.isEmpty()) {
-            throw new ResourceNotFoundException("No Users were found for the given organisation");
-        }
 
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -290,7 +291,7 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    protected ResponseEntity<?> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
+    protected ResponseEntity<?> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -298,18 +299,15 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
         ResponseEntity responseEntity;
 
-        if ("True".equalsIgnoreCase(showDeleted)) {
-            showDeleted = "true";
-        } else {
-            showDeleted = "false";
-        }
+        showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
 
-        if (pageable.isPaged()) {
+        if (page != null) {
+            Sort sort = new Sort(Sort.Direction.ASC,"firstName");
+            Pageable pageable = RefDataUtil.createPageableObject(page, size, sort);
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
         }
-
 
         return ResponseEntity
                 .status(responseEntity.getStatusCode().value())

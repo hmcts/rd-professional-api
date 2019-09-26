@@ -9,9 +9,6 @@ import io.swagger.annotations.Authorization;
 import javax.validation.constraints.NotBlank;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -68,11 +65,12 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                      @PageableDefault(page = 0, size = 2, sort = "firstName", direction = Sort.Direction.ASC) Pageable pageable) {
+                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "size", required = false) Integer size) {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", pageable);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
     @ApiOperation(

@@ -9,8 +9,11 @@ import feign.Response;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +35,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
-public interface RefDataUtil {
+public class RefDataUtil {
 
-    static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
+    private RefDataUtil() {}
+
+    @Value("${defaultPageSize}")
+    static Integer defaultPageSize;
+
+    public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
         List<PaymentAccount> userMapPaymentAccount;
 
@@ -44,7 +52,7 @@ public interface RefDataUtil {
     }
 
 
-    static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+    public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
 
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
@@ -63,7 +71,7 @@ public interface RefDataUtil {
         return paymentAccounts;
     }
 
-    static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
+    public static List<PaymentAccount> getPaymentAccount(List<PaymentAccount> paymentAccounts) {
 
         List<PaymentAccount> paymentAccountsFromOrg = new ArrayList<>();
 
@@ -71,7 +79,7 @@ public interface RefDataUtil {
         return paymentAccounts;
     }
 
-    static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
 
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
@@ -83,7 +91,7 @@ public interface RefDataUtil {
     }
 
 
-    static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -102,9 +110,9 @@ public interface RefDataUtil {
         return user;
     }
 
-    static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                            RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                            String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
+    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
+                                                                   RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                                   String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
@@ -125,8 +133,8 @@ public interface RefDataUtil {
 
     }
 
-    static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                            Map<String, Organisation> activeOrganisationDtls) {
+    public static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+                                                                                   Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse
@@ -155,7 +163,7 @@ public interface RefDataUtil {
 
 
 
-    static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -173,7 +181,7 @@ public interface RefDataUtil {
         return user;
     }
 
-    static String removeEmptySpaces(String value) {
+    public static String removeEmptySpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
@@ -181,7 +189,7 @@ public interface RefDataUtil {
         return modValue;
     }
 
-    static String removeAllSpaces(String value) {
+    public static String removeAllSpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
@@ -189,7 +197,7 @@ public interface RefDataUtil {
         return modValue;
     }
 
-    static void validateOrgIdentifier(String extOrgId, String orgId) {
+    public static void validateOrgIdentifier(String extOrgId, String orgId) {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
 
@@ -198,7 +206,7 @@ public interface RefDataUtil {
 
     }
 
-    static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
 
@@ -220,7 +228,7 @@ public interface RefDataUtil {
         }
     }
 
-    static HttpHeaders generateResponseEntityWithHeaderFromPage(Pageable pageable, Page page, ResponseEntity responseEntity) {
+    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page, ResponseEntity responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -247,5 +255,24 @@ public interface RefDataUtil {
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
+    }
+
+    public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
+        if (size == null) {
+            size = defaultPageSize;
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return pageable;
+    }
+
+    public static String getShowDeletedValue(String showDeleted) {
+        if ("True".equalsIgnoreCase(showDeleted)) {
+            showDeleted = "true";
+        } else {
+            showDeleted = "false";
+        }
+        return showDeleted;
     }
 }

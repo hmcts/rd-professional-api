@@ -267,7 +267,7 @@ public class RefDataUtilTest {
         when(pageableMock.getPageNumber()).thenReturn(0);
         when(pageableMock.getPageSize()).thenReturn(2);
 
-        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithHeaderFromPage(pageableMock, pageMock, responseEntityMock);
+        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock, responseEntityMock);
 
         assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
@@ -289,7 +289,7 @@ public class RefDataUtilTest {
         when(pageableMock.getPageNumber()).thenReturn(0);
         when(pageableMock.getPageSize()).thenReturn(2);
 
-        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithHeaderFromPage(pageableMock, pageMock, null);
+        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock, null);
 
         HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
 
