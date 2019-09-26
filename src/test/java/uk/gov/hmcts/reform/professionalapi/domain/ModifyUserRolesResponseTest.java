@@ -5,13 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.sql.Delete;
 import org.junit.Test;
 
 public class ModifyUserRolesResponseTest {
 
     @Test
-    public void should_Return_User_profile_Resposne() {
+    public void should_Return_User_profile_Response() {
 
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
         userProfileRolesResponse.setAddRoleResponse(addRolesForUser());

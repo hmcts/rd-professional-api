@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class AddRoleResponseTest {
