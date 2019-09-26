@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -295,5 +296,46 @@ public class RefDataUtilTest {
 
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
         //verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
+    }
+
+    @Test
+    public void test_shouldCreatePageableObject() {
+        Integer page = 0;
+        Integer size = 5;
+        Sort sort = mock(Sort.class);
+
+        Pageable pageable = RefDataUtil.createPageableObject(page, size, sort);
+
+        assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageSize()).isEqualTo(5);
+    }
+
+    @Test
+    public void test_shouldCreatePageableObjectWithDefaultPageSize() {
+        Integer page = 0;
+        Sort sort = mock(Sort.class);
+
+        Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
+
+        assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    public void test_getShowDeletedValueTrue() {
+        String showDeleted = "True";
+
+        String response = RefDataUtil.getShowDeletedValue(showDeleted);
+
+        assertThat(response.equals("true")).isTrue();
+    }
+
+    @Test
+    public void test_getShowDeletedValueFalse() {
+        String showDeleted = "false";
+
+        String response = RefDataUtil.getShowDeletedValue(showDeleted);
+
+        assertThat(response.equals("false")).isTrue();
     }
 }

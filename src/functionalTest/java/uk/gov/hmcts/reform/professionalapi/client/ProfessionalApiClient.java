@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -292,6 +293,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {

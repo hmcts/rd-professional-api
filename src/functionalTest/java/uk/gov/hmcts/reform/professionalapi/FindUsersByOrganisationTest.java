@@ -196,17 +196,14 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchResponse, "any");
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
 
-        List<HashMap> headersResponses = (List<HashMap>) searchResponse.get("headers");
-        assertThat(headersResponses.contains("paginationInfo")).isTrue();
-
         assertThat(professionalUsersResponses.size()).isEqualTo(1);
         assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
 
-        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "1", "5");
+        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "1", "1");
 
         validateRetrievedUsers(searchResponse2, "any");
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
-        assertThat(professionalUsersResponses2.size()).isGreaterThan(1);
+        assertThat(professionalUsersResponses2.size()).isEqualTo(1);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
