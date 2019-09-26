@@ -4,7 +4,11 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -70,12 +74,14 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
-        assertThat(response.get("statusCode")).isNotNull();
-        assertThat(response.get("statusCode")).isEqualTo(200);
-        assertThat(response.get("statusMessage")).isEqualTo("success");
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
         ModifyUserProfileData deleteUserProfileData = createDeleteRolesUserProfileData();
         Map<String, Object> responseForDelete = professionalReferenceDataClient.modifyUserRolesOfOrganisation(deleteUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
     }
 
@@ -105,7 +111,11 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = createDeleteRolesUserProfileData();
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        RoleName roleName1 = new RoleName(" ");
+        Set<RoleName> rolesDelete = new HashSet<>();
+        rolesDelete.add(roleName1);
+        modifyUserProfileData.setRolesDelete(rolesDelete);
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
@@ -133,13 +143,15 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         String userIdentifier = settingUpOrganisation(puiUserManager);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
-        assertThat(response.get("statusCode")).isNotNull();
-        assertThat(response.get("statusMessage")).isEqualTo("success");
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
         ModifyUserProfileData deleteUserProfileData = createDeleteRolesUserProfileData();
         Map<String, Object> responseForDelete = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(deleteUserProfileData, userIdentifier, puiUserManager);
 
         log.info("responseForDelete :: " + responseForDelete);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
     }
 
@@ -147,7 +159,11 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     public void ac6_delete_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
-        ModifyUserProfileData modifyUserProfileData = createDeleteRolesUserProfileData();
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        RoleName roleName1 = new RoleName(" ");
+        Set<RoleName> deleteRoles = new HashSet<>();
+        deleteRoles.add(roleName1);
+        modifyUserProfileData.setRolesDelete(deleteRoles);
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("400");
@@ -163,8 +179,14 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
-        assertThat(response.get("response_body")).isNotNull();
+        log.info("response :: " + response);
+        verifyDeleteRolesResponse(response);
+       /* assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response.get("deleteRolesResponse")).isNotNull();
+        List<Map<String, Object> > deleteRolesResponse = (List<Map<String, Object>>) response.get("deleteRolesResponse");
+        Map<String, Object>  deleteRoleResponse = deleteRolesResponse.get(0);
+        assertThat(deleteRoleResponse.get("idamStatusCode")).isEqualTo("500");
+        assertThat(deleteRoleResponse.get("idamMessage")).isEqualTo("Internal Server Error");*/
     }
 
     @Test
@@ -197,8 +219,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
-        assertThat(response.get("response_body")).isNotNull();
+        verifyDeleteRolesResponse(response);
+
     }
 
     private ModifyUserProfileData  createAddRolesUserProfileData() {
@@ -222,5 +244,14 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         roles.add(roleName1);
         modifyUserProfileData.setRolesDelete(roles);
         return modifyUserProfileData;
+    }
+
+    private void verifyDeleteRolesResponse(Map<String, Object> response) {
+
+        assertThat(response.get("deleteRolesResponse")).isNotNull();
+        List<Map<String, Object> > deleteRolesResponse = (List<Map<String, Object>>) response.get("deleteRolesResponse");
+        Map<String, Object>  deleteRoleResponse = deleteRolesResponse.get(0);
+        assertThat(deleteRoleResponse.get("idamStatusCode")).isEqualTo("500");
+        assertThat(deleteRoleResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
 }

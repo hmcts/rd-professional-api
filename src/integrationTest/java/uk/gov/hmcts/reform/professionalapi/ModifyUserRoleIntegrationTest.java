@@ -72,10 +72,9 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
-        assertThat(response.get("statusCode")).isNotNull();
-        assertThat(response.get("statusCode")).isEqualTo(200);
-        assertThat(response.get("statusMessage")).isEqualTo("success");
     }
 
     @Test
@@ -104,12 +103,15 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
-
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        RoleName roleName1 = new RoleName(" ");
+        Set<RoleName> rolesAdd = new HashSet<>();
+        rolesAdd.add(roleName1);
+        modifyUserProfileData.setRolesAdd(rolesAdd);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body")).isNotNull();
+
     }
 
     @Test
@@ -121,7 +123,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("403");
-        assertThat(response.get("response_body")).isNotNull();
+
     }
 
     @Test
@@ -131,18 +133,22 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
-
-        assertThat(response.get("statusCode")).isNotNull();
-        assertThat(response.get("statusMessage")).isEqualTo("success");
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
 
     @Test
     public void ac6_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        RoleName roleName1 = new RoleName(" ");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName1);
+
+        modifyUserProfileData.setRolesAdd(roles);
         String userIdentifier = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, " ", puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isNotNull();
 
@@ -156,8 +162,10 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
-        assertThat(response.get("response_body")).isNotNull();
+        assertThat(response.get("addRolesResponse")).isNotNull();
+        Map<String, Object> addRolesResponse = (Map<String, Object>) response.get("addRolesResponse");
+        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
+        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
 
     @Test
@@ -190,8 +198,11 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
-        assertThat(response.get("response_body")).isNotNull();
+        assertThat(response.get("addRoleResponse")).isNotNull();
+        Map<String, Object> addRolesResponse = (Map<String, Object>) response.get("addRoleResponse");
+        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
+        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
+
     }
 
     private ModifyUserProfileData  createModifyUserProfileData() {

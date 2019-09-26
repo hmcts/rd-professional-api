@@ -200,11 +200,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
         //search active user
-        /*  Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
-        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
-        assertThat(professionalUsersResponse1.get("roles")).isNotNull();*/
-
         ArrayList<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
         assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
@@ -74,7 +74,7 @@ public class ProfessionalUserReqValidator {
 
         List<RoleName> emptyRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleNames)) {
-            emptyRoles = roleNames.stream().filter(roleName -> roleName.getName().equals(" ")).collect(Collectors.toList());
+            emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
 
         }
         return emptyRoles.size() > 0 ? true : false;
