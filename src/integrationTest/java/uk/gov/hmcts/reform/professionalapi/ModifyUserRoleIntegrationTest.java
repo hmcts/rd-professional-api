@@ -162,10 +162,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
-        assertThat(response.get("addRolesResponse")).isNotNull();
-        Map<String, Object> addRolesResponse = (Map<String, Object>) response.get("addRolesResponse");
-        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
-        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
+        verifyDeleteRolesResponse(response);
     }
 
     @Test
@@ -198,10 +195,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
-        assertThat(response.get("addRoleResponse")).isNotNull();
-        Map<String, Object> addRolesResponse = (Map<String, Object>) response.get("addRoleResponse");
-        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
-        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
+        verifyDeleteRolesResponse(response);
 
     }
 
@@ -216,5 +210,14 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         modifyUserProfileData.setRolesAdd(roles);
         return modifyUserProfileData;
+    }
+
+    private void verifyDeleteRolesResponse(Map<String, Object> response) {
+
+        assertThat(response.get("addRolesResponse")).isNotNull();
+        Map<String, Object>  addRolesResponse =  (Map<String, Object>)response.get("addRolesResponse");
+
+        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
+        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
 }

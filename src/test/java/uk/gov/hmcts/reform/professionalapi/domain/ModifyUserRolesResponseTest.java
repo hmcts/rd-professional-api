@@ -13,10 +13,10 @@ public class ModifyUserRolesResponseTest {
     public void should_Return_User_profile_Response() {
 
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
-        userProfileRolesResponse.setAddRoleResponse(addRolesForUser());
+        userProfileRolesResponse.setAddRolesResponse(addRolesForUser());
         userProfileRolesResponse.setDeleteRolesResponse(deleteRolesForUser());
-        assertThat(userProfileRolesResponse.getAddRoleResponse().getIdamStatusCode()).isEqualTo("200");
-        assertThat(userProfileRolesResponse.getAddRoleResponse().getIdamMessage()).isEqualTo("Success");
+        assertThat(userProfileRolesResponse.getAddRolesResponse().getIdamStatusCode()).isEqualTo("200");
+        assertThat(userProfileRolesResponse.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
         assertThat(userProfileRolesResponse.getDeleteRolesResponse().get(0).getIdamStatusCode()).isEqualTo("200");
         assertThat(userProfileRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
@@ -49,7 +49,7 @@ public class ModifyUserRolesResponseTest {
         deleteResponses.add(deleteRoleResponse);
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses);
 
-        assertThat(modifyUserRolesResponse.getAddRoleResponse().getIdamMessage()).isEqualTo("addMessage");
+        assertThat(modifyUserRolesResponse.getAddRolesResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
     }
 }

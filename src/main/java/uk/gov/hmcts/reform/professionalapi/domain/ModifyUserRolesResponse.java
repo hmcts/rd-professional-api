@@ -11,11 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ModifyUserRolesResponse {
 
-    private AddRoleResponse addRoleResponse;
+    private AddRoleResponse addRolesResponse;
     private List<DeleteRoleResponse> deleteRolesResponse;
 
-    public ModifyUserRolesResponse(AddRoleResponse addRoleResponse, List<DeleteRoleResponse> deleteResponses) {
-        this.addRoleResponse = addRoleResponse;
+    public ModifyUserRolesResponse(AddRoleResponse addRolesResponse, List<DeleteRoleResponse> deleteResponses) {
+        this.addRolesResponse = addRolesResponse;
         this.deleteRolesResponse = deleteResponses;
     }
 

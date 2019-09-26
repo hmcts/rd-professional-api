@@ -411,6 +411,46 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
+    public void updateUserProfileAddRolesMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStatus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"statusCode\":\"200\","
+                    + "  \"statusMessage\":\"success\""
+                    + "}";
+            returnHttpStatus = 200;
+        } else if (status.is4xxClientError()) {
+            body = "{"
+                    + "  \"statusCode\":\"400\","
+                    + "  \"statusMessage\":\"Bad Request\""
+                    + "}";
+            returnHttpStatus = 400;
+        } else if (status.is5xxServerError()) {
+
+            body = "{"
+                    + "  \"addRolesResponse\": {"
+                    + "  \"idamStatusCode\": \"500\","
+                    + "  \"idamMessage\": \"Internal Server Error\""
+                    + "  } "
+                    + "}";
+            returnHttpStatus = 500;
+
+        }
+
+        userProfileService.stubFor(
+                put(urlPathMatching("/v1/userprofile/.*"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        )
+        );
+
+
+    }
+
+
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override
         public Response transform(Request request, Response response, FileSource files, Parameters parameters) {

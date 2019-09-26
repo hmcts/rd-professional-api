@@ -263,7 +263,7 @@ public class ProfessionalUserServiceTest {
 
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
+        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
         modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -278,8 +278,8 @@ public class ProfessionalUserServiceTest {
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRoleResponse()).isNotNull();
-        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Success");
+        assertThat(response.getAddRolesResponse()).isNotNull();
+        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
         assertThat(response.getDeleteRolesResponse()).isNotNull();
         assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
@@ -297,7 +297,7 @@ public class ProfessionalUserServiceTest {
         String id = UUID.randomUUID().toString();
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
+        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
         ObjectMapper mapper = new ObjectMapper();
 
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
@@ -307,8 +307,8 @@ public class ProfessionalUserServiceTest {
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRoleResponse()).isNotNull();
-        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Request Not Valid");
+        assertThat(response.getAddRolesResponse()).isNotNull();
+        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Request Not Valid");
     }
 
     @Test(expected = ExternalApiException.class)
@@ -325,7 +325,7 @@ public class ProfessionalUserServiceTest {
 
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
 
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
@@ -337,8 +337,8 @@ public class ProfessionalUserServiceTest {
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRoleResponse()).isNotNull();
-        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Internal Server Error");
+        assertThat(response.getAddRolesResponse()).isNotNull();
+        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Internal Server Error");
     }
 
 
