@@ -40,7 +40,7 @@ public class RefDataUtil {
     private RefDataUtil() {}
 
     @Value("${defaultPageSize}")
-    static Integer defaultPageSize;
+    static final Integer defaultPageSize = 10;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -245,13 +245,9 @@ public class RefDataUtil {
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
-            // since Headers are read only , its cant be modified and hence copied all existing heards into new one and added new header for pagination
-            MultiValueMap<String, String> orginalHeaders = responseEntity.getHeaders();
-            orginalHeaders.forEach((key, value) -> {
-                if (!(key.equalsIgnoreCase("request-context") || key.equalsIgnoreCase("x-powered-by") || key.equalsIgnoreCase("content-length"))) {
-                    headers.put(key, value);
-                }
-            });
+            // since Headers are read only , it can't be modified and hence copied all existing headers into new one and added new header for pagination
+            MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
+            originalHeaders.forEach((key, value) -> headers.put(key, value));
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
