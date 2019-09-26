@@ -149,7 +149,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
 
         if (professionalUsers.getContent().isEmpty()) {
-            throw new ResourceNotFoundException("No Users were found for the given organisation");
+            throw new ResourceNotFoundException("No Users found for page number " + pageable.getPageNumber());
         }
 
         return professionalUsers;

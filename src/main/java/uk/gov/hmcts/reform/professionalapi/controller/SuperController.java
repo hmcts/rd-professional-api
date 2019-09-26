@@ -293,7 +293,6 @@ public abstract class SuperController {
 
     protected ResponseEntity<?> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
-        ResponseEntity responseEntityToReturn;
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
@@ -309,10 +308,6 @@ public abstract class SuperController {
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
         }
-
-        return ResponseEntity
-                .status(responseEntity.getStatusCode().value())
-                .headers(responseEntity.getHeaders())
-                .body(responseEntity.getBody());
+        return responseEntity;
     }
 }
