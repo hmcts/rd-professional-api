@@ -196,7 +196,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         log.info("User Id::" + userId);
         //create add roles object
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        modifyUserProfileData.setRolesAdd(createOrDeleteRoleName());
+        modifyUserProfileData.setRolesAdd(createAddRoleName());
 
         Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
         //search active user
@@ -250,6 +250,14 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     private  Set<RoleName> createOrDeleteRoleName() {
+
+        RoleName roleName = new RoleName("pui-user-manager");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        return roles;
+    }
+
+    private  Set<RoleName> createAddRoleName() {
 
         RoleName roleName = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
