@@ -10,7 +10,7 @@ import org.junit.Test;
 public class ModifyUserRolesResponseTest {
 
     @Test
-    public void should_Return_User_profile_Resposne() {
+    public void should_Return_User_profile_Response() {
 
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
         userProfileRolesResponse.setAddRoleResponse(addRolesForUser());
@@ -37,5 +37,19 @@ public class ModifyUserRolesResponseTest {
         deleteRoleResponse.setIdamMessage("Success");
         deleteResponses.add(deleteRoleResponse);
         return deleteResponses;
+    }
+
+    @Test
+    public void modifyUserRolesResponseTest() {
+        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        addRoleResponse.setIdamMessage("addMessage");
+        List<DeleteRoleResponse> deleteResponses = new ArrayList<>();
+        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        deleteRoleResponse.setIdamMessage("deleteMessage");
+        deleteResponses.add(deleteRoleResponse);
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses);
+
+        assertThat(modifyUserRolesResponse.getAddRoleResponse().getIdamMessage()).isEqualTo("addMessage");
+        assertThat(modifyUserRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
     }
 }
