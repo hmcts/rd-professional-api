@@ -302,7 +302,7 @@ public abstract class SuperController {
                 .body(responseEntity.getBody());
     }
 
-    protected ResponseEntity<UserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
@@ -310,7 +310,7 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
 
-        UserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData,userId);
+        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData,userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);

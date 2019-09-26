@@ -165,4 +165,112 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(rolesSize.contains("pui-user-manager,pui-organisation-manager"));
     }
 
+    @Test
+    public void ac3_delete_role_existing_user_to_organisation_internal() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifier).isNotEmpty();
+
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        IdamClient idamClient = new IdamClient(configProperties);
+        String email = idamClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+
+        assertThat(newUserCreationRequest).isNotNull();
+        // inviting the user
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest);
+
+        assertThat(newUserResponse).isNotNull();
+        // search active user
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = professionalUsersResponses.get(1);
+
+        assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        String userId = (String) professionalUsersResponse.get("userIdentifier");
+
+        log.info("User Id::" + userId);
+        //create add roles object
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        modifyUserProfileData.setRolesAdd(createOrDeleteRoleName());
+
+        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
+        //search active user
+        /*  Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
+        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        assertThat(professionalUsersResponse1.get("roles")).isNotNull();*/
+
+        ArrayList<String> rolesSize = searchUserInfo(orgIdentifier);
+        assertThat(rolesSize.size()).isEqualTo(3);
+        assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
+
+        ModifyUserProfileData modifyUserProfileDataFordel = new ModifyUserProfileData();
+        modifyUserProfileDataFordel.setRolesDelete(createOrDeleteRoleName());
+        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
+        //search active user
+        ArrayList<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
+        assertThat(rolesAfterDelete.size()).isEqualTo(2);
+        assertThat(rolesSize.contains("pui-organisation-manager,caseworker"));
+
+    }
+
+    @Test
+    public void ac4_delete_role_existing_user_using_pui_user_manager_for_external_200() {
+
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK,generateBearerTokenForPuiManager(),"Active");
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = professionalUsersResponses.get(0);
+        assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
+        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        String userId = (String) professionalUsersResponse.get("userIdentifier");
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        RoleName role1 = new RoleName("pui-organisation-manager");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(role1);
+        modifyUserProfileData.setRolesAdd(roles);
+        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,modifyUserProfileData,bearerTokenForPuiUserManager,userId);
+        //search active user
+        ArrayList<String> rolesAfterDelete = searchUserInfo(orgIdentifierResponse);
+        assertThat(rolesAfterDelete.size()).isEqualTo(2);
+        assertThat(rolesAfterDelete.contains("pui-organisation-manager,caseworker"));
+
+        // roles to delete
+        ModifyUserProfileData modifyUserProfileDataFordel = new ModifyUserProfileData();
+        RoleName roleName = new RoleName("caseworker");
+        Set<RoleName> rolesDelete = new HashSet<>();
+        rolesDelete.add(roleName);
+        modifyUserProfileDataFordel.setRolesDelete(rolesDelete);
+
+        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifierResponse,userId);
+        //search active user
+        ArrayList<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
+        assertThat(rolesInfo.size()).isEqualTo(1);
+        assertThat(rolesInfo.contains("pui-organisation-manager"));
+    }
+
+    private  Set<RoleName> createOrDeleteRoleName() {
+
+        RoleName roleName = new RoleName("pui-user-manager");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        return roles;
+    }
+
+    private ArrayList<String> searchUserInfo(String orgIdentifier) {
+
+        Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
+        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        assertThat(professionalUsersResponse1.get("roles")).isNotNull();
+
+        return (ArrayList<String>)professionalUsersResponse1.get("roles");
+
+    }
+
 }

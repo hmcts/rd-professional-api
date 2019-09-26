@@ -24,12 +24,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -143,22 +139,22 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public UserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
-        UserRolesResponse userRolesResponse;
+    public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
+        ModifyUserRolesResponse modifyUserRolesResponse;
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
 
-            Class clazz = UserRolesResponse.class;
+            Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
-                UserRolesResponse userProfileErrorResponse = (UserRolesResponse) responseResponseEntity.getBody();
-                throw new ExternalApiException(HttpStatus.valueOf(userProfileErrorResponse.getStatusCode()), userProfileErrorResponse.getStatusMessage());
+                ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
+                // throw new ExternalApiException(HttpStatus.valueOf(response.status()), "failure");
 
             }
-            userRolesResponse = (UserRolesResponse)responseResponseEntity.getBody();
+            modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
         }  catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
-        return userRolesResponse;
+        return modifyUserRolesResponse;
     }
 }

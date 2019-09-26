@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 
 @Component
 @Slf4j
@@ -57,9 +62,23 @@ public class ProfessionalUserReqValidator {
 
     public void validateModifyRolesRequest(ModifyUserProfileData modifyUserProfileData, String userId) {
 
-        if (null == modifyUserProfileData || StringUtils.isEmpty(userId) || CollectionUtils.isEmpty(modifyUserProfileData.getRolesAdd())) {
+        if (null == modifyUserProfileData || StringUtils.isEmpty(userId)
+                || invalidRoleName(modifyUserProfileData.getRolesAdd())
+                || invalidRoleName(modifyUserProfileData.getRolesDelete())) {
 
             throw new InvalidRequest("The Request provided is invalid for modify the roles for user");
         }
     }
+
+    public boolean invalidRoleName(Set<RoleName> roleNames) {
+
+        List<RoleName> emptyRoles = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(roleNames)) {
+            emptyRoles = roleNames.stream().filter(roleName -> roleName.getName().equals(" ")).collect(Collectors.toList());
+
+        }
+        return emptyRoles.size() > 0 ? true : false;
+    }
+
+
 }

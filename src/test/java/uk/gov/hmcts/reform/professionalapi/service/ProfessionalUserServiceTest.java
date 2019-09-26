@@ -28,6 +28,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import org.springframework.http.ResponseEntity;
@@ -41,16 +42,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -266,25 +260,31 @@ public class ProfessionalUserServiceTest {
         roles.add(roleName1);
         roles.add(roleName2);
         modifyUserProfileData.setRolesAdd(roles);
-        String id = UUID.randomUUID().toString();
 
-        UserRolesResponse userRolesResponse = new UserRolesResponse(200,"Success");
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
+        modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
 
         ObjectMapper mapper = new ObjectMapper();
 
-        String body = mapper.writeValueAsString(userRolesResponse);
+        String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body1 = mapper.writeValueAsString(userRolesResponse);
+        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        String id = UUID.randomUUID().toString();
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
+        assertThat(response.getAddRoleResponse()).isNotNull();
+        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Success");
+        assertThat(response.getDeleteRolesResponse()).isNotNull();
+        assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
 
-    @Test(expected = ExternalApiException.class)
+    @Test
     public void modify_user_roles_bad_request() throws Exception {
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
@@ -296,18 +296,19 @@ public class ProfessionalUserServiceTest {
         modifyUserProfileData.setRolesAdd(roles);
         String id = UUID.randomUUID().toString();
 
-        UserRolesResponse userRolesResponse = new UserRolesResponse(400, "Fail");
-
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
         ObjectMapper mapper = new ObjectMapper();
 
-        String body = mapper.writeValueAsString(userRolesResponse);
+        String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
-        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatusMessage()).isEqualTo("Fail");
+        assertThat(response.getAddRoleResponse()).isNotNull();
+        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Request Not Valid");
     }
 
     @Test(expected = ExternalApiException.class)
@@ -320,21 +321,24 @@ public class ProfessionalUserServiceTest {
         roles.add(roleName1);
         roles.add(roleName2);
         modifyUserProfileData.setRolesAdd(roles);
-        String id = UUID.randomUUID().toString();
 
-        UserRolesResponse userRolesResponse = new UserRolesResponse(500, "Fail");
 
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        modifyUserRolesResponse.setAddRoleResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
 
-        String body = mapper.writeValueAsString(userRolesResponse);
+        String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(feignExceptionMock.status()).thenReturn(500);
         when(userProfileFeignClient.modifyUserRoles(any(), any())).thenThrow(feignExceptionMock);
+        String id = UUID.randomUUID().toString();
 
-        UserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatusMessage()).isEqualTo("Fail");
+        assertThat(response.getAddRoleResponse()).isNotNull();
+        assertThat(response.getAddRoleResponse().getIdamMessage()).isEqualTo("Internal Server Error");
     }
 
 
@@ -420,5 +424,23 @@ public class ProfessionalUserServiceTest {
 
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNull();
+    }
+
+    private AddRoleResponse createAddRoleResponse(HttpStatus status, String message) {
+
+        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        addRoleResponse.setIdamStatusCode(status.toString());
+        addRoleResponse.setIdamMessage(message);
+        return addRoleResponse;
+    }
+
+    private List<DeleteRoleResponse> createDeleteRoleResponse(HttpStatus status, String message) {
+
+        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        deleteRoleResponse.setIdamStatusCode(status.toString());
+        deleteRoleResponse.setIdamMessage(message);
+        List<DeleteRoleResponse> deleteRoleResponses = new ArrayList<>();
+        deleteRoleResponses.add(deleteRoleResponse);
+        return deleteRoleResponses;
     }
 }

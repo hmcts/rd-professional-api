@@ -16,13 +16,18 @@ public class ModifyUserProfileDataTest {
         String idamId = UUID.randomUUID().toString();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
-        Set<RoleName> roles = new HashSet<RoleName>();
-        roles.add(roleName1);
-        roles.add(roleName2);
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData("a@hmcts.net","fname","lname", "ACTIVE",roles);
-        modifyUserProfileData.setRolesAdd(roles);
+        Set<RoleName> rolesAdd = new HashSet<RoleName>();
+        rolesAdd.add(roleName1);
+        rolesAdd.add(roleName2);
+        Set<RoleName> rolesDelete = new HashSet<RoleName>();
+        rolesDelete.add(roleName1);
+        rolesDelete.add(roleName2);
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData("a@hmcts.net","fname","lname", "ACTIVE",rolesAdd,rolesDelete);
+        modifyUserProfileData.setRolesAdd(rolesAdd);
+        modifyUserProfileData.setRolesDelete(rolesDelete);
 
         assertThat(modifyUserProfileData.getRolesAdd().size()).isEqualTo(2);
+        assertThat(modifyUserProfileData.getRolesDelete().size()).isEqualTo(2);
         assertThat(modifyUserProfileData.getEmail()).isEqualTo("a@hmcts.net");
         assertThat(modifyUserProfileData.getFirstName()).isEqualTo("fname");
         assertThat(modifyUserProfileData.getLastName()).isEqualTo("lname");
