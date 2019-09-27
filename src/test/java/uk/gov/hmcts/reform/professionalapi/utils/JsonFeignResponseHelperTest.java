@@ -59,7 +59,7 @@ public class JsonFeignResponseHelperTest {
     public void test_convertHeaders() {
 
         Map<String, Collection<String>> header = new HashMap<>();
-        Collection<String> list = new ArrayList<>(Arrays.asList(new String[]{"gzip",  ""}));
+        Collection<String> list = new ArrayList<>(Arrays.asList(new String[]{"gzip",  "request-context", "x-powered-by", "content-length"}));
         header.put("content-encoding", list);
         MultiValueMap<String, String> responseHeader = JsonFeignResponseHelper.convertHeaders(header);
         assertThat(responseHeader).isNotEmpty();
