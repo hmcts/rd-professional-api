@@ -272,12 +272,6 @@ public class RefDataUtilTest {
 
         assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
-
-        //MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        //HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
-
-        //verify(httpHeadersMock, times(1)).addAll(multiValueMap);
-        //verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
     }
 
     @Test
@@ -295,7 +289,6 @@ public class RefDataUtilTest {
         HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
 
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
-        //verify(httpHeadersMock, times(1)).add(any(String.class), any(String.class));
     }
 
     @Test

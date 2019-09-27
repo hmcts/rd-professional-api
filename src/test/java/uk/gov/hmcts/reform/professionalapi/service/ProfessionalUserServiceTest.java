@@ -29,10 +29,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
@@ -316,5 +320,57 @@ public class ProfessionalUserServiceTest {
 
         ProfessionalUser professionalUserResponse = professionalUserService.findProfessionalUserById(id);
         assertThat(professionalUserResponse).isNull();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
+        Pageable pageableMock = mock(Pageable.class);
+        Organisation organisationMock = mock(Organisation.class);
+        List<ProfessionalUser> professionalUserList = new ArrayList<>();
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        ProfessionalUser professionalUser = new ProfessionalUser("fName","lName", "some@email.com", organisationMock);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName","lName", "some1@email.com", organisationMock);
+        professionalUserList.add(professionalUser);
+        professionalUserList.add(professionalUser1);
+
+        when(professionalUserRepository.findByOrganisation(organisationMock, pageableMock)).thenReturn(professionalUserPage);
+        when(professionalUserPage.getContent()).thenReturn(professionalUserList);
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(professionalUser1);
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        userProfiles.add(professionalUsersResponse);
+        userProfiles.add(professionalUsersResponse1);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(response);
+
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisationMock, "false", false, "Active", pageableMock);
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+        Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisationMock, pageableMock);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    @SuppressWarnings("unchecked")
+    public void shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
+        Pageable pageableMock = mock(Pageable.class);
+        Organisation organisationMock = mock(Organisation.class);
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        when(professionalUserRepository.findByOrganisation(organisationMock, pageableMock)).thenReturn(professionalUserPage);
+
+        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisationMock, "false", false, "Active", pageableMock);
     }
 }
