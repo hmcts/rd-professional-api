@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TestConfigProperties {
 
-    @Value("${test.url}")
-    public String baseTestUrl;
 
     @Value("${generated.user.email.pattern}")
     public String generatedUserEmailPattern;
