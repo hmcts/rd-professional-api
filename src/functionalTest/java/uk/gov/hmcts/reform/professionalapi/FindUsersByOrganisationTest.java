@@ -206,6 +206,24 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
     }
 
+    @Test
+    public void find_all_users_for_an_organisation_external_with_pagination_should_return_200() {
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active", "0", "1");
+
+        validateRetrievedUsers(searchResponse, "any");
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        assertThat(professionalUsersResponses.size()).isEqualTo(1);
+
+        Map<String, Object> searchResponse2 = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active", "1", "1");
+
+        validateRetrievedUsers(searchResponse2, "any");
+        List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
+        assertThat(professionalUsersResponses2.size()).isEqualTo(1);
+    }
+
+
+
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 

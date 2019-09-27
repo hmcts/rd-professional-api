@@ -301,6 +301,21 @@ public class ProfessionalApiClient {
         }
     }
 
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?status=" + userStatus + "&page=" + pageNumber + "&size=" + size)
+                .andReturn();
+
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -328,6 +343,8 @@ public class ProfessionalApiClient {
 
         return response.body().as(Map.class);
     }
+
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
