@@ -40,7 +40,7 @@ public class RefDataUtil {
     private RefDataUtil() {}
 
     @Value("${defaultPageSize}")
-    public static int defaultPageSize;
+    public static final int DEFAULTPAGESIZE = 10;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -255,7 +255,7 @@ public class RefDataUtil {
 
     public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
         if (size == null) {
-            size = defaultPageSize;
+            size = DEFAULTPAGESIZE;
         }
         return PageRequest.of(page, size, sort);
     }
