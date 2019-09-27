@@ -139,7 +139,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             log.info("Filtering users by status: " + status);
 
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
-            responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
+            responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
 
         return responseEntity;

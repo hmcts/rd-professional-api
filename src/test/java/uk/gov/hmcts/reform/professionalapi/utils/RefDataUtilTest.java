@@ -314,6 +314,7 @@ public class RefDataUtilTest {
     public void test_shouldCreatePageableObjectWithDefaultPageSize() {
         Integer page = 0;
         Sort sort = mock(Sort.class);
+        RefDataUtil.defaultPageSize = 10;
 
         Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
 

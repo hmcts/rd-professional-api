@@ -109,4 +109,4 @@ feign:
       - authorization
       - serviceauthorization
 
-defaultPageSize: 10
+defaultPageSize: ${DEFAULTPAGESIZE:10}
