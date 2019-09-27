@@ -77,7 +77,7 @@ security:
 auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:OLMEJQA7UHU6EZKG}
+    totp_secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: false
@@ -86,7 +86,7 @@ usermap:
     - "false"
 
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.demo.platform.hmcts.net}
 
 auth.idam.client.detailsUri: "/details"
 ## Secure roles configuration
@@ -100,7 +100,7 @@ exui.role:
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
-userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-pr-105.service.core-compute-105.internal}
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-demo.service.core-compute-demo.internal}
 ccdUrl: ${CCD_URL:https://ccd-user-profile-api-aat.service.core-compute-aat.internal}
 
 feign:
