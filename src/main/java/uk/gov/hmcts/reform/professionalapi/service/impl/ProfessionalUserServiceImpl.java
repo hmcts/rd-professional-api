@@ -148,8 +148,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             if (response.status() > 300) {
                 ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
-                // throw new ExternalApiException(HttpStatus.valueOf(response.status()), "failure");
-
             }
             modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
         }  catch (FeignException ex) {
