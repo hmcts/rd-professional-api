@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
 public class ModifyUserRolesResponseTest {
 
@@ -41,15 +42,19 @@ public class ModifyUserRolesResponseTest {
 
     @Test
     public void modifyUserRolesResponseTest() {
+
         AddRoleResponse addRoleResponse = new AddRoleResponse();
         addRoleResponse.setIdamMessage("addMessage");
         List<DeleteRoleResponse> deleteResponses = new ArrayList<>();
         DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
         deleteRoleResponse.setIdamMessage("deleteMessage");
         deleteResponses.add(deleteRoleResponse);
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses);
+        ErrorResponse errorResponse = new ErrorResponse("failure","500","1200");
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(errorResponse, addRoleResponse, deleteResponses);
 
         assertThat(modifyUserRolesResponse.getAddRolesResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
+        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorMessage()).isEqualTo("failure");
+        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorDescription()).isEqualTo("500");
     }
 }
