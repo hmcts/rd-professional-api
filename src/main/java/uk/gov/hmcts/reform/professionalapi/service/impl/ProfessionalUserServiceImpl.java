@@ -141,6 +141,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
         ModifyUserRolesResponse modifyUserRolesResponse;
+        log.info("inside modifyRolesForUser ::");
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
 
             Class clazz = ModifyUserRolesResponse.class;
@@ -148,13 +149,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
             if (response.status() > 300) {
                 ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
-                // throw new ExternalApiException(HttpStatus.valueOf(response.status()), "failure");
-
             }
             modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
         }  catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
+        log.info("inside modifyRolesForUser ::");
         return modifyUserRolesResponse;
     }
 }
