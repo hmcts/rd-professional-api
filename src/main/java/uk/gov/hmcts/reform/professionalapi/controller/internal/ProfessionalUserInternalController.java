@@ -68,7 +68,7 @@ public class ProfessionalUserInternalController extends SuperController {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "");
     }
 
     @ApiOperation(

@@ -124,20 +124,13 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
-
         if (null != contactInformations) {
 
             for (ContactInformationCreationRequest contactInformation : contactInformations) {
                 requestValues(contactInformation.getAddressLine1(), contactInformation.getPostCode());
                 if (null != contactInformation.getDxAddress()) {
-
                     for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
-
-                        requestValues(dxAddress.getDxNumber(), dxAddress.getDxExchange());
-                        if ((!isDxNumberValid(dxAddress.getDxNumber()))) {
-                            throw new InvalidRequest(", DxNumber: " + dxAddress.getDxNumber());
-                        }
-
+                        isDxAddressValid(dxAddress);
                     }
                 }
             }
@@ -153,20 +146,40 @@ public class OrganisationCreationRequestValidator {
         return isEmpty;
     }
 
-    private Boolean isDxNumberValid(String dxNumber) {
-
-        Boolean numberIsValid = true;
-
-        if (dxNumber != null) {
-
-            String regex = "^(?:DX|NI) [0-9]{10}+$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(dxNumber);
-            numberIsValid = matcher.matches();
+    private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) && StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("Invalid DX Number provided, it cannot be null, empty or greater than 13, and invalid DX Exchange provided, it cannot be null, empty or greater than 20");
         }
 
-        return numberIsValid;
+        if (StringUtils.isEmpty(dxAddress.getDxNumber())) {
+            throw new InvalidRequest("DX Number cannot be null, empty or greater than 13");
+        }
 
+        if (StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("DX Exchange cannot be null, empty or greater than 20");
+        }
+
+
+        if (dxAddress.getDxNumber() != null) {
+            String regex = "^[a-zA-Z0-9 ]*$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(dxAddress.getDxNumber());
+            if (!matcher.matches()) {
+                throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
+            }
+        }
+
+        if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
+            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters" + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+        }
+
+        if (dxAddress.getDxNumber().length() > 13) {
+            throw new InvalidRequest("DX Number must be 13 characters or less, you have entered " + dxAddress.getDxNumber().length() + " characters");
+        }
+
+        if (dxAddress.getDxExchange().length() > 20) {
+            throw new InvalidRequest("DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + " characters");
+        }
     }
 
 
