@@ -148,7 +148,6 @@ public class ProfessionalUserInternalController extends SuperController {
     ) {
 
         log.info("Received request to update user roles of an organisation...");
-        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
 
     }

@@ -66,11 +66,9 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerTokenForPuiUserManager;
-
 
     @Autowired
     protected TestConfigProperties configProperties;
@@ -85,7 +83,6 @@ public abstract class AuthorizationFunctionalTest {
 
         IdamClient idamClient = new IdamClient(configProperties);
 
-        log.info("idamClient: " + idamClient);
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
@@ -121,11 +118,8 @@ public abstract class AuthorizationFunctionalTest {
 
     public RequestSpecification generateBearerTokenForPuiManager() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
-        log.info("RESPONSE:::::" + response);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-        log.info("RESPONSE AFTER UPDATE");
 
 
         List<String> userRoles = new ArrayList<>();
@@ -146,8 +140,6 @@ public abstract class AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
-
-        log.info("NEW USER RESPONSE::::::::::" + newUserResponse);
 
 
         return bearerTokenForPuiUserManager;

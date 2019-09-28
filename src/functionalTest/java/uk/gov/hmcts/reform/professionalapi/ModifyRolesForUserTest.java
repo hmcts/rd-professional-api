@@ -204,9 +204,9 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(rolesSize.size()).isEqualTo(3);
         assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
 
-        ModifyUserProfileData modifyUserProfileDataFordel = new ModifyUserProfileData();
-        modifyUserProfileDataFordel.setRolesDelete(createOrDeleteRoleName());
-        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
+        ModifyUserProfileData deleteRoleReqest = new ModifyUserProfileData();
+        deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
+        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,deleteRoleReqest,orgIdentifier,userId);
         //search active user
         ArrayList<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
         assertThat(rolesAfterDelete.size()).isEqualTo(2);
@@ -229,24 +229,26 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         modifyUserProfileData.setRolesAdd(roles);
+
         Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,modifyUserProfileData,bearerTokenForPuiUserManager,userId);
         //search active user
-        ArrayList<String> rolesAfterDelete = searchUserInfo(orgIdentifierResponse);
-        assertThat(rolesAfterDelete.size()).isEqualTo(2);
-        assertThat(rolesAfterDelete.contains("pui-organisation-manager,caseworker"));
+        ArrayList<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
+        assertThat(rolesAfterAdd.size()).isEqualTo(2);
+        assertThat(rolesAfterAdd.contains("pui-organisation-manager,caseworker"));
 
         // roles to delete
-        ModifyUserProfileData modifyUserProfileDataFordel = new ModifyUserProfileData();
-        RoleName roleName = new RoleName("caseworker");
+        ModifyUserProfileData deleteRoleRequest = new ModifyUserProfileData();
+        RoleName roleName = new RoleName("pui-organisation-manager");
         Set<RoleName> rolesDelete = new HashSet<>();
         rolesDelete.add(roleName);
-        modifyUserProfileDataFordel.setRolesDelete(rolesDelete);
+        deleteRoleRequest.setRolesDelete(rolesDelete);
 
-        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifierResponse,userId);
+        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,deleteRoleRequest,bearerTokenForPuiUserManager,userId);
+
         //search active user
         ArrayList<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
-        assertThat(rolesInfo.contains("pui-organisation-manager"));
+        assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
     private  Set<RoleName> createOrDeleteRoleName() {

@@ -243,7 +243,6 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations")
                 .andReturn();
 
-        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -390,7 +389,6 @@ public class ProfessionalApiClient {
                 .body(modifyUserProfileData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
-        log.info("ModifyUserRole response for internal:: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -406,7 +404,6 @@ public class ProfessionalApiClient {
                 .body(modifyUserProfileData)
                 .put("/refdata/external/v1/organisations/users/" + userId)
                 .andReturn();
-        log.info("ModifyUserRole response for external: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -422,7 +419,6 @@ public class ProfessionalApiClient {
                 .body(modifyUserProfileData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
                 .andReturn();
-        log.info("ModifyUserRole response for internal: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -441,7 +437,7 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getS2sTokenHeaders() {
-        log.info("S2SToken::" + s2sToken);
+
         return withUnauthenticatedRequest()
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
