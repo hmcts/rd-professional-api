@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -96,6 +95,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
+
+    protected static final String ACTIVE = "ACTIVE";
 
     @Before
     public void setUpClient() {
@@ -364,6 +365,91 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         )
         );
     }
+
+    public void updateUserProfileRolesMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStatus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"statusCode\":\"200\","
+                    + "  \"statusMessage\":\"success\""
+                    + "}";
+            returnHttpStatus = 200;
+        } else if (status.is4xxClientError()) {
+            body = "{"
+                    + "  \"statusCode\":\"400\","
+                    + "  \"statusMessage\":\"Bad Request\""
+                    + "}";
+            returnHttpStatus = 400;
+        } else if (status.is5xxServerError()) {
+
+            body = "{"
+                    + "  \"addRolesResponse\": {"
+                    + "  \"idamStatusCode\": \"500\","
+                    + "  \"idamMessage\": \"Internal Server Error\""
+                    + "  } ,"
+                    + "  \"deleteRolesResponse\": ["
+                    +   "{"
+                    + "  \"idamStatusCode\": \"500\","
+                    + "  \"idamMessage\": \"Internal Server Error\""
+                    + "  } "
+                    + "  ]"
+                    + "}";
+            returnHttpStatus = 500;
+
+        }
+
+        userProfileService.stubFor(
+                put(urlPathMatching("/v1/userprofile/.*"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        )
+        );
+
+
+    }
+
+    public void updateUserProfileAddRolesMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStatus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"statusCode\":\"200\","
+                    + "  \"statusMessage\":\"success\""
+                    + "}";
+            returnHttpStatus = 200;
+        } else if (status.is4xxClientError()) {
+            body = "{"
+                    + "  \"statusCode\":\"400\","
+                    + "  \"statusMessage\":\"Bad Request\""
+                    + "}";
+            returnHttpStatus = 400;
+        } else if (status.is5xxServerError()) {
+
+            body = "{"
+                    + "  \"addRolesResponse\": {"
+                    + "  \"idamStatusCode\": \"500\","
+                    + "  \"idamMessage\": \"Internal Server Error\""
+                    + "  } "
+                    + "}";
+            returnHttpStatus = 500;
+
+        }
+
+        userProfileService.stubFor(
+                put(urlPathMatching("/v1/userprofile/.*"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        )
+        );
+
+
+    }
+
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override

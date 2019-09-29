@@ -22,7 +22,7 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
