@@ -92,6 +92,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
+    public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier, String showDeleted, String role) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
+    }
+
     public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, String id) {
         return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",role, id, showDeleted, status);
     }
@@ -256,6 +260,8 @@ public class ProfessionalReferenceDataClient {
                         Map.class);
 
         response.put("http_status", responseEntity.getStatusCode().toString());
+        response.put("headers", responseEntity.getHeaders().toString());
+
 
         return response;
     }

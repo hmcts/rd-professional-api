@@ -14,12 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -92,16 +96,33 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ProfessionalUser findProfessionalUserById(UUID id) {
         Optional<ProfessionalUser> professionalUser = professionalUserRepository.findById(id);
-        if (professionalUser.isPresent()) {
-            return professionalUser.get();
-        }
-        return null;
+        return professionalUser.orElse(null);
+    }
+
+    @Override
+    public ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
+        Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
+
+        ResponseEntity responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status);
+
+        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers, responseEntity);
+
+        return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
+        List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+
+        if (professionalUsers.isEmpty()) {
+            throw new ResourceNotFoundException("No Users were found for the given organisation");
+        }
+
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
+    }
+
+    private ResponseEntity retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
         ResponseEntity responseEntity;
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = generateRetrieveUserProfilesRequest(organisation);
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
@@ -116,22 +137,30 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             log.info("Filtering users by status: " + status);
 
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
-            return responseEntity.status(responseEntity.getStatusCode()).headers(responseEntity.getHeaders()).body(professionalUsersEntityResponse);
+            responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
 
         return responseEntity;
     }
 
-    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(Organisation organisation) {
-        List<ProfessionalUser> professionalUsers;
-        List<String> usersId = new ArrayList<>();
+    private Page<ProfessionalUser> getPagedListOfUsers(Organisation organisation, Pageable pageable) {
+        Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
 
-        professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+        if (professionalUsers.getContent().isEmpty()) {
+            throw new ResourceNotFoundException("No Users found for page number " + pageable.getPageNumber());
+        }
+
+        return professionalUsers;
+    }
+
+    private RetrieveUserProfilesRequest generateRetrieveUserProfilesRequest(List<ProfessionalUser> professionalUsers) {
+        List<String> usersId = new ArrayList<>();
 
         professionalUsers.forEach(user -> usersId.add(user.getUserIdentifier()));
 
         return new RetrieveUserProfilesRequest(usersId);
     }
+
 
     @Override
     public ProfessionalUser persistUser(ProfessionalUser updatedProfessionalUser) {

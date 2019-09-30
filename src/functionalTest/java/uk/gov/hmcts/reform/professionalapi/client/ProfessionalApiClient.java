@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -21,6 +22,7 @@ import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -295,6 +297,37 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, String pageNumber, String size) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<String, Object>();
+        }
+    }
+
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
+                .andReturn();
+
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -317,6 +350,8 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
         return response.body().as(Map.class);
     }
+
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 

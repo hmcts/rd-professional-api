@@ -90,18 +90,12 @@ public class IdamClient {
     public String getBearerToken(String userEmail) {
 
         String codeAuthorization = Base64.getEncoder().encodeToString((userEmail + ":" + password).getBytes());
-        log.info("CODE AUTH:::::::::::::" + BASIC + codeAuthorization);
 
         Map<String, String> authorizeParams = new HashMap<>();
         authorizeParams.put("client_id", testConfig.getClientId());
         authorizeParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         authorizeParams.put("response_type", "code");
         authorizeParams.put("scope", "openid roles profile create-user manage-user");
-
-        log.info("CLIENT ID:::::::::::::" +  testConfig.getClientId());
-        log.info("redirect_uri::::::::::" + testConfig.getOauthRedirectUrl());
-        log.info("IDAM URL::::::::::::::" + testConfig.getIdamApiUrl());
-
 
         Response authorizeResponse = RestAssured
                 .given()

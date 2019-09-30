@@ -69,11 +69,13 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                                                   @RequestParam(value = "showDeleted", required = false) String showDeleted) {
+                                                      @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "size", required = false) Integer size) {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "");
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
     @ApiOperation(
