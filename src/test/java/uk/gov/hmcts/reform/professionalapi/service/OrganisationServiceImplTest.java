@@ -604,6 +604,8 @@ public class OrganisationServiceImplTest {
         prdEnums.add(new PrdEnum(new PrdEnumId(1, "FAKE_ROLE"), "pui-fake-manager", "FAKE_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(2, "FAKE_FAKE"), "pui-fake-manager", "FAKE_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "pui-fake-manager", "FAKE_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "FAKE_JURISD"), "PROBATE", "FAKE_ROLE"));
+
 
         List<UserAttribute> attributes = new ArrayList<>();
         attributes.add(userAttributeMock);

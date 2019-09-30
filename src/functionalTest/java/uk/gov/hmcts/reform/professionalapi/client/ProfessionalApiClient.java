@@ -203,6 +203,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
         Response response = getMultipleAuthHeadersInternal()
