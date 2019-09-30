@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -22,8 +27,10 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
@@ -59,13 +66,12 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-
     protected ProfessionalApiClient professionalApiClient;
 
+    protected RequestSpecification bearerTokenForPuiUserManager;
 
     @Autowired
     protected TestConfigProperties configProperties;
-
 
     @Before
     public void setUp() {
@@ -77,7 +83,6 @@ public abstract class AuthorizationFunctionalTest {
 
         IdamClient idamClient = new IdamClient(configProperties);
 
-        log.info("idamClient: " + idamClient);
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
@@ -111,6 +116,35 @@ public abstract class AuthorizationFunctionalTest {
         return organisationIdentifier;
     }
 
+    public RequestSpecification generateBearerTokenForPuiManager() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+
+        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+
+        return bearerTokenForPuiUserManager;
+    }
+
     protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
         assertThat(searchResponse.get("idamStatus")).isNotNull();
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
@@ -128,4 +162,5 @@ public abstract class AuthorizationFunctionalTest {
             assertThat(professionalUsersResponse.get("roles")).isNull();
         }
     }
+
 }

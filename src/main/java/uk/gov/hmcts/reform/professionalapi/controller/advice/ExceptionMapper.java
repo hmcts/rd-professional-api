@@ -60,7 +60,6 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-
     public ResponseEntity<Object> annotationDrivenValidationError(
             MethodArgumentNotValidException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID.getErrorMessage());
