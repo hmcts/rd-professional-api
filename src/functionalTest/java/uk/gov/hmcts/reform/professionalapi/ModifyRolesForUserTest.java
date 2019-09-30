@@ -6,11 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 
 import io.restassured.specification.RequestSpecification;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -19,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
@@ -127,14 +124,14 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         roles.add(role1);
         modifyUserProfileData.setRolesAdd(roles);
 
-        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK, modifyUserProfileData, orgIdentifier, userId);
 
         Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
         Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
-        ArrayList<String> rolesSize = ( ArrayList<String>)professionalUsersResponse1.get("roles");
+        ArrayList<String> rolesSize = (ArrayList<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(3);
         assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
     }
@@ -142,7 +139,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     @Test
     public void ac2_add_role_existing_user_using_pui_user_manager_for_external_200() {
 
-        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK,generateBearerTokenForPuiManager(),"Active");
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
         Map professionalUsersResponse = professionalUsersResponses.get(0);
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
@@ -154,13 +151,13 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         modifyUserProfileData.setRolesAdd(roles);
-        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,modifyUserProfileData,bearerTokenForPuiUserManager,userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
         Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
         Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
-        ArrayList<String> rolesSize = ( ArrayList<String>)professionalUsersResponse1.get("roles");
+        ArrayList<String> rolesSize = (ArrayList<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(2);
         assertThat(rolesSize.contains("pui-user-manager,pui-organisation-manager"));
     }
@@ -198,17 +195,17 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         modifyUserProfileData.setRolesAdd(createAddRoleName());
 
-        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,modifyUserProfileData,orgIdentifier,userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK, modifyUserProfileData, orgIdentifier, userId);
         //search active user
-        ArrayList<String> rolesSize = searchUserInfo(orgIdentifier);
+        List<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
         assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
 
         ModifyUserProfileData deleteRoleReqest = new ModifyUserProfileData();
         deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
-        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK,deleteRoleReqest,orgIdentifier,userId);
+        Map<String, Object> modifiedUserResponseForDelete = professionalApiClient.modifyUserRoleToExistingUserForPrdAdmin(HttpStatus.OK, deleteRoleReqest, orgIdentifier, userId);
         //search active user
-        ArrayList<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
+        List<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
         assertThat(rolesAfterDelete.size()).isEqualTo(2);
         assertThat(rolesSize.contains("pui-organisation-manager,caseworker"));
 
@@ -217,7 +214,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     @Test
     public void ac4_delete_role_existing_user_using_pui_user_manager_for_external_200() {
 
-        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK,generateBearerTokenForPuiManager(),"Active");
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiManager(), "Active");
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
         Map professionalUsersResponse = professionalUsersResponses.get(0);
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
@@ -230,9 +227,9 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         roles.add(role1);
         modifyUserProfileData.setRolesAdd(roles);
 
-        Map<String, Object> modifiedUserResponse =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,modifyUserProfileData,bearerTokenForPuiUserManager,userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
         //search active user
-        ArrayList<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
+        List<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesAfterAdd.size()).isEqualTo(2);
         assertThat(rolesAfterAdd.contains("pui-organisation-manager,caseworker"));
 
@@ -243,15 +240,15 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         rolesDelete.add(roleName);
         deleteRoleRequest.setRolesDelete(rolesDelete);
 
-        Map<String, Object> modifiedUserResponseForDelete =  professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK,deleteRoleRequest,bearerTokenForPuiUserManager,userId);
+        Map<String, Object> modifiedUserResponseForDelete = professionalApiClient.modifyUserRoleToExistingUserForExternal(HttpStatus.OK, deleteRoleRequest, bearerTokenForPuiUserManager, userId);
 
         //search active user
-        ArrayList<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
+        List<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
         assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
-    private  Set<RoleName> createOrDeleteRoleName() {
+    private Set<RoleName> createOrDeleteRoleName() {
 
         RoleName roleName = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
@@ -259,7 +256,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         return roles;
     }
 
-    private  Set<RoleName> createAddRoleName() {
+    private Set<RoleName> createAddRoleName() {
 
         RoleName roleName = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
@@ -267,15 +264,19 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         return roles;
     }
 
-    private ArrayList<String> searchUserInfo(String orgIdentifier) {
+    private List<String> searchUserInfo(String orgIdentifier) {
 
-        Map<String, Object> searchResponse1 = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
-        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
-        assertThat(professionalUsersResponse1.get("roles")).isNotNull();
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
-        return (ArrayList<String>)professionalUsersResponse1.get("roles");
-
+        List<String> rolesToBeReturned = new ArrayList<>();
+        professionalUsersResponses.forEach(user -> {
+            if (IdamStatus.ACTIVE.name().equalsIgnoreCase((String) user.get("idamStatus"))) {
+                assertThat(user.get("roles")).isNotNull();
+                rolesToBeReturned.addAll((Collection<? extends String>) user.get("roles"));
+            }
+        });
+        return rolesToBeReturned;
     }
 
 }
