@@ -4,9 +4,6 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -157,38 +154,12 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
-        if (StringUtils.isEmpty(dxAddress.getDxNumber()) && StringUtils.isEmpty(dxAddress.getDxExchange())) {
-            throw new InvalidRequest("Invalid DX Number provided, it cannot be null, empty or greater than 13, and invalid DX Exchange provided, it cannot be null, empty or greater than 20");
-        }
-
-        if (StringUtils.isEmpty(dxAddress.getDxNumber())) {
-            throw new InvalidRequest("DX Number cannot be null, empty or greater than 13");
-        }
-
-        if (StringUtils.isEmpty(dxAddress.getDxExchange())) {
-            throw new InvalidRequest("DX Exchange cannot be null, empty or greater than 20");
-        }
-
-
-        if (dxAddress.getDxNumber() != null) {
-            String regex = "^[a-zA-Z0-9 ]*$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(dxAddress.getDxNumber());
-            if (!matcher.matches()) {
-                throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
-            }
-        }
-
-        if (dxAddress.getDxNumber().length() > 13 && dxAddress.getDxExchange().length() > 20) {
-            throw new InvalidRequest("DX Number " + THIRTEEN_OR_LESS + dxAddress.getDxNumber().length() + CHARACTERS + ", DX Exchange must be 20 characters or less, you have entered " + dxAddress.getDxExchange().length() + CHARACTERS);
-        }
-
-        if (dxAddress.getDxNumber().length() > 13) {
-            throw new InvalidRequest("DX Number " + THIRTEEN_OR_LESS + dxAddress.getDxNumber().length() + CHARACTERS);
-        }
-
-        if (dxAddress.getDxExchange().length() > 20) {
-            throw new InvalidRequest("DX Exchange " + THIRTEEN_OR_LESS + dxAddress.getDxExchange().length() + CHARACTERS);
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
+            throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
+        } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
+            throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
+        } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
+            throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
         }
     }
 

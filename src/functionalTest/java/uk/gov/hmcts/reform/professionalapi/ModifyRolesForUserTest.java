@@ -6,7 +6,12 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 
 import io.restassured.specification.RequestSpecification;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
