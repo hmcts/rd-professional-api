@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class TestConfigProperties {
 
 
+    @Value("${idam.auth.clientSecret}")
+    public String clientSecret;
     @Value("${generated.user.email.pattern}")
     public String generatedUserEmailPattern;
 

@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
@@ -49,14 +49,15 @@ public class ProfessionalApiClient {
     private final String s2sToken;
 
 
-    protected IdamClient idamClient;
+    protected IdamOpenIdClient idamOpenIdClient;
+
 
     public ProfessionalApiClient(
             String professionalApiUrl,
-            String s2sToken, IdamClient idamClient) {
+            String s2sToken, IdamOpenIdClient idamOpenIdClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
-        this.idamClient = idamClient;
+        this.idamOpenIdClient = idamOpenIdClient;
     }
 
     public String getWelcomePage() {
@@ -478,11 +479,12 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
-        return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
+        return getMultipleAuthHeaders(idamOpenIdClient.getInternalBearerToken());
     }
 
+
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
-        String bearerTokenForSuperUser = idamClient.getExternalBearerToken(role, firstName, lastName, email);
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalBearerToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 

@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -104,8 +104,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        IdamClient idamClient = new IdamClient(configProperties);
-        String email = idamClient.createUser("pui-organisation-manager");
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String email = idamOpenIdClient.createUser("pui-organisation-manager");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();
@@ -177,8 +177,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        IdamClient idamClient = new IdamClient(configProperties);
-        String email = idamClient.createUser("pui-organisation-manager");
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String email = idamOpenIdClient.createUser("pui-organisation-manager");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();
