@@ -1,7 +1,9 @@
 spring:
   cloud:
     propertiesvolume:
-      paths: /mnt/secrets/s2s,/mnt/secrets/rd
+      prefixed: false
+      paths: /mnt/secrets/rd
       aliases:
-        s2s.microservicekey-rd-professional-api: S2S_SECRET
-        rd.s2s-url: S2S_URL
+        s2s-secret: idam.s2s-auth.totp_secret
+        professional-api-POSTGRES-PASS: POSTGRES_PASSWORD
+
