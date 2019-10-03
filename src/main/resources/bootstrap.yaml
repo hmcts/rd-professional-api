@@ -5,5 +5,5 @@ spring:
       paths: /mnt/secrets/rd
       aliases:
         s2s-secret: idam.s2s-auth.totp_secret
-        professional-api-POSTGRES-PASS: POSTGRES_PASSWORD
+        professional-api-POSTGRES-PASS: spring.datasource.password
 
