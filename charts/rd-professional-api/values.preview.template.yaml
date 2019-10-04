@@ -1,10 +1,20 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  aadIdentityName:
   environment:
-    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    APPINSIGHTS_INSTRUMENTATIONKEY: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
-
+    POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
+    POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+  postgresql:
+    postgresqlUsername: dbrefdata
+    postgresqlPassword: dbrefdata
+    postgresqlDatabase: dbrefdata
+  keyVaults:
+    rd:
+      secrets:
+        - s2s-secret
 postgresql:
   #Whether to deploy the Postgres Chart or not
   enabled: true
