@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -50,14 +51,16 @@ public class ProfessionalApiClient {
 
 
     protected IdamOpenIdClient idamOpenIdClient;
+    protected IdamClient idamClient;
 
 
     public ProfessionalApiClient(
             String professionalApiUrl,
-            String s2sToken, IdamOpenIdClient idamOpenIdClient) {
+            String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
+        this.idamClient = idamClient;
     }
 
     public String getWelcomePage() {
@@ -361,9 +364,27 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
+    //with OPENID implementation
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
 
         Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+    }
+
+    //with Bearer token
+    public void updateOrganisationWithOldBearerToken(String organisationIdentifier) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        Response response = getMultipleAuthHeadersInternalWithOldBearerToken()
                 .body(organisationCreationRequest)
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
@@ -479,12 +500,16 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
-        return getMultipleAuthHeaders(idamOpenIdClient.getInternalBearerToken());
+        return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
+    }
+
+    private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {
+        return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
 
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
-        String bearerTokenForSuperUser = idamOpenIdClient.getExternalBearerToken(role, firstName, lastName, email);
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 

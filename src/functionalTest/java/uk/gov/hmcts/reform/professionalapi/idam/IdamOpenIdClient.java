@@ -75,18 +75,18 @@ public class IdamOpenIdClient {
         return userEmail;
     }
 
-    public String getInternalBearerToken() {
+    public String getInternalOpenIdToken() {
         String userEmail = createUser("prd-admin");
-        return getBearerToken(userEmail);
+        return getOpenIdToken(userEmail);
     }
 
 
-    public String getExternalBearerToken(String role, String firstName, String lastName, String email) {
+    public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);
-        return getBearerToken(userEmail);
+        return getOpenIdToken(userEmail);
     }
 
-    public String getBearerToken(String userEmail) {
+    public String getOpenIdToken(String userEmail) {
 
         Map<String, String> tokenParams = new HashMap<>();
         tokenParams.put("grant_type", "password");
@@ -97,7 +97,7 @@ public class IdamOpenIdClient {
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
-        Response bearerTokenResponse = RestAssured
+        Response openIdTokenResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
                 .baseUri(testConfig.getIdamApiUrl())
@@ -106,9 +106,9 @@ public class IdamOpenIdClient {
                 .post("/o/token")
                 .andReturn();
 
-        assertThat(bearerTokenResponse.getStatusCode()).isEqualTo(200);
+        assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
-        IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
+        IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
     }
