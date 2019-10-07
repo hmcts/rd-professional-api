@@ -514,8 +514,6 @@ public class ProfessionalApiClient {
     }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
-        log.info("authToken::" + userToken);
-        log.info("S2SToken::" + s2sToken);
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
