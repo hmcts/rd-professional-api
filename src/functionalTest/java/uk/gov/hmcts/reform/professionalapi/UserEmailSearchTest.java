@@ -23,7 +23,6 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_find_a_user_by_their_email_address() {
-
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()

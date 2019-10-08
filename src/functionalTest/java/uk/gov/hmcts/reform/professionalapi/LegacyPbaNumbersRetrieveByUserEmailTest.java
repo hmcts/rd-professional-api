@@ -22,7 +22,6 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
 
     @Test
     public void can_retrieve_payment_numbers_by_user_email() {
-
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();

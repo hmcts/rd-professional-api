@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @ActiveProfiles("functional")
 @Slf4j
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
-
     RequestSpecification bearerTokenForPuiUserManager;
     RequestSpecification bearerTokenForNonPuiUserManager;
 
