@@ -184,11 +184,15 @@ pitest {
             'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
+    enableDefaultIncrementalAnalysis = true
+    historyInputLocation = ['build/reports/pitest/fastermutationtesting']
+    historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
     mutationThreshold = 90   
 
 }
+
 
 project.tasks['pitest'].group = "Verification"
 
