@@ -15,6 +15,8 @@ idam.auth.tokenAuth: ${IDAM_TOKEN_ATUH:cmQtcHJvZmVzc2lvbmFsLWFwaTpjYzVmMmE2LTk2O
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-pr-250.service.core-compute-preview.internal}
+
 spring.flyway.enabled: false
 ## Secure roles configuration 1
 exui.role.hmcts-admin: prd-admin
