@@ -146,3 +146,6 @@ into the pre-script window.  Also add a header as follows:
 ```
 ServiceAuthorization: Bearer {{token}}
 ```
+
+NB internal endpoints will also require 
+hmcts-admin role per bearer token
