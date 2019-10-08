@@ -130,7 +130,8 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
+        // DBG ONLY
+        // log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
