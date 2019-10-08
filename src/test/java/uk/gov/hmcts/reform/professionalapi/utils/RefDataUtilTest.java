@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -251,6 +252,7 @@ public class RefDataUtilTest {
 
         RefDataUtil.filterUsersByStatus(responseEntity, "Active");
     }
+<<<<<<< HEAD
 
     @Test
     public void test_shouldGenerateResponseEntityWithHeaderFromPage() {

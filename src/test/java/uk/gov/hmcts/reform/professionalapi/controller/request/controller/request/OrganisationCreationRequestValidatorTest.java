@@ -242,7 +242,7 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.requestContactInformation(contactList1);
     }
 
-    @Test(expected = Test.None.class)
+    @Test
     public void requestContactInformationDxAddwithvalidTest() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
@@ -254,7 +254,7 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
 
-    @Test(expected = Test.None.class)
+    @Test
     public void should_validate_jurisdictions_successfully() {
 
         OrganisationCreationRequestValidator.validateJurisdictions(createJurisdictions(), getEnumList());
