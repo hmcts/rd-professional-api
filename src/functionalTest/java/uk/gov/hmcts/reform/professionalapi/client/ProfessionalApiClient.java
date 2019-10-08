@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -32,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -173,7 +175,21 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    @SuppressWarnings("unchecked")
+    public  NewUserCreationRequest createNewUserRequest(String email) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("caseworker");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someFirstName")
+                .lastName("someLastName")
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+    }
+
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
@@ -186,6 +202,8 @@ public class ProfessionalApiClient {
 
         return response.body().as(Map.class);
     }
+
+
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
@@ -227,7 +245,6 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations")
                 .andReturn();
 
-        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -277,11 +294,38 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, String pageNumber, String size) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
         if (HttpStatus.OK == status) {
-            return response.body().as(Map.class);
+            return response.as(Map.class);
         } else {
             return new HashMap<String, Object>();
         }
+    }
+
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
+                .andReturn();
+
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
     }
 
     public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
@@ -292,11 +336,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        if (HttpStatus.OK == status) {
-            return response.body().as(Map.class);
-        } else {
-            return new HashMap<String, Object>();
-        }
+        return response.body().as(Map.class);
     }
 
     public Map<String, Object> searchAllActiveUsersByOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
@@ -308,9 +348,10 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
         return response.body().as(Map.class);
     }
+
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
@@ -377,6 +418,51 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String,Object> modifyUserRoleToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(modifyUserProfileData)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
+
+        Response response = requestSpecification
+                .body(modifyUserProfileData)
+                .put("/refdata/external/v1/organisations/users/" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+
+    }
+
+    public Map<String,Object> modifyUserRoleToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+
+        Response response = requestSpecification
+                .body(modifyUserProfileData)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+
+    }
+
+
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
@@ -386,6 +472,7 @@ public class ProfessionalApiClient {
     }
 
     private RequestSpecification getS2sTokenHeaders() {
+
         return withUnauthenticatedRequest()
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
@@ -400,7 +487,8 @@ public class ProfessionalApiClient {
     }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
-
+        log.info("authToken::" + userToken);
+        log.info("S2SToken::" + s2sToken);
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)

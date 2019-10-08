@@ -14,12 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
@@ -64,11 +69,13 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                                                   @RequestParam(value = "showDeleted", required = false) String showDeleted) {
+                                                      @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "size", required = false) Integer size) {
 
         log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "");
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
     @ApiOperation(
@@ -107,5 +114,43 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
 
         return retrieveUserByEmail(email);
+    }
+
+    @ApiOperation(
+            value = "Modify roles for user",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User Roles has been added",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/users/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
+            @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @PathVariable("orgId")  String orgId,
+            @PathVariable("userId") String userId
+    ) {
+
+        log.info("Received request to update user roles of an organisation...");
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+
     }
 }

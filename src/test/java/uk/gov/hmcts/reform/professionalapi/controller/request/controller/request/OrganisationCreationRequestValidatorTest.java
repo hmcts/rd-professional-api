@@ -188,9 +188,63 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
 
-    @Test(expected = InvalidRequest.class) //invalid dx number should throw invalid request
-    public void requestContactInformationDxAddTest() {
+    @Test(expected = InvalidRequest.class)
+    public void requestContactInformationDxAddwithDxNumerHasSpecialCharsTest() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1*2$3&4@", "DxExchange");
+        List<DxAddressCreationRequest> dxList = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void requestContactInformationDxAddwithEmptyTest() {
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", null);
+        List<DxAddressCreationRequest> dxList = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest(null, "DxExchange");
+        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
+        dxList1.add(dxRequest1);
+        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList1);
+        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
+        contactList1.add(contactInfoCreateRequest1);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList1);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void requestContactInformationDxAddwithInvalidLengthTest() {
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 12345678900000", "DxExchange1234567890");
+        List<DxAddressCreationRequest> dxList = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", "DxExchangeDxExchange123");
+        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
+        dxList1.add(dxRequest1);
+        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList1);
+        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
+        contactList1.add(contactInfoCreateRequest1);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList1);
+    }
+
+    @Test(expected = Test.None.class)
+    public void requestContactInformationDxAddwithvalidTest() {
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A","A","A","A", "A","A","A", dxList);
@@ -264,7 +318,8 @@ public class OrganisationCreationRequestValidatorTest {
             "email-100@yahoo.com",
             "email-100@email.net",
             "email+100@gmail.com",
-            "emAil-100@yahoo-test.com"};
+            "emAil-100@yahoo-test.com",
+            "e.mAil-100@yahoo-test.com"};
 
         for (String email : validEmails) {
             OrganisationCreationRequestValidator.validateEmail(email);

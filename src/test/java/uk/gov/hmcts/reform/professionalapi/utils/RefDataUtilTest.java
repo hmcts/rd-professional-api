@@ -5,11 +5,13 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -248,5 +250,85 @@ public class RefDataUtilTest {
         when(responseEntity.getBody()).thenReturn(realResponseEntity.getBody());
 
         RefDataUtil.filterUsersByStatus(responseEntity, "Active");
+    }
+
+    @Test
+    public void test_shouldGenerateResponseEntityWithHeaderFromPage() {
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.add("fakeHeader", "fakeValue");
+
+        ResponseEntity responseEntityMock = mock(ResponseEntity.class);
+        when(responseEntityMock.getHeaders()).thenReturn(responseHeader);
+
+        Page pageMock = mock(Page.class);
+        when(pageMock.getTotalElements()).thenReturn(1L);
+        when(pageMock.getTotalPages()).thenReturn(2);
+
+        Pageable pageableMock = mock(Pageable.class);
+        when(pageableMock.getPageNumber()).thenReturn(0);
+        when(pageableMock.getPageSize()).thenReturn(2);
+
+        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock, responseEntityMock);
+
+        assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
+        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+    }
+
+    @Test
+    public void test_shouldGenerateResponseEntityWithHeaderFromPageWhenResponseEntityIsNull() {
+        Page pageMock = mock(Page.class);
+        when(pageMock.getTotalElements()).thenReturn(1L);
+        when(pageMock.getTotalPages()).thenReturn(2);
+
+        Pageable pageableMock = mock(Pageable.class);
+        when(pageableMock.getPageNumber()).thenReturn(0);
+        when(pageableMock.getPageSize()).thenReturn(2);
+
+        HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock, null);
+
+        HttpHeaders httpHeadersMock = mock(HttpHeaders.class);
+
+        assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+    }
+
+    @Test
+    public void test_shouldCreatePageableObject() {
+        Integer page = 0;
+        Integer size = 5;
+        Sort sort = mock(Sort.class);
+
+        Pageable pageable = RefDataUtil.createPageableObject(page, size, sort);
+
+        assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageSize()).isEqualTo(5);
+    }
+
+    @Test
+    public void test_shouldCreatePageableObjectWithDefaultPageSize() {
+        Integer page = 0;
+        Sort sort = mock(Sort.class);
+
+        Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
+
+        assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    public void test_getShowDeletedValueTrue() {
+        String showDeleted = "True";
+
+        String response = RefDataUtil.getShowDeletedValue(showDeleted);
+
+        assertThat(response.equals("true")).isTrue();
+    }
+
+    @Test
+    public void test_getShowDeletedValueFalse() {
+        String showDeleted = "false";
+
+        String response = RefDataUtil.getShowDeletedValue(showDeleted);
+
+        assertThat(response.equals("false")).isTrue();
     }
 }

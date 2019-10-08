@@ -170,6 +170,62 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchAllActiveUsersByOrganisationExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
     }
 
+    @Test
+    public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-case-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "1Aaron";
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "0", "1");
+
+        validateRetrievedUsers(searchResponse, "any");
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        assertThat(professionalUsersResponses.size()).isEqualTo(1);
+        assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
+
+        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "1", "1");
+
+        validateRetrievedUsers(searchResponse2, "any");
+        List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
+        assertThat(professionalUsersResponses2.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void find_all_users_for_an_organisation_external_with_pagination_should_return_200() {
+
+        RequestSpecification specification = generateBearerTokenForPuiManager();
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", "0", "1");
+
+        validateRetrievedUsers(searchResponse, "any");
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        assertThat(professionalUsersResponses.size()).isEqualTo(1);
+
+        Map<String, Object> searchResponse2 = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", "1", "1");
+
+        validateRetrievedUsers(searchResponse2, "any");
+        List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
+        assertThat(professionalUsersResponses2.size()).isEqualTo(1);
+    }
+
+
+
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
