@@ -1,13 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
@@ -22,8 +15,11 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
+
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
@@ -98,12 +94,6 @@ public abstract class AuthorizationFunctionalTest {
         return activateOrganisation(response, role);
     }
 
-    protected String createAndUpdateOrganisationToActive(String role, OrganisationCreationRequest organisationCreationRequest) {
-
-        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
-        return activateOrganisation(response, role);
-    }
-
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
@@ -111,21 +101,4 @@ public abstract class AuthorizationFunctionalTest {
         return organisationIdentifier;
     }
 
-    protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
-        assertThat(searchResponse.get("idamStatus")).isNotNull();
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
-
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-        assertThat(professionalUsersResponse.get("email")).isNotNull();
-        if (rolesRequired) {
-            assertThat(professionalUsersResponse.get("roles")).isNotNull();
-        } else {
-            assertThat(professionalUsersResponse.get("roles")).isNull();
-        }
-    }
 }
