@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
@@ -920,5 +919,4 @@ public class ProfessionalApiClient {
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
     }
->>>>>>> master
 }

@@ -252,7 +252,6 @@ public class RefDataUtilTest {
 
         RefDataUtil.filterUsersByStatus(responseEntity, "Active");
     }
-<<<<<<< HEAD
 
     @Test
     public void test_shouldGenerateResponseEntityWithHeaderFromPage() {
