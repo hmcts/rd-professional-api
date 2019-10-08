@@ -41,10 +41,11 @@ public class IdamClient {
     }
 
     public String createUser(String userRole) {
+        return createUser(userRole, nextUserEmail(), "First", "Last");
+    }
+
+    public String createUser(String userRole, String userEmail, String firstName, String lastName) {
         //Generating a random user
-        String userEmail = nextUserEmail();
-        String firstName = "First";
-        String lastName = "Last";
         String userGroup = "";
         String password = "Hmcts1234";
 
@@ -70,15 +71,23 @@ public class IdamClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
-
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
     }
 
-    public String getBearerToken() {
-
+    public String getInternalBearerToken() {
         String userEmail = createUser("prd-admin");
+        return getBearerToken(userEmail);
+    }
+
+
+    public String getExternalBearerToken(String role, String firstName, String lastName, String email) {
+        String userEmail = createUser(role, email, firstName, lastName);
+        return getBearerToken(userEmail);
+    }
+
+    public String getBearerToken(String userEmail) {
 
         String codeAuthorization = Base64.getEncoder().encodeToString((userEmail + ":" + password).getBytes());
 
@@ -86,7 +95,7 @@ public class IdamClient {
         authorizeParams.put("client_id", testConfig.getClientId());
         authorizeParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         authorizeParams.put("response_type", "code");
-        authorizeParams.put("scope", "openid profile roles create-user manage-user");
+        authorizeParams.put("scope", "openid roles profile create-user manage-user");
 
         Response authorizeResponse = RestAssured
                 .given()
@@ -97,6 +106,8 @@ public class IdamClient {
                 .params(authorizeParams)
                 .post("/oauth2/authorize")
                 .andReturn();
+
+
 
         assertThat(authorizeResponse.getStatusCode()).isEqualTo(200);
 
@@ -123,10 +134,10 @@ public class IdamClient {
         assertThat(bearerTokenResponse.getStatusCode()).isEqualTo(200);
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
+
+        log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
         return accessTokenResponse.getAccessToken();
-
     }
-
 
     private String nextUserEmail() {
         return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));

@@ -49,6 +49,18 @@ version = '0.0.1'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+        }
+    }
+}
+
 compileJava {
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
@@ -104,6 +116,8 @@ configurations {
     functionalTestCompile.extendsFrom testCompile
     functionalTestRuntime.extendsFrom testRuntime
 }
+
+check.dependsOn jacocoTestCoverageVerification
 
 checkstyle {
     maxWarnings = 0
@@ -167,8 +181,7 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application',
-            'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
+            'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
     outputFormats = ['XML', 'HTML']
@@ -189,8 +202,7 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java" +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/JsonFeignResponseHelper.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
 

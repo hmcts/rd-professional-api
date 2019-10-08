@@ -7,19 +7,29 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -65,23 +75,78 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured("pui-user-manager")
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
+                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
+                                                     @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status,
+                                                     @RequestParam(value = "page", required = false) Integer page,
+                                                     @RequestParam(value = "size", required = false) Integer size) {
 
-        ResponseEntity<?> profUsersEntityResponse = null;
+        ResponseEntity<?> profUsersEntityResponse;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
-        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email);
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
+        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
         if (!StringUtils.isEmpty(email)) {
             log.info("email not empty");
-            profUsersEntityResponse = retrieveUserByEmail(email);
+            if (isRolePuiUserManager) {
+                profUsersEntityResponse = retrieveUserByEmail(email);
+            } else {
+                throw new AccessDeniedException("403 Forbidden");
+            }
         } else {
-            log.info("showDeleted not empty");
-            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted);
+
+            if (!isRolePuiUserManager) {
+                if (StringUtils.isEmpty(status)) {
+                    status = "Active";
+                }
+                profExtUsrReqValidator.validateStatusIsActive(status);
+            }
+
+            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
         }
 
         return profUsersEntityResponse;
+    }
+
+    @ApiOperation(
+            value = "Modify roles for user",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User Roles has been added",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            )
+    })
+    @PutMapping(
+            path = "/users/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ResponseBody
+    @Secured("pui-user-manager")
+    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
+            @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @ApiParam(hidden = true) @OrgId String orgId,
+            @PathVariable("userId") String userId
+    ) {
+
+        log.info("Received request to update user roles of an organisation...");
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+
     }
 }

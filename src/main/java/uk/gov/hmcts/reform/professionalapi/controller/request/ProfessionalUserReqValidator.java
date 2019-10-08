@@ -1,11 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 
 @Component
 @Slf4j
@@ -20,14 +29,57 @@ public class ProfessionalUserReqValidator {
         return false;
     }
 
-    public void validateRequest(String orgId, String showDeleted, String email) {
+    public void validateRequest(String orgId, String showDeleted, String email, String status) {
+        if (null == orgId  && null == email && null == showDeleted) {
+            throw new InvalidRequest("No input values given for the request");
+        }
 
-
-        if (null == orgId && null == showDeleted && null == email) {
-            log.error("No input values for the request");
-            throw new EmptyResultDataAccessException(1);
+        if (!StringUtils.isEmpty(status)) {
+            validateUserStatus(status);
         }
 
         isValidEmail(email);
     }
+
+    public static void validateUserStatus(String status) {
+        boolean valid = false;
+
+        for (IdamStatus idamStatus : IdamStatus.values()) {
+            if (status.equalsIgnoreCase(idamStatus.toString())) {
+                valid = true;
+            }
+        }
+
+        if (!valid) {
+            throw new InvalidRequest("The status provided is invalid");
+        }
+    }
+
+    public void validateStatusIsActive(String status) {
+        if (!IdamStatus.ACTIVE.toString().equalsIgnoreCase(status)) {
+            throw new InvalidRequest("Required status param value equal to 'Active'");
+        }
+    }
+
+    public void validateModifyRolesRequest(ModifyUserProfileData modifyUserProfileData, String userId) {
+
+        if (null == modifyUserProfileData || StringUtils.isEmpty(userId)
+                || invalidRoleName(modifyUserProfileData.getRolesAdd())
+                || invalidRoleName(modifyUserProfileData.getRolesDelete())) {
+
+            throw new InvalidRequest("The Request provided is invalid for modify the roles for user");
+        }
+    }
+
+    public boolean invalidRoleName(Set<RoleName> roleNames) {
+
+        List<RoleName> emptyRoles = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(roleNames)) {
+            emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
+
+        }
+        return emptyRoles.size() > 0 ? true : false;
+    }
+
+
 }
