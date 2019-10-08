@@ -232,6 +232,7 @@ public class OrganisationServiceImplTest {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
@@ -597,4 +598,23 @@ public class OrganisationServiceImplTest {
                 times(1)).saveAll(any());
     }
 
+    @Test
+    public void testFakeAttributesNotAdded() {
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "FAKE"), "pui-fake-manager", "FAKE_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "FAKE_ROLE"), "pui-fake-manager", "FAKE_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "FAKE_FAKE"), "pui-fake-manager", "FAKE_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "pui-fake-manager", "FAKE_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "FAKE_JURISD"), "PROBATE", "FAKE_ROLE"));
+
+
+        List<UserAttribute> attributes = new ArrayList<>();
+        attributes.add(userAttributeMock);
+        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
+        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
+
+        organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+
+        verify(userAttributeRepositoryMock, times(0)).saveAll(any());
+    }
 }

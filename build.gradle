@@ -181,8 +181,7 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application',
-            'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
+            'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10
     enableDefaultIncrementalAnalysis = true
@@ -207,8 +206,7 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java" +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/JsonFeignResponseHelper.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
     }
 }
 
