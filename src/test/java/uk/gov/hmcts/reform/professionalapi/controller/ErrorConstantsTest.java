@@ -14,7 +14,7 @@ public class ErrorConstantsTest {
 
         assertThat(ErrorConstants.UNSUPPORTED_MEDIA_TYPES.getErrorMessage()).isEqualTo("2 : Unsupported Media Type");
 
-        assertThat(ErrorConstants.INVALID_REQUEST.getErrorMessage()).isEqualTo("There is a problem with your request. Please check and try again");
+        assertThat(ErrorConstants.INVALID_REQUEST.getErrorMessage()).isEqualTo("3 : There is a problem with your request. Please check and try again");
 
     }
 
