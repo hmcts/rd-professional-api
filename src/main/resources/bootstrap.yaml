@@ -6,4 +6,5 @@ spring:
       aliases:
         s2s-secret: idam.s2s-auth.totp_secret
         professional-api-POSTGRES-PASS: spring.datasource.password
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
 
