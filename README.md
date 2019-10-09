@@ -141,7 +141,8 @@ pm.sendRequest('http://127.0.0.1:8089/token', function (err, res) {
     }
 });
 ```
-into the pre-script window.  Also add a header as follows:
+into the pre-script window  Also add a header as follows:
+
 
 ```
 ServiceAuthorization: Bearer {{token}}
