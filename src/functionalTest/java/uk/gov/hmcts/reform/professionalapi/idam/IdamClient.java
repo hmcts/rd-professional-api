@@ -81,6 +81,7 @@ public class IdamClient {
         return getBearerToken(userEmail);
     }
 
+
     public String getExternalBearerToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);
         return getBearerToken(userEmail);
@@ -94,7 +95,7 @@ public class IdamClient {
         authorizeParams.put("client_id", testConfig.getClientId());
         authorizeParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         authorizeParams.put("response_type", "code");
-        authorizeParams.put("scope", "openid profile roles manage-user create-user search-user");
+        authorizeParams.put("scope", "openid roles profile create-user manage-user");
 
         Response authorizeResponse = RestAssured
                 .given()
@@ -105,6 +106,8 @@ public class IdamClient {
                 .params(authorizeParams)
                 .post("/oauth2/authorize")
                 .andReturn();
+
+
 
         assertThat(authorizeResponse.getStatusCode()).isEqualTo(200);
 
@@ -132,6 +135,7 @@ public class IdamClient {
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
 
+        //log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
         return accessTokenResponse.getAccessToken();
     }
 
