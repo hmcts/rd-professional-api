@@ -2,20 +2,3 @@ java:
     # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  environment:
-    S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-  aadIdentityName: rd
-  keyVaults:
-    "s2s":
-      resourceGroup: rpe-service-auth-provider
-      secrets:
-        - microservicekey-rd-professional-api
-    "rd":
-      resourceGroup: rd
-      secrets:
-        - s2s-url
-        - professional-api-POSTGRES-DATABASE
-        - professional-api-POSTGRES-HOST
-        - professional-api-POSTGRES-PASS
-        - professional-api-POSTGRES-PORT
-        - professional-api-POSTGRES-USER
