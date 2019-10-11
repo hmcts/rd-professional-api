@@ -61,13 +61,18 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     UserAttributeRepository userAttributeRepository;
     PrdEnumRepository prdEnumRepository;
+
+    @Autowired
     UserAccountMapRepository userAccountMapRepository;
+    @Autowired
     UserProfileFeignClient userProfileFeignClient;
+    @Autowired
     PrdEnumService prdEnumService;
 
     private static final String SIDAM_ROLE = "SIDAM_ROLE";
     private static final String ADMIN_ROLE = "ADMIN_ROLE";
     private static final String JURISD_ID = "JURISD_ID";
+
 
     @Autowired
     public OrganisationServiceImpl(
@@ -77,10 +82,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
             UserAttributeRepository userAttributeRepository,
-            PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository,
-            UserProfileFeignClient userProfileFeignClient,
-            PrdEnumService prdEnumService
+            PrdEnumRepository prdEnumRepository
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -88,11 +90,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
-        this.userAccountMapRepository = userAccountMapRepository;
         this.userAttributeRepository = userAttributeRepository;
         this.prdEnumRepository = prdEnumRepository;
-        this.userProfileFeignClient = userProfileFeignClient;
-        this.prdEnumService = prdEnumService;
     }
 
     @Override
@@ -120,10 +119,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
+    /*private*/public List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
 
 
-        prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
+       prdEnumService.findAllPrdEnums()/*.stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
             if (enumType.equalsIgnoreCase(SIDAM_ROLE)
                     || enumType.equalsIgnoreCase(ADMIN_ROLE)
@@ -133,12 +132,12 @@ public class OrganisationServiceImpl implements OrganisationService {
 
                 attributes.add(userAttribute);
             }
-        });
+        })*/;
 
-        if (!CollectionUtils.isEmpty(attributes)) {
-
-            userAttributeRepository.saveAll(attributes);
-        }
+//        if (!CollectionUtils.isEmpty(attributes)) {
+//
+//            userAttributeRepository.saveAll(attributes);
+//        }
         return attributes;
     }
 

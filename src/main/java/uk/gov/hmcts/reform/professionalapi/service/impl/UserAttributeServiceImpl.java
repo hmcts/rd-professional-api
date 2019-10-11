@@ -33,6 +33,8 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         this.prdEnumService = prdEnumService;
     }
 
+
+
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums) {
 
@@ -58,5 +60,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         }
 
     }
+
+    
 
 }
