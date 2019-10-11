@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -89,14 +90,12 @@ public class UserAttributeServiceTest {
         jurisdictionIds.add("PROBATE");
 
         List<UserAttribute> result = userAttributeServiceMock.addUserAttributesToSuperUserWithJurisdictions(professionalUserMock, userAttributes, jurisdictionIds);
-//
+
          assertThat(result.size()).isEqualTo(expectSize);
 
-//        OrganisationResponse organisationResponse =
-//                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
-//
-//        verify(
-//                userAttributeRepositoryMock,
-//                times(1)).saveAll(any());
-    }
+
+        verify(
+                userAttributeRepositoryMock,
+                times(1)).saveAll(any());
+}
 }

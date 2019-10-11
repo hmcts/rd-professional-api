@@ -34,8 +34,6 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         this.prdEnumService = prdEnumService;
     }
 
-
-
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums) {
 
@@ -64,19 +62,27 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user, List<UserAttribute> attributes, List<String> jurisdictionIds) {
 
-        prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
-            String enumType = prdEnum.getPrdEnumId().getEnumType();
-            System.out.println("enumType = " + enumType);
-           if (enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
-                  || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
-                  || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
-               PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
-               UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-               attributes.add(userAttribute);
-           }
-    })
-        ;
+        prdEnumService.findAllPrdEnums().stream()
+                .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
+                .map(prdEnum -> {
+                            PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                            return new UserAttribute(user, e);
+                        }).forEach(userAttribute -> attributes.add(userAttribute));
+
+        if (!CollectionUtils.isEmpty(attributes)) {
+
+            userAttributeRepository.saveAll(attributes);
+        }
+
         return attributes;
+
+    }
+
+    private boolean isValidEnumType ( String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
+        return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
+                || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
+                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
+
 
     }
 

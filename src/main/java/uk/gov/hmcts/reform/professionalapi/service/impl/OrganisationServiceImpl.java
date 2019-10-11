@@ -121,29 +121,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationResponse(organisation);
     }
-
-    /*private*/public List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
-
-
-       prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
-            String enumType = prdEnum.getPrdEnumId().getEnumType();
-            if (enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
-                    || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
-                    || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
-                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
-                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-
-                attributes.add(userAttribute);
-            }
-        });
-
-        if (!CollectionUtils.isEmpty(attributes)) {
-
-            userAttributeRepository.saveAll(attributes);
-        }
-        return attributes;
-    }
-
+    
     private Organisation saveOrganisation(Organisation organisation) {
         Organisation persistedOrganisation = null;
         try {
