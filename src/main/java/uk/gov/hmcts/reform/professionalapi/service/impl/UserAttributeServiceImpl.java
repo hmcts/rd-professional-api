@@ -66,16 +66,16 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
         prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
             String enumType = prdEnum.getPrdEnumId().getEnumType();
-            if (enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
-                    || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
-                    || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
-                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
-                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-
-                attributes.add(userAttribute);
-            }
-
-        });
+            System.out.println("enumType = " + enumType);
+           if (enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
+                  || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
+                  || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
+               PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+               UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
+               attributes.add(userAttribute);
+           }
+    })
+        ;
         return attributes;
 
     }
