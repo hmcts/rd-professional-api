@@ -99,6 +99,7 @@ public class OrganisationServiceImplTest {
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+    private UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
 
 
     private final PrdEnumId prdEnumId = mock(PrdEnumId.class);
@@ -582,43 +583,7 @@ public class OrganisationServiceImplTest {
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
     }
 
-    @Test
-    public void testAddAllAttributes() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
-        userRoles.add("pui-user-manager");
-        userRoles.add("pui-organisation-manager");
-        userRoles.add("pui-finance-manager");
-        userRoles.add("pui-case-manager");
-        userRoles.add("organisation-admin");
-
-        List<UserAttribute> attributes = new ArrayList<>();
-        attributes.add(userAttributeMock);
-        int expectSize = attributes.size() + 1;
-
-        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
-        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
-        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
-
-        ProfessionalUser professionalUserMock = Mockito.mock(ProfessionalUser.class);
-        List<String> jurisdictionIds = new ArrayList<>();
-
-        List<UserAttribute> result = ((OrganisationServiceImpl)sut).addAllAttributes(attributes, professionalUserMock, jurisdictionIds);
-
-        assertThat(result.size()).isEqualTo(expectSize);
-
-//        OrganisationResponse organisationResponse =
-//                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
-
-//        verify(
-//                userAttributeRepositoryMock,
-//                times(1)).saveAll(any());
-    }
 
     @Test
     public void testFakeAttributesNotAdded() {

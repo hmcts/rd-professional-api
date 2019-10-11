@@ -12,6 +12,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Mockito;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -36,6 +38,9 @@ public class UserAttributeServiceTest {
     private final ProfessionalUser professionalUser = mock(ProfessionalUser.class);
     private List<String> userRoles = new ArrayList<>();
     private List<PrdEnum> prdEnums = new ArrayList<>();
+
+    private final UserAttribute userAttributeMock = mock(UserAttribute.class);
+
 
     @Before
     public void setUp() {
@@ -64,5 +69,43 @@ public class UserAttributeServiceTest {
                 userAttributeRepository,
                 times(1)).saveAll(any());
 
+    }
+
+    @Test
+    public void testAddAllAttributes() {
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
+
+        userRoles.add("pui-user-manager");
+        userRoles.add("pui-organisation-manager");
+        userRoles.add("pui-finance-manager");
+        userRoles.add("pui-case-manager");
+        userRoles.add("organisation-admin");
+
+        List<UserAttribute> attributes = new ArrayList<>();
+        attributes.add(userAttributeMock);
+        int expectSize = attributes.size() + 1;
+
+//        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
+//        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
+//        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
+
+        ProfessionalUser professionalUserMock = Mockito.mock(ProfessionalUser.class);
+        List<String> jurisdictionIds = new ArrayList<>();
+
+        List<UserAttribute> result = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(professionalUserMock, attributes, jurisdictionIds);
+
+        assertThat(result.size()).isEqualTo(expectSize);
+
+//        OrganisationResponse organisationResponse =
+//                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+//
+//        verify(
+//                userAttributeRepositoryMock,
+//                times(1)).saveAll(any());
     }
 }
