@@ -16,6 +16,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionMapperTest {
@@ -30,6 +31,19 @@ public class ExceptionMapperTest {
 
         ResponseEntity<Object> responseEntity =
                 exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+    }
+
+    @Test
+    public void should_handle_resource_not_found_exception() {
+
+        ResourceNotFoundException resourceNotFoundException = mock(ResourceNotFoundException.class);
+
+
+        ResponseEntity<Object> responseEntity =
+                exceptionMapper.handleResourceNotFoundException(resourceNotFoundException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
