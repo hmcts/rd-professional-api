@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -68,6 +69,7 @@ public abstract class AuthorizationFunctionalTest {
 
     protected ProfessionalApiClient professionalApiClient;
 
+
     protected RequestSpecification bearerTokenForPuiUserManager;
 
     @Autowired
@@ -81,6 +83,7 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
@@ -90,7 +93,7 @@ public abstract class AuthorizationFunctionalTest {
 
         professionalApiClient = new ProfessionalApiClient(
                 professionalApiUrl,
-                s2sToken, idamClient);
+                s2sToken, idamOpenIdClient, idamClient);
     }
 
     @After
@@ -130,7 +133,7 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
+        // log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)

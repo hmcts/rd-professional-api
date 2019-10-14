@@ -135,7 +135,7 @@ public class IdamClient {
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
 
-        log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
+        //log.info("ACCESS TOKEN RESPONSE:::: " + accessTokenResponse.getAccessToken());
         return accessTokenResponse.getAccessToken();
     }
 
