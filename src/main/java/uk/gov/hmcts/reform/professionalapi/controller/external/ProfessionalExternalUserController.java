@@ -32,6 +32,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.isValidEmail;
+
 @RequestMapping(
         path = "refdata/external/v1/organisations",
         produces = MediaType.APPLICATION_JSON_UTF8_VALUE
@@ -143,7 +145,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         ResponseEntity<ProfessionalUsersResponse> profUsersEntityResponse = null;
         log.info("ProfessionalExternalUserController::findUserByEmail:" + email);
-        profExtUsrReqValidator.isValidEmail(email);
+        isValidEmail(email);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
