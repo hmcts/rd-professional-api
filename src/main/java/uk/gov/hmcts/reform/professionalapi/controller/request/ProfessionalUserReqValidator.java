@@ -29,16 +29,14 @@ public class ProfessionalUserReqValidator {
         return false;
     }
 
-    public void validateRequest(String orgId, String showDeleted, String email, String status) {
-        if (null == orgId  && null == email && null == showDeleted) {
+    public void validateRequest(String orgId, String showDeleted, String status) {
+        if (null == orgId  && null == showDeleted) {
             throw new InvalidRequest("No input values given for the request");
         }
 
         if (!StringUtils.isEmpty(status)) {
             validateUserStatus(status);
         }
-
-        isValidEmail(email);
     }
 
     public static void validateUserStatus(String status) {

@@ -91,11 +91,11 @@ public class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, "pui-user-manager")).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
 
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class), any(String.class));
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, "", null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
@@ -131,11 +131,11 @@ public class ProfessionalExternalUserControllerTest {
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, "pui-case-manager")).thenReturn(true);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
 
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class), any(String.class));
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, "Pending", null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "Pending", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }

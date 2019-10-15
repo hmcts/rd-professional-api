@@ -169,7 +169,8 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
-                userAttributeRepositoryMock, prdEnumRepositoryMock,
+                userAttributeRepositoryMock,
+                prdEnumRepositoryMock,
                 userAccountMapRepositoryMock,
                 userProfileFeignClient,
                 prdEnumServiceMock);

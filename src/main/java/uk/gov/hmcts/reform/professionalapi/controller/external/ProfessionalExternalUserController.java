@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
@@ -78,14 +79,71 @@ public class ProfessionalExternalUserController extends SuperController {
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity<?> findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email,
                                                      @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status,
                                                      @RequestParam(value = "page", required = false) Integer page,
                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        ResponseEntity<?> profUsersEntityResponse;
         log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
-        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, email, status);
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
+        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
+        ResponseEntity<?> profUsersEntityResponse;
+
+        if (!isRolePuiUserManager) {
+            if (StringUtils.isEmpty(status)) {
+                status = "Active";
+            }
+            profExtUsrReqValidator.validateStatusIsActive(status);
+        }
+
+        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
+
+        return profUsersEntityResponse;
+    }
+
+    @ApiOperation(
+            value = "Retrieves the user with the given email address if organisation is active or showDeleted flag ",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The email of the desired user to be retrieved",
+            required = false
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "A professional user along with their details",
+                    response = ProfessionalUsersEntityResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Invalid authorization"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No user was found with the provided email address"
+            )
+    })
+    @GetMapping(
+            value = "/user",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured({"pui-user-manager"})
+    public ResponseEntity<ProfessionalUsersResponse> findUserByEmail(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
+                                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
+
+        ResponseEntity<ProfessionalUsersResponse> profUsersEntityResponse = null;
+        log.info("ProfessionalExternalUserController::findUserByEmail:" + email);
+        profExtUsrReqValidator.isValidEmail(email);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
 
@@ -96,16 +154,6 @@ public class ProfessionalExternalUserController extends SuperController {
             } else {
                 throw new AccessDeniedException("403 Forbidden");
             }
-        } else {
-
-            if (!isRolePuiUserManager) {
-                if (StringUtils.isEmpty(status)) {
-                    status = "Active";
-                }
-                profExtUsrReqValidator.validateStatusIsActive(status);
-            }
-
-            profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
         }
 
         return profUsersEntityResponse;
@@ -149,4 +197,6 @@ public class ProfessionalExternalUserController extends SuperController {
         return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
 
     }
+
+
 }

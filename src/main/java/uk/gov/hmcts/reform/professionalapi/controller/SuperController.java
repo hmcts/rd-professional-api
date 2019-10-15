@@ -163,7 +163,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveUserByEmail(String email) {
+    protected ResponseEntity<ProfessionalUsersResponse> retrieveUserByEmail(String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(RefDataUtil.removeEmptySpaces(email));
 
