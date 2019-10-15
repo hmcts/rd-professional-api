@@ -65,9 +65,9 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         prdEnumService.findAllPrdEnums().stream()
                 .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
                 .map(prdEnum -> {
-                            PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
-                            return new UserAttribute(user, e);
-                        }).forEach(userAttribute -> attributes.add(userAttribute));
+                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                    return new UserAttribute(user, e);
+                }).forEach(userAttribute -> attributes.add(userAttribute));
 
         if (!CollectionUtils.isEmpty(attributes)) {
 
@@ -78,7 +78,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     }
 
-    private boolean isValidEnumType ( String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
+    private boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
                 || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
@@ -87,6 +87,6 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     }
 
 
-    
+
 
 }
