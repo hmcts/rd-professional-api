@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.isValidEmail;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -32,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.isValidEmail;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
