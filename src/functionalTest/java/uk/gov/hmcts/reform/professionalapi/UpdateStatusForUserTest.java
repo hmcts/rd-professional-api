@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
 
     @Test
-    public void ac1_modify_status_existing_user_to_organisation_internal() {
+    public void ac1_modify_status_existing_user_from_ACTIVE_to_PENDING() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
