@@ -89,7 +89,7 @@ usermap:
 
 auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
-auth.idam.client.detailsUri: "/details"
+auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
 exui.role:
     hmcts-admin: prd-admin

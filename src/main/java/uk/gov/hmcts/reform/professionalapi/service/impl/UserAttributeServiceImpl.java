@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumType;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -58,5 +59,34 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         }
 
     }
+
+    public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user, List<UserAttribute> attributes, List<String> jurisdictionIds) {
+
+        prdEnumService.findAllPrdEnums().stream()
+                .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
+                .map(prdEnum -> {
+                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                    return new UserAttribute(user, e);
+                }).forEach(userAttribute -> attributes.add(userAttribute));
+
+        if (!CollectionUtils.isEmpty(attributes)) {
+
+            userAttributeRepository.saveAll(attributes);
+        }
+
+        return attributes;
+
+    }
+
+    private boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
+        return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
+                || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
+                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
+
+
+    }
+
+
+
 
 }
