@@ -332,7 +332,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
+    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
@@ -343,7 +343,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
+    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
@@ -440,7 +440,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(modifyUserProfileData)
@@ -455,22 +455,7 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserStatusToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
-
-        Response response = getMultipleAuthHeadersInternal()
-                .body(modifyUserProfileData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-
-        return response.body().as(Map.class);
-
-    }
-
-    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
                 .body(modifyUserProfileData)
@@ -485,7 +470,7 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String organisationId, String userId) {
 
         Response response = requestSpecification
                 .body(modifyUserProfileData)
