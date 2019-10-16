@@ -180,8 +180,6 @@ public class OrganisationServiceImplTest {
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
 
-
-
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
@@ -231,7 +229,6 @@ public class OrganisationServiceImplTest {
     public void testSavesAnOrganisation() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);

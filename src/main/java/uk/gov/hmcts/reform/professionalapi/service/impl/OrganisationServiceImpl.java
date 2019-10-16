@@ -275,15 +275,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
-        activeOrganisations.forEach(
-            organisation -> {
-
-                if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-
-                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
-                }
-
-            });
+        activeOrganisations.forEach(organisation -> {
+            if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+            }
+        });
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
