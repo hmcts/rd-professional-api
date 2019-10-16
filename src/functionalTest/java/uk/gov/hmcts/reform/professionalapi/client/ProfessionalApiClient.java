@@ -455,6 +455,21 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String,Object> modifyUserStatusToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(modifyUserProfileData)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+
+    }
+
     public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
@@ -474,7 +489,7 @@ public class ProfessionalApiClient {
 
         Response response = requestSpecification
                 .body(modifyUserProfileData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
 
         response.then()
