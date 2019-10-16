@@ -28,12 +28,10 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -73,8 +71,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
-@RunWith(MockitoJUnitRunner.class)
-//@ContextConfiguration (loader = Annotation)
 public class OrganisationServiceImplTest {
 
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -95,9 +91,7 @@ public class OrganisationServiceImplTest {
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
-    private UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
-
-
+    private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
     private final PrdEnumId prdEnumId = mock(PrdEnumId.class);
 
     private final UserAttribute userAttributeMock = mock(UserAttribute.class);
@@ -116,15 +110,8 @@ public class OrganisationServiceImplTest {
 
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
 
-    @Mock
-    private UserProfileFeignClient userProfileFeignClientMock;
-
-    @Mock
-    private PrdEnumService prdEnumServiceMock;
-
-    //@InjectMocks
-    private OrganisationService sut = new OrganisationServiceImpl(organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
-            dxAddressRepositoryMock, contactInformationRepositoryMock, userAttributeRepositoryMock, prdEnumRepositoryMock);
+    @InjectMocks
+    private OrganisationServiceImpl organisationService;
 
     @Before
     public void setUp() {
@@ -182,17 +169,16 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
-                userAttributeRepositoryMock, prdEnumRepositoryMock
-                );
-
+                userAttributeRepositoryMock, prdEnumRepositoryMock,
+                userAccountMapRepositoryMock,
+                userProfileFeignClient,
+                prdEnumServiceMock);
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
                         "some-org-name", "PENDING", "sra-id", "false", "number01", "company-url",
                         superUser,
                         paymentAccountList, contactInformationCreationRequests);
-
-
 
         when(organisationMock.getId()).thenReturn(UUID.randomUUID());
 
@@ -243,7 +229,6 @@ public class OrganisationServiceImplTest {
     public void testSavesAnOrganisation() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
@@ -368,8 +353,10 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock, contactInformationRepositoryMock,
                 userAttributeRepositoryMock,
-                prdEnumRepositoryMock);
-
+                prdEnumRepositoryMock,
+                userAccountMapRepositoryMock,
+                userProfileFeignClient,
+                prdEnumServiceMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
@@ -579,16 +566,20 @@ public class OrganisationServiceImplTest {
                 organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
     }
 
-
-
     @Test
-    public void testFakeAttributesNotAdded() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(0, "FAKE"), "pui-fake-manager", "FAKE_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(1, "FAKE_ROLE"), "pui-fake-manager", "FAKE_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(2, "FAKE_FAKE"), "pui-fake-manager", "FAKE_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "pui-fake-manager", "FAKE_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "FAKE_JURISD"), "PROBATE", "FAKE_ROLE"));
+    public void testAllAttributesAddedToSuperUser() {
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
+        userRoles.add("pui-user-manager");
+        userRoles.add("pui-organisation-manager");
+        userRoles.add("pui-finance-manager");
+        userRoles.add("pui-case-manager");
+        userRoles.add("organisation-admin");
 
         List<UserAttribute> attributes = new ArrayList<>();
         attributes.add(userAttributeMock);
@@ -596,8 +587,12 @@ public class OrganisationServiceImplTest {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeRepositoryMock.saveAll(any())).thenReturn(attributes);
 
-        organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
+        OrganisationResponse organisationResponse =
+                organisationServiceImplMock.createOrganisationFrom(organisationCreationRequest);
 
-        verify(userAttributeRepositoryMock, times(0)).saveAll(any());
+        verify(
+                userAttributeRepositoryMock,
+                times(1)).saveAll(any());
     }
+
 }
