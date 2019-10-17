@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
@@ -45,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -116,28 +114,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         return new OrganisationResponse(organisation);
     }
-
-//    private List<UserAttribute> addAllAttributes(List<UserAttribute> attributes, ProfessionalUser user, List<String> jurisdictionIds) {
-//
-//
-//        prdEnumService.findAllPrdEnums().stream().forEach(prdEnum -> {
-//            String enumType = prdEnum.getPrdEnumId().getEnumType();
-//            if (enumType.equalsIgnoreCase(SIDAM_ROLE)
-//                    || enumType.equalsIgnoreCase(ADMIN_ROLE)
-//                    || (enumType.equalsIgnoreCase(JURISD_ID) && jurisdictionIds.contains(prdEnum.getEnumName()))) {
-//                PrdEnum newPrdEnum = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
-//                UserAttribute userAttribute = new UserAttribute(user, newPrdEnum);
-//
-//                attributes.add(userAttribute);
-//            }
-//        });
-//
-//        if (!CollectionUtils.isEmpty(attributes)) {
-//
-//            userAttributeRepository.saveAll(attributes);
-//        }
-//        return attributes;
-//    }
 
     private Organisation saveOrganisation(Organisation organisation) {
         Organisation persistedOrganisation = null;
