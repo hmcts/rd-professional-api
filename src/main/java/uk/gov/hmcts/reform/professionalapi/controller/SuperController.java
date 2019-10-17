@@ -97,7 +97,7 @@ public abstract class SuperController {
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
 
-    private final String sraRegulatedFalse = "false";
+    static final String sraRegulatedFalse = "false";
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
