@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+
 import feign.FeignException;
 import feign.Response;
 import java.util.List;
@@ -47,6 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
 
 @RestController
 @Slf4j
@@ -106,7 +109,7 @@ public abstract class SuperController {
         }
 
         if (organisationCreationRequest.getSuperUser() != null) {
-            organisationCreationRequestValidator.validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+            validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
@@ -267,7 +270,7 @@ public abstract class SuperController {
 
         Object responseBody = null;
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
+        validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
