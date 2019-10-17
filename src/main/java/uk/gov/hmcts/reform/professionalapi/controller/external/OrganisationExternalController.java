@@ -171,7 +171,6 @@ public class OrganisationExternalController extends SuperController {
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
 
         log.info("In retrievePaymentAccountByUserEmail method:");
-        boolean isPuiFinanceManExist = false;
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

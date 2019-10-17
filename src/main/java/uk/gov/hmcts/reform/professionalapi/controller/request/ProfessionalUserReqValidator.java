@@ -78,7 +78,7 @@ public class ProfessionalUserReqValidator {
             emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
 
         }
-        return emptyRoles.size() > 0 ? true : false;
+        return emptyRoles.isEmpty();
     }
 
 

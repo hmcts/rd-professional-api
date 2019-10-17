@@ -50,7 +50,7 @@ public class OrganisationCreationRequestValidator {
 
     public static boolean contains(String status) {
         for (OrganisationStatus type : OrganisationStatus.values()) {
-            if (type.name().equals(status.toUpperCase())) {
+            if (type.name().equalsIgnoreCase(status)) {
                 return true;
             }
         }
@@ -59,7 +59,6 @@ public class OrganisationCreationRequestValidator {
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
         if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
-            String errorMessage = "Invalid organisationIdentifier provided organisationIdentifier: " + inputOrganisationIdentifier;
             throw new EmptyResultDataAccessException(1);
         }
     }
