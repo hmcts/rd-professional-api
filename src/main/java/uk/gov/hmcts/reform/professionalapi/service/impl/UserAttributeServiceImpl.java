@@ -36,7 +36,6 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     @Override
     public void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums) {
-
         List<UserAttribute> userAttributes =  new ArrayList<>();
 
         userRoles.forEach(role -> {
@@ -54,23 +53,21 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         });
 
         if (!CollectionUtils.isEmpty(userAttributes)) {
-
             userAttributeRepository.saveAll(userAttributes);
         }
 
     }
 
+    @Override
     public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user, List<UserAttribute> attributes, List<String> jurisdictionIds) {
-
         prdEnumService.findAllPrdEnums().stream()
                 .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
                 .map(prdEnum -> {
                     PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
                     return new UserAttribute(user, e);
-                }).forEach(userAttribute -> attributes.add(userAttribute));
+                }).forEach(attributes::add);
 
         if (!CollectionUtils.isEmpty(attributes)) {
-
             userAttributeRepository.saveAll(attributes);
         }
 
@@ -82,8 +79,6 @@ public class UserAttributeServiceImpl implements UserAttributeService {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
                 || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
-
-
     }
 
 
