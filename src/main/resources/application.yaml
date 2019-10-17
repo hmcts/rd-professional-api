@@ -101,7 +101,7 @@ exui.role:
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
-userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-pr-115.service.core-compute-preview.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-115.service.core-compute-preview.internal}
 
 
 ccdUrl: ${CCD_URL:https://ccd-user-profile-api-aat.service.core-compute-aat.internal}

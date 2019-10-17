@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
 
     @Test
-    public void ac1_modify_status_existing_user_from_Active_to_Pending() {
+    public void ac1_modify_status_existing_user_from_Active_to_Pending_Internal() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifier = (String) response.get("organisationIdentifier");
@@ -62,11 +62,39 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
     }
 
     @Test
-    public void ac3_modify_status_pending_user_throws_400() {
+    public void ac2_modify_status_user_external() {
 
-        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForPuiManagerWithPendingUser(), "PENDING");
+        RequestSpecification specification = generateBearerTokenForPuiManagerWithPendingUser();
 
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, specification, "ACTIVE");
 
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.toString());
+
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        String id = (String)professionalUsersResponses.get(0).get("userIdentifier");
+
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, specification, id);
+
+        searchUserValidateStatusExternal(id,"SUSPENDED", specification);
+    }
+
+    @Test
+    public void ac3_modify_status_pending_user_throws_400_external() {
+
+        RequestSpecification specification = generateBearerTokenForPuiManagerWithPendingUser();
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, specification, "PENDING");
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.toString());
+
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        String id = (String)professionalUsersResponses.get(0).get("userIdentifier");
+
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.BAD_REQUEST, modifyUserProfileData, specification,id);
+
+        searchUserValidateStatusExternal(id,"PENDING", specification);
     }
 
     public RequestSpecification generateBearerTokenForPuiManagerWithPendingUser() {
@@ -107,6 +135,18 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
     private void searchUserValidateStatus(String userId, String statusToBeValidated, String orgIdentifier) {
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+
+        professionalUsersResponses.forEach(user -> {
+            if (userId.equalsIgnoreCase((String) user.get("userIdentifier"))) {
+                assertThat(user.get("idamStatus").toString()).isEqualTo(statusToBeValidated);
+            }
+        });
+    }
+
+    private void searchUserValidateStatusExternal(String userId, String statusToBeValidated, RequestSpecification requestSpecification) {
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, requestSpecification, statusToBeValidated);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
         professionalUsersResponses.forEach(user -> {
