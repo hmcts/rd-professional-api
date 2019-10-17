@@ -108,7 +108,7 @@ public abstract class SuperController {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
-        if (organisationCreationRequest.getSuperUser() != null) {
+        if (null != organisationCreationRequest.getSuperUser()) {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 

@@ -152,7 +152,7 @@ public class ProfessionalExternalUserController extends SuperController {
             log.info("email is valid");
             optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
         } else {
-            throw new InvalidRequest("The email provided is invalid");
+            throw new InvalidRequest("The email provided '" + email + "' is invalid");
         }
 
         if (optionalResponseEntity.isPresent()) {
