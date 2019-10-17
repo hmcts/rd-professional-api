@@ -97,7 +97,7 @@ public abstract class SuperController {
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
 
-    static final String sraRegulatedFalse = "false";
+    static final String SRA_REGULATED_FALSE = "false";
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
@@ -105,7 +105,7 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated(sraRegulatedFalse);
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         if (organisationCreationRequest.getSuperUser() != null) {
@@ -119,7 +119,7 @@ public abstract class SuperController {
         }
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated(sraRegulatedFalse);
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         OrganisationResponse organisationResponse =
@@ -196,7 +196,7 @@ public abstract class SuperController {
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated(sraRegulatedFalse);
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
