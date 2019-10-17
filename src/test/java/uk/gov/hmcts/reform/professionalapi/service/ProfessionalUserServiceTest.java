@@ -334,8 +334,6 @@ public class ProfessionalUserServiceTest {
         roles.add(roleName2);
         modifyUserProfileData.setRolesAdd(roles);
 
-
-
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();

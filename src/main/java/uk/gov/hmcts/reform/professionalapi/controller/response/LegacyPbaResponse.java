@@ -19,7 +19,8 @@ public class LegacyPbaResponse {
     @SuppressWarnings({"checkstyle:ParameterName"})
     private List<String> getPaymentAccounts(List<String> payment_accounts) {
 
-        return this.payment_accounts = payment_accounts.stream().map(payment_account ->
+        payment_accounts.stream().map(payment_account ->
                 payment_account).collect(Collectors.toList());
+        return this.payment_accounts;
     }
 }
