@@ -37,5 +37,5 @@ public interface UserProfileFeignClient {
     @PutMapping(value = "/v1/userprofile/{userId}")
     @RequestLine("PUT /v1/userprofile/{userId}")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
-    Response modifyUserRoles(@RequestBody Object modifyRoles, @PathVariable("userId") String userId);
+    Response modifyUserRoles(@RequestBody Object modifyRoles, @PathVariable("userId") String userId, @RequestParam(value = "origin") String origin);
 }
