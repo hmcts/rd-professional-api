@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
 
     @Test
-    public void ac1_modify_status_existing_user_from_Active_to_Pending_Internal() {
+    public void ac1_modify_status_existing_user_from_Active_to_Suspended_Internal() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifier = (String) response.get("organisationIdentifier");
