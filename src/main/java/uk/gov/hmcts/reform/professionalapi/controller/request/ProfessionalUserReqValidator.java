@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 @Slf4j
 public class ProfessionalUserReqValidator {
 
-    public static boolean isValidEmail(String email) {
+    private static boolean isValidEmail(String email) {
         if (email != null) {
             Pattern p = Pattern.compile("\\\\A(?=[a-zA-Z0-9@.!#$%&'*+/=?^_`{|}~-]{6,254}\\\\z)(?=[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]\" + \"{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:(?=[a-zA-Z0-9-]{1,63}\" + \"\\\\.)[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\\\.)+(?=[a-zA-Z0-9-]{1,63}\\\\z)[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\\\z\" + \"'?[- a-zA-Z]+$\";\n");
             Matcher m = p.matcher(email);
@@ -41,7 +41,7 @@ public class ProfessionalUserReqValidator {
         isValidEmail(email);
     }
 
-    public static void validateUserStatus(String status) {
+    private static void validateUserStatus(String status) {
         boolean valid = false;
 
         for (IdamStatus idamStatus : IdamStatus.values()) {
@@ -71,14 +71,14 @@ public class ProfessionalUserReqValidator {
         }
     }
 
-    public boolean invalidRoleName(Set<RoleName> roleNames) {
+    private boolean invalidRoleName(Set<RoleName> roleNames) {
 
         List<RoleName> emptyRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleNames)) {
             emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
 
         }
-        return emptyRoles.size() > 0 ? true : false;
+        return emptyRoles.size() > 0;
     }
 
 
