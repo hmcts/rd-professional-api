@@ -104,7 +104,7 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -114,7 +114,7 @@ public abstract class SuperController {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
-        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
@@ -153,7 +153,7 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
-            if (contains(orgStatus.toUpperCase())) {
+            if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
                 log.info("Received request to retrieve organisation with status " + orgStatus.toUpperCase());
                 organisationResponse =
@@ -254,7 +254,7 @@ public abstract class SuperController {
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
-        if (contains(orgStatus.toUpperCase())) {
+        if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
             organisationsDetailResponse =
                     organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
@@ -276,7 +276,7 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
 
-        validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        organisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
