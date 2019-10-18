@@ -285,7 +285,7 @@ public class ProfessionalUserServiceTest {
         ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
 
-        when(userProfileFeignClient.modifyUserRoles(any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.modifyUserRoles(any(),any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         String id = UUID.randomUUID().toString();
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
@@ -314,7 +314,7 @@ public class ProfessionalUserServiceTest {
 
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
-        when(userProfileFeignClient.modifyUserRoles(any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
@@ -343,7 +343,7 @@ public class ProfessionalUserServiceTest {
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(feignExceptionMock.status()).thenReturn(500);
-        when(userProfileFeignClient.modifyUserRoles(any(), any())).thenThrow(feignExceptionMock);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
         String id = UUID.randomUUID().toString();
 
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
