@@ -68,7 +68,7 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
+    public ResponseEntity findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
@@ -107,11 +107,11 @@ public class ProfessionalUserInternalController extends SuperController {
             )
     })
     @GetMapping(
-            value = "/users",
+            value = "/user",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity findUserByEmail(@RequestParam(value = "email") String email) {
 
         return retrieveUserByEmail(email);
     }

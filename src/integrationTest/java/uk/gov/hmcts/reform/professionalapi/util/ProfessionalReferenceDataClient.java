@@ -53,7 +53,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUserByEmail(String email, String role) {
-        return getRequest(APP_INT_BASE_PATH + "/users?email={email}", role,email);
+        return getRequest(APP_INT_BASE_PATH + "/user?email={email}", role,email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {

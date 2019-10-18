@@ -86,7 +86,7 @@ public class OrganisationInternalController extends SuperController {
 
     @Secured("prd-admin")
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<?> retrieveOrganisations(
+    public ResponseEntity retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
 
@@ -122,7 +122,7 @@ public class OrganisationInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
+    public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for internal...");
         return retrievePaymentAccountByUserEmail(email);
     }
@@ -145,7 +145,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @ResponseBody
     @Secured("prd-admin")
-    public ResponseEntity<?> updatesOrganisation(
+    public ResponseEntity updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
@@ -182,7 +182,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @ResponseBody
     @Secured("prd-admin")
-    public ResponseEntity<?> addUserToOrganisation(
+    public ResponseEntity addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
