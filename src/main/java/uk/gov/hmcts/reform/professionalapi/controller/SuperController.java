@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+
 import feign.FeignException;
 import feign.Response;
 import java.util.List;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+
 @RestController
 @Slf4j
 public abstract class SuperController {
@@ -73,7 +76,6 @@ public abstract class SuperController {
     @Autowired
     private JurisdictionServiceImpl jurisdictionService;
 
-
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
 
@@ -95,17 +97,19 @@ public abstract class SuperController {
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
 
+    static final String SRA_REGULATED_FALSE = "false";
+
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated("false");
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
-        if (organisationCreationRequest.getSuperUser() != null) {
-            organisationCreationRequestValidator.validateEmail(organisationCreationRequest.getSuperUser().getEmail());
+        if (null != organisationCreationRequest.getSuperUser()) {
+            validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
         organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
@@ -115,7 +119,7 @@ public abstract class SuperController {
         }
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated("false");
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         OrganisationResponse organisationResponse =
@@ -127,7 +131,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
 
@@ -163,7 +167,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity<?> retrieveUserByEmail(String email) {
+    protected ResponseEntity retrieveUserByEmail(String email) {
 
         ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(RefDataUtil.removeEmptySpaces(email));
 
@@ -173,7 +177,7 @@ public abstract class SuperController {
                 .body(professionalUsersResponse);
     }
 
-    protected ResponseEntity<?> retrievePaymentAccountByUserEmail(String email) {
+    protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
 
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(RefDataUtil.removeEmptySpaces(email));
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
@@ -186,13 +190,13 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity<?> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
-            organisationCreationRequest.setSraRegulated("false");
+            organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
@@ -245,7 +249,7 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<?> retrieveAllOrganisationsByStatus(String status) {
+    protected ResponseEntity retrieveAllOrganisationsByStatus(String status) {
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
@@ -261,12 +265,12 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    protected ResponseEntity<?> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        OrganisationCreationRequestValidator.validateEmail(newUserCreationRequest.getEmail());
+        validateEmail(newUserCreationRequest.getEmail());
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
@@ -301,7 +305,7 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    protected ResponseEntity<?> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
+    protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
