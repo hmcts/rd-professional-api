@@ -97,7 +97,9 @@ public abstract class SuperController {
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
 
+
     static final String SRA_REGULATED_FALSE = "false";
+
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
@@ -223,13 +225,12 @@ public abstract class SuperController {
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
-        OrganisationResponse organisationResponse = organisationService.updateOrganisation(organisationCreationRequest, orgId);
+        organisationService.updateOrganisation(organisationCreationRequest, orgId);
         return ResponseEntity.status(200).build();
     }
 
     private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         log.info("Creating user...");
-        ResponseEntity responseResponseEntity;
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
@@ -275,7 +276,7 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
 
-        OrganisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        organisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
