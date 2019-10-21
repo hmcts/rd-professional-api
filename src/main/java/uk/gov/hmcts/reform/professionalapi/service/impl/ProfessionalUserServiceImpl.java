@@ -171,12 +171,13 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
         ModifyUserRolesResponse modifyUserRolesResponse;
         log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
+        //TODO put this EXUI in a constant
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId, "EXUI")) {
 
             Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-            ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
+            //ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
 
             modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
         }  catch (FeignException ex) {
