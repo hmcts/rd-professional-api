@@ -67,4 +67,9 @@ public class OrganisationIdentifierValidatorImplTest {
     public void shouldThrowEmptyResultDataAccessExceptionWhenOrganisationIsNull() {
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(null, UUID.randomUUID().toString());
     }
+
+    @Test
+    public void test_verifyNonPuiFinanceManagerOrgIdentifier() {
+        //TODO write test
+    }
 }
