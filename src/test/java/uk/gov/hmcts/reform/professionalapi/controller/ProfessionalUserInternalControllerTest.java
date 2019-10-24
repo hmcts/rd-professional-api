@@ -23,10 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,6 +78,30 @@ public class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null);
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+    }
+
+    @Test
+    public void testFindUserByEmailWithPuiUserManager() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+
+        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
+        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("testing@email.com")).thenReturn(professionalUser);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+
+        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
+        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
+
+        ResponseEntity actual = professionalUserInternalController.findUserByEmail("testing@email.com");
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
