@@ -19,6 +19,7 @@ public class NewUserCreationRequestTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
+
         NewUserCreationRequest newUserCreationRequest =
                 new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, new ArrayList<>());
 
@@ -37,11 +38,14 @@ public class NewUserCreationRequestTest {
         List<String> testRoles = new ArrayList<>();
         testRoles.add("a role");
 
+
+
         NewUserCreationRequest testNewUserCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
                 .firstName(testFirstName)
                 .lastName(testLastName)
                 .email(testEmail)
                 .roles(testRoles)
+                .jurisdictions(null)
                 .build();
 
         assertThat(testNewUserCreationRequest.getFirstName()).isEqualTo(testFirstName);

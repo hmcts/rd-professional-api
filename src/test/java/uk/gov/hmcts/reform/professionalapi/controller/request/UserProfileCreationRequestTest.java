@@ -20,8 +20,9 @@ public class UserProfileCreationRequestTest {
         UserProfileCreationRequest userProfileCreationRequest =
                 new UserProfileCreationRequest("some@hmcts.net", "fname", "lname", LanguagePreference.EN, UserCategory.PROFESSIONAL, UserType.EXTERNAL, roles);
 
+           userProfileCreationRequest.setEmail("somebody@hmcts.net");
 
-        assertThat(userProfileCreationRequest.getEmail()).isEqualTo("some@hmcts.net");
+        assertThat(userProfileCreationRequest.getEmail()).isEqualTo("somebody@hmcts.net");
         assertThat(userProfileCreationRequest.getFirstName()).isEqualTo("fname");
         assertThat(userProfileCreationRequest.getLastName()).isEqualTo("lname");
         assertThat(userProfileCreationRequest.getLanguagePreference()).isEqualTo(LanguagePreference.EN);
