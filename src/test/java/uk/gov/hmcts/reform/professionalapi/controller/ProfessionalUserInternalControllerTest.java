@@ -1,21 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-import uk.gov.hmcts.reform.professionalapi.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.ProfessionalUserInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -23,19 +22,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doNothing;
-
 public class ProfessionalUserInternalControllerTest {
 
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
     private Organisation organisation;
-    private ProfessionalUserReqValidator profExtUsrReqValidator;
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     private ResponseEntity<?> responseEntity;
@@ -50,7 +41,6 @@ public class ProfessionalUserInternalControllerTest {
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
-        profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
 
