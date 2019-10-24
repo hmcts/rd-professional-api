@@ -69,7 +69,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
-        modifyUserProfileData.setIdamStatus("ABC"); //FIXME
+        modifyUserProfileData.setIdamStatus("SUSPENDED");
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
