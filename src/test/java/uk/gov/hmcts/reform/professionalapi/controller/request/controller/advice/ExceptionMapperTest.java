@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.controller.advice;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import javax.validation.ConstraintViolationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-import javax.validation.ConstraintViolationException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionMapperTest {
