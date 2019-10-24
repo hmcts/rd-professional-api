@@ -55,10 +55,10 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
         //check status was changed from ACTIVE to SUSPENDED
         searchUserValidateStatus(userId, "SUSPENDED", orgIdentifier);
 
-        modifyUserProfileData.setIdamStatus(IdamStatus.ACTIVE.toString());
+        /*modifyUserProfileData.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, modifyUserProfileData, orgIdentifier, userId);
         //check status was changed back to ACTIVE after being changed to SUSPENDED
-        searchUserValidateStatus(userId, "ACTIVE", orgIdentifier);
+        searchUserValidateStatus(userId, "ACTIVE", orgIdentifier);*/
     }
 
     @Test
