@@ -6,3 +6,4 @@ public enum ProfessionalUserStatus {
     DELETED,
     BLOCKED
 }
+
