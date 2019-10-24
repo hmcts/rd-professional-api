@@ -21,28 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @Slf4j
 public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private String settingUpOrganisation(String role) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        return ((String) newUserResponse.get("userIdentifier"));
-    }
-
     @Test
     public void ac1_modify_status_of_active_user_for_an_active_organisation_with_prd_admin_role_should_return_200() {
 
@@ -87,14 +65,5 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
 
         modifyUserProfileData.setRolesAdd(roles);
         return modifyUserProfileData;
-    }
-
-    private void verifyDeleteRolesResponse(Map<String, Object> response) {
-
-        assertThat(response.get("addRolesResponse")).isNotNull();
-        Map<String, Object>  addRolesResponse =  (Map<String, Object>)response.get("addRolesResponse");
-
-        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
-        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
 }

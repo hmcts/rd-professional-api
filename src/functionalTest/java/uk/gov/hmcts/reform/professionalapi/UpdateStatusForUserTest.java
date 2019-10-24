@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
 
     @Test
-    public void ac1_modify_status_existing_user_from_Active_to_Suspended_Internal() {
+    public void ac1_ac2_Organisation_user_with_appropriate_rights_change_status_for_another_user_belonging_to_the_same_organisation_to_suspended_and_active() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifier = (String) response.get("organisationIdentifier");
@@ -62,7 +62,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
     }
 
     @Test
-    public void ac2_modify_status_user_external() {
+    public void ac3_modify_status_user_external() {
 
         RequestSpecification specification = generateBearerTokenForPuiManagerWithPendingUser();
 
@@ -80,9 +80,45 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
     }
 
     @Test
-    public void ac3_modify_status_pending_user_throws_400_external() {
+    public void ac0_modify_status_user_external() {
 
         RequestSpecification specification = generateBearerTokenForPuiManagerWithPendingUser();
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, specification, "ACTIVE");
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.toString());
+
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        String id = (String)professionalUsersResponses.get(0).get("userIdentifier");
+
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, specification, id);
+
+        searchUserValidateStatusExternal(id,"SUSPENDED", specification);
+    }
+
+    @Test
+    public void ac5_Organisation_user_with_appropriate_rights_change_status_for_another_user_belonging_to_the_same_organisation_to_active_throws400() {
+
+        RequestSpecification specification = generateBearerTokenForPuiManagerWithPendingUser();
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, specification, "PENDING");
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.toString());
+
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        String id = (String)professionalUsersResponses.get(0).get("userIdentifier");
+
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.BAD_REQUEST, modifyUserProfileData, specification,id);
+
+        searchUserValidateStatusExternal(id,"PENDING", specification);
+    }
+
+    @Test
+    public void ac6_Organisation_user_with_inappropriate_rights_change_status_for_another_user_belonging_to_the_same_organisation_throws403() {
+
+        RequestSpecification specification = generateBearerTokenForPuiCaseManagerWithPendingUser();
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, specification, "PENDING");
 
@@ -109,6 +145,41 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
         String firstName = "someName";
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+
+        List<String> userRoles1 = new ArrayList<>();
+        userRoles1.add("pui-organisation-manager");
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles1)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
+                .firstName("Leeroy")
+                .lastName("Jenkins")
+                .email("leeroy@jenkins.com")
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+
+        return bearerTokenForPuiUserManager;
+    }
+
+    public RequestSpecification generateBearerTokenForPuiCaseManagerWithPendingUser() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-case-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, userEmail);
 
         List<String> userRoles1 = new ArrayList<>();
         userRoles1.add("pui-organisation-manager");
