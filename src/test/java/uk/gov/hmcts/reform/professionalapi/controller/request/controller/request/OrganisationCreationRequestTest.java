@@ -2,21 +2,15 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.controller.reques
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 public class OrganisationCreationRequestTest {
-
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -37,7 +31,7 @@ public class OrganisationCreationRequestTest {
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", null, null, null);
 
-         organisationCreationRequest.setStatus("ACTIVE");
+        organisationCreationRequest.setStatus("ACTIVE");
 
         assertThat(organisationCreationRequest.getName()).isEqualTo("test");
         assertThat(organisationCreationRequest.getStatus()).isEqualTo("ACTIVE");

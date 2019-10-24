@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 
-
 public class UserProfileCreationRequestTest {
 
     @Test
@@ -20,7 +19,7 @@ public class UserProfileCreationRequestTest {
         UserProfileCreationRequest userProfileCreationRequest =
                 new UserProfileCreationRequest("some@hmcts.net", "fname", "lname", LanguagePreference.EN, UserCategory.PROFESSIONAL, UserType.EXTERNAL, roles);
 
-           userProfileCreationRequest.setEmail("somebody@hmcts.net");
+        userProfileCreationRequest.setEmail("somebody@hmcts.net");
 
         assertThat(userProfileCreationRequest.getEmail()).isEqualTo("somebody@hmcts.net");
         assertThat(userProfileCreationRequest.getFirstName()).isEqualTo("fname");
