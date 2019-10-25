@@ -38,42 +38,20 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        //NB CANNOT presently update BOTH roles and status simultaneously
-        //RoleName role1 = new RoleName("pui-user-manager");
-        //! Set<RoleName> roles = new HashSet<>();
-        //! roles.add(role1);
+
         modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.name());
-        //! modifyUserProfileData.setRolesAdd(roles);
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
         HttpStatus httpStatus = HttpStatus.OK;
 
-
-        /*Map<String, Object> actualData = */professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
-
-        /*log.info("RDCC-418::actualData: " + actualData.keySet());
-        log.info("@@@@@@@@EMAIL: " + modifyUserProfileData.getEmail());
-
-        assertThat(actualData).isNotNull();
-        assertThat(actualData.keySet().size() > 0).isTrue();*/
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
 
         String status = searchUserStatus(orgIdentifierResponse, userId);
         log.info("@@@@@@@@@@@@@status:" + status);
 
         assertThat(StringUtils.isNotBlank(status)).isTrue();
         assertThat(status).isEqualTo("SUSPENDED");
-
-        /*
-            public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
-
-        Response response = getMultipleAuthHeadersInternal()
-                .body(modifyUserProfileData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-
-         */
 
     }
 
@@ -88,7 +66,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
                 .map(user -> (String) user.get("idamStatus"))
                 .collect(Collectors.toList()).get(0);
     }
-
 
 
 }
