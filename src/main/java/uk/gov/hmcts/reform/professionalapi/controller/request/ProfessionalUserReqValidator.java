@@ -41,7 +41,7 @@ public class ProfessionalUserReqValidator {
         }
     }
 
-    private static void validateUserStatus(String status) {
+    public static void validateUserStatus(String status) {
         boolean valid = false;
 
         for (IdamStatus idamStatus : IdamStatus.values()) {
