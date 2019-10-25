@@ -49,7 +49,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> actualData = professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
 
-        log.info("RDCC-418::actualData" + actualData.keySet());
+        log.info("RDCC-418::actualData: " + actualData.keySet());
+        log.info("@@@@@@@@EMAIL: " + modifyUserProfileData.getEmail());
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.keySet().size() > 0).isTrue();
@@ -64,7 +65,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
          */
-        
+
     }
 
 
