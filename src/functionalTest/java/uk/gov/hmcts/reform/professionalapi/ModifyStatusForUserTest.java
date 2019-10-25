@@ -52,6 +52,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         log.info("RDCC-418::actualData" + actualData.keySet());
 
         assertThat(actualData).isNotNull();
+        assertThat(actualData.keySet().size() > 0).isTrue();
 
         /*
             public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
