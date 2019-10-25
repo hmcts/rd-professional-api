@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -47,13 +50,19 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         HttpStatus httpStatus = HttpStatus.OK;
 
-        Map<String, Object> actualData = professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
+        /*Map<String, Object> actualData = */professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
 
-        log.info("RDCC-418::actualData: " + actualData.keySet());
+        /*log.info("RDCC-418::actualData: " + actualData.keySet());
         log.info("@@@@@@@@EMAIL: " + modifyUserProfileData.getEmail());
 
         assertThat(actualData).isNotNull();
-        assertThat(actualData.keySet().size() > 0).isTrue();
+        assertThat(actualData.keySet().size() > 0).isTrue();*/
+
+        String status = searchUserStatus(orgIdentifierResponse);
+        log.info("@@@@@@@@@@@@@status:" + status);
+
+        assertThat(StringUtils.isNotBlank(status)).isTrue();
+        assertThat(status).isEqualTo("SUSPENDED");
 
         /*
             public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
@@ -66,6 +75,15 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
          */
 
+    }
+
+
+    private String searchUserStatus(String orgIdentifier) {
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+
+        return professionalUsersResponses.stream().map(user -> (String) user.get("idamStatus")).collect(Collectors.joining());
     }
 
 
