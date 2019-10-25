@@ -493,6 +493,33 @@ public class OrganisationServiceImplTest {
         sut.createOrganisationFrom(organisationCreationRequest);
     }
 
+    @Test(expected = InvalidRequest.class)
+    public void throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
+        List<String> paymentAccountList = new ArrayList<>();
+        String pbaNumber = "PBA1234567";
+        paymentAccountList.add(pbaNumber);
+
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("PROBATE");
+        List<Jurisdiction> jurisdictions = new ArrayList<>();
+        jurisdictions.add(jurisdiction);
+
+        superUser = new UserCreationRequest(
+                "some-fname",
+                "some-lname",
+                null,
+                jurisdictions
+        );
+
+        organisationCreationRequest =
+                new OrganisationCreationRequest(
+                        "some-org-name", "PENDING", "sra-id", "false", "company-number", "company-url",
+                        superUser,
+                        paymentAccountList, contactInformationCreationRequests);
+
+        sut.createOrganisationFrom(organisationCreationRequest);
+    }
+
     @Test
     public void testAllAttributesAddedToSuperUser() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));

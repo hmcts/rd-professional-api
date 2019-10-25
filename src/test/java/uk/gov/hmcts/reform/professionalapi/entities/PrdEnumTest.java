@@ -22,4 +22,10 @@ public class PrdEnumTest {
         assertThat(prdEnum.getEnumDescription()).isEqualTo("enum-desc");
     }
 
+    @Test
+    public void test_NoArgsConstructor() {
+        PrdEnum prdEnum = new PrdEnum();
+        assertThat(prdEnum).isNotNull();
+    }
+
 }
