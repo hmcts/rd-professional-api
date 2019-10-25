@@ -64,9 +64,8 @@ public class ProfessionalUserReqValidator {
     public void validateModifyRolesRequest(ModifyUserProfileData modifyUserProfileData, String userId) {
 
         if (null == modifyUserProfileData || StringUtils.isEmpty(userId)
-                || (null == modifyUserProfileData.getIdamStatus()
-                && (invalidRoleName(modifyUserProfileData.getRolesAdd())
-                || invalidRoleName(modifyUserProfileData.getRolesDelete())))) {
+                || invalidRoleName(modifyUserProfileData.getRolesAdd())
+                || invalidRoleName(modifyUserProfileData.getRolesDelete())) {
 
             throw new InvalidRequest("The Request provided is invalid for modify the roles for user");
         }

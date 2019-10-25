@@ -328,6 +328,7 @@ public abstract class SuperController {
     protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
         profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
