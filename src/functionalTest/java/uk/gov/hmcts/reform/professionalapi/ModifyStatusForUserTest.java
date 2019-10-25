@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import io.restassured.specification.RequestSpecification;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -12,14 +13,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
-import java.util.*;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -41,8 +36,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserResponse).isNotNull();
 
-        HttpStatus httpStatus = HttpStatus.OK;
-
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         RoleName role1 = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
@@ -52,6 +45,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
+        HttpStatus httpStatus = HttpStatus.OK;
+
         Map<String, Object> actualData = professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
 
         log.info("RDCC-418::actualData" + actualData.keySet());
@@ -59,7 +54,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(actualData).isNotNull();
 
         /*
-
             public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
