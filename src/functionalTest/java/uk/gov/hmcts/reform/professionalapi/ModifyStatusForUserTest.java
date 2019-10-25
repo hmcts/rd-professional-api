@@ -50,6 +50,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         HttpStatus httpStatus = HttpStatus.OK;
 
+
         /*Map<String, Object> actualData = */professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
 
         /*log.info("RDCC-418::actualData: " + actualData.keySet());
@@ -58,7 +59,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(actualData).isNotNull();
         assertThat(actualData.keySet().size() > 0).isTrue();*/
 
-        String status = searchUserStatus(orgIdentifierResponse);
+        String status = searchUserStatus(orgIdentifierResponse, userId);
         log.info("@@@@@@@@@@@@@status:" + status);
 
         assertThat(StringUtils.isNotBlank(status)).isTrue();
@@ -78,12 +79,15 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
     }
 
 
-    private String searchUserStatus(String orgIdentifier) {
+    private String searchUserStatus(String orgIdentifier, String userId) {
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
-        return professionalUsersResponses.stream().map(user -> (String) user.get("idamStatus")).collect(Collectors.joining());
+        return professionalUsersResponses.stream()
+                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
+                .map(user -> (String) user.get("idamStatus"))
+                .collect(Collectors.toList()).get(0);
     }
 
 
