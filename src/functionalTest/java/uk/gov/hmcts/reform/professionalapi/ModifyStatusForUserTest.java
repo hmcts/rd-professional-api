@@ -15,8 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -40,7 +38,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        //TODO CANNOT presently update BOTH roles and status simultaneously
+        //NB CANNOT presently update BOTH roles and status simultaneously
         //RoleName role1 = new RoleName("pui-user-manager");
         //! Set<RoleName> roles = new HashSet<>();
         //! roles.add(role1);
