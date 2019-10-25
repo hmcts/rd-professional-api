@@ -95,7 +95,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         }
     }
 
-    //@Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
+    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
