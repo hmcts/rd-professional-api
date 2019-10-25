@@ -3,9 +3,17 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Set;
+import java.util.UUID;
+
+import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+
 
 public class ProfessionalUserReqValidatorTest {
 
@@ -38,6 +46,12 @@ public class ProfessionalUserReqValidatorTest {
         assertFalse(result);
     }
 
+    @Test(expected = Test.None.class)
+    public void test_validateUserStatus() {
+        String status = IdamStatus.ACTIVE.name();
+        profUserReqValidator.validateUserStatus(status);
+    }
+
     @Test(expected = InvalidRequest.class)
     public void test_validateUserStatusThrows400ForInvalidStatus() {
         String status = "this-is-not-a-status";
@@ -51,7 +65,29 @@ public class ProfessionalUserReqValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void test_validateModifyRolesRequestThrows400WhenInvalidRequest() {
+    public void test_validateModifyRolesRequestThrows400WhenInvalidRequestWhenUserIdIsEmpty() {
         profUserReqValidator.validateModifyRolesRequest(modifyUserProfileDataMock, "");
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_validateModifyRolesRequestThrows400ForInvalidAddRoleName() {
+        Set<RoleName> rolesAdd = new Array2DHashSet<>();
+        rolesAdd.add(new RoleName(""));
+        when(modifyUserProfileDataMock.getRolesAdd()).thenReturn(rolesAdd);
+
+        profUserReqValidator.validateModifyRolesRequest(modifyUserProfileDataMock, UUID.randomUUID().toString());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_validateModifyRolesRequestThrows400ForInvalidDeleteRoleName() {
+        Set<RoleName> rolesAdd = new Array2DHashSet<>();
+        rolesAdd.add(new RoleName("pui-user-manager"));
+        when(modifyUserProfileDataMock.getRolesAdd()).thenReturn(rolesAdd);
+
+        Set<RoleName> rolesDelete = new Array2DHashSet<>();
+        rolesDelete.add(new RoleName(""));
+        when(modifyUserProfileDataMock.getRolesDelete()).thenReturn(rolesDelete);
+
+        profUserReqValidator.validateModifyRolesRequest(modifyUserProfileDataMock, UUID.randomUUID().toString());
     }
 }

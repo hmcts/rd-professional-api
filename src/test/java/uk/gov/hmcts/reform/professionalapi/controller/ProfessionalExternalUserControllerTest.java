@@ -133,7 +133,7 @@ public class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "Pending", null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
