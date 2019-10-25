@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
@@ -133,7 +134,7 @@ public class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "Pending", null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
@@ -173,5 +174,13 @@ public class ProfessionalExternalUserControllerTest {
         Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "testing@email.com");
         assertThat(actual).isNotNull();
         assertThat(actual.get().getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testFindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
+        Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

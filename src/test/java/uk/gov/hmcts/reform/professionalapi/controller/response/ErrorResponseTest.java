@@ -25,7 +25,12 @@ public class ErrorResponseTest {
         assertThat(errorDetails.getErrorMessage()).isEqualTo(expectMsg);
         assertThat(errorDetails.getTimeStamp()).isEqualTo(expectTs);
         assertThat(errorDetails.getErrorDescription()).isEqualTo(expectDesc);
+    }
 
+    @Test
+    public void test_NoArgsConstructor() {
+        ErrorResponse errorResponse = new ErrorResponse();
+        assertThat(errorResponse).isNotNull();
     }
 
 }
