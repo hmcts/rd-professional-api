@@ -40,11 +40,12 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        RoleName role1 = new RoleName("pui-user-manager");
-        Set<RoleName> roles = new HashSet<>();
-        roles.add(role1);
+        //TODO CANNOT presently update BOTH roles and status simultaneously
+        //RoleName role1 = new RoleName("pui-user-manager");
+        //! Set<RoleName> roles = new HashSet<>();
+        //! roles.add(role1);
         modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.name());
-        modifyUserProfileData.setRolesAdd(roles);
+        //! modifyUserProfileData.setRolesAdd(roles);
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
@@ -78,7 +79,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
     }
 
-
+    @SuppressWarnings("unchecked")
     private String searchUserStatus(String orgIdentifier, String userId) {
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
@@ -89,6 +90,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
                 .map(user -> (String) user.get("idamStatus"))
                 .collect(Collectors.toList()).get(0);
     }
+
 
 
 }
