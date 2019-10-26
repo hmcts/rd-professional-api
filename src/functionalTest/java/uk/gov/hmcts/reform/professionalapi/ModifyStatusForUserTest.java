@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -33,26 +34,45 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest);
 
         assertThat(newUserResponse).isNotNull();
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        ModifyUserProfileData data = new ModifyUserProfileData();
+        /*
+            public ModifyUserProfileData(@JsonProperty(value = "email") String email,
+                                 @JsonProperty(value = "firstName") String firstName,
+                                 @JsonProperty(value = "lastName") String lastName,
+                                 @JsonProperty(value = "idamStatus") String idamStatus,
+                                 @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
+                                 @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
 
-        modifyUserProfileData.setIdamStatus(IdamStatus.SUSPENDED.name());
+         */
+
+        data.setEmail(newUserCreationRequest.getEmail());
+        data.setFirstName(newUserCreationRequest.getFirstName());
+        data.setLastName(newUserCreationRequest.getLastName());
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
+
+        Set<RoleName> rolesAdd = new HashSet<>();
+        RoleName rn = new RoleName("pui-case-manager");
+        rolesAdd.add(rn);
+        data.setRolesAdd(rolesAdd);
+
+        Set<RoleName> rolesDelete = new HashSet<>();
+        data.setRolesDelete(rolesDelete);
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
         HttpStatus httpStatus = HttpStatus.OK;
 
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, modifyUserProfileData, orgIdentifierResponse, userId);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, data, orgIdentifierResponse, userId);
 
         String status = searchUserStatus(orgIdentifierResponse, userId);
         log.info("@@@@@@@@@@@@@status:" + status);
 
         assertThat(StringUtils.isNotBlank(status)).isTrue();
         assertThat(status).isEqualTo("SUSPENDED");
-
     }
 
     @SuppressWarnings("unchecked")
