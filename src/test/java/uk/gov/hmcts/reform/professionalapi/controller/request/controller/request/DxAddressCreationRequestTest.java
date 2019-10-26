@@ -74,6 +74,23 @@ public class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
+
+
         assertThat(violations.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void buildMethodtest() {
+        String dxExchange = "dxExchange";
+        String dxNumber = "dxExchange";
+
+        DxAddressCreationRequest dxAddressCreationRequest = DxAddressCreationRequest.dxAddressCreationRequest()
+                .dxExchange(dxExchange)
+                .dxNumber(dxNumber)
+                .build();
+
+        assertThat(dxAddressCreationRequest.getDxExchange()).isEqualTo(dxExchange);
+        assertThat(dxAddressCreationRequest.getDxNumber()).isEqualTo(dxNumber);
+
     }
 }

@@ -497,7 +497,7 @@ public class ProfessionalUserServiceTest {
 
     @Test(expected = ResourceNotFoundException.class)
     @SuppressWarnings("unchecked")
-    public void shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
+    public void shouldThrowResourceNotFoundExceptionWhenNoUsersReturnedWithPageable() {
         Pageable pageableMock = mock(Pageable.class);
         Organisation organisationMock = mock(Organisation.class);
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
@@ -505,5 +505,17 @@ public class ProfessionalUserServiceTest {
         when(professionalUserRepository.findByOrganisation(organisationMock, pageableMock)).thenReturn(professionalUserPage);
 
         professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisationMock, "false", false, "Active", pageableMock);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    @SuppressWarnings("unchecked")
+    public void shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
+        Pageable pageableMock = mock(Pageable.class);
+        Organisation organisationMock = mock(Organisation.class);
+        Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
+
+        when(professionalUserRepository.findByOrganisation(organisationMock, pageableMock)).thenReturn(professionalUserPage);
+
+        professionalUserService.findProfessionalUsersByOrganisation(organisationMock, "false", false, "Active");
     }
 }
