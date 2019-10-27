@@ -274,9 +274,6 @@ public class ProfessionalUserServiceTest {
         List<String> rolesData = new ArrayList<>();
         rolesData.add("pui-case-manager");
         rolesData.add("pui-case-organisation");
-        NewUserCreationRequest modifyUserProfileData = new NewUserCreationRequest(
-                "first","last","domain@hotmail.com", rolesData, new ArrayList<>());
-
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
@@ -289,6 +286,7 @@ public class ProfessionalUserServiceTest {
         /*ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body1 = mapper.writeValueAsString(modifyUserRolesResponse);*/
 
+        NewUserCreationRequest modifyUserProfileData = new NewUserCreationRequest("first","last","domain@hotmail.com", rolesData, new ArrayList<>());
         when(userProfileFeignClient.modifyUserRoles(any(),any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         String id = UUID.randomUUID().toString();
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
@@ -312,8 +310,6 @@ public class ProfessionalUserServiceTest {
         modifyUserProfileData.setRolesAdd(roles);*/
         String id = UUID.randomUUID().toString();
 
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
 
         List<String> rolesData = new ArrayList<>();
         rolesData.add("pui-case-manager");
@@ -326,6 +322,9 @@ public class ProfessionalUserServiceTest {
                         new ArrayList<>());
 
         ObjectMapper mapper = new ObjectMapper();
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
@@ -340,16 +339,6 @@ public class ProfessionalUserServiceTest {
     @Test(expected = ExternalApiException.class)
     public void modify_user_roles_server_error() throws Exception {
 
-        List<String> roles = new ArrayList<>(userRoles);
-        roles.add("pui-case-manager");
-        roles.add("pui-case-organisation");
-        /*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData = //new /*ModifyUserProfileData*/NewUserCreationRequest();
-                new NewUserCreationRequest("first",
-                        "last",
-                        "domain@hotmail.com",
-                        roles,
-                        new ArrayList<>());
-
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
@@ -359,6 +348,16 @@ public class ProfessionalUserServiceTest {
         when(feignExceptionMock.status()).thenReturn(500);
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
         String id = UUID.randomUUID().toString();
+
+        List<String> roles = new ArrayList<>(userRoles);
+        roles.add("pui-case-manager");
+        roles.add("pui-case-organisation");
+        NewUserCreationRequest modifyUserProfileData =
+                new NewUserCreationRequest("first",
+                        "last",
+                        "domain@hotmail.com",
+                        roles,
+                        new ArrayList<>());
 
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
