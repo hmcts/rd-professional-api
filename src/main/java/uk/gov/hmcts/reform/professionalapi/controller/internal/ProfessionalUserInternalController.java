@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
 @RequestMapping(
@@ -144,7 +144,7 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
-            @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @RequestBody /*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData,
             @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId
     ) {

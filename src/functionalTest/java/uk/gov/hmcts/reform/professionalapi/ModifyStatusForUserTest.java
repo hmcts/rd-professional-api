@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
     @Test
-    public void add_new_user_to_organisation() {
+    public void rdcc_418_update_user_status() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();

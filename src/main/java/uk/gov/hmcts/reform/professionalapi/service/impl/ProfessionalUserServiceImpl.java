@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -168,9 +169,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
+    public ModifyUserRolesResponse modifyRolesForUser(/*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData, String userId) {
         ModifyUserRolesResponse modifyUserRolesResponse;
-        log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
+        //! log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
         //TODO put this EXUI in a constant
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId, "exui")) {
 

@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -26,6 +26,6 @@ public interface ProfessionalUserService {
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
-    ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId);
+    ModifyUserRolesResponse modifyRolesForUser(/*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData, String userId);
 }
 

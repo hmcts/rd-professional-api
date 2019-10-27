@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -325,15 +324,16 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
-        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+    //TODO refactor
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(/*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData, String organisationIdentifier, String userId) {
+        //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
+        //!? organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
+        //!!? Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        //!!? organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
+        //!!? organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
 
-        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData,userId);
+        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData, userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);
