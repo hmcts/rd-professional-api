@@ -308,8 +308,6 @@ public class ProfessionalUserServiceTest {
         roles.add(roleName1);
         roles.add(roleName2);
         modifyUserProfileData.setRolesAdd(roles);*/
-        String id = UUID.randomUUID().toString();
-
 
         List<String> rolesData = new ArrayList<>();
         rolesData.add("pui-case-manager");
@@ -329,6 +327,7 @@ public class ProfessionalUserServiceTest {
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
+        String id = UUID.randomUUID().toString();
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
