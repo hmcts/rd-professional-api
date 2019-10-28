@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.professionalapi.configuration.FeignInterceptorConfiguration;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 
@@ -37,5 +38,5 @@ public interface UserProfileFeignClient {
     @PutMapping(value = "/v1/userprofile/{userId}")
     @RequestLine("PUT /v1/userprofile/{userId}")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
-    Response modifyUserRoles(@RequestBody Object modifyRoles, @PathVariable("userId") String userId, @RequestParam(value = "origin") String origin);
+    Response modifyUserRoles(@RequestBody NewUserCreationRequest modifyRoles, @PathVariable("userId") String userId, @RequestParam(value = "origin") String origin);
 }

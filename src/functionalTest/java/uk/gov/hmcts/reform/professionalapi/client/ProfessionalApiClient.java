@@ -33,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -313,7 +314,7 @@ public class ProfessionalApiClient {
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
     }
 
@@ -373,6 +374,20 @@ public class ProfessionalApiClient {
                 .andReturn();
 
         log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+    }
+
+    public void updateUser(UserCreationRequest userCreationRequest, String role, String userIdentifier) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(userCreationRequest)
+                .put("/refdata/internal/v1/users/" + userIdentifier)
+                .andReturn();
+
+        log.info("Update user response: " + response.getStatusCode());
 
         response.then()
                 .assertThat()

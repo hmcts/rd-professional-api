@@ -159,7 +159,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         modifyUserProfileData.setRolesAdd(roles);
-        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
         Map<String, Object> searchResponse1 = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
         Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
@@ -167,7 +167,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         ArrayList<String> rolesSize = (ArrayList<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(2);
-        assertThat(rolesSize.contains("pui-user-manager,pui-organisation-manager"));
+        assertThat(rolesSize).contains("pui-user-manager,pui-organisation-manager");
     }
 
     @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
@@ -208,7 +208,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
+        assertThat(rolesSize).contains("caseworker,pui-organisation-manager,pui-user-manager");
 
         ModifyUserProfileData deleteRoleReqest = new ModifyUserProfileData();
         deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
@@ -216,7 +216,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
         assertThat(rolesAfterDelete.size()).isEqualTo(2);
-        assertThat(rolesSize.contains("pui-organisation-manager,caseworker"));
+        assertThat(rolesSize).contains("pui-organisation-manager,caseworker");
 
     }
 
@@ -241,7 +241,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesAfterAdd.size()).isEqualTo(2);
-        assertThat(rolesAfterAdd.contains("pui-organisation-manager,caseworker"));
+        assertThat(rolesAfterAdd).contains("pui-organisation-manager,caseworker");
 
         // roles to delete
         ModifyUserProfileData deleteRoleRequest = new ModifyUserProfileData();
@@ -250,12 +250,12 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         rolesDelete.add(roleName);
         deleteRoleRequest.setRolesDelete(rolesDelete);
 
-        Map<String, Object> modifiedUserResponseForDelete = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, deleteRoleRequest, bearerTokenForPuiUserManager, userId);
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, deleteRoleRequest, bearerTokenForPuiUserManager, userId);
 
         //search active user
         List<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
-        assertThat(!rolesInfo.contains("pui-organisation-manager"));
+        //assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
     private Set<RoleName> createOrDeleteRoleName() {
