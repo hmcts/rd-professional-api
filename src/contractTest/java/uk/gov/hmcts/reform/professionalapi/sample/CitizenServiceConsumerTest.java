@@ -13,82 +13,75 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.professionalapi.sample.Citizen;
-import uk.gov.hmcts.reform.professionalapi.sample.CitizenClient;
-import uk.gov.hmcts.reform.professionalapi.sample.IdObject;
 
-/**
- * Dummy service, leaving it in as an example of how to use SpringBoot in a PACT test
- * Also serves as a good sanity check to make sure the PACT broker is up in which case these tests should pass
- */
+
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @PactTestFor(providerName = "citizenservice", port = "8888")
 @SpringBootTest({
-				// overriding provider address
-				"citizenservice.ribbon.listOfServers: localhost:8888"
+                // overriding provider address
+                "citizenservice.ribbon.listOfServers: localhost:8888"
 })
 public class CitizenServiceConsumerTest {
 
-	@Autowired
-	private CitizenClient citizenClient;
+    @Autowired
+    private CitizenClient citizenClient;
 
-	@Pact(state = "provider accepts a new citizen", provider = "citizenservice", consumer = "citizenclient")
-	RequestResponsePact createCitizenPact(PactDslWithProvider builder) {
-		// @formatter:off
-		return builder
-						.given("provider accepts a new citizen")
-						.uponReceiving("a request to POST a citizen")
-							.path("/citizen-service/citizens")
-							.method("POST")
-                            //.body()
-						.willRespondWith()
-							.status(201)
-							.matchHeader("Content-Type", "application/json")
-							.body(new PactDslJsonBody()
-											.integerType("id", 42))
-						.toPact();
-		// @formatter:on
-	}
+    @Pact(state = "provider accepts a new citizen", provider = "citizenservice", consumer = "citizenclient")
+    RequestResponsePact createCitizenPact(PactDslWithProvider builder) {
+        // @formatter:off
+        return builder
+                .given("provider accepts a new citizen")
+                .uponReceiving("a request to POST a citizen")
+                .path("/citizen-service/citizens")
+                .method("POST")
+                .willRespondWith()
+                .status(201)
+                .matchHeader("Content-Type", "application/json")
+                .body(new PactDslJsonBody()
+                        .integerType("id", 42))
+                        .toPact();
+        // @formatter:on
+    }
 
-	@Pact(state = "citizen 42 exists", provider = "citizenservice", consumer = "citizenclient")
-	RequestResponsePact updateCitizenPact(PactDslWithProvider builder) {
-		// @formatter:off
-		return builder
-						.given("citizen 42 exists")
-						.uponReceiving("a request to PUT a citizen")
-						  .path("/citizen-service/citizens/42")
-						  .method("PUT")
-						.willRespondWith()
-						  .status(200)
-						  .matchHeader("Content-Type", "application/json")
-						  .body(new PactDslJsonBody()
-											.stringType("firstName", "Jon")
-											.stringType("lastName", "Snow"))
-						.toPact();
-		// @formatter:on
-	}
+    @Pact(state = "citizen 42 exists", provider = "citizenservice", consumer = "citizenclient")
+    RequestResponsePact updateCitizenPact(PactDslWithProvider builder) {
+        // @formatter:off
+        return builder
+                        .given("citizen 42 exists")
+                        .uponReceiving("a request to PUT a citizen")
+                          .path("/citizen-service/citizens/42")
+                          .method("PUT")
+                        .willRespondWith()
+                          .status(200)
+                          .matchHeader("Content-Type", "application/json")
+                          .body(new PactDslJsonBody()
+                                            .stringType("firstName", "Jon")
+                                            .stringType("lastName", "Snow"))
+                        .toPact();
+        // @formatter:on
+    }
 
 
-	@Test
-	@PactTestFor(pactMethod = "createCitizenPact")
-	void verifyCreateCitizenPact() {
-		Citizen citizen = new Citizen();
-		citizen.setFirstName("Jon");
-		citizen.setLastName("Snow");
-		IdObject id = citizenClient.createCitizen(citizen);
-		assertThat(id.getId()).isEqualTo(42);
-	}
+    @Test
+    @PactTestFor(pactMethod = "createCitizenPact")
+    void verifyCreateCitizenPact() {
+        Citizen citizen = new Citizen();
+        citizen.setFirstName("Jon");
+        citizen.setLastName("Snow");
+        IdObject id = citizenClient.createCitizen(citizen);
+        assertThat(id.getId()).isEqualTo(42);
+    }
 
-	@Test
-	@PactTestFor(pactMethod = "updateCitizenPact")
-	void verifyUpdateCitizenPact() {
-		Citizen citizen = new Citizen();
-		citizen.setFirstName("Jon");
-		citizen.setLastName("Snow");
-		Citizen updateCitizen = citizenClient.updateCitizen(42L, citizen);
-		assertThat(updateCitizen.getFirstName()).isEqualTo("Jon");
-		assertThat(updateCitizen.getLastName()).isEqualTo("Snow");
-	}
+    @Test
+    @PactTestFor(pactMethod = "updateCitizenPact")
+    void verifyUpdateCitizenPact() {
+        Citizen citizen = new Citizen();
+        citizen.setFirstName("Jon");
+        citizen.setLastName("Snow");
+        Citizen updateCitizen = citizenClient.updateCitizen(42L, citizen);
+        assertThat(updateCitizen.getFirstName()).isEqualTo("Jon");
+        assertThat(updateCitizen.getLastName()).isEqualTo("Snow");
+    }
 
 }
