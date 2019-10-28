@@ -34,7 +34,7 @@ def versions = [
         reformHealthStarter: '0.0.4',
         reformLogging      : '5.1.0',
         reformS2sClient    : '3.0.0',
-        serenity           : '2.0.11',
+        serenity           : '2.0.23',
         sonarPitest        : '0.5',
         springBoot         : '2.1.4.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
@@ -286,9 +286,6 @@ dependencies {
 
 
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
-
-    // pact sample
-    // compile('org.springframework.cloud:spring-cloud-starter-openfeign')
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
