@@ -319,7 +319,8 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-    testCompile group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
 
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
@@ -332,6 +333,12 @@ dependencies {
     functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
     }
+
+
+    testContractCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
+        force = true
+    }
+
 
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
@@ -347,9 +354,6 @@ dependencies {
 
     testPactCompile sourceSets.main.runtimeClasspath
     testPactCompile sourceSets.test.runtimeClasspath
-
-    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
-    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
