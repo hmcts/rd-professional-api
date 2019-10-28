@@ -280,11 +280,8 @@ dependencies {
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
 
     }
-
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-
-
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
 
     // pact sample
@@ -292,8 +289,6 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-openfeign')
     // https://mvnrepository.com/artifact/com.netflix.ribbon/ribbon-loadbalancer
     compile group: 'com.netflix.ribbon', name: 'ribbon-loadbalancer', version: '2.0-RC2'
-
-
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -352,23 +347,21 @@ dependencies {
     smokeTestCompile sourceSets.main.runtimeClasspath
     smokeTestCompile sourceSets.test.runtimeClasspath
 
-    testContractCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
-    testContractCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
-    //testContractCompile ("com.fasterxml.jackson.core:jackson-databind:2.9.8") {
-    //    force = true
-    //}
     testContractCompile sourceSets.main.runtimeClasspath
     testContractCompile sourceSets.test.runtimeClasspath
 
-    testPactCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
-    testPactCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
-    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
-    testPactCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    testPactRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
-    testPactImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
     testPactCompile sourceSets.main.runtimeClasspath
     testPactCompile sourceSets.test.runtimeClasspath
+
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+
+    testPactCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+    testPactCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
+    // testPactCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
+    // testPactRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    // testPactImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -376,7 +369,7 @@ dependencyCheck {
     // Specifies if the build should be failed if a CVSS score above a specified level is identified.
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     // FIXME temp disabled with 42
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 42 : 11
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     println 'Hi from dependencyCheck'
     suppressionFiles = ['config/owasp/suppressions.xml']
 }
