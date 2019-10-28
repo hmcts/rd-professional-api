@@ -16,4 +16,10 @@ public class PrdEnumIdTest {
         assertEquals(1, prdEnumId.getEnumCode());
         assertThat(prdEnumId.getEnumType()).isEqualTo("enum-type");
     }
+
+    @Test
+    public void test_NoArgsConstructor() {
+        PrdEnumId prdEnumId = new PrdEnumId();
+        assertThat(prdEnumId).isNotNull();
+    }
 }
