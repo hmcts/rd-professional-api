@@ -183,6 +183,11 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     }
 }
 
+task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+    //TODO Impl
+    println 'Hi from runAndPublishConsumerPactTests'
+}
+
 jacoco {
     toolVersion = "0.8.1"
 }
@@ -232,10 +237,6 @@ sonarqube {
 
 project.tasks['sonarqube'].dependsOn test, integration
 project.tasks['sonarqube'].group = "Verification"
-
-runAndPublishConsumerPactTests {
-    // TODO Call broker and publish consumer contract
-}
 
 repositories {
 
