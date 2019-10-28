@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 //import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 
@@ -52,7 +53,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         data.setEmail(newUserCreationRequest.getEmail());
         data.setFirstName(newUserCreationRequest.getFirstName());
         data.setLastName(newUserCreationRequest.getLastName());
-        //data.setIdamStatus(IdamStatus.SUSPENDED.name());
+        data.setIdamStatus(IdamStatus.ACTIVE.name());
 
         Set<RoleName> rolesAdd = new HashSet<>();
         RoleName rn = new RoleName("pui-case-manager");
