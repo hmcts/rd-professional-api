@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.controller;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +23,6 @@ public class UserCreationRequestValidatorTest {
     @Before
     public void setUp() {
         userCreationRequestValidatorMock = mock(UserCreationRequestValidator.class);
-    }
-
-    @Test
-    public void privateConstructorTest() throws Exception {
-        Constructor<UserCreationRequestValidator> constructor = UserCreationRequestValidator.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
-        constructor.setAccessible(true);
-        constructor.newInstance((Object[]) null);
     }
 
     @Test

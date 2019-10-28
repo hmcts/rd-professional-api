@@ -331,14 +331,6 @@ dependencies {
     testCompile group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
-    // compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
-
-
-    //testCompile group: 'net.serenity-bdd', name: 'serenity-core', version: '2.0.11'
-    //testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: '2.0.11'
-    //testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: '2.0.11'
-    //testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: '2.0.11'
-
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
     }
@@ -360,10 +352,6 @@ dependencies {
     smokeTestCompile sourceSets.main.runtimeClasspath
     smokeTestCompile sourceSets.test.runtimeClasspath
 
-    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serentity
-    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serentity
-    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serentity
-    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serentity
     testContractCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
     testContractCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
     testContractCompile ("com.fasterxml.jackson.core:jackson-databind:2.9.8") {
@@ -372,10 +360,6 @@ dependencies {
     testContractCompile sourceSets.main.runtimeClasspath
     testContractCompile sourceSets.test.runtimeClasspath
 
-    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serentity
-    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serentity
-    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serentity
-    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serentity
     testPactCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
     testPactCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
