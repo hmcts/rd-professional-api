@@ -354,9 +354,9 @@ dependencies {
 
     testContractCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
     testContractCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
-    testContractCompile ("com.fasterxml.jackson.core:jackson-databind:2.9.8") {
-        force = true
-    }
+    //testContractCompile ("com.fasterxml.jackson.core:jackson-databind:2.9.8") {
+    //    force = true
+    //}
     testContractCompile sourceSets.main.runtimeClasspath
     testContractCompile sourceSets.test.runtimeClasspath
 
