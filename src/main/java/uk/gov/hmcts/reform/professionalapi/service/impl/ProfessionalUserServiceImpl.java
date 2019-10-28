@@ -176,8 +176,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-            ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
-
             modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
         }  catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");

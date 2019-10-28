@@ -5,14 +5,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -159,7 +157,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<?> addUserToOrganisationUsingExternalController(
+    public ResponseEntity addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true)@OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
@@ -173,11 +171,10 @@ public class OrganisationExternalController extends SuperController {
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
 
         log.info("In retrievePaymentAccountByUserEmail method:");
-        boolean isPuiFinanceManExist = false;
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Collection<GrantedAuthority>  authorities =  serviceAndUserDetails.getAuthorities();
+        serviceAndUserDetails.getAuthorities();
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
         return ResponseEntity

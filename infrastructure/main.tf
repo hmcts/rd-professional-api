@@ -140,6 +140,7 @@ module "rd_professional_api" {
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
   asp_name = "${local.app_service_plan}"
   asp_rg = "${local.app_service_plan}"
+  enable_ase = "${var.enable_ase}"
 
   app_settings = {
     LOGBACK_REQUIRE_ALERT_LEVEL = false

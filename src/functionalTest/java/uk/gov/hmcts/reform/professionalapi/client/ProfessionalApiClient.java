@@ -213,7 +213,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
         Response response = getMultipleAuthHeadersInternal()
                 .param("email", email)
-                .get("/refdata/internal/v1/organisations/users")
+                .get("/refdata/internal/v1/organisations/user")
                 .andReturn();
         log.info("Search For User By Email Response: " + response.asString());
         response.then()
