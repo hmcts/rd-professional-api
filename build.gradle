@@ -288,10 +288,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
 
     // pact sample
-    //! compile('org.springframework.cloud:spring-cloud-starter-netflix-ribbon')
-    compile('org.springframework.cloud:spring-cloud-starter-openfeign')
-    // https://mvnrepository.com/artifact/com.netflix.ribbon/ribbon-loadbalancer
-    compile group: 'com.netflix.ribbon', name: 'ribbon-loadbalancer', version: '2.0-RC2'
+    // compile('org.springframework.cloud:spring-cloud-starter-openfeign')
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -325,9 +322,7 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-    // testCompile('org.codehaus.groovy:groovy-all:2.4.6')
     testCompile group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version
-    // testCompile('org.springframework.boot:spring-boot-starter-test')
 
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
