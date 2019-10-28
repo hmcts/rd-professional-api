@@ -355,13 +355,6 @@ dependencies {
 
     testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
     testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
-
-    testPactCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
-    testPactCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-
-    // testPactCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    // testPactRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
-    // testPactImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
