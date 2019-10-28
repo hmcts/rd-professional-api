@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'checkstyle'
+    //id 'checkstyle'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.20.0'
@@ -19,6 +19,7 @@ plugins {
     id 'org.sonarqube' version '2.6.2'
     id 'org.springframework.boot' version '2.1.4.RELEASE'
     id "org.flywaydb.flyway" version "5.0.7"
+    id 'au.com.dius.pact' version '3.5.24'
 }
 
 apply plugin: 'java'
@@ -37,7 +38,8 @@ def versions = [
         sonarPitest        : '0.5',
         springBoot         : '2.1.4.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
-        springfoxSwagger   : '2.9.2'
+        springfoxSwagger   : '2.9.2',
+        pact_version       : '3.5.24'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
@@ -97,6 +99,24 @@ sourceSets {
         }
         resources.srcDir file('src/smokeTest/resources')
     }
+
+    testContract {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/contractTest/java')
+        }
+        resources.srcDir file('src/contractTest/resources')
+    }
+    testPact {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/pactTest/java')
+        }
+        resources.srcDir file('src/pactTest/resources')
+    }
+
 }
 
 idea {
@@ -119,12 +139,12 @@ configurations {
 
 check.dependsOn jacocoTestCoverageVerification
 
-checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.10.1'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
-}
+//checkstyle {
+//    maxWarnings = 0
+//    toolVersion = '8.10.1'
+//    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+//    configDir = new File(rootDir, 'config/checkstyle')
+//}
 
 pmd {
     toolVersion = '6.12.0'
@@ -261,6 +281,14 @@ dependencies {
 
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
 
+    // pact sample
+    //! compile('org.springframework.cloud:spring-cloud-starter-netflix-ribbon')
+    compile('org.springframework.cloud:spring-cloud-starter-openfeign')
+    // https://mvnrepository.com/artifact/com.netflix.ribbon/ribbon-loadbalancer
+    compile group: 'com.netflix.ribbon', name: 'ribbon-loadbalancer', version: '2.0-RC2'
+
+
+
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -293,6 +321,18 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
+    testCompile('org.codehaus.groovy:groovy-all:2.4.6')
+    testCompile group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    // compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
+
+
+    //testCompile group: 'net.serenity-bdd', name: 'serenity-core', version: '2.0.11'
+    //testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: '2.0.11'
+    //testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: '2.0.11'
+    //testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: '2.0.11'
+
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
     }
@@ -313,6 +353,32 @@ dependencies {
 
     smokeTestCompile sourceSets.main.runtimeClasspath
     smokeTestCompile sourceSets.test.runtimeClasspath
+
+    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serentity
+    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serentity
+    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serentity
+    //testContractCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serentity
+    testContractCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+    testContractCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
+    testContractCompile ("com.fasterxml.jackson.core:jackson-databind:2.9.8") {
+        force = true
+    }
+    testContractCompile sourceSets.main.runtimeClasspath
+    testContractCompile sourceSets.test.runtimeClasspath
+
+    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serentity
+    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serentity
+    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serentity
+    //testPactCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serentity
+    testPactCompile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+    testPactCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testCompile  group: 'au.com.dius', name: 'pact-jvm-provider-spring_2.12', version: '3.5.24'
+    testPactCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
+    testPactRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    testPactImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
+    testPactCompile sourceSets.main.runtimeClasspath
+    testPactCompile sourceSets.test.runtimeClasspath
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -342,6 +408,15 @@ bootJar {
     archiveName = jarName
     manifest {
         attributes('Implementation-Version': project.version.toString())
+    }
+}
+
+pact {
+    publish {
+        pactDirectory = 'target/pacts'
+        pactBrokerUrl = 'http://localhost:9292'
+        tags = ['Dev']
+        //version = project.pactVersion
     }
 }
 
