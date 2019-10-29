@@ -330,25 +330,11 @@ dependencies {
     functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
     }
-    //// https://mvnrepository.com/artifact/au.com.dius/pact-jvm-consumer
-    //compile group: 'au.com.dius', name: 'pact-jvm-consumer', version: '4.0.2'
-
-
-    // https://mvnrepository.com/artifact/au.com.dius/pact-jvm-consumer
-    // testContractCompile group: 'au.com.dius', name: 'pact-jvm-consumer_2.11', version: '3.5.24'
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    // testContractCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    // testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.2.0-RC1'
-    // https://mvnrepository.com/artifact/junit/junit
-    // testContractCompile group: 'junit', name: 'junit', version: '4.12'
-
 
     testContractCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
         force = true
     }
-
-
+    
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
