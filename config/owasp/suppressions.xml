@@ -1575,70 +1575,70 @@
    file name: commons-beanutils-1.9.3.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/commons-beanutils/commons-beanutils@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2019-10086</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: checkstyle-8.10.1.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com.puppycrawl.tools/checkstyle@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2019-9658</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: jackson-databind-2.9.9.3.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-databind@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CCVE-2019-14540,CVE-2019-16335,CVE-2019-16942,CVE-2019-16943,CVE-2019-17267,CVE-2019-17531</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: spring-security-config-5.1.5.RELEASE.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-config@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: spring-security-core-5.1.5.RELEASE.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-core@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: groovy-xml-2.5.6.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.codehaus.groovy/groovy-xml@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: groovy-json-2.5.6.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.codehaus.groovy/groovy-json@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: tomcat-embed-websocket-9.0.17.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-websocket@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2019-0221,CVE-2019-0232,CVE-2019-10072</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: tomcat-embed-core-9.0.17.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2019-0221,CVE-2019-0232,CVE-2019-10072</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: spring-security-crypto-5.1.5.RELEASE.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-crypto@.*$</packageUrl>
-        <cve>CVE-*</cve>
+        <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
