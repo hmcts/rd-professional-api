@@ -30,7 +30,7 @@ def versions = [
         lombok             : '1.18.6',
         gradlePitest       : '1.3.0',
         pitest             : '1.4.2',
-        reformHealthStarter: '0.0.4',
+        reformHealthStarter: '0.0.5',
         reformLogging      : '5.1.0',
         reformS2sClient    : '3.0.0',
         serenity           : '2.0.11',
