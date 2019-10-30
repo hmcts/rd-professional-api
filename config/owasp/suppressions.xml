@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd"-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
    file name: groovy-xml-2.4.15.jar
@@ -2628,5 +2628,61 @@
        ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
     <cpe>cpe:/a:xwiki:xwiki</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2007-4898</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2010-4641</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2010-4642</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2018-16277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-1.2.71.jar
+   ]]></notes>
+        <sha1>d9717625bb3c731561251f8dd2c67a1011d6764c</sha1>
+        <cpe>cpe:/a:jetbrains:kotlin</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-1.2.71.jar
+   ]]></notes>
+        <sha1>d9717625bb3c731561251f8dd2c67a1011d6764c</sha1>
+        <cve>CVE-2019-10101</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-1.2.71.jar
+   ]]></notes>
+        <sha1>d9717625bb3c731561251f8dd2c67a1011d6764c</sha1>
+        <cve>CVE-2019-10102</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-1.2.71.jar
+   ]]></notes>
+        <sha1>d9717625bb3c731561251f8dd2c67a1011d6764c</sha1>
+        <cve>CVE-2019-10103</cve>
     </suppress>
 </suppressions>
