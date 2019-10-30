@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-//import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
@@ -40,15 +39,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         ModifyUserProfileData data = new ModifyUserProfileData();
-        /*
-            public ModifyUserProfileData(@JsonProperty(value = "email") String email,
-                                 @JsonProperty(value = "firstName") String firstName,
-                                 @JsonProperty(value = "lastName") String lastName,
-                                 @JsonProperty(value = "idamStatus") String idamStatus,
-                                 @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
-                                 @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
-
-         */
 
         data.setEmail(newUserCreationRequest.getEmail());
         data.setFirstName(newUserCreationRequest.getFirstName());
@@ -73,7 +63,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         log.info("@@@@@@@@@@@@@status:" + status);
 
         assertThat(StringUtils.isNotBlank(status)).isTrue();
-        //assertThat(status).isEqualTo("SUSPENDED");
     }
 
     @SuppressWarnings("unchecked")
