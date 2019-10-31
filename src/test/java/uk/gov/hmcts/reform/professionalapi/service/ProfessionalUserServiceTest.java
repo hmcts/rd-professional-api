@@ -17,11 +17,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
+
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -91,7 +90,7 @@ public class ProfessionalUserServiceTest {
 
     private NewUserCreationRequest newUserCreationRequest;
 
-    private  List<PrdEnum> prdEnums = new ArrayList<>();
+    private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<String> userRoles;
 
     @Before
@@ -210,7 +209,7 @@ public class ProfessionalUserServiceTest {
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
         Mockito.verify(
@@ -224,9 +223,9 @@ public class ProfessionalUserServiceTest {
     public void findUsersByOrganisation_with_status_active() throws Exception {
         Organisation organisationMock = mock(Organisation.class);
 
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName","lName", "some@email.com", organisationMock));
-        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1","lName1", "some1@email.com", organisationMock));
-        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2","lName2", "some2@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisationMock));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisationMock));
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
@@ -250,7 +249,7 @@ public class ProfessionalUserServiceTest {
         users.add(user);
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
 
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(response);
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
         Mockito.verify(
@@ -263,13 +262,13 @@ public class ProfessionalUserServiceTest {
     @Test
     public void modify_user_roles() throws Exception {
 
-        /*ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         Set<RoleName> roles = new HashSet<RoleName>();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);
-        modifyUserProfileData.setRolesAdd(roles);*/
+        modifyUserProfileData.setRolesAdd(roles);
 
         List<String> rolesData = new ArrayList<>();
         rolesData.add("pui-case-manager");
@@ -283,11 +282,10 @@ public class ProfessionalUserServiceTest {
 
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
-        /*ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);*/
+        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
 
-        NewUserCreationRequest modifyUserProfileData = new NewUserCreationRequest("first","last","domain@hotmail.com", rolesData, new ArrayList<>());
-        when(userProfileFeignClient.modifyUserRoles(any(),any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         String id = UUID.randomUUID().toString();
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
@@ -301,23 +299,13 @@ public class ProfessionalUserServiceTest {
     @Test
     public void modify_user_roles_bad_request() throws Exception {
 
-        /*ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         Set<RoleName> roles = new HashSet<>();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);
-        modifyUserProfileData.setRolesAdd(roles);*/
-
-        List<String> rolesData = new ArrayList<>();
-        rolesData.add("pui-case-manager");
-        rolesData.add("pui-case-organisation");
-        NewUserCreationRequest modifyUserProfileData =
-                new NewUserCreationRequest("first",
-                        "last",
-                        "domain@hotmail.com",
-                        rolesData,
-                        new ArrayList<>());
+        modifyUserProfileData.setRolesAdd(roles);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -346,18 +334,16 @@ public class ProfessionalUserServiceTest {
 
         when(feignExceptionMock.status()).thenReturn(500);
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
+
+        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        Set<RoleName> roles = new HashSet<RoleName>();
+        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName2 = new RoleName("pui-case-organisation");
+        roles.add(roleName1);
+        roles.add(roleName2);
+        modifyUserProfileData.setRolesAdd(roles);
+
         String id = UUID.randomUUID().toString();
-
-        List<String> roles = new ArrayList<>(userRoles);
-        roles.add("pui-case-manager");
-        roles.add("pui-case-organisation");
-        NewUserCreationRequest modifyUserProfileData =
-                new NewUserCreationRequest("first",
-                        "last",
-                        "domain@hotmail.com",
-                        roles,
-                        new ArrayList<>());
-
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
 
         assertThat(response).isNotNull();
@@ -380,7 +366,7 @@ public class ProfessionalUserServiceTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUsersByOrganisationEmptyResultExceptionTest()throws Exception {
+    public void findUsersByOrganisationEmptyResultExceptionTest() throws Exception {
         ProfessionalUser user = mock(ProfessionalUser.class);
         String id = UUID.randomUUID().toString();
         List<String> ids = new ArrayList<>();
@@ -396,7 +382,7 @@ public class ProfessionalUserServiceTest {
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenThrow(exceptionMock);
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
         Mockito.verify(
@@ -477,8 +463,8 @@ public class ProfessionalUserServiceTest {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        ProfessionalUser professionalUser = new ProfessionalUser("fName","lName", "some@email.com", organisationMock);
-        ProfessionalUser professionalUser1 = new ProfessionalUser("fName","lName", "some1@email.com", organisationMock);
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName", "some@email.com", organisationMock);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName", "some1@email.com", organisationMock);
         professionalUserList.add(professionalUser);
         professionalUserList.add(professionalUser1);
 
@@ -500,7 +486,7 @@ public class ProfessionalUserServiceTest {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
         Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(response);
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisationMock, "false", false, "Active", pageableMock);
         assertThat(responseEntity.getBody()).isNotNull();
