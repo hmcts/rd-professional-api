@@ -37,6 +37,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ModifyUserProfileDataValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ModifyUserProfileDataValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
@@ -259,41 +261,57 @@ public class ProfessionalUserServiceTest {
         assertThat(responseEntity).isNotNull();
     }
 
-    @Test
+    //@Test
+    // not yet implemented (tdd)
     public void modify_user_roles() throws Exception {
 
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        Set<RoleName> roles = new HashSet<RoleName>();
+        Set<RoleName> rolesData = new HashSet<RoleName>();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
-        roles.add(roleName1);
-        roles.add(roleName2);
-        modifyUserProfileData.setRolesAdd(roles);
+        rolesData.add(roleName1);
+        rolesData.add(roleName2);
 
-        List<String> rolesData = new ArrayList<>();
-        rolesData.add("pui-case-manager");
-        rolesData.add("pui-case-organisation");
 
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
-        modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
+//        List<RoleName> rolesData = new ArrayList<>();
+//        rolesData.add("pui-case-manager");
+//        rolesData.add("pui-organisation-manager");
 
-        ObjectMapper mapper = new ObjectMapper();
 
-        String body = mapper.writeValueAsString(modifyUserRolesResponse);
+        Set<RoleName> rolesToDeleteData = new HashSet<RoleName>();
+        RoleName roleToDeleteName = new RoleName("pui-finance-manager");
+        rolesToDeleteData.add(roleToDeleteName);
 
-        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
+        ModifyUserProfileData modifyUserProfileData1 =
+                new ModifyUserProfileData("test@test.com","fname","lname",IdamStatus.ACTIVE.name(),rolesData,rolesToDeleteData);
+        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
+        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        assertThat(actualModifyProfileData).isNotNull();
+        assertThat(actualModifyProfileData.getEmail()).isNull();
+        assertThat(actualModifyProfileData.getIdamStatus()).isNull();
 
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
-        assertThat(response.getDeleteRolesResponse()).isNotNull();
-        assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
+//        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+//        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
+//        modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        String body = mapper.writeValueAsString(modifyUserRolesResponse);
+//
+//        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
+//
+//
+//
+//        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+//        String id = UUID.randomUUID().toString();
+//        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+//
+//        assertThat(response).isNotNull();
+//        assertThat(response.getAddRolesResponse()).isNotNull();
+//        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
+//        assertThat(response.getDeleteRolesResponse()).isNotNull();
+//        assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
 
     @Test

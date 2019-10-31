@@ -43,6 +43,8 @@ public class ModifyUserRolesResponseTest {
     @Test
     public void modifyUserRolesResponseTest() {
 
+
+
         AddRoleResponse addRoleResponse = new AddRoleResponse();
         addRoleResponse.setIdamMessage("addMessage");
         List<DeleteRoleResponse> deleteResponses = new ArrayList<>();

@@ -13,6 +13,8 @@ public class ModifyUserProfileDataTest {
     @Test
     public void should_add_roles_add_when_modified() {
 
+        ModifyUserProfileData modifyUserProfileData1 = new ModifyUserProfileData(){};
+
         String idamId = UUID.randomUUID().toString();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
