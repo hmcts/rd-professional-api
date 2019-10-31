@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 
 @RequestMapping(
@@ -144,7 +145,7 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
-            @RequestBody /*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData,
+            @RequestBody ModifyUserProfileData modifyUserProfileData,
             @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId
     ) {

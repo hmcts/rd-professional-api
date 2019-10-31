@@ -32,15 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
-import uk.gov.hmcts.reform.professionalapi.domain.UserType;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -325,7 +317,7 @@ public abstract class SuperController {
     }
 
     //TODO refactor
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(/*ModifyUserProfileData*/NewUserCreationRequest modifyUserProfileData, String organisationIdentifier, String userId) {
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
         //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         //!? organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
