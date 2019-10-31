@@ -38,8 +38,8 @@ import org.springframework.util.MultiValueMap;
 public class IdamConsumerTest {
 
     private static final String IDAM_DETAILS_URL = "/details";
-    private static final String IDAM_OAUTH2_AUTHORIZE_URL = "/oauth2/authorize";
-    private static final String IDAM_OAUTH2_TOKEN_URL = "/oauth2/token";
+    private static final String IDAM_OAUTH2_AUTHORIZE_URL = "/o/token";
+    private static final String IDAM_OAUTH2_TOKEN_URL = "/o/token";
 
     private static final String CLIENT_REDIRECT_URI = "/oauth2redirect";
 
