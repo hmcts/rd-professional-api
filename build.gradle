@@ -158,13 +158,11 @@ pmd {
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-    //testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    //classpath = sourceSets.integrationTest.runtimeClasspath
-    println 'integration disabled for now!'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-
     systemProperty "scenario", System.getProperty('scenario')
 
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
@@ -185,8 +183,8 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
-    //TODO Impl
-    println 'Hi from runAndPublishConsumerPactTests'
+    // Nothing to do here
+    println 'pact tests have been moved to pactPublish'
 }
 
 jacoco {
@@ -386,7 +384,7 @@ bootJar {
 pact {
     publish {
         pactDirectory = 'target/pacts'
-        pactBrokerUrl = 'http://localhost:9292'
+        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
         tags = ['Dev']
         //version = project.pactVersion
     }
