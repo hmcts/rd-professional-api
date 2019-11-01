@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public class UpdateStatusResponseTest {
 
@@ -16,10 +16,10 @@ public class UpdateStatusResponseTest {
 
         UpdateStatusResponse updateStatusResponse = new UpdateStatusResponse(idamStatusCode, idamMessage);
 
-            assertThat(updateStatusResponse.getIdamStatusCode()).isEqualTo("Code");
-            assertThat(updateStatusResponse.getIdamMessage()).isEqualTo("Message");
-
-        }
+        assertThat(updateStatusResponse.getIdamStatusCode()).isEqualTo("Code");
+        assertThat(updateStatusResponse.getIdamMessage()).isEqualTo("Message");
 
     }
+
+}
 
