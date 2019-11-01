@@ -26,6 +26,7 @@ public class ModifyUserProfileData {
 
     private Set<RoleName> rolesDelete;
 
+    //TODO remove email
     @JsonCreator
     public ModifyUserProfileData(@JsonProperty(value = "email") String email,
                                  @JsonProperty(value = "firstName") String firstName,

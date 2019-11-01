@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public abstract class AuthorizationFunctionalTest {
     @Before
     public void setUp() {
         RestAssured.useRelaxedHTTPSValidation();
+        RestAssured.defaultParser = Parser.JSON;
 
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
