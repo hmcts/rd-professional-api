@@ -47,7 +47,7 @@ public class ModifyUserProfileDataValidatorImplTest {
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
         assertThat(actualModifyProfileData).isNotNull();
-        assertThat(actualModifyProfileData.getEmail().equals("test@test.com"));
+        assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo("ACTIVE");
         assertThat(actualModifyProfileData.getRolesAdd()).isNull();
         assertThat(actualModifyProfileData.getRolesDelete()).isNull();
@@ -74,8 +74,8 @@ public class ModifyUserProfileDataValidatorImplTest {
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
         assertThat(actualModifyProfileData).isNotNull();
-        assertThat(actualModifyProfileData.getEmail().equals("test@test.com"));
-        assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo("ACTIVE");
+        assertThat(actualModifyProfileData.getEmail()).isNull();
+        assertThat(actualModifyProfileData.getIdamStatus()).isNull();
         assertThat(actualModifyProfileData.getRolesAdd()).containsOnly(roleName1, roleName2);
         assertThat(actualModifyProfileData.getRolesDelete()).containsOnly(roleToDeleteName);
     }
