@@ -13,14 +13,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 public class ModifyUserRolesResponse {
 
     private ErrorResponse errorResponse;
-    private RoleAdditionResponse addRolesResponse;
-    private List<RoleDeletionResponse> deleteRolesResponse;
+    private RoleAdditionResponse roleAdditionResponse;
+    private List<RoleDeletionResponse> roleDeletionResponse;
     private UpdateStatusResponse updateStatusResponse;
 
     public ModifyUserRolesResponse(ErrorResponse errorResponse, RoleAdditionResponse addRolesResponse, List<RoleDeletionResponse> deleteResponses, UpdateStatusResponse updateStatusResponse) {
         this.errorResponse = errorResponse;
-        this.addRolesResponse = addRolesResponse;
-        this.deleteRolesResponse = deleteResponses;
+        this.roleAdditionResponse = addRolesResponse;
+        this.roleDeletionResponse = deleteResponses;
         this.updateStatusResponse = updateStatusResponse;
     }
 
