@@ -230,7 +230,7 @@ public class IdamConsumerTest {
 
         return new PactDslJsonBody()
                 .stringValue("id", "123")
-                .stringValue("email", "rd-pui-case-manager@fake.hmcts.net")
+                .stringValue("email", "rd-pui-case-manager@fake.hmcts.co.uk")
                 .stringValue("forename", "Oscar")
                 .stringValue("surname", "Wilde")
                 .stringValue("roles", array.toString());
