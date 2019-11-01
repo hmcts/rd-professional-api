@@ -329,7 +329,7 @@ public class ProfessionalUserServiceTest {
         ObjectMapper mapper = new ObjectMapper();
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
@@ -338,15 +338,15 @@ public class ProfessionalUserServiceTest {
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Request Not Valid");
+        assertThat(response.getRoleAdditionResponse()).isNotNull();
+        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
     }
 
     @Test(expected = ExternalApiException.class)
     public void modify_user_roles_server_error() throws Exception {
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
 
         mapper.writeValueAsString(modifyUserRolesResponse);
@@ -366,8 +366,8 @@ public class ProfessionalUserServiceTest {
         ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Internal Server Error");
+        assertThat(response.getRoleAdditionResponse()).isNotNull();
+        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Internal Server Error");
     }
 
 

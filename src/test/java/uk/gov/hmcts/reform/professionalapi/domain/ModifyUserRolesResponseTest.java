@@ -14,12 +14,12 @@ public class ModifyUserRolesResponseTest {
     public void should_Return_User_profile_Response() {
 
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
-        userProfileRolesResponse.setAddRolesResponse(addRolesForUser());
-        userProfileRolesResponse.setDeleteRolesResponse(deleteRolesForUser());
-        assertThat(userProfileRolesResponse.getAddRolesResponse().getIdamStatusCode()).isEqualTo("200");
-        assertThat(userProfileRolesResponse.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
-        assertThat(userProfileRolesResponse.getDeleteRolesResponse().get(0).getIdamStatusCode()).isEqualTo("200");
-        assertThat(userProfileRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
+        userProfileRolesResponse.setRoleAdditionResponse(addRolesForUser());
+        userProfileRolesResponse.setRoleDeletionResponse(deleteRolesForUser());
+        assertThat(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()).isEqualTo("200");
+        assertThat(userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Success");
+        assertThat(userProfileRolesResponse.getRoleDeletionResponse().get(0).getIdamStatusCode()).isEqualTo("200");
+        assertThat(userProfileRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
 
     private RoleAdditionResponse addRolesForUser() {
@@ -53,9 +53,9 @@ public class ModifyUserRolesResponseTest {
         ErrorResponse errorResponse = new ErrorResponse("failure","500","1200");
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(errorResponse, addRoleResponse, deleteResponses, updateStatusResponse);
 
-        assertThat(modifyUserRolesResponse.getAddRolesResponse().getIdamMessage()).isEqualTo("addMessage");
+        assertThat(modifyUserRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getUpdateStatusResponse().getIdamMessage()).isEqualTo("updateMessage");
-        assertThat(modifyUserRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
+        assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
         assertThat(modifyUserRolesResponse.getErrorResponse().getErrorMessage()).isEqualTo("failure");
         assertThat(modifyUserRolesResponse.getErrorResponse().getErrorDescription()).isEqualTo("500");
     }
