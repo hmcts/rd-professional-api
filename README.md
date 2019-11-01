@@ -162,7 +162,7 @@ Uncomment out the line found in the build.gradle:
 comment out the real broker
 
 Start the docker container from the root dir run
-`docker-compose up -f docker-compose.yml docker-packborker-compose.yml`
+`docker-compose -f broker-compose.yml up`
 
 Publish via the gradle command
 `./gradlew pactPublish`
