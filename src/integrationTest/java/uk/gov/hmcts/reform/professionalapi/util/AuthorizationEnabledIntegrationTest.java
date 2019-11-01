@@ -420,7 +420,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"addRolesResponse\": {"
+                    + "  \"updateStatusResponse\": {"
                     + "  \"idamStatusCode\": \"200\","
                     + "  \"idamMessage\": \"Success\""
                     + "  } "
