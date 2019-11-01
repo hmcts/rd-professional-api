@@ -39,7 +39,7 @@ public class ModifyUserProfileDataValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestforStatus(){
+    public void testValidateRequestforStatus() {
 
         ModifyUserProfileData modifyUserProfileData =
                     new ModifyUserProfileData("test@test.com","fname","lname", IdamStatus.ACTIVE.name(),null,null);
@@ -78,6 +78,16 @@ public class ModifyUserProfileDataValidatorImplTest {
         assertThat(actualModifyProfileData.getIdamStatus()).isNull();
         assertThat(actualModifyProfileData.getRolesAdd()).containsOnly(roleName1, roleName2);
         assertThat(actualModifyProfileData.getRolesDelete()).containsOnly(roleToDeleteName);
+    }
+
+    @Test (expected =  InvalidRequest.class)
+    public void testThrowErrorIfValidateRequestIsEmpty() {
+
+        ModifyUserProfileData modifyUserProfileData =
+                new ModifyUserProfileData("test@test.com", "fname", "lname", null, null, null);
+
+        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
+        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
     }
 
 
