@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
-
 
 public class ModifyUserProfileDataValidatorImplTest {
 
@@ -26,7 +26,7 @@ public class ModifyUserProfileDataValidatorImplTest {
         rolesToDeleteData.add(roleToDeleteName);
 
         ModifyUserProfileData modifyUserProfileData =
-                        new ModifyUserProfileData("test@test.com","fname","lname", IdamStatus.ACTIVE.name(),rolesData,rolesToDeleteData);
+                new ModifyUserProfileData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
@@ -39,10 +39,10 @@ public class ModifyUserProfileDataValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestforStatus() {
+    public void testValidateRequestForStatus() {
 
         ModifyUserProfileData modifyUserProfileData =
-                    new ModifyUserProfileData("test@test.com","fname","lname", IdamStatus.ACTIVE.name(),null,null);
+                new ModifyUserProfileData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), null, null);
 
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
@@ -55,7 +55,7 @@ public class ModifyUserProfileDataValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestforRoles() {
+    public void testValidateRequestForRoles() {
 
         Set<RoleName> rolesData = new HashSet<>();
         RoleName roleName1 = new RoleName("pui-case-manager");
@@ -80,7 +80,7 @@ public class ModifyUserProfileDataValidatorImplTest {
         assertThat(actualModifyProfileData.getRolesDelete()).containsOnly(roleToDeleteName);
     }
 
-    @Test (expected =  InvalidRequest.class)
+    @Test(expected = InvalidRequest.class)
     public void testThrowErrorIfValidateRequestIsEmpty() {
 
         ModifyUserProfileData modifyUserProfileData =

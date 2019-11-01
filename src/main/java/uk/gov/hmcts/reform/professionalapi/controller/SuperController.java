@@ -61,7 +61,7 @@ public abstract class SuperController {
     @Autowired
     private JurisdictionServiceImpl jurisdictionService;
     @Autowired
-    protected ModifyUserProfileDataValidatorImpl modifyUserProfileDataValidator;
+    protected ModifyUserProfileDataValidator modifyUserProfileDataValidator;
 
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
