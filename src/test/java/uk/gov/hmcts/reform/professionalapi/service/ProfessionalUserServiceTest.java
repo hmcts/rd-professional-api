@@ -456,20 +456,20 @@ public class ProfessionalUserServiceTest {
         assertThat(professionalUserResponse).isNull();
     }
 
-    private AddRoleResponse createAddRoleResponse(HttpStatus status, String message) {
+    private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
 
-        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();
         addRoleResponse.setIdamStatusCode(status.toString());
         addRoleResponse.setIdamMessage(message);
         return addRoleResponse;
     }
 
-    private List<DeleteRoleResponse> createDeleteRoleResponse(HttpStatus status, String message) {
+    private List<RoleDeletionResponse> createDeleteRoleResponse(HttpStatus status, String message) {
 
-        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamStatusCode(status.toString());
         deleteRoleResponse.setIdamMessage(message);
-        List<DeleteRoleResponse> deleteRoleResponses = new ArrayList<>();
+        List<RoleDeletionResponse> deleteRoleResponses = new ArrayList<>();
         deleteRoleResponses.add(deleteRoleResponse);
         return deleteRoleResponses;
     }

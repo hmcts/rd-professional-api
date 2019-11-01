@@ -22,18 +22,18 @@ public class ModifyUserRolesResponseTest {
         assertThat(userProfileRolesResponse.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");
     }
 
-    private AddRoleResponse addRolesForUser() {
+    private RoleAdditionResponse addRolesForUser() {
 
-        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();
         addRoleResponse.setIdamStatusCode("200");
         addRoleResponse.setIdamMessage("Success");
         return addRoleResponse;
     }
 
-    private List<DeleteRoleResponse> deleteRolesForUser() {
+    private List<RoleDeletionResponse> deleteRolesForUser() {
 
-        List<DeleteRoleResponse> deleteResponses = new ArrayList<>();
-        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
+        RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamStatusCode("200");
         deleteRoleResponse.setIdamMessage("Success");
         deleteResponses.add(deleteRoleResponse);
@@ -45,10 +45,10 @@ public class ModifyUserRolesResponseTest {
 
 
 
-        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();
         addRoleResponse.setIdamMessage("addMessage");
-        List<DeleteRoleResponse> deleteResponses = new ArrayList<>();
-        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
+        RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamMessage("deleteMessage");
         deleteResponses.add(deleteRoleResponse);
         ErrorResponse errorResponse = new ErrorResponse("failure","500","1200");
