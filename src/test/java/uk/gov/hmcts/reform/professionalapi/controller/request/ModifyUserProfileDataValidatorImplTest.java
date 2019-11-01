@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 public class ModifyUserProfileDataValidatorImplTest {
 
     @Test
-    public void testValidateRequest() {
+    public void testValidateRequestIfBothStatusAndRoleArePresent() {
 
         Set<RoleName> rolesData = new HashSet<>();
         RoleName roleName1 = new RoleName("pui-case-manager");
@@ -28,8 +28,10 @@ public class ModifyUserProfileDataValidatorImplTest {
         ModifyUserProfileData modifyUserProfileData =
                 new ModifyUserProfileData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
+
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isNull();
@@ -88,6 +90,7 @@ public class ModifyUserProfileDataValidatorImplTest {
 
         ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
         ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+
     }
 
 
