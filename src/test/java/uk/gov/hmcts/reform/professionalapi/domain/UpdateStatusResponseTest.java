@@ -11,12 +11,12 @@ public class UpdateStatusResponseTest {
 
         UpdateStatusResponse updateStatusResponse1 = new UpdateStatusResponse() {};
 
-        String idamStatusCode = "Code";
+        String idamStatusCode = "Coded";
         String idamMessage = "Message";
 
         UpdateStatusResponse updateStatusResponse = new UpdateStatusResponse(idamStatusCode, idamMessage);
 
-        assertThat(updateStatusResponse.getIdamStatusCode()).isEqualTo("Code");
+        assertThat(updateStatusResponse.getIdamStatusCode()).isEqualTo("Coded");
         assertThat(updateStatusResponse.getIdamMessage()).isEqualTo("Message");
 
     }
