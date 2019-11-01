@@ -193,11 +193,12 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
             @ApiParam(hidden = true) @OrgId String orgId,
-            @PathVariable("userId") String userId
+            @PathVariable("userId") String userId,
+            @RequestParam(name = "origin", required = false) Optional<String> origin
     ) {
 
         log.info("Received request to update user roles of an organisation...");
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId, origin);
 
     }
 

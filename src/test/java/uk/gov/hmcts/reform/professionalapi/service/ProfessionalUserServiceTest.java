@@ -335,7 +335,7 @@ public class ProfessionalUserServiceTest {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getAddRolesResponse()).isNotNull();
@@ -363,7 +363,7 @@ public class ProfessionalUserServiceTest {
         modifyUserProfileData.setRolesAdd(roles);
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getAddRolesResponse()).isNotNull();

@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import feign.FeignException;
 import feign.Response;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -66,6 +60,8 @@ public abstract class SuperController {
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
     private JurisdictionServiceImpl jurisdictionService;
+    @Autowired
+    protected ModifyUserProfileDataValidatorImpl modifyUserProfileDataValidator;
 
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
@@ -317,7 +313,7 @@ public abstract class SuperController {
     }
 
     //TODO refactor
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId) {
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId, Optional<String> origin) {
         //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
         //!? organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
@@ -325,7 +321,9 @@ public abstract class SuperController {
         //!!? organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         //!!? organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
 
-        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData, userId);
+        modifyUserProfileData = modifyUserProfileDataValidator.validateRequest(modifyUserProfileData);
+
+        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData, userId, origin);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);
