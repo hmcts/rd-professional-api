@@ -216,8 +216,8 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     private void verifyDeleteRolesResponse(Map<String, Object> response) {
 
-        assertThat(response.get("addRolesResponse")).isNotNull();
-        Map<String, Object>  addRolesResponse =  (Map<String, Object>)response.get("addRolesResponse");
+        assertThat(response.get("roleAdditionResponse")).isNotNull();
+        Map<String, Object>  addRolesResponse =  (Map<String, Object>)response.get("roleAdditionResponse");
 
         assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
         assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");

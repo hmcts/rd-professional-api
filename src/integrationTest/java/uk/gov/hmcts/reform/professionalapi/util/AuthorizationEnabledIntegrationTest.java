@@ -388,11 +388,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         } else if (status.is5xxServerError()) {
 
             body = "{"
-                    + "  \"addRolesResponse\": {"
+                    + "  \"roleAdditionResponse\": {"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
                     + "  } ,"
-                    + "  \"deleteRolesResponse\": ["
+                    + "  \"roleDeletionResponse\": ["
                     +   "{"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
