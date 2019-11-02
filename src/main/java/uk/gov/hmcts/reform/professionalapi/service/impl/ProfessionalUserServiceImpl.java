@@ -176,7 +176,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
         //! log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
         try (Response response = userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId, origin.get())) {
-
+            log.info("modify response status : " + response.status());
+            log.info("modify response status : " + response.body() != null ? response.body().toString() : " body is null");
             Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
