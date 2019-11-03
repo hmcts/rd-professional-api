@@ -194,7 +194,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestBody ModifyUserProfileData modifyUserProfileData,
             @ApiParam(hidden = true) @OrgId String orgId,
             @PathVariable("userId") String userId,
-            @RequestParam(name = "origin", required = false) Optional<String> origin
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
         log.info("Received request to update user roles of an organisation...");
