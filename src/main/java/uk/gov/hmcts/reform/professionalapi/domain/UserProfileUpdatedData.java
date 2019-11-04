@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ModifyUserProfileData {
+public class UserProfileUpdatedData {
 
     private String email;
 
@@ -28,12 +28,12 @@ public class ModifyUserProfileData {
 
     //TODO remove email
     @JsonCreator
-    public ModifyUserProfileData(@JsonProperty(value = "email") String email,
-                                 @JsonProperty(value = "firstName") String firstName,
-                                 @JsonProperty(value = "lastName") String lastName,
-                                 @JsonProperty(value = "idamStatus") String idamStatus,
-                                 @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
-                                 @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
+    public UserProfileUpdatedData(@JsonProperty(value = "email") String email,
+                                  @JsonProperty(value = "firstName") String firstName,
+                                  @JsonProperty(value = "lastName") String lastName,
+                                  @JsonProperty(value = "idamStatus") String idamStatus,
+                                  @JsonProperty(value = "rolesAdd") Set<RoleName> rolesAdd,
+                                  @JsonProperty(value = "rolesDelete") Set<RoleName> rolesDelete
     ) {
         this.email = email;
         this.firstName = firstName;

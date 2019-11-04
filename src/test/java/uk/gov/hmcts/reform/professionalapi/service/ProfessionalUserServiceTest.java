@@ -37,10 +37,10 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ModifyUserProfileDataValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ModifyUserProfileDataValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -281,12 +281,12 @@ public class ProfessionalUserServiceTest {
         RoleName roleToDeleteName = new RoleName("pui-finance-manager");
         rolesToDeleteData.add(roleToDeleteName);
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
 
-        ModifyUserProfileData modifyUserProfileData1 =
-                new ModifyUserProfileData("test@test.com","fname","lname",IdamStatus.ACTIVE.name(),rolesData,rolesToDeleteData);
-        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
-        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        UserProfileUpdatedData userProfileUpdatedData1 =
+                new UserProfileUpdatedData("test@test.com","fname","lname",IdamStatus.ACTIVE.name(),rolesData,rolesToDeleteData);
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isNull();
@@ -318,13 +318,13 @@ public class ProfessionalUserServiceTest {
     @Test
     public void modify_user_roles_bad_request() throws Exception {
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         Set<RoleName> roles = new HashSet<>();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);
-        modifyUserProfileData.setRolesAdd(roles);
+        userProfileUpdatedData.setRolesAdd(roles);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -335,7 +335,7 @@ public class ProfessionalUserServiceTest {
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getRoleAdditionResponse()).isNotNull();
@@ -354,16 +354,16 @@ public class ProfessionalUserServiceTest {
         when(feignExceptionMock.status()).thenReturn(500);
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         Set<RoleName> roles = new HashSet<RoleName>();
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);
-        modifyUserProfileData.setRolesAdd(roles);
+        userProfileUpdatedData.setRolesAdd(roles);
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getRoleAdditionResponse()).isNotNull();

@@ -375,8 +375,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"statusCode\":\"200\","
-                    + "  \"statusMessage\":\"success\""
+                    + "  \"statusUpdateResponse\": {"
+                    + "  \"idamStatusCode\": \"200\","
+                    + "  \"idamMessage\": \"Success\""
+                    + "  } "
                     + "}";
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
@@ -420,7 +422,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"updateStatusResponse\": {"
+                    + "  \"roleAdditionResponse\": {"
                     + "  \"idamStatusCode\": \"200\","
                     + "  \"idamMessage\": \"Success\""
                     + "  } "

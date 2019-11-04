@@ -7,12 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UpdateStatusResponse {
+public class StatusUpdateResponse {
 
     private String idamStatusCode;
     private String idamMessage;
 
-    public UpdateStatusResponse(String idamStatusCode, String idamMessage) {
+    public StatusUpdateResponse(String idamStatusCode, String idamMessage) {
 
         this.idamStatusCode = idamStatusCode;
         this.idamMessage = idamMessage;

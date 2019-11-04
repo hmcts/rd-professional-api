@@ -22,11 +22,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
+//tbc uncomment when 418 changes for UP are in aat and refactor test
 @Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -43,8 +44,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someName";
@@ -118,30 +117,31 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
-        Map professionalUsersResponse = professionalUsersResponses.get(1);
+        Map professionalUsersResponse = (Map) searchResponse.get("users");
 
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
         log.info("User Id::" + userId);
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName role1 = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
-        modifyUserProfileData.setRolesAdd(roles);
+        userProfileUpdatedData.setRolesAdd(roles);
 
-        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, modifyUserProfileData, orgIdentifier, userId);
+        searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
 
-        Map<String, Object> searchResponse1 = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
-        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        //List<Map> professionalUsersResponses1 = (List<Map>) searchResponse.get("users");
+        //Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
+
+        Map<String, Object> professionalUsersResponse1 = (Map<String, Object>) searchResponse.get("users");
+
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
-        ArrayList<String> rolesSize = (ArrayList<String>) professionalUsersResponse1.get("roles");
+        List<String> rolesSize = (List) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager"));
+        assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager")).isTrue();
     }
 
     @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
@@ -155,18 +155,18 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName role1 = new RoleName("pui-organisation-manager");
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
-        modifyUserProfileData.setRolesAdd(roles);
-        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
+        userProfileUpdatedData.setRolesAdd(roles);
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, userProfileUpdatedData, bearerTokenForPuiUserManager, userId);
         Map<String, Object> searchResponse1 = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
         Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
-        ArrayList<String> rolesSize = (ArrayList<String>) professionalUsersResponse1.get("roles");
+        List<String> rolesSize = (List<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(2);
         assertThat(rolesSize).contains("pui-user-manager,pui-organisation-manager");
     }
@@ -202,16 +202,16 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         log.info("User Id::" + userId);
         //create add roles object
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
-        modifyUserProfileData.setRolesAdd(createAddRoleName());
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setRolesAdd(createAddRoleName());
 
-        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, modifyUserProfileData, orgIdentifier, userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, orgIdentifier, userId);
         //search active user
         List<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
         assertThat(rolesSize).contains("caseworker,pui-organisation-manager,pui-user-manager");
 
-        ModifyUserProfileData deleteRoleReqest = new ModifyUserProfileData();
+        UserProfileUpdatedData deleteRoleReqest = new UserProfileUpdatedData();
         deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
         Map<String, Object> modifiedUserResponseForDelete = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, deleteRoleReqest, orgIdentifier, userId);
         //search active user
@@ -232,20 +232,20 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName role1 = new RoleName("pui-organisation-manager");
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
-        modifyUserProfileData.setRolesAdd(roles);
+        userProfileUpdatedData.setRolesAdd(roles);
 
-        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, modifyUserProfileData, bearerTokenForPuiUserManager, userId);
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, userProfileUpdatedData, bearerTokenForPuiUserManager, userId);
         //search active user
         List<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesAfterAdd.size()).isEqualTo(2);
         assertThat(rolesAfterAdd).contains("pui-organisation-manager,caseworker");
 
         // roles to delete
-        ModifyUserProfileData deleteRoleRequest = new ModifyUserProfileData();
+        UserProfileUpdatedData deleteRoleRequest = new UserProfileUpdatedData();
         RoleName roleName = new RoleName("pui-organisation-manager");
         Set<RoleName> rolesDelete = new HashSet<>();
         rolesDelete.add(roleName);

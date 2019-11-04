@@ -15,13 +15,13 @@ public class ModifyUserRolesResponse {
     private ErrorResponse errorResponse;
     private RoleAdditionResponse roleAdditionResponse;
     private List<RoleDeletionResponse> roleDeletionResponse;
-    private UpdateStatusResponse updateStatusResponse;
+    private StatusUpdateResponse statusUpdateResponse;
 
-    public ModifyUserRolesResponse(ErrorResponse errorResponse, RoleAdditionResponse addRolesResponse, List<RoleDeletionResponse> deleteResponses, UpdateStatusResponse updateStatusResponse) {
+    public ModifyUserRolesResponse(ErrorResponse errorResponse, RoleAdditionResponse addRolesResponse, List<RoleDeletionResponse> deleteResponses, StatusUpdateResponse statusUpdateResponse) {
         this.errorResponse = errorResponse;
         this.roleAdditionResponse = addRolesResponse;
         this.roleDeletionResponse = deleteResponses;
-        this.updateStatusResponse = updateStatusResponse;
+        this.statusUpdateResponse = statusUpdateResponse;
     }
 
 }
