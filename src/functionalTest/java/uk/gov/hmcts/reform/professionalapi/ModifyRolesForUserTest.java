@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
