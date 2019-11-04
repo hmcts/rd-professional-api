@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -46,11 +46,11 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
-        modifyUserProfileData.setIdamStatus("SUSPENDED");
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+        userProfileUpdatedData.setIdamStatus("SUSPENDED");
 
         updateUserProfileAddRolesMock(HttpStatus.OK);
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("updateStatusResponse"));
@@ -59,16 +59,16 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
 
     }
 
-    private ModifyUserProfileData  createModifyUserProfileData() {
+    private UserProfileUpdatedData createModifyUserProfileData() {
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(puiCaseManager);
         RoleName roleName2 = new RoleName(puiOrgManager);
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName1);
         roles.add(roleName2);
 
-        modifyUserProfileData.setRolesAdd(roles);
-        return modifyUserProfileData;
+        userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
     }
 }

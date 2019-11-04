@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
@@ -62,10 +62,6 @@ public class ProfessionalApiClient {
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
         this.idamClient = idamClient;
-    }
-
-    public IdamOpenIdClient getIdamOpenIdClient() {
-        return idamOpenIdClient;
     }
 
     public String getWelcomePage() {
@@ -460,10 +456,10 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body(modifyUserProfileData)
+                .body(userProfileUpdatedData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
 
@@ -475,10 +471,10 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
-                .body(modifyUserProfileData)
+                .body(userProfileUpdatedData)
                 .put("/refdata/external/v1/organisations/users/" + userId + "?origin=EXUI")
                 .andReturn();
 
@@ -490,10 +486,10 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
 
         Response response = requestSpecification
-                .body(modifyUserProfileData)
+                .body(userProfileUpdatedData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
 

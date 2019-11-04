@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,8 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -33,24 +31,26 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        String lastName = "someLastName";
-        String firstName = "someFirstName";
 
-        String email = professionalApiClient.getIdamOpenIdClient().createUser(hmctsAdmin);
+        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest();
+        assertThat(userCreationRequest).isNotNull();
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+        //tbc remove if Jenkins passes
+        //String lastName = "someLastName";
+        //String firstName = "someFirstName";
+        /*NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
+                .build();*/
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
         assertThat(newUserResponse).isNotNull();
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
-        ModifyUserProfileData data = new ModifyUserProfileData();
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
 
         data.setFirstName("UpdatedFirstName");
         data.setLastName("UpdatedLastName");

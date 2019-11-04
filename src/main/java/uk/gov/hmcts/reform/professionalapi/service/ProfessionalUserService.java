@@ -23,6 +23,6 @@ public interface ProfessionalUserService {
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
-    ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId, Optional<String> origin);
+    ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin);
 }
 

@@ -53,7 +53,7 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
-    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    protected OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
@@ -61,7 +61,7 @@ public abstract class SuperController {
     @Autowired
     private JurisdictionServiceImpl jurisdictionService;
     @Autowired
-    protected ModifyUserProfileDataValidator modifyUserProfileDataValidator;
+    protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
@@ -313,17 +313,11 @@ public abstract class SuperController {
     }
 
     //TODO refactor
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(ModifyUserProfileData modifyUserProfileData, String organisationIdentifier, String userId, Optional<String> origin) {
-        //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        //!? organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
-        //!? profExtUsrReqValidator.validateModifyRolesRequest(modifyUserProfileData, userId);
-        //!!? Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
-        //!!? organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
-        //!!? organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String organisationIdentifier, String userId, Optional<String> origin) {
 
-        modifyUserProfileData = modifyUserProfileDataValidator.validateRequest(modifyUserProfileData);
+        userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(modifyUserProfileData, userId, origin);
+        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);

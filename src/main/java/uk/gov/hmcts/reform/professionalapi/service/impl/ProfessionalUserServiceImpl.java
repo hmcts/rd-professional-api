@@ -168,21 +168,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId, Optional<String> origin) {
+    public ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
         ModifyUserRolesResponse modifyUserRolesResponse;
 
-        if (!origin.isPresent()) {
-            origin = Optional.of("");
-        }
-        //! log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
-        try (Response response = userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId, origin.get())) {
-            //TODO: loggers needs to be removed once testing is done
-            log.info("modify response status : " + response.status());
-            if (response.body() != null) {
-                log.info("modify response status : " + response.body().toString());
-            } else {
-                log.info("modify response status : body is null");
-            }
+        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
+
             Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 

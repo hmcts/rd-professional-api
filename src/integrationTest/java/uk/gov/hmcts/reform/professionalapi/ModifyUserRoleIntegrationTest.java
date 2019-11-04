@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -69,9 +69,9 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 
@@ -104,12 +104,12 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(" ");
         Set<RoleName> rolesAdd = new HashSet<>();
         rolesAdd.add(roleName1);
-        modifyUserProfileData.setRolesAdd(rolesAdd);
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        userProfileUpdatedData.setRolesAdd(rolesAdd);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("400");
 
@@ -119,9 +119,9 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     public void ac4_modify_roles_of_active_users_with_other_role_should_return_403() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("403");
 
@@ -131,9 +131,9 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     public void ac5_modify_roles_of_active_users_for_an_active_organisation_with_pui_user_manager_role_should_return_200() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
@@ -143,14 +143,14 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     public void ac6_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(" ");
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName1);
 
-        modifyUserProfileData.setRolesAdd(roles);
+        userProfileUpdatedData.setRolesAdd(roles);
         String userIdentifier = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isNotNull();
 
@@ -160,9 +160,9 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     public void ac8_modify_roles_of_active_users_for_with_pui_user_manager_role_should_return_500_for_Internal_server() {
 
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         String userIdentifier = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         verifyDeleteRolesResponse(response);
     }
@@ -193,25 +193,25 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        ModifyUserProfileData modifyUserProfileData = createModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
 
         verifyDeleteRolesResponse(response);
 
     }
 
-    private ModifyUserProfileData  createModifyUserProfileData() {
+    private UserProfileUpdatedData createModifyUserProfileData() {
 
-        ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(puiCaseManager);
         RoleName roleName2 = new RoleName(puiOrgManager);
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName1);
         roles.add(roleName2);
 
-        modifyUserProfileData.setRolesAdd(roles);
-        return modifyUserProfileData;
+        userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
     }
 
     private void verifyDeleteRolesResponse(Map<String, Object> response) {

@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-public class ModifyUserProfileDataValidatorImplTest {
+public class UserProfileUpdateRequestValidatorImplTest {
 
     @Test
     public void testValidateRequestIfBothStatusAndRoleArePresent() {
@@ -25,12 +25,12 @@ public class ModifyUserProfileDataValidatorImplTest {
         RoleName roleToDeleteName = new RoleName("pui-finance-manager");
         rolesToDeleteData.add(roleToDeleteName);
 
-        ModifyUserProfileData modifyUserProfileData =
-                new ModifyUserProfileData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
+        UserProfileUpdatedData userProfileUpdatedData =
+                new UserProfileUpdatedData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
 
-        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
-        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
 
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
@@ -43,11 +43,11 @@ public class ModifyUserProfileDataValidatorImplTest {
     @Test
     public void testValidateRequestForStatus() {
 
-        ModifyUserProfileData modifyUserProfileData =
-                new ModifyUserProfileData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), null, null);
+        UserProfileUpdatedData userProfileUpdatedData =
+                new UserProfileUpdatedData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), null, null);
 
-        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
-        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isEqualTo("ACTIVE");
@@ -70,11 +70,11 @@ public class ModifyUserProfileDataValidatorImplTest {
         rolesToDeleteData.add(roleToDeleteName);
 
 
-        ModifyUserProfileData modifyUserProfileData =
-                new ModifyUserProfileData("test@test.com", "fname", "lname", null, rolesData, rolesToDeleteData);
+        UserProfileUpdatedData userProfileUpdatedData =
+                new UserProfileUpdatedData("test@test.com", "fname", "lname", null, rolesData, rolesToDeleteData);
 
-        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
-        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isNull();
@@ -85,11 +85,11 @@ public class ModifyUserProfileDataValidatorImplTest {
     @Test(expected = InvalidRequest.class)
     public void testThrowErrorIfValidateRequestIsEmpty() {
 
-        ModifyUserProfileData modifyUserProfileData =
-                new ModifyUserProfileData("test@test.com", "fname", "lname", null, null, null);
+        UserProfileUpdatedData userProfileUpdatedData =
+                new UserProfileUpdatedData("test@test.com", "fname", "lname", null, null, null);
 
-        ModifyUserProfileDataValidator sut = new ModifyUserProfileDataValidatorImpl();
-        ModifyUserProfileData actualModifyProfileData = sut.validateRequest(modifyUserProfileData);
+        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
+        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
 
     }
 
