@@ -149,7 +149,6 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         ModifyUserProfileData deleteUserProfileData = createDeleteRolesUserProfileData();
         Map<String, Object> responseForDelete = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(deleteUserProfileData, userIdentifier, puiUserManager);
 
-        log.info("responseForDelete :: " + responseForDelete);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 
@@ -179,7 +178,6 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         String userIdentifier = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(modifyUserProfileData, userIdentifier, puiUserManager);
 
-        log.info("response :: " + response);
         verifyDeleteRolesResponse(response);
 
     }

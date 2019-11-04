@@ -170,7 +170,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     @Override
     public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
         ModifyUserRolesResponse modifyUserRolesResponse;
-        log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
         try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
 
             Class clazz = ModifyUserRolesResponse.class;

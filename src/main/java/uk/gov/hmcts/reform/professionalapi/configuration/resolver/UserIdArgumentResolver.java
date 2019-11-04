@@ -39,7 +39,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
         if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
             userId = serviceAndUserDetails.getUsername().trim();
-            log.info("Inside UserIdArgumentResolver::userId::" + userId);
+            log.info("Inside UserIdArgumentResolver");
             Object[] roles  =  serviceAndUserDetails.getAuthorities().toArray();
             String serviceName = serviceAndUserDetails.getServicename();
         }

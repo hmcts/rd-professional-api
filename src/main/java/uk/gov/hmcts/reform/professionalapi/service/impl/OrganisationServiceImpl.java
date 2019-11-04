@@ -237,7 +237,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         pendingOrganisations.addAll(activeOrganisations);
 
-        log.info("Retrieving all organisations..." + pendingOrganisations.size());
+        log.info("Retrieving all organisations...");
         return new OrganisationsDetailResponse(pendingOrganisations, true);
     }
 
@@ -296,7 +296,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
-            log.debug("Retrieving organisation with ID " + organisationIdentifier);
+            log.debug("Retrieving organisation");
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);

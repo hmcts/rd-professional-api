@@ -140,10 +140,6 @@ public class ProfessionalApiClient {
                 .post("/refdata/external/v1/organisations")
                 .andReturn();
 
-        if (response.statusCode() != CREATED.value()) {
-            log.info("Create organisation response: " + response.asString());
-        }
-
         response.then()
                 .assertThat()
                 .statusCode(CREATED.value());
@@ -156,8 +152,6 @@ public class ProfessionalApiClient {
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
                 .andReturn();
-
-        log.info("Create organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -215,7 +209,7 @@ public class ProfessionalApiClient {
                 .param("email", email)
                 .get("/refdata/internal/v1/organisations/user")
                 .andReturn();
-        log.info("Search For User By Email Response: " + response.asString());
+
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -229,10 +223,6 @@ public class ProfessionalApiClient {
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
                 .andReturn();
-
-        if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.asString());
-        }
 
         response.then()
                 .assertThat()
@@ -264,8 +254,6 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations/pbas?email=" + email)
                 .andReturn();
 
-        log.info("Retrieve organisation response: " + response.asString());
-
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -280,8 +268,6 @@ public class ProfessionalApiClient {
                 .body("")
                 .get("/refdata/internal/v1/organisations/pbas?email=" + email)
                 .andReturn();
-
-        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()
@@ -372,8 +358,6 @@ public class ProfessionalApiClient {
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
 
-        log.info("Update organisation response: " + response.getStatusCode());
-
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -389,8 +373,6 @@ public class ProfessionalApiClient {
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
 
-        log.info("Update organisation response: " + response.getStatusCode());
-
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -402,7 +384,7 @@ public class ProfessionalApiClient {
                 .body("")
                 .get("/refdata/internal/v1/organisations?status=" + status)
                 .andReturn();
-        log.debug("Retrieve organisation response by status: " + response.getStatusCode());
+
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -417,8 +399,6 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations?status=" + status)
                 .andReturn();
 
-        log.debug("Retrieve organisation response for unknown status: " + response.asString());
-
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
@@ -430,8 +410,6 @@ public class ProfessionalApiClient {
                 .body("")
                 .get("/search/pba/" + email)
                 .andReturn();
-
-        log.info("Retrieve organisation response: " + response.asString());
 
         response.then()
                 .assertThat()

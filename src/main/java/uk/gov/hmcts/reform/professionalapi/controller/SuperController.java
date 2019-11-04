@@ -127,7 +127,7 @@ public abstract class SuperController {
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
-        log.info("Received response to create a new organisation..." + organisationResponse);
+        log.info("Received response to create a new organisation...");
         return ResponseEntity
                 .status(201)
                 .body(organisationResponse);
@@ -163,7 +163,7 @@ public abstract class SuperController {
                 throw new InvalidRequest("400");
             }
         }
-        log.debug("Received response to retrieve organisation details" + organisationResponse);
+        log.debug("Received response to retrieve organisation details");
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
@@ -216,7 +216,7 @@ public abstract class SuperController {
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-                log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
+                log.info("Idam registration success !!");
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
@@ -293,7 +293,7 @@ public abstract class SuperController {
         ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-            log.info("Idam registration success !! idamId = " + userProfileCreationResponse.getIdamId());
+            log.info("Idam registration success !!");
             newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {

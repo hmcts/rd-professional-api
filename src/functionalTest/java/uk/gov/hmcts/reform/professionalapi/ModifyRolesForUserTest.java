@@ -124,7 +124,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        log.info("User Id::" + userId);
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         RoleName role1 = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
@@ -199,7 +198,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        log.info("User Id::" + userId);
         //create add roles object
         ModifyUserProfileData modifyUserProfileData = new ModifyUserProfileData();
         modifyUserProfileData.setRolesAdd(createAddRoleName());
