@@ -48,12 +48,14 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         userProfileUpdatedData.setIdamStatus("SUSPENDED");
+        updateUserProfileRolesMock(HttpStatus.OK);
 
-        updateUserProfileAddRolesMock(HttpStatus.OK);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        log.info("response$$$" + response);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("updateStatusResponse"));
+        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("statusUpdateResponse"));
+        log.info("addRolesResponse@@@" + addRolesResponse);
         assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("200");
         assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Success");
 
