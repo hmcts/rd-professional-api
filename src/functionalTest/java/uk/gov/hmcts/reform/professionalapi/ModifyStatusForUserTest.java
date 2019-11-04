@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.apache.commons.lang.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -15,54 +15,52 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
-import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
+@Ignore
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
     @Test
-    public void rdcc_418_update_user_status() {
+    public void rdcc_418_ac1_update_user_status_from_active_to_suspended() {
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        String lastName = "someLastName";
+        String firstName = "someFirstName";
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        assertThat(newUserCreationRequest).isNotNull();
+        String email = professionalApiClient.getIdamOpenIdClient().createUser(hmctsAdmin);
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest);
-
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
         assertThat(newUserResponse).isNotNull();
-
-        ModifyUserProfileData data = new ModifyUserProfileData();
-
-        data.setEmail(newUserCreationRequest.getEmail());
-        data.setFirstName(newUserCreationRequest.getFirstName());
-        data.setLastName(newUserCreationRequest.getLastName());
-        data.setIdamStatus(IdamStatus.ACTIVE.name());
-
-        Set<RoleName> rolesAdd = new HashSet<>();
-        RoleName rn = new RoleName("pui-case-manager");
-        rolesAdd.add(rn);
-        data.setRolesAdd(rolesAdd);
-
-        Set<RoleName> rolesDelete = new HashSet<>();
-        data.setRolesDelete(rolesDelete);
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
-        HttpStatus httpStatus = HttpStatus.OK;
+        ModifyUserProfileData data = new ModifyUserProfileData();
 
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(httpStatus, data, orgIdentifierResponse, userId);
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
 
-        String status = searchUserStatus(orgIdentifierResponse, userId);
-        log.info("@@@@@@@@@@@@@status:" + status);
+        Map<String,Object> modifyStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
 
-        assertThat(StringUtils.isNotBlank(status)).isTrue();
+        String status = searchUserStatus(orgIdentifier, userId);
+
+        assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
     }
 
     @SuppressWarnings("unchecked")

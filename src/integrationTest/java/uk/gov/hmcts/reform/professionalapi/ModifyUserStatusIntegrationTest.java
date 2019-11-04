@@ -53,7 +53,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(modifyUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("addRolesResponse"));
+        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("updateStatusResponse"));
         assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("200");
         assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Success");
 

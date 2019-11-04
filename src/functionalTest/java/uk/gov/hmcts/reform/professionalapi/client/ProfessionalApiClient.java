@@ -64,6 +64,10 @@ public class ProfessionalApiClient {
         this.idamClient = idamClient;
     }
 
+    public IdamOpenIdClient getIdamOpenIdClient() {
+        return idamOpenIdClient;
+    }
+
     public String getWelcomePage() {
         return withUnauthenticatedRequest()
                 .get("/")
@@ -475,7 +479,7 @@ public class ProfessionalApiClient {
 
         Response response = requestSpecification
                 .body(modifyUserProfileData)
-                .put("/refdata/external/v1/organisations/users/" + userId)
+                .put("/refdata/external/v1/organisations/users/" + userId + "?origin=EXUI")
                 .andReturn();
 
         response.then()

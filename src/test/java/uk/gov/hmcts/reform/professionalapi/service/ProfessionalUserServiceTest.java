@@ -329,24 +329,24 @@ public class ProfessionalUserServiceTest {
         ObjectMapper mapper = new ObjectMapper();
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Request Not Valid");
+        assertThat(response.getRoleAdditionResponse()).isNotNull();
+        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
     }
 
     @Test(expected = ExternalApiException.class)
     public void modify_user_roles_server_error() throws Exception {
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
 
         mapper.writeValueAsString(modifyUserRolesResponse);
@@ -363,11 +363,11 @@ public class ProfessionalUserServiceTest {
         modifyUserProfileData.setRolesAdd(roles);
 
         String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id, Optional.of(""));
 
         assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Internal Server Error");
+        assertThat(response.getRoleAdditionResponse()).isNotNull();
+        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Internal Server Error");
     }
 
 
@@ -456,20 +456,20 @@ public class ProfessionalUserServiceTest {
         assertThat(professionalUserResponse).isNull();
     }
 
-    private AddRoleResponse createAddRoleResponse(HttpStatus status, String message) {
+    private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
 
-        AddRoleResponse addRoleResponse = new AddRoleResponse();
+        RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();
         addRoleResponse.setIdamStatusCode(status.toString());
         addRoleResponse.setIdamMessage(message);
         return addRoleResponse;
     }
 
-    private List<DeleteRoleResponse> createDeleteRoleResponse(HttpStatus status, String message) {
+    private List<RoleDeletionResponse> createDeleteRoleResponse(HttpStatus status, String message) {
 
-        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse();
+        RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamStatusCode(status.toString());
         deleteRoleResponse.setIdamMessage(message);
-        List<DeleteRoleResponse> deleteRoleResponses = new ArrayList<>();
+        List<RoleDeletionResponse> deleteRoleResponses = new ArrayList<>();
         deleteRoleResponses.add(deleteRoleResponse);
         return deleteRoleResponses;
     }

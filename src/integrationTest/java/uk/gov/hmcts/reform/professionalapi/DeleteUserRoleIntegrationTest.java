@@ -245,8 +245,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     private void verifyDeleteRolesResponse(Map<String, Object> response) {
 
-        assertThat(response.get("deleteRolesResponse")).isNotNull();
-        List<Map<String, Object>> deleteRolesResponse = (List<Map<String, Object>>) response.get("deleteRolesResponse");
+        assertThat(response.get("roleDeletionResponse")).isNotNull();
+        List<Map<String, Object>> deleteRolesResponse = (List<Map<String, Object>>) response.get("roleDeletionResponse");
         Map<String, Object>  deleteRoleResponse = deleteRolesResponse.get(0);
         assertThat(deleteRoleResponse.get("idamStatusCode")).isEqualTo("500");
         assertThat(deleteRoleResponse.get("idamMessage")).isEqualTo("Internal Server Error");

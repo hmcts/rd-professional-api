@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.Optional;
 import javax.validation.constraints.NotBlank;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
@@ -146,11 +148,12 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody ModifyUserProfileData modifyUserProfileData,
             @PathVariable("orgId")  String orgId,
-            @PathVariable("userId") String userId
+            @PathVariable("userId") String userId,
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
         log.info("Received request to update user roles of an organisation...");
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId, origin);
 
     }
 }
