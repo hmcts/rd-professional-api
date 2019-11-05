@@ -8,7 +8,7 @@ public class DeleteRoleResponseTest {
 
     @Test
     public void deleteRoleResponseTest() {
-        DeleteRoleResponse deleteRoleResponse = new DeleteRoleResponse("Role","Code","Message");
+        RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse("Role","Code","Message");
 
         assertThat(deleteRoleResponse.getRoleName()).isEqualTo("Role");
         assertThat(deleteRoleResponse.getIdamStatusCode()).isEqualTo("Code");
