@@ -88,7 +88,6 @@ public class ProfessionalExternalUserController extends SuperController {
                                                      @RequestParam(value = "page", required = false) Integer page,
                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalExternalUserController::findUsersByOrganisation");
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");

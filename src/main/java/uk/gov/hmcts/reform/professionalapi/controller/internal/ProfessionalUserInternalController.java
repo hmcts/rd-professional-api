@@ -73,8 +73,6 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalUserInternalController:Received request to get users for internal organisation");
-
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 

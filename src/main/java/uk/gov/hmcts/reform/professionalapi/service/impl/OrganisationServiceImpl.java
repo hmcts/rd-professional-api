@@ -237,7 +237,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         pendingOrganisations.addAll(activeOrganisations);
 
-        log.info("Retrieving all organisations...");
         return new OrganisationsDetailResponse(pendingOrganisations, true);
     }
 

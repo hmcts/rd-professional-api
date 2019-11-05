@@ -79,9 +79,9 @@ public abstract class AuthorizationFunctionalTest {
     public void setUp() {
         RestAssured.useRelaxedHTTPSValidation();
 
-        //log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
-        //log.info("Configured S2S microservice: " + s2sName);
-        //log.info("Configured S2S URL: " + s2sUrl);
+        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
+        log.info("Configured S2S microservice: " + s2sName);
+        log.info("Configured S2S URL: " + s2sUrl);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
@@ -133,7 +133,7 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        // log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
+        log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)

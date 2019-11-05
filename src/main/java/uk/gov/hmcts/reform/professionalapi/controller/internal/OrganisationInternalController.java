@@ -150,7 +150,6 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to update an organisation");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
 
