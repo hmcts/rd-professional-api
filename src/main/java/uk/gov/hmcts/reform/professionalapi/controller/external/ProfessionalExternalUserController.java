@@ -32,8 +32,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 
 
@@ -190,13 +190,14 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
-            @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @ApiParam(hidden = true) @OrgId String orgId,
-            @PathVariable("userId") String userId
+            @PathVariable("userId") String userId,
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
         log.info("Received request to update user roles of an organisation...");
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }
 

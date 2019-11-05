@@ -129,7 +129,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
@@ -168,15 +168,16 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
+    public ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
         ModifyUserRolesResponse modifyUserRolesResponse;
-        try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
+
+        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
 
             Class clazz = ModifyUserRolesResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-            modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
-        }  catch (FeignException ex) {
+            modifyUserRolesResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
+        } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
         log.info("inside modifyRolesForUser ::");

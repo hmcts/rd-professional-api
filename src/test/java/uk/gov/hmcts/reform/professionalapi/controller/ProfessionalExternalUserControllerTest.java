@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -38,7 +38,7 @@ public class ProfessionalExternalUserControllerTest {
     private ProfessionalUserService professionalUserServiceMock;
     private Organisation organisation;
     private ProfessionalUserReqValidator profExtUsrReqValidator;
-    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    private OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     private ResponseEntity<?> responseEntity;
 
@@ -51,7 +51,7 @@ public class ProfessionalExternalUserControllerTest {
         organisation = mock(Organisation.class);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
-        organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
+        organisationIdentifierValidatorImpl = mock(OrganisationIdentifierIdentifierValidatorImpl.class);
         profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);

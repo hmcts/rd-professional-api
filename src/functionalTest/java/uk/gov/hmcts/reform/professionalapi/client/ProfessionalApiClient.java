@@ -33,7 +33,8 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
@@ -299,7 +300,7 @@ public class ProfessionalApiClient {
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
     }
 
@@ -318,7 +319,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisation(String organisationId, String role, HttpStatus status) {
+    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
@@ -329,7 +330,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
+    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
@@ -357,6 +358,20 @@ public class ProfessionalApiClient {
                 .body(organisationCreationRequest)
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+    }
+
+    public void updateUser(UserCreationRequest userCreationRequest, String role, String userIdentifier) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(userCreationRequest)
+                .put("/refdata/internal/v1/users/" + userIdentifier)
+                .andReturn();
+
+        log.info("Update user response: " + response.getStatusCode());
 
         response.then()
                 .assertThat()
@@ -418,10 +433,11 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForPrdAdmin(HttpStatus status, ModifyUserProfileData modifyUserProfileData, String organisationId, String userId) {
+    @SuppressWarnings("unchecked")
+    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body(modifyUserProfileData)
+                .body(userProfileUpdatedData)
                 .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
 
@@ -433,11 +449,11 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForExternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
-                .body(modifyUserProfileData)
-                .put("/refdata/external/v1/organisations/users/" + userId)
+                .body(userProfileUpdatedData)
+                .put("/refdata/external/v1/organisations/users/" + userId + "?origin=EXUI")
                 .andReturn();
 
         response.then()
@@ -448,11 +464,11 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserRoleToExistingUserForInternal(HttpStatus status, ModifyUserProfileData modifyUserProfileData, RequestSpecification requestSpecification,String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
 
         Response response = requestSpecification
-                .body(modifyUserProfileData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users" + userId)
+                .body(userProfileUpdatedData)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
                 .andReturn();
 
         response.then()
