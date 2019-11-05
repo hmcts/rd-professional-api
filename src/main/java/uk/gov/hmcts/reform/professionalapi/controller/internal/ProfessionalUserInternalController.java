@@ -75,8 +75,6 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
-
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
@@ -152,7 +150,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        log.info("Received request to update user roles of an organisation...");
+        //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }

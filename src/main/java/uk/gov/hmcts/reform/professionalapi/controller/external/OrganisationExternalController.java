@@ -60,7 +60,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("Received request to create a new organisation for external user...");
+        //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);
     }
 
@@ -126,7 +126,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true)@OrgId  String orgId) {
-        log.info("Received request to retrieve an organisations payment accounts by email for external...");
+        //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
     }
@@ -162,7 +162,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true)@OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to add a new user to an organisation for external...");
+        //Received request to add a new user to an organisation for external
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
@@ -170,7 +170,7 @@ public class OrganisationExternalController extends SuperController {
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
 
-        log.info("In retrievePaymentAccountByUserEmail method:");
+        //In retrievePaymentAccountByUserEmail method
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -186,7 +186,7 @@ public class OrganisationExternalController extends SuperController {
     protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(String id) {
 
         OrganisationEntityResponse organisationResponse = null;
-        log.info("Received request to retrieve External organisation with ID ");
+        //Received request to retrieve External organisation with ID
         organisationResponse =
                 organisationService.retrieveOrganisation(id);
         return ResponseEntity

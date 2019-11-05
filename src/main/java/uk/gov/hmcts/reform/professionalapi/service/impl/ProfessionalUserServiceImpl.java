@@ -134,7 +134,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if (!StringUtils.isBlank(status)) {
-            log.info("Filtering users by status: " + status);
+            //Filtering users by status
 
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
             responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
@@ -180,7 +180,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
-        log.info("inside modifyRolesForUser ::");
+        //inside modifyRolesForUser
         return modifyUserRolesResponse;
     }
 }
