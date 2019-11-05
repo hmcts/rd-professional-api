@@ -150,7 +150,7 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        log.info("Received request to update user roles of an organisation...");
+        //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }

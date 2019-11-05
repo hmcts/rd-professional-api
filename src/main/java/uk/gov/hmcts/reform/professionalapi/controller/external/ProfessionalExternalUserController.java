@@ -148,7 +148,7 @@ public class ProfessionalExternalUserController extends SuperController {
         Optional<ResponseEntity> optionalResponseEntity;
 
         if (isValidEmail(email)) {
-            log.info("email is valid");
+            //email is valid
             optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
         } else {
             throw new InvalidRequest("The email provided '" + email + "' is invalid");
@@ -196,7 +196,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        log.info("Received request to update user roles of an organisation...");
+        //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }

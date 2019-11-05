@@ -114,7 +114,7 @@ public abstract class SuperController {
         OrganisationResponse organisationResponse =
                 organisationService.createOrganisationFrom(organisationCreationRequest);
 
-        log.info("Received response to create a new organisation...");
+        //Received response to create a new organisation
         return ResponseEntity
                 .status(201)
                 .body(organisationResponse);
@@ -126,13 +126,13 @@ public abstract class SuperController {
 
         Object organisationResponse = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
-            log.info("Received request to retrieve all organisations");
+            //Received request to retrieve all organisations
             organisationResponse =
                     organisationService.retrieveOrganisations();
 
         } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
                 || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
-            log.info("Received request to retrieve organisation with ID ");
+            //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
             organisationResponse =
@@ -142,7 +142,7 @@ public abstract class SuperController {
 
             if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
-                log.info("Received request to retrieve organisation with status " + orgStatus.toUpperCase());
+                //Received request to retrieve organisation with status
                 organisationResponse =
                         organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
             } else {
@@ -197,13 +197,13 @@ public abstract class SuperController {
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
         if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
-            log.info("Organisation is getting activated");
+            //Organisation is getting activated
 
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-                log.info("Idam registration success !!");
+                //Idam registration success
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
@@ -217,7 +217,7 @@ public abstract class SuperController {
     }
 
     private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
-        log.info("Creating user...");
+        //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
                 professionalUser.getEmailAddress(),
@@ -249,7 +249,7 @@ public abstract class SuperController {
             log.error("Invalid Request param for status field");
             throw new InvalidRequest("400");
         }
-        log.info("Received response for status...");
+        //Received response for status...
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
@@ -280,7 +280,7 @@ public abstract class SuperController {
         ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-            log.info("Idam registration success !!");
+            //Idam registration success
             newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {
