@@ -1,19 +1,28 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+
 import io.restassured.specification.RequestSpecification;
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+
+@RunWith(SpringIntegrationSerenityRunner.class)
+@ActiveProfiles("functional")
+@Slf4j
 public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFunctionalTest {
 
     RequestSpecification bearerTokenForPuiFinanceManager;
@@ -44,7 +53,7 @@ public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFuncti
     }
 
     @Test
-    public void ac1_HMCTS_user_can_retrieve_a_list_of_PBAs_of_a_given_organisation() {
+    public void ac1_hmcts_user_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiFinanceManager());
         assertThat(response.get("paymentAccount")).asList().hasSize(1);
     }
