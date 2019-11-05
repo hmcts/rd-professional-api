@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationValidator;
 
 public class UpdateOrganisationRequestValidatorTest {
 
     @Test
     public void test_UpdateOrganisationRequestValidator() {
 
-        List<UpdateOrganisationValidator> updateOrganisationRequestValidatorList = new ArrayList<>();
-        updateOrganisationRequestValidatorList.add(mock(UpdateOrganisationValidator.class));
+        List<OrganisationIdentifierValidator> updateOrganisationRequestValidatorList = new ArrayList<>();
+        updateOrganisationRequestValidatorList.add(mock(OrganisationIdentifierValidator.class));
 
         UpdateOrganisationRequestValidator updateOrganisationRequestValidator = new UpdateOrganisationRequestValidator(updateOrganisationRequestValidatorList);
 

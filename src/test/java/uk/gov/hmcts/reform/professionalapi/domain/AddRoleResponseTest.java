@@ -8,7 +8,7 @@ public class AddRoleResponseTest {
 
     @Test
     public void addRoleResponseTest() {
-        AddRoleResponse addRoleResponse = new AddRoleResponse("Code","Message");
+        RoleAdditionResponse addRoleResponse = new RoleAdditionResponse("Code","Message");
 
         assertThat(addRoleResponse.getIdamStatusCode()).isEqualTo("Code");
         assertThat(addRoleResponse.getIdamMessage()).isEqualTo("Message");
