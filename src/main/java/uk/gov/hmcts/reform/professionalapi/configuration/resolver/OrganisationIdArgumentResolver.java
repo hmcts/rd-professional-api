@@ -56,8 +56,6 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
                 organisation = professionalUser.getOrganisation();
                 orgId = organisation.getOrganisationIdentifier();
-                log.info("OrganisationIdentifier::" + orgId);
-
             } else {
                 log.error("ProfessionalUserUser info null::");
                 throw new AccessDeniedException("403 Forbidden");

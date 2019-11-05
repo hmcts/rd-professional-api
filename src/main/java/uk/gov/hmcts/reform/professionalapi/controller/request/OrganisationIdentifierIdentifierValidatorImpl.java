@@ -18,9 +18,9 @@ public class OrganisationIdentifierIdentifierValidatorImpl implements Organisati
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
-        log.info("Into Organisation identifier validator...");
+        //Into Organisation identifier validator
         checkOrganisationDoesNotExist(existingOrganisation, inputOrganisationIdentifier);
-        log.info("Validation completed for identifier Organisation...");
+        //Validation completed for identifier Organisation
     }
 
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {

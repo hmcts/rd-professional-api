@@ -237,7 +237,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         pendingOrganisations.addAll(activeOrganisations);
 
-        log.info("Retrieving all organisations..." + pendingOrganisations.size());
         return new OrganisationsDetailResponse(pendingOrganisations, true);
     }
 
@@ -270,7 +269,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-        log.info("Into update Organisation service");
+        //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
         organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
@@ -278,7 +277,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
         organisationRepository.save(organisation);
-        log.info("Update Organisation service done...");
+        //Update Organisation service done
 
         return new OrganisationResponse(organisation);
     }
@@ -296,7 +295,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
-            log.debug("Retrieving organisation with ID " + organisationIdentifier);
+            log.debug("Retrieving organisation");
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);
@@ -313,8 +312,6 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
-
-            log.info("for ACTIVE::Status:");
 
             organisations = retrieveActiveOrganisationDetails();
         }
