@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 
 import io.restassured.specification.RequestSpecification;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
