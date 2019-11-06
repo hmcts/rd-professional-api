@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 
 import io.restassured.specification.RequestSpecification;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFuncti
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         List<String> userRoles = Arrays.stream(otherRoles).collect(Collectors.toList());
+        userRoles.add(roleUnderTest);
+
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someName";
