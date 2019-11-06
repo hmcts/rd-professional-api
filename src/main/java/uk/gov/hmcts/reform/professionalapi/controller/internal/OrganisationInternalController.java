@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
 
 @RequestMapping(
@@ -125,6 +127,48 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         log.info("Received request to retrieve an organisations payment accounts by email for internal...");
         return retrievePaymentAccountByUserEmail(email);
+    }
+
+    @ApiOperation(
+            value = "Edit pbas of organisations by organisation Id",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "The organisations associated payment accounts",
+                    response = OrganisationPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Data not found"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/pbas",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
+                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+        log.info("Received request to edit payment accounts by organisation Id...");
+        return editPaymentAccounts(organisationIdentifier);
+    }
+
+    protected ResponseEntity editPaymentAccounts(String organisationIdentifier) {
+
+        PbaResponse response = paymentAccountService.editPaymentsAccountsByOrgId(organisationIdentifier);
+        return ResponseEntity
+                .status(201)
+                .body(response);
+
     }
 
     @ApiOperation(

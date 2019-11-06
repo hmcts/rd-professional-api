@@ -471,6 +471,22 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> editPbaAccountsByOrgId(String orgId, String hmctsAdmin) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .put("/refdata/internal/v1/organisations/" + orgId + "/pbas")
+                .andReturn();
+
+        log.info("Retrieve edit pba response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
     public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification

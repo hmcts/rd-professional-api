@@ -6,14 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -28,6 +29,12 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     UserProfileFeignClient userProfileFeignClient;
 
     private ProfessionalUserRepository professionalUserRepository;
+
+    private PaymentAccountRepository paymentAccountRepository;
+
+    private OrganisationRepository organisationRepository;
+
+    private UserAccountMapRepository userAccountMapRepository;
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
@@ -60,5 +67,21 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         }
         return organisation;
+    }
+
+    @Override
+    public PbaResponse editPaymentsAccountsByOrgId(String orgId) {
+
+        Organisation organisation =  organisationRepository.findByOrganisationIdentifier(orgId);
+        PbaResponse response = null;
+        if (null == organisation) {
+
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        List<SuperUser> user = organisation.getUsers();
+        userAccountMapRepository.findById(user.get(0).getId());
+
+        return response;
     }
 }
