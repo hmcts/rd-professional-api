@@ -25,9 +25,9 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @Slf4j
 public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFunctionalTest {
 
-    RequestSpecification bearerTokenForPuiFinanceManager;
+    RequestSpecification bearerTokenForUser;
 
-    public RequestSpecification generateBearerTokenForPuiFinanceManager() {
+    public RequestSpecification generateBearerTokenForUser(String role) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
@@ -38,7 +38,7 @@ public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFuncti
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerTokenForPuiFinanceManager = professionalApiClient.getMultipleAuthHeadersExternal(puiFinanceManager, firstName, lastName, userEmail);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
@@ -49,12 +49,18 @@ public class RetrievePaymentAccountForAnOrganisation extends AuthorizationFuncti
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
 
-        return bearerTokenForPuiFinanceManager;
+        return bearerTokenForUser;
     }
 
     @Test
-    public void ac1_hmcts_user_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForPuiFinanceManager());
+    public void ac1_hmcts_user_with_appropriate_permission_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiFinanceManager));
         assertThat(response.get("paymentAccount")).asList().hasSize(1);
+    }
+
+    @Test
+    public void ac1_hmcts_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiCaseManager));
+        assertThat(response.isEmpty());
     }
 }
