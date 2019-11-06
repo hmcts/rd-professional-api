@@ -80,8 +80,16 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
 
+    public Map<String,Object> retrieveAllOrganisationsWithPaging(String role, Integer page, Integer size) {
+        return getRequest(APP_INT_BASE_PATH + "/?page={page}&size={size}", role, page, size);
+    }
+
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
+    }
+
+    public Map<String,Object> retrieveAllOrganisationDetailsByStatusPaging(String role, String status, Integer page, Integer size) {
+        return getRequest(APP_INT_BASE_PATH + "?status={status}&page={page}&size={size}", role, status, page, size);
     }
 
     public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {

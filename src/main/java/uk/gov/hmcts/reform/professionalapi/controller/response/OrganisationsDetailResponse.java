@@ -16,4 +16,9 @@ public class OrganisationsDetailResponse {
                 new OrganisationEntityResponse(organisation, isRequiredAllEntities)).collect(Collectors.toList());
 
     }
+
+    public List<OrganisationEntityResponse> getOrganisations() {
+        return organisations;
+    }
+
 }

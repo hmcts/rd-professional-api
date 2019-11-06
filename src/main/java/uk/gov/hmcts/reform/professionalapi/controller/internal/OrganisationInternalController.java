@@ -88,9 +88,11 @@ public class OrganisationInternalController extends SuperController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
+            @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status,
+            @ApiParam(name = "page", required = false)@RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", required = false)@RequestParam(value = "size", required = false) Integer size) {
 
-        return retrieveAllOrganisationOrById(id, status);
+        return retrieveAllOrganisationOrById(id, status, page, size);
     }
 
 

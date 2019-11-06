@@ -10,10 +10,7 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.org
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -283,7 +280,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .email("someone11@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
                         .addressLine1("addressLine2").build())).build();
 
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationRequest);
@@ -302,7 +299,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
 
-        assertThat(orgResponse.get("http_status").toString().contains("200"));
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
         assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
         assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
 
@@ -323,4 +320,337 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(superUserSecond.get("email")).isEqualTo("super.user@hmcts.net");
     }
 
+    @Test
+    public void  persists_pending_orgs_and_return_pending_from_prd_with_paging() {
+        OrganisationCreationRequest organisationRequest1 = anOrganisationCreationRequest()
+                .name("org-name1")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname1")
+                        .lastName("lname1")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse1 = professionalReferenceDataClient.createOrganisation(organisationRequest1);
+        assertThat(organisationResponse1.get("http_status").toString().contains("201")).isEqualTo(true);
+
+        OrganisationCreationRequest organisationRequest2 = anOrganisationCreationRequest()
+                .name("org-name2")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname2")
+                        .lastName("lname2")
+                        .email("someone2@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse2 = professionalReferenceDataClient.createOrganisation(organisationRequest2);
+        assertThat(organisationResponse2.get("http_status").toString().contains("201")).isEqualTo(true);
+
+        OrganisationCreationRequest organisationRequest3 = anOrganisationCreationRequest()
+                .name("org-name3")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname3")
+                        .lastName("lname3")
+                        .email("someone3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse3 = professionalReferenceDataClient.createOrganisation(organisationRequest3);
+        assertThat(organisationResponse3.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationsWithPaging(hmctsAdmin, 0, 2);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
+
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        assertThat(organisation1.get("status")).isEqualTo("PENDING");
+        Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        assertThat(organisation2.get("status")).isEqualTo("PENDING");
+
+        assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
+    }
+
+
+    @Test
+    public void  persists_active_orgs_and_return_active_from_prd_and_up_with_paging() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        OrganisationCreationRequest organisationRequest1 = anOrganisationCreationRequest()
+                .name("org-name1")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname1")
+                        .lastName("lname1")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse1 = professionalReferenceDataClient.createOrganisation(organisationRequest1);
+        assertThat(organisationResponse1.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and change the and assert success
+        String orgId1 = (String) organisationResponse1.get("organisationIdentifier");
+        organisationRequest1.setStatus("ACTIVE");
+        Map<String, Object> responseForOrganisationUpdate1 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest1, hmctsAdmin, orgId1);
+        assertThat(responseForOrganisationUpdate1.get("http_status")).isEqualTo(200);
+
+        OrganisationCreationRequest organisationRequest2 = anOrganisationCreationRequest()
+                .name("org-name2")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname2")
+                        .lastName("lname2")
+                        .email("someone2@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse2 = professionalReferenceDataClient.createOrganisation(organisationRequest2);
+        assertThat(organisationResponse2.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId2 = (String) organisationResponse2.get("organisationIdentifier");
+        organisationRequest2.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate2 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest2, hmctsAdmin, orgId2);
+        assertThat(responseForOrganisationUpdate2.get("http_status")).isEqualTo(200);
+
+        OrganisationCreationRequest organisationRequest3 = anOrganisationCreationRequest()
+                .name("org-name3")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname3")
+                        .lastName("lname3")
+                        .email("someone3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse3 = professionalReferenceDataClient.createOrganisation(organisationRequest3);
+        assertThat(organisationResponse3.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId3 = (String) organisationResponse3.get("organisationIdentifier");
+        organisationRequest3.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate3 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest3, hmctsAdmin, orgId3);
+        assertThat(responseForOrganisationUpdate3.get("http_status")).isEqualTo(200);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationsWithPaging(hmctsAdmin, 0, 2);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
+
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        assertThat(organisation1.get("status")).isEqualTo("ACTIVE");
+        Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        assertThat(organisation2.get("status")).isEqualTo("ACTIVE");
+
+        assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
+    }
+
+    @Test
+    public void  persists_pending_and_active_orgs_and_return_both_from_prd_and_up_with_paging() {
+        //Add a pending organisation
+        OrganisationCreationRequest organisationRequest1 = anOrganisationCreationRequest()
+                .name("org-name1")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname1")
+                        .lastName("lname1")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse1 = professionalReferenceDataClient.createOrganisation(organisationRequest1);
+        assertThat(organisationResponse1.get("http_status").toString().contains("201")).isEqualTo(true);
+        //add 2 active organisations
+        OrganisationCreationRequest organisationRequest2 = anOrganisationCreationRequest()
+                .name("org-name2")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname2")
+                        .lastName("lname2")
+                        .email("someone2@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse2 = professionalReferenceDataClient.createOrganisation(organisationRequest2);
+        assertThat(organisationResponse2.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId2 = (String) organisationResponse2.get("organisationIdentifier");
+        organisationRequest2.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate2 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest2, hmctsAdmin, orgId2);
+        assertThat(responseForOrganisationUpdate2.get("http_status")).isEqualTo(200);
+
+        OrganisationCreationRequest organisationRequest3 = anOrganisationCreationRequest()
+                .name("org-name3")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname3")
+                        .lastName("lname3")
+                        .email("someone3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse3 = professionalReferenceDataClient.createOrganisation(organisationRequest3);
+        assertThat(organisationResponse3.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId3 = (String) organisationResponse3.get("organisationIdentifier");
+        organisationRequest3.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate3 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest3, hmctsAdmin, orgId3);
+        assertThat(responseForOrganisationUpdate3.get("http_status")).isEqualTo(200);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationsWithPaging(hmctsAdmin, 0, 2);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
+
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
+    }
+
+    @Test
+    public void  persists_pending_orgs_and_return_pending_from_prd_with_status_and_paging() {
+        OrganisationCreationRequest organisationRequest1 = anOrganisationCreationRequest()
+                .name("org-name1")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname1")
+                        .lastName("lname1")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse1 = professionalReferenceDataClient.createOrganisation(organisationRequest1);
+        assertThat(organisationResponse1.get("http_status").toString().contains("201")).isEqualTo(true);
+
+        OrganisationCreationRequest organisationRequest2 = anOrganisationCreationRequest()
+                .name("org-name2")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname2")
+                        .lastName("lname2")
+                        .email("someone2@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse2 = professionalReferenceDataClient.createOrganisation(organisationRequest2);
+        assertThat(organisationResponse2.get("http_status").toString().contains("201")).isEqualTo(true);
+
+        OrganisationCreationRequest organisationRequest3 = anOrganisationCreationRequest()
+                .name("org-name3")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname3")
+                        .lastName("lname3")
+                        .email("someone3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse3 = professionalReferenceDataClient.createOrganisation(organisationRequest3);
+        assertThat(organisationResponse3.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
+        Map<String, Object> orgResponse =  professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusPaging(hmctsAdmin, "PENDING", 0, 2);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        assertThat(organisation1.get("status")).isEqualTo("PENDING");
+        Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        assertThat(organisation2.get("status")).isEqualTo("PENDING");
+
+        assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
+    }
+
+    @Test
+    public void  persists_active_orgs_and_return_active_from_prd_with_status_paging() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        OrganisationCreationRequest organisationRequest1 = anOrganisationCreationRequest()
+                .name("org-name1")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname1")
+                        .lastName("lname1")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse1 = professionalReferenceDataClient.createOrganisation(organisationRequest1);
+        assertThat(organisationResponse1.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId1 = (String) organisationResponse1.get("organisationIdentifier");
+        organisationRequest1.setStatus("ACTIVE");
+        Map<String, Object> responseForOrganisationUpdate1 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest1, hmctsAdmin, orgId1);
+        assertThat(responseForOrganisationUpdate1.get("http_status")).isEqualTo(200);
+
+        OrganisationCreationRequest organisationRequest2 = anOrganisationCreationRequest()
+                .name("org-name2")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname2")
+                        .lastName("lname2")
+                        .email("someone2@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse2 = professionalReferenceDataClient.createOrganisation(organisationRequest2);
+        assertThat(organisationResponse2.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId2 = (String) organisationResponse2.get("organisationIdentifier");
+        organisationRequest2.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate2 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest2, hmctsAdmin, orgId2);
+        assertThat(responseForOrganisationUpdate2.get("http_status")).isEqualTo(200);
+
+        OrganisationCreationRequest organisationRequest3 = anOrganisationCreationRequest()
+                .name("org-name3")
+                .superUser(aUserCreationRequest()
+                        .firstName("fname3")
+                        .lastName("lname3")
+                        .email("someone3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Collections.singletonList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build())).build();
+        Map<String, Object> organisationResponse3 = professionalReferenceDataClient.createOrganisation(organisationRequest3);
+        assertThat(organisationResponse3.get("http_status").toString().contains("201")).isEqualTo(true);
+        //Update the Organisation status to be active and assert success
+        String orgId3 = (String) organisationResponse3.get("organisationIdentifier");
+        organisationRequest3.setStatus("ACTIVE");
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> responseForOrganisationUpdate3 =
+                professionalReferenceDataClient.updateOrganisation(organisationRequest3, hmctsAdmin, orgId3);
+        assertThat(responseForOrganisationUpdate3.get("http_status")).isEqualTo(200);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> orgResponse = professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusPaging(hmctsAdmin, "ACTIVE", 0, 2);
+
+        assertThat(orgResponse.get("http_status").toString().contains("200")).isEqualTo(true);
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("organisations")).asList().size().isEqualTo(2);
+
+        Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
+        assertThat(organisation1.get("status")).isEqualTo("ACTIVE");
+        Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
+        assertThat(organisation2.get("status")).isEqualTo("ACTIVE");
+
+        assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
+    }
 }

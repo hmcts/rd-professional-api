@@ -120,16 +120,25 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status, Integer page, Integer size) {
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
+        Pageable pageable = null;
+
+        if (page != null) {
+            pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,"name"));
+        }
 
         Object organisationResponse = null;
+        ResponseEntity responseEntity = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            organisationResponse =
-                    organisationService.retrieveOrganisations();
-
+            if (pageable != null) {
+                //call the retrieveOrganisations with pageable here
+                responseEntity = organisationService.retrieveOrganisationsWithPageable(pageable);
+            } else {
+                organisationResponse = organisationService.retrieveOrganisations();
+            }
         } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
                 || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
             //Received request to retrieve organisation with ID
@@ -143,17 +152,31 @@ public abstract class SuperController {
             if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
                 //Received request to retrieve organisation with status
-                organisationResponse =
-                        organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
+                if (pageable != null) {
+                    responseEntity = organisationService.findByOrganisationStatusWithPageable(
+                            OrganisationStatus.valueOf(orgStatus.toUpperCase()), pageable);
+                } else {
+                    organisationResponse =
+                            organisationService.findByOrganisationStatus(
+                                    OrganisationStatus.valueOf(orgStatus.toUpperCase()));
+                }
+
             } else {
                 log.error("Invalid Request param for status field");
                 throw new InvalidRequest("400");
             }
         }
         log.debug("Received response to retrieve organisation details");
-        return ResponseEntity
-                .status(200)
-                .body(organisationResponse);
+
+        if (pageable != null && responseEntity != null) {
+            return responseEntity;
+        } else {
+            return ResponseEntity
+                    .status(200)
+                    .body(organisationResponse);
+        }
+
+
     }
 
     protected ResponseEntity retrieveUserByEmail(String email) {

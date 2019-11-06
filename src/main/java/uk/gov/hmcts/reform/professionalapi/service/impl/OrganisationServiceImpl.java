@@ -14,6 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -263,6 +267,69 @@ public class OrganisationServiceImpl implements OrganisationService {
         return updatedOrganisationDetails;
     }
 
+    public ResponseEntity retrieveActiveOrganisationDetails(Pageable pageable) {
+
+        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
+        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        OrganisationsDetailResponse organisationsDetailResponse = null;
+
+        Page<Organisation> activeOrganisations = organisationRepository.findByStatus(
+                OrganisationStatus.ACTIVE, pageable);
+        List<Organisation> activeOrganisationsTemp = activeOrganisations.getContent();
+        if (CollectionUtils.isEmpty(activeOrganisationsTemp)) {
+            throw new EmptyResultDataAccessException(1);
+        } else {
+            activeOrganisationsTemp.forEach(organisation -> {
+                if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                }
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(activeOrganisationDtls)) {
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
+            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+                    "false", activeOrganisationDtls);
+            organisationsDetailResponse = new OrganisationsDetailResponse(
+                    updatedOrganisationDetails, true);
+        }
+
+        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, activeOrganisations, null);
+        return ResponseEntity.status(200).headers(headers).body(organisationsDetailResponse);
+    }
+
+    public List<Organisation> retrieveActiveOrganisationDetails(List<Organisation> organisations) {
+
+        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
+        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        List<Organisation> pendingOrganisations = new ArrayList<>();
+        List<Organisation> activeOrganisations = new ArrayList<>();
+
+        if (!organisations.isEmpty()) {
+            organisations.forEach(organisation -> {
+                if (organisation.getStatus().isActive() && organisation.getUsers().size() > 0 && organisation.getUsers().get(0).getUserIdentifier() != null) {
+                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                    activeOrganisations.add(organisation);
+                } else {
+                    if (organisation.getStatus().isPending()) {
+                        pendingOrganisations.add(organisation);
+                    }
+                }
+            });
+            //log.info("Retrieving all organisations..." + activeOrganisations.toString());
+            if (activeOrganisationDtls.size() > 0) {
+                RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().collect(Collectors.toList()));
+                updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+                        "false", activeOrganisationDtls);
+                if (updatedOrganisationDetails != null) {
+                    pendingOrganisations.addAll(updatedOrganisationDetails);
+                }
+            }
+        }
+
+        return pendingOrganisations;
+    }
+
     @Override
     public OrganisationResponse updateOrganisation(
             OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
@@ -304,7 +371,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-
         List<Organisation> organisations = null;
 
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
@@ -325,5 +391,49 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
 
+    @Override
+    public ResponseEntity retrieveOrganisationsWithPageable(Pageable pageable) {
+        List<OrganisationStatus> statusList = new ArrayList<>();
+        statusList.add(OrganisationStatus.PENDING);
+        statusList.add(OrganisationStatus.ACTIVE);
+        Page<Organisation> organisationsPage = organisationRepository.findByStatusIn(
+                statusList, pageable);
+
+        OrganisationsDetailResponse organisationsDetailResponse =
+                new OrganisationsDetailResponse(retrieveActiveOrganisationDetails(organisationsPage.getContent()),
+                        true);
+
+        if (organisationsDetailResponse.getOrganisations().isEmpty()) {
+            log.info("No Organisations Retrieved...");
+            throw new EmptyResultDataAccessException(1);
+        } else {
+            log.info("Retrieving all organisations..." + organisationsDetailResponse.getOrganisations().size());
+            HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, organisationsPage, null);
+            return ResponseEntity.status(200).headers(headers).body(organisationsDetailResponse);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity findByOrganisationStatusWithPageable(OrganisationStatus status, Pageable pageable) {
+        Page<Organisation> organisations = null;
+        ResponseEntity responseEntity = null;
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
+            organisations = organisationRepository.findByStatus(status, pageable);
+            if (CollectionUtils.isEmpty(organisations.getContent())) {
+                throw new EmptyResultDataAccessException(1);
+            } else {
+                OrganisationsDetailResponse organisationsDetailResponse = new OrganisationsDetailResponse(
+                        organisations.getContent(), true);
+                HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, organisations, null);
+                responseEntity = ResponseEntity.status(200).headers(headers).body(organisationsDetailResponse);
+            }
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
+            log.info("for ACTIVE::Status:");
+            responseEntity = retrieveActiveOrganisationDetails(pageable);
+        }
+
+        return responseEntity;
+    }
 }
 

@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -139,7 +140,7 @@ public class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.retrieveOrganisations()).thenReturn(organisationsDetailResponseMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -151,7 +152,7 @@ public class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponseMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), null);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), null, null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -163,7 +164,7 @@ public class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponseMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), "PENDING");
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisationMock.getOrganisationIdentifier(), "PENDING",null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -175,7 +176,36 @@ public class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponseMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", null, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisationByStatusAndPaging() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Pageable pageableMock = mock(Pageable.class);
+        OrganisationStatus organisationStatusMock = mock(OrganisationStatus.class);
+        responseEntity = mock(ResponseEntity.class);
+
+        when(organisationServiceMock.findByOrganisationStatusWithPageable(organisationStatusMock, pageableMock)).thenReturn(responseEntity);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING", 0, 2);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test
+    public void testRetrieveOrganisationByIdNullStatusNullAndPaging() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        Pageable pageableMock = mock(Pageable.class);
+        responseEntity = mock(ResponseEntity.class);
+
+        when(organisationServiceMock.retrieveOrganisationsWithPageable(pageableMock)).thenReturn(responseEntity);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null, 0, 2);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -185,7 +215,7 @@ public class OrganisationInternalControllerTest {
     public void testRetrieveOrganisationThrows400WhenStatusInvalid() {
         when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponseMock);
 
-        organisationInternalController.retrieveOrganisations(null, "this is not a status");
+        organisationInternalController.retrieveOrganisations(null, "this is not a status", null, null);
     }
 
     @Test

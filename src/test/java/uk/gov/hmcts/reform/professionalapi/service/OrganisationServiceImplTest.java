@@ -36,6 +36,10 @@ import org.mockito.MockitoAnnotations;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -106,7 +110,6 @@ public class OrganisationServiceImplTest {
     private List<PaymentAccount> paymentAccounts;
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
-
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
 
     @InjectMocks
@@ -571,5 +574,185 @@ public class OrganisationServiceImplTest {
         assertThat(organisationResponse).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testRetrieveOrganisationsWithPageableThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
+        Pageable pageableMock = mock(Pageable.class);
+        List<OrganisationStatus> organisationStatuses = new ArrayList<>();
+        organisationStatuses.add(OrganisationStatus.PENDING);
+        organisationStatuses.add(OrganisationStatus.ACTIVE);
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatusIn(organisationStatuses,pageableMock))
+                .thenReturn(organisationsPage);
+
+        List<Organisation> organisationList = new ArrayList<>();
+        Organisation org1 = new Organisation(
+                "some-org-name1", OrganisationStatus.PENDING, "sra-id1", "SomeCompanyNumber1", true, "company-url1");
+        organisationList.add(org1);
+        Organisation org2 = new Organisation(
+                "some-org-name2", OrganisationStatus.ACTIVE, "sra-id2", "SomeCompanyNumber2", true, "company-url2");
+        List<SuperUser> superUsers = new ArrayList<>();
+        SuperUser user = new SuperUser("firstName", "lastName", "email@org.com", organisationMock);
+        user.setUserIdentifier(UUID.randomUUID().toString());
+        superUsers.add(user);
+        org2.setUsers(superUsers);
+        organisationList.add(org2);
+
+        when(organisationsPage.getContent()).thenReturn(organisationList);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisationMock);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ResponseEntity responseEntity = sut.retrieveOrganisationsWithPageable(pageableMock);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+
+        verify(organisationRepositoryMock, times(1)).findByStatusIn(organisationStatuses,pageableMock);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    @SuppressWarnings("unchecked")
+    public void testRetrieveOrganisationsWithPageableForNullResponse() {
+        Pageable pageableMock = mock(Pageable.class);
+        List<OrganisationStatus> organisationStatuses = new ArrayList<>();
+        organisationStatuses.add(OrganisationStatus.PENDING);
+        organisationStatuses.add(OrganisationStatus.ACTIVE);
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatusIn(organisationStatuses,pageableMock)).thenReturn(organisationsPage);
+
+        List<Organisation> organisationList = new ArrayList<>();
+        //No organisation added so it should return EmptyResultDataAccessException
+        when(organisationsPage.getContent()).thenReturn(organisationList);
+
+        ResponseEntity responseEntity = sut.retrieveOrganisationsWithPageable(pageableMock);
+    }
+
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testFindByOrganisationStatusWithPendingAndPageable() {
+        Pageable pageableMock = mock(Pageable.class);
+        OrganisationStatus status = OrganisationStatus.PENDING;
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatus(status, pageableMock))
+                .thenReturn(organisationsPage);
+
+        List<Organisation> organisationList = new ArrayList<>();
+        Organisation org1 = new Organisation(
+                "some-org-name1", OrganisationStatus.PENDING, "sra-id1", "SomeCompanyNumber1", true, "company-url1");
+        Organisation org2 = new Organisation(
+                "some-org-name2", OrganisationStatus.PENDING, "sra-id2", "SomeCompanyNumber2", true, "company-url2");
+        organisationList.add(org1);
+        organisationList.add(org2);
+        when(organisationsPage.getContent()).thenReturn(organisationList);
+
+        ResponseEntity responseEntity = sut.findByOrganisationStatusWithPageable(status,pageableMock);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+
+        verify(organisationRepositoryMock, times(1)).findByStatus(status,pageableMock);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testFindByOrganisationStatusWithActiveAndPageableThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
+        SuperUser user = mock(SuperUser.class);
+        String id = UUID.randomUUID().toString();
+        when(user.getUserIdentifier()).thenReturn(id);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(user);
+
+        when(organisationMock.getUsers()).thenReturn(users);
+
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisationMock);
+
+        Pageable pageableMock = mock(Pageable.class);
+        OrganisationStatus status = OrganisationStatus.ACTIVE;
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatus(status, pageableMock)).thenReturn(organisationsPage);
+
+        when(organisationsPage.getContent()).thenReturn(organisations);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisationMock);
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(UUID.randomUUID().toString());
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.getUserProfiles().addAll(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ResponseEntity responseEntity = sut.findByOrganisationStatusWithPageable(status,pageableMock);
+
+        assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
+
+        verify(organisationRepositoryMock, times(1)).findByStatus(status,pageableMock);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    @SuppressWarnings("unchecked")
+    public void testFindByOrganisationStatusWithPendingAndPageableForNullResponse() {
+        Pageable pageableMock = mock(Pageable.class);
+        OrganisationStatus status = OrganisationStatus.PENDING;
+
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatus(status,pageableMock))
+                .thenReturn(organisationsPage);
+
+        List<Organisation> organisationList = new ArrayList<>();
+        //No organisation added so it should return EmptyResultDataAccessException
+        when(organisationsPage.getContent()).thenReturn(organisationList);
+
+        ResponseEntity responseEntity = sut.findByOrganisationStatusWithPageable(status,pageableMock);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    @SuppressWarnings("unchecked")
+    public void testFindByOrganisationStatusWithActiveAndPageableForNullResponse() {
+        Pageable pageableMock = mock(Pageable.class);
+        OrganisationStatus status = OrganisationStatus.ACTIVE;
+
+        Page<Organisation> organisationsPage = (Page<Organisation>) mock(Page.class);
+
+        when(organisationRepositoryMock.findByStatus(status,pageableMock))
+                .thenReturn(organisationsPage);
+
+        List<Organisation> organisationList = new ArrayList<>();
+        //No organisation added so it should return EmptyResultDataAccessException
+        when(organisationsPage.getContent()).thenReturn(organisationList);
+
+        ResponseEntity responseEntity = sut.findByOrganisationStatusWithPageable(status,pageableMock);
     }
 }
