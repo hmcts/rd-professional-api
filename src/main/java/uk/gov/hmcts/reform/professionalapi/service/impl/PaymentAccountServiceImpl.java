@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,8 +81,23 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         }
 
         List<SuperUser> user = organisation.getUsers();
-        userAccountMapRepository.findById(user.get(0).getId());
+        Optional<UserAccountMap> userAccountMap = userAccountMapRepository.findById(user.get(0).getId());
 
+        UserAccountMapId userAccountMapId = userAccountMap.get().getUserAccountMapId();
+
+        deleteUserAndPaymentAccountsFromUserAccountMap(userAccountMapId);
         return response;
+    }
+
+    public void deleteUserAndPaymentAccountsFromUserAccountMap(UserAccountMapId userAccountMapId) {
+
+
+        ProfessionalUser user = userAccountMapId.getProfessionalUser();
+        if (null != userAccountMapId.getProfessionalUser()) {
+
+            userAccountMapRepository.deleteById(userAccountMapId.getProfessionalUser().getId());
+        }
+
+        user.getOrganisation().getPaymentAccounts()
     }
 }
