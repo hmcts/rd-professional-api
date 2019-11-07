@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,5 +50,13 @@ public class UserCreationRequestValidatorTest {
         prdEnumList.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), caseManagerRole, "SIDAM_ROLE"));
 
         userCreationRequestValidatorMock.validateRoles(roles, prdEnumList);
+    }
+
+    @Test
+    public void privateConstructorTest() throws Exception {
+        Constructor<UserCreationRequestValidator> constructor = UserCreationRequestValidator.class.getDeclaredConstructor();
+        assertEquals(constructor.isAccessible(), false);
+        constructor.setAccessible(true);
+        constructor.newInstance((Object[]) null);
     }
 }

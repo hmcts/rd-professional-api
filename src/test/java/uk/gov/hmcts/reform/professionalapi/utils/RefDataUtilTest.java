@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -331,4 +333,11 @@ public class RefDataUtilTest {
         assertThat(response.equals("false")).isTrue();
     }
 
+    @Test
+    public void privateConstructorTest() throws Exception {
+        Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
+        assertEquals(constructor.isAccessible(), false);
+        constructor.setAccessible(true);
+        constructor.newInstance((Object[]) null);
+    }
 }

@@ -22,7 +22,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -31,9 +35,14 @@ public class PaymentAccountServiceTest {
 
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
-    UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
+    private final UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
+    private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
+    private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
+    private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final OrganisationServiceImpl organisationServiceMock = mock(OrganisationServiceImpl.class);
 
-    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,professionalUserRepositoryMock);
+
+    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,professionalUserRepositoryMock, paymentAccountRepositoryMock, organisationRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
 
     private Organisation organisationMock;
 

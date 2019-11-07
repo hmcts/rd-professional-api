@@ -126,9 +126,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    private void addPbaAccountToOrganisation(
-            List<String> paymentAccounts,
-            Organisation organisation) {
+    public void addPbaAccountToOrganisation(List<String> paymentAccounts, Organisation organisation) {
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
@@ -208,7 +206,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
+    public void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
         if (!paymentAccounts.isEmpty()) {
             List<UserAccountMap> userAccountMaps = new ArrayList<>();

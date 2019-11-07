@@ -159,16 +159,12 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
-        return editPaymentAccounts(organisationIdentifier);
-    }
 
-    protected ResponseEntity editPaymentAccounts(String organisationIdentifier) {
+        PbaResponse response = paymentAccountService.editPaymentsAccountsByOrgId(pbaEditRequest, organisationIdentifier);
 
-        PbaResponse response = paymentAccountService.editPaymentsAccountsByOrgId(organisationIdentifier);
         return ResponseEntity
                 .status(201)
                 .body(response);
-
     }
 
     @ApiOperation(
