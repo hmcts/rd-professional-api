@@ -102,8 +102,11 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         data.setIdamStatus(IdamStatus.SUSPENDED.name());
 
         Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        //TODO remove logger
+        log.info("RESPONSE FROM MODIFY::::::::::::::" + modifiedStatusResponse);
         //WHEN I request the list of PBAs of the given organisation
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
+        log.info("RESPONSE FROM RETRIVE PBAS" + response);
         //THEN I should not see the list of PBAs of that organisation
         assertThat(response.isEmpty());
     }
