@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -31,12 +33,14 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @Slf4j
 public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
-    RequestSpecification bearerTokenForUser;
+    private RequestSpecification bearerTokenForUser;
+    private String orgIdentifier;
+    private String userId;
 
     public RequestSpecification generateBearerTokenForUser(String roleUnderTest, String... otherRoles) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         List<String> userRoles = Arrays.stream(otherRoles).collect(Collectors.toList());
         userRoles.add(roleUnderTest);
@@ -54,7 +58,9 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+
+        userId = (String) newUserResponse.get("userIdentifier");
 
         return bearerTokenForUser;
     }
@@ -74,6 +80,22 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiCaseManager));
+        assertThat(response.isEmpty());
+    }
+
+    @Test
+    public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
+        //GIVEN I am a pui organisation manager or pui finance manager without Active status
+        //AND the given organisation is a valid organisation
+        bearerTokenForUser = generateBearerTokenForUser(puiOrgManager, puiFinanceManager);
+
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
+
+        Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        //WHEN I request the list of PBAs of the given organisation
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
+        //THEN I should not see the list of PBAs of that organisation
         assertThat(response.isEmpty());
     }
 
@@ -143,4 +165,27 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         });
 
     }
+
+    /*
+            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        userRoles.add("pui-organisation-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
+     */
 }
