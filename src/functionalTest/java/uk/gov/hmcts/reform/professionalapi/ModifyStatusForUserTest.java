@@ -35,16 +35,6 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest();
         assertThat(userCreationRequest).isNotNull();
 
-        //tbc remove if Jenkins passes
-        //String lastName = "someLastName";
-        //String firstName = "someFirstName";
-        /*NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();*/
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
         assertThat(newUserResponse).isNotNull();
 
