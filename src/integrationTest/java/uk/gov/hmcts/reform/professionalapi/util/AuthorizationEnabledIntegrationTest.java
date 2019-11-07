@@ -383,8 +383,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
             body = "{"
-                    + "  \"statusCode\":\"400\","
-                    + "  \"statusMessage\":\"Bad Request\""
+                    + "  \"errorMessage\": \"400\","
+                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
         } else if (status.is5xxServerError()) {

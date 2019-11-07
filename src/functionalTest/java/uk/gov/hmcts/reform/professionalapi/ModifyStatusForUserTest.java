@@ -63,6 +63,47 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
     }
 
+    @Test
+    public void rdcc_418_ac2_update_user_status_from_active_to_suspended_and_up_fails() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest();
+        assertThat(userCreationRequest).isNotNull();
+
+        //tbc remove if Jenkins passes
+        //String lastName = "someLastName";
+        //String firstName = "someFirstName";
+        /*NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();*/
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        assertThat(newUserResponse).isNotNull();
+
+        String userId = (String) newUserResponse.get("userIdentifier");
+
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
+
+        Map<String,Object> modifyStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+
+        String status = searchUserStatus(orgIdentifier, userId);
+
+        assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
+    }
+
     @SuppressWarnings("unchecked")
     private String searchUserStatus(String orgIdentifier, String userId) {
 
