@@ -87,7 +87,16 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
         //GIVEN I am a pui organisation manager or pui finance manager without Active status
         //AND the given organisation is a valid organisation
-        bearerTokenForUser = generateBearerTokenForUser(puiOrgManager, puiFinanceManager);
+        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
+
+        Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
+        orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        userId = (String) newUserResponse.get("userIdentifier");
 
         UserProfileUpdatedData data = new UserProfileUpdatedData();
         data.setIdamStatus(IdamStatus.SUSPENDED.name());

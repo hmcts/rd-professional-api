@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
@@ -188,6 +189,20 @@ public class ProfessionalApiClient {
                 .firstName("someFirstName")
                 .lastName("someLastName")
                 .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+    }
+
+    public  NewUserCreationRequest createNewUserRequest(String... roles) {
+        List<String> userRoles = Arrays.stream(roles).collect(Collectors.toList());
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
