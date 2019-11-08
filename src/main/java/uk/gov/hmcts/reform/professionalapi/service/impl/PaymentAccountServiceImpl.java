@@ -85,21 +85,10 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             throw new EmptyResultDataAccessException(1);
         }
 
-        SuperUser superUser = organisation.getUsers().get(0);
-        PaymentAccount paymentAccount = organisation.getPaymentAccounts().get(0);
-
-        UserAccountMapId userAccountMapIdFromOrg = new UserAccountMapId(superUser.toProfessionalUser(), paymentAccount);
-
-        Optional<UserAccountMap> userAccountMap = userAccountMapRepository.findByUserAccountMapId(userAccountMapIdFromOrg);
-
-        UserAccountMapId userAccountMapId = userAccountMap.get().getUserAccountMapId();
-
         deleteUserAndPaymentAccountsFromUserAccountMap(orgId);
-
         deletePaymentAccountsFromOrganisation(orgId);
 
         addPaymentAccountsToOrganisation(pbaEditRequest, orgId);
-
         addUserAndPaymentAccountsToUserAccountMap(orgId);
 
         return new PbaResponse("200", "Success");
@@ -126,11 +115,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         shouldBeEmptyList.size();
     }
 
-    private void deletePaymentAccountsFromOrganisation(String orgId) {
+    public void deletePaymentAccountsFromOrganisation(String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
         List<UUID> accountIds = new ArrayList<>();
 
-        organisation.getPaymentAccounts().stream().forEach(account -> accountIds.add(account.getId()));
+        organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
 
         //TODO remove below lines (Used to check DB queries are executing correctly)
         List<PaymentAccount> shouldNotBeEmptyList = paymentAccountRepository.findAll();
@@ -146,16 +135,17 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         organisation.setPaymentAccounts(emptyAccountList);
     }
 
-    private void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, String orgId) {
+    public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
 
         organisationServiceImpl.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation);
         Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgId);
 
+        //TODO remove below lines (Used to check Payment Accounts are added correctly)
         updatedOrganisation.getPaymentAccounts();
     }
 
-    private void addUserAndPaymentAccountsToUserAccountMap(String orgId) {
+    public void addUserAndPaymentAccountsToUserAccountMap(String orgId) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
 
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();

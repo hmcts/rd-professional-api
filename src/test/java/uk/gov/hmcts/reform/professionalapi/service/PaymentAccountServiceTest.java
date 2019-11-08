@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import java.util.ArrayList;
@@ -14,14 +12,11 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
@@ -40,15 +35,28 @@ public class PaymentAccountServiceTest {
     private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final OrganisationServiceImpl organisationServiceMock = mock(OrganisationServiceImpl.class);
+    private final SuperUser superUserMock = mock(SuperUser.class);
+    private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+    private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
-
-    private final PaymentAccountService sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,professionalUserRepositoryMock, paymentAccountRepositoryMock, organisationRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
+    private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock, paymentAccountRepositoryMock, organisationRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
 
     private Organisation organisationMock;
+    private List<SuperUser> superUsers = new ArrayList<>();
+    private List<PaymentAccount> paymentAccounts = new ArrayList<>();
+    private List<String> pbas = new ArrayList<>();
+    private PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
 
     @Before
     public void setUp() {
         organisationMock = mock(Organisation.class);
+
+        superUsers.add(superUserMock);
+
+        paymentAccounts.add(paymentAccountMock);
+
+        pbas.add("PBA0000001");
+
     }
 
     @Test
@@ -137,5 +145,33 @@ public class PaymentAccountServiceTest {
     public void testThrowsExceptionWhenEmailInvalid() {
         when(sut.findPaymentAccountsByEmail("some-email"))
                 .thenReturn(organisationMock);
+    }
+
+    @Test
+    public void editPaymentsAccountsByOrgId() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+
+        //delete user and payment account code:
+        when(organisationMock.getUsers()).thenReturn(superUsers);
+        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+
+        //delete payment account from org code:
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+        when(paymentAccountMock.getId()).thenReturn(UUID.randomUUID());
+
+        PbaResponse pbaResponse = sut.editPaymentsAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
+
+        assertThat(pbaResponse.getStatusMessage()).isEqualTo("Success");
+        assertThat(pbaResponse.getStatusCode()).isEqualTo("200");
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void editPaymentsAccountsByOrgIdThrows404() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
+
+        sut.editPaymentsAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
+
     }
 }
