@@ -88,7 +88,6 @@ public class ProfessionalExternalUserController extends SuperController {
                                                      @RequestParam(value = "page", required = false) Integer page,
                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
@@ -149,7 +148,7 @@ public class ProfessionalExternalUserController extends SuperController {
         Optional<ResponseEntity> optionalResponseEntity;
 
         if (isValidEmail(email)) {
-            log.info("email is valid");
+            //email is valid
             optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
         } else {
             throw new InvalidRequest("The email provided '" + email + "' is invalid");
@@ -197,7 +196,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        log.info("Received request to update user roles of an organisation...");
+        //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }

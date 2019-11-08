@@ -52,7 +52,7 @@ public class AuthCheckerConfiguration {
 
     @Bean
     public Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor() {
-        log.info(String.format("Configured authorised services: %s", String.join(", ", authorisedServices)));
+        //log.info(String.format("Configured authorised services: %s", String.join(", ", authorisedServices)));
         return any -> ImmutableSet.copyOf(authorisedServices);
     }
 
