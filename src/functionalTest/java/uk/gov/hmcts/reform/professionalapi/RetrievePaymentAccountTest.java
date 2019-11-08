@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -84,34 +86,30 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
-        //GIVEN I am a pui organisation manager or pui finance manager without Active status
-        //AND the given organisation is a valid organisation
-
-        //bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
         orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
         log.info("NEW USER RESPONSE::::::::::::" + newUserResponse);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
         log.info("SEARCH USERS RESPONSE::::::::::::" + searchUsersResponse);
 
-        //UserProfileUpdatedData data = new UserProfileUpdatedData();
-        //data.setIdamStatus(IdamStatus.SUSPENDED.name());
-        //Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
+        Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        log.info("MODIFIED STATUS RESPONSE:::::::::::" + modifiedStatusResponse);
 
         //TODO remove logger
-        //log.info("RESPONSE FROM MODIFY::::::::::::::" + modifiedStatusResponse);
 
-        //WHEN I request the list of PBAs of the given organisation
-        //Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
         //log.info("RESPONSE FROM RETRIEVE PBAS:::::::::::::" + response);
-        //THEN I should not see the list of PBAs of that organisation
-        //assertThat(response.get("errorMessage")).isNotNull();
+
+        assertThat(response.get("errorMessage")).isNotNull();
         //assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
 
