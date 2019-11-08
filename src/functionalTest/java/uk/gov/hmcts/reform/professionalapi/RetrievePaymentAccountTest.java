@@ -80,7 +80,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiCaseManager));
-        assertThat(response.isEmpty());
+        assertThat(response.isEmpty()).isTrue();
     }
 
     @Test
@@ -106,9 +106,10 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         log.info("RESPONSE FROM MODIFY::::::::::::::" + modifiedStatusResponse);
         //WHEN I request the list of PBAs of the given organisation
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
-        log.info("RESPONSE FROM RETRIVE PBAS" + response);
+        log.info("RESPONSE FROM RETRIEVE PBAS:::::::::::::" + response);
         //THEN I should not see the list of PBAs of that organisation
-        assertThat(response.isEmpty());
+        assertThat(response.get("errorMessage")).isNotNull();
+        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
 
     @Test
