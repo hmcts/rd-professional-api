@@ -94,6 +94,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        userId = (String) newUserResponse.get("userIdentifier");
         log.info("NEW USER RESPONSE::::::::::::" + newUserResponse);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
