@@ -102,26 +102,12 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, "some-fname", "some-lname", email);
         log.info("SEARCH USERS RESPONSE::::::::::::" + searchUsersResponse);
         assertThat(searchUsersResponse.containsValue("PENDING"));
-        //NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
-        //bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
-        //Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
-        //userId = (String) newUserResponse.get("userIdentifier");
-        //log.info("NEW USER RESPONSE::::::::::::" + newUserResponse);
-
-        //Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
-
-        //UserProfileUpdatedData data = new UserProfileUpdatedData();
-        //data.setIdamStatus(IdamStatus.SUSPENDED.name());
-        //Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
-        //log.info("MODIFIED STATUS RESPONSE:::::::::::" + modifiedStatusResponse);
-
-        //TODO remove logger
 
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
-        //log.info("RESPONSE FROM RETRIEVE PBAS:::::::::::::" + response);
+        log.info("RESPONSE FROM RETRIEVE PBAS:::::::::::::" + response);
 
         assertThat(response.get("errorMessage")).isNotNull();
-        //assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
+        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
 
     @Test
