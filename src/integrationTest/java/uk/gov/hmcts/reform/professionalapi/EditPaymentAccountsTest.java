@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -29,7 +30,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         List<String> newPaymentAccounts = new ArrayList<>();
         newPaymentAccounts.add("PBA0000003");
-        newPaymentAccounts.add("PBA0000004");
+        newPaymentAccounts.add("BBA0000004");
         newPaymentAccounts.add("PBA0000005");
         newPaymentAccounts.add("PBA0000006");
         newPaymentAccounts.add("PBA0000007");
@@ -45,8 +46,8 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         PbaResponse pbaResponse = paymentAccountService.editPaymentsAccountsByOrgId(pbaEditRequest, orgId);
 
-        assertThat(pbaResponse.getStatusCode()).isEqualTo("200");
-        assertThat(pbaResponse.getStatusMessage()).isEqualTo("Success");
+        assertThat(pbaResponse.getStatusCode()).isEqualTo(HttpStatus.OK.toString());
+        assertThat(pbaResponse.getStatusMessage()).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
         Map<String, Object> organisationEntityResponse = (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");

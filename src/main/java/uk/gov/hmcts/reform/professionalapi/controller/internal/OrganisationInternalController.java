@@ -163,7 +163,7 @@ public class OrganisationInternalController extends SuperController {
         PbaResponse response = paymentAccountService.editPaymentsAccountsByOrgId(pbaEditRequest, organisationIdentifier);
 
         return ResponseEntity
-                .status(201)
+                .status(200)
                 .body(response);
     }
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -91,7 +91,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         addPaymentAccountsToOrganisation(pbaEditRequest, orgId);
         addUserAndPaymentAccountsToUserAccountMap(orgId);
 
-        return new PbaResponse("200", "Success");
+        return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 
 
@@ -102,7 +102,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         ProfessionalUser user = organisation.getUsers().get(0).toProfessionalUser();
         List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
 
-        paymentAccount.stream().forEach(account -> {
+        paymentAccount.forEach(account -> {
             if (null != user && null != account) {
                 UserAccountMapId userAccountMapId = new UserAccountMapId(user, account);
                 userAccountMapIdList.add(userAccountMapId);

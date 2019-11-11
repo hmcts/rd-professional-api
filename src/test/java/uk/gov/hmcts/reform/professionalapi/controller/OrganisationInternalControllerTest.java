@@ -22,21 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -208,5 +198,21 @@ public class OrganisationInternalControllerTest {
     @Test(expected = EmptyResultDataAccessException.class)
     public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+    }
+
+    @Test
+    public void testEditPaymentAccountsByOrgId() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        List<String> pbas = new ArrayList<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
+
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+
+        ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
     }
 }

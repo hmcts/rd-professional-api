@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants;
+import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Constructor;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants;
 
 public class ProfessionalApiGeneratorConstantsTest {
 
