@@ -26,8 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -89,7 +87,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
 
-        String email =randomAlphabetic(10) + "@somewhere.com".toLowerCase();
+        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
         Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(aUserCreationRequest()
                 .firstName("some-fname")
