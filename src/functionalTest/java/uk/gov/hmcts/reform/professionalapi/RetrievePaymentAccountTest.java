@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -87,23 +89,33 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
 
+        String email =randomAlphabetic(10) + "@somewhere.com".toLowerCase();
         Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build()).build();
         orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
-        userId = (String) newUserResponse.get("userIdentifier");
-        log.info("NEW USER RESPONSE::::::::::::" + newUserResponse);
-
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, "some-fname", "some-lname", email);
         log.info("SEARCH USERS RESPONSE::::::::::::" + searchUsersResponse);
+        assertThat(searchUsersResponse.containsValue("PENDING"));
+        //NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(puiOrgManager, puiFinanceManager);
+        //bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(userCreationRequest.getRoles().get(0), userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+        //Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        //userId = (String) newUserResponse.get("userIdentifier");
+        //log.info("NEW USER RESPONSE::::::::::::" + newUserResponse);
 
-        UserProfileUpdatedData data = new UserProfileUpdatedData();
-        data.setIdamStatus(IdamStatus.SUSPENDED.name());
-        Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
-        log.info("MODIFIED STATUS RESPONSE:::::::::::" + modifiedStatusResponse);
+        //Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
+
+        //UserProfileUpdatedData data = new UserProfileUpdatedData();
+        //data.setIdamStatus(IdamStatus.SUSPENDED.name());
+        //Map<String,Object> modifiedStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        //log.info("MODIFIED STATUS RESPONSE:::::::::::" + modifiedStatusResponse);
 
         //TODO remove logger
 
