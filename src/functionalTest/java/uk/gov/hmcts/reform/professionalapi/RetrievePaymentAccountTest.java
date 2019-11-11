@@ -100,11 +100,9 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, "some-fname", "some-lname", email);
-        log.info("SEARCH USERS RESPONSE::::::::::::" + searchUsersResponse);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
-        log.info("RESPONSE FROM RETRIEVE PBAS:::::::::::::" + response);
 
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
@@ -177,26 +175,4 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     }
 
-    /*
-            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
-        userRoles.add("pui-organisation-manager");
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        UserProfileUpdatedData data = new UserProfileUpdatedData();
-
-        data.setFirstName("UpdatedFirstName");
-        data.setLastName("UpdatedLastName");
-        data.setIdamStatus(IdamStatus.SUSPENDED.name());
-     */
 }
