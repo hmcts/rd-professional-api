@@ -24,16 +24,57 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
     @Test
     public void ac1_modify_status_of_active_user_for_an_active_organisation_with_prd_admin_role_should_return_200() {
 
+        //create and update organisation
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
+
+        //create new user
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> userRoles = new ArrayList<>();
         userRoles.add(puiCaseManager);
+        updateUserProfileRolesMock(HttpStatus.OK);
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5) + "@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+        String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
+        //modify user details
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+        userProfileUpdatedData.setIdamStatus("SUSPENDED");
         updateUserProfileRolesMock(HttpStatus.OK);
 
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+
+        //validate overall response should be 200 always
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+
+        //internal response for update status should be 200
+        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("statusUpdateResponse"));
+        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("200");
+        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Success");
+
+    }
+
+
+    @Test
+    public void ac2_modify_status_of_active_user_should_return_400_when_up_fails_with_400() {
+
+        //create and update organisation
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
+
+        //create new user
+        List<String> userRoles = new ArrayList<>();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userRoles.add(puiCaseManager);
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
@@ -45,19 +86,22 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
+        //modify user details
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         userProfileUpdatedData.setIdamStatus("SUSPENDED");
-        updateUserProfileRolesMock(HttpStatus.OK);
+        updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
+        //validate overall response should be 200 always
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
-        log.info("response$$$" + response);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        Map<String, Object> addRolesResponse = ((Map<String, Object>) response.get("statusUpdateResponse"));
-        log.info("addRolesResponse@@@" + addRolesResponse);
-        assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("200");
-        assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Success");
+
+        //internal response for update status should be 400
+        Map<String, Object> updateResponse = ((Map<String, Object>) response.get("errorResponse"));
+        assertThat(updateResponse.get("errorMessage")).isEqualTo("400");
+        assertThat(updateResponse.get("errorDescription")).isEqualTo("BAD REQUEST");
+        assertThat(updateResponse.get("timeStamp")).isEqualTo("23:10");
 
     }
 
