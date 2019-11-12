@@ -12,8 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
+import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -21,6 +22,8 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Autowired
     PaymentAccountServiceImpl paymentAccountService;
+    @Autowired
+    OrganisationServiceImpl organisationService;
 
     @Test
     public void editPaymentAccountsTest() {
@@ -30,7 +33,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         List<String> newPaymentAccounts = new ArrayList<>();
         newPaymentAccounts.add("PBA0000003");
-        newPaymentAccounts.add("BBA0000004");
+        newPaymentAccounts.add("PBA0000004");
         newPaymentAccounts.add("PBA0000005");
         newPaymentAccounts.add("PBA0000006");
         newPaymentAccounts.add("PBA0000007");
@@ -44,14 +47,15 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
-        PbaResponse pbaResponse = paymentAccountService.editPaymentsAccountsByOrgId(pbaEditRequest, orgId);
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
 
-        assertThat(pbaResponse.getStatusCode()).isEqualTo(HttpStatus.OK.toString());
-        assertThat(pbaResponse.getStatusMessage()).isEqualTo(HttpStatus.OK.getReasonPhrase());
+        assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
-        Map<String, Object> organisationEntityResponse = (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
-        List<PaymentAccount> paymentAccount = (List<PaymentAccount>) organisationEntityResponse.get("paymentAccount");
+
+        Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
         assertThat(paymentAccount).hasSize(6);
     }
 }

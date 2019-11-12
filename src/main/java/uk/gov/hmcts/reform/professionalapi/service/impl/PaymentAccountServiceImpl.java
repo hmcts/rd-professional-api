@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +34,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     UserProfileFeignClient userProfileFeignClient;
 
     private ProfessionalUserRepository professionalUserRepository;
-
     private PaymentAccountRepository paymentAccountRepository;
-
     private OrganisationRepository organisationRepository;
-
     private UserAccountMapRepository userAccountMapRepository;
-
     private OrganisationServiceImpl organisationServiceImpl;
 
     public Organisation findPaymentAccountsByEmail(String email) {
@@ -77,84 +72,50 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return organisation;
     }
 
-    @Override
-    public PbaResponse editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
-
-        if (null == organisation) {
-            throw new EmptyResultDataAccessException(1);
-        }
-
-        deleteUserAndPaymentAccountsFromUserAccountMap(orgId);
-        deletePaymentAccountsFromOrganisation(orgId);
-
-        addPaymentAccountsToOrganisation(pbaEditRequest, orgId);
-        addUserAndPaymentAccountsToUserAccountMap(orgId);
-
-        return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
-    }
-
-
-    public void deleteUserAndPaymentAccountsFromUserAccountMap(String orgId) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
-
-        List<UserAccountMapId> userAccountMapIdList = new ArrayList<>();
+    @Transactional
+    public void deleteUserAccountMaps(Organisation organisation) {
         ProfessionalUser user = organisation.getUsers().get(0).toProfessionalUser();
         List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
+        List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
 
-        paymentAccount.forEach(account -> {
-            if (null != user && null != account) {
-                UserAccountMapId userAccountMapId = new UserAccountMapId(user, account);
-                userAccountMapIdList.add(userAccountMapId);
-            }
-        });
-        userAccountMapRepository.deleteByUserAccountMapIdIn(userAccountMapIdList);
-
-        //TODO remove below lines (Used to check DB queries are executing correctly)
-        List<UserAccountMap> shouldBeEmptyList = userAccountMapRepository.findAll();
-        shouldBeEmptyList.size();
+        userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
     }
 
-    public void deletePaymentAccountsFromOrganisation(String orgId) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+    @Transactional
+    public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
         List<UUID> accountIds = new ArrayList<>();
 
         organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
 
-        //TODO remove below lines (Used to check DB queries are executing correctly)
-        List<PaymentAccount> shouldNotBeEmptyList = paymentAccountRepository.findAll();
-        shouldNotBeEmptyList.size();
-
         paymentAccountRepository.deleteByIdIn(accountIds);
-
-        //TODO remove below lines (Used to check DB queries are executing correctly)
-        List<PaymentAccount> shouldBeEmptyList = paymentAccountRepository.findAll();
-        shouldBeEmptyList.size();
 
         List<PaymentAccount> emptyAccountList = new ArrayList<>();
         organisation.setPaymentAccounts(emptyAccountList);
     }
 
-    public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, String orgId) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
 
+    public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
         organisationServiceImpl.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation);
-        Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgId);
-
-        //TODO remove below lines (Used to check Payment Accounts are added correctly)
-        updatedOrganisation.getPaymentAccounts();
     }
 
-    public void addUserAndPaymentAccountsToUserAccountMap(String orgId) {
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
-
+    public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
         SuperUser superUser = organisation.getUsers().get(0);
 
         organisationServiceImpl.persistedUserAccountMap(superUser.toProfessionalUser(), paymentAccounts);
 
-        //TODO remove below lines (Used to check DB queries are executing correctly)
-        List<UserAccountMap> shouldNotBeEmptyList = userAccountMapRepository.findAll();
-        shouldNotBeEmptyList.size();
+        return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
+    }
+
+    private List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
+        List<UserAccountMapId> userAccountMapIdList = new ArrayList<>();
+
+        accounts.forEach(account -> {
+            if (null != user && null != account) {
+                UserAccountMapId userAccountMapId = new UserAccountMapId(user, account);
+                userAccountMapIdList.add(userAccountMapId);
+            }
+        });
+        return userAccountMapIdList;
     }
 }

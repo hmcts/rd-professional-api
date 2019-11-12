@@ -8,5 +8,11 @@ public interface PaymentAccountService {
 
     Organisation findPaymentAccountsByEmail(String email);
 
-    PbaResponse editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId);
+    void deleteUserAccountMaps(Organisation organisation);
+
+    void deletePaymentAccountsFromOrganisation(Organisation organisation);
+
+    void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation);
+
+    PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation);
 }

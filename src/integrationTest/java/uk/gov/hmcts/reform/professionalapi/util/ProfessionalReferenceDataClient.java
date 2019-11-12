@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -290,6 +291,24 @@ public class ProfessionalReferenceDataClient {
 
         try {
             HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,getMultipleAuthHeaders(externalRole,userIdentifier));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+
+        return getResponse(responseEntity);
+    }
+
+    public  Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
+
+        try {
+            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest ,getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
