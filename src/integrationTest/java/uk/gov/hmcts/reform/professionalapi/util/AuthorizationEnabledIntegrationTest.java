@@ -372,7 +372,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public void updateUserProfileRolesMock(HttpStatus status) {
         String body = null;
-        int returnHttpStatus = status.value();
+        int returnHttpStatus = 200;
         if (status.is2xxSuccessful()) {
             body = "{"
                     + "  \"statusUpdateResponse\": {"
@@ -383,8 +383,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
             body = "{"
-                    + "  \"statusCode\":\"400\","
-                    + "  \"statusMessage\":\"Bad Request\""
+                    + "  \"errorMessage\": \"400\","
+                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
         } else if (status.is5xxServerError()) {
@@ -401,8 +402,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  } "
                     + "  ]"
                     + "}";
-            returnHttpStatus = 500;
-
         }
 
         userProfileService.stubFor(
@@ -417,12 +416,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
-    public void updateUserProfileAddRolesMock(HttpStatus status) {
+    public void updateUserProfileMock(HttpStatus status) {
         String body = null;
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"roleAdditionResponse\": {"
+                    + "  \"statusUpdateResponse\": {"
                     + "  \"idamStatusCode\": \"200\","
                     + "  \"idamMessage\": \"Success\""
                     + "  } "
@@ -430,20 +429,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
             body = "{"
-                    + "  \"statusCode\":\"400\","
-                    + "  \"statusMessage\":\"Bad Request\""
+                    + "  \"errorMessage\": \"400\","
+                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
-        } else if (status.is5xxServerError()) {
-
-            body = "{"
-                    + "  \"addRolesResponse\": {"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 500;
-
         }
 
         userProfileService.stubFor(
