@@ -11,7 +11,9 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class ProfessionalExternalUserControllerTest {
 
@@ -41,6 +44,7 @@ public class ProfessionalExternalUserControllerTest {
     private OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     private ResponseEntity<?> responseEntity;
+    private RefDataUtil refDataUtilMock;
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -55,6 +59,7 @@ public class ProfessionalExternalUserControllerTest {
         profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
+        refDataUtilMock = mock(RefDataUtil.class);
 
         MockitoAnnotations.initMocks(this);
     }
@@ -182,5 +187,51 @@ public class ProfessionalExternalUserControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void testSearchUsersByOrganisationAndPaging() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
+
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        Authentication authentication = mock(Authentication.class);
+        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
+        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
+        authorities.add(grantedAuthority);
+
+        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(refDataUtilMock.getPagingEnabled()).thenReturn("true");
+        when(refDataUtilMock.getUserSortColumn()).thenReturn("firstName");
+        when(refDataUtilMock.getDefaultPageNumber()).thenReturn("0");
+        when(refDataUtilMock.getDefaultPageSize()).thenReturn("5");
+        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
+        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        //when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUsersByOrganisationWithPageable(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class),any(Pageable.class))).thenReturn(responseEntity);
+        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER)).thenReturn(true);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+
+        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
+        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
+        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
+
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", 0, 2);
+        Mockito.verify(professionalUserServiceMock, Mockito.times(1))
+                .findProfessionalUsersByOrganisationWithPageable(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class),any(Pageable.class));
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
 }

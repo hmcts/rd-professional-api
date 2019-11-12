@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateR
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class ProfessionalUserInternalControllerTest {
 
@@ -30,7 +31,7 @@ public class ProfessionalUserInternalControllerTest {
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
     private ResponseEntity<?> responseEntityMock;
     private UserProfileUpdatedData userProfileUpdatedDataMock;
-
+    private RefDataUtil refDataUtilMock;
 
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
@@ -46,6 +47,7 @@ public class ProfessionalUserInternalControllerTest {
         responseEntityMock = mock(ResponseEntity.class);
         userProfileUpdatedDataMock = mock(UserProfileUpdatedData.class);
         userProfileUpdateRequestValidatorMock = mock(UserProfileUpdateRequestValidator.class);
+        refDataUtilMock = mock(RefDataUtil.class);
 
 
         MockitoAnnotations.initMocks(this);
@@ -61,6 +63,10 @@ public class ProfessionalUserInternalControllerTest {
         organisationMock.setUsers(users);
         organisationMock.setStatus(OrganisationStatus.ACTIVE);
 
+        when(refDataUtilMock.getPagingEnabled()).thenReturn("false");
+        when(refDataUtilMock.getOrgSortColumn()).thenReturn("name");
+        when(refDataUtilMock.getDefaultPageNumber()).thenReturn("0");
+        when(refDataUtilMock.getDefaultPageSize()).thenReturn("10");
         when(organisationMock.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);

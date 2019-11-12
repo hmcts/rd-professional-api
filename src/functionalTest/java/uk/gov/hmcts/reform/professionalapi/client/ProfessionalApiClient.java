@@ -258,6 +258,38 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrieveAllOrganisationsWithPagination(Integer pageNumber, Integer size) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("refdata/internal/v1/organisations?page=" + pageNumber + "&size=" + size)
+                .andReturn();
+
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrieveOrganisationsWithStatusAndPagination(String status, Integer pageNumber, Integer size) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .get("refdata/internal/v1/organisations?status=" + status + "&page=" + pageNumber + "&size=" + size)
+                .andReturn();
+
+        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
         Response response = getMultipleAuthHeadersInternal()
@@ -302,7 +334,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, String pageNumber, String size) {
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, Integer pageNumber, Integer size) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
@@ -318,7 +350,7 @@ public class ProfessionalApiClient {
         }
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, Integer pageNumber, Integer size) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)

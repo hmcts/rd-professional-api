@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class RefDataUtilTest {
+    RefDataUtil refDataUtil = new RefDataUtil("false", "name", "firstName", "10", "0");
 
     @Test
     public void shouldReturnPaymentAccountsFromUserAccountMap() {
@@ -292,13 +293,15 @@ public class RefDataUtilTest {
 
     @Test
     public void test_shouldCreatePageableObject() {
-        Integer page = 0;
+        Integer page = 1;
         Integer size = 5;
         Sort sort = mock(Sort.class);
-
-        Pageable pageable = RefDataUtil.createPageableObject(page, size, sort);
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
+        Pageable pageable = RefDataUtil.createPageableObject(page, size, sort, defaultPageNumber, defaultPageSize);
 
         assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageNumber()).isEqualTo(1);
         assertThat(pageable.getPageSize()).isEqualTo(5);
     }
 
@@ -306,11 +309,45 @@ public class RefDataUtilTest {
     public void test_shouldCreatePageableObjectWithDefaultPageSize() {
         Integer page = 0;
         Sort sort = mock(Sort.class);
-
-        Pageable pageable = RefDataUtil.createPageableObject(page, null, sort);
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
+        Pageable pageable = RefDataUtil.createPageableObject(page, null, sort, defaultPageNumber, defaultPageSize);
 
         assertThat(pageable).isNotNull();
         assertThat(pageable.getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    public void test_shouldCreatePageableObjectWithDefaultPageNumber() {
+        Sort sort = mock(Sort.class);
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
+        Pageable pageable = RefDataUtil.createPageableObject(null, null, sort, defaultPageNumber, defaultPageSize);
+
+        assertThat(pageable).isNotNull();
+        assertThat(pageable.getPageNumber()).isEqualTo(0);
+    }
+
+    @Test
+    public void test_shouldGetPropertiesValues() {
+        String pagingEnabled = refDataUtil.getPagingEnabled();
+        String orgSortColumn = refDataUtil.getOrgSortColumn();
+        String userSortColumn = refDataUtil.getUserSortColumn();
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
+
+        assertThat(pagingEnabled).isEqualTo("false");
+        assertThat(orgSortColumn).isEqualTo("name");
+        assertThat(userSortColumn).isEqualTo("firstName");
+        assertThat(defaultPageNumber).isEqualTo("0");
+        assertThat(defaultPageSize).isEqualTo("10");
+    }
+
+    @Test(expected = java.lang.NullPointerException.class)
+    public void test_CreatePageableObjectWithNullSortshouldThrowException() {
+        String defaultPage = "0";
+        String defaultSize = "10";
+        Pageable pageable = RefDataUtil.createPageableObject(null, null, null, defaultPage, defaultSize);
     }
 
     @Test

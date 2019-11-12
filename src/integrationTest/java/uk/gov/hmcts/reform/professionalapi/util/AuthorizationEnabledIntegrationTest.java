@@ -100,6 +100,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${paging.enabled}")
+    protected String pagingEnabled;
+
     protected static final String ACTIVE = "ACTIVE";
 
     @Before

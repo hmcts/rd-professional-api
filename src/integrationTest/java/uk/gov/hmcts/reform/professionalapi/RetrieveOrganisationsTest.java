@@ -15,7 +15,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -24,9 +24,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Slf4j
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
+
+    @Autowired
+    RefDataUtil refDataUtil;
 
     @SuppressWarnings("unchecked")
     @Test
@@ -67,7 +71,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
 
-        //RetrieveOrganisationsTest:Received response to retrieve an organisation details
     }
 
     @Test
@@ -653,4 +656,12 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         assertThat(orgResponse.get("headers").toString().contains("paginationInfo")).isEqualTo(true);
     }
+
+    @Test
+    public void test_shouldGetRefDataUtilPagingEnabled() {
+        String pagingEnabled = refDataUtil.getPagingEnabled();
+        assertThat(pagingEnabled).isNotNull();
+        assertThat(pagingEnabled).isEqualTo("true");
+    }
+
 }

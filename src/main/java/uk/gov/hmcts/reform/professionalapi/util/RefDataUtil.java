@@ -9,6 +9,8 @@ import feign.Response;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -29,18 +32,47 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfil
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 
+@Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class RefDataUtil {
 
-    private RefDataUtil() {}
+    @Value("${paging.enabled}")
+    protected String pagingEnabled;
 
-    @Value("${defaultPageSize}")
-    public static final int DEFAULTPAGESIZE = 10;
+    @Value("${org.sort.column}")
+    protected String orgSortColumn;
+
+    @Value("${user.sort.column}")
+    protected String userSortColumn;
+
+    @Value("${default.page.size}")
+    protected String defaultPageSize;
+
+    @Value("${default.page.number}")
+    protected String defaultPageNumber;
+
+    public String getPagingEnabled() {
+        return pagingEnabled;
+    }
+
+    public String getOrgSortColumn() {
+        return orgSortColumn;
+    }
+
+    public String getUserSortColumn() {
+        return userSortColumn;
+    }
+
+    public String getDefaultPageSize() {
+        return defaultPageSize;
+    }
+
+    public String getDefaultPageNumber() {
+        return defaultPageNumber;
+    }
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -253,11 +285,18 @@ public class RefDataUtil {
         return headers;
     }
 
-    public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
-        if (size == null) {
-            size = DEFAULTPAGESIZE;
+    public static Pageable createPageableObject(Integer page, Integer size, Sort sort, String defaultPage, String defaultSize) {
+        Pageable pageable = null;
+        if (page == null) {
+            page = Integer.valueOf(defaultPage);
         }
-        return PageRequest.of(page, size, sort);
+        if (size == null) {
+            size = Integer.valueOf(defaultSize);
+        }
+        if (!sort.isEmpty()) {
+            pageable = PageRequest.of(page, size, sort);
+        }
+        return pageable;
     }
 
     public static String getShowDeletedValue(String showDeleted) {

@@ -60,6 +60,57 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void can_retrieve_pending_and_active_organisations_with_paging() {
+
+        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
+        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
+        assertThat(orgIdentifierOne).isNotEmpty();
+        Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
+        String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
+        assertThat(orgIdentifierTwo).isNotEmpty();
+
+        professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisationsWithPagination(0, 2);
+
+        assertThat(finalResponse.get("organisations")).isNotNull();
+        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    public void can_retrieve_pending_organisations_with_paging() {
+
+        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
+        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
+        assertThat(orgIdentifierOne).isNotEmpty();
+        Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
+        String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
+        assertThat(orgIdentifierTwo).isNotEmpty();
+
+        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("PENDING", 0, 2);
+
+        assertThat(finalResponse.get("organisations")).isNotNull();
+        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    public void can_retrieve_active_organisations_with_paging() {
+
+        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
+        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
+        assertThat(orgIdentifierOne).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierOne, hmctsAdmin);
+        Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
+        String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
+        assertThat(orgIdentifierTwo).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+
+        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("ACTIVE", 0, 2);
+
+        assertThat(finalResponse.get("organisations")).isNotNull();
+        Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient

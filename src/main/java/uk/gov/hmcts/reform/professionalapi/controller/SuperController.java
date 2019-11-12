@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static java.lang.Boolean.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 
 import feign.FeignException;
 import feign.Response;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +65,9 @@ public abstract class SuperController {
     @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
+    @Autowired
+    protected RefDataUtil refDataUtil;
+
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
 
@@ -83,7 +88,6 @@ public abstract class SuperController {
 
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
-
 
     static final String SRA_REGULATED_FALSE = "false";
 
@@ -124,9 +128,13 @@ public abstract class SuperController {
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
         Pageable pageable = null;
+        String pagingEnabled = refDataUtil.getPagingEnabled();
+        String orgSortColumn = refDataUtil.getOrgSortColumn();
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
 
-        if (page != null) {
-            pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,"name"));
+        if ((TRUE.toString().equalsIgnoreCase(pagingEnabled))) {
+            pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,orgSortColumn), defaultPageNumber, defaultPageSize);
         }
 
         Object organisationResponse = null;
@@ -325,9 +333,13 @@ public abstract class SuperController {
         ResponseEntity responseEntity;
 
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
+        String pagingEnabled = refDataUtil.getPagingEnabled();
+        String userSortColumn = refDataUtil.getUserSortColumn();
+        String defaultPageNumber = refDataUtil.getDefaultPageNumber();
+        String defaultPageSize = refDataUtil.getDefaultPageSize();
 
-        if (page != null) {
-            Pageable pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,"firstName"));
+        if ((TRUE.toString().equalsIgnoreCase(pagingEnabled))) {
+            Pageable pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,userSortColumn), defaultPageNumber, defaultPageSize);
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);

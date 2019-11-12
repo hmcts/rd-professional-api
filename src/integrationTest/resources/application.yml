@@ -32,3 +32,8 @@ user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://127.0.0.1:8092}
+paging.enabled: true
+default.page.size: 10
+default.page.number: 0
+org.sort.column: name
+user.sort.column: firstName

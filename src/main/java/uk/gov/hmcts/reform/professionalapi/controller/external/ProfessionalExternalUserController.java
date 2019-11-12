@@ -85,8 +85,8 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                      @ApiParam(name = "showDeleted", required = false) @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                      @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status,
-                                                     @RequestParam(value = "page", required = false) Integer page,
-                                                     @RequestParam(value = "size", required = false) Integer size) {
+                                                     @ApiParam(name = "page", required = false) @RequestParam(value = "page", required = false) Integer page,
+                                                     @ApiParam(name = "size", required = false) @RequestParam(value = "size", required = false) Integer size) {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
