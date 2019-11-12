@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -35,7 +36,9 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     private RequestSpecification bearerTokenForUser;
     private String orgIdentifier;
-    private String userId;
+    private String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+    private String lastName = "someLastName";
+    private String firstName = "someName";
 
     public RequestSpecification generateBearerTokenForUser(String roleUnderTest, String... otherRoles) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -45,22 +48,17 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         List<String> userRoles = Arrays.stream(otherRoles).collect(Collectors.toList());
         userRoles.add(roleUnderTest);
 
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(roleUnderTest, firstName, lastName, userEmail);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(roleUnderTest, firstName, lastName, email);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
-                .email(userEmail)
+                .email(email)
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
 
-        userId = (String) newUserResponse.get("userIdentifier");
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
 
         return bearerTokenForUser;
     }
@@ -87,19 +85,13 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
 
-        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
-        Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation();
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(aUserCreationRequest()
-                .firstName("some-fname")
-                .lastName("some-lname")
-                .email(email)
-                .jurisdictions(createJurisdictions())
-                .build()).build();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(createUserForTest()).build();
+        Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
         orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, puiOrgManager, "true", HttpStatus.OK);
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, "some-fname", "some-lname", email);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName, email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
@@ -110,19 +102,13 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .paymentAccount(paymentAccounts)
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email(email)
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
-                        .build())
+                .superUser(createUserForTest())
                 .build();
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(request);
@@ -137,7 +123,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
-        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         List<String> paymentAccounts = new ArrayList<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
@@ -145,12 +130,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         Map<String, Object> response =  professionalApiClient.createOrganisation(
                 someMinimalOrganisationRequest()
                         .paymentAccount(paymentAccounts)
-                        .superUser(aUserCreationRequest()
-                                .firstName("some-fname")
-                                .lastName("some-lname")
-                                .email(email)
-                                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                                .build())
+                        .superUser(createUserForTest())
                         .build());
 
         professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, hmctsAdmin);
@@ -173,6 +153,16 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
         });
 
+    }
+
+    private UserCreationRequest createUserForTest() {
+        UserCreationRequest user = aUserCreationRequest()
+                .firstName("some-fname")
+                .lastName("some-lname")
+                .email(email)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        return user;
     }
 
 }
