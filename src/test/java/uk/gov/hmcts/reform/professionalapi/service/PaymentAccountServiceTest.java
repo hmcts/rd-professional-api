@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -122,85 +121,54 @@ public class PaymentAccountServiceTest {
         when(sut.findPaymentAccountsByEmail("some-email")).thenReturn(organisationMock);
     }
 
-//    @Test
-//    public void editPaymentsAccountsByOrgId() {
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-//        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
-//
-//        //delete user and payment account code:
-//        when(organisationMock.getUsers()).thenReturn(superUsers);
-//        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
-//        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-//
-//        //delete payment account from org code:
-//        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-//        when(paymentAccountMock.getId()).thenReturn(UUID.randomUUID());
-//
-//        PbaResponse pbaResponse = sut.editPaymentsAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
-//
-//        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
-//        verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
-//
-//        assertThat(pbaResponse.getStatusMessage()).isEqualTo("OK");
-//        assertThat(pbaResponse.getStatusCode()).isEqualTo("200 OK");
-//    }
-//
-//    @Test(expected = EmptyResultDataAccessException.class)
-//    public void editPaymentsAccountsByOrgIdThrows404() {
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
-//
-//        sut.editPaymentsAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
-//    }
+    @Test
+    public void deleteUserAndPaymentAccountsFromUserAccountMapTest() {
 
-//    @Test
-//    public void deleteUserAndPaymentAccountsFromUserAccountMapTest() {
-//
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-//        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
-//        when(organisationMock.getUsers()).thenReturn(superUsers);
-//        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
-//        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-//
-//        sut.deleteUserAndPaymentAccountsFromUserAccountMap(organisationMock.getOrganisationIdentifier());
-//
-//        verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
-//    }
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationMock.getUsers()).thenReturn(superUsers);
+        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-//    @Test
-//    public void deletePaymentAccountsFromOrganisationTest() {
-//
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-//        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
-//        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-//        when(paymentAccountMock.getId()).thenReturn(UUID.randomUUID());
-//
-//        sut.deletePaymentAccountsFromOrganisation(organisationMock.getOrganisationIdentifier());
-//
-//        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
-//    }
-//
-//    @Test
-//    public void addPaymentAccountsToOrganisationTest() {
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-//        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
-//
-//        sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisationMock.getOrganisationIdentifier());
-//
-//        verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
-//        verify(organisationRepositoryMock, times(2)).findByOrganisationIdentifier(organisationMock.getOrganisationIdentifier());
-//    }
-//
-//    @Test
-//    public void addUserAndPaymentAccountsToUserAccountMapTest() {
-//        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-//        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
-//        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-//
-//        when(organisationMock.getUsers()).thenReturn(superUsers);
-//        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
-//
-//        sut.addUserAndPaymentAccountsToUserAccountMap(organisationMock.getOrganisationIdentifier());
-//
-//        verify(userAccountMapRepositoryMock, times(1)).saveAll(anyList());
-//    }
+        sut.deleteUserAccountMaps(organisationMock);
+
+        verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
+    }
+
+    @Test
+    public void deletePaymentAccountsFromOrganisationTest() {
+
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+        when(paymentAccountMock.getId()).thenReturn(UUID.randomUUID());
+
+        sut.deletePaymentAccountsFromOrganisation(organisationMock);
+
+        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+    }
+
+    @Test
+    public void addPaymentAccountsToOrganisationTest() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+
+        sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisationMock);
+
+        verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void addUserAndPaymentAccountsToUserAccountMapTest() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+
+        when(organisationMock.getUsers()).thenReturn(superUsers);
+        when(organisationMock.getUsers().get(0).toProfessionalUser()).thenReturn(professionalUserMock);
+
+        sut.addUserAndPaymentAccountsToUserAccountMap(organisationMock);
+
+        verify(userAccountMapRepositoryMock, times(1)).saveAll(anyList());
+    }
 }

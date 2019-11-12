@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;

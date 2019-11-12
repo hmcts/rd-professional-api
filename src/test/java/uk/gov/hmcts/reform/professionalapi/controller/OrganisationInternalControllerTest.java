@@ -209,6 +209,7 @@ public class OrganisationInternalControllerTest {
         PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
 
         when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
 
         ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
 

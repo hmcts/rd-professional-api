@@ -21,9 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
-
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"

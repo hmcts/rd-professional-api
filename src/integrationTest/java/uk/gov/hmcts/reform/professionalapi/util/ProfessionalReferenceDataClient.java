@@ -308,7 +308,7 @@ public class ProfessionalReferenceDataClient {
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 
         try {
-            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest ,getMultipleAuthHeaders(hmctsAdmin));
+            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest, getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
