@@ -347,7 +347,7 @@ public class RefDataUtilTest {
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);
     }
-    
+
     @Test
     public void test_decodeResponseFromUp() {
         Map<String, Collection<String>> header = new HashMap<>();

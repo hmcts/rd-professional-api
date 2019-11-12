@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
-@Transactional
 @Slf4j
 @AllArgsConstructor
 public class PaymentAccountServiceImpl implements PaymentAccountService {
@@ -89,10 +88,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         paymentAccountRepository.deleteByIdIn(accountIds);
 
-        List<PaymentAccount> emptyAccountList = new ArrayList<>();
-        organisation.setPaymentAccounts(emptyAccountList);
+        //The below lines are required to set the Organisation's Payment Accounts List to empty
+        //if this is not done, the Organisation's list will still contain the previous Accounts
+        List<PaymentAccount> resetOrganisationPaymentAccounts = new ArrayList<>();
+        organisation.setPaymentAccounts(resetOrganisationPaymentAccounts);
     }
-
 
     public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
         organisationServiceImpl.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation);
@@ -107,15 +107,15 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 
-    private List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
-        List<UserAccountMapId> userAccountMapIdList = new ArrayList<>();
+    public List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
+        List<UserAccountMapId> userAccountMapIds = new ArrayList<>();
 
         accounts.forEach(account -> {
             if (null != user && null != account) {
                 UserAccountMapId userAccountMapId = new UserAccountMapId(user, account);
-                userAccountMapIdList.add(userAccountMapId);
+                userAccountMapIds.add(userAccountMapId);
             }
         });
-        return userAccountMapIdList;
+        return userAccountMapIds;
     }
 }
