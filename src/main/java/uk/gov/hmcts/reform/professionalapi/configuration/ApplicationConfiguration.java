@@ -22,10 +22,10 @@ public class ApplicationConfiguration {
         this.s2sMicroService = s2sMicroService;
         this.s2sUrl = s2sUrl;
         this.pbaFromUserAccountMap = pbaFromUserAccountMap;
-        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
-        log.info("Configured S2S microservice: " + s2sMicroService);
-        log.info("Configured S2S URL: " + s2sUrl);
-        log.info("Configured pbaFromUserAccountMap: " + pbaFromUserAccountMap);
+        //log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
+        //log.info("Configured S2S microservice: " + s2sMicroService);
+        //log.info("Configured S2S URL: " + s2sUrl);
+        //log.info("Configured pbaFromUserAccountMap: " + pbaFromUserAccountMap);
     }
 
     public String getS2sSecret() {

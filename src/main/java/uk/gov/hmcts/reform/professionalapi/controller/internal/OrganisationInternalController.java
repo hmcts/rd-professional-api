@@ -51,7 +51,7 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("Received request to create a new organisation for internal users...");
+        //Received request to create a new organisation for internal users
         return createOrganisationFrom(organisationCreationRequest);
     }
 
@@ -125,7 +125,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
-        log.info("Received request to retrieve an organisations payment accounts by email for internal...");
+        //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmail(email);
     }
 
@@ -199,7 +199,6 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to update organisation for organisationIdentifier: ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
 
@@ -236,7 +235,7 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to add a internal new user to an organisation...");
+        //Received request to add a internal new user to an organisation
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
     }

@@ -11,11 +11,11 @@ public class OrganisationStatusIdentifierValidatorImpl implements OrganisationId
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
-        log.info("Into Organisation status validator...");
+        //Into Organisation status validator
 
         validateOrganisationStatus(inputStatus, existingOrganisation.getStatus(), inputOrganisationIdentifier);
 
-        log.info("Validation completed for Update Organisation...");
+        //Validation completed for Update Organisation
     }
 
     private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus, OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
