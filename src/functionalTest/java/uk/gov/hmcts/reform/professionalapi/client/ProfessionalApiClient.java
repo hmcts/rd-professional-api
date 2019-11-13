@@ -475,7 +475,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> editPbaAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body(pbaEditRequest.getPaymentAccounts())
+                .body(pbaEditRequest)
                 .put("/refdata/internal/v1/organisations/" + orgId + "/pbas")
                 .andReturn();
 
