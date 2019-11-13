@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -52,7 +53,9 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
-        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(orgIdentifierResponse, hmctsAdmin);
+        PbaEditRequest pbaEditRequest = new PbaEditRequest(paymentAccountsEdit);
+
+        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest, orgIdentifierResponse, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
     }
 

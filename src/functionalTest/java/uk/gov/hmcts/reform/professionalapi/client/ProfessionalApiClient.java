@@ -33,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
@@ -471,10 +472,10 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> editPbaAccountsByOrgId(String orgId, String hmctsAdmin) {
+    public Map<String, Object> editPbaAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .body("")
+                .body(pbaEditRequest.getPaymentAccounts())
                 .put("/refdata/internal/v1/organisations/" + orgId + "/pbas")
                 .andReturn();
 
