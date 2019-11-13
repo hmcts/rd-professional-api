@@ -69,7 +69,7 @@ public abstract class AuthorizationFunctionalTest {
     protected String puiCaseManager;
 
     @Value("${paging.enabled}")
-    protected String pagenationToggle;
+    protected String paginationToggle;
 
     protected ProfessionalApiClient professionalApiClient;
 
@@ -92,7 +92,7 @@ public abstract class AuthorizationFunctionalTest {
         IdamClient idamClient = new IdamClient(configProperties);
 
         /* SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 

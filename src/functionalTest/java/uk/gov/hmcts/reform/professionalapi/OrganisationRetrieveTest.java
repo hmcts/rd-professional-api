@@ -70,7 +70,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
-        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisationsWithPagination(0, 2);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisationsWithPagination(0, 2, paginationToggle);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
@@ -86,7 +86,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
         assertThat(orgIdentifierTwo).isNotEmpty();
 
-        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("PENDING", 0, 2);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("PENDING", 0, 2, paginationToggle);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
@@ -104,7 +104,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
 
-        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("ACTIVE", 0, 2);
+        Map<String, Object> finalResponse = professionalApiClient.retrieveOrganisationsWithStatusAndPagination("ACTIVE", 0, 2, paginationToggle);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
