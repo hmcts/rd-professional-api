@@ -400,7 +400,17 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
