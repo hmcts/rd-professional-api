@@ -201,7 +201,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchResponse2, "any");
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
 
-        if("true".equalsIgnoreCase(pagenationToggle)) {
+        if ("true".equalsIgnoreCase(pagenationToggle)) {
             assertThat(professionalUsersResponses.size()).isEqualTo(1);
             assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("some-fname");
             assertThat(professionalUsersResponses2.size()).isEqualTo(1);
@@ -220,7 +220,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void find_all_users_for_an_organisation_external_with_pagination_should_return_200() {
 
         RequestSpecification specification = generateBearerTokenForPuiManager();
-        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", 0, 1, pagenationToggle );
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", 0, 1, pagenationToggle);
 
         validateRetrievedUsers(searchResponse, "any");
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
@@ -232,7 +232,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchResponse2, "any");
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
 
-        if("true".equalsIgnoreCase(pagenationToggle)) {
+        if ("true".equalsIgnoreCase(pagenationToggle)) {
             assertThat(professionalUsersResponses.size()).isEqualTo(1);
             assertThat(professionalUsersResponses2.size()).isEqualTo(1);
 

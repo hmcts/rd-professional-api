@@ -342,7 +342,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        if("true".equalsIgnoreCase(pagenationToggle)) {
+        if ("true".equalsIgnoreCase(pagenationToggle)) {
             assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
 
         } else {
@@ -362,7 +362,7 @@ public class ProfessionalApiClient {
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
                 .andReturn();
 
-        if("true".equalsIgnoreCase(pagenationToggle)) {
+        if ("true".equalsIgnoreCase(pagenationToggle)) {
             assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
 
         } else {
