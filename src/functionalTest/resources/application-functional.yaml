@@ -22,3 +22,6 @@ exui.role.pui-user-manager: pui-user-manager
 exui.role.pui-organisation-manager: pui-organisation-manager
 exui.role.pui-finance-manager: pui-finance-manager
 exui.role.pui-case-manager: pui-case-manager
+
+# pagination toggle on/off and keep in sync with application
+paging.enabled: false

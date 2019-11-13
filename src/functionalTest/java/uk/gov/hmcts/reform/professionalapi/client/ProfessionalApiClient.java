@@ -265,7 +265,7 @@ public class ProfessionalApiClient {
                 .get("refdata/internal/v1/organisations?page=" + pageNumber + "&size=" + size)
                 .andReturn();
 
-        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
 
         response.then()
                 .assertThat()
@@ -281,7 +281,7 @@ public class ProfessionalApiClient {
                 .get("refdata/internal/v1/organisations?status=" + status + "&page=" + pageNumber + "&size=" + size)
                 .andReturn();
 
-        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
 
         response.then()
                 .assertThat()
@@ -334,7 +334,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, Integer pageNumber, Integer size) {
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, Integer pageNumber, Integer size, String pagenationToggle) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
@@ -342,7 +342,13 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        if("true".equalsIgnoreCase(pagenationToggle)) {
+            assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
+
+        } else {
+            assertThat(response.headers().hasHeaderWithName("paginationInfo")).isFalse();
+        }
+
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -350,13 +356,19 @@ public class ProfessionalApiClient {
         }
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, Integer pageNumber, Integer size) {
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, Integer pageNumber, Integer size, String pagenationToggle) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
                 .andReturn();
 
-        assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        if("true".equalsIgnoreCase(pagenationToggle)) {
+            assertThat(response.headers().hasHeaderWithName("paginationInfo")).isTrue();
+
+        } else {
+            assertThat(response.headers().hasHeaderWithName("paginationInfo")).isFalse();
+        }
+
 
         response.then()
                 .assertThat()
