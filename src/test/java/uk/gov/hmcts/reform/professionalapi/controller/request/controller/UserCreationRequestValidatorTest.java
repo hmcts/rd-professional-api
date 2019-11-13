@@ -55,7 +55,7 @@ public class UserCreationRequestValidatorTest {
     @Test
     public void privateConstructorTest() throws Exception {
         Constructor<UserCreationRequestValidator> constructor = UserCreationRequestValidator.class.getDeclaredConstructor();
-        assertEquals(constructor.isAccessible(), false);
+        assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);
     }
