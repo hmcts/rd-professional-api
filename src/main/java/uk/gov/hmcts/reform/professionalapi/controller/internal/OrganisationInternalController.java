@@ -130,7 +130,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Edit pbas of organisations by organisation Id",
+            value = "Edit the PBAs of an Organisation by Organisation ID",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -139,8 +139,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The organisations associated payment accounts",
-                    response = OrganisationPbaResponse.class
+                    message = "The Organisation's associated payment accounts",
+                    response = PbaResponse.class
             ),
             @ApiResponse(
                     code = 403,
@@ -165,6 +165,8 @@ public class OrganisationInternalController extends SuperController {
         if (null == organisation) {
             throw new EmptyResultDataAccessException(1);
         }
+
+        paymentAccountService.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts());
 
         paymentAccountService.deleteUserAccountMaps(organisation);
         paymentAccountService.deletePaymentAccountsFromOrganisation(organisation);

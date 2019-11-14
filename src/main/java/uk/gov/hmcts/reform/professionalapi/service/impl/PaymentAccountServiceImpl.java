@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
@@ -34,7 +34,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     private ProfessionalUserRepository professionalUserRepository;
     private PaymentAccountRepository paymentAccountRepository;
-    private OrganisationRepository organisationRepository;
     private UserAccountMapRepository userAccountMapRepository;
     private OrganisationServiceImpl organisationServiceImpl;
 
@@ -117,5 +116,16 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             }
         });
         return userAccountMapIds;
+    }
+
+    public void validatePaymentAccounts(List<String> paymentAccounts) {
+        if (paymentAccounts != null) {
+
+            paymentAccounts.forEach(pbaAccount -> {
+                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
+                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters, you entered: " + pbaAccount);
+                }
+            });
+        }
     }
 }

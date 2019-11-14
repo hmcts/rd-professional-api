@@ -46,7 +46,7 @@ public class PaymentAccountServiceTest {
 
     private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
             applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
-            paymentAccountRepositoryMock, organisationRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
+            paymentAccountRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
 
     private final SuperUser superUserMock = mock(SuperUser.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
