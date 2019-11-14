@@ -14,11 +14,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
-
-
+    
     @Test
     public void test_editPaymentAccountsShouldReturn200() {
-
         List<String> newPaymentAccounts = new ArrayList<>();
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
@@ -52,7 +50,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow404IfInvalidPbaIsPassed() {
+    public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
         List<String> newPaymentAccounts = new ArrayList<>();
         newPaymentAccounts.add("this-is-invalid");
 
@@ -63,6 +61,26 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+
+    @Test
+    public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
+        List<String> newPaymentAccounts = new ArrayList<>();
+        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
+
+        String orgId = createActiveOrganisationAndPbaEditRequest();
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+
+        assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
+
+        List paymentAccounts = (List) retrievePaymentAccountsByEmailResponse.get("paymentAccount");
+        assertThat(paymentAccounts).hasSize(0);
     }
 
     private String createActiveOrganisationAndPbaEditRequest() {
