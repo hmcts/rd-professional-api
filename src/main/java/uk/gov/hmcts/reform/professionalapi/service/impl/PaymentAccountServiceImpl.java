@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
@@ -34,8 +36,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     private ProfessionalUserRepository professionalUserRepository;
     private PaymentAccountRepository paymentAccountRepository;
-    private UserAccountMapRepository userAccountMapRepository;
     private OrganisationServiceImpl organisationServiceImpl;
+    private UserAccountMapService userAccountMapService;
 
     public Organisation findPaymentAccountsByEmail(String email) {
 
@@ -72,11 +74,16 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     @Transactional
     public void deleteUserAccountMaps(Organisation organisation) {
+        /** Please note:
+         * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
+         * If this changes then the below logic will need to change accordingly */
         ProfessionalUser user = organisation.getUsers().get(0).toProfessionalUser();
+
         List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
         List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
 
-        userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
+        userAccountMapService.deleteByUserAccountMapIdIn(accountsToDelete);
+
     }
 
     @Transactional
@@ -87,8 +94,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         paymentAccountRepository.deleteByIdIn(accountIds);
 
-        //The below lines are required to set the Organisation's Payment Accounts List to empty
-        //if this is not done, the Organisation's list will still contain the previous Accounts
+        /** Please Note:
+         * The below lines are required to set the Organisation's Payment Accounts List to be empty.
+         * If this is not done, the Organisation's list will still contain the previous Accounts */
         List<PaymentAccount> resetOrganisationPaymentAccounts = new ArrayList<>();
         organisation.setPaymentAccounts(resetOrganisationPaymentAccounts);
     }
@@ -101,31 +109,34 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
         SuperUser superUser = organisation.getUsers().get(0);
 
-        organisationServiceImpl.persistedUserAccountMap(superUser.toProfessionalUser(), paymentAccounts);
+        /** Please note:
+         * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
+         * If this changes then the below logic will need to change accordingly */
+        userAccountMapService.persistedUserAccountMap(superUser.toProfessionalUser(), paymentAccounts);
 
         return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 
     public List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
-        List<UserAccountMapId> userAccountMapIds = new ArrayList<>();
 
-        accounts.forEach(account -> {
-            if (null != user && null != account) {
-                UserAccountMapId userAccountMapId = new UserAccountMapId(user, account);
-                userAccountMapIds.add(userAccountMapId);
-            }
-        });
+        List<UserAccountMapId> userAccountMapIds = accounts.stream().filter(account -> null != user && null != account)
+                .map(account -> new UserAccountMapId(user, account))
+                .collect(Collectors.toList());
+
         return userAccountMapIds;
+
     }
 
     public void validatePaymentAccounts(List<String> paymentAccounts) {
         if (paymentAccounts != null) {
 
-            paymentAccounts.forEach(pbaAccount -> {
-                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
-                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters, you entered: " + pbaAccount);
-                }
-            });
+            String invalidPbas = paymentAccounts.stream()
+                    .filter(pbaAccount -> pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$"))
+                    .collect(Collectors.joining(", "));
+
+            if (!StringUtils.isEmpty(invalidPbas)) {
+                throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: " + invalidPbas);
+            }
         }
     }
 }

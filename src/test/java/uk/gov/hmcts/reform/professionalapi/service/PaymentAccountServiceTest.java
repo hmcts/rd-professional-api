@@ -30,6 +30,7 @@ public class PaymentAccountServiceTest {
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
@@ -42,11 +43,11 @@ public class PaymentAccountServiceTest {
     private final OrganisationServiceImpl organisationServiceMock = new OrganisationServiceImpl(
             organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
             dxAddressRepositoryMock, contactInformationRepositoryMock, prdEnumRepositoryMock,
-            userAccountMapRepositoryMock, userProfileFeignClient, prdEnumServiceMock, userAttributeServiceMock);
+            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock, userAttributeServiceMock);
 
     private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
             applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
-            paymentAccountRepositoryMock, userAccountMapRepositoryMock, organisationServiceMock);
+            paymentAccountRepositoryMock, organisationServiceMock, userAccountMapServiceMock);
 
     private final SuperUser superUserMock = mock(SuperUser.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
@@ -132,7 +133,7 @@ public class PaymentAccountServiceTest {
 
         sut.deleteUserAccountMaps(organisationMock);
 
-        verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
+        verify(userAccountMapServiceMock, times(1)).deleteByUserAccountMapIdIn(anyList());
     }
 
     @Test
@@ -169,6 +170,6 @@ public class PaymentAccountServiceTest {
 
         sut.addUserAndPaymentAccountsToUserAccountMap(organisationMock);
 
-        verify(userAccountMapRepositoryMock, times(1)).saveAll(anyList());
+        verify(userAccountMapServiceMock, times(1)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
     }
 }

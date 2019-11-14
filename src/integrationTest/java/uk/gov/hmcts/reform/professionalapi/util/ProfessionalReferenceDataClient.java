@@ -310,8 +310,9 @@ public class ProfessionalReferenceDataClient {
         try {
             HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest, getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
         } catch (RestClientResponseException ex) {
-            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            HashMap<String, Object> statusAndBody = new HashMap<>();
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;

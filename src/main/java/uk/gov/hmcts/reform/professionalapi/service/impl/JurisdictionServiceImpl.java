@@ -51,7 +51,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         return new JurisdictionUserCreationRequest(user.getEmailAddress(), jurisdictions);
     }
 
-    public Boolean callCcd(JurisdictionUserCreationRequest request, String userId) {
+    public boolean callCcd(JurisdictionUserCreationRequest request, String userId) {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             log.info("Jurisdiction create user profile success!!");

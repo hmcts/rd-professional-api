@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import io.swagger.annotations.*;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
+
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -160,18 +163,18 @@ public class OrganisationInternalController extends SuperController {
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
 
-        Organisation organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
 
-        if (null == organisation) {
+        if (!organisation.isPresent()) {
             throw new EmptyResultDataAccessException(1);
         }
 
         paymentAccountService.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts());
 
-        paymentAccountService.deleteUserAccountMaps(organisation);
-        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation);
-        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation);
+        paymentAccountService.deleteUserAccountMaps(organisation.get());
+        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
+        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
+        PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation.get());
 
         return ResponseEntity
                 .status(200)

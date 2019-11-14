@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
-    
+
     @Test
     public void test_editPaymentAccountsShouldReturn200() {
         List<String> newPaymentAccounts = new ArrayList<>();
