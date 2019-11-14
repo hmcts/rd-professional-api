@@ -9,5 +9,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 @Repository
 public interface PaymentAccountRepository extends JpaRepository<PaymentAccount, UUID> {
 
+    void deleteByPbaNumberIn(List<String> pbaNumber);
+
     List<PaymentAccount> findByPbaNumber(String pbaNumbersFrom);
+
+    void deleteByIdIn(List<UUID> accountIds);
 }
