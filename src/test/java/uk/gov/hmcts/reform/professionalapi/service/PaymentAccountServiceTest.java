@@ -6,7 +6,9 @@ import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -55,7 +57,7 @@ public class PaymentAccountServiceTest {
     private Organisation organisationMock;
     private List<SuperUser> superUsers = new ArrayList<>();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
-    private List<String> pbas = new ArrayList<>();
+    private Set<String> pbas = new HashSet<>();
     private PbaEditRequest pbaEditRequest = new PbaEditRequest(null);
 
     @Before

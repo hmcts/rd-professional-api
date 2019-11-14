@@ -9,8 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -215,7 +217,7 @@ public class OrganisationInternalControllerTest {
     public void testEditPaymentAccountsByOrgId() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        List<String> pbas = new ArrayList<>();
+        Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
         PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
 

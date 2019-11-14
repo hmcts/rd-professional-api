@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
-        organisationServiceImpl.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation);
+        List<String> pbaAccounts = new ArrayList<>(pbaEditRequest.getPaymentAccounts());
+
+        organisationServiceImpl.addPbaAccountToOrganisation(pbaAccounts, organisation);
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
@@ -124,19 +127,32 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 .collect(Collectors.toList());
 
         return userAccountMapIds;
-
     }
 
-    public void validatePaymentAccounts(List<String> paymentAccounts) {
+    public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (paymentAccounts != null) {
-
-            String invalidPbas = paymentAccounts.stream()
-                    .filter(pbaAccount -> pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$"))
-                    .collect(Collectors.joining(", "));
-
-            if (!StringUtils.isEmpty(invalidPbas)) {
-                throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: " + invalidPbas);
-            }
+            checkPbaNumberIsValid(paymentAccounts);
+            checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
+    }
+
+    public void checkPbaNumberIsValid(Set<String> paymentAccounts) {
+        String invalidPbas = paymentAccounts.stream()
+                .filter(pbaAccount -> pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$"))
+                .collect(Collectors.joining(", "));
+
+        if (!StringUtils.isEmpty(invalidPbas)) {
+            throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: " + invalidPbas);
+        }
+    }
+
+    public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
+
+        paymentAccountsInDatabase.forEach(pbaInDb -> paymentAccounts.forEach(pba -> {
+            if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
+                throw new InvalidRequest("The PBA number you have entered belongs to another Organisation");
+            }
+        }));
     }
 }

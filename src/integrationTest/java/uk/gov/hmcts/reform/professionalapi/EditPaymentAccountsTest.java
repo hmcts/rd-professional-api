@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldReturn200() {
-        List<String> newPaymentAccounts = new ArrayList<>();
+        Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
         newPaymentAccounts.add("PBA0000005");
@@ -51,7 +53,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
-        List<String> newPaymentAccounts = new ArrayList<>();
+        Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
@@ -66,7 +68,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
-        List<String> newPaymentAccounts = new ArrayList<>();
+        Set<String> newPaymentAccounts = new HashSet<>();
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
@@ -81,6 +83,31 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         List paymentAccounts = (List) retrievePaymentAccountsByEmailResponse.get("paymentAccount");
         assertThat(paymentAccounts).hasSize(0);
+    }
+
+    @Test
+    public void test_editPaymentAccountsShouldReturn400IfPaymentAccountBelongsToAnotherOrganisation() {
+        List<String> existingPaymentAccounts = new ArrayList<>();
+        existingPaymentAccounts.add("PBA0000003");
+        existingPaymentAccounts.add("PBA0000004");
+
+        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFields().paymentAccount(existingPaymentAccounts).build();
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(firstOrganisationCreationRequest);
+        String firstOrgId = (String) responseForOrganisationCreation.get("organisationIdentifier");
+        updateOrganisation(firstOrgId, hmctsAdmin, ACTIVE);
+
+        Set<String> newPaymentAccounts = new HashSet<>();
+        newPaymentAccounts.add("PBA0000003");
+        newPaymentAccounts.add("PBA0000005");
+
+        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
+
+        String orgId = createActiveOrganisationAndPbaEditRequest();
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+
+        assertThat(pbaResponse.get("http_status")).isEqualTo("400");
     }
 
     private String createActiveOrganisationAndPbaEditRequest() {

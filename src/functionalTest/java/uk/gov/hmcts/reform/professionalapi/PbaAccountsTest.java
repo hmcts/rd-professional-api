@@ -6,8 +6,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
@@ -49,7 +51,7 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
 
-        List<String> paymentAccountsEdit = new ArrayList<>();
+        Set<String> paymentAccountsEdit = new HashSet<>();
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
