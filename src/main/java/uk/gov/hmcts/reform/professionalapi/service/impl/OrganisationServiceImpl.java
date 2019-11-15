@@ -38,8 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
@@ -47,9 +45,9 @@ import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -63,7 +61,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     DxAddressRepository dxAddressRepository;
     ContactInformationRepository contactInformationRepository;
     PrdEnumRepository prdEnumRepository;
-    UserAccountMapRepository userAccountMapRepository;
+    UserAccountMapService userAccountMapService;
     UserProfileFeignClient userProfileFeignClient;
     PrdEnumService prdEnumService;
     UserAttributeService userAttributeService;
@@ -76,7 +74,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository,
+            UserAccountMapService userAccountMapService,
             UserProfileFeignClient userProfileFeignClient,
             PrdEnumService prdEnumService,
             UserAttributeService userAttributeService
@@ -87,7 +85,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
-        this.userAccountMapRepository = userAccountMapRepository;
+        this.userAccountMapService = userAccountMapService;
         this.prdEnumRepository = prdEnumRepository;
         this.userProfileFeignClient = userProfileFeignClient;
         this.prdEnumService = prdEnumService;
@@ -130,14 +128,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    private void addPbaAccountToOrganisation(
-            List<String> paymentAccounts,
-            Organisation organisation) {
+    public void addPbaAccountToOrganisation(List<String> paymentAccounts, Organisation organisation) {
 
         if (paymentAccounts != null) {
             paymentAccounts.forEach(pbaAccount -> {
                 if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
-                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters");
+                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters, you entered: " + pbaAccount);
                 }
 
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
@@ -168,7 +164,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<UserAttribute> attributes = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser, newProfessionalUser.getUserAttributes(), jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
-        persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
+        userAccountMapService.persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
@@ -209,20 +205,6 @@ public class OrganisationServiceImpl implements OrganisationService {
                 dxAddresses.add(dxAddress);
             });
             dxAddressRepository.saveAll(dxAddresses);
-        }
-    }
-
-    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
-
-        if (!paymentAccounts.isEmpty()) {
-            List<UserAccountMap> userAccountMaps = new ArrayList<>();
-            log.debug("PaymentAccount is not empty");
-            paymentAccounts.forEach(paymentAccount -> {
-                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
-            });
-            if (!CollectionUtils.isEmpty(userAccountMaps)) {
-                userAccountMapRepository.saveAll(userAccountMaps);
-            }
         }
     }
 
@@ -350,7 +332,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public Organisation  getOrganisationByOrgIdentifier(String organisationIdentifier) {
+    public Organisation getOrganisationByOrgIdentifier(String organisationIdentifier) {
         RefDataUtil.removeAllSpaces(organisationIdentifier);
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }

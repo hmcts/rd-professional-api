@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.professionalapi.utils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import feign.Request;
 import feign.Response;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -373,6 +375,14 @@ public class RefDataUtilTest {
         String response = RefDataUtil.getShowDeletedValue(showDeleted);
 
         assertThat(response.equals("false")).isTrue();
+    }
+
+    @Test
+    public void privateConstructorTest() throws Exception {
+        Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
+        assertFalse(constructor.isAccessible());
+        constructor.setAccessible(true);
+        constructor.newInstance((Object[]) null);
     }
 
     @Test
