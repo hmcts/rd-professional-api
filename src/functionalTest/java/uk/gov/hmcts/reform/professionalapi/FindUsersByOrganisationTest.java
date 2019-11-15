@@ -203,7 +203,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         if ("true".equalsIgnoreCase(paginationToggle)) {
             assertThat(professionalUsersResponses.size()).isEqualTo(1);
-            assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("some-fname");
+            assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
             assertThat(professionalUsersResponses2.size()).isEqualTo(1);
 
         } else {
