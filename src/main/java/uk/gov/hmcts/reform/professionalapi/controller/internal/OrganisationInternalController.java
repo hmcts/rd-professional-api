@@ -172,8 +172,7 @@ public class OrganisationInternalController extends SuperController {
         paymentAccountService.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
 
         paymentAccountService.deleteUserAccountMaps(organisation.get());
-        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
-        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
+        paymentAccountService.editPaymentAccountsForAnOrganisation(pbaEditRequest, organisation.get());
         PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation.get());
 
         return ResponseEntity

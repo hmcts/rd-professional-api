@@ -84,7 +84,12 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
 
         userAccountMapService.deleteByUserAccountMapIdIn(accountsToDelete);
+    }
 
+    @Transactional
+    public void editPaymentAccountsForAnOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
+        deletePaymentAccountsFromOrganisation(organisation);
+        addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
     }
 
     @Transactional
@@ -132,7 +137,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (paymentAccounts != null) {
             checkPbaNumberIsValid(paymentAccounts);
-            checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
     }
 
@@ -144,15 +148,5 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         if (!StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: " + invalidPbas);
         }
-    }
-
-    public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
-
-        paymentAccountsInDatabase.forEach(pbaInDb -> paymentAccounts.forEach(pba -> {
-            if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
-                throw new InvalidRequest("The PBA number you have entered belongs to another Organisation");
-            }
-        }));
     }
 }
