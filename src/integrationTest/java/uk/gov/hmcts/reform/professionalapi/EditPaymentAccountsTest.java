@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -91,9 +92,9 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
 
-        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFields().paymentAccount(existingPaymentAccounts).build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(firstOrganisationCreationRequest);
-        String firstOrgId = (String) responseForOrganisationCreation.get("organisationIdentifier");
+        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFieldsAreUpdated().status("PENDING").paymentAccount(existingPaymentAccounts).build();
+        java.util.Map<String, Object> responseForFirstOrganisationCreation = professionalReferenceDataClient.createOrganisation(firstOrganisationCreationRequest);
+        String firstOrgId = (String) responseForFirstOrganisationCreation.get("organisationIdentifier");
         updateOrganisation(firstOrgId, hmctsAdmin, ACTIVE);
 
         Set<String> newPaymentAccounts = new HashSet<>();
