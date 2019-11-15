@@ -111,7 +111,7 @@ feign:
       - authorization
       - serviceauthorization
 
-paging.enabled: false
+paging.enabled: true
 default.page.size: 10
 default.page.number: 0
 org.sort.column: name

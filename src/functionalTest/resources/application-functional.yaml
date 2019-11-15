@@ -24,4 +24,4 @@ exui.role.pui-finance-manager: pui-finance-manager
 exui.role.pui-case-manager: pui-case-manager
 
 # pagination toggle on/off and keep in sync with application
-paging.enabled: false
+paging.enabled: true
