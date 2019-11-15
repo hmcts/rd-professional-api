@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -309,5 +310,22 @@ public class OrganisationInternalControllerTest {
     @Test(expected = EmptyResultDataAccessException.class)
     public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+    }
+
+    @Test
+    public void testEditPaymentAccountsByOrgId() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        List<String> pbas = new ArrayList<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
+
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
+
+        ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
     }
 }

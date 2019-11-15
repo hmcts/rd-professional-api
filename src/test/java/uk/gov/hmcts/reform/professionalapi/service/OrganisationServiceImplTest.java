@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
@@ -80,6 +81,7 @@ public class OrganisationServiceImplTest {
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
+    private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
@@ -175,7 +177,7 @@ public class OrganisationServiceImplTest {
                 dxAddressRepositoryMock,
                 contactInformationRepositoryMock,
                 prdEnumRepositoryMock,
-                userAccountMapRepositoryMock,
+                userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
                 userAttributeServiceMock
@@ -256,7 +258,7 @@ public class OrganisationServiceImplTest {
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
         verify(dxAddressRepositoryMock, times(1)).saveAll(any());
         verify(organisationMock, times(1)).addProfessionalUser(superUserMock);
-        verify(userAccountMapRepositoryMock, times(1)).saveAll(any());
+        verify(userAccountMapServiceMock, times(1)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
     }
 
     @Test
@@ -311,7 +313,7 @@ public class OrganisationServiceImplTest {
                 paymentAccountRepositoryMock,
                 dxAddressRepositoryMock, contactInformationRepositoryMock,
                 prdEnumRepositoryMock,
-                userAccountMapRepositoryMock,
+                userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
                 userAttributeServiceMock);
