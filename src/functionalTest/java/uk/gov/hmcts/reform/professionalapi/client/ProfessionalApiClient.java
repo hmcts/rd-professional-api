@@ -536,8 +536,10 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
-        return response.body().as(Map.class);
+        Map<String, Object> userStatusResponse = new HashMap<>();
+        userStatusResponse.put("http_status", response.getStatusCode());
+        userStatusResponse.put("user_status", response.body().asString());
+        return userStatusResponse;
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
