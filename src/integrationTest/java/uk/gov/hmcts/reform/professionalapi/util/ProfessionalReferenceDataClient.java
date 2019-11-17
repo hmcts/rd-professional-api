@@ -321,4 +321,24 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
+
+    public  Map<String, Object> findUserStatusByEmail(String email, String role) {
+        ResponseEntity<String> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "users/findUserByEmailId?email=" + email;
+
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.GET, requestEntity, String.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+        Map<String, Object> userStatusResponse = new HashMap<>();
+        userStatusResponse.put("http_status", responseEntity.getStatusCodeValue());
+        userStatusResponse.put("user_status", responseEntity.getBody());
+        return userStatusResponse;
+    }
 }

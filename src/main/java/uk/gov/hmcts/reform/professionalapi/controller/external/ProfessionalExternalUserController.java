@@ -11,6 +11,7 @@ import io.swagger.annotations.Authorization;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -202,4 +203,59 @@ public class ProfessionalExternalUserController extends SuperController {
     }
 
 
-}
+    @ApiOperation(
+            value = "Retrieves the user status with the given email address if organisation is active",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The status of the desired user to be retrieved",
+            required = false
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "User status active or Not",
+                    response = ProfessionalUsersEntityResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Invalid authorization"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No user status was found with the provided email address"
+            )
+    })
+    @GetMapping(
+            value = "/users/findUserByEmailId",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    public ResponseEntity<String> findUserStatusByEmail(
+                                                    @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
+
+        String userStatus;
+        if (isValidEmail(email)) {
+            //email is valid
+            userStatus = professionalUserService.findUserStatusByEmailAddress(email);
+        } else {
+            throw new InvalidRequest("The email provided '" + email + "' is invalid");
+        }
+
+        return ResponseEntity
+                .status(200)
+                .body(userStatus);
+    }
+
+
+
+    }

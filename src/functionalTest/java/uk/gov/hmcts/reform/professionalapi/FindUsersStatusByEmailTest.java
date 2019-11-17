@@ -100,7 +100,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForNonPuiManager(), userEmail);
 
     }
 
@@ -108,7 +108,21 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac2_find_user_status_by_email_with_non_pui_user_manager_role_should_return_200() {
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), "");
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-case-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someFirstName";
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForNonPuiManager(), userEmail);
 
     }
 

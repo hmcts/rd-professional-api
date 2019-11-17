@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
@@ -48,7 +50,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     PrdEnumRepository prdEnumRepository;
 
     UserAttributeServiceImpl userAttributeService;
-
     UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
@@ -177,6 +178,20 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
         return modifyUserRolesResponse;
+    }
+
+    public String findUserStatusByEmailAddress(String emailAddress) {
+
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
+
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        GetUserProfileResponse userProfileResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
+        String status = userProfileResponse.getIdamStatus() == IdamStatus.ACTIVE ? "User Status Active" : "User Status Not Active";
+
+        return status;
     }
 
 }
