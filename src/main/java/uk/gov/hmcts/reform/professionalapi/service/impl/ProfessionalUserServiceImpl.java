@@ -189,9 +189,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         GetUserProfileResponse userProfileResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
-        String status = userProfileResponse.getIdamStatus() == IdamStatus.ACTIVE ? "User Status Active" : "User Status Not Active";
-
-        return status;
+        return userProfileResponse.getIdamStatus() == IdamStatus.ACTIVE ? "User Status Active" : "User Status Not Active";
     }
 
 }

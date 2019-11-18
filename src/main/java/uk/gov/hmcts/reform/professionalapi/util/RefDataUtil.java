@@ -6,7 +6,11 @@ import static java.util.stream.Collectors.toList;
 import feign.FeignException;
 import feign.Response;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +46,8 @@ public class RefDataUtil {
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
+
+    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -105,7 +111,7 @@ public class RefDataUtil {
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
         return user;
@@ -129,7 +135,7 @@ public class RefDataUtil {
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
         }  catch (FeignException ex) {
 
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
     }
@@ -300,7 +306,7 @@ public class RefDataUtil {
             userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
 
         }  catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
         return userProfileResponse;
