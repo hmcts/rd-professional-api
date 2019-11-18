@@ -87,12 +87,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     @Transactional
-    public void editPaymentAccountsForAnOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
-        deletePaymentAccountsFromOrganisation(organisation);
-        addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-    }
-
-    @Transactional
     public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
         List<UUID> accountIds = new ArrayList<>();
 

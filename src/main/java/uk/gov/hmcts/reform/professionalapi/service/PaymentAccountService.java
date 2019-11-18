@@ -19,6 +19,4 @@ public interface PaymentAccountService {
     PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation);
 
     void validatePaymentAccounts(Set<String> paymentAccounts, String orgId);
-
-    void editPaymentAccountsForAnOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation);
 }
