@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.isValidEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -146,13 +145,9 @@ public class ProfessionalExternalUserController extends SuperController {
                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
 
         Optional<ResponseEntity> optionalResponseEntity;
-
-        if (isValidEmail(email)) {
-            //email is valid
-            optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
-        } else {
-            throw new InvalidRequest("The email provided '" + email + "' is invalid");
-        }
+        validateEmail(email);
+        //email is valid
+        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
 
         if (optionalResponseEntity.isPresent()) {
             return optionalResponseEntity;
@@ -242,14 +237,9 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity<String> findUserStatusByEmail(
                                                     @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
 
-        String userStatus;
-        if (isValidEmail(email)) {
-            //email is valid
-            userStatus = professionalUserService.findUserStatusByEmailAddress(email);
-        } else {
-            throw new InvalidRequest("The email provided '" + email + "' is invalid");
-        }
-
+        validateEmail(email);
+        //email is valid
+        String userStatus = professionalUserService.findUserStatusByEmailAddress(email);
         return ResponseEntity
                 .status(200)
                 .body(userStatus);

@@ -101,4 +101,66 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         assertThat(response.get("user_status")).isEqualTo("User Status Active");
 
     }
+
+    @Test
+    public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "1Aaron";
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("403");
+
+    }
+
+    @Test
+    public void should_give_bad_request_for_invalid_email_to_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "1Aaron";
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+
+    }
 }
