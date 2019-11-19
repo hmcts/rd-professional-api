@@ -69,7 +69,7 @@ public class Application  implements CommandLineRunner {
                     log.error("InvalidKeyException", e);
                 }
             }
-        }, 0, 60 * 1000);
+        }, 0, 60 * 1000 * 10);
     }
 
     public void pushFile() throws IOException, InvalidKeyException {
