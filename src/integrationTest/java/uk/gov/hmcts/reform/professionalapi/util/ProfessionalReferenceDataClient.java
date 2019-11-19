@@ -336,7 +336,7 @@ public class ProfessionalReferenceDataClient {
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
-       /* Map<String, Object> userStatusResponse = new HashMap<>();
+        /* Map<String, Object> userStatusResponse = new HashMap<>();
         userStatusResponse.put("http_status", responseEntity.getStatusCodeValue());
         userStatusResponse.put("user_status", responseEntity.getBody());*/
         return  getResponse(responseEntity);

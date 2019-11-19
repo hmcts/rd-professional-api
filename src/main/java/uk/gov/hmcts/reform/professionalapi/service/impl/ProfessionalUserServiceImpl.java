@@ -193,7 +193,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         if (IdamStatus.ACTIVE == userProfileResponse.getIdamStatus()) {
 
             newUserResponse = new NewUserResponse();
-            newUserResponse.setUserIdentifier(userProfileResponse.getIdamId()) ;
+            newUserResponse.setUserIdentifier(userProfileResponse.getIdamId());
             statusCode = 200;
         } else {
 
