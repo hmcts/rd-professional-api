@@ -180,16 +180,29 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return modifyUserRolesResponse;
     }
 
-    public String findUserStatusByEmailAddress(String emailAddress) {
+    public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
-
+        int statusCode;
+        NewUserResponse newUserResponse = null;
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
         }
 
         GetUserProfileResponse userProfileResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
-        return userProfileResponse.getIdamStatus() == IdamStatus.ACTIVE ? "User Status Active" : "User Status Not Active";
+        if (IdamStatus.ACTIVE == userProfileResponse.getIdamStatus()) {
+
+            newUserResponse = new NewUserResponse();
+            newUserResponse.setUserIdentifier(userProfileResponse.getIdamId()) ;
+            statusCode = 200;
+        } else {
+
+            statusCode = Integer.valueOf(userProfileResponse.getIdamStatusCode());
+        }
+
+        return ResponseEntity
+                .status(statusCode)
+                .body(newUserResponse);
     }
 
 }

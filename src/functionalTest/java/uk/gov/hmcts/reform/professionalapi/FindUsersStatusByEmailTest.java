@@ -32,6 +32,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
+        log.info("Response::" + response);
         assertThat(response.get("http_status")).isEqualTo(200);
         assertThat(response.get("user_status")).isEqualTo("User Status Active");
     }

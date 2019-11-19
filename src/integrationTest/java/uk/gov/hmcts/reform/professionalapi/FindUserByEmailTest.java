@@ -97,8 +97,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
 
-        assertThat(response.get("http_status")).isEqualTo(200);
-        assertThat(response.get("user_status")).isEqualTo("User Status Active");
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
 
     }
 

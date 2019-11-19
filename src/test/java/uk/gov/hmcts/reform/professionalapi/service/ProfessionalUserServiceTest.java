@@ -548,17 +548,20 @@ public class ProfessionalUserServiceTest {
         when(professionalUserMock.getEmailAddress()).thenReturn("email@org.com");
         when(professionalUserRepository.findByEmailAddress(professionalUserMock.getEmailAddress())).thenReturn(professionalUserMock);
         UserProfile profile = new UserProfile("a123dfgr46", "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, true);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        String status =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
 
-        assertThat(status).isNotNull();
-        assertThat(status).isEqualTo("User Status Active");
+        assertThat(newResponse).isNotNull();
+        assertThat(newResponse.getStatusCodeValue()).isEqualTo(200);
+        assertThat(newResponse.getBody()).isNotNull();
+        assertThat(newResponse.getBody().getUserIdentifier()).isEqualTo("a123dfgr46");
+
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByEmailAddress(professionalUserMock.getEmailAddress());
         Mockito.verify(userProfileFeignClient, Mockito.times(1)).getUserProfileByEmail(anyString());
     }
@@ -568,27 +571,29 @@ public class ProfessionalUserServiceTest {
 
         Organisation organisationMock = mock(Organisation.class);
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        NewUserResponse newUserResponse = new NewUserResponse();
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(professionalUserMock.getEmailAddress()).thenReturn("email@org.com");
         when(professionalUserRepository.findByEmailAddress(professionalUserMock.getEmailAddress())).thenReturn(professionalUserMock);
         UserProfile profile = new UserProfile("a123dfgr46", "email@org.com", "firstName", "lastName", IdamStatus.PENDING);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, true);
+        userProfileResponse.setIdamStatusCode("404");
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        String status =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
 
-        assertThat(status).isNotNull();
-        assertThat(status).isEqualTo("User Status Not Active");
+        assertThat(newResponse).isNotNull();
+        assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
+        assertThat(newResponse.getBody()).isNull();
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByEmailAddress(professionalUserMock.getEmailAddress());
         Mockito.verify(userProfileFeignClient, Mockito.times(1)).getUserProfileByEmail(anyString());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
     public void  findUserStatusByEmailForPendingOrgThrowsException()throws Exception {
 
         Organisation organisationMock = mock(Organisation.class);
@@ -598,17 +603,18 @@ public class ProfessionalUserServiceTest {
         when(professionalUserMock.getEmailAddress()).thenReturn("email@org.com");
         when(professionalUserRepository.findByEmailAddress(professionalUserMock.getEmailAddress())).thenReturn(professionalUserMock);
         UserProfile profile = new UserProfile("a123dfgr46", "email@org.com", "firstName", "lastName", IdamStatus.PENDING);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, true);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+        userProfileResponse.setIdamStatusCode("500");
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        String status =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
 
-        assertThat(status).isNotNull();
-        assertThat(status).isEqualTo("User Status Not Active");
+        assertThat(newResponse).isNotNull();
+        assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByEmailAddress(professionalUserMock.getEmailAddress());
         Mockito.verify(userProfileFeignClient, Mockito.times(0)).getUserProfileByEmail(anyString());
     }
@@ -618,22 +624,23 @@ public class ProfessionalUserServiceTest {
 
         Organisation organisationMock = mock(Organisation.class);
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("adg1234tg");
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(professionalUserMock.getEmailAddress()).thenReturn("email@org.com");
         when(professionalUserRepository.findByEmailAddress(professionalUserMock.getEmailAddress())).thenReturn(professionalUserMock);
-        UserProfile profile = new UserProfile("a123dfgr46", "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile("a123dfgr46", "email@org.com", "firstName", "lastName", IdamStatus.PENDING);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, true);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
-
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
-                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(500).build());
+                .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        String status =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
+        ResponseEntity<NewUserResponse> status =   professionalUserService.findUserStatusByEmailAddress(professionalUserMock.getEmailAddress());
 
         assertThat(status).isNull();
-        assertThat(status).isNotEqualTo("User Status Not Active");
+        assertThat(status.getStatusCode()).isEqualTo(500);
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByEmailAddress(professionalUserMock.getEmailAddress());
         Mockito.verify(userProfileFeignClient, Mockito.times(1)).getUserProfileByEmail(anyString());
     }

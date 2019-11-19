@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
+@Slf4j
 public class RefDataUtil {
 
     private RefDataUtil() {}
@@ -298,14 +300,19 @@ public class RefDataUtil {
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-            if (response.status() > 300) {
-                ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+            if (response.status() == 200) {
+
+                userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
+            } else {
+                ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
+                userProfileResponse = new GetUserProfileResponse();
+                userProfileResponse.setIdamStatusCode(responseResponseEntity.getStatusCode().toString());
 
             }
-            userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
 
         }  catch (FeignException ex) {
+            log.error("Error while invoking UserProfileByEmail service call", ex);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -234,15 +235,12 @@ public class ProfessionalExternalUserController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
-    public ResponseEntity<String> findUserStatusByEmail(
+    public ResponseEntity<NewUserResponse> findUserStatusByEmail(
                                                     @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
 
         validateEmail(email);
         //email is valid
-        String userStatus = professionalUserService.findUserStatusByEmailAddress(email);
-        return ResponseEntity
-                .status(200)
-                .body(userStatus);
+        return professionalUserService.findUserStatusByEmailAddress(email);
     }
 
 }
