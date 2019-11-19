@@ -72,6 +72,8 @@ security:
     - rd_user_profile_api
     - xui_webapp
     - finrem_payment_service
+    - fpl_case_service
+    - ia-case-api
 
 
 ### dependency configuration
