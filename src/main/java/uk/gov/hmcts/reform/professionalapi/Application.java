@@ -78,37 +78,20 @@ public class Application  implements CommandLineRunner {
         final File sourceFile = new File(this.getClass().getClassLoader().getResource(sourceCsvFile).getFile());
         ServiceURL serviceUrl = createServiceUrl(new PipelineOptions());
         ContainerURL containerUrl = serviceUrl.createContainerURL(CONTAINER_NAME);
-        createContainer(containerUrl);
         final BlockBlobURL blockBlobUrl = containerUrl.createBlockBlobURL(sourceCsvFile);
         uploadFile(blockBlobUrl, sourceFile);
     }
 
-    @SuppressWarnings("deprecation")
     public static void uploadFile(BlockBlobURL blob, File sourceFile) throws IOException {
         log.info("Start uploading file %s...", sourceFile);
         final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(sourceFile.toPath());
 
         TransferManager.uploadFileToBlockBlob(fileChannel, blob, 8 * 1024 * 1024, null)
-                .toCompletable()
+                .ignoreElement()
                 .doOnComplete(() -> log.info("File %s is uploaded.", sourceFile.getName()))
                 .doOnError(error -> log.error("Failed to upload file %s with error %s.", sourceFile.toPath(),
                         error.getMessage()))
                 .blockingAwait();
-    }
-
-    public static void createContainer(ContainerURL containerUrl) {
-        log.info("Start creating container %s...", CONTAINER_NAME);
-        try {
-            final ContainerCreateResponse response = containerUrl.create(null, null, null).blockingGet();
-            log.info("Storage container %s created with status code: %s.", CONTAINER_NAME, response.statusCode());
-        } catch (RestException e) {
-            if (e.response().statusCode() != 409) {
-                log.info("Failed to create container %s.", CONTAINER_NAME, e);
-                throw e;
-            } else {
-                log.info("%s container already exists.", CONTAINER_NAME);
-            }
-        }
     }
 
     public static ServiceURL createServiceUrl(@Autowired(required = false) PipelineOptions options) throws InvalidKeyException,
