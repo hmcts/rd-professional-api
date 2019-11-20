@@ -55,10 +55,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchUserResponse, "any");
         log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
 
-        List<String> userRoles = (List<String>) ((Map) searchUserResponse.get("users")).get("roles");
-        log.info("USER ROLES::::::::::::" + userRoles);
+        List<HashMap> superUserResponse = (List<HashMap>) searchUserResponse.get("users");
+        superUserResponse.stream().forEach(user -> {
+            assertThat("roles").contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+        });
+        log.info("USER ROLES::::::::::::" + superUserResponse);
 
-        assertThat(userRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
