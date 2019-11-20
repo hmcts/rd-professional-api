@@ -50,15 +50,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-        log.info("UPDATED ORG RESPONSE::::::::::::::" + response);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-
-        //Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email.toLowerCase(), hmctsAdmin);
         log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
 
-        List<String> userRoles = (List<String>) searchUserResponse.get("roles");
+        List<String> userRoles = (List<String>) ((Map) searchUserResponse.get("users")).get("roles");
         log.info("USER ROLES::::::::::::" + userRoles);
 
         assertThat(userRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
