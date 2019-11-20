@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
@@ -32,23 +33,27 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(aUserCreationRequest()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .email(email)
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
-                        .build())
+                .superUser(superUser)
                 .build();
 
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+        log.info("UPDATED ORG RESPONSE::::::::::::::" + response);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
 
         //Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email.toLowerCase(), hmctsAdmin);
         log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
