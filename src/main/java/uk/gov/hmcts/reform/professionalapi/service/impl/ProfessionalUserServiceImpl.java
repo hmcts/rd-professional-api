@@ -194,7 +194,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             // If we dont find active user in up will send it to user 404 status code in the header
             statusCode = 404;
             newUserResponse = new NewUserResponse();
+        } else {
+
+            newUserResponse.setIdamStatus(null);
         }
+
         return ResponseEntity
                 .status(statusCode)
                 .body(newUserResponse);

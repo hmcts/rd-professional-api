@@ -32,9 +32,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
-        log.info("Response::" + response);
-        assertThat(response.get("http_status")).isEqualTo(200);
-        assertThat(response.get("user_status")).isEqualTo("User Status Active");
+        assertThat(response.get("userIdentifier")).isNotNull();
+
     }
 
 
@@ -52,8 +51,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
-        assertThat(response.get("http_status")).isEqualTo(200);
-        assertThat(response.get("user_status")).isEqualTo("User Status Active");
+        assertThat(response.get("userIdentifier")).isNotNull();
     }
 
     @Test
@@ -66,9 +64,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
         // find the status of the user
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
-        assertThat(response.get("http_status")).isEqualTo(200);
-        assertThat(response.get("user_status")).isEqualTo("User Status Not Active");
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
+        assertThat(response.get("userIdentifier")).isNull();
     }
 
     @Test
@@ -90,8 +87,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRolesForToken.add("pui-organisation-manager");
 
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
-        assertThat(response.get("http_status")).isEqualTo(200);
-        assertThat(response.get("user_status")).isEqualTo("User Status Active");
+        assertThat(response.get("userIdentifier")).isNotNull();
     }
 
 }
