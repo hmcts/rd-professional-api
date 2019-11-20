@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 public class UserRolesTest extends AuthorizationFunctionalTest {
 
     private String orgIdentifier;
+    private String firstName = "some-fname";
+    private String lastName = "some-lname";
 
     @Test
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
@@ -32,8 +34,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
+                        .firstName(firstName)
+                        .lastName(lastName)
                         .email(email)
                         .jurisdictions(OrganisationFixtures.createJurisdictions())
                         .build())
@@ -46,7 +48,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-        //professionalApiClient.getMultipleAuthHeadersExternal(searchUserResponse.get("role").toString(), searchUserResponse.get("firstName").toString(), searchUserResponse.get("lastname").toString(), email);
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
 
         //Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email.toLowerCase(), hmctsAdmin);
         log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
