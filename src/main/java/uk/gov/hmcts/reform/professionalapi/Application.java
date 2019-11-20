@@ -7,8 +7,6 @@ import com.microsoft.azure.storage.blob.ServiceURL;
 import com.microsoft.azure.storage.blob.SharedKeyCredentials;
 import com.microsoft.azure.storage.blob.StorageURL;
 import com.microsoft.azure.storage.blob.TransferManager;
-import com.microsoft.azure.storage.blob.models.ContainerCreateResponse;
-import com.microsoft.rest.v2.RestException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -48,8 +46,8 @@ public class Application  implements CommandLineRunner {
     private static final String BLOB_URL = "http://3fbfcfb8181346cabaf7.blob.core.windows.net";
     private static final String BLOB_HTTPS_URL = "https://3fbfcfb8181346cabaf7.blob.core.windows.net";
     private static final boolean isEnableHttps = false;
-    private static final String ASURE_ACCOUNT_NAME = "3fbfcfb8181346cabaf7";
-    private static final String ASSURE_ACCOUNT_KEY = "pMfqbiimUan/k6q+G3t1rOpfBLSn2SeHV4AXZa+7XtNAKAdjKLbK7yl4/UU77NCU+taymTLN4eKyE/IIyTwolg==";
+    private static final String AZURE_ACCOUNT_NAME = "3fbfcfb8181346cabaf7";
+    private static final String AZURE_ACCOUNT_KEY = "pMfqbiimUan/k6q+G3t1rOpfBLSn2SeHV4AXZa+7XtNAKAdjKLbK7yl4/UU77NCU+taymTLN4eKyE/IIyTwolg==";
     private static final String CONTAINER_NAME = "blobcontainer";
 
     public static void main(final String[] args) {
@@ -97,8 +95,8 @@ public class Application  implements CommandLineRunner {
     public static ServiceURL createServiceUrl(@Autowired(required = false) PipelineOptions options) throws InvalidKeyException,
             MalformedURLException {
         log.debug("Creating ServiceURL bean...");
-        final SharedKeyCredentials credentials = new SharedKeyCredentials(ASURE_ACCOUNT_NAME,
-                ASSURE_ACCOUNT_KEY);
+        final SharedKeyCredentials credentials = new SharedKeyCredentials(AZURE_ACCOUNT_NAME,
+                AZURE_ACCOUNT_KEY);
         final URL blobUrl = getUrl();
         final ServiceURL serviceUrl = new ServiceURL(blobUrl, StorageURL.createPipeline(credentials, new PipelineOptions()));
 
@@ -107,9 +105,9 @@ public class Application  implements CommandLineRunner {
 
     private static URL getUrl() throws MalformedURLException {
         if (isEnableHttps) {
-            return new URL(String.format(BLOB_HTTPS_URL, ASURE_ACCOUNT_NAME));
+            return new URL(String.format(BLOB_HTTPS_URL, AZURE_ACCOUNT_NAME));
         }
-        return new URL(String.format(BLOB_URL, ASURE_ACCOUNT_NAME));
+        return new URL(String.format(BLOB_URL, AZURE_ACCOUNT_NAME));
     }
 
     public static String createFile() {
