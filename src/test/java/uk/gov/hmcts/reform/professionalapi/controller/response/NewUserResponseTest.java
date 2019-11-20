@@ -28,6 +28,8 @@ public class NewUserResponseTest {
         when(professionalUserMock.getUserIdentifier()).thenReturn("userIdentifier");
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setUserIdentifier("userIdentifier");
+        newUserResponse.setIdamStatus("ACTIVE");
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo("userIdentifier");
+        assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
     }
 }

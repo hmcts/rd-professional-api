@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -292,23 +293,21 @@ public class RefDataUtil {
         return modifyUserRolesResponse;
     }
 
-    public static GetUserProfileResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
+    public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
 
-        GetUserProfileResponse userProfileResponse;
+        NewUserResponse newUserResponse;
         try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
             if (response.status() == 200) {
 
-                userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
+                newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
-                userProfileResponse = new GetUserProfileResponse();
-                userProfileResponse.setIdamStatusCode(responseResponseEntity.getStatusCode().toString());
-
+                newUserResponse = new NewUserResponse();
             }
 
         }  catch (FeignException ex) {
@@ -316,7 +315,7 @@ public class RefDataUtil {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
-        return userProfileResponse;
+        return newUserResponse;
 
     }
 }

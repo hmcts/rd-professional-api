@@ -94,10 +94,10 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
 
     }
 

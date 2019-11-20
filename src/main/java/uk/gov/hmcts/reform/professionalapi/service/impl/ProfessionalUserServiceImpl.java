@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -183,23 +182,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
-        int statusCode;
+        int statusCode = 200;
         NewUserResponse newUserResponse = null;
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        GetUserProfileResponse userProfileResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
-        if (IdamStatus.ACTIVE == userProfileResponse.getIdamStatus()) {
+        newUserResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
 
+        if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+            // If we dont find active user in up will send it to user 404 status code in the header
+            statusCode = 404;
             newUserResponse = new NewUserResponse();
-            newUserResponse.setUserIdentifier(userProfileResponse.getIdamId());
-            statusCode = 200;
-        } else {
-
-            statusCode = Integer.valueOf(userProfileResponse.getIdamStatusCode());
         }
-
         return ResponseEntity
                 .status(statusCode)
                 .body(newUserResponse);
