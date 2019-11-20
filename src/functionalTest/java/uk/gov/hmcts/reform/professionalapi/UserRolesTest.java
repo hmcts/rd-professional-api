@@ -55,11 +55,18 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchUserResponse, "any");
         log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
 
-        List<HashMap> superUserResponse = (List<HashMap>) searchUserResponse.get("users");
-        superUserResponse.stream().forEach(user -> {
-            assertThat("roles").contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
-        });
-        log.info("USER ROLES::::::::::::" + superUserResponse);
+        //List<HashMap> superUserResponse = (List<HashMap>) searchUserResponse.get("users");
+        //Map<String, Object> superUserDetails = superUserResponse.get(0);
+        //log.info("SUPER USER DETAILS::::::::::::" + superUserResponse);
+
+        List<Map> users = getNestedValue(searchUserResponse, "users");
+        log.info("USERS::::::::::::" + users);
+        Map superUserDetails = users.get(0);
+        log.info("SUPER USER DETAILS:::::::::;" + superUserDetails);
+        List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
+        log.info("SUPER USER ROLES:::::::::::::" + superUserRoles);
+
+        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
     }
 
@@ -81,5 +88,15 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 assertThat(user.get("roles")).isNotNull();
             }
         });
+    }
+
+    public static <T> T getNestedValue(Map map, String... keys) {
+        Object value = map;
+
+        for (String key : keys) {
+            value = ((Map) value).get(key);
+        }
+
+        return (T) value;
     }
 }
