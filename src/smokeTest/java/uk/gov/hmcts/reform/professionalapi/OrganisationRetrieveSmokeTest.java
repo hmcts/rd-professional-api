@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -14,9 +12,7 @@ public class OrganisationRetrieveSmokeTest extends AuthorizationFunctionalSmokeT
     @Test
     public void can_retrieve_a_single_organisation() {
 
-
-        Map<String, Object>  response = professionalApiClient.retrieveOrganisationDetails("AB2345G",puiCaseManager);
-        log.info("Responsed:" + response);
+        professionalApiClient.retrieveOrganisationDetails("AB2345G",puiUserManager);
 
     }
 

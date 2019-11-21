@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import java.io.IOException;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 
@@ -23,9 +20,7 @@ public class ProfessionalApiClientSmokeTest {
     private final String professionalApiUrl;
     private final String s2sToken;
 
-
     protected IdamOpenIdClientSmokeTest idamOpenIdClient;
-
 
 
     public ProfessionalApiClientSmokeTest(
@@ -42,21 +37,15 @@ public class ProfessionalApiClientSmokeTest {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+    public void  retrieveOrganisationDetails(String id, String role) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
                 .andReturn();
 
-        if (response.statusCode() != OK.value()) {
+        if (response.statusCode() != INTERNAL_SERVER_ERROR.value()) {
             log.info("Retrieve organisation response: " + response.asString());
         }
-
-        response.then()
-                .assertThat()
-                .statusCode(OK.value());
-
-        return response.body().as(Map.class);
 
     }
 
@@ -71,8 +60,4 @@ public class ProfessionalApiClientSmokeTest {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
-    @SuppressWarnings("unused")
-    private JsonNode parseJson(String jsonString) throws IOException {
-        return mapper.readTree(jsonString);
-    }
 }
