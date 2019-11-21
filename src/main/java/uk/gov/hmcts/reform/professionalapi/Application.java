@@ -47,7 +47,8 @@ import org.springframework.retry.annotation.EnableRetry;
 public class Application  implements CommandLineRunner {
 
 
-    private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
+    //private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
+    private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
     private static final String BLOB_HTTPS_URL = "https://rd.demo.platform.hmcts.net";
     private static final boolean isEnableHttps = false;
     private static final String AZURE_ACCOUNT_NAME = "rddemo";
