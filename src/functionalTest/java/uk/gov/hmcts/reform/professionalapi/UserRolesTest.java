@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -28,11 +32,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
+    private String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+    private List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
     @Test
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -53,21 +58,39 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-        log.info("USER SEARCH RESPONSE::::::::::::" + searchUserResponse);
-
-        //List<HashMap> superUserResponse = (List<HashMap>) searchUserResponse.get("users");
-        //Map<String, Object> superUserDetails = superUserResponse.get(0);
-        //log.info("SUPER USER DETAILS::::::::::::" + superUserResponse);
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
-        log.info("USERS::::::::::::" + users);
         Map superUserDetails = users.get(0);
-        log.info("SUPER USER DETAILS:::::::::;" + superUserDetails);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
-        log.info("SUPER USER ROLES:::::::::::::" + superUserRoles);
 
         assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
+    }
+
+    @Test
+    public void ac2_can_add_new_user_with_fpla_or_iac_roles() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.addAll(fplaAndIacRoles);
+        log.info("USER ROLES::::::::::::::" + userRoles);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        log.info("NEW USER RESPONSE ROLES:::::::::::" + newUserResponse.get("roles"));
+
+        assertThat(newUserResponse.get("idamStatus")).isEqualTo("Active");
+        assertThat(newUserResponse.get("roles")).asList().contains(fplaAndIacRoles);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
