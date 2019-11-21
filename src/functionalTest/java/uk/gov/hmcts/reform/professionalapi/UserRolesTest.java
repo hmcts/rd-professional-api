@@ -89,7 +89,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
-        validateRetrievedUsers(searchUserResponse, "Active");
+        validateRetrievedUsers(searchUserResponse, "any");
+        log.info("SEARCH USER RESPONSE::::::::::::::" + searchUserResponse);
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
         Map newUserDetails = users.get(1);
@@ -117,7 +118,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        RequestSpecification bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw", firstName, lastName, email);
+        RequestSpecification bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         professionalApiClient.addNewUserToAnOrganisationExternal(orgIdentifier, puiUserManager, userCreationRequest, bearerTokenForUser);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForUser, "Active");
