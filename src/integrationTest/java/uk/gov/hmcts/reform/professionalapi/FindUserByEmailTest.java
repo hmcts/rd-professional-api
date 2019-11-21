@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +11,13 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
+
 
     @Before
     public void setUp() {
@@ -79,27 +77,20 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
+        inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get("userIdentifier")).isNotNull();
 
     }
+
 
     @Test
     public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_organisation_status_as_active() {
@@ -110,19 +101,10 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -141,22 +123,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);
 
         assertThat(response.get("http_status")).isEqualTo("400");

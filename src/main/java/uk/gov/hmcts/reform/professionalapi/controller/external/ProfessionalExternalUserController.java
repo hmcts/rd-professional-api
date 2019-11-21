@@ -214,8 +214,8 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "User status active or Not",
-                    response = ProfessionalUsersEntityResponse.class
+                    message = "User status active will return user identifier else only status code",
+                    response = NewUserResponse.class
             ),
             @ApiResponse(
                     code = 400,
