@@ -17,7 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigPropertiesSmokeTest.class, Oauth2SmokeTest.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
-@TestPropertySource("classpath:smokeTest-functional.yaml")
+@TestPropertySource("classpath:smoketest-functional.yaml")
 @Slf4j
 public abstract class AuthorizationFunctionalSmokeTest {
 
