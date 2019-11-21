@@ -83,6 +83,10 @@ public class Application  implements CommandLineRunner {
 
     public static void uploadFile(BlockBlobURL blob, File sourceFile) throws IOException {
         log.info("Start uploading file " + sourceFile.getName());
+
+        log.info("Absolute file path: " + sourceFile.getAbsolutePath());
+        log.info("Cannonical file path: " + sourceFile.getCanonicalPath());
+        log.info("toPath file path: " + sourceFile.toPath());
         final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(sourceFile.toPath());
 
         TransferManager.uploadFileToBlockBlob(fileChannel, blob, 8 * 1024 * 1024, null)
