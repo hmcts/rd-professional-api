@@ -7,13 +7,16 @@ import com.microsoft.azure.storage.blob.ServiceURL;
 import com.microsoft.azure.storage.blob.SharedKeyCredentials;
 import com.microsoft.azure.storage.blob.StorageURL;
 import com.microsoft.azure.storage.blob.TransferManager;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.AsynchronousFileChannel;
+
 import java.security.InvalidKeyException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -73,20 +76,24 @@ public class Application  implements CommandLineRunner {
 
     public void pushFile() throws IOException, InvalidKeyException {
 
-        final String sourceCsvFile = "content_demo.csv";
-        final File sourceFile = new File(this.getClass().getClassLoader().getResource(sourceCsvFile).getFile());
+        File sourceFile = File.createTempFile("tmp", ".csv");
+        FileOutputStream fos = new FileOutputStream(sourceFile);
+        fos.write("A,B,C,D".getBytes());
+        //final File sourceFile = new File(this.getClass().getClassLoader().getResource(sourceCsvFile).getFile());
         ServiceURL serviceUrl = createServiceUrl(new PipelineOptions());
         ContainerURL containerUrl = serviceUrl.createContainerURL(CONTAINER_NAME);
-        final BlockBlobURL blockBlobUrl = containerUrl.createBlockBlobURL(sourceCsvFile);
+        final BlockBlobURL blockBlobUrl = containerUrl.createBlockBlobURL(sourceFile.getName());
         uploadFile(blockBlobUrl, sourceFile);
     }
 
     public static void uploadFile(BlockBlobURL blob, File sourceFile) throws IOException {
-        log.info("Start uploading file " + sourceFile.getName());
+
+        /*log.info("Start uploading file " + sourceFile.getName());
 
         log.info("Absolute file path: " + sourceFile.getAbsolutePath());
         log.info("Cannonical file path: " + sourceFile.getCanonicalPath());
-        log.info("toPath file path: " + sourceFile.toPath());
+        log.info("toPath file path: " + sourceFile.toPath());*/
+
         final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(sourceFile.toPath());
 
         TransferManager.uploadFileToBlockBlob(fileChannel, blob, 8 * 1024 * 1024, null)
