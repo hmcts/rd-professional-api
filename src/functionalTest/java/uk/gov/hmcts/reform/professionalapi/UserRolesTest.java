@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -68,11 +69,10 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac2_can_add_new_user_with_fpla_or_iac_roles() {
+    public void ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.addAll(fplaAndIacRoles);
@@ -85,12 +85,51 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
-        log.info("NEW USER RESPONSE:::::::::::" + newUserResponse);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
 
-        assertThat(newUserResponse.get("idamStatus")).isEqualTo("Active");
-        assertThat(newUserResponse.get("roles")).asList().contains(fplaAndIacRoles);
+        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
+        validateRetrievedUsers(searchUserResponse, "Active");
+
+        List<Map> users = getNestedValue(searchUserResponse, "users");
+        Map newUserDetails = users.get(1);
+        List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
+        log.info("NEW USER ROLES:::::::::::::"+ newUserRoles);
+
+        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+
     }
+
+    @Test
+    public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.addAll(fplaAndIacRoles);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        RequestSpecification bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw", firstName, lastName, email);
+        professionalApiClient.addNewUserToAnOrganisationExternal(orgIdentifier, puiUserManager, userCreationRequest, bearerTokenForUser);
+
+        Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForUser, "Active");
+        log.info("EXTERNAL SEARCH USER RESPONSE::::::::;;" + searchUserResponse);
+        validateRetrievedUsers(searchUserResponse, "any");
+
+        List<Map> users = getNestedValue(searchUserResponse, "users");
+        Map newUserDetails = users.get(1);
+        List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
+
+        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+    }
+
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();

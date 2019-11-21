@@ -209,6 +209,17 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> addNewUserToAnOrganisationExternal(String orgId, String role, NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+        Response response = requestSpecification
+                .body(newUserCreationRequest)
+                .post("/refdata/external/v1/organisations/users/")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
 
 
     @SuppressWarnings("unchecked")
