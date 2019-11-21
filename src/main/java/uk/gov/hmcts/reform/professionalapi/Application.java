@@ -44,8 +44,8 @@ import org.springframework.retry.annotation.EnableRetry;
 public class Application  implements CommandLineRunner {
 
 
-    private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
-    private static final String BLOB_HTTPS_URL = "http://rddemo.blob.core.windows.net";
+    private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
+    private static final String BLOB_HTTPS_URL = "https://rd.demo.platform.hmcts.net";
     private static final boolean isEnableHttps = false;
     private static final String AZURE_ACCOUNT_NAME = "rddemo";
     private static final String AZURE_ACCOUNT_KEY = "Vjmr3Yk0DUrygumP7FKJ2eUiOyhWvZ5XczDMk13J+m9vtk2IOXEcOlfjlcTaHDb5mHwAsq7qOYf3GtxEo/uFIA==";
@@ -73,7 +73,7 @@ public class Application  implements CommandLineRunner {
 
     public void pushFile() throws IOException, InvalidKeyException {
 
-        final String sourceCsvFile = "content.csv";
+        final String sourceCsvFile = "content_demo.csv";
         final File sourceFile = new File(this.getClass().getClassLoader().getResource(sourceCsvFile).getFile());
         ServiceURL serviceUrl = createServiceUrl(new PipelineOptions());
         ContainerURL containerUrl = serviceUrl.createContainerURL(CONTAINER_NAME);
@@ -82,20 +82,20 @@ public class Application  implements CommandLineRunner {
     }
 
     public static void uploadFile(BlockBlobURL blob, File sourceFile) throws IOException {
-        log.info("Start uploading file %s...", sourceFile);
+        log.info("Start uploading file " + sourceFile.getName());
         final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(sourceFile.toPath());
 
         TransferManager.uploadFileToBlockBlob(fileChannel, blob, 8 * 1024 * 1024, null)
                 .ignoreElement()
-                .doOnComplete(() -> log.info("File %s is uploaded.", sourceFile.getName()))
-                .doOnError(error -> log.error("Failed to upload file %s with error %s.", sourceFile.toPath(),
+                .doOnComplete(() -> log.info("File " + sourceFile.getName() + " is uploaded."))
+                .doOnError(error -> log.error("Failed to upload file " + sourceFile.getName() + " with error %s.", sourceFile.toPath(),
                         error.getMessage()))
                 .blockingAwait();
     }
 
     public static ServiceURL createServiceUrl(@Autowired(required = false) PipelineOptions options) throws InvalidKeyException,
             MalformedURLException {
-        log.debug("Creating ServiceURL bean...");
+        log.info("Creating ServiceURL bean...");
         final SharedKeyCredentials credentials = new SharedKeyCredentials(AZURE_ACCOUNT_NAME,
                 AZURE_ACCOUNT_KEY);
         final URL blobUrl = getUrl();
