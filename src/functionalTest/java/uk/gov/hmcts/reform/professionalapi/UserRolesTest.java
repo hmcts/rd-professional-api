@@ -76,7 +76,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.addAll(fplaAndIacRoles);
-        log.info("USER ROLES::::::::::::::" + userRoles);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
@@ -87,7 +86,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .build();
 
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
-        log.info("NEW USER RESPONSE ROLES:::::::::::" + newUserResponse.get("roles"));
+        log.info("NEW USER RESPONSE:::::::::::" + newUserResponse);
 
         assertThat(newUserResponse.get("idamStatus")).isEqualTo("Active");
         assertThat(newUserResponse.get("roles")).asList().contains(fplaAndIacRoles);
