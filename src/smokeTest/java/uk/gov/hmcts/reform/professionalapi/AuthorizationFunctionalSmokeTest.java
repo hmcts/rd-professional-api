@@ -33,8 +33,8 @@ public abstract class AuthorizationFunctionalSmokeTest {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
-    @Value("${exui.role.pui-user-manager}")
-    protected String puiUserManager;
+    @Value("${exui.role.hmcts-admin}")
+    protected String hmctsAdmin;
 
     protected ProfessionalApiClientSmokeTest professionalApiClient;
 

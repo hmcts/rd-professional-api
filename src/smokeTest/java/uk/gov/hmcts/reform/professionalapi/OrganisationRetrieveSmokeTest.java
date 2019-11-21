@@ -12,7 +12,7 @@ public class OrganisationRetrieveSmokeTest extends AuthorizationFunctionalSmokeT
     @Test
     public void can_retrieve_a_single_organisation() {
 
-        professionalApiClient.retrieveOrganisationDetails("AB2345G",puiUserManager);
+        professionalApiClient.retrieveOrganisationDetails("AB2345G",hmctsAdmin);
 
     }
 

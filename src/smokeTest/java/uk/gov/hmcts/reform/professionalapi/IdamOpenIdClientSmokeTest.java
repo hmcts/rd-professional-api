@@ -10,7 +10,11 @@ import com.google.gson.annotations.SerializedName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +25,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class IdamOpenIdClientSmokeTest {
 
     private final TestConfigPropertiesSmokeTest testConfig;
-
-    public static final String BASIC = "Basic ";
 
     private final String password = "Hmcts1234";
 
@@ -70,12 +72,6 @@ public class IdamOpenIdClientSmokeTest {
 
     public String getInternalOpenIdToken() {
         String userEmail = createUser("prd-admin");
-        return getOpenIdToken(userEmail);
-    }
-
-
-    public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
-        String userEmail = createUser(role, email, firstName, lastName);
         return getOpenIdToken(userEmail);
     }
 
