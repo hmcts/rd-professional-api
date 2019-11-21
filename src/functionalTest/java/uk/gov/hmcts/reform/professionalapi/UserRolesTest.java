@@ -6,13 +6,14 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import io.restassured.specification.RequestSpecification;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -93,7 +94,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<Map> users = getNestedValue(searchUserResponse, "users");
         Map newUserDetails = users.get(1);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
-        log.info("NEW USER ROLES:::::::::::::"+ newUserRoles);
+        log.info("NEW USER ROLES:::::::::::::" + newUserRoles);
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
