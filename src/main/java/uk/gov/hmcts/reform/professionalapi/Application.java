@@ -43,12 +43,13 @@ import org.springframework.retry.annotation.EnableRetry;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application  implements CommandLineRunner {
 
-    private static final String BLOB_URL = "http://3fbfcfb8181346cabaf7.blob.core.windows.net";
-    private static final String BLOB_HTTPS_URL = "https://3fbfcfb8181346cabaf7.blob.core.windows.net";
+
+    private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
+    private static final String BLOB_HTTPS_URL = "http://rddemo.blob.core.windows.net";
     private static final boolean isEnableHttps = false;
-    private static final String AZURE_ACCOUNT_NAME = "3fbfcfb8181346cabaf7";
-    private static final String AZURE_ACCOUNT_KEY = "pMfqbiimUan/k6q+G3t1rOpfBLSn2SeHV4AXZa+7XtNAKAdjKLbK7yl4/UU77NCU+taymTLN4eKyE/IIyTwolg==";
-    private static final String CONTAINER_NAME = "blobcontainer";
+    private static final String AZURE_ACCOUNT_NAME = "rddemo";
+    private static final String AZURE_ACCOUNT_KEY = "Vjmr3Yk0DUrygumP7FKJ2eUiOyhWvZ5XczDMk13J+m9vtk2IOXEcOlfjlcTaHDb5mHwAsq7qOYf3GtxEo/uFIA==";
+    private static final String CONTAINER_NAME = "jrdtest";
 
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
