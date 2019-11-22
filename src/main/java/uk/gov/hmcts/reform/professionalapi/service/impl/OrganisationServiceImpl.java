@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -118,7 +119,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private Organisation saveOrganisation(Organisation organisation) {
-        Organisation persistedOrganisation = null;
+        Organisation persistedOrganisation;
         try {
             persistedOrganisation = organisationRepository.save(organisation);
         } catch (ConstraintViolationException ex) {
@@ -157,14 +158,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(jurisdiction -> jurisdiction.getId()).collect(Collectors.toList());
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId).collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser, newProfessionalUser.getUserAttributes(), jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
-        userAccountMapService.persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
+        userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
@@ -216,7 +217,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
 
         if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
-
             log.info("No Organisations Retrieved...");
             throw new EmptyResultDataAccessException(1);
         }
@@ -227,51 +227,35 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public List<Organisation> retrieveActiveOrganisationDetails() {
-
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
-        activeOrganisations.forEach(organisation -> {
-            if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
-            }
-        });
+        Map<String, Organisation> activeOrganisationDtls = generateActiveOrganisationDetailsMap(activeOrganisations);
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
-
-            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
-                    "false", activeOrganisationDtls);
-
+            updatedOrganisationDetails = updateOrganisationDetails(activeOrganisationDtls);
         }
+
         return updatedOrganisationDetails;
     }
 
     public ResponseEntity retrieveActiveOrganisationDetails(Pageable pageable) {
-
-        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        List<Organisation> updatedOrganisationDetails;
         OrganisationsDetailResponse organisationsDetailResponse = null;
+        Map<String, Organisation> activeOrganisationDtls;
 
-        Page<Organisation> activeOrganisations = organisationRepository.findByStatus(
-                OrganisationStatus.ACTIVE, pageable);
+        Page<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE, pageable);
         List<Organisation> activeOrganisationsTemp = activeOrganisations.getContent();
+
         if (CollectionUtils.isEmpty(activeOrganisationsTemp)) {
             throw new EmptyResultDataAccessException(1);
         } else {
-            activeOrganisationsTemp.forEach(organisation -> {
-                if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
-                }
-            });
+            activeOrganisationDtls = generateActiveOrganisationDetailsMap(activeOrganisationsTemp);
         }
 
         if (!CollectionUtils.isEmpty(activeOrganisationDtls)) {
-            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
-                    "false", activeOrganisationDtls);
+            updatedOrganisationDetails = updateOrganisationDetails(activeOrganisationDtls);
             organisationsDetailResponse = new OrganisationsDetailResponse(
                     updatedOrganisationDetails, true);
         }
@@ -281,16 +265,15 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public List<Organisation> retrieveActiveOrganisationDetails(List<Organisation> organisations) {
-
-        List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        List<Organisation> updatedOrganisationDetails;
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
         List<Organisation> pendingOrganisations = new ArrayList<>();
         List<Organisation> activeOrganisations = new ArrayList<>();
 
         if (!organisations.isEmpty()) {
             organisations.forEach(organisation -> {
                 if (organisation.getStatus().isActive() && organisation.getUsers().size() > 0 && organisation.getUsers().get(0).getUserIdentifier() != null) {
-                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                    activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
                     activeOrganisations.add(organisation);
                 } else {
                     if (organisation.getStatus().isPending()) {
@@ -298,11 +281,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                     }
                 }
             });
-            //log.info("Retrieving all organisations..." + activeOrganisations.toString());
             if (activeOrganisationDtls.size() > 0) {
-                RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().collect(Collectors.toList()));
-                updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
-                        "false", activeOrganisationDtls);
+                updatedOrganisationDetails = updateOrganisationDetails(activeOrganisationDtls);
                 if (updatedOrganisationDetails != null) {
                     pendingOrganisations.addAll(updatedOrganisationDetails);
                 }
@@ -345,29 +325,23 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
-            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
+            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);
     }
 
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
-
         List<Organisation> organisations = null;
 
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
-
             organisations = organisationRepository.findByStatus(status);
-
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
-
             organisations = retrieveActiveOrganisationDetails();
         }
 
         if (CollectionUtils.isEmpty(organisations)) {
-
             throw new EmptyResultDataAccessException(1);
-
         }
         return new OrganisationsDetailResponse(organisations, true);
     }
@@ -393,12 +367,11 @@ public class OrganisationServiceImpl implements OrganisationService {
             HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, organisationsPage, null);
             return ResponseEntity.status(200).headers(headers).body(organisationsDetailResponse);
         }
-
     }
 
     @Override
     public ResponseEntity findByOrganisationStatusWithPageable(OrganisationStatus status, Pageable pageable) {
-        Page<Organisation> organisations = null;
+        Page<Organisation> organisations;
         ResponseEntity responseEntity = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
             organisations = organisationRepository.findByStatus(status, pageable);
@@ -416,6 +389,27 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         return responseEntity;
+    }
+
+    private Map<String, Organisation> generateActiveOrganisationDetailsMap(List<Organisation> activeOrganisations) {
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
+
+        activeOrganisations.forEach(organisation -> {
+            if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+            }
+        });
+
+        return activeOrganisationDtls;
+    }
+
+    private List<Organisation> updateOrganisationDetails(Map<String, Organisation> activeOrganisationDtls) {
+        RetrieveUserProfilesRequest retrieveUserProfilesRequest;
+
+        retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
+
+        return RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
+                "false", activeOrganisationDtls);
     }
 }
 
