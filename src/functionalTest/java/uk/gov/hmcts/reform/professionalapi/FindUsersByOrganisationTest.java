@@ -51,7 +51,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerTokenForPuiUserManager;
     }
@@ -78,7 +78,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                     .roles(userRoles)
                     .jurisdictions(OrganisationFixtures.createJurisdictions())
                     .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
             return bearerTokenForNonPuiUserManager;
         } else {
@@ -189,7 +189,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .build();
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "0", "1");
 

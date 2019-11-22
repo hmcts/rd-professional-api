@@ -37,6 +37,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
     private String email2 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
     private List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+    private List<String> dummmRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
+    private List<String> puiUserManagerRoleOnly = Arrays.asList(puiUserManager);
     private List<String> userRoles = new ArrayList<>();
 
     @Test
@@ -78,7 +80,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
@@ -93,7 +95,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     }
 
-    @Test
+    /*@Test
     public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
 
         //Create and activate super user
@@ -109,12 +111,18 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
+        //String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
         //Create and activate new user
         userRoles.addAll(fplaAndIacRoles);
-        NewUserCreationRequest userCreationRequest = createNewUser(email2, userRoles);
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email2);
 
+        NewUserCreationRequest userCreationRequest = createNewUser(email2, userRoles);
+
+       // NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, puiUserManagerRoleOnly);
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email2);
+       // assertThat(bearerTokenForNewUser).isNotNull();
         //Super user adding new user to org
+       // professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.OK);
         professionalApiClient.addNewUserToAnOrganisationExternal(orgIdentifier, userCreationRequest, bearerTokenForSuperUser);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForSuperUser, "Active");
@@ -126,8 +134,45 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+    }*/
+
+    @Test
+    public void ac4_internal_user_cannot_add_user_with_non_fpla_or_iac_roles() {
+
+        String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        userRoles.addAll(dummmRoles);
+        NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.BAD_REQUEST);
+
     }
 
+    public RequestSpecification generateBearerTokenForPuiManager() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+
+        List<String> userRoles1 = new ArrayList<>();
+        userRoles1.add("pui-organisation-manager");
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles1)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
+
+        return bearerTokenForPuiUserManager;
+    }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
