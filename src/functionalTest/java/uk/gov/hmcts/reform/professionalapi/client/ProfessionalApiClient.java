@@ -581,6 +581,18 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users/findUserByEmailId?email=" + email)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+    }
 
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
