@@ -37,16 +37,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
     private String email2 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
     private List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+    private List<String> userRoles = new ArrayList<>();
 
     @Test
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
 
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
+        UserCreationRequest superUser = createSuperUser(email);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
 
@@ -72,20 +68,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        List<String> userRoles = new ArrayList<>();
         userRoles.addAll(fplaAndIacRoles);
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
+        NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
@@ -106,15 +96,10 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
 
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email2)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        //To activate super user
-        RequestSpecification bearerTokenForSuperUser = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email2);
+        //Create and activate super user
+        UserCreationRequest superUser = createSuperUser(email);
+        RequestSpecification bearerTokenForSuperUser = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        assertThat(bearerTokenForSuperUser).isNotNull();
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
@@ -122,22 +107,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         orgIdentifier = (String) response.get("organisationIdentifier");
-
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        List<String> userRoles = new ArrayList<>();
+        //Create and activate new user
         userRoles.addAll(fplaAndIacRoles);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        //To activate new user
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        NewUserCreationRequest userCreationRequest = createNewUser(email2, userRoles);
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email2);
 
         //Super user adding new user to org
         professionalApiClient.addNewUserToAnOrganisationExternal(orgIdentifier, userCreationRequest, bearerTokenForSuperUser);
@@ -182,5 +157,26 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         }
 
         return (T) value;
+    }
+
+    private UserCreationRequest createSuperUser(String email) {
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        return superUser;
+    }
+
+    private NewUserCreationRequest createNewUser(String email,List<String> userRoles) {
+        NewUserCreationRequest newUser = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        return newUser;
     }
 }
