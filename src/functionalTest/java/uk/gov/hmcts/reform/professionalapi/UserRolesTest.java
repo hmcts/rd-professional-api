@@ -86,8 +86,11 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
+        log.info("USERS:::::::::::::" + users);
         Map newUserDetails = users.get(1);
+        log.info("NEW USER::::::::::::" + newUserDetails);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
+        log.info("NEW USER ROLES::::::::::" + newUserRoles);
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
