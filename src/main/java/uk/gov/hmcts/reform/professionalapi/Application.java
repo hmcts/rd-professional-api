@@ -47,8 +47,8 @@ import org.springframework.retry.annotation.EnableRetry;
 public class Application  implements CommandLineRunner {
 
 
-    //private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
-    private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
+    private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
+    //private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
     private static final String BLOB_HTTPS_URL = "https://rd.demo.platform.hmcts.net";
     private static final boolean isEnableHttps = false;
     private static final String AZURE_ACCOUNT_NAME = "rddemo";
@@ -80,7 +80,6 @@ public class Application  implements CommandLineRunner {
         File sourceFile = File.createTempFile("tmp", ".csv");
         FileOutputStream fos = new FileOutputStream(sourceFile);
         fos.write("A,B,C,D".getBytes());
-        //final File sourceFile = new File(this.getClass().getClassLoader().getResource(sourceCsvFile).getFile());
         ServiceURL serviceUrl = createServiceUrl(new PipelineOptions());
         ContainerURL containerUrl = serviceUrl.createContainerURL(CONTAINER_NAME);
         final BlockBlobURL blockBlobUrl = containerUrl.createBlockBlobURL(sourceFile.getName());
@@ -88,12 +87,6 @@ public class Application  implements CommandLineRunner {
     }
 
     public static void uploadFile(BlockBlobURL blob, File sourceFile) throws IOException {
-
-        /*log.info("Start uploading file " + sourceFile.getName());
-
-        log.info("Absolute file path: " + sourceFile.getAbsolutePath());
-        log.info("Cannonical file path: " + sourceFile.getCanonicalPath());
-        log.info("toPath file path: " + sourceFile.toPath());*/
 
         final AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(sourceFile.toPath());
 
@@ -141,4 +134,5 @@ public class Application  implements CommandLineRunner {
         }
         return fileName;
     }
+
 }
