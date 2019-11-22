@@ -35,8 +35,9 @@ public class SmokeTest {
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .get("/")
                 .andReturn();
-
-        assertThat(response.body().asString())
-            .contains("Welcome to the System Reference Data API");
+        if (null != response.body()) {
+            assertThat(response.body().asString())
+                    .contains("Welcome to the System Reference Data API");
+        }
     }
 }
