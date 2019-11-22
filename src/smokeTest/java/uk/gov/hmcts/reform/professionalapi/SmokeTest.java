@@ -7,13 +7,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class SmokeTest {
 
+    // use this when testing locally - replace the below content with this line
     private final String targetInstance =
         StringUtils.defaultIfBlank(
             System.getenv("TEST_URL"),
@@ -35,9 +37,13 @@ public class SmokeTest {
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .get("/")
                 .andReturn();
-        if (null != response.body()) {
+        if (null != response && response.statusCode() == 200) {
             assertThat(response.body().asString())
                     .contains("Welcome to the System Reference Data API");
+
+        } else {
+
+            Assert.fail();
         }
     }
 }
