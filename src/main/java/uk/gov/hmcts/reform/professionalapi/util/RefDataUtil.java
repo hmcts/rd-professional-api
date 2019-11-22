@@ -6,9 +6,14 @@ import static java.util.stream.Collectors.toList;
 import feign.FeignException;
 import feign.Response;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -36,12 +42,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
+@Slf4j
 public class RefDataUtil {
 
     private RefDataUtil() {}
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
+
+    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -105,7 +114,7 @@ public class RefDataUtil {
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         }  catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
         return user;
@@ -129,7 +138,7 @@ public class RefDataUtil {
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
         }  catch (FeignException ex) {
 
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
     }
@@ -282,5 +291,31 @@ public class RefDataUtil {
             modifyUserRolesResponse = (ModifyUserRolesResponse) responseEntity.getBody();
         }
         return modifyUserRolesResponse;
+    }
+
+    public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
+
+        NewUserResponse newUserResponse;
+        try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
+
+            Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
+            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+
+            if (response.status() == 200) {
+
+                newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
+            } else {
+                ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
+                newUserResponse = new NewUserResponse();
+            }
+
+        }  catch (FeignException ex) {
+            log.error("Error while invoking UserProfileByEmail service call", ex);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+        }
+
+        return newUserResponse;
+
     }
 }
