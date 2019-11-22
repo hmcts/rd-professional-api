@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
+
 
     @Before
     public void setUp() {
@@ -63,5 +66,72 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.findUserByEmail("someone@somewhere.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
+    }
+
+    @Test
+    public void find_user_status_by_user_email_address_for_organisation_status_as_active() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        inviteUserCreationRequest(userEmail, userRoles);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
+
+    }
+
+
+    @Test
+    public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("403");
+
+    }
+
+    @Test
+    public void should_give_bad_request_for_invalid_email_to_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+
     }
 }
