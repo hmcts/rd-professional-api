@@ -84,57 +84,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-        log.info("SEARCH USER RESPONSE::::::::::::::" + searchUserResponse);
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
         Map newUserDetails = users.get(1);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
-        log.info("NEW USER ROLES:::::::::::::" + newUserRoles);
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
     }
-
-    /*@Test
-    public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
-
-        //Create and activate super user
-        UserCreationRequest superUser = createSuperUser(email);
-        RequestSpecification bearerTokenForSuperUser = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
-        assertThat(bearerTokenForSuperUser).isNotNull();
-
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(superUser)
-                .build();
-
-        Map<String, Object> response = professionalApiClient.createOrganisation(request);
-        orgIdentifier = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
-
-        //String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
-        //Create and activate new user
-        userRoles.addAll(fplaAndIacRoles);
-
-        NewUserCreationRequest userCreationRequest = createNewUser(email2, userRoles);
-
-       // NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, puiUserManagerRoleOnly);
-
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email2);
-       // assertThat(bearerTokenForNewUser).isNotNull();
-        //Super user adding new user to org
-       // professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.OK);
-        professionalApiClient.addNewUserToAnOrganisationExternal(orgIdentifier, userCreationRequest, bearerTokenForSuperUser);
-
-        Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForSuperUser, "Active");
-        log.info("EXTERNAL SEARCH USER RESPONSE::::::::;;" + searchUserResponse);
-        validateRetrievedUsers(searchUserResponse, "any");
-
-        List<Map> users = getNestedValue(searchUserResponse, "users");
-        Map newUserDetails = users.get(1);
-        List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
-
-        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
-    }*/
 
     @Test
     public void ac4_internal_user_cannot_add_user_with_non_fpla_or_iac_roles() {
