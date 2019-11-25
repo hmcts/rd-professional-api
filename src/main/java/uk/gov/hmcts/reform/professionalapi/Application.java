@@ -92,10 +92,10 @@ public class Application  implements CommandLineRunner {
                 } catch (InvalidKeyException e) {
                     log.error("InvalidKeyException", e);
                 }  catch (Exception e) {
-                    log.error("InvalidKeyException", e);
+                    log.error("Exception", e);
                 }
             }
-        }, 0, 10 * 1000 * 10);
+        }, 0, 10 * 1000 * 360);
     }
 
     public void pushFile(File sftpFile) throws IOException, InvalidKeyException, URISyntaxException {
@@ -178,7 +178,7 @@ public class Application  implements CommandLineRunner {
                 .decryptAndVerifyStream()
                 .withConfig(keyringConfig)
                 .andIgnoreSignatures()
-                .fromEncryptedInputStream(cipherTextStream);
+                  .fromEncryptedInputStream(cipherTextStream);
 
         return createLocalFileForSftp(plaintextStream);
     }
