@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 echo "Security.sh started"
 echo ${TEST_URL}
+echo ${SecurityRules}
 zap-api-scan.py -t ${TEST_URL}/v2/api-docs -f openapi -u ${SecurityRules} -P 1001 -l FAIL
 echo "zap api scan done"
 cat zap.out
