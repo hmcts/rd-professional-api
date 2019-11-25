@@ -34,8 +34,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-    private String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-    private String email2 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
     private List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
     private List<String> dummmRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
     private List<String> puiUserManagerRoleOnly = Arrays.asList(puiUserManager);
@@ -44,6 +42,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
 
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
@@ -77,7 +76,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         log.info("orgIdentifier:::::::::::::" + orgIdentifier);
         userRoles.addAll(fplaAndIacRoles);
-
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
@@ -104,6 +103,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         userRoles.addAll(dummmRoles);
         NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
 
