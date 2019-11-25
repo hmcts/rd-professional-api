@@ -74,7 +74,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        log.info("orgIdentifier:::::::::::::" + orgIdentifier);
         userRoles.addAll(fplaAndIacRoles);
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
@@ -82,17 +81,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         Map<String, Object> userResponse =  professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
-        log.info("InviteUserResponse:::::::::::::" + userResponse);
-
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
-        log.info("USERS:::::::::::::" + users);
         Map newUserDetails = users.get(1);
-        log.info("NEW USER::::::::::::" + newUserDetails);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
-        log.info("NEW USER ROLES::::::::::" + newUserRoles);
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
