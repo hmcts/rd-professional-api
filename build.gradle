@@ -268,6 +268,10 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
     compile group: 'com.microsoft.azure', name: 'azure-storage-spring-boot-starter', version: '2.2.0'
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.55'
+    compile group: 'org.apache.commons', name: 'commons-vfs2', version: '2.4.1'
+    compile group: 'name.neuhalfen.projects.crypto.bouncycastle.openpgp', name: 'bouncy-gpg', version: '2.0.1'
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
