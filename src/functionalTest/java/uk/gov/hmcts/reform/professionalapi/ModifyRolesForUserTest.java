@@ -59,7 +59,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .roles(userRoles1)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
         return bearerTokenForPuiUserManager;
     }
@@ -87,7 +87,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                     .roles(userRoles)
                     .jurisdictions(OrganisationFixtures.createJurisdictions())
                     .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
             return bearerTokenForNonPuiUserManager;
         } else {
@@ -112,7 +112,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
 
         assertThat(newUserResponse).isNotNull();
 
@@ -188,7 +188,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
         // inviting the user
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
 
         assertThat(newUserResponse).isNotNull();
         // search active user

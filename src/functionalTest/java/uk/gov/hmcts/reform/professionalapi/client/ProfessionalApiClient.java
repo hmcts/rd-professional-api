@@ -196,7 +196,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
                 .proxy("proxyout.reform.hmcts.net", 8080)
@@ -204,11 +204,22 @@ public class ProfessionalApiClient {
                 .andReturn();
         response.then()
                 .assertThat()
-                .statusCode(CREATED.value());
+                .statusCode(expectedStatus.value());
 
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> addNewUserToAnOrganisationExternal(String orgId, NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+        Response response = requestSpecification
+                .body(newUserCreationRequest)
+                .post("/refdata/external/v1/organisations/users/")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
 
 
     @SuppressWarnings("unchecked")
