@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
@@ -48,7 +49,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     PrdEnumRepository prdEnumRepository;
 
     UserAttributeServiceImpl userAttributeService;
-
     UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
@@ -177,6 +177,31 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
         return modifyUserRolesResponse;
+    }
+
+    public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
+
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
+        int statusCode = 200;
+        NewUserResponse newUserResponse = null;
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        newUserResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
+
+        if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+            // If we dont find active user in up will send it to user 404 status code in the header
+            statusCode = 404;
+            newUserResponse = new NewUserResponse();
+        } else {
+
+            newUserResponse.setIdamStatus(null);
+        }
+
+        return ResponseEntity
+                .status(statusCode)
+                .body(newUserResponse);
     }
 
 }

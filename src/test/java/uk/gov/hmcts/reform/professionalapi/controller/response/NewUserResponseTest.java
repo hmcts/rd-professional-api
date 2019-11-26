@@ -21,4 +21,15 @@ public class NewUserResponseTest {
 
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo("userIdentifier");
     }
+
+    @Test
+    public void test_userIdentifier_with_setter() {
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+        when(professionalUserMock.getUserIdentifier()).thenReturn("userIdentifier");
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("userIdentifier");
+        newUserResponse.setIdamStatus("ACTIVE");
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo("userIdentifier");
+        assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
+    }
 }
