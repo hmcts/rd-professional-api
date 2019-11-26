@@ -59,8 +59,8 @@ import org.springframework.retry.annotation.EnableRetry;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application  implements CommandLineRunner {
 
-    //private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
-    private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
+    private static final String BLOB_URL = "http://rd.demo.platform.hmcts.net";
+    //private static final String BLOB_URL = "http://rddemo.blob.core.windows.net";
     private static final String BLOB_HTTPS_URL = "https://rd.demo.platform.hmcts.net";
     private static final boolean isEnableHttps = false;
     private static final String AZURE_ACCOUNT_NAME = "rddemo";
@@ -70,7 +70,7 @@ public class Application  implements CommandLineRunner {
     private static final String SFTP_USER = "kiren.bhardwa@hmcts.net";
     private static final String SFTP_USER_PASSWORD = "frame-n9Lf)xiFUz";
     private static final String SFTP_HOST = "91.186.188.7";//https://files2.ciphr247.com";
-    private static final String SFTP_FILE_NAME = "Courts.csv.gpg";
+    private static final String SFTP_FILE_NAME = "Courts.csv";
     private static final Integer SFTP_TIME_OUT = 60000;
     private static final String GPG_PASSWORD = "Shreedhar!9";
 
@@ -85,8 +85,8 @@ public class Application  implements CommandLineRunner {
             public void run() {
                 try {
                     File sftpEncryptedFile = getFileFromSftp();
-                    File decryptedSftpFile = decryptFile(sftpEncryptedFile);
-                    pushFile(decryptedSftpFile);
+                    //File decryptedSftpFile = decryptFile(sftpEncryptedFile);
+                    pushFile(sftpEncryptedFile);
                 } catch (IOException e) {
                     log.error("IOException", e);
                 } catch (InvalidKeyException e) {
@@ -95,7 +95,7 @@ public class Application  implements CommandLineRunner {
                     log.error("Exception", e);
                 }
             }
-        }, 0, 10 * 1000 * 360);
+        }, 0, 10 * 1000 * 180);
     }
 
     public void pushFile(File sftpFile) throws IOException, InvalidKeyException, URISyntaxException {
