@@ -34,7 +34,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-
     private List<String> dummmRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
     private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
@@ -69,7 +68,9 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
 
+
         List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "pui-user-manager");
+
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
@@ -142,6 +143,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+
         NewUserCreationRequest userCreationRequest = createNewUser(email, dummmRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
