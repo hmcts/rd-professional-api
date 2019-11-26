@@ -34,10 +34,9 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-    private List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+
     private List<String> dummmRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
-    private List<String> puiUserManagerRoleOnly = Arrays.asList(puiUserManager);
-    private List<String> userRoles = new ArrayList<>();
+    private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
     @Test
     public void ac1_super_user_can_have_fpla_or_iac_roles() {
@@ -70,13 +69,13 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
 
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "pui-user-manager");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        userRoles.addAll(fplaAndIacRoles);
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
+        NewUserCreationRequest userCreationRequest = createNewUser(email, fplaAndIacRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         Map<String, Object> userResponse =  professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
@@ -92,14 +91,58 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     }
 
+    //External endpoint for create new user is failing because PUM is unable to add new user with fpla and iac roles in AAT env
+    //Awaiting https://tools.hmcts.net/jira/browse/SIDM-3475 and https://tools.hmcts.net/jira/browse/SIDM-3476
+    public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
+
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email1 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
+        String email2 = randomAlphabetic(10) + "@usersearch3.test".toLowerCase();
+
+        //Create and activate super user
+        UserCreationRequest superUser = createSuperUser(email);
+        // RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        //assertThat(bearerTokenForSuperUser).isNotNull();
+
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .superUser(superUser)
+                .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+        orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        //String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        NewUserCreationRequest userCreationRequest = createNewUser(email1, puiUserManagerRoleOnly);
+        RequestSpecification bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email1);
+        Map<String, Object> userResponse =  professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        log.info("NEW USER RESPONSE::::::::::" + userResponse);
+
+        NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, fplaAndIacRoles);
+        professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, email2);
+
+        professionalApiClient.addNewUserToAnOrganisationExternal(anotherUserCreationRequest, bearerTokenForPuiUserManager);
+
+        Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForPuiUserManager, "Active");
+        log.info("EXTERNAL SEARCH USER RESPONSE::::::::;;" + searchUserResponse);
+        validateRetrievedUsers(searchUserResponse, "any");
+
+        List<Map> users = getNestedValue(searchUserResponse, "users");
+        Map newUserDetails = users.get(1);
+        List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
+
+        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+    }
+
     @Test
     public void ac4_internal_user_cannot_add_user_with_non_fpla_or_iac_roles() {
 
         String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        userRoles.addAll(dummmRoles);
-        NewUserCreationRequest userCreationRequest = createNewUser(email, userRoles);
+        NewUserCreationRequest userCreationRequest = createNewUser(email, dummmRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.BAD_REQUEST);
