@@ -95,10 +95,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     //Awaiting https://tools.hmcts.net/jira/browse/SIDM-3475 and https://tools.hmcts.net/jira/browse/SIDM-3476
     public void ac3_external_user_can_add_new_user_with_fpla_or_iac_roles() {
 
-        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        String email1 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
-        String email2 = randomAlphabetic(10) + "@usersearch3.test".toLowerCase();
 
         //Create and activate super user
         UserCreationRequest superUser = createSuperUser(email);
@@ -115,11 +112,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         //String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
+        String email1 = randomAlphabetic(10) + "@usersearch2.test".toLowerCase();
         NewUserCreationRequest userCreationRequest = createNewUser(email1, puiUserManagerRoleOnly);
         RequestSpecification bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email1);
         Map<String, Object> userResponse =  professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         log.info("NEW USER RESPONSE::::::::::" + userResponse);
 
+        String email2 = randomAlphabetic(10) + "@usersearch3.test".toLowerCase();
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
         NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, fplaAndIacRoles);
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, email2);
 
