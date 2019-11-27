@@ -35,7 +35,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String firstName = "some-fname";
     private String lastName = "some-lname";
 
-    private List<String> dummmRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
+    private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
     private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
     @Test
@@ -142,7 +142,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        NewUserCreationRequest userCreationRequest = createNewUser(email, dummmRoles);
+        NewUserCreationRequest userCreationRequest = createNewUser(email, dummyRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.BAD_REQUEST);
