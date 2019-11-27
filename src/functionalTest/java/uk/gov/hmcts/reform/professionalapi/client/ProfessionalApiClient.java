@@ -209,7 +209,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> addNewUserToAnOrganisationExternal(String orgId, NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+
         Response response = requestSpecification
                 .body(newUserCreationRequest)
                 .post("/refdata/external/v1/organisations/users/")
