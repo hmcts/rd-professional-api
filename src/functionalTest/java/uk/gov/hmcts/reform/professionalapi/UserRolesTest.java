@@ -82,10 +82,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
+        log.info("SEARCH USERS RESPONSE:::::::::::;" + searchUserResponse);
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
+        log.info("USERS::::::::::::::" + users);
         Map newUserDetails = users.get(1);
+        log.info("NEW USER DETAILS::::::::::;;" + newUserDetails);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
+        log.info("NEW USER ROLS::::::::::::::;" + newUserRoles);
 
         assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
 
