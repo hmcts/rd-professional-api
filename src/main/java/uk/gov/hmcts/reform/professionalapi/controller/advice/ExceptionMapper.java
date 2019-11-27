@@ -60,7 +60,6 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-
     public ResponseEntity<Object> annotationDrivenValidationError(
             MethodArgumentNotValidException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, METHOD_ARG_NOT_VALID.getErrorMessage());
@@ -87,7 +86,6 @@ public class ExceptionMapper {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
-        String fieldName = null;
         if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
             String message = ex.getCause().getCause().getMessage().toUpperCase();
             if (message.contains("SRA_ID")) {
