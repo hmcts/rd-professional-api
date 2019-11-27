@@ -79,19 +79,18 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         Map<String, Object> userResponse =  professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        String userId = (String) userResponse.get("userIdentifier");
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
-        log.info("SEARCH USERS RESPONSE:::::::::::;" + searchUserResponse);
 
-        List<Map> users = getNestedValue(searchUserResponse, "users");
-        log.info("USERS::::::::::::::" + users);
-        Map newUserDetails = users.get(1);
-        log.info("NEW USER DETAILS::::::::::;;" + newUserDetails);
-        List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
-        log.info("NEW USER ROLS::::::::::::::;" + newUserRoles);
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchUserResponse.get("users");
 
-        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+        professionalUsersResponses.stream().forEach(user -> {
+            if (user.get("userIdentifier").equals(userId)) {
+                assertThat(user.get("roles")).asList().contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor");
+            }
+        });
 
     }
 
