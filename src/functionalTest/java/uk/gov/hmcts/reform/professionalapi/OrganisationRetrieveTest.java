@@ -60,14 +60,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void can_retrieve_an_organisation_by_email() {
-
-        Map<String, Object> response = professionalApiClient
-                .searchForUserByEmailAddress("someone@more.net", hmctsAdmin);
-        assertThat(response.size()).isGreaterThanOrEqualTo(1);
-    }
-
-    @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
