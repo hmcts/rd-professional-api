@@ -198,9 +198,9 @@ public class OrganisationInternalControllerTest {
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email")).thenReturn(organisationMock);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email@test.com")).thenReturn(organisationMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -208,6 +208,11 @@ public class OrganisationInternalControllerTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testRetrievePaymentAccountByEmailThrows400WhenEmailIsInvalid() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
     }
 

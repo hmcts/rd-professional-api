@@ -167,6 +167,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
+
         validateEmail(email);
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(RefDataUtil.removeEmptySpaces(email));
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
