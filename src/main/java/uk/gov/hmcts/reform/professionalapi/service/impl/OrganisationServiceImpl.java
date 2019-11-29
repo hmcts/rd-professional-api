@@ -160,7 +160,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<UserAttribute> attributes = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser, newProfessionalUser.getUserAttributes(), jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
-        userAccountMapService.persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
+        userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
@@ -225,20 +225,20 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
             }
         });
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
                     "false", activeOrganisationDtls);
 
         }
@@ -278,7 +278,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
-            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
+            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);
     }

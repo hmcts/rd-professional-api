@@ -57,6 +57,8 @@ public abstract class SuperController {
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
+    protected PaymentAccountValidator paymentAccountValidator;
+    @Autowired
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
     private JurisdictionServiceImpl jurisdictionService;

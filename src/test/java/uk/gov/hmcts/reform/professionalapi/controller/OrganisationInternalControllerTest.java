@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -54,6 +55,7 @@ public class OrganisationInternalControllerTest {
     private Organisation organisationMock;
     private OrganisationCreationRequest organisationCreationRequestMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    private PaymentAccountValidator paymentAccountValidatorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -87,6 +89,7 @@ public class OrganisationInternalControllerTest {
         organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
         organisationCreationRequestMock = mock(OrganisationCreationRequest.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
+        paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         responseEntity = mock(ResponseEntity.class);
