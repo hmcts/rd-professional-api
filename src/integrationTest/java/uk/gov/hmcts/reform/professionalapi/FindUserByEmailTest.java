@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.pitest.functional.prelude.Prelude.isEqualTo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
