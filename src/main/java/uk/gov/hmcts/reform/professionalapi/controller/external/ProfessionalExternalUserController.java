@@ -148,7 +148,7 @@ public class ProfessionalExternalUserController extends SuperController {
         Optional<ResponseEntity> optionalResponseEntity;
         validateEmail(email);
         //email is valid
-        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
+        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email.toLowerCase()));
 
         if (optionalResponseEntity.isPresent()) {
             return optionalResponseEntity;
@@ -240,7 +240,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         validateEmail(email);
         //email is valid
-        return professionalUserService.findUserStatusByEmailAddress(email);
+        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase());
     }
 
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.pitest.functional.prelude.Prelude.isEqualTo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Before
     public void setUp() {
         Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", organisation);
+        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);
     }
