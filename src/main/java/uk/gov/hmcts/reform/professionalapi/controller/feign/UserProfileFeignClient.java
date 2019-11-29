@@ -29,6 +29,11 @@ public interface UserProfileFeignClient {
     @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
     Response getUserProfileById(@RequestParam("userId") String userId);
 
+    @GetMapping(value = "/v1/userprofile", params = "email")
+    @RequestLine("GET /v1/userprofile")
+    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    Response getUserProfileByEmail(@RequestParam("email") String email);
+
     @PostMapping(value = "/v1/userprofile/users")
     @RequestLine("POST /v1/userprofile/users")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})

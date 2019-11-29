@@ -11,11 +11,12 @@ java:
     postgresqlUsername: dbrefdata
     postgresqlPassword: dbrefdata
     postgresqlDatabase: dbrefdata
+    #Whether to deploy the Postgres Chart or not
+    enabled: true
   keyVaults:
     rd:
       secrets:
         - s2s-secret
-postgresql:
-  #Whether to deploy the Postgres Chart or not
-  enabled: true
+
+
 

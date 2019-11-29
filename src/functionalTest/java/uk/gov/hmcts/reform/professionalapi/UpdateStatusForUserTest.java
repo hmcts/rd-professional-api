@@ -41,7 +41,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
         assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
@@ -158,7 +158,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .roles(userRoles1)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
                 .firstName("Leeroy")
@@ -166,7 +166,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .email("leeroy@jenkins.com")
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
         return bearerTokenForPuiUserManager;
     }
@@ -193,7 +193,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .roles(userRoles1)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
                 .firstName("Leeroy")
@@ -201,7 +201,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .email("leeroy@jenkins.com")
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
         return bearerTokenForPuiUserManager;
     }
