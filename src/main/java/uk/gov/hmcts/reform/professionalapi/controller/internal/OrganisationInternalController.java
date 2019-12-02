@@ -169,7 +169,7 @@ public class OrganisationInternalController extends SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-        paymentAccountService.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts());
+        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
 
         paymentAccountService.deleteUserAccountMaps(organisation.get());
         paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());

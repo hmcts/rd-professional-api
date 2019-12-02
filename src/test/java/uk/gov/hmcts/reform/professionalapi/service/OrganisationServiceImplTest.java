@@ -23,7 +23,9 @@ import java.nio.charset.Charset;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
@@ -43,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationR
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -92,6 +95,7 @@ public class OrganisationServiceImplTest {
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
+    private final PaymentAccountValidator paymentAccountValidatorMock = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
     private final UserAttribute userAttributeMock = mock(UserAttribute.class);
     private List<String> userRoles = new ArrayList<>();
@@ -118,7 +122,7 @@ public class OrganisationServiceImplTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
 
         String pbaNumber = "PBA1234567";
 
@@ -177,8 +181,8 @@ public class OrganisationServiceImplTest {
                 userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
-                userAttributeServiceMock
-
+                userAttributeServiceMock,
+                paymentAccountValidatorMock
         );
 
         organisationCreationRequest =
@@ -313,7 +317,8 @@ public class OrganisationServiceImplTest {
                 userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
-                userAttributeServiceMock);
+                userAttributeServiceMock,
+                paymentAccountValidatorMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 
@@ -375,7 +380,7 @@ public class OrganisationServiceImplTest {
 
         when(userProfileFeignClient.getUserProfileById(anyString()))
                 .thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty()))
-                .body(body, Charset.defaultCharset()).status(200).build());
+                        .body(body, Charset.defaultCharset()).status(200).build());
 
 
         OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
@@ -416,7 +421,7 @@ public class OrganisationServiceImplTest {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        when(userProfileFeignClient.getUserProfiles(any(),any(),any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
 
@@ -463,10 +468,9 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisation).isNotNull();
 
-        verify(organisationRepositoryMock,times(1))
+        verify(organisationRepositoryMock, times(1))
                 .findByOrganisationIdentifier(organisationIdentifier);
     }
-
 
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -480,7 +484,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void throwInvalidRequestWhenInvalidPbaIsPassed() {
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
 
         String pbaNumber = "GBA1234567";
 
@@ -497,7 +501,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
 
