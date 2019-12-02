@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
@@ -41,11 +42,13 @@ public class PaymentAccountServiceTest {
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+    private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
 
     private final OrganisationServiceImpl organisationServiceMock = new OrganisationServiceImpl(
             organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
             dxAddressRepositoryMock, contactInformationRepositoryMock, prdEnumRepositoryMock,
-            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock, userAttributeServiceMock);
+            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock,
+            userAttributeServiceMock, paymentAccountValidatorMock);
 
     private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
             applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,

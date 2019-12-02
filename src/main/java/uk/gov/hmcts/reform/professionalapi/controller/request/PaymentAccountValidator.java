@@ -16,8 +16,12 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 @Slf4j
 public class PaymentAccountValidator {
 
+    PaymentAccountRepository paymentAccountRepository;
+
     @Autowired
-    private PaymentAccountRepository paymentAccountRepository;
+    public PaymentAccountValidator(PaymentAccountRepository paymentAccountRepository) {
+        this.paymentAccountRepository = paymentAccountRepository;
+    }
 
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (!paymentAccounts.isEmpty()) {

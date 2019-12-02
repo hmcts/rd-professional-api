@@ -4,8 +4,10 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -61,6 +65,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserProfileFeignClient userProfileFeignClient;
     PrdEnumService prdEnumService;
     UserAttributeService userAttributeService;
+    PaymentAccountValidator paymentAccountValidator;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -73,7 +78,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserAccountMapService userAccountMapService,
             UserProfileFeignClient userProfileFeignClient,
             PrdEnumService prdEnumService,
-            UserAttributeService userAttributeService
+            UserAttributeService userAttributeService,
+            PaymentAccountValidator paymentAccountValidator
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -86,6 +92,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userProfileFeignClient = userProfileFeignClient;
         this.prdEnumService = prdEnumService;
         this.userAttributeService = userAttributeService;
+        this.paymentAccountValidator = paymentAccountValidator;
     }
 
     @Override
@@ -125,13 +132,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addPbaAccountToOrganisation(List<String> paymentAccounts, Organisation organisation) {
-
         if (paymentAccounts != null) {
-            paymentAccounts.forEach(pbaAccount -> {
-                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
-                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters, you entered: " + pbaAccount);
-                }
+            Set<String> pbas = new HashSet<>(paymentAccounts);
 
+            paymentAccountValidator.checkPbaNumberIsValid(pbas);
+
+            paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
@@ -153,7 +159,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(jurisdiction -> jurisdiction.getId()).collect(Collectors.toList());
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId).collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
