@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
@@ -88,7 +90,7 @@ public class ProfessionalApiClient {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         return someMinimalOrganisationRequest()

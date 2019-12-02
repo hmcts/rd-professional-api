@@ -23,7 +23,9 @@ import java.nio.charset.Charset;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
@@ -120,7 +122,7 @@ public class OrganisationServiceImplTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
 
         String pbaNumber = "PBA1234567";
 
@@ -482,7 +484,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void throwInvalidRequestWhenInvalidPbaIsPassed() {
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
 
         String pbaNumber = "GBA1234567";
 
@@ -499,7 +501,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
-        List<String> paymentAccountList = new ArrayList<>();
+        Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
 

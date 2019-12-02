@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,11 +130,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    public void addPbaAccountToOrganisation(List<String> paymentAccounts, Organisation organisation) {
+    public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         if (paymentAccounts != null) {
-            Set<String> pbas = new HashSet<>(paymentAccounts);
-
-            paymentAccountValidator.checkPbaNumberIsValid(pbas);
+            paymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);

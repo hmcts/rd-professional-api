@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +87,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldReturn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
-        List<String> existingPaymentAccounts = new ArrayList<>();
+        Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
 
@@ -128,7 +127,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     private String createActiveOrganisationAndPbaEditRequest() {
-        List<String> existingPaymentAccounts = new ArrayList<>();
+        Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000001");
         existingPaymentAccounts.add("PBA0000002");
 

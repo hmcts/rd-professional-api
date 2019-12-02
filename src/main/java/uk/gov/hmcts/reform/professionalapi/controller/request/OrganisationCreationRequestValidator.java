@@ -4,6 +4,8 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.List;
+import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -97,7 +99,7 @@ public class OrganisationCreationRequestValidator {
 
     }
 
-    private void requestPaymentAccount(List<String> paymentAccounts) {
+    private void requestPaymentAccount(Set<String> paymentAccounts) {
 
         if (paymentAccounts != null) {
 
