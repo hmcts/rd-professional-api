@@ -90,4 +90,21 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Test
+    public void RDCC_719_ac1_find_user_status_by_email_with_caseworker_publiclaw_courtadmin_role_should_return_200_with_user_status_active() {
+
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("caseworker-publiclaw-courtadmin");
+        // creating new user request
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+        // creating user in idam with the same email used in the invite user so that status automatically will update in the up
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+        // inviting user
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
+        assertThat(response.get("userIdentifier")).isNotNull();
+    }
+
 }
