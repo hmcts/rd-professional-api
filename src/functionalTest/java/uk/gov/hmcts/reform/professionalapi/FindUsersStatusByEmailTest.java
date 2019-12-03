@@ -91,7 +91,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void RDCC_719_ac1_find_user_status_by_email_with_caseworker_publiclaw_courtadmin_role_should_return_200_with_user_status_active() {
+    public void rdcc_719_ac1_find_user_status_by_email_with_caseworker_publiclaw_courtadmin_role_should_return_200_with_user_status_active() {
 
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
