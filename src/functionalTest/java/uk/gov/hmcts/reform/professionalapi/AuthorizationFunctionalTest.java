@@ -71,7 +71,6 @@ public abstract class AuthorizationFunctionalTest {
 
     protected ProfessionalApiClient professionalApiClient;
 
-
     protected RequestSpecification bearerTokenForPuiUserManager;
 
     @Autowired

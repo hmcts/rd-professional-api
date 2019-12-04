@@ -67,6 +67,10 @@ public class ProfessionalApiClient {
         this.idamClient = idamClient;
     }
 
+    public IdamOpenIdClient getidamOpenIdClient() {
+        return idamOpenIdClient;
+    }
+
     public String getWelcomePage() {
         return withUnauthenticatedRequest()
                 .get("/")
@@ -168,15 +172,9 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
-    public  NewUserCreationRequest createNewUserRequest(List<String> rolesToAdd) {
-
-        List<String> userRoles;
-        if (rolesToAdd.isEmpty()) {
-            userRoles = new ArrayList<>();
-            userRoles.add("pui-user-manager");
-        } else {
-            userRoles = rolesToAdd;
-        }
+    public  NewUserCreationRequest createNewUserRequest() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")

@@ -158,8 +158,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
         List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(fplaAndIacRoles);
+
+        String userEmail = professionalApiClient.getidamOpenIdClient().createUser("caseworker-publiclaw","email123@email.com","first", "last");
+
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        newUserCreationRequest.setEmail(userEmail);
+        newUserCreationRequest.setRoles(fplaAndIacRoles);
         assertThat(newUserCreationRequest).isNotNull();
 
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest, HttpStatus.CREATED);
