@@ -32,7 +32,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest();
+        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(new ArrayList<String>());
         assertThat(userCreationRequest).isNotNull();
 
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.OK);
@@ -63,7 +63,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest();
+        NewUserCreationRequest userCreationRequest = professionalApiClient.createNewUserRequest(new ArrayList<String>());
         assertThat(userCreationRequest).isNotNull();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.OK);
         assertThat(newUserResponse).isNotNull();

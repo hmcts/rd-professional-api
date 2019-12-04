@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -24,7 +25,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(new ArrayList<String>());
         assertThat(newUserCreationRequest).isNotNull();
 
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest, HttpStatus.CREATED);

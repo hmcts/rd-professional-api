@@ -168,9 +168,15 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
-    public  NewUserCreationRequest createNewUserRequest() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+    public  NewUserCreationRequest createNewUserRequest(List<String> rolesToAdd) {
+
+        List<String> userRoles;
+        if (rolesToAdd.isEmpty()) {
+            userRoles = new ArrayList<>();
+            userRoles.add("pui-user-manager");
+        } else {
+            userRoles = rolesToAdd;
+        }
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
