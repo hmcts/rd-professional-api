@@ -6,7 +6,9 @@ import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -14,6 +16,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
@@ -39,11 +42,13 @@ public class PaymentAccountServiceTest {
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+    private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
 
     private final OrganisationServiceImpl organisationServiceMock = new OrganisationServiceImpl(
             organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
             dxAddressRepositoryMock, contactInformationRepositoryMock, prdEnumRepositoryMock,
-            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock, userAttributeServiceMock);
+            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock,
+            userAttributeServiceMock, paymentAccountValidatorMock);
 
     private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
             applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
@@ -55,7 +60,7 @@ public class PaymentAccountServiceTest {
     private Organisation organisationMock;
     private List<SuperUser> superUsers = new ArrayList<>();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
-    private List<String> pbas = new ArrayList<>();
+    private Set<String> pbas = new HashSet<>();
     private PbaEditRequest pbaEditRequest = new PbaEditRequest(null);
 
     @Before

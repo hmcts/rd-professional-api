@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,6 @@ public interface PaymentAccountRepository extends JpaRepository<PaymentAccount, 
     List<PaymentAccount> findByPbaNumber(String pbaNumbersFrom);
 
     void deleteByIdIn(List<UUID> accountIds);
+
+    List<PaymentAccount> findByPbaNumberIn(Set<String> pbaNumbers);
 }

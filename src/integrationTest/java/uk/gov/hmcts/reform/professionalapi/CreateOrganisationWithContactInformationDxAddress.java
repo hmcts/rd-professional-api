@@ -8,10 +8,11 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -243,7 +244,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_first_name_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -270,7 +271,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_LastName_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -298,7 +299,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_email_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -325,7 +326,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_contact_information_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()

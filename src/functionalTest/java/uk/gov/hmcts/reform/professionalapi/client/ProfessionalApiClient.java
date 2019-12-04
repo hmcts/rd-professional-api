@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
@@ -88,7 +90,7 @@ public class ProfessionalApiClient {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         return someMinimalOrganisationRequest()
@@ -196,7 +198,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest) {
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
                 .proxy("proxyout.reform.hmcts.net", 8080)
@@ -204,11 +206,23 @@ public class ProfessionalApiClient {
                 .andReturn();
         response.then()
                 .assertThat()
-                .statusCode(CREATED.value());
+                .statusCode(expectedStatus.value());
 
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+                .body(newUserCreationRequest)
+                .post("/refdata/external/v1/organisations/users/")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
 
 
     @SuppressWarnings("unchecked")
