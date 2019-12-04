@@ -62,14 +62,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         Map superUserDetails = users.get(0);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
-        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
+        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworkr-ia");
 
     }
 
     @Test
     public void ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
 
-        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "pui-user-manager");
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworkr-ia", "pui-user-manager");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
@@ -88,7 +88,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         professionalUsersResponses.stream().forEach(user -> {
             if (user.get("userIdentifier").equals(userId)) {
-                assertThat(user.get("roles")).asList().contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
+                assertThat(user.get("roles")).asList().contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworkr-ia");
             }
         });
 
@@ -122,7 +122,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         log.info("NEW USER RESPONSE::::::::::" + userResponse);
 
         String email2 = randomAlphabetic(10) + "@usersearch3.test".toLowerCase();
-        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworkr-ia");
         NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, fplaAndIacRoles);
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, email2);
 
@@ -136,7 +136,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         Map newUserDetails = users.get(1);
         List<String> newUserRoles = getNestedValue(newUserDetails, "roles");
 
-        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
+        assertThat(newUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworkr-ia");
     }
 
     @Test
