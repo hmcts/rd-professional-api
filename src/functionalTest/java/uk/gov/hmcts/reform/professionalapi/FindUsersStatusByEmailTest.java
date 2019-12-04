@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -69,7 +70,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac4_find_user_status_by_email_with_active__pui_organisation_manager_role_should_return_status_for_user() {
+    public void ac4_find_user_status_by_email_with_active_pui_organisation_manager_role_should_return_status_for_user() {
 
         // creating new user request
         List<String> userRoles = new ArrayList<>();
@@ -95,15 +96,22 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("caseworker-publiclaw-courtadmin");
         // creating new user request
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-organisation-manager");
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+        professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
+
+        List<String> userRolesForCourtAdmin = new ArrayList<>();
+        userRolesForCourtAdmin.add("caseworker-publiclaw-courtadmin");
+        NewUserCreationRequest courtAdminUserCreationRequest = createUserRequest(userRolesForCourtAdmin);
+        RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", courtAdminUserCreationRequest.getFirstName(), courtAdminUserCreationRequest.getLastName(), courtAdminUserCreationRequest.getEmail());
+
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, bearerTokenForCourtAdmin, userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
