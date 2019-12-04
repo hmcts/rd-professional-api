@@ -153,25 +153,25 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc_720_ac7_add_new_user_with_roles() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
 
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
 
         List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
 
-        String userEmail = professionalApiClient.getidamOpenIdClient().createUser("caseworker-publiclaw","email123@email.com","first", "last");
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        professionalApiClient.getMultipleAuthHeadersExternal(hmctsAdmin, firstName, lastName, email);
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        newUserCreationRequest.setEmail(userEmail);
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(fplaAndIacRoles);
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest, HttpStatus.CREATED);
+        String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
 
-        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, "false", HttpStatus.OK);
+        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUserResponse.get("users");
