@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
@@ -48,7 +49,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     PrdEnumRepository prdEnumRepository;
 
     UserAttributeServiceImpl userAttributeService;
-
     UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
@@ -129,12 +129,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
 
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
         if (!StringUtils.isBlank(status)) {
-            log.info("Filtering users by status: " + status);
+            //Filtering users by status
 
             ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
             responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
@@ -168,21 +168,40 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ModifyUserRolesResponse modifyRolesForUser(ModifyUserProfileData modifyUserProfileData, String userId) {
+    public ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
         ModifyUserRolesResponse modifyUserRolesResponse;
-        log.info("inside modifyRolesForUser :: add roles" + modifyUserProfileData.getRolesAdd() + " : RolesDelete:" + modifyUserProfileData.getRolesDelete());
-        try (Response response =  userProfileFeignClient.modifyUserRoles(modifyUserProfileData, userId)) {
 
-            Class clazz = ModifyUserRolesResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
-
-            ModifyUserRolesResponse userProfileErrorResponse = (ModifyUserRolesResponse) responseResponseEntity.getBody();
-
-            modifyUserRolesResponse = (ModifyUserRolesResponse)responseResponseEntity.getBody();
-        }  catch (FeignException ex) {
+        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
+            modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
+        } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
-        log.info("inside modifyRolesForUser ::");
         return modifyUserRolesResponse;
     }
+
+    public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
+
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
+        int statusCode = 200;
+        NewUserResponse newUserResponse = null;
+        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        newUserResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
+
+        if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+            // If we dont find active user in up will send it to user 404 status code in the header
+            statusCode = 404;
+            newUserResponse = new NewUserResponse();
+        } else {
+
+            newUserResponse.setIdamStatus(null);
+        }
+
+        return ResponseEntity
+                .status(statusCode)
+                .body(newUserResponse);
+    }
+
 }

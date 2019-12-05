@@ -8,7 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -167,9 +169,9 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void validateOrganisationRequestTest() {
-        List<String> list = new ArrayList<>();
-        list.add("");
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "","",null, list,null);
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("");
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "","",null, paymentAccounts,null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 
@@ -374,7 +376,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "123456789","",null, new ArrayList<>(),null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "123456789","",null, new HashSet<>(),null);
 
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }

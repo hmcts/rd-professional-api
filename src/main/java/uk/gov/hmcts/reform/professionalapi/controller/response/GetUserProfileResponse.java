@@ -29,7 +29,7 @@ public class GetUserProfileResponse {
         this.lastName = userProfile.getLastName();
         this.email = userProfile.getEmail();
         this.idamStatus = userProfile.getIdamStatus();
-        if (isRequiredRoles) {
+        if (Boolean.TRUE.equals(isRequiredRoles)) {
             this.roles = getRoles();
             this.idamStatusCode = getIdamStatusCode();
             this.idamMessage = getIdamMessage();

@@ -16,8 +16,9 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Slf4j
 public class ProfessionalReferenceDataClient {
@@ -266,12 +267,12 @@ public class ProfessionalReferenceDataClient {
         return response;
     }
 
-    public  Map<String, Object> modifyUserRolesOfOrganisation(ModifyUserProfileData modifyUserProfileData, String orgId, String userIdentifier, String hmctsAdmin) {
+    public  Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/users/" + userIdentifier;
 
         try {
-            HttpEntity<ModifyUserProfileData> requestEntity = new HttpEntity<>(modifyUserProfileData,getMultipleAuthHeaders(hmctsAdmin));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -284,12 +285,12 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public  Map<String, Object> modifyUserRolesOfOrganisationExternal(ModifyUserProfileData modifyUserProfileData, String userIdentifier, String externalRole) {
+    public  Map<String, Object> modifyUserRolesOfOrganisationExternal(UserProfileUpdatedData userProfileUpdatedData, String userIdentifier, String externalRole) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH  + "/users/" + userIdentifier;
 
         try {
-            HttpEntity<ModifyUserProfileData> requestEntity = new HttpEntity<>(modifyUserProfileData,getMultipleAuthHeaders(externalRole,userIdentifier));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,getMultipleAuthHeaders(externalRole,userIdentifier));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -300,5 +301,42 @@ public class ProfessionalReferenceDataClient {
 
 
         return getResponse(responseEntity);
+    }
+
+    public  Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
+
+        try {
+            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest, getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+
+        return getResponse(responseEntity);
+    }
+
+    public  Map<String, Object> findUserStatusByEmail(String email, String role) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "users/findUserByEmailId?email=" + email;
+
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.GET, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return  getResponse(responseEntity);
     }
 }

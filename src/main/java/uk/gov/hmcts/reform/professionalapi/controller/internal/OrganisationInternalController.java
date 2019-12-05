@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import io.swagger.annotations.*;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -14,9 +17,12 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
 
 @RequestMapping(
@@ -26,7 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 @Slf4j
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
-
 
     @ApiOperation(
             value = "Creates an Organisation",
@@ -49,7 +54,7 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("Received request to create a new organisation for internal users...");
+        //Received request to create a new organisation for internal users
         return createOrganisationFrom(organisationCreationRequest);
     }
 
@@ -123,8 +128,57 @@ public class OrganisationInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
-        log.info("Received request to retrieve an organisations payment accounts by email for internal...");
+        //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmail(email);
+    }
+
+    @ApiOperation(
+            value = "Edit the PBAs of an Organisation by Organisation ID",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "The Organisation's associated payment accounts",
+                    response = PbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Data not found"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/pbas",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
+                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+        log.info("Received request to edit payment accounts by organisation Id...");
+
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (!organisation.isPresent()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
+
+        paymentAccountService.deleteUserAccountMaps(organisation.get());
+        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
+        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
+        PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation.get());
+
+        return ResponseEntity
+                .status(200)
+                .body(response);
     }
 
     @ApiOperation(
@@ -150,7 +204,6 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to update organisation for organisationIdentifier: ");
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
 
@@ -187,7 +240,7 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to add a internal new user to an organisation...");
+        //Received request to add a internal new user to an organisation
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
     }

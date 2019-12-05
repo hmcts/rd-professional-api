@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -34,8 +37,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
@@ -43,9 +44,9 @@ import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
+import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -59,10 +60,11 @@ public class OrganisationServiceImpl implements OrganisationService {
     DxAddressRepository dxAddressRepository;
     ContactInformationRepository contactInformationRepository;
     PrdEnumRepository prdEnumRepository;
-    UserAccountMapRepository userAccountMapRepository;
+    UserAccountMapService userAccountMapService;
     UserProfileFeignClient userProfileFeignClient;
     PrdEnumService prdEnumService;
     UserAttributeService userAttributeService;
+    PaymentAccountValidator paymentAccountValidator;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -72,10 +74,11 @@ public class OrganisationServiceImpl implements OrganisationService {
             DxAddressRepository dxAddressRepository,
             ContactInformationRepository contactInformationRepository,
             PrdEnumRepository prdEnumRepository,
-            UserAccountMapRepository userAccountMapRepository,
+            UserAccountMapService userAccountMapService,
             UserProfileFeignClient userProfileFeignClient,
             PrdEnumService prdEnumService,
-            UserAttributeService userAttributeService
+            UserAttributeService userAttributeService,
+            PaymentAccountValidator paymentAccountValidator
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -83,11 +86,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.paymentAccountRepository = paymentAccountRepository;
         this.contactInformationRepository = contactInformationRepository;
         this.dxAddressRepository = dxAddressRepository;
-        this.userAccountMapRepository = userAccountMapRepository;
+        this.userAccountMapService = userAccountMapService;
         this.prdEnumRepository = prdEnumRepository;
         this.userProfileFeignClient = userProfileFeignClient;
         this.prdEnumService = prdEnumService;
         this.userAttributeService = userAttributeService;
+        this.paymentAccountValidator = paymentAccountValidator;
     }
 
     @Override
@@ -126,16 +130,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    private void addPbaAccountToOrganisation(
-            List<String> paymentAccounts,
-            Organisation organisation) {
-
+    public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         if (paymentAccounts != null) {
-            paymentAccounts.forEach(pbaAccount -> {
-                if (pbaAccount == null || !pbaAccount.matches("(PBA|pba).*") || !pbaAccount.matches("^[a-zA-Z0-9]+$")) {
-                    throw new InvalidRequest("PBA number must start with PBA/pba and be followed by 7 alphanumeric characters");
-                }
+            paymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
+            paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
@@ -157,14 +156,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(jurisdiction -> jurisdiction.getId()).collect(Collectors.toList());
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId).collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser, newProfessionalUser.getUserAttributes(), jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
-        persistedUserAccountMap(persistedSuperUser,organisation.getPaymentAccounts());
+        userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());
 
         organisation.addProfessionalUser(persistedSuperUser.toSuperUser());
 
@@ -208,20 +207,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
-
-        if (!paymentAccounts.isEmpty()) {
-            List<UserAccountMap> userAccountMaps = new ArrayList<>();
-            log.debug("PaymentAccount is not empty");
-            paymentAccounts.forEach(paymentAccount -> {
-                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
-            });
-            if (!CollectionUtils.isEmpty(userAccountMaps)) {
-                userAccountMapRepository.saveAll(userAccountMaps);
-            }
-        }
-    }
-
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
 
@@ -237,27 +222,26 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         pendingOrganisations.addAll(activeOrganisations);
 
-        log.info("Retrieving all organisations..." + pendingOrganisations.size());
         return new OrganisationsDetailResponse(pendingOrganisations, true);
     }
 
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String,Organisation> activeOrganisationDtls = new ConcurrentHashMap<String,Organisation>();
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(),organisation);
+                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
             }
         });
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,retrieveUserProfilesRequest,
+            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
                     "false", activeOrganisationDtls);
 
         }
@@ -270,7 +254,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
 
-        log.info("Into update Organisation service");
+        //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
         organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
@@ -278,13 +262,13 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
         organisationRepository.save(organisation);
-        log.info("Update Organisation service done...");
+        //Update Organisation service done
 
         return new OrganisationResponse(organisation);
     }
 
     @Override
-    public Organisation  getOrganisationByOrgIdentifier(String organisationIdentifier) {
+    public Organisation getOrganisationByOrgIdentifier(String organisationIdentifier) {
         RefDataUtil.removeAllSpaces(organisationIdentifier);
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
     }
@@ -296,8 +280,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
-            log.debug("Retrieving organisation with ID " + organisationIdentifier);
-            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(),userProfileFeignClient, false));
+            log.debug("Retrieving organisation");
+            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);
     }
@@ -313,8 +297,6 @@ public class OrganisationServiceImpl implements OrganisationService {
             organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
-
-            log.info("for ACTIVE::Status:");
 
             organisations = retrieveActiveOrganisationDetails();
         }

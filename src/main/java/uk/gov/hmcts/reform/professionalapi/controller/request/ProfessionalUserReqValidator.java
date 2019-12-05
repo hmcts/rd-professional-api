@@ -13,21 +13,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Component
 @Slf4j
 public class ProfessionalUserReqValidator {
 
-    public static boolean isValidEmail(String email) {
-        if (!StringUtils.isEmpty(email)) {
-            Pattern p = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
-            Matcher m = p.matcher(email);
-            return m.find();
-        }
 
-        return false;
+    public static boolean isValidEmail(String email) {
+        return StringUtils.isNotEmpty(email) && isEmailValid(email);
     }
 
     public void validateRequest(String orgId, String showDeleted, String status) {
@@ -41,16 +36,10 @@ public class ProfessionalUserReqValidator {
     }
 
     public static void validateUserStatus(String status) {
-        boolean valid = false;
-
-        for (IdamStatus idamStatus : IdamStatus.values()) {
-            if (status.equalsIgnoreCase(idamStatus.toString())) {
-                valid = true;
-            }
-        }
-
-        if (!valid) {
-            throw new InvalidRequest("The status provided is invalid");
+        try {
+            IdamStatus.valueOf(status.toUpperCase());
+        } catch (Exception ex) {
+            throw new InvalidRequest(String.format("The status provided is invalid ex=%s", ex));
         }
     }
 
@@ -60,24 +49,30 @@ public class ProfessionalUserReqValidator {
         }
     }
 
-    public void validateModifyRolesRequest(ModifyUserProfileData modifyUserProfileData, String userId) {
+    public void validateModifyRolesRequest(UserProfileUpdatedData userProfileUpdatedData, String userId) {
 
-        if (null == modifyUserProfileData || StringUtils.isEmpty(userId)
-                || invalidRoleName(modifyUserProfileData.getRolesAdd())
-                || invalidRoleName(modifyUserProfileData.getRolesDelete())) {
+        if (null == userProfileUpdatedData || StringUtils.isEmpty(userId)
+                || invalidRoleName(userProfileUpdatedData.getRolesAdd())
+                || invalidRoleName(userProfileUpdatedData.getRolesDelete())) {
 
             throw new InvalidRequest("The Request provided is invalid for modify the roles for user");
         }
     }
 
-    public boolean invalidRoleName(Set<RoleName> roleNames) {
+    private boolean invalidRoleName(Set<RoleName> roleNames) {
 
         List<RoleName> emptyRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleNames)) {
             emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
 
         }
-        return emptyRoles.size() > 0 ? true : false;
+        return emptyRoles.size() > 0;
+    }
+
+    private static boolean isEmailValid(String email) {
+        Pattern p = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+        Matcher m = p.matcher(email);
+        return m.find();
     }
 
 

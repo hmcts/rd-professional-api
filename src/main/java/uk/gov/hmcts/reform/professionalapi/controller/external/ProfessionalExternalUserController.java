@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.isValidEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,11 +29,11 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserProfileData;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 
 
@@ -88,7 +88,6 @@ public class ProfessionalExternalUserController extends SuperController {
                                                      @RequestParam(value = "page", required = false) Integer page,
                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalExternalUserController::findUsersByOrganisation:" + organisationIdentifier);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
@@ -147,13 +146,9 @@ public class ProfessionalExternalUserController extends SuperController {
                                                     @ApiParam(name = "email", required = false) @RequestParam(value = "email", required = false) String email) {
 
         Optional<ResponseEntity> optionalResponseEntity;
-
-        if (isValidEmail(email)) {
-            log.info("email is valid");
-            optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
-        } else {
-            throw new InvalidRequest("The email provided '" + email + "' is invalid");
-        }
+        validateEmail(email);
+        //email is valid
+        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
 
         if (optionalResponseEntity.isPresent()) {
             return optionalResponseEntity;
@@ -191,15 +186,61 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
-            @RequestBody ModifyUserProfileData modifyUserProfileData,
+            @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @ApiParam(hidden = true) @OrgId String orgId,
-            @PathVariable("userId") String userId
+            @PathVariable("userId") String userId,
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        log.info("Received request to update user roles of an organisation...");
-        return modifyRolesForUserOfOrganisation(modifyUserProfileData, orgId, userId);
+        //Received request to update user roles of an organisation
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }
 
+
+    @ApiOperation(
+            value = "Retrieves the user status with the given email address if organisation is active",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The status of the desired user to be retrieved",
+            required = false
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "User status active will return user identifier else only status code",
+                    response = NewUserResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid email was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Invalid authorization"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No user status was found with the provided email address"
+            )
+    })
+    @GetMapping(
+            value = "/users/findUserByEmailId",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    public ResponseEntity<NewUserResponse> findUserStatusByEmail(
+                                                    @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
+
+        validateEmail(email);
+        //email is valid
+        return professionalUserService.findUserStatusByEmailAddress(email);
+    }
 
 }

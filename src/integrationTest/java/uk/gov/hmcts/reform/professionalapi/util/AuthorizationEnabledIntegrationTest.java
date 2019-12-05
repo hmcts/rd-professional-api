@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -230,7 +233,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
 
-
     @After
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
@@ -252,6 +254,22 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
+
+        String lastName = "someLastName";
+        String firstName = "1Aaron";
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status) {
@@ -372,35 +390,36 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public void updateUserProfileRolesMock(HttpStatus status) {
         String body = null;
-        int returnHttpStatus = status.value();
+        int returnHttpStatus = 200;
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"statusCode\":\"200\","
-                    + "  \"statusMessage\":\"success\""
+                    + "  \"statusUpdateResponse\": {"
+                    + "  \"idamStatusCode\": \"200\","
+                    + "  \"idamMessage\": \"Success\""
+                    + "  } "
                     + "}";
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
             body = "{"
-                    + "  \"statusCode\":\"400\","
-                    + "  \"statusMessage\":\"Bad Request\""
+                    + "  \"errorMessage\": \"400\","
+                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
         } else if (status.is5xxServerError()) {
 
             body = "{"
-                    + "  \"addRolesResponse\": {"
+                    + "  \"roleAdditionResponse\": {"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
                     + "  } ,"
-                    + "  \"deleteRolesResponse\": ["
+                    + "  \"roleDeletionResponse\": ["
                     +   "{"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
                     + "  } "
                     + "  ]"
                     + "}";
-            returnHttpStatus = 500;
-
         }
 
         userProfileService.stubFor(
@@ -415,31 +434,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
-    public void updateUserProfileAddRolesMock(HttpStatus status) {
+    public void updateUserProfileMock(HttpStatus status) {
         String body = null;
         int returnHttpStatus = status.value();
         if (status.is2xxSuccessful()) {
             body = "{"
-                    + "  \"statusCode\":\"200\","
-                    + "  \"statusMessage\":\"success\""
+                    + "  \"statusUpdateResponse\": {"
+                    + "  \"idamStatusCode\": \"200\","
+                    + "  \"idamMessage\": \"Success\""
+                    + "  } "
                     + "}";
             returnHttpStatus = 200;
         } else if (status.is4xxClientError()) {
             body = "{"
-                    + "  \"statusCode\":\"400\","
-                    + "  \"statusMessage\":\"Bad Request\""
+                    + "  \"errorMessage\": \"400\","
+                    + "  \"errorDescription\": \"BAD REQUEST\","
+                    + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
-        } else if (status.is5xxServerError()) {
-
-            body = "{"
-                    + "  \"addRolesResponse\": {"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 500;
-
         }
 
         userProfileService.stubFor(
@@ -529,6 +541,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
+
+
     }
 }
 

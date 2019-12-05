@@ -7,10 +7,11 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void persists_and_returns_a_single_pba_account_number_for_an_organisation() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -53,7 +54,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void persists_and_returns_multiple_pba_account_numbers_for_an_organisation() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
         paymentAccounts.add("PBA2345678");
         paymentAccounts.add("PBA3456789");
@@ -87,7 +88,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void still_persists_organisation_when_payment_accounts_list_is_empty() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
 
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
@@ -146,7 +147,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void returns_400_when_a_null_pba_number_is_received() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(null);
 
         OrganisationCreationRequest organisationCreationRequest =
@@ -169,10 +170,10 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void persists_and_returns_a_multiple_pba_accounts_number_for_multiple_organisations() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
-        List<String> paymentAccounts2 = new ArrayList<>();
+        Set<String> paymentAccounts2 = new HashSet<>();
         paymentAccounts.add("PBA7654321");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()

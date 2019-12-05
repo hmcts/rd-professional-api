@@ -26,4 +26,5 @@ public class ProfessionalApiGeneratorTest {
         assertThat(uniqueAlphanumericString.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
         assertThat(uniqueAlphanumericString.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
     }
+
 }
