@@ -118,6 +118,25 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Test
+    public void rdcc_719_ac2_caseworker_publiclaw_courtadmin_role_should_return_403_when_calling_any_other_endpoint() {
 
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        assertThat(orgId).isNotNull();
+
+        // creating new user request
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-organisation-manager");
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+
+        // creating user in idam with the same email used in the invite user so that status automatically will update in the up
+        professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);
+
+        // inviting user
+        professionalApiClient.addNewUserToAnOrganisationExternal(userCreationRequest, bearerTokenForCourtAdmin, HttpStatus.FORBIDDEN);
+    }
 
 }
