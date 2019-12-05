@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,17 +104,21 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
-
+        log.info("NEW USER EMAIL::::::::::::" + userCreationRequest.getEmail());
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgId, hmctsAdmin, "false", HttpStatus.OK);
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchUserResponse.get("users");
+        log.info("ORG USER:::::::::::::::;;" + professionalUsersResponses);
 
-        List<String> userRolesForCourtAdmin = new ArrayList<>();
-        userRolesForCourtAdmin.add("caseworker-publiclaw-courtadmin");
-        NewUserCreationRequest courtAdminUserCreationRequest = createUserRequest(userRolesForCourtAdmin);
-        RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", courtAdminUserCreationRequest.getFirstName(), courtAdminUserCreationRequest.getLastName(), courtAdminUserCreationRequest.getEmail());
+      //  List<String> userRolesForCourtAdmin = new ArrayList<>();
+        //userRolesForCourtAdmin.add("caseworker-publiclaw-courtadmin");NewUserCreationRequest
+      //  NewUserCreationRequest courtAdminUserCreationRequest = createUserRequest(userRolesForCourtAdmin);
+        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);
 
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, bearerTokenForCourtAdmin, userCreationRequest.getEmail());
-        assertThat(response.get("userIdentifier")).isNotNull();
+        log.info("RESPONSE::::::::::" + response);
     }
 
 }
