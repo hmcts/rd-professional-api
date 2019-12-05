@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
