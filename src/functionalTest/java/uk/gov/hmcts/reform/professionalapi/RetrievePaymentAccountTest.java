@@ -9,10 +9,11 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 
 import io.restassured.specification.RequestSpecification;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerTokenForUser;
     }
@@ -102,7 +103,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
@@ -123,7 +124,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(

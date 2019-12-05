@@ -30,7 +30,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
 
@@ -49,7 +49,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
         String email = userCreationRequest.getEmail().toUpperCase();
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles),email);
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -63,7 +63,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-finance-manager");
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNull();
@@ -82,7 +82,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         List<String> userRolesForToken = new ArrayList<>();
         userRolesForToken.add("pui-organisation-manager");
