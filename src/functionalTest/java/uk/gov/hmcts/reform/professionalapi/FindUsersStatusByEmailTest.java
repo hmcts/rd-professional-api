@@ -3,12 +3,13 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.specification.RequestSpecification;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -97,7 +98,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     public void rdcc_719_ac1_find_user_status_by_email_with_caseworker_publiclaw_courtadmin_role_should_return_200_with_user_status_active() {
 
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
-
+        assertThat(orgId).isNotNull();
         // creating new user request
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-organisation-manager");
@@ -111,9 +112,9 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUserResponse.get("users");
         log.info("ORG USER:::::::::::::::;;" + professionalUsersResponses);
 
-      //  List<String> userRolesForCourtAdmin = new ArrayList<>();
+        //List<String> userRolesForCourtAdmin = new ArrayList<>();
         //userRolesForCourtAdmin.add("caseworker-publiclaw-courtadmin");NewUserCreationRequest
-      //  NewUserCreationRequest courtAdminUserCreationRequest = createUserRequest(userRolesForCourtAdmin);
+        //NewUserCreationRequest courtAdminUserCreationRequest = createUserRequest(userRolesForCourtAdmin);
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);
 
