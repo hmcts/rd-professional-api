@@ -67,6 +67,10 @@ public class ProfessionalApiClient {
         this.idamClient = idamClient;
     }
 
+    public IdamOpenIdClient getidamOpenIdClient() {
+        return idamOpenIdClient;
+    }
+
     public String getWelcomePage() {
         return withUnauthenticatedRequest()
                 .get("/")
