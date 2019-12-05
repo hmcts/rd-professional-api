@@ -35,8 +35,8 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     enableDockerBuild()
     installCharts()
-    // **enable below for AAT deployment**
-    //disableLegacyDeployment()
+    // **enable below for AKS deployment**
+    disableLegacyDeployment()
     enableAksStagingDeployment()
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
