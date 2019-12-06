@@ -365,4 +365,5 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
+
 }

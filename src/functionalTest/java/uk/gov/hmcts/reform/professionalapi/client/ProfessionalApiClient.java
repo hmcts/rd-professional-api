@@ -67,6 +67,10 @@ public class ProfessionalApiClient {
         this.idamClient = idamClient;
     }
 
+    public IdamOpenIdClient getidamOpenIdClient() {
+        return idamOpenIdClient;
+    }
+
     public String getWelcomePage() {
         return withUnauthenticatedRequest()
                 .get("/")
@@ -211,7 +215,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification, HttpStatus expectedStatus) {
 
         Response response = requestSpecification
                 .body(newUserCreationRequest)
@@ -219,7 +223,7 @@ public class ProfessionalApiClient {
                 .andReturn();
         response.then()
                 .assertThat()
-                .statusCode(CREATED.value());
+                .statusCode(expectedStatus.value());
 
         return response.body().as(Map.class);
     }
