@@ -47,6 +47,10 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     @Test
     public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        Set<String> newPaymentAccounts = new HashSet<>();
+        newPaymentAccounts.add("PBA0000003");
+        newPaymentAccounts.add("PBA0000004");
+        pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
         Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, "this-does-not-exist", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
@@ -68,6 +72,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
+
         Set<String> newPaymentAccounts = new HashSet<>();
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);

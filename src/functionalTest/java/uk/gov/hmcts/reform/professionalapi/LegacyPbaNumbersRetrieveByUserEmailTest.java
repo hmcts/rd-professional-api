@@ -44,7 +44,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
 
         Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
         assertThat(emailResponse.get("payment_accounts")).asList().isNotEmpty();
-        assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber);
+        assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber.toUpperCase());
     }
 
     @Test

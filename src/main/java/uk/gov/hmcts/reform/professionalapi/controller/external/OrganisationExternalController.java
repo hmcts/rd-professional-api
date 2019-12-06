@@ -174,7 +174,7 @@ public class OrganisationExternalController extends SuperController {
         validateEmail(email);
         //In retrievePaymentAccountByUserEmail method
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
+
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         serviceAndUserDetails.getAuthorities();
 

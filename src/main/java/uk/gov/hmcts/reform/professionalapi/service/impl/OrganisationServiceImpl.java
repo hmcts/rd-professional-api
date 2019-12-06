@@ -135,7 +135,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             paymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
             paymentAccounts.forEach(pbaAccount -> {
-                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount);
+                PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
