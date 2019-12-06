@@ -63,6 +63,6 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
 
         Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(emailIgnoreCase, hmctsAdmin);
-        assertThat(searchResponse.get("email")).isEqualTo(emailIgnoreCase);
+        assertThat(searchResponse.get("email")).isEqualTo(emailIgnoreCase.toLowerCase());
     }
 }
