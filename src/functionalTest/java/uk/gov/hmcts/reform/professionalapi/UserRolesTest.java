@@ -120,7 +120,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest anotherUserCreationRequest = createNewUser(email2, fplaAndIacRoles);
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, email2);
 
-        professionalApiClient.addNewUserToAnOrganisationExternal(anotherUserCreationRequest, bearerTokenForPuiUserManager);
+        professionalApiClient.addNewUserToAnOrganisationExternal(anotherUserCreationRequest, bearerTokenForPuiUserManager, HttpStatus.CREATED);
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, bearerTokenForPuiUserManager, "Active");
         validateRetrievedUsers(searchUserResponse, "any");
