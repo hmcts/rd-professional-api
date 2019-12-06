@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Slf4j
 public class OrganisationCreationRequestValidator {
 
-
     private final List<RequestValidator> validators;
 
     private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
