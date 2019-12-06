@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,8 +35,6 @@ public class OrganisationIdentifierIdentifierValidatorImpl implements Organisati
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
             throw new EmptyResultDataAccessException(1);
 
-        } else if (!extOrgIdentifier.trim().equals(organisation.getOrganisationIdentifier().trim())) {
-            throw new AccessDeniedException("403 Forbidden");
         }
     }
 

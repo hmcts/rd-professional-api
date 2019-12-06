@@ -163,6 +163,7 @@ public class OrganisationInternalController extends SuperController {
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
 
+        paymentAccountValidator.checkPbaNumberIsValid(pbaEditRequest.getPaymentAccounts());
         Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (!organisation.isPresent()) {

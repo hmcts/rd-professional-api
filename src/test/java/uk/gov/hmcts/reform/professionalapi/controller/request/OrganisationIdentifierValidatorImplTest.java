@@ -7,13 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.Test;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.access.AccessDeniedException;
 
 import org.springframework.security.core.GrantedAuthority;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -48,17 +46,6 @@ public class OrganisationIdentifierValidatorImplTest {
     @Test(expected = EmptyResultDataAccessException.class)
     public void shouldCheckOrganisationDoesNotExist() {
         organisationIdentifierValidatorImpl.validate(null, null, null);
-    }
-
-    @Test(expected = AccessDeniedException.class)
-    public void shouldThrowAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(paymentAccountMock);
-
-        when(organisationMock.getOrganisationIdentifier()).thenReturn("huinkj");
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisationMock, UUID.randomUUID().toString());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
