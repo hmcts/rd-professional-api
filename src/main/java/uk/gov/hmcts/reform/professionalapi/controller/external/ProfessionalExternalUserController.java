@@ -148,7 +148,7 @@ public class ProfessionalExternalUserController extends SuperController {
         Optional<ResponseEntity> optionalResponseEntity;
         validateEmail(email);
         //email is valid
-        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email));
+        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email.toLowerCase()));
 
         if (optionalResponseEntity.isPresent()) {
             return optionalResponseEntity;
@@ -234,13 +234,14 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users/findUserByEmailId",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-publiclaw-courtadmin"})
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
                                                     @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
 
         validateEmail(email);
         //email is valid
-        return professionalUserService.findUserStatusByEmailAddress(email);
+        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase()
+        );
     }
 
 }
