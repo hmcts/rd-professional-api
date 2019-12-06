@@ -199,14 +199,6 @@ public class RefDataUtil {
         return modValue;
     }
 
-    /*public static String convertToLowercase(String value) {
-        String modValue = value;
-        if (!StringUtils.isEmpty(modValue)) {
-            modValue = modValue.trim().toLowerCase();
-        }
-        return modValue;
-    }*/
-
     public static String removeAllSpaces(String value) {
         String modValue = value;
         if (!StringUtils.isEmpty(modValue)) {

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -169,9 +171,9 @@ public class OrganisationExternalController extends SuperController {
     }
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
-
+        validateEmail(email);
         //In retrievePaymentAccountByUserEmail method
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         serviceAndUserDetails.getAuthorities();

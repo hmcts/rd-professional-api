@@ -80,11 +80,11 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
-        return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email.toLowerCase()));
+        return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
     }
 
     public ProfessionalUser findProfessionalUserProfileByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email).toLowerCase());
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
 
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
             throw new EmptyResultDataAccessException(1);

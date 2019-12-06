@@ -548,7 +548,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
 
         Response response = requestSpecification
-                .get("/refdata/external/v1/organisations/users/findUserByEmailId?email=" + email.toLowerCase())
+                .get("/refdata/external/v1/organisations/users/findUserByEmailId?email=" + email)
                 .andReturn();
 
         response.then()
