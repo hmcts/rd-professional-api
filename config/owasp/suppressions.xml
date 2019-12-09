@@ -1570,4 +1570,11 @@
         <packageUrl regex="true">^pkg:maven/commons-beanutils/commons-beanutils@.*$</packageUrl>
         <cve>CVE-2019-10086</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: phantomjsdriver-1.4.4.jar
+   ]]></notes>
+        <sha1>e5778e3273f8201bf9e0ff65fb8118f37b84beba</sha1>
+        <cve>CVE-2019-17221</cve>
+    </suppress>
 </suppressions>
