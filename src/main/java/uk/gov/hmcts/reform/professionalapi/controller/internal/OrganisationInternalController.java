@@ -170,8 +170,6 @@ public class OrganisationInternalController extends SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-
-
         paymentAccountService.deleteUserAccountMaps(organisation.get());
         paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
         paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
