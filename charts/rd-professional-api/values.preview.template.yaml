@@ -8,9 +8,9 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
   postgresql:
-    postgresqlDatabase: dbrefdata
     #Whether to deploy the Postgres Chart or not
     enabled: true
+    postgresqlDatabase: dbrefdata
     postgresqlUsername: dbrefdata
     postgresqlPassword: dbrefdata
   keyVaults:

@@ -72,7 +72,8 @@ security:
     - rd_user_profile_api
     - xui_webapp
     - finrem_payment_service
-
+    - fpl_case_service
+    - ia-case-api
 
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
