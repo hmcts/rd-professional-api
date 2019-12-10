@@ -56,10 +56,12 @@ public class PaymentAccountValidator {
 
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
+        Set<String> upperCasePbas = paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
         List<String> uniquePBas = new ArrayList<>();
 
-        paymentAccountsInDatabase.forEach(pbaInDb -> paymentAccounts.forEach(pba -> {
+        paymentAccountsInDatabase.forEach(pbaInDb -> upperCasePbas.forEach(pba -> {
             if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
                 uniquePBas.add(pba);
             }
