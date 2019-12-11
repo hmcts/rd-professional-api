@@ -22,7 +22,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     @Before
     public void setUp() {
         Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "someone@somewhere.com", organisation);
+        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);
     }
