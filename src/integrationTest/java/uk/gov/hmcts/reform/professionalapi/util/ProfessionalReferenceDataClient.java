@@ -324,7 +324,7 @@ public class ProfessionalReferenceDataClient {
 
     public  Map<String, Object> findUserStatusByEmail(String email, String role) {
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "users/findUserByEmailId?email=" + email;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "users/accountId?email=" + email;
 
         try {
             HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
