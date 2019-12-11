@@ -231,7 +231,7 @@ public class ProfessionalExternalUserController extends SuperController {
             )
     })
     @GetMapping(
-            value = "/users/findUserByEmailId",
+            value = "/users/accountId",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-publiclaw-courtadmin"})
