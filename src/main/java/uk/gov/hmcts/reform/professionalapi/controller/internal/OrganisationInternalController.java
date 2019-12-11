@@ -163,13 +163,12 @@ public class OrganisationInternalController extends SuperController {
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
 
+        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (!organisation.isPresent()) {
             throw new EmptyResultDataAccessException(1);
         }
-
-        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
 
         paymentAccountService.deleteUserAccountMaps(organisation.get());
         paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());

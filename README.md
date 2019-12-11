@@ -170,4 +170,4 @@ Publish via the gradle command
 Once Verify on url `http://localhost:9292/`
 The pact contract(s) should be published
 
-Remember to return the localhost back to the remote broker
+Remember to return the localhost back to the remote broker.

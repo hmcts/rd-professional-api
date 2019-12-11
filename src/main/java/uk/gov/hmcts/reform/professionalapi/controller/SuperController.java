@@ -159,8 +159,9 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity retrieveUserByEmail(String email) {
+        validateEmail(email);
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(RefDataUtil.removeEmptySpaces(email));
+        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(RefDataUtil.removeEmptySpaces(email).toLowerCase());
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
         return ResponseEntity
@@ -170,7 +171,8 @@ public abstract class SuperController {
 
     protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
 
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(RefDataUtil.removeEmptySpaces(email));
+        validateEmail(email);
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(RefDataUtil.removeEmptySpaces(email).toLowerCase());
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);

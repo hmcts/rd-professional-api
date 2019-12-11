@@ -3,17 +3,22 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 
 @Component
 @Slf4j
+@NoArgsConstructor
 public class PaymentAccountValidator {
 
     PaymentAccountRepository paymentAccountRepository;
@@ -24,15 +29,24 @@ public class PaymentAccountValidator {
     }
 
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
-        if (!paymentAccounts.isEmpty()) {
+        if (!CollectionUtils.isEmpty(paymentAccounts)) {
             checkPbaNumberIsValid(paymentAccounts);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
     }
 
-    public void checkPbaNumberIsValid(Set<String> paymentAccounts) {
+    public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
         String invalidPbas = paymentAccounts.stream()
-                .filter(pbaAccount -> pbaAccount == null || !pbaAccount.matches("^(PBA|pba)[a-zA-Z0-9]*$"))
+                .filter(pbaAccount -> {
+                    if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
+                        Pattern pattern = Pattern.compile("(?i)pba.[a-zA-Z0-9]*$");
+                        Matcher matcher = pattern.matcher(pbaAccount);
+                        if (matcher.matches()) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .collect(Collectors.joining(", "));
 
         if (!StringUtils.isEmpty(invalidPbas)) {
@@ -40,11 +54,14 @@ public class PaymentAccountValidator {
         }
     }
 
+
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(paymentAccounts);
+        Set<String> upperCasePbas = paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
         List<String> uniquePBas = new ArrayList<>();
 
-        paymentAccountsInDatabase.forEach(pbaInDb -> paymentAccounts.forEach(pba -> {
+        paymentAccountsInDatabase.forEach(pbaInDb -> upperCasePbas.forEach(pba -> {
             if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
                 uniquePBas.add(pba);
             }

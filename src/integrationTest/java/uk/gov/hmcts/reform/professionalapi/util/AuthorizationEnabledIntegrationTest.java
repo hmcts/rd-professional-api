@@ -281,7 +281,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  \"idamRegistrationResponse\":\"201\""
                     + "}";
             returnHttpStaus = 201;
+
         }
+
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()

@@ -215,7 +215,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification) {
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification, HttpStatus expectedStatus) {
 
         Response response = requestSpecification
                 .body(newUserCreationRequest)
@@ -223,7 +223,7 @@ public class ProfessionalApiClient {
                 .andReturn();
         response.then()
                 .assertThat()
-                .statusCode(CREATED.value());
+                .statusCode(expectedStatus.value());
 
         return response.body().as(Map.class);
     }
@@ -548,7 +548,7 @@ public class ProfessionalApiClient {
     public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
 
         Response response = requestSpecification
-                .get("/refdata/external/v1/organisations/users/findUserByEmailId?email=" + email)
+                .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
                 .andReturn();
 
         response.then()
