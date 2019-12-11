@@ -18,13 +18,6 @@ For information about the software versions used to build this API and a complet
 While not essential, it is highly recommended to use the pre-push git hook included in this repository to ensure that all tests are passing. This can be done by running the following command:
 `$ git config core.hooksPath .githooks`
 
-### Environment Vars
-
-If running locally for development or testing you will need to set the following environment variables
-
-* export POSTGRES_USERNAME=dbrefdata
-* export POSTGRES_PASSWORD=dbrefdata
-* export S2S_SECRET=AAAAAAAAAAAAAAAC
 
 ### Running the application
 
