@@ -36,7 +36,7 @@ withPipeline(type, product, component) {
     enableDockerBuild()
     installCharts()
     // **enable below for AAT deployment**
-    //disableLegacyDeployment()
+    disableLegacyDeployment()
     enableAksStagingDeployment()
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -50,6 +50,14 @@ withPipeline(type, product, component) {
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
+  
+  
+  before('buildinfra:prod') {
+  error('Halting pipeline before prod stages - code freeze')
+}
+before('deploy:prod') {
+  error('Halting pipeline before prod stages - code freeze')
+}
 
     enablePactAs([
             AppPipelineDsl.PactRoles.CONSUMER
