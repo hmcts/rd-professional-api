@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.Optional;
 import javax.validation.constraints.NotBlank;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +15,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
@@ -63,12 +70,12 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?>  findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                                                   @RequestParam(value = "showDeleted", required = false) String showDeleted) {
+    public ResponseEntity findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
+                                                      @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                      @RequestParam(value = "page", required = false) Integer page,
+                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        log.info("ProfessionalUserInternalController:Received request to get users for internal organisationIdentifier: " + organisationIdentifier);
-
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
     @ApiOperation(
@@ -100,12 +107,51 @@ public class ProfessionalUserInternalController extends SuperController {
             )
     })
     @GetMapping(
-            value = "/users",
+            value = "/user",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<?> findUserByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity findUserByEmail(@RequestParam(value = "email") String email) {
 
         return retrieveUserByEmail(email);
+    }
+
+    @ApiOperation(
+            value = "Modify roles for user",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "User Roles has been added",
+                    response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/users/{userId}",
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
+            @RequestBody UserProfileUpdatedData userProfileUpdatedData,
+            @PathVariable("orgId")  String orgId,
+            @PathVariable("userId") String userId,
+            @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
+    ) {
+
+        //Received request to update user roles of an organisation
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
+
     }
 }

@@ -5,9 +5,7 @@ s2s-name: rd_professional_api
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
-test.url: ${TEST_URL:http://rd-professional-api-aat.service.core-compute-aat.internal}
 test.user.password: ${TEST_USER_PASSWORD:Hmcts123}
-#oauth2.redirect.uri: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-preview.service.core-compute-preview.internal/oauth2redirect}
 oauth2.client.id: ${OAUTH2_CLIENT_ID:rd-professional-api}
 oauth2.client.secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64}
 idam.auth.clientId: rd-professional-api
@@ -23,5 +21,3 @@ exui.role.pui-user-manager: pui-user-manager
 exui.role.pui-organisation-manager: pui-organisation-manager
 exui.role.pui-finance-manager: pui-finance-manager
 exui.role.pui-case-manager: pui-case-manager
-
-

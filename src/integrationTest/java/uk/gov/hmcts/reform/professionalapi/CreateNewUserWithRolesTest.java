@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.som
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -106,7 +105,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
         assertThat(users.size()).isEqualTo(2);
 
-        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
+        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(userIdentifierResponse);
         assertThat(persistedProfessionalUser).isNotNull();
     }
 
@@ -256,7 +255,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
         assertThat(users.size()).isEqualTo(2);
 
-        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(UUID.fromString(userIdentifierResponse));
+        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(userIdentifierResponse);
         assertThat(persistedProfessionalUser).isNotNull();
         assertThat(persistedProfessionalUser.getUserAttributes().size()).isEqualTo(2);
     }
@@ -366,4 +365,5 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
+
 }

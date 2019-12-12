@@ -19,6 +19,10 @@ public class UserAttributeTest {
 
         UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
 
+        UserAttribute userAttributeNoArg = new UserAttribute();
+
+        assertThat(userAttributeNoArg).isNotNull();
+
         assertThat(userAttribute.getProfessionalUser()).isEqualTo(professionalUser);
         assertThat(userAttribute.getPrdEnum()).isEqualTo(prdEnum);
         assertThat(userAttribute.getId()).isNull();

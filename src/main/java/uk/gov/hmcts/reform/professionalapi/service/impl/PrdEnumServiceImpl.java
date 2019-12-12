@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -19,6 +20,8 @@ public class PrdEnumServiceImpl implements PrdEnumService {
 
     PrdEnumRepository prdEnumRepository;
 
+    List<PrdEnum> enumList = null;
+
     @Autowired
     public PrdEnumServiceImpl(
             PrdEnumRepository prdEnumRepository) {
@@ -27,7 +30,12 @@ public class PrdEnumServiceImpl implements PrdEnumService {
 
     @Override
     public List<PrdEnum> findAllPrdEnums() {
-        return prdEnumRepository.findAll();
+        if (CollectionUtils.isEmpty(enumList)) {
+            enumList = prdEnumRepository.findAll();
+            return enumList;
+        } else {
+            return enumList;
+        }
     }
 
     public List<String> getPrdEnumByEnumType(String enumType) {

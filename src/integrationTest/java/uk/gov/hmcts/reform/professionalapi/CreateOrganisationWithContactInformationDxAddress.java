@@ -8,10 +8,11 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -37,17 +38,16 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                                                           .dxNumber("DX 1234567890")
-                                                                           .dxExchange("dxExchange").build()))
-                                                  .build()))
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -70,15 +70,15 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(9))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                                                           .dxNumber("DX 1234567890")
-                                                                           .dxExchange("dxExchange").build()))
-                                                  .build()))
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX 1234567890")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -95,14 +95,14 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber("companyno")
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234")
+                                .dxNumber("this is an invalid dx number")
                                 .dxExchange("dxExchange").build()))
                         .build()))
                 .build();
@@ -147,13 +147,13 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .build()))
+                        .build()))
                 .build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
@@ -165,13 +165,13 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone1@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone1@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine2")
-                                                  .build()))
+                        .build()))
                 .build();
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest2);
@@ -189,13 +189,13 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -219,16 +219,16 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyUrl("company-url")
                 .companyNumber(randomAlphabetic(8))
                 .superUser(aUserCreationRequest()
-                           .firstName("some-fname")
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                                                           .dxNumber(null)
-                                                                           .dxExchange(null).build()))
-                                                  .build()))
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber(null)
+                                .dxExchange(null).build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -244,20 +244,20 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_first_name_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
-                           .firstName(null)
-                           .lastName("some-lname")
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName(null)
+                        .lastName("some-lname")
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -271,7 +271,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_LastName_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -279,13 +279,13 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                 .companyNumber(randomAlphabetic(8))
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
-                           .firstName("firstname")
-                           .lastName(null)
-                           .email("someone@somewhere.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("firstname")
+                        .lastName(null)
+                        .email("someone@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -299,20 +299,20 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_user_email_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
-                           .firstName("firstname")
-                           .lastName("some-lname")
-                           .email(null)
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("firstname")
+                        .lastName("some-lname")
+                        .email(null)
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
-                                                  .build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -326,20 +326,20 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
     @Test
     public void returns_bad_request_when_contact_information_null() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")
                 .paymentAccount(paymentAccounts)
                 .superUser(aUserCreationRequest()
-                           .firstName("firstname")
-                           .lastName("some-lname")
-                           .email("some@email.com")
-                           .jurisdictions(createJurisdictions())
-                           .build())
+                        .firstName("firstname")
+                        .lastName("some-lname")
+                        .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                                                  .build()))
+                        .build()))
                 .build();
 
         Map<String, Object> response =

@@ -14,8 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
-
-
 public class SuperUserTest {
 
     @Test
@@ -48,7 +46,6 @@ public class SuperUserTest {
 
         assertThat(superUser.getCreated()).isNotNull();
 
-
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();
     }
@@ -63,11 +60,15 @@ public class SuperUserTest {
                 "some-email-address",
                 organisation);
         UUID id = UUID.randomUUID();
-        superUser.setUserIdentifier(id);
+        superUser.setUserIdentifier(id.toString());
         superUser.setId(id);
         superUser.setCreated(LocalDateTime.now());
         superUser.setLastUpdated(LocalDateTime.now());
         superUser.setDeleted(LocalDateTime.now());
+
+        SuperUser superUserNoArg = new SuperUser();
+
+        assertThat(superUserNoArg).isNotNull();
 
 
         ProfessionalUser professionalUser = superUser.toProfessionalUser();
@@ -78,6 +79,6 @@ public class SuperUserTest {
         assertThat(professionalUser.getDeleted()).isNotNull();
         assertThat(professionalUser.getId()).isNotNull();
         assertThat(professionalUser.getLastUpdated()).isNotNull();
-        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id);
+        assertThat(professionalUser.getUserIdentifier()).isEqualTo(id.toString());
     }
 }
