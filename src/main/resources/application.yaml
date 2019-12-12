@@ -73,7 +73,7 @@ security:
     - xui_webapp
     - finrem_payment_service
     - fpl_case_service
-    - ia-case-api
+    - iac
 
 
 ### dependency configuration
