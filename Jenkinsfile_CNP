@@ -28,28 +28,38 @@ def vaultOverrides = [
 ]
 
 withPipeline(type, product, component) {
-  
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
     enableDbMigration('rd')
     enableDockerBuild()
     installCharts()
-
     enableAksStagingDeployment()
     // **enable below for AKS deployment**
     disableLegacyDeployment()
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-perftest.service.core-compute-perftest.internall"
-    env.IDAM_URL = "https://idam-api.perftest.platform.hmcts.net"
-    env.TEST_URL = "http://rd-professional-api-perftest.service.core-compute-perftest.internal"
+
+    onPerftest{
+        env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-perftest.service.core-compute-perftest.internall"
+        env.IDAM_URL = "https://idam-api.perftest.platform.hmcts.net"
+        env.TEST_URL = "http://rd-professional-api-perftest.service.core-compute-perftest.internal"
+    }
+
+    onPR{
+        env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+        env.TEST_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
+    }
+
 
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    after('functionalTest:aat') {
+    after('functionalTest:perftest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
+
 
     enablePactAs([
             AppPipelineDsl.PactRoles.CONSUMER
