@@ -28,6 +28,9 @@ public class PrdEnum {
     @OneToMany(mappedBy = "prdEnum")
     private List<UserAttribute> userAttributes;
 
+    @Column
+    private String enabled;
+
     public PrdEnum(PrdEnumId prdEnumId, String enumName, String enumDescription) {
         this.prdEnumId = prdEnumId;
         this.enumName = enumName;
