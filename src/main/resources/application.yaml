@@ -89,7 +89,7 @@ usermap:
     - "false"
 
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.ithc.platform.hmcts.net}
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
@@ -103,9 +103,9 @@ exui.role:
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-ithc.service.core-compute-ithc.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 
-ccdUrl: ${CCD_URL:http://ccd-user-profile-api-ithc.service.core-compute-ithc.internal}
+ccdUrl: ${CCD_URL:http://ccd-user-profile-api-aat.service.core-compute-aat.internal}
 
 feign:
   allow:
