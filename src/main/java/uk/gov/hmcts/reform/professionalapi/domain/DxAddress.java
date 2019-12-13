@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,11 +27,9 @@ public class DxAddress {
     private UUID id;
 
     @Column(name = "DX_NUMBER")
-    @Size(min = 13, max = 13)
     private String dxNumber;
 
     @Column(name = "DX_EXCHANGE")
-    @Size(max = 20)
     private String dxExchange;
 
     @ManyToOne

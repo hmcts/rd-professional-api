@@ -1,24 +1,53 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
+
+    private String settingUpOrganisation(String role) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5) + "@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        return (String) newUserResponse.get("userIdentifier");
+    }
+
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
-        validateUsers(response);
+        validateUsers(response, 3);
     }
 
     @Test
@@ -26,7 +55,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
-        validateUsers(response);
+        validateUsers(response, 3);
     }
 
     @Test
@@ -34,7 +63,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,null, hmctsAdmin);
-        validateUsers(response);
+        validateUsers(response, 3);
 
     }
 
@@ -72,7 +101,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(1);
+        HashMap professionalUsersResponse = professionalUsersResponses.get(2);
 
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         assertThat(professionalUsersResponse.get("firstName")).isEqualTo("adil");
@@ -88,18 +117,79 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(professionalUsersResponse1.get("idamMessage")).isEqualTo("");
     }
 
-    private void validateUsers(Map<String, Object> response) {
+    @Test
+    public void retrieve_active_users_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisation("pui-case-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiCaseManager, id);
+        validateUsers(response, 2);
+    }
+
+    @Test
+    public void retrieve_active_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiUserManager, id);
+        validateUsers(response, 2);
+    }
+
+    @Test
+    public void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Deleted", puiUserManager, id);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","", puiUserManager, id);
+        validateUsers(response, 3);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_pagination() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email(randomAlphabetic(5) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest().firstName("someName1").lastName("someLastName1").email(randomAlphabetic(6) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest1, hmctsAdmin);
+        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest().firstName("someName2").lastName("someLastName2").email(randomAlphabetic(7) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest2, hmctsAdmin);
+        NewUserCreationRequest userCreationRequest3 = aNewUserCreationRequest().firstName("someName3").lastName("someLastName3").email(randomAlphabetic(8) + "@email.com").roles(userRoles).jurisdictions(OrganisationFixtures.createJurisdictions()).build();
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest3, hmctsAdmin);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"False", hmctsAdmin);
+
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(3);
+
+        Map<String, Object> response2 = professionalReferenceDataClient.findUsersByOrganisationWithPaginationInformation(organisationIdentifier,"False", hmctsAdmin);
+
+        assertThat(((List<ProfessionalUsersResponse>) response2.get("users")).size()).isEqualTo(3);
+    }
+
+    private void validateUsers(Map<String, Object> response, int expectedUserCount) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
-
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-        assertThat(professionalUsersResponse.get("email")).isNotNull();
-        assertThat(((List)professionalUsersResponse.get("roles")).size()).isEqualTo(1);
+        professionalUsersResponses.stream().forEach(user -> {
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("firstName")).isNotNull();
+            assertThat(user.get("lastName")).isNotNull();
+            assertThat(user.get("email")).isNotNull();
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                assertThat(((List) user.get("roles")).size()).isEqualTo(1);
+            } else {
+                assertThat(user.get("idamStatus")).isNotNull();
+                assertThat(((List) user.get("roles"))).isEmpty();
+            }
+        });
     }
 }

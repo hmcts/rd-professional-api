@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.persistence;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +18,9 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     List<ProfessionalUser> findByOrganisationAndDeletedNotNull(Organisation organisation);
 
+    Page<ProfessionalUser> findByOrganisation(Organisation organisation, Pageable pageable);
+
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
-    ProfessionalUser findByUserIdentifier(UUID userIdentifier);
+    ProfessionalUser findByUserIdentifier(String userIdentifier);
 }

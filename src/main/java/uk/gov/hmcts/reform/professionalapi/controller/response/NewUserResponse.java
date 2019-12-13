@@ -1,20 +1,27 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class NewUserResponse {
 
     @JsonProperty
-    private final UUID userIdentifier;
+    private  String userIdentifier;
+    @JsonProperty
+    private String  idamStatus;
 
     public NewUserResponse(ProfessionalUser user) {
 
         this.userIdentifier = user.getUserIdentifier();
     }
 
-    public UUID getUserIdentifier() {
+    public String getUserIdentifier() {
         return userIdentifier;
     }
 }

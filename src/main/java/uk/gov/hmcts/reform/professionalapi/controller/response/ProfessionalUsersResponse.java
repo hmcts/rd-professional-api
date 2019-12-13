@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 public class ProfessionalUsersResponse {
 
     @JsonProperty
-    private UUID userIdentifier;
+    private String userIdentifier;
     @JsonProperty
     private String firstName;
     @JsonProperty
@@ -27,7 +26,7 @@ public class ProfessionalUsersResponse {
     @JsonProperty
     private List<String> roles;
     @JsonProperty
-    private IdamStatus idamStatus;
+    private String idamStatus;
     @JsonProperty
     private String idamStatusCode;
     @JsonProperty
@@ -39,7 +38,7 @@ public class ProfessionalUsersResponse {
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
         this.roles = user.getRoles();
-        this.idamStatus = user.getIdamStatus();
+        this.idamStatus = user.getIdamStatus() ==  null ? "" :  user.getIdamStatus().toString();
         this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
         this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
     }
