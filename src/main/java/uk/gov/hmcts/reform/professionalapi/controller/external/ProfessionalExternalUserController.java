@@ -239,7 +239,6 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users/accountId",
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    //@Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-publiclaw-courtadmin"})
     @Secured({"dummy-role"})
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
                                                     @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
