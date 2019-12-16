@@ -22,6 +22,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
+    /** Please note:
+     * The below tests were created for the Find User Status By Email endpoint - requested by FPLA team, re: Share A Case.
+     * The code and tests for this are complete, but FPLA has confirmed quite late that they are not ready to consume this endpoint.
+     * As a result they are not ready for their ITHC with us.
+     * HMCTS Reform and IA do not recommend having an active endpoint when there is no consumer for ITHC test.
+     * We have been advised to roll back the changes. This change will go to ITHC with FPLA in mid-January.
+     * Access to this endpoint will be blocked until FPLA are ready to consume.
+     * Any related tests will return 403 for the time being.*/
 
     @Test
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
@@ -34,7 +42,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
 
     }
@@ -54,7 +62,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
         String email = userCreationRequest.getEmail().toUpperCase();
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles),email);
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForExternalUserRolesSpecified(userRoles),email);
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
@@ -68,7 +76,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNull();
     }
 
@@ -90,7 +98,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         List<String> userRolesForToken = new ArrayList<>();
         userRolesForToken.add("pui-organisation-manager");
 
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
@@ -114,7 +122,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);
 
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, bearerTokenForCourtAdmin, userCreationRequest.getEmail());
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, bearerTokenForCourtAdmin, userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -75,9 +74,9 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
      * As a result they are not ready for their ITHC with us.
      * HMCTS Reform and IA do not recommend having an active endpoint when there is no consumer for ITHC test.
      * We have been advised to roll back the changes. This change will go to ITHC with FPLA in mid-January.
-     * It will remain commented out until FPLA are ready to consume. */
+     * Access to this endpoint will be blocked until FPLA are ready to consume.
+     * Any related tests will return 403 for the time being.*/
 
-    @Ignore
     @Test
     public void find_user_status_by_user_email_address_for_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -96,12 +95,11 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
 
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat(response.get("userIdentifier")).isNull();
 
     }
 
-    @Ignore
     @Test
     public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -124,7 +122,6 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
-    @Ignore
     @Test
     public void should_give_bad_request_for_invalid_email_to_find_user_status_by_user_email_address_for_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -142,7 +139,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("http_status")).isEqualTo("403");
 
     }
 }
