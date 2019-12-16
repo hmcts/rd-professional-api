@@ -29,13 +29,10 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-
-
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -197,8 +194,15 @@ public class ProfessionalExternalUserController extends SuperController {
 
     }
 
+    /** Please note:
+     * The development of the below endpoint was requested by FPLA team, re: Share A Case.
+     * The code and tests for this are complete, but FPLA has confirmed quite late that they are not ready to consume this endpoint.
+     * As a result they are not ready for their ITHC with us.
+     * HMCTS Reform and IA do not recommend having an active endpoint when there is no consumer for ITHC test.
+     * We have been advised to roll back the changes. This change will go to ITHC with FPLA in mid-January.
+     * It will remain commented out until FPLA are ready to consume. */
 
-    @ApiOperation(
+    /* @ApiOperation(
             value = "Retrieves the user status with the given email address if organisation is active",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
@@ -242,6 +246,6 @@ public class ProfessionalExternalUserController extends SuperController {
         //email is valid
         return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase()
         );
-    }
+    } */
 
 }
