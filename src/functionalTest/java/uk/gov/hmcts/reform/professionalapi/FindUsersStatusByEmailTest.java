@@ -43,7 +43,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get("userIdentifier")).isNull();
 
     }
 
@@ -63,7 +63,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
         String email = userCreationRequest.getEmail().toUpperCase();
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForExternalUserRolesSpecified(userRoles),email);
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get("userIdentifier")).isNull();
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRolesForToken.add("pui-organisation-manager");
 
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get("userIdentifier")).isNull();
     }
 
     @Test
@@ -123,7 +123,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);
 
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.FORBIDDEN, bearerTokenForCourtAdmin, userCreationRequest.getEmail());
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get("userIdentifier")).isNull();
     }
 
     @Test
