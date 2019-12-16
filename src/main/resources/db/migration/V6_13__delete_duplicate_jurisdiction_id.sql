@@ -1,3 +1,3 @@
 
-DELETE FROM user_attribute where ENUM_CODE = 34;
+DELETE FROM user_attribute where prd_enum_code = 34;
 
