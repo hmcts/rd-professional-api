@@ -25,7 +25,7 @@ public class PrdEnumServiceTest {
 
         verify(
                 prdEnumRepositoryMock,
-                times(1)).findAll();
+                times(1)).findByEnabled("YES");
 
         assertThat(prdEnums).isNotNull();
     }
