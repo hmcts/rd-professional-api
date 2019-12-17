@@ -73,7 +73,7 @@ If the API is running, you should see this response:
 
 The application uses a Postgres database which can be run through a docker container on its own if required.
 
-this
+
 
 The application should automatically apply any database migrations using flyway.
 
