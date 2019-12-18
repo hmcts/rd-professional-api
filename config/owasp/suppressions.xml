@@ -3070,4 +3070,12 @@
         <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-xml@.*$</packageUrl>
         <cve>CVE-2019-10247</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: phantomjsdriver-1.4.4.jar
+   ]]></notes>
+        <sha1>e5778e3273f8201bf9e0ff65fb8118f37b84beba</sha1>
+        <cpe>cpe:/a:phantomjs:phantomjs</cpe>
+    </suppress>
+
 </suppressions>
