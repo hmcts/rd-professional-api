@@ -15,3 +15,5 @@ java:
         - professional-api-POSTGRES-PASS
         - s2s-secret
         - AppInsightsInstrumentationKey
+        - CCD-URL
+        - IDAM-URL
