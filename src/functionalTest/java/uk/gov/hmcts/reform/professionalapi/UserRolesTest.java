@@ -62,8 +62,9 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         Map superUserDetails = users.get(0);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
-        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
-
+        assertThat(superUserRoles.size()).isEqualTo(17);
+        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "caseworker-sscs",
+                "caseworker-sscs-dwpresponsewriter");
     }
 
     @Test
