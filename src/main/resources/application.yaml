@@ -26,6 +26,7 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
+  flyway.validateOnMigrate: false
 
 ### database configuration
   datasource:
