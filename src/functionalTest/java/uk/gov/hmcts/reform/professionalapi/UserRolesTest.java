@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.specification.RequestSpecification;
@@ -39,7 +38,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
     @Test
-    public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {
+    public void rdcc_720_744_ac1_super_user_can_have_fpla_or_iac_roles() {
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
@@ -68,9 +67,10 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void rdcc_720_ac2_internal_user_can_add_new_user_with_fpla_or_iac_roles() {
+    public void rdcc_720_744_ac2_internal_user_can_add_new_user_with_fpla_iac_sscs_roles() {
 
-        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "pui-user-manager");
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "pui-user-manager","caseworker-sscs",
+                "caseworker-sscs-dwpresponsewriter");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
@@ -89,7 +89,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         professionalUsersResponses.stream().forEach(user -> {
             if (user.get("userIdentifier").equals(userId)) {
-                assertThat(user.get("roles")).asList().contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
+                assertThat(user.get("roles")).asList().contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia","caseworker-sscs",
+                        "caseworker-sscs-dwpresponsewriter");
             }
         });
 
@@ -239,24 +240,5 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         return (T) value;
     }
 
-    private UserCreationRequest createSuperUser(String email) {
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-        return superUser;
-    }
 
-    private NewUserCreationRequest createNewUser(String email,List<String> userRoles) {
-        NewUserCreationRequest newUser = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-        return newUser;
-    }
 }
