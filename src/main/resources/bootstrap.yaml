@@ -9,6 +9,6 @@ spring:
         s2s-secret: idam.s2s-auth.totp_secret
         professional-api-POSTGRES-PASS: spring.datasource.password
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
-        CCD-URL: ccd_url
-        IDAM-URL: idam_url
+        CCD-URL: CCD_URL
+        IDAM-URL: IDAM_URL
 
