@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
 
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
 
         String pbaNumber = "PBA" + randomAlphabetic(7);
 
@@ -44,7 +44,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
 
         Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
         assertThat(emailResponse.get("payment_accounts")).asList().isNotEmpty();
-        assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber);
+        assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber.toUpperCase());
     }
 
     @Test
