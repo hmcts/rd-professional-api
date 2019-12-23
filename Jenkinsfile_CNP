@@ -28,15 +28,14 @@ def vaultOverrides = [
 ]
 
 withPipeline(type, product, component) {
-  
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
     enableDbMigration('rd')
     enableDockerBuild()
     installCharts()
-    // **enable below for AAT deployment**
-    //disableLegacyDeployment()
+    disableLegacyDeployment()
     enableAksStagingDeployment()
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"

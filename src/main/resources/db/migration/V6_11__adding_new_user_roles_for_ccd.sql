@@ -1,2 +1,0 @@
---RDCC-720 CCD roles
-INSERT INTO PRD_ENUM (ENUM_CODE, ENUM_NAME, ENUM_TYPE, ENUM_DESC) VALUES (35, 'caseworker-ia', 'CCD_ROLE', 'caseworker-ia');

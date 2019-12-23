@@ -213,7 +213,7 @@ pitest {
     historyOutputLocation = ['build/reports/pitest/fastermutationtestingoutput']
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
-    mutationThreshold = 90   
+    mutationThreshold = 90
 
 }
 
@@ -332,7 +332,7 @@ dependencies {
     testContractCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
         force = true
     }
-    
+
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 

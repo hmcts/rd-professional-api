@@ -88,7 +88,6 @@ usermap:
     pbaFromUserAccountMap:
     - "false"
 
-
 auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 auth.idam.client.detailsUri: "/o/userinfo"
