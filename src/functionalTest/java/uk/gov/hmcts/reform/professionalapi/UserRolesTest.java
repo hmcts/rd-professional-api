@@ -15,6 +15,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
     private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
+
+    @Ignore
     @Test
     public void rdcc_720_744_ac1_super_user_can_have_fpla_or_iac_roles() {
 
@@ -62,15 +65,14 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
         assertThat(superUserRoles.size()).isEqualTo(17);
-        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "caseworker-sscs",
-                "caseworker-sscs-dwpresponsewriter");
+        assertThat(superUserRoles).contains("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia");
     }
 
+    @Ignore
     @Test
     public void rdcc_720_744_ac2_internal_user_can_add_new_user_with_fpla_iac_sscs_roles() {
 
-        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "pui-user-manager","caseworker-sscs",
-                "caseworker-sscs-dwpresponsewriter");
+        List<String> fplaAndIacRoles = Arrays.asList("caseworker-publiclaw", "caseworker-publiclaw-solicitor", "caseworker-ia-legalrep-solicitor", "caseworker-ia", "pui-user-manager");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
@@ -153,6 +155,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     }
 
+    @Ignore
     @Test
     public void rdcc_720_ac7_add_new_user_with_roles() {
 
