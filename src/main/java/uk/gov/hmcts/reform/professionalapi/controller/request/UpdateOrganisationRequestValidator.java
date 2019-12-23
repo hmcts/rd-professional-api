@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Slf4j
 public class UpdateOrganisationRequestValidator {
 
-    private final List<UpdateOrganisationValidator> validators;
+    private final List<OrganisationIdentifierValidator> validators;
 
-    public UpdateOrganisationRequestValidator(List<UpdateOrganisationValidator> validators) {
+    public UpdateOrganisationRequestValidator(List<OrganisationIdentifierValidator> validators) {
         this.validators = validators;
     }
 

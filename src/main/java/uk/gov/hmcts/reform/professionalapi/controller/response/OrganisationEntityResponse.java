@@ -53,7 +53,7 @@ public class OrganisationEntityResponse  {
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                 .collect(toList());
-        if (isRequiredAllEntities) {
+        if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))

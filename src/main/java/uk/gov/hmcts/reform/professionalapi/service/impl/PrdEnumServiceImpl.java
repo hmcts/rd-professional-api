@@ -31,7 +31,7 @@ public class PrdEnumServiceImpl implements PrdEnumService {
     @Override
     public List<PrdEnum> findAllPrdEnums() {
         if (CollectionUtils.isEmpty(enumList)) {
-            enumList = prdEnumRepository.findByEnabled("YES");
+            enumList = prdEnumRepository.findAll();
             return enumList;
         } else {
             return enumList;

@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-
-import java.util.Collection;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
@@ -66,7 +62,7 @@ public class OrganisationExternalController extends SuperController {
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
 
-        log.info("Received request to create a new organisation for external user...");
+        //Received request to create a new organisation for external user
         return createOrganisationFrom(organisationCreationRequest);
     }
 
@@ -97,7 +93,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @Secured({"pui-organisation-manager"})
+    @Secured({"pui-organisation-manager", "pui-finance-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
             @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
@@ -132,7 +128,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true)@OrgId  String orgId) {
-        log.info("Received request to retrieve an organisations payment accounts by email for external...");
+        //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
     }
@@ -163,25 +159,24 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<?> addUserToOrganisationUsingExternalController(
+    public ResponseEntity addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true)@OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        log.info("Received request to add a new user to an organisation for external...");
+        //Received request to add a new user to an organisation for external
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
+        validateEmail(email);
+        //In retrievePaymentAccountByUserEmail method
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
-        log.info("In retrievePaymentAccountByUserEmail method:");
-        boolean isPuiFinanceManExist = false;
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email);
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, extOrgIdentifier);
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Collection<GrantedAuthority>  authorities =  serviceAndUserDetails.getAuthorities();
+        serviceAndUserDetails.getAuthorities();
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
         return ResponseEntity
@@ -193,7 +188,7 @@ public class OrganisationExternalController extends SuperController {
     protected ResponseEntity<OrganisationEntityResponse> retrieveOrganisationOrById(String id) {
 
         OrganisationEntityResponse organisationResponse = null;
-        log.info("Received request to retrieve External organisation with ID ");
+        //Received request to retrieve External organisation with ID
         organisationResponse =
                 organisationService.retrieveOrganisation(id);
         return ResponseEntity

@@ -51,10 +51,11 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         return new JurisdictionUserCreationRequest(user.getEmailAddress(), jurisdictions);
     }
 
-    public void callCcd(JurisdictionUserCreationRequest request, String userId) {
+    public boolean callCcd(JurisdictionUserCreationRequest request, String userId) {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             log.info("Jurisdiction create user profile success!!");
+            return true;
         } catch (FeignException ex) {
             String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
             log.error(errorMessage, ex);
