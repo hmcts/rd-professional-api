@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import io.restassured.RestAssured;
-import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
@@ -81,7 +80,6 @@ public abstract class AuthorizationFunctionalTest {
     @Before
     public void setUp() {
         RestAssured.useRelaxedHTTPSValidation();
-        RestAssured.defaultParser = Parser.JSON;
 
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
@@ -90,7 +88,7 @@ public abstract class AuthorizationFunctionalTest {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
-        /* SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
@@ -137,7 +135,7 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        //log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
+        // log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)

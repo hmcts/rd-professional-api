@@ -73,7 +73,7 @@ If the API is running, you should see this response:
 
 The application uses a Postgres database which can be run through a docker container on its own if required.
 
-
+this
 
 The application should automatically apply any database migrations using flyway.
 
@@ -170,4 +170,4 @@ Publish via the gradle command
 Once Verify on url `http://localhost:9292/`
 The pact contract(s) should be published
 
-Remember to return the localhost back to the remote broker
+Remember to return the localhost back to the remote broker.
