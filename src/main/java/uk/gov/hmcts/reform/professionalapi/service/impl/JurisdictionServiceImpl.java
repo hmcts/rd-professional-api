@@ -26,6 +26,9 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 
+    static final String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
+    static final String successMessage = "Jurisdiction create user profile success!!";
+
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {
 
@@ -51,15 +54,21 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         return new JurisdictionUserCreationRequest(user.getEmailAddress(), jurisdictions);
     }
 
-    public boolean callCcd(JurisdictionUserCreationRequest request, String userId) {
+    public void callCcd(JurisdictionUserCreationRequest request, String userId) {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
-            log.info("Jurisdiction create user profile success!!");
-            return true;
+            if (response == null || response.status() > 300) {
+                log.info("CCD status code: " + (response == null ? null : response.status()));
+                throwException(null);
+            }
         } catch (FeignException ex) {
-            String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
-            log.error(errorMessage, ex);
-            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+            throwException(ex);
         }
+        log.info(successMessage);
+    }
+
+    public void throwException(Exception ex) {
+        log.error(errorMessage, ex);
+        throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
     }
 }

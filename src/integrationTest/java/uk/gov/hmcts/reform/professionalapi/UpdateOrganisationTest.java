@@ -174,6 +174,17 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         assertThat(persistedOrganisation.getCompanyNumber()).isNotNull();
     }
 
+    @Test
+    public void should_abort_flow_when_ccd_fails() {
+        ccdUserProfileErrorWireMock(HttpStatus.FORBIDDEN);
+        String organisationIdentifier = createOrganisationRequest();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        ccdUserProfileErrorWireMock(HttpStatus.OK);
+    }
+
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
