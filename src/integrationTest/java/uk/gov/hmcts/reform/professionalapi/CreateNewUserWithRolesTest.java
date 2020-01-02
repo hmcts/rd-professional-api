@@ -366,4 +366,63 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
 
+    @Test
+    public void validate_email_for_invite_user_successfully() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName("someLastName")
+                .email("a.adison@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("201 CREATED");
+
+    }
+
+    @Test
+    public void validate_invalid_email_for_invite_user_and_throw_exception() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
+        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("fname")
+                .lastName("someLastName")
+                .email("a.adisonemail.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+
+    }
 }

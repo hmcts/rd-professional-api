@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.82")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.83")
     }
 }
 
@@ -12,14 +12,13 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.27.0'
+    id 'com.github.ben-manes.versions' version '0.20.0'
     id "info.solidsoft.pitest" version '1.3.0'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-    id 'org.owasp.dependencycheck' version '5.2.4'
-    id 'org.sonarqube' version '2.8'
+    id 'org.owasp.dependencycheck' version '5.2.2'
+    id 'org.sonarqube' version '2.6.2'
     id 'org.springframework.boot' version '2.1.4.RELEASE'
     id "org.flywaydb.flyway" version "5.0.7"
-    id 'au.com.dius.pact' version '3.5.24'
 }
 
 apply plugin: 'java'
@@ -31,15 +30,14 @@ def versions = [
         lombok             : '1.18.6',
         gradlePitest       : '1.3.0',
         pitest             : '1.4.2',
-        reformHealthStarter: '0.0.4',
+        reformHealthStarter: '0.0.5',
         reformLogging      : '5.1.0',
         reformS2sClient    : '3.0.0',
         serenity           : '2.0.23',
         sonarPitest        : '0.5',
         springBoot         : '2.1.4.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
-        springfoxSwagger   : '2.9.2',
-        pact_version       : '3.5.24'
+        springfoxSwagger   : '2.9.2'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
@@ -57,7 +55,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'LINE'
                 value = 'COVEREDRATIO'
-                minimum = 0.80
+                minimum = 0.70
             }
         }
     }
@@ -99,24 +97,6 @@ sourceSets {
         }
         resources.srcDir file('src/smokeTest/resources')
     }
-
-    testContract {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/contractTest/java')
-        }
-        resources.srcDir file('src/contractTest/resources')
-    }
-    testPact {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/pactTest/java')
-        }
-        resources.srcDir file('src/pactTest/resources')
-    }
-
 }
 
 idea {
@@ -163,6 +143,7 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
+
     systemProperty "scenario", System.getProperty('scenario')
 
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
@@ -180,11 +161,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
     }
-}
-
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
-    // Nothing to do here
-    println 'pact tests have been moved to pactPublish'
 }
 
 jacoco {
@@ -205,7 +181,8 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.Application'
+            'uk.gov.hmcts.reform.professionalapi.Application',
+            'uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper'
     ]
     threads = 10
     enableDefaultIncrementalAnalysis = true
@@ -230,7 +207,8 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java" +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/JsonFeignResponseHelper.java"
     }
 }
 
@@ -260,7 +238,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
 
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.5.6'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.1'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
@@ -273,14 +251,14 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version: versions.reformHealthStarter
-    compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4') {
+    compile(group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.3') {
         // TODO remove when auth-checker-lib upgrades its dependency to spring boot 2.0.x
         exclude group: 'uk.gov.hmcts.reform', module: 'java-logging-spring'
 
     }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
@@ -305,7 +283,7 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.1.0'
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.4'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
     testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest
@@ -317,7 +295,7 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
+    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
         force = true
     }
 
@@ -329,10 +307,6 @@ dependencies {
         force = true
     }
 
-    testContractCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
-        force = true
-    }
-    
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath
 
@@ -341,12 +315,6 @@ dependencies {
 
     smokeTestCompile sourceSets.main.runtimeClasspath
     smokeTestCompile sourceSets.test.runtimeClasspath
-
-    testContractCompile sourceSets.main.runtimeClasspath
-    testContractCompile sourceSets.test.runtimeClasspath
-
-    testPactCompile sourceSets.main.runtimeClasspath
-    testPactCompile sourceSets.test.runtimeClasspath
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -378,16 +346,6 @@ bootJar {
     archiveName = jarName
     manifest {
         attributes('Implementation-Version': project.version.toString())
-    }
-}
-
-pact {
-    publish {
-        pactDirectory = 'target/pacts'
-        //pactBrokerUrl = 'http://localhost:9292'
-        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
-        tags = ['Dev']
-        //version = project.pactVersion
     }
 }
 

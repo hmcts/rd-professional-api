@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
@@ -16,11 +15,7 @@ import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,8 +25,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
@@ -41,7 +36,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -102,8 +96,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
-
-    protected static final String ACTIVE = "ACTIVE";
 
     @Before
     public void setUpClient() {
@@ -241,6 +233,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
 
+
     @After
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();
@@ -264,22 +257,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 
-    public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
-
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        return userCreationRequest;
-
-    }
-
     public void userProfileCreateUserWireMock(HttpStatus status) {
         String body = null;
         int returnHttpStaus = status.value();
@@ -289,9 +266,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  \"idamRegistrationResponse\":\"201\""
                     + "}";
             returnHttpStaus = 201;
-
         }
-
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
@@ -398,85 +373,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         );
     }
 
-    public void updateUserProfileRolesMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStatus = 200;
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"statusUpdateResponse\": {"
-                    + "  \"idamStatusCode\": \"200\","
-                    + "  \"idamMessage\": \"Success\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 200;
-        } else if (status.is4xxClientError()) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
-        } else if (status.is5xxServerError()) {
-
-            body = "{"
-                    + "  \"roleAdditionResponse\": {"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } ,"
-                    + "  \"roleDeletionResponse\": ["
-                    +   "{"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } "
-                    + "  ]"
-                    + "}";
-        }
-
-        userProfileService.stubFor(
-                put(urlPathMatching("/v1/userprofile/.*"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
-
-
-    }
-
-    public void updateUserProfileMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStatus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"statusUpdateResponse\": {"
-                    + "  \"idamStatusCode\": \"200\","
-                    + "  \"idamMessage\": \"Success\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 200;
-        } else if (status.is4xxClientError()) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
-        }
-
-        userProfileService.stubFor(
-                put(urlPathMatching("/v1/userprofile/.*"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
-
-
-    }
-
-
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override
         public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
@@ -551,8 +447,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
-
-
     }
 }
 

@@ -14,13 +14,13 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Component
 @Slf4j
-public class OrganisationIdentifierIdentifierValidatorImpl implements OrganisationIdentifierValidator {
+public class OrganisationIdentifierValidatorImpl implements UpdateOrganisationValidator {
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
-        //Into Organisation identifier validator
+        log.info("Into Organisation identifier validator...");
         checkOrganisationDoesNotExist(existingOrganisation, inputOrganisationIdentifier);
-        //Validation completed for identifier Organisation
+        log.info("Validation completed for identifier Organisation...");
     }
 
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {

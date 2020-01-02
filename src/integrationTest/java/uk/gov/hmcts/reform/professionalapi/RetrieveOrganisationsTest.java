@@ -70,7 +70,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
 
-        //RetrieveOrganisationsTest:Received response to retrieve an organisation details
+        log.info("RetrieveOrganisationsTest:Received response to retrieve an organisation details...");
     }
 
     @Test
