@@ -19,7 +19,8 @@ public class RetrieveUserProfilesRequest {
     private List<String> userIds;
 
     @JsonCreator
-    public RetrieveUserProfilesRequest(@JsonProperty(value = "userIds") List<String> userIds) {
+    public RetrieveUserProfilesRequest(
+            @JsonProperty(value = "userIds") List<String> userIds) {
 
         this.userIds = userIds;
     }

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
+
+
 public class SuperUserTest {
 
     @Test
@@ -65,10 +67,6 @@ public class SuperUserTest {
         superUser.setCreated(LocalDateTime.now());
         superUser.setLastUpdated(LocalDateTime.now());
         superUser.setDeleted(LocalDateTime.now());
-
-        SuperUser superUserNoArg = new SuperUser();
-
-        assertThat(superUserNoArg).isNotNull();
 
 
         ProfessionalUser professionalUser = superUser.toProfessionalUser();
