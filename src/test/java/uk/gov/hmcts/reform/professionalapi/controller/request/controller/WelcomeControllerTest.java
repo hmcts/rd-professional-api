@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.controller;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -21,8 +23,8 @@ public class WelcomeControllerTest {
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertThat(
-            responseEntity.getBody(),
-            containsString(expectedMessage)
+                responseEntity.getBody(),
+                containsString(expectedMessage)
         );
     }
 }

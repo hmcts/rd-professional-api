@@ -6,17 +6,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 
 @Getter
+@Setter
 @Builder(builderMethodName = "aNewUserCreationRequest")
 public class NewUserCreationRequest {
 
-    private final String firstName;
-    private final String lastName;
-    private final String email;
-    private final List<String> roles;
-    private final List<Jurisdiction> jurisdictions;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private List<String> roles;
+    private List<Jurisdiction> jurisdictions;
 
     @JsonCreator
     public NewUserCreationRequest(

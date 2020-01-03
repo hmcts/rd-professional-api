@@ -22,4 +22,19 @@ public class MultipleUserProfilesResponseTest {
         assertThat(multipleUserProfilesResponse.getUserProfiles().size()).isEqualTo(1);
     }
 
+    @Test
+    public void test_MultipleUserProfilesResponseSetter() {
+        List<UserProfile> userProfiles = new ArrayList<>();
+        userProfiles.add(userProfileMock);
+
+        List<GetUserProfileResponse> getUserProfileResponse = new ArrayList<>();
+        getUserProfileResponse.add(mock(GetUserProfileResponse.class));
+
+        MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles, true);
+
+        multipleUserProfilesResponse.setUserProfiles(getUserProfileResponse);
+
+        assertThat(multipleUserProfilesResponse.getUserProfiles()).isEqualTo(getUserProfileResponse);
+    }
+
 }

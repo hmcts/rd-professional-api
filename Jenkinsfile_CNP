@@ -1,6 +1,7 @@
 #!groovy
 
-@Library("Infrastructure@disableprdepcheck")
+@Library("Infrastructure")
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "rd"
@@ -34,9 +35,10 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     enableDockerBuild()
     installCharts()
-   // disableLegacyDeployment()
-    enableAksStagingDeployment()
 
+    enableAksStagingDeployment()
+    // **enable below for AKS deployment**
+    disableLegacyDeployment()
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
     env.TEST_URL = "http://rd-professional-api-aat.service.core-compute-aat.internal"
@@ -48,5 +50,9 @@ withPipeline(type, product, component) {
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
+
+    enablePactAs([
+            AppPipelineDsl.PactRoles.CONSUMER
+    ])
 
 }
