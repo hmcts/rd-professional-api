@@ -94,7 +94,7 @@ public class IdamClient {
         authorizeParams.put("client_id", testConfig.getClientId());
         authorizeParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         authorizeParams.put("response_type", "code");
-        authorizeParams.put("scope", "openid profile roles create-user manage-user");
+        authorizeParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         Response authorizeResponse = RestAssured
                 .given()

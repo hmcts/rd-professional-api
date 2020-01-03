@@ -44,4 +44,26 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }
+
+    @Test
+    public void can_search_by_email_regardless_of_case() {
+
+        String emailIgnoreCase = randomAlphabetic(10) + "@usersearch.test".toUpperCase();
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(emailIgnoreCase)
+                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .build())
+                .build();
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
+
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(emailIgnoreCase, hmctsAdmin);
+        assertThat(searchResponse.get("email")).isEqualTo(emailIgnoreCase.toLowerCase());
+    }
 }

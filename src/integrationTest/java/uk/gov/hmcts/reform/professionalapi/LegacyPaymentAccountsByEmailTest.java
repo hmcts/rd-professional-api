@@ -7,10 +7,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
     public void get_request_returns_correct_payment_accounts_for_user_email_address_ac1() {
 
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -52,7 +52,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
     @Test
     public void get_request_returns_multiple_payment_accounts_associated_with_user_email_address_ac2() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("pbaNumber-1");
         paymentAccounts.add("pbaNumber-2");
 
