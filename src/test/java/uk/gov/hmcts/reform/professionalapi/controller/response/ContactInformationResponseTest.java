@@ -10,7 +10,6 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
-
 public class ContactInformationResponseTest {
 
     @Test
