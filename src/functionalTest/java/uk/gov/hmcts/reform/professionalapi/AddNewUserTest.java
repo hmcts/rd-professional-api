@@ -31,5 +31,4 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserResponse).isNotNull();
     }
-
 }

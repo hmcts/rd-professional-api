@@ -16,7 +16,6 @@ public class PrdEnumTest {
 
         PrdEnum prdEnum = new PrdEnum(prdEnumId, "enum-name", "enum-desc");
 
-
         assertThat(prdEnum.getPrdEnumId()).isEqualTo(prdEnumId);
         assertThat(prdEnum.getEnumName()).isEqualTo("enum-name");
         assertThat(prdEnum.getEnumDescription()).isEqualTo("enum-desc");

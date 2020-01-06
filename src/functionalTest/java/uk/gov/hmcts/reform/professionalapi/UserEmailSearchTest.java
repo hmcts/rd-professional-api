@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @ActiveProfiles("functional")
 public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
+
     @Test
     public void can_find_a_user_by_their_email_address() {
 

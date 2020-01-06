@@ -23,8 +23,6 @@ public enum ErrorConstants {
 
     CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception");
 
-
-
     private final String errorMessage;
 
     ErrorConstants(String  errorMessage) {

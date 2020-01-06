@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
-
     @Before
     public void setUp() {
         Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
