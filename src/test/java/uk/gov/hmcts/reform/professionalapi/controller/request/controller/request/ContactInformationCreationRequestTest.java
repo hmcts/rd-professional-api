@@ -59,7 +59,7 @@ public class ContactInformationCreationRequestTest {
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", null, null, null, null, null, null, null);
+                "some-address1",  null, null, null, null, null, null, null);
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isNull();

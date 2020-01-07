@@ -74,8 +74,6 @@ public class DxAddressCreationRequestTest {
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
 
-
-
         assertThat(violations.size()).isEqualTo(1);
     }
 
