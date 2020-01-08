@@ -145,12 +145,13 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
+            @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, orgId, userId, origin);
 
     }
 }

@@ -132,7 +132,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         if (paymentAccounts != null) {
-            PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            paymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
