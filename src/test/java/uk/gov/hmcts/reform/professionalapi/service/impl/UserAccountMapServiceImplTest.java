@@ -29,7 +29,6 @@ public class UserAccountMapServiceImplTest {
 
         PaymentAccount pba = new PaymentAccount("PBA1234567");
         paymentAccounts.add(0,pba);
-        //userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, pba)));
 
         sut.persistedUserAccountMap(persistedSuperUser,paymentAccounts);
 
