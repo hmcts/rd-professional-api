@@ -101,7 +101,7 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -111,8 +111,9 @@ public abstract class SuperController {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
-        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
-
+        if (organisationCreationRequest.getSuperUser() != null) {
+            OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        }
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
@@ -150,7 +151,7 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
-            if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+            if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
                 //Received request to retrieve organisation with status
                 organisationResponse =
@@ -216,8 +217,10 @@ public abstract class SuperController {
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 //Idam registration success
-                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                if (userProfileCreationResponse != null) {
+                    professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                    superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                }
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
@@ -253,7 +256,7 @@ public abstract class SuperController {
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
-        if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+        if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
             organisationsDetailResponse =
                     organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
@@ -275,7 +278,7 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
 
-        organisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        OrganisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
@@ -293,7 +296,9 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
-            newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            if (userProfileCreationResponse != null) {
+                newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            }
             responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
