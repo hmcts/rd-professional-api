@@ -95,7 +95,7 @@ public abstract class SuperController {
     private String jurisdictionIds;
 
 
-    static final String SRA_REGULATED_FALSE = "false";
+    private static final String SRA_REGULATED_FALSE = "false";
 
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
@@ -329,7 +329,6 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    //refactor
     protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
