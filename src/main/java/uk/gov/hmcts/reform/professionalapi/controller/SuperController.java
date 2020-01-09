@@ -111,9 +111,8 @@ public abstract class SuperController {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
-        if (organisationCreationRequest.getSuperUser() != null) {
-            OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
-        }
+        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
@@ -217,10 +216,8 @@ public abstract class SuperController {
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 //Idam registration success
-                if (userProfileCreationResponse != null) {
-                    professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                    superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                }
+                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
                 log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
@@ -296,9 +293,7 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
-            if (userProfileCreationResponse != null) {
-                newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-            }
+            newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
@@ -329,7 +324,8 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
+    //refactor
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String organisationIdentifier, String userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 

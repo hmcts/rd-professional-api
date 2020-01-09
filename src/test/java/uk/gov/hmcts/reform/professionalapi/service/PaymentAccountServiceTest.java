@@ -122,6 +122,8 @@ public class PaymentAccountServiceTest {
         assertThat(organisation).isNotNull();
 
         verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(organisationMock, times(1)).setUsers(any());
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
 
     }
 
