@@ -157,6 +157,8 @@ public class PaymentAccountServiceTest {
         sut.deletePaymentAccountsFromOrganisation(organisationMock);
 
         verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+        verify(organisationMock, times(1)).getPaymentAccounts();
+        verify(organisationMock, times(1)).setPaymentAccounts(anyList());
     }
 
     @Test
