@@ -10,11 +10,13 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
+
 @Entity(name = "user_account_map")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-public class UserAccountMap {
+public class UserAccountMap implements Serializable {
 
     @EmbeddedId
     private UserAccountMapId  userAccountMapId;
