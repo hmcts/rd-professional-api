@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
+import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 
 public class UserAccountMapServiceImplTest {
 
