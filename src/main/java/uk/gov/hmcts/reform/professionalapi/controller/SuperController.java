@@ -329,8 +329,8 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    //TODO refactor
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String organisationIdentifier, String userId, Optional<String> origin) {
+    //refactor
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
