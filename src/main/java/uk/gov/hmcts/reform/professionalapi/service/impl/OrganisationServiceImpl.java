@@ -228,12 +228,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
-            if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+            if (organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
                 activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
             }
         });
