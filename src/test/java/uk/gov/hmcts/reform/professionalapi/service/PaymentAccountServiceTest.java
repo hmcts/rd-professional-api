@@ -190,9 +190,9 @@ public class PaymentAccountServiceTest {
     @Test
     public void generateListOfAccountsToDelete() {
         ProfessionalUser prefU = new ProfessionalUser("Con","Hal","email@gmail.com",organisationMock);
-        List<UserAccountMapId> listUM = new ArrayList<>();
+        List<UserAccountMapId> listUserMap = new ArrayList<>();
         assertThat(sut.generateListOfAccountsToDelete(prefU,paymentAccounts)).isNotNull();
-        listUM = sut.generateListOfAccountsToDelete(prefU,paymentAccounts);
-        assertThat(listUM.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
+        listUserMap = sut.generateListOfAccountsToDelete(prefU,paymentAccounts);
+        assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
     }
 }
