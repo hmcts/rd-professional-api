@@ -46,7 +46,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("some@email.com");
 
-        assertThat(orgResponse.get("payment_accounts").toString().equals("PBA1234567"));
+        assertThat(orgResponse.get("paymentAccounts").toString().equals("PBA1234567"));
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 
@@ -73,7 +73,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
 
         orgResponse.forEach((k,v) -> {
 
-            if ("payment_accounts".equals(k) && "http_status".equals(k)) {
+            if ("paymentAccounts".equals(k) && "http_status".equals(k)) {
 
                 assertThat(v.toString().contains("pbaNumber-1, pbaNumber-2"));
                 assertThat(v.toString().contains("Ok"));
@@ -88,7 +88,7 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
         professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
         Map<String, Object> orgResponse = professionalReferenceDataClient.findLegacyPbaAccountsByUserEmail("someone@somewhere.com");
-        assertThat(orgResponse.get("payment_accounts")).asList().isEmpty();
+        assertThat(orgResponse.get("paymentAccounts")).asList().isEmpty();
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
     }

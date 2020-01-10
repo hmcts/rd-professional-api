@@ -43,8 +43,8 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
                 .build());
 
         Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
-        assertThat(emailResponse.get("payment_accounts")).asList().isNotEmpty();
-        assertThat(emailResponse.get("payment_accounts")).asList().contains(pbaNumber.toUpperCase());
+        assertThat(emailResponse.get("paymentAccounts")).asList().isNotEmpty();
+        assertThat(emailResponse.get("paymentAccounts")).asList().contains(pbaNumber.toUpperCase());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
         professionalApiClient.createOrganisation(request);
 
         Map<String, Object> emailResponse = professionalApiClient.retrieveLegacyPbaNumbersByUserEmail(email.toLowerCase());
-        assertThat(emailResponse.get("payment_accounts")).asList().isEmpty();
+        assertThat(emailResponse.get("paymentAccounts")).asList().isEmpty();
 
     }
 

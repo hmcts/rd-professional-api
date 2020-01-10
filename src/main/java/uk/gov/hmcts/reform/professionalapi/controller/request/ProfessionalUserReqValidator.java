@@ -66,7 +66,7 @@ public class ProfessionalUserReqValidator {
             emptyRoles = roleNames.stream().filter(roleName -> StringUtils.isBlank(roleName.getName())).collect(Collectors.toList());
 
         }
-        return emptyRoles.isEmpty();
+        return emptyRoles.size() > 0;
     }
 
     private static boolean isEmailValid(String email) {
