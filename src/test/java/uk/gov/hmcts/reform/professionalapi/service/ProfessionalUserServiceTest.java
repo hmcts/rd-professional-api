@@ -232,6 +232,8 @@ public class ProfessionalUserServiceTest {
                 Mockito.times(1)).findByOrganisation(organisation);
 
         assertThat(responseEntity).isNotNull();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+
     }
 
     @Test
