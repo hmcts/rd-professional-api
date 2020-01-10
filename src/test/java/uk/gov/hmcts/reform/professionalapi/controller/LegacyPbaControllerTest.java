@@ -83,7 +83,7 @@ public class LegacyPbaControllerTest {
         ResponseEntity<?> actual = legacyPbaController.retrievePbaAccountsByEmail(email);
 
         assertThat(actual).isNotNull();
-        assertThat(((LegacyPbaResponse)actual.getBody()).getPayment_accounts()).isEmpty();
+        assertThat(((LegacyPbaResponse)actual.getBody()).getPaymentAccounts()).isEmpty();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(professionalUserServiceImplMock,
