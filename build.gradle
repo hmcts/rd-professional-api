@@ -235,7 +235,7 @@ sonarqube {
 }
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
-project.tasks['sonarqube'].group = "Verification"
+
 
 repositories {
 
