@@ -58,17 +58,19 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             if (response == null || response.status() > 300) {
-                log.info("CCD status code: " + (response == null ? "500" : response.status()));
-                throwException(null);
+                int responseCode = response == null ? 500 : response.status();
+                log.info("CCD status code: " + responseCode);
+                throwException(responseCode);
             }
         } catch (FeignException ex) {
-            throwException(ex);
+            throwException(ex.status() < 0 ? 500 : ex.status());
         }
         log.info(successMessage);
     }
 
-    public void throwException(Exception ex) {
-        log.error(errorMessage, ex);
-        throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+    public void throwException(int statusCode) {
+
+        log.error(errorMessage);
+        throw new ExternalApiException(HttpStatus.valueOf(statusCode), errorMessage);
     }
 }
