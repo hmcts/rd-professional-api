@@ -9,10 +9,10 @@ public class LegacyPbaResponse {
 
     @JsonProperty
     @SuppressWarnings({"checkstyle:MemberName"})
-    private final List<String> paymentAccounts;
+    private final List<String> payment_accounts;
 
     @SuppressWarnings({"checkstyle:ParameterName"})
-    public LegacyPbaResponse(List<String> paymentAccounts) {
-        this.paymentAccounts = paymentAccounts;
+    public LegacyPbaResponse(List<String> payment_accounts) {
+        this.payment_accounts = payment_accounts;
     }
 }

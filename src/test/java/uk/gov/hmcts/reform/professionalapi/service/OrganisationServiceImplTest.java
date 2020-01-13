@@ -181,8 +181,7 @@ public class OrganisationServiceImplTest {
                 userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
-                userAttributeServiceMock,
-                paymentAccountValidatorMock
+                userAttributeServiceMock
         );
 
         organisationCreationRequest =
@@ -317,8 +316,7 @@ public class OrganisationServiceImplTest {
                 userAccountMapServiceMock,
                 userProfileFeignClient,
                 prdEnumServiceMock,
-                userAttributeServiceMock,
-                paymentAccountValidatorMock);
+                userAttributeServiceMock);
         realOrganisationService.retrieveOrganisation(testOrganisationId);
     }
 

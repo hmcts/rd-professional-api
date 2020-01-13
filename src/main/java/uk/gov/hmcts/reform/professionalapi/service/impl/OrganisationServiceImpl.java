@@ -64,7 +64,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserProfileFeignClient userProfileFeignClient;
     PrdEnumService prdEnumService;
     UserAttributeService userAttributeService;
-    PaymentAccountValidator paymentAccountValidator;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -77,8 +76,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserAccountMapService userAccountMapService,
             UserProfileFeignClient userProfileFeignClient,
             PrdEnumService prdEnumService,
-            UserAttributeService userAttributeService,
-            PaymentAccountValidator paymentAccountValidator
+            UserAttributeService userAttributeService
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -91,7 +89,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userProfileFeignClient = userProfileFeignClient;
         this.prdEnumService = prdEnumService;
         this.userAttributeService = userAttributeService;
-        this.paymentAccountValidator = paymentAccountValidator;
     }
 
     @Override

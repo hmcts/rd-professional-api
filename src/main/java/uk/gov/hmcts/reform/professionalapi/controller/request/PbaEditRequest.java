@@ -16,7 +16,7 @@ public class PbaEditRequest {
     private Set<String> paymentAccounts;
 
     @JsonCreator
-    public PbaEditRequest(@JsonProperty("paymentAccounts") Set<String> paymentAccounts) {
+    public PbaEditRequest(@JsonProperty("payment_accounts") Set<String> paymentAccounts) {
         this.paymentAccounts = paymentAccounts;
     }
 }
