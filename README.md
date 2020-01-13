@@ -30,6 +30,7 @@ If running locally for development or testing you will need to set the following
 
 To run the API quickly use the docker helper script as follows:
 
+
 ```
 ./bin/run-in-docker.sh
 ```
