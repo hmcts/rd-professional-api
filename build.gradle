@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.82")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.83")
     }
 }
 
@@ -31,7 +31,7 @@ def versions = [
         lombok             : '1.18.6',
         gradlePitest       : '1.3.0',
         pitest             : '1.4.2',
-        reformHealthStarter: '0.0.4',
+        reformHealthStarter: '0.0.5',
         reformLogging      : '5.1.0',
         reformS2sClient    : '3.0.0',
         serenity           : '2.0.23',
@@ -225,8 +225,7 @@ sonarqube {
     properties {
         property "sonar.projectName", "RD :: Professional Reference Data api"
         property "sonar.projectKey", "RDPROFESSIONALAPI"
-        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
@@ -235,7 +234,7 @@ sonarqube {
     }
 }
 
-project.tasks['sonarqube'].dependsOn test, integration
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 project.tasks['sonarqube'].group = "Verification"
 
 repositories {
@@ -261,8 +260,8 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
 
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.5.6'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9.3'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.1'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
@@ -281,7 +280,7 @@ dependencies {
     }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
@@ -306,7 +305,7 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.1.0'
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.4'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
     testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest
