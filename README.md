@@ -156,7 +156,6 @@ To publish against remote broker:
 Turn on VPN and verify on url `https://pact-broker.platform.hmcts.net/`
 The pact contract(s) should be published
 
-
 To publish against local broker:
 Uncomment out the line found in the build.gradle:
 `pactBrokerUrl = 'http://localhost:9292'`
