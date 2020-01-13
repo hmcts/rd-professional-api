@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
@@ -45,13 +44,12 @@ public class PaymentAccountServiceTest {
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
-    private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
 
     private final OrganisationServiceImpl organisationServiceMock = new OrganisationServiceImpl(
             organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
             dxAddressRepositoryMock, contactInformationRepositoryMock, prdEnumRepositoryMock,
             userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock,
-            userAttributeServiceMock, paymentAccountValidatorMock);
+            userAttributeServiceMock);
 
     private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
             applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
@@ -122,6 +120,8 @@ public class PaymentAccountServiceTest {
         assertThat(organisation).isNotNull();
 
         verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(organisationMock, times(1)).setUsers(any());
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
 
     }
 
@@ -155,6 +155,8 @@ public class PaymentAccountServiceTest {
         sut.deletePaymentAccountsFromOrganisation(organisationMock);
 
         verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+        verify(organisationMock, times(1)).getPaymentAccounts();
+        verify(organisationMock, times(1)).setPaymentAccounts(anyList());
     }
 
     @Test
@@ -179,5 +181,16 @@ public class PaymentAccountServiceTest {
         sut.addUserAndPaymentAccountsToUserAccountMap(organisationMock);
 
         verify(userAccountMapServiceMock, times(1)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
+
+        assertThat(sut.addUserAndPaymentAccountsToUserAccountMap(organisationMock)).isNotNull();
+    }
+
+    @Test
+    public void generateListOfAccountsToDelete() {
+        ProfessionalUser prefU = new ProfessionalUser("Con","Hal","email@gmail.com",organisationMock);
+        List<UserAccountMapId> listUserMap = new ArrayList<>();
+        assertThat(sut.generateListOfAccountsToDelete(prefU,paymentAccounts)).isNotNull();
+        listUserMap = sut.generateListOfAccountsToDelete(prefU,paymentAccounts);
+        assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
     }
 }

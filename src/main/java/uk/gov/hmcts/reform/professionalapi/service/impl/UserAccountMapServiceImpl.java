@@ -27,9 +27,8 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         if (!paymentAccounts.isEmpty()) {
             List<UserAccountMap> userAccountMaps = new ArrayList<>();
             log.debug("PaymentAccount is not empty");
-            paymentAccounts.forEach(paymentAccount -> {
-                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount)));
-            });
+            paymentAccounts.forEach(paymentAccount ->
+                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount))));
             if (!CollectionUtils.isEmpty(userAccountMaps)) {
                 userAccountMapRepository.saveAll(userAccountMaps);
             }

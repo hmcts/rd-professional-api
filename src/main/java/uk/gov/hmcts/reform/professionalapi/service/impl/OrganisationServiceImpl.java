@@ -64,7 +64,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserProfileFeignClient userProfileFeignClient;
     PrdEnumService prdEnumService;
     UserAttributeService userAttributeService;
-    PaymentAccountValidator paymentAccountValidator;
 
     @Autowired
     public OrganisationServiceImpl(
@@ -77,8 +76,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             UserAccountMapService userAccountMapService,
             UserProfileFeignClient userProfileFeignClient,
             PrdEnumService prdEnumService,
-            UserAttributeService userAttributeService,
-            PaymentAccountValidator paymentAccountValidator
+            UserAttributeService userAttributeService
     ) {
 
         this.organisationRepository = organisationRepository;
@@ -91,7 +89,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         this.userProfileFeignClient = userProfileFeignClient;
         this.prdEnumService = prdEnumService;
         this.userAttributeService = userAttributeService;
-        this.paymentAccountValidator = paymentAccountValidator;
     }
 
     @Override
@@ -132,7 +129,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         if (paymentAccounts != null) {
-            paymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
@@ -228,12 +225,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
-        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<String, Organisation>();
+        Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
-            if (organisation.getUsers().size() > 0 && null != organisation.getUsers().get(0).getUserIdentifier()) {
+            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
                 activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
             }
         });
