@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.persistence.*;
@@ -44,16 +45,11 @@ public class PaymentAccountServiceTest {
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
+    private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
+    private OrganisationServiceImpl organisationService;
+    private PaymentAccountServiceImpl sut;
 
-    private final OrganisationServiceImpl organisationServiceMock = new OrganisationServiceImpl(
-            organisationRepositoryMock, professionalUserRepositoryMock, paymentAccountRepositoryMock,
-            dxAddressRepositoryMock, contactInformationRepositoryMock, prdEnumRepositoryMock,
-            userAccountMapServiceMock, userProfileFeignClient, prdEnumServiceMock,
-            userAttributeServiceMock);
 
-    private final PaymentAccountServiceImpl sut = new PaymentAccountServiceImpl(
-            applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
-            paymentAccountRepositoryMock, organisationServiceMock, userAccountMapServiceMock);
 
     private final SuperUser superUserMock = mock(SuperUser.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
@@ -66,6 +62,15 @@ public class PaymentAccountServiceTest {
 
     @Before
     public void setUp() {
+
+        organisationService = new OrganisationServiceImpl();
+        organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
+        organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
+
+        sut = new PaymentAccountServiceImpl(
+                applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
+                paymentAccountRepositoryMock, organisationService, userAccountMapServiceMock);
+
         organisationMock = mock(Organisation.class);
         superUsers.add(superUserMock);
         paymentAccounts.add(paymentAccountMock);

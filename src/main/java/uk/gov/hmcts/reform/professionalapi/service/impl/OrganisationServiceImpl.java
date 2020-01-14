@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -53,43 +54,30 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
 @Slf4j
+@Setter
 public class OrganisationServiceImpl implements OrganisationService {
-    OrganisationRepository organisationRepository;
-    ProfessionalUserRepository professionalUserRepository;
-    PaymentAccountRepository paymentAccountRepository;
-    DxAddressRepository dxAddressRepository;
-    ContactInformationRepository contactInformationRepository;
-    PrdEnumRepository prdEnumRepository;
-    UserAccountMapService userAccountMapService;
-    UserProfileFeignClient userProfileFeignClient;
-    PrdEnumService prdEnumService;
-    UserAttributeService userAttributeService;
-
     @Autowired
-    public OrganisationServiceImpl(
-            OrganisationRepository organisationRepository,
-            ProfessionalUserRepository professionalUserRepository,
-            PaymentAccountRepository paymentAccountRepository,
-            DxAddressRepository dxAddressRepository,
-            ContactInformationRepository contactInformationRepository,
-            PrdEnumRepository prdEnumRepository,
-            UserAccountMapService userAccountMapService,
-            UserProfileFeignClient userProfileFeignClient,
-            PrdEnumService prdEnumService,
-            UserAttributeService userAttributeService
-    ) {
-
-        this.organisationRepository = organisationRepository;
-        this.professionalUserRepository = professionalUserRepository;
-        this.paymentAccountRepository = paymentAccountRepository;
-        this.contactInformationRepository = contactInformationRepository;
-        this.dxAddressRepository = dxAddressRepository;
-        this.userAccountMapService = userAccountMapService;
-        this.prdEnumRepository = prdEnumRepository;
-        this.userProfileFeignClient = userProfileFeignClient;
-        this.prdEnumService = prdEnumService;
-        this.userAttributeService = userAttributeService;
-    }
+    OrganisationRepository organisationRepository;
+    @Autowired
+    ProfessionalUserRepository professionalUserRepository;
+    @Autowired
+    PaymentAccountRepository paymentAccountRepository;
+    @Autowired
+    DxAddressRepository dxAddressRepository;
+    @Autowired
+    ContactInformationRepository contactInformationRepository;
+    @Autowired
+    PrdEnumRepository prdEnumRepository;
+    @Autowired
+    UserAccountMapService userAccountMapService;
+    @Autowired
+    UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    PrdEnumService prdEnumService;
+    @Autowired
+    UserAttributeService userAttributeService;
+    @Autowired
+    PaymentAccountValidator paymentAccountValidator;
 
     @Override
     @Transactional
@@ -172,15 +160,15 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
-                ContactInformation newContactInformation = new ContactInformation(
-                        RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getCounty()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getCountry()),
-                        RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()),
-                        organisation);
+                ContactInformation newContactInformation = new ContactInformation();
+                newContactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+                newContactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+                newContactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+                newContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+                newContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+                newContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+                newContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
+                newContactInformation.setOrganisation(organisation);
 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
 
