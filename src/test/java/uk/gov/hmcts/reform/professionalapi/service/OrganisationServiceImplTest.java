@@ -171,7 +171,6 @@ public class OrganisationServiceImplTest {
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
 
-
         organisationCreationRequest =
                 new OrganisationCreationRequest(
                         "some-org-name", "PENDING", "sra-id", "false", "number01", "company-url",
