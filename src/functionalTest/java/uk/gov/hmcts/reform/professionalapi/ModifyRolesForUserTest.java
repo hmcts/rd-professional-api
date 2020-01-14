@@ -15,7 +15,6 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -27,8 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
-//tbc uncomment when 418 changes for UP are in aat and refactor test
-@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
@@ -95,7 +92,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         }
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
@@ -144,7 +140,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager")).isTrue();
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac2_add_role_existing_user_using_pui_user_manager_for_external_200() {
 
@@ -171,7 +166,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         assertThat(rolesSize).contains("pui-user-manager,pui-organisation-manager");
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac3_delete_role_existing_user_to_organisation_internal() {
 
@@ -221,7 +215,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac4_delete_role_existing_user_using_pui_user_manager_for_external_200() {
 
