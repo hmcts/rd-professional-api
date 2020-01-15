@@ -7,10 +7,10 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     public void get_request_returns_correct_payment_accounts_associated_with_email() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
@@ -70,7 +70,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     public void returns_multiple_correct_payment_accounts_associated_with_email() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
         paymentAccounts.add("PBA1234568");
 
@@ -138,7 +138,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     @Test
     public void return_404_when_organisation_status_pending_for_pba_user_email_address() {
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()

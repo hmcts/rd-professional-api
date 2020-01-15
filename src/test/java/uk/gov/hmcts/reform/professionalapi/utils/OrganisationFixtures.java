@@ -8,7 +8,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -33,7 +35,7 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
@@ -52,7 +54,7 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFields() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()
@@ -84,7 +86,7 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 
         return anOrganisationCreationRequest()

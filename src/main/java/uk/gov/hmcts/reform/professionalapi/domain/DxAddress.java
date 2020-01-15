@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Getter
 @Setter
-public class DxAddress {
+public class DxAddress implements Serializable {
 
     @Id
     @GeneratedValue(strategy = AUTO)
