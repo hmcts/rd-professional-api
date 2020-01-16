@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
@@ -27,7 +27,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
@@ -54,7 +54,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
-        List<String> paymentAccounts = new ArrayList<>();
+        Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
         Map<String, Object> response =  professionalApiClient.createOrganisation(

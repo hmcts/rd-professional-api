@@ -20,12 +20,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 @Builder(builderMethodName = "anUserProfileCreationRequest")
 public class UserProfileCreationRequest  {
 
-    @JsonIgnore
-    private final String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
 
-    @Pattern(regexp = emailRegex)
+    @Pattern(regexp = EMAILREGEX)
     private String email;
 
+    @JsonIgnore
+    private static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+    
     @NotBlank
     private String firstName;
 

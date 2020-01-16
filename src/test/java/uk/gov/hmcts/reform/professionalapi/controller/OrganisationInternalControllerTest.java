@@ -9,8 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +28,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -51,6 +55,7 @@ public class OrganisationInternalControllerTest {
     private Organisation organisationMock;
     private OrganisationCreationRequest organisationCreationRequestMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
+    private PaymentAccountValidator paymentAccountValidatorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -84,6 +89,7 @@ public class OrganisationInternalControllerTest {
         organisationEntityResponseMock = mock(OrganisationEntityResponse.class);
         organisationCreationRequestMock = mock(OrganisationCreationRequest.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
+        paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         responseEntity = mock(ResponseEntity.class);
@@ -197,9 +203,9 @@ public class OrganisationInternalControllerTest {
 
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
 
-        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email")).thenReturn(organisationMock);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email@test.com")).thenReturn(organisationMock);
 
-        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -207,6 +213,28 @@ public class OrganisationInternalControllerTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testRetrievePaymentAccountByEmailThrows400WhenEmailIsInvalid() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+    }
+
+    @Test
+    public void testEditPaymentAccountsByOrgId() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
+
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("AK57L4T");
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
+
+        ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest, organisationMock.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
     }
 }

@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
+import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
 public class ContactInformationResponseTest {
 
@@ -16,6 +21,8 @@ public class ContactInformationResponseTest {
         final String expectCounty = "City of London";
         final String expectCountry = "England";
         final String expectTownCity = "London";
+        List<DxAddress> dxAddressList = new ArrayList<>();
+        dxAddressList.add(mock(DxAddress.class));
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
@@ -25,6 +32,7 @@ public class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
+        contactInformation.setDxAddresses(dxAddressList);
 
         ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
 
@@ -35,6 +43,7 @@ public class ContactInformationResponseTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
+        assertThat(sut.getDxAddress()).isNotEmpty();
     }
 
 }

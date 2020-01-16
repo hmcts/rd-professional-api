@@ -33,13 +33,13 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         String userId = null;
-        log.info("Inside UserIdArgumentResolver");
+        //Inside UserIdArgumentResolver
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
         if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
             userId = serviceAndUserDetails.getUsername().trim();
-            log.info("Inside UserIdArgumentResolver::userId::" + userId);
+            //Inside UserIdArgumentResolver
             Object[] roles  =  serviceAndUserDetails.getAuthorities().toArray();
             String serviceName = serviceAndUserDetails.getServicename();
         }
