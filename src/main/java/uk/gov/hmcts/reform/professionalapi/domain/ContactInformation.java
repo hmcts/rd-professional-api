@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ContactInformation {
+public class ContactInformation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = AUTO)

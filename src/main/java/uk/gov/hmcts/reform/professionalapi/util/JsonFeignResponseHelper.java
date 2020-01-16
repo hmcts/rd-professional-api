@@ -41,8 +41,13 @@ public class JsonFeignResponseHelper {
 
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
         MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
-        responseHeaders.entrySet().stream().forEach(e ->
-                responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue())));
+        responseHeaders.entrySet().stream().forEach(e -> {
+            if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey().equalsIgnoreCase("x-powered-by") || e.getKey().equalsIgnoreCase("content-length"))) {
+                responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
+            }
+        });
+
+
         return responseEntityHeaders;
     }
 }

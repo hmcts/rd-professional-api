@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class ProfessionalUser {
+public class ProfessionalUser implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

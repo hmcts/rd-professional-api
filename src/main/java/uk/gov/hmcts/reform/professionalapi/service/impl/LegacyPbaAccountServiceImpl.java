@@ -28,8 +28,6 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         List<String> pbaNumbers = null;
 
-        List<PaymentAccount>  paymentAccountsFromEntity = new ArrayList<>();
-
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
 
             if ("false".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
@@ -55,11 +53,11 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         if (!paymentAccountsEntity.isEmpty()) {
 
-            paymentAccountsEntity.forEach(paymentAccount -> {
+            paymentAccountsEntity.forEach(paymentAccount ->
 
-                paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim());
+                paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim())
 
-            });
+            );
         }
         return paymentAccountPbaNumbers;
     }
@@ -84,7 +82,7 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
     private List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
-        List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
+        List<PaymentAccount> userMapPaymentAccount;
 
         userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
                 .collect(toList());
