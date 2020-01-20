@@ -43,7 +43,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     public JurisdictionUserCreationRequest createJurisdictionUserProfileRequestForSuperUser(ProfessionalUser user) {
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
+        List<Jurisdiction> jurisdictions = new ArrayList<>();
         user.getUserAttributes().forEach(userAttribute -> {
             if (userAttribute.getPrdEnum().getPrdEnumId().getEnumType().equalsIgnoreCase("JURISD_ID")) {
                 Jurisdiction jurisdiction = new Jurisdiction();

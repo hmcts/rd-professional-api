@@ -15,7 +15,6 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -27,8 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
-//tbc uncomment when 418 changes for UP are in aat and refactor test
-@Ignore
+
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
@@ -59,7 +57,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .roles(userRoles1)
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerTokenForPuiUserManager;
     }
@@ -87,7 +85,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                     .roles(userRoles)
                     .jurisdictions(OrganisationFixtures.createJurisdictions())
                     .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
+            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
             return bearerTokenForNonPuiUserManager;
         } else {
@@ -95,7 +93,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         }
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
@@ -112,39 +109,37 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        Map professionalUsersResponse = (Map) searchResponse.get("users");
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = getActiveUser(professionalUsersResponses);
 
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        log.info("User Id::" + userId);
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName role1 = new RoleName("pui-user-manager");
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
 
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, orgIdentifier, userId);
         searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
 
-        //List<Map> professionalUsersResponses1 = (List<Map>) searchResponse.get("users");
-        //Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
-
-        Map<String, Object> professionalUsersResponse1 = (Map<String, Object>) searchResponse.get("users");
+        List<Map> professionalUsersResponses1 = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse1 = getActiveUser(professionalUsersResponses1);
 
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
         List<String> rolesSize = (List) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize.contains("caseworker,pui-organisation-manager,pui-user-manager")).isTrue();
+        assertThat(rolesSize).contains("caseworker").contains("pui-organisation-manager").contains("pui-user-manager");
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
     @Test
     public void ac2_add_role_existing_user_using_pui_user_manager_for_external_200() {
 
@@ -163,15 +158,15 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.OK, userProfileUpdatedData, bearerTokenForPuiUserManager, userId);
         Map<String, Object> searchResponse1 = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse1.get("users");
-        Map professionalUsersResponse1 = professionalUsersResponses1.get(1);
+        Map professionalUsersResponse1 = getActiveUser(professionalUsersResponses1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();
 
         List<String> rolesSize = (List<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(2);
-        assertThat(rolesSize).contains("pui-user-manager,pui-organisation-manager");
+        assertThat(rolesSize).contains("pui-user-manager").contains("pui-organisation-manager");
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
+
     @Test
     public void ac3_delete_role_existing_user_to_organisation_internal() {
 
@@ -188,19 +183,18 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
         // inviting the user
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
         // search active user
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
-        Map professionalUsersResponse = professionalUsersResponses.get(1);
+        Map professionalUsersResponse = getActiveUser(professionalUsersResponses);
 
         assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
         assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
-        log.info("User Id::" + userId);
         //create add roles object
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         userProfileUpdatedData.setRolesAdd(createAddRoleName());
@@ -209,7 +203,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize).contains("caseworker,pui-organisation-manager,pui-user-manager");
+        assertThat(rolesSize).contains("caseworker").contains("pui-organisation-manager").contains("pui-user-manager");
 
         UserProfileUpdatedData deleteRoleReqest = new UserProfileUpdatedData();
         deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
@@ -217,11 +211,11 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
         assertThat(rolesAfterDelete.size()).isEqualTo(2);
-        assertThat(rolesSize).contains("pui-organisation-manager,caseworker");
+        assertThat(rolesSize).contains("pui-organisation-manager").contains("caseworker");
 
     }
 
-    @Ignore// Ignoring until OpenId can be tested without hacking config file to point to p.r.
+
     @Test
     public void ac4_delete_role_existing_user_using_pui_user_manager_for_external_200() {
 
@@ -242,7 +236,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesAfterAdd.size()).isEqualTo(2);
-        assertThat(rolesAfterAdd).contains("pui-organisation-manager,caseworker");
+        assertThat(rolesAfterAdd).contains("pui-organisation-manager").contains("pui-user-manager");
 
         // roles to delete
         UserProfileUpdatedData deleteRoleRequest = new UserProfileUpdatedData();
@@ -288,6 +282,18 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
             }
         });
         return rolesToBeReturned;
+    }
+
+    private Map getActiveUser(List<Map> professionalUsersResponses) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
     }
 
 }

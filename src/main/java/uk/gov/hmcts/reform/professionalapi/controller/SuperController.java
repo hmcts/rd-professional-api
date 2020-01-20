@@ -95,13 +95,13 @@ public abstract class SuperController {
     private String jurisdictionIds;
 
 
-    static final String SRA_REGULATED_FALSE = "false";
+    private static final String SRA_REGULATED_FALSE = "false";
 
 
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -111,7 +111,7 @@ public abstract class SuperController {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
-        organisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
@@ -150,7 +150,7 @@ public abstract class SuperController {
 
         } else if (StringUtils.isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
-            if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+            if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
                 //Received request to retrieve organisation with status
                 organisationResponse =
@@ -253,7 +253,7 @@ public abstract class SuperController {
         String orgStatus = RefDataUtil.removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
-        if (organisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+        if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
             organisationsDetailResponse =
                     organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
@@ -275,7 +275,7 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
 
-        organisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        OrganisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
@@ -324,8 +324,7 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    //TODO refactor
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String organisationIdentifier, String userId, Optional<String> origin) {
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 

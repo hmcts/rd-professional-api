@@ -53,11 +53,11 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         if (!paymentAccountsEntity.isEmpty()) {
 
-            paymentAccountsEntity.forEach(paymentAccount -> {
+            paymentAccountsEntity.forEach(paymentAccount ->
 
-                paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim());
+                paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim())
 
-            });
+            );
         }
         return paymentAccountPbaNumbers;
     }

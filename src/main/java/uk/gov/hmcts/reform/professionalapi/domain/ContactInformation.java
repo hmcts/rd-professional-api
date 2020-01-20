@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ContactInformation {
+public class ContactInformation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -66,18 +67,6 @@ public class ContactInformation {
 
     @OneToMany(mappedBy = "contactInformation")
     private List<DxAddress> dxAddresses = new ArrayList<>();
-
-    public ContactInformation(String addressLine1, String addressLine2, String addressLine3, String townCity,
-                              String county, String country, String postCode, Organisation organisation) {
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
-        this.addressLine3 = addressLine3;
-        this.townCity = townCity;
-        this.county = county;
-        this.country = country;
-        this.postCode = postCode;
-        this.organisation = organisation;
-    }
 
     public void addDxAddress(DxAddress dxAddress) {
         dxAddresses.add(dxAddress);

@@ -77,11 +77,11 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 public class OrganisationServiceImplTest {
 
+    OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
-    private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
     private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
@@ -91,7 +91,7 @@ public class OrganisationServiceImplTest {
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
     private final DxAddress dxAddressMock = mock(DxAddress.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
-    private final OrganisationRepository organisationRepositoryNullReturnedMock = mock(OrganisationRepository.class);
+    private final OrganisationRepository organisationRepositoryImplNullReturnedMock = mock(OrganisationRepository.class);
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
@@ -120,7 +120,6 @@ public class OrganisationServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
 
         Set<String> paymentAccountList = new HashSet<>();
 
@@ -171,19 +170,6 @@ public class OrganisationServiceImplTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        sut = new OrganisationServiceImpl(
-                organisationRepositoryMock,
-                professionalUserRepositoryMock,
-                paymentAccountRepositoryMock,
-                dxAddressRepositoryMock,
-                contactInformationRepositoryMock,
-                prdEnumRepositoryMock,
-                userAccountMapServiceMock,
-                userProfileFeignClient,
-                prdEnumServiceMock,
-                userAttributeServiceMock,
-                paymentAccountValidatorMock
-        );
 
         organisationCreationRequest =
                 new OrganisationCreationRequest(
@@ -200,7 +186,7 @@ public class OrganisationServiceImplTest {
         when(professionalUserRepositoryMock.save(any(ProfessionalUser.class)))
                 .thenReturn(professionalUserMock);
 
-        when(organisationRepositoryMock.save(any(Organisation.class)))
+        when(organisationRepository.save(any(Organisation.class)))
                 .thenReturn(organisationMock);
 
         when(paymentAccountRepositoryMock.save(any(PaymentAccount.class)))
@@ -220,20 +206,22 @@ public class OrganisationServiceImplTest {
         when(dxAddressRepositoryMock.save(any(DxAddress.class)))
                 .thenReturn(dxAddressMock);
 
-        when(organisationRepositoryMock.findAll())
+        when(organisationRepository.findAll())
                 .thenReturn(organisations);
 
-        when(organisationRepositoryMock.findByOrganisationIdentifier(any()))
+        when(organisationRepository.findByOrganisationIdentifier(any()))
                 .thenReturn(organisationMock);
 
-        when(organisationRepositoryNullReturnedMock.findByOrganisationIdentifier(any()))
+        when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any()))
                 .thenReturn(null);
 
-        when(organisationRepositoryMock.findByStatus(any()))
+        when(organisationRepository.findByStatus(any()))
                 .thenReturn(organisations);
 
         when(userAccountMapRepositoryMock.findAll())
                 .thenReturn(userAccountMaps);
+
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -253,7 +241,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationResponse).isNotNull();
 
-        verify(organisationRepositoryMock, times(1)).save(any(Organisation.class));
+        verify(organisationRepository, times(1)).save(any(Organisation.class));
         verify(professionalUserRepositoryMock, times(1)).save(any(ProfessionalUser.class));
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
         verify(contactInformationRepositoryMock, times(1)).save(any(ContactInformation.class));
@@ -264,7 +252,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesOrganisationWithInvalidRequest() {
-        when(organisationRepositoryMock.save(any(Organisation.class)))
+        when(organisationRepository.save(any(Organisation.class)))
                 .thenThrow(ConstraintViolationException.class);
 
         Assertions.assertThatThrownBy(() -> sut.createOrganisationFrom(organisationCreationRequest))
@@ -272,7 +260,7 @@ public class OrganisationServiceImplTest {
 
         verify(organisationMock, times(0)).setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
 
-        verify(organisationRepositoryMock, times(2)).save(any(Organisation.class));
+        verify(organisationRepository, times(2)).save(any(Organisation.class));
 
         assertThat(organisationMock.getOrganisationIdentifier()).isNotNull();
     }
@@ -283,8 +271,8 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationResponse).isNotNull();
 
-        verify(organisationRepositoryMock, times(1)).findByOrganisationIdentifier(any(String.class));
-        verify(organisationRepositoryMock, times(1)).save(any(Organisation.class));
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
+        verify(organisationRepository, times(1)).save(any(Organisation.class));
         verify(organisationMock, times(1)).setName(any(String.class));
         verify(organisationMock, times(1)).setStatus(any(OrganisationStatus.class));
         verify(organisationMock, times(1)).setSraId(any(String.class));
@@ -299,7 +287,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isEqualTo(404);
 
-        verify(organisationRepositoryMock, times(1)).findByStatus(any(OrganisationStatus.class));
+        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
     }
 
 
@@ -309,17 +297,8 @@ public class OrganisationServiceImplTest {
         testOrganisation.setId(UUID.randomUUID());
         String testOrganisationId = testOrganisation.getOrganisationIdentifier();
 
-        OrganisationService realOrganisationService = new OrganisationServiceImpl(organisationRepositoryNullReturnedMock,
-                professionalUserRepositoryMock,
-                paymentAccountRepositoryMock,
-                dxAddressRepositoryMock, contactInformationRepositoryMock,
-                prdEnumRepositoryMock,
-                userAccountMapServiceMock,
-                userProfileFeignClient,
-                prdEnumServiceMock,
-                userAttributeServiceMock,
-                paymentAccountValidatorMock);
-        realOrganisationService.retrieveOrganisation(testOrganisationId);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
+        sut.retrieveOrganisation(testOrganisationId);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -345,8 +324,8 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationsDetailResponse).isNull();
 
-        verify(organisationRepositoryMock, times(1)).findByStatus(OrganisationStatus.PENDING);
-        verify(organisationRepositoryMock, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
 
     }
 
@@ -364,7 +343,7 @@ public class OrganisationServiceImplTest {
         users.add(user);
         ProfessionalUser professionalUser = mock(ProfessionalUser.class);
 
-        when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
+        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getUsers()).thenReturn(users);
         when(professionalUser.getUserIdentifier()).thenReturn(id);
@@ -387,7 +366,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationEntityResponse).isNotNull();
 
-        verify(organisationRepositoryMock, times(1)).findByOrganisationIdentifier(any(String.class));
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
         verify(organisationMock, times(1)).setUsers(any());
     }
 
@@ -407,7 +386,7 @@ public class OrganisationServiceImplTest {
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
-        when(organisationRepositoryMock.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -427,13 +406,13 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
 
-        verify(organisationRepositoryMock, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
         verify(organisationMock, times(8)).getUsers();
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrieveAnOrganisationByUuidNotFound() {
-        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
+        Mockito.when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
         sut.retrieveOrganisation(organisationIdentifier);
     }
@@ -449,33 +428,33 @@ public class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
 
-        when(organisationRepositoryMock.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations();
 
         assertThat(organisationDetailResponse).isNotNull();
 
-        verify(organisationRepositoryMock, times(1))
+        verify(organisationRepository, times(1))
                 .findByStatus(OrganisationStatus.PENDING);
     }
 
     @Test
     public void retrieveAnOrganisationByOrgId() {
-        Mockito.when(organisationRepositoryMock.findByOrganisationIdentifier(organisationIdentifier))
+        Mockito.when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier))
                 .thenReturn(organisationMock);
 
         Organisation organisation = sut.getOrganisationByOrgIdentifier(organisationIdentifier);
 
         assertThat(organisation).isNotNull();
 
-        verify(organisationRepositoryMock, times(1))
+        verify(organisationRepository, times(1))
                 .findByOrganisationIdentifier(organisationIdentifier);
     }
 
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testThrowsExceptionWhenOrganisationEmpty() {
-        Mockito.when(organisationRepositoryMock.findAll())
+        Mockito.when(organisationRepository.findAll())
                 .thenReturn(new ArrayList<>());
 
         sut.retrieveOrganisations();

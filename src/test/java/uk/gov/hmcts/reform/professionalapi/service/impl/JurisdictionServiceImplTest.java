@@ -89,6 +89,7 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
     }
 
     @Test(expected = ExternalApiException.class)
