@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
@@ -73,6 +75,50 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         //RetrieveOrganisationsTest:Received response to retrieve an organisation details
     }
 
+    private String settingUpOrganisation(String role) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5) + "@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        return (String) newUserResponse.get("userIdentifier");
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiCaseManager);
+        assertThat(response.get("http_status")).toString().contains("200");
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiFinanceManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiFinanceManager);
+        assertThat(response.get("http_status")).toString().contains("200");
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiOrgManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiOrgManager);
+        assertThat(response.get("http_status")).toString().contains("200");
+    }
+
+
     @Test
     public void persists_and_returns_all_organisations() {
         Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
@@ -118,7 +164,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void forbidden_if_pui_finance_manager_try_access_organisation_id_without_role_access() {
+    public void forbidden_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
