@@ -15,6 +15,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -71,6 +72,7 @@ public abstract class AuthorizationFunctionalTest {
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerTokenForPuiUserManager;
+    protected RequestSpecification bearerTokenForPuiCaseManager;
 
     @Autowired
     protected TestConfigProperties configProperties;

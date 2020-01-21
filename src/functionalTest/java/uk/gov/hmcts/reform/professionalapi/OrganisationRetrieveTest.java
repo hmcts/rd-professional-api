@@ -106,11 +106,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
-    //@Test
-    public void can_retrieve_an_organisation_with_role() {
-
-    }
-
     @Test
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
