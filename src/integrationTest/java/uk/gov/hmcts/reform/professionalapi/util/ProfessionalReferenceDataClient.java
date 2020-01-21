@@ -74,7 +74,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String,Object> retrieveExternalOrganisation(String id, String role) {
-        return getRequest(APP_EXT_BASE_PATH + "?id={id}", role, id);
+        return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
 
     public Map<String,Object> retrieveAllOrganisations(String role) {

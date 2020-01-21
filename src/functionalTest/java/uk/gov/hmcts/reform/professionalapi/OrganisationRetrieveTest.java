@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -40,6 +41,16 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+    }
+
+    @Test
+    public void retrieve_an_organisation_with_user_manager_rights_return_403() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
     }
 
     @Test

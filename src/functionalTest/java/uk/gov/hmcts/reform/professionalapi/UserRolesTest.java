@@ -95,7 +95,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
         List<String> userRoles1 = new ArrayList<>();
         userRoles1.add("pui-organisation-manager");
@@ -108,7 +108,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
-        return bearerTokenForPuiUserManager;
+        return bearerToken;
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
