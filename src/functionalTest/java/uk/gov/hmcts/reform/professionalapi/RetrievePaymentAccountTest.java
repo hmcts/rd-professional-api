@@ -75,7 +75,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         assertThat(response.get("paymentAccount")).asList().hasSize(1);
     }
 
-    @Test
+    //@Test
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiCaseManager));
         assertThat(response.get("errorMessage")).isNotNull();
