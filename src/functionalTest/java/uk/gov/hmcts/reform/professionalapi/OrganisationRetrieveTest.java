@@ -21,7 +21,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     @Test
     public void can_retrieve_all_organisations() {
         professionalApiClient.createOrganisation();
-
         Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
