@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
+
     @Test
     public void can_retrieve_all_organisations() {
         professionalApiClient.createOrganisation();
