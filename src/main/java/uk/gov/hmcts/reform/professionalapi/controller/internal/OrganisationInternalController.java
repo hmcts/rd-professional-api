@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.Sra;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -215,9 +216,10 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
-            @ApiParam(hidden = true) @UserId String userId) {
+            @ApiParam(hidden = true) @UserId String userId,
+            @ApiParam(hidden = true) @Sra Boolean updateSraOnly) {
 
-        return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId, updateSraOnly);
     }
 
     @ApiOperation(

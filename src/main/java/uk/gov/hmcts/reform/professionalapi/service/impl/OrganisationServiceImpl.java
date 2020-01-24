@@ -253,6 +253,20 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    public OrganisationResponse updateSra(
+            OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier) {
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+
+        organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
+        organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())));
+        organisationRepository.save(organisation);
+        //Update Organisation service done
+
+        return new OrganisationResponse(organisation);
+    }
+
+    @Override
     public Organisation getOrganisationByOrgIdentifier(String organisationIdentifier) {
         RefDataUtil.removeAllSpaces(organisationIdentifier);
         return organisationRepository.findByOrganisationIdentifier(organisationIdentifier);

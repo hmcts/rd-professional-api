@@ -191,7 +191,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId, Boolean updateSraOnly) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
@@ -200,31 +200,36 @@ public abstract class SuperController {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
-        organisationCreationRequestValidator.validate(organisationCreationRequest);
-        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
+//        if (updateSraOnly) {
+//            organisationCreationRequestValidator.validateSraRequest(organisationCreationRequest);
+//            organisationService.updateSra(organisationCreationRequest, orgId);
+//        } else {
+            organisationCreationRequestValidator.validate(organisationCreationRequest);
+            organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+            Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+            updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
 
-        SuperUser superUser = existingOrganisation.getUsers().get(0);
-        ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
-                && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
-            //Organisation is getting activated
+            SuperUser superUser = existingOrganisation.getUsers().get(0);
+            ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
+            if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+                    && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
+                //Organisation is getting activated
 
-            jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
-            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
-                //Idam registration success
-                professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-                professionalUserService.persistUser(professionalUser);
-            } else {
-                log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
-                return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
+                jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
+                ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
+                if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                    UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
+                    //Idam registration success
+                    professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                    superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+                    professionalUserService.persistUser(professionalUser);
+                } else {
+                    log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+                    return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
+                }
             }
-        }
-        organisationService.updateOrganisation(organisationCreationRequest, orgId);
+            organisationService.updateSra(organisationCreationRequest, orgId);
+        //}
         return ResponseEntity.status(200).build();
     }
 

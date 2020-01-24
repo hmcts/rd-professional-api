@@ -88,6 +88,10 @@ public class OrganisationCreationRequestValidator {
         requestContactInformation(request.getContactInformation());
     }
 
+    public void validateSraRequest(OrganisationCreationRequest request) {
+        requestValues(request.getSraId(), request.getSraRegulated());
+    }
+
     private void requestSuperUserValidateAccount(UserCreationRequest superUser) {
 
         if (superUser == null || isEmptyValue(superUser.getFirstName())

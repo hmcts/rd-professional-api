@@ -18,6 +18,8 @@ public interface OrganisationService {
 
     OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
 
+    OrganisationResponse updateSra(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
+
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
     OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
