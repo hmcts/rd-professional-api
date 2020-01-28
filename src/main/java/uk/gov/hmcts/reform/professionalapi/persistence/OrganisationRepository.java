@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.persistence;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -20,4 +21,8 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     Organisation findByUsers(ProfessionalUser user);
 
     List<Organisation> findByStatus(OrganisationStatus status);
+
+    List<Organisation> findOrgsByStatus(OrganisationStatus status);
+
+    List<Organisation> findOrgsById(String organisationIdentifier);
 }
