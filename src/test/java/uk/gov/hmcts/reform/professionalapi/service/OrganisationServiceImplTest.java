@@ -287,7 +287,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isEqualTo(404);
 
-        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
+        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class).name());
     }
 
 
@@ -324,8 +324,8 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationsDetailResponse).isNull();
 
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING.name());
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE.name());
 
     }
 
@@ -386,7 +386,7 @@ public class OrganisationServiceImplTest {
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE.name())).thenReturn(organisations);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -406,7 +406,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
 
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE.name());
         verify(organisationMock, times(8)).getUsers();
     }
 
@@ -428,14 +428,14 @@ public class OrganisationServiceImplTest {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.PENDING.name())).thenReturn(organisations);
 
         OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations();
 
         assertThat(organisationDetailResponse).isNotNull();
 
         verify(organisationRepository, times(1))
-                .findByStatus(OrganisationStatus.PENDING);
+                .findByStatus(OrganisationStatus.PENDING.name());
     }
 
     @Test

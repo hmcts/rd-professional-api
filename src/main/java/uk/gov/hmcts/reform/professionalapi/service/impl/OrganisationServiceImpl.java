@@ -194,8 +194,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     public OrganisationsDetailResponse retrieveOrganisations() {
-
-        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING);
+        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING.name());
 
         List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
 
@@ -215,7 +214,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE.name());
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
@@ -279,7 +278,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
-            organisations = organisationRepository.findByStatus(status);
+            organisations = organisationRepository.findByStatus(status.name());
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
