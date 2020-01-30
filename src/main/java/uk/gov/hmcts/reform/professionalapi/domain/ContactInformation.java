@@ -53,7 +53,7 @@ public class ContactInformation implements Serializable {
     @Size(max = 14)
     private String postCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 

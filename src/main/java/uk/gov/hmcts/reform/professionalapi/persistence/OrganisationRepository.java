@@ -21,10 +21,12 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
 
     Organisation findByUsers(ProfessionalUser user);
 
+    //List<Organisation> findByStatus(String status);
 
-    //@Query(value = "SELECT * FROM organisation org INNER JOIN professional_user pu ON org.ORGANISATION_IDENTIFIER::uuid = pu.ORGANISATION_ID::uuid INNER JOIN payment_account pa ON org.ORGANISATION_IDENTIFIER::uuid = pa.ORGANISATION_ID::uuid INNER JOIN contact_information ci ON org.ORGANISATION_IDENTIFIER::uuid = ci.ORGANISATION_ID::uuid WHERE org.status = :status", nativeQuery = true)
-    //@Query(value = "SELECT * FROM organisation org JOIN professional_user pu ON org.ORGANISATION_IDENTIFIER = pu.ORGANISATION_ID", nativeQuery = true)
-    @Query(value = "SELECT * FROM organisation org WHERE org.status = :status", nativeQuery = true)
+    //@Query(value = "SELECT * FROM (((organisation org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID) INNER JOIN payment_account pa ON org.id = pa.ORGANISATION_ID INNER JOIN) contact_information ci ON org.id = ci.ORGANISATION_ID WHERE org.status = :status)", nativeQuery = true)
+    @Query(value = "SELECT * FROM organisation org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID WHERE org.status = :status", nativeQuery = true)
+    //@Query(value = "SELECT * FROM organisation org WHERE org.status = :status", nativeQuery = true)
+    //@Query(value = "SELECT * FROM ((organisation org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID) INNER JOIN payment_account pa ON org.ORGANISATION_IDENTIFIER = pa.ORGANISATION_ID INNER JOIN contact_information ci ON org.ORGANISATION_IDENTIFIER = ci.ORGANISATION_ID)", nativeQuery = true)
     List<Organisation> findByStatus(@Param("status")String status);
 
 }
