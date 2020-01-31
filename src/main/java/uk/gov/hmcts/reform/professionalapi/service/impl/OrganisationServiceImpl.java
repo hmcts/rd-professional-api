@@ -276,13 +276,17 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         }
 
-        if (group == "ALL") {
-            resultingOrganisations.addAll(pendingOrganisations);
-            resultingOrganisations.addAll(updatedOrganisationDetails);
-        } else if (group == "ACTIVE") {
-            resultingOrganisations.addAll(updatedOrganisationDetails);
-        } else if (group == "PENDING") {
-            resultingOrganisations.addAll(pendingOrganisations);
+        switch (group) {
+            case "ALL":
+                resultingOrganisations.addAll(pendingOrganisations);
+                resultingOrganisations.addAll(updatedOrganisationDetails);
+                break;
+            case "ACTIVE":
+                resultingOrganisations.addAll(updatedOrganisationDetails);
+                break;
+            case "PENDING":
+                resultingOrganisations.addAll(pendingOrganisations);
+                break;
         }
 
         return new OrganisationsDetailResponse(resultingOrganisations, true);
