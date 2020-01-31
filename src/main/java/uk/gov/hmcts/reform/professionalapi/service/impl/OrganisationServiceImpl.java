@@ -287,6 +287,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             case "PENDING":
                 resultingOrganisations.addAll(pendingOrganisations);
                 break;
+            default:
+                break;
         }
 
         return new OrganisationsDetailResponse(resultingOrganisations, true);
