@@ -139,7 +139,7 @@ public abstract class SuperController {
             //Received request to retrieve all organisations
             log.info("queries for getall----");
             organisationResponse =
-                    organisationService.retrieveOrganisations();
+                    organisationService.retrieveOrganisations("ALL");
             log.info("queries for getall end----");
 
         } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
