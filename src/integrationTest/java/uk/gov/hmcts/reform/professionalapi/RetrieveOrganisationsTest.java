@@ -111,9 +111,10 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .jurisdictions(createJurisdictions())
                         .build())
                 .build());
-
+        System.out.println("retrieve all orgs start");
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
+        System.out.println("retrieve all orgs end");
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }

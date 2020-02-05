@@ -14,11 +14,16 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.bytebuddy.implementation.bind.annotation.Super;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity(name = "organisation")
+@Entity
+@Table(name = "organisation")
+@SecondaryTable(name = "contact_information")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -34,14 +39,15 @@ public class Organisation implements Serializable {
     private String name;
 
     //@OneToMany(mappedBy = "organisation")
-    @OneToMany
+    @OneToMany(targetEntity = SuperUser.class)
     @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
     private List<SuperUser> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "organisation")
+    @OneToMany(targetEntity = PaymentAccount.class, mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "organisation")
+    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
@@ -88,6 +94,7 @@ public class Organisation implements Serializable {
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+
     }
 
     public void addProfessionalUser(SuperUser superUser) {

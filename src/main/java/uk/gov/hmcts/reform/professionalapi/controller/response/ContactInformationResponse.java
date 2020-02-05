@@ -37,10 +37,12 @@ public class ContactInformationResponse {
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
         this.postCode = contactInfo.getPostCode();
+        System.out.println("in the contact information response, about to get dx address");
         this.dxAddress = contactInfo.getDxAddresses()
                 .stream()
                 .map(dxAddres ->  new DxAddressResponse(dxAddres))
                 .collect(toList());
+        System.out.println("in the contact information response, about to get dx address");
     }
 
 }

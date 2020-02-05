@@ -27,6 +27,7 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @Query(value = "SELECT * FROM organisation org WHERE org.status = :status", nativeQuery = true)
     List<Organisation> findByStatus(@Param("status")String status);
 
-    @Query(value = "SELECT * FROM organisation", nativeQuery = true)
+    // org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID
+    @Query(value = "SELECT * FROM organisation org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID INNER JOIN payment_account pa ON org.id = pa.ORGANISATION_ID ", nativeQuery = true)
     List<Organisation> findAll();
 }

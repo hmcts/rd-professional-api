@@ -137,22 +137,26 @@ public class ProfessionalReferenceDataClient {
     private Map<String, Object> getRequest(String uriPath,String role, Object... params) {
 
         ResponseEntity<Map> responseEntity;
-
+        System.out.println(uriPath + "We in the get");
         try {
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            System.out.println(request.getBody());
+            System.out.println(request.getHeaders());
+            System.out.println("get request params +   " +params.getClass());
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
                             request,
                             Map.class,
                             params);
+            System.out.println(responseEntity.toString());
         } catch (HttpStatusCodeException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
             statusAndBody.put("response_body", ex.getResponseBodyAsString());
             return statusAndBody;
         }
-
+        System.out.println("Where does the call happen");
         return getResponse(responseEntity);
     }
 
