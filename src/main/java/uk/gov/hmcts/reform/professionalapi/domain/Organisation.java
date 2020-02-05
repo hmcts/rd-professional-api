@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.bytebuddy.implementation.bind.annotation.Super;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,6 +26,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@NamedEntityGraph(
+        name = "Organisation.alljoins",
+        attributeNodes = {
+                @NamedAttributeNode("users"),
+                @NamedAttributeNode("paymentAccounts"),
+                @NamedAttributeNode("contactInformations")
+        }
+)
 public class Organisation implements Serializable {
 
     @Id
@@ -47,7 +53,6 @@ public class Organisation implements Serializable {
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation", fetch = FetchType.LAZY)
-    @Fetch(FetchMode.JOIN)
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
@@ -118,15 +123,15 @@ public class Organisation implements Serializable {
     }
 
     public List<SuperUser> getUsers() {
-        return users;
+        return users.stream().distinct().collect(Collectors.toList());
     }
 
     public List<PaymentAccount> getPaymentAccounts() {
-        return paymentAccounts;
+        return paymentAccounts.stream().distinct().collect(Collectors.toList());
     }
 
     public List<ContactInformation> getContactInformation() {
-        return contactInformations;
+        return contactInformations.stream().distinct().collect(Collectors.toList());
     }
 
     public OrganisationStatus getStatus() {

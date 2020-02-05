@@ -2,6 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import java.util.List;
 import java.util.UUID;
+
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +34,11 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     List<Organisation> findByStatus(@Param("status")String status);
 
     // org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID
-    @Query(value = "SELECT * FROM organisation org INNER JOIN professional_user pu ON org.id = pu.ORGANISATION_ID INNER JOIN payment_account pa ON org.id = pa.ORGANISATION_ID ", nativeQuery = true)
+   // @Query(value = "SELECT org FROM organisation org  JOIN  professional_user pu ON org.id = pu.ORGANISATION_ID ", nativeQuery = true) //INNER JOIN payment_account pa ON org.id = pa.ORGANISATION_ID ", nativeQuery = true)
+    @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
+
+    //@Query(value = "SELECT org FROM Organisation org JOIN FETCH org.users") //INNER JOIN payment_account pa ON org.id = pa.ORGANISATION_ID ", nativeQuery = true)
+
+    //List<Organisation> fetchOrganisationWithChild();
 }
