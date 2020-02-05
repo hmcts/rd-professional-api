@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import feign.FeignException;
 import feign.Response;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -317,9 +317,7 @@ public abstract class SuperController {
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
 
         if (page != null) {
-            List<String> sortFieldNames = new ArrayList<>();
-            sortFieldNames.add("firstName");
-            Pageable pageable = null;//RefDataUtil.createPageableObject(page, size);
+            Pageable pageable = RefDataUtil.createPageableObject(page, size,  Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
