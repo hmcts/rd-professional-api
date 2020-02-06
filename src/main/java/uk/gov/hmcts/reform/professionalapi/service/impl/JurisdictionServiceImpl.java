@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+
 import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
@@ -26,7 +28,6 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 
-    static final String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
     static final String successMessage = "Jurisdiction create user profile success!!";
 
     @Override
@@ -55,22 +56,25 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     public void callCcd(JurisdictionUserCreationRequest request, String userId) {
+        int responseCode = 500;
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
-            if (response == null || response.status() > 300) {
-                int responseCode = response == null ? 500 : response.status();
-                log.info("CCD status code: " + responseCode);
+            if (response == null) {
+                throwException(responseCode);
+            } else if (response.status() > 300) {
+                responseCode = response.status();
                 throwException(responseCode);
             }
         } catch (FeignException ex) {
-            throwException(ex.status() < 0 ? 500 : ex.status());
+            throwException(ex.status() < 0 ? responseCode : ex.status());
         }
         log.info(successMessage);
     }
 
     public void throwException(int statusCode) {
-
-        log.error(errorMessage);
-        throw new ExternalApiException(HttpStatus.valueOf(statusCode), errorMessage);
+        log.info("CCD error status code: " + statusCode);
+        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+        String errorMessage = resolveStatusAndReturnMessage(httpStatus);
+        throw new ExternalApiException(httpStatus, errorMessage);
     }
 }
