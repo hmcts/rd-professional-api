@@ -40,7 +40,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
 
         assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
@@ -55,7 +55,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(superUser.get("email")).isEqualTo("someone@somewhere.com");
 
         List<String> accounts = ((List<String>)  orgResponse.get("paymentAccount"));
-        assertThat(accounts.get(0).equals("pba123"));
+        assertThat(accounts.get(0)).isEqualTo("PBA1234567");
 
         Map<String, Object> contactInfo = ((List<Map<String, Object>>) orgResponse.get("contactInformation")).get(0);
         assertThat(contactInfo.get("addressLine1")).isEqualTo("addressLine1");
@@ -74,6 +74,31 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_case_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiCaseManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiFinanceManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiFinanceManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiOrgManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiOrgManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+    }
+
+
+    @Test
     public void persists_and_returns_all_organisations() {
         Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
@@ -89,7 +114,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
     }
 
@@ -118,7 +143,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
-    public void forbidden_if_pui_finance_manager_try_access_organisation_id_without_role_access() {
+    public void forbidden_if_user_does_not_exist_in_org_pui_finance_manager_try_access_organisation_id() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }

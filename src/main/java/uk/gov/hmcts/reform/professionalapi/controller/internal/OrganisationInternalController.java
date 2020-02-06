@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -14,7 +16,6 @@ import javax.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,8 +62,8 @@ public class OrganisationInternalController extends SuperController {
             )
     })
     @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
@@ -104,7 +105,7 @@ public class OrganisationInternalController extends SuperController {
     })
 
     @Secured("prd-admin")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity retrieveOrganisations(
             @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
@@ -138,7 +139,7 @@ public class OrganisationInternalController extends SuperController {
     })
     @GetMapping(
             path = "/pbas",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
@@ -170,7 +171,7 @@ public class OrganisationInternalController extends SuperController {
     })
     @PutMapping(
             path = "/{orgId}/pbas",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
@@ -208,7 +209,7 @@ public class OrganisationInternalController extends SuperController {
     })
     @PutMapping(
             value = "/{orgId}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     @Secured("prd-admin")
@@ -244,7 +245,7 @@ public class OrganisationInternalController extends SuperController {
     })
     @PostMapping(
             path = "/{orgId}/users/",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     @Secured("prd-admin")
