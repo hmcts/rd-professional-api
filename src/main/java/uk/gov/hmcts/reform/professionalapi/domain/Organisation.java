@@ -15,13 +15,13 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "organisation")
-@SecondaryTable(name = "contact_information")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -29,9 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NamedEntityGraph(
         name = "Organisation.alljoins",
         attributeNodes = {
-                @NamedAttributeNode("users"),
-                @NamedAttributeNode("paymentAccounts"),
-                @NamedAttributeNode("contactInformations")
+                @NamedAttributeNode(value = "users"),
         }
 )
 public class Organisation implements Serializable {
@@ -44,15 +42,17 @@ public class Organisation implements Serializable {
     @Size(max = 255)
     private String name;
 
-    //@OneToMany(mappedBy = "organisation")
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = SuperUser.class)
     @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
     private List<SuperUser> users = new ArrayList<>();
 
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = PaymentAccount.class, mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
-    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
@@ -99,7 +99,6 @@ public class Organisation implements Serializable {
         this.sraRegulated = sraRegulated;
         this.companyUrl = companyUrl;
         this.organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
-
     }
 
     public void addProfessionalUser(SuperUser superUser) {

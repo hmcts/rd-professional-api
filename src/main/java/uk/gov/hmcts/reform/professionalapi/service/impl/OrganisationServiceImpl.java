@@ -218,26 +218,19 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse retrieveOrganisations(String group) {
         List<Organisation> retrievedOrganisations = organisationRepository.findAll();
-        for(int i = 0; i < retrievedOrganisations.size(); i++) {
-            System.out.println("in retrieve: retrieved orgs, first name:" + retrievedOrganisations.get(i).getUsers().get(0).getFirstName());
-            System.out.println("in retrieve: retrieved orgs, account name:" + retrievedOrganisations.get(i).getName());
-        }
 
-        List<Organisation> pendingOrganisations = new ArrayList<>();// = organisationRepository.findByStatus(OrganisationStatus.PENDING.name());
-        List<Organisation> activeOrganisations = new ArrayList<>();// = retrieveActiveOrganisationDetails();
+        List<Organisation> pendingOrganisations = new ArrayList<>();
+        List<Organisation> activeOrganisations = new ArrayList<>();
         List<Organisation> resultingOrganisations = new ArrayList<>();
 
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
                 activeOrganisations.add(organisation);
             }
-        });
-        retrievedOrganisations.forEach(organisation -> {
             if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);
             }
         });
-        System.out.println("in retrieve, sorted");
 
         if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
 
@@ -248,13 +241,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedActiveOrganisations = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
 
-        System.out.println("in retrieve, getdetails start");
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
                 activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
             }
         });
-        System.out.println("in retrieve, get details END");
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
@@ -279,7 +270,6 @@ public class OrganisationServiceImpl implements OrganisationService {
             default:
                 break;
         }
-        System.out.println("in retrieve, about to return response");
         return new OrganisationsDetailResponse(resultingOrganisations, true);
     }
 
@@ -324,7 +314,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-        //TODO maybe put other table data here to be retrieved?
+
         List<Organisation> organisations = null;
 
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {

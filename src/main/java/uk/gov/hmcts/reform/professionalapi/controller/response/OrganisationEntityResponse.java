@@ -46,24 +46,18 @@ public class OrganisationEntityResponse  {
         this.sraRegulated = organisation.getSraRegulated();
         this.companyNumber = organisation.getCompanyNumber();
         this.companyUrl = organisation.getCompanyUrl();
-        System.out.println("orgentityresponse, super user start");
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
-        System.out.println("orgentityresponse, super user end");
-        System.out.println("orgentityresponse, payment account start");
         this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                 .collect(toList());
-        System.out.println("orgentityresponse, payment account end");
-        System.out.println("orgentityresponse, contact info start, this gets the dx address tho?");
         if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))
                     .collect(toList());
-            System.out.println("orgentityresponse, contact info end, this gets the dx address tho?");
         }
     }
 }

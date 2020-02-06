@@ -137,14 +137,15 @@ public abstract class SuperController {
         Object organisationResponse = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
-            log.info("queries for getall----");
+            log.info("queries for getall-----------------------------------------");
             organisationResponse =
                     organisationService.retrieveOrganisations("ALL");
-            log.info("queries for getall end----");
+            log.info("queries for getall end-------------------------------------");
 
         } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
                 || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
             //Received request to retrieve organisation with ID
+
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
             organisationResponse =
                     organisationService.retrieveOrganisation(orgId);

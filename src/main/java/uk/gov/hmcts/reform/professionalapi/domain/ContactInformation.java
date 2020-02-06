@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity(name = "contact_information")
@@ -53,7 +55,7 @@ public class ContactInformation implements Serializable {
     @Size(max = 14)
     private String postCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
@@ -65,6 +67,7 @@ public class ContactInformation implements Serializable {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "contactInformation")
     private List<DxAddress> dxAddresses = new ArrayList<>();
 

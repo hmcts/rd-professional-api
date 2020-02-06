@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -100,6 +101,11 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void persists_and_returns_all_organisations() {
+        List<ContactInformationCreationRequest> list2 = new ArrayList<>();
+        List<ContactInformationCreationRequest> list3 = new ArrayList<>();
+        list2.add(aContactInformationCreationRequest().addressLine1("SECOND org").build());
+        list3.add(aContactInformationCreationRequest().addressLine1("THIRD org").build());
+
         Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
         Map<String, Object> orgResponse2 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
@@ -110,13 +116,24 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .email("someoneElse@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
+                .contactInformation(list2)
                 .build());
-        System.out.println("retrieve all orgs start");
+        Map<String, Object> orgResponse3 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
+                .name("some-other-org-nam3")
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fnam3")
+                        .lastName("some-lnam3")
+                        .email("someoneEls3@somewhere.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(list3)
+                .build());
+
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
-        System.out.println("retrieve all orgs end");
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
-        assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(2);
+        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(3);
     }
 
     @Test

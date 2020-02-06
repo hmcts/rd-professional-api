@@ -11,9 +11,9 @@ public class OrganisationsDetailResponse {
     private  List<OrganisationEntityResponse> organisations;
 
     public OrganisationsDetailResponse(List<Organisation> organisations, Boolean isRequiredAllEntities) {
-        System.out.println("orgdetailresponse, streaming orgs");
+
         this.organisations = organisations.stream().map(organisation ->
                 new OrganisationEntityResponse(organisation, isRequiredAllEntities)).collect(Collectors.toList());
-        System.out.println("orgdetailresponse, done streaming orgs");
+
     }
 }
