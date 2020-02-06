@@ -227,7 +227,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
                 activeOrganisations.add(organisation);
             }
-            if (organisation.getStatus() == OrganisationStatus.PENDING) {
+            else if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);
             }
         });
