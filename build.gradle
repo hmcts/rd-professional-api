@@ -42,8 +42,6 @@ def versions = [
         pact_version       : '3.5.24'
 ]
 
-ext["rest-assured.version"] = '4.2.0'
-
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
@@ -266,7 +264,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.2'
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-    compile group: 'io.rest-assured', name: 'rest-assured', version: '4.2.0'
+    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -302,6 +300,9 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-core"
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
+
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured-common', version: '4.0.0'
 
     testCompile group: 'com.h2database', name: 'h2'
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
