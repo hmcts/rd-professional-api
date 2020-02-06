@@ -226,8 +226,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
                 activeOrganisations.add(organisation);
-            }
-            else if (organisation.getStatus() == OrganisationStatus.PENDING) {
+            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);
             }
         });

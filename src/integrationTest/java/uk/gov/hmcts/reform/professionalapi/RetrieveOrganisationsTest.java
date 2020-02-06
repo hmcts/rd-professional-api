@@ -105,6 +105,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         List<ContactInformationCreationRequest> list3 = new ArrayList<>();
         list2.add(aContactInformationCreationRequest().addressLine1("SECOND org").build());
         list3.add(aContactInformationCreationRequest().addressLine1("THIRD org").build());
+        list3.add(aContactInformationCreationRequest().addressLine1("THIRD org 2nd address").build());
 
         Map<String, Object> orgResponse1 = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest()
                 .build());
@@ -131,7 +132,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
-        assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(3);
     }
