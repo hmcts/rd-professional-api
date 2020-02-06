@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -10,7 +12,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotBlank;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        produces = APPLICATION_JSON_VALUE
 )
 @RestController
 @Slf4j
@@ -67,7 +69,7 @@ public class ProfessionalUserInternalController extends SuperController {
     })
     @GetMapping(
             value = "/{orgId}/users",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
@@ -108,7 +110,7 @@ public class ProfessionalUserInternalController extends SuperController {
     })
     @GetMapping(
             value = "/user",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity findUserByEmail(@RequestParam(value = "email") String email) {
@@ -140,7 +142,7 @@ public class ProfessionalUserInternalController extends SuperController {
     })
     @PutMapping(
             path = "/{orgId}/users/{userId}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(

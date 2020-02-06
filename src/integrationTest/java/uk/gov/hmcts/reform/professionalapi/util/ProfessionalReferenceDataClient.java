@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -225,7 +228,7 @@ public class ProfessionalReferenceDataClient {
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.setContentType(MediaType.valueOf(APPLICATION_JSON_VALUE));
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
         String bearerToken = sidamTokenMap.get(role);
@@ -248,7 +251,7 @@ public class ProfessionalReferenceDataClient {
     private HttpHeaders getS2sTokenHeaders() {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.setContentType(MediaType.valueOf(APPLICATION_JSON_VALUE));
         headers.add("ServiceAuthorization", JWT_TOKEN);
         return headers;
     }

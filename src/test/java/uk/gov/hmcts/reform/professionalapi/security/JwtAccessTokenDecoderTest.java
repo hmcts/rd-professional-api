@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -102,7 +103,7 @@ public class JwtAccessTokenDecoderTest {
     @Test
     public void wraps_deserialization_exceptions() throws IOException {
 
-        doThrow(IOException.class)
+        doThrow(JsonProcessingException.class)
                 .when(objectMapper)
                 .readValue(
                         isA(String.class),

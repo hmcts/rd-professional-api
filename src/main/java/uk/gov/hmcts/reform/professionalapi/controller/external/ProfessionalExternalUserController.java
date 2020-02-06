@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -10,8 +11,6 @@ import io.swagger.annotations.Authorization;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,7 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        produces = APPLICATION_JSON_VALUE
 )
 @RestController
 @Slf4j
@@ -79,7 +78,7 @@ public class ProfessionalExternalUserController extends SuperController {
     })
     @GetMapping(
             value = "/users",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
@@ -139,7 +138,7 @@ public class ProfessionalExternalUserController extends SuperController {
     })
     @GetMapping(
             value = "/user",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-user-manager"})
     public Optional<ResponseEntity> findUserByEmail(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
@@ -181,7 +180,7 @@ public class ProfessionalExternalUserController extends SuperController {
     })
     @PutMapping(
             path = "/users/{userId}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     @Secured("pui-user-manager")
@@ -232,7 +231,7 @@ public class ProfessionalExternalUserController extends SuperController {
     })
     @GetMapping(
             value = "/users/accountId",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-publiclaw-courtadmin"})
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
