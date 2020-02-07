@@ -58,7 +58,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             if (response == null) {
-                log.info("Response returned null while CCD call");
+                log.warn("Response returned null while CCD call");
                 throwException(responseCode);
             } else if (response.status() > 300) {
                 responseCode = response.status();
@@ -67,7 +67,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
                 log.info(successMessage);
             }
         } catch (FeignException ex) {
-            log.info("Feign exception while CCD call");
+            log.warn("Feign exception while CCD call");
             throwException(ex.status() < 0 ? responseCode : ex.status());
         }
     }
