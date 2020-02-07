@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -150,27 +149,5 @@ public class JurisdictionServiceImplTest {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(OrganisationFixtures.createJurisdictions(), "some@hmcts.net", "some@hmcts.net");
 
-    }
-
-    @Test
-    public void should_throw_exception() {
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(400))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("21 : There is a problem with your request. Please check and try again");
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(404))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("22 : Resource not found");
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(401))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("23 : Missing Bearer Token");
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(403))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("24 : Access Denied");
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(409))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("25 : User already exists");
-
-        assertThatThrownBy(() -> jurisdictionServiceImpl.throwException(500))
-                .isInstanceOf(ExternalApiException.class).hasMessageStartingWith("26 : error was caused by an unknown exception");
     }
 }

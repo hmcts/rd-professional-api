@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.throwException;
 
 import feign.FeignException;
 import feign.Response;
@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.JurisdictionUserCreationRequest;
@@ -60,21 +58,17 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             if (response == null) {
+                log.info("Response returned null while CCD call");
                 throwException(responseCode);
             } else if (response.status() > 300) {
                 responseCode = response.status();
                 throwException(responseCode);
+            } else {
+                log.info(successMessage);
             }
         } catch (FeignException ex) {
+            log.info("Feign exception while CCD call");
             throwException(ex.status() < 0 ? responseCode : ex.status());
         }
-        log.info(successMessage);
-    }
-
-    public void throwException(int statusCode) {
-        log.info("CCD error status code: " + statusCode);
-        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
-        String errorMessage = resolveStatusAndReturnMessage(httpStatus);
-        throw new ExternalApiException(httpStatus, errorMessage);
     }
 }
