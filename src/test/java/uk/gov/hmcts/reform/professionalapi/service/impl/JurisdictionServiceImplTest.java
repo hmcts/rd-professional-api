@@ -89,6 +89,7 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
     }
 
     @Test(expected = ExternalApiException.class)
@@ -97,6 +98,17 @@ public class JurisdictionServiceImplTest {
         FeignException feignException = mock(FeignException.class);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         when(feignException.status()).thenReturn(400);
+        when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net","s2sToken", request)).thenThrow(feignException);
+
+        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void should_throw_error_when_ccd_returns_error_less_than_zero() {
+
+        FeignException feignException = mock(FeignException.class);
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(feignException.status()).thenReturn(-1);
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net","s2sToken", request)).thenThrow(feignException);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");

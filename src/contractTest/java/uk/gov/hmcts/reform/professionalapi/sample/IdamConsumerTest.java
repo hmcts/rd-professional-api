@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.sample;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import au.com.dius.pact.consumer.MockServer;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -58,7 +59,7 @@ public class IdamConsumerTest {
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        headers.put(HttpHeaders.CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
 
         return builder
                 .given("Idam returns the auth code ")
@@ -80,7 +81,7 @@ public class IdamConsumerTest {
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        headers.put(HttpHeaders.CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
 
         return builder
                 .given("Idam successfully returns user details")
@@ -206,7 +207,7 @@ public class IdamConsumerTest {
                 SerenityRest
                         .given()
                         .headers(headers)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .contentType(APPLICATION_FORM_URLENCODED_VALUE)
                         .formParams(body)
                         .log().all(true)
                         .when()

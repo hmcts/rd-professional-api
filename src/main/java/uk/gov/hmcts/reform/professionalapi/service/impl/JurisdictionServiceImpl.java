@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.throwException;
+
 import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.JurisdictionUserCreationRequest;
@@ -26,7 +26,6 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 
-    static final String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
     static final String successMessage = "Jurisdiction create user profile success!!";
 
     @Override
@@ -55,22 +54,21 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     public void callCcd(JurisdictionUserCreationRequest request, String userId) {
+        int responseCode = 500;
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
-            if (response == null || response.status() > 300) {
-                int responseCode = response == null ? 500 : response.status();
-                log.info("CCD status code: " + responseCode);
+            if (response == null) {
+                log.info("Response returned null while CCD call");
                 throwException(responseCode);
+            } else if (response.status() > 300) {
+                responseCode = response.status();
+                throwException(responseCode);
+            } else {
+                log.info(successMessage);
             }
         } catch (FeignException ex) {
-            throwException(ex.status() < 0 ? 500 : ex.status());
+            log.info("Feign exception while CCD call");
+            throwException(ex.status() < 0 ? responseCode : ex.status());
         }
-        log.info(successMessage);
-    }
-
-    public void throwException(int statusCode) {
-
-        log.error(errorMessage);
-        throw new ExternalApiException(HttpStatus.valueOf(statusCode), errorMessage);
     }
 }

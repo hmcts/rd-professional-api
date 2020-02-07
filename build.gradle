@@ -301,6 +301,9 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured-common', version: '4.0.0'
+
     testCompile group: 'com.h2database', name: 'h2'
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
