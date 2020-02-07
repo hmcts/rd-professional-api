@@ -64,10 +64,14 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> newOrgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifierTwo,hmctsAdmin);
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(newOrgResponse.get("paymentAccount")).asList().size().isEqualTo(3);
+        assertThat(newOrgResponse.get("contactInformation")).asList().size().isEqualTo(2);
+
     }
 
     @Test

@@ -21,7 +21,6 @@ import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,8 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
-
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -95,6 +95,47 @@ public class ProfessionalApiClient {
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new ArrayList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new ArrayList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+        List<ContactInformationCreationRequest> contactInfoList = new ArrayList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
 
         return someMinimalOrganisationRequest()
                 .name(randomAlphabetic(10))
@@ -110,18 +151,7 @@ public class ProfessionalApiClient {
                         .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1")
-                        .addressLine2("addressLine2")
-                        .addressLine3("addressLine3")
-                        .country("some-country")
-                        .county("some-county")
-                        .townCity("some-town-city")
-                        .postCode("some-post-code")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()));
+                .contactInformation(contactInfoList);
     }
 
     public static List<Jurisdiction> createJurisdictions() {
