@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -12,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,7 +59,7 @@ public class LegacyPbaController {
     })
     @GetMapping(
             value = "/pba/{email}",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     public ResponseEntity<LegacyPbaResponse> retrievePbaAccountsByEmail(@PathVariable("email") @NotBlank String email) {

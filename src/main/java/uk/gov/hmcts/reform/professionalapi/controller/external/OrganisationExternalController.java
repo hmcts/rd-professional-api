@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -10,7 +11,6 @@ import io.swagger.annotations.Authorization;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,8 +55,8 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
@@ -92,7 +92,7 @@ public class OrganisationExternalController extends SuperController {
                     message = "Not Found"
             )
     })
-    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
             @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
@@ -124,7 +124,7 @@ public class OrganisationExternalController extends SuperController {
     })
     @GetMapping(
             path = "/pbas",
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true)@OrgId  String orgId) {
@@ -154,8 +154,8 @@ public class OrganisationExternalController extends SuperController {
     })
     @PostMapping(
             path = "/users/",
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
     @Secured("pui-user-manager")
