@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 
 import feign.FeignException;
 import feign.Response;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +99,7 @@ public abstract class SuperController {
     private static final String SRA_REGULATED_FALSE = "false";
 
 
-    protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+    protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
@@ -243,7 +244,7 @@ public abstract class SuperController {
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseHelper.toResponseEntity(response, clazz);
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             log.error("UserProfile api failed:: status code ::" + ex.status());
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
@@ -316,7 +317,7 @@ public abstract class SuperController {
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
 
         if (page != null) {
-            Pageable pageable = RefDataUtil.createPageableObject(page, size, new Sort(Sort.DEFAULT_DIRECTION,"firstName"));
+            Pageable pageable = RefDataUtil.createPageableObject(page, size,  Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);

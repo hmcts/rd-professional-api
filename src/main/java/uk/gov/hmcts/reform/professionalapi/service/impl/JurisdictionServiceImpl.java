@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.throwException;
+
 import feign.FeignException;
 import feign.Response;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.JurisdictionUserCreationRequest;
@@ -25,6 +25,8 @@ public class JurisdictionServiceImpl implements JurisdictionService {
 
     @Autowired
     AuthTokenGenerator authTokenGenerator;
+
+    static final String successMessage = "Jurisdiction create user profile success!!";
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {
@@ -52,13 +54,21 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     }
 
     public void callCcd(JurisdictionUserCreationRequest request, String userId) {
+        int responseCode = 500;
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
-            log.info("Jurisdiction create user profile success!!");
+            if (response == null) {
+                log.info("Response returned null while CCD call");
+                throwException(responseCode);
+            } else if (response.status() > 300) {
+                responseCode = response.status();
+                throwException(responseCode);
+            } else {
+                log.info(successMessage);
+            }
         } catch (FeignException ex) {
-            String errorMessage = "Jurisdiction create user profile failed or CCD service is down";
-            log.error(errorMessage, ex);
-            throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+            log.info("Feign exception while CCD call");
+            throwException(ex.status() < 0 ? responseCode : ex.status());
         }
     }
 }
