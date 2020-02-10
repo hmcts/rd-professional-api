@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExceptionMapper;
@@ -208,5 +209,14 @@ public class ExceptionMapperTest {
         when(dataIntegrityViolationException.getCause().getCause().getMessage()).thenReturn(errorCause);
 
         return exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
+    }
+
+    @Test
+    public void should_handle_HttpClientErrorException() {
+        HttpClientErrorException httpClientErrorException = mock(HttpClientErrorException.class);
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleHttpClientErrorException(httpClientErrorException);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
     }
 }

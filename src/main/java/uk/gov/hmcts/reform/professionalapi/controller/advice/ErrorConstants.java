@@ -15,7 +15,7 @@ public enum ErrorConstants {
 
     DATA_INTEGRITY_VIOLATION("6 : %s Invalid or already exists"),
 
-    ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
+    DUPLICATE_USER("7 : User already present in the system"),
 
     UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
 

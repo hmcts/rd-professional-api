@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator.checkUserAlreadyExist;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator.validateRoles;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 import feign.FeignException;
@@ -22,10 +22,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.*;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -275,17 +285,12 @@ public abstract class SuperController {
 
         Object responseBody = null;
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        validateEmail(newUserCreationRequest.getEmail());
-        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
-        checkUserAlreadyExist(professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail()));
-
+        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
+        checkUserAlreadyExist(newUserCreationRequest.getEmail());
         validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
-
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
+        validateRoles(roles, prdEnumList);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),
@@ -338,5 +343,18 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);
+    }
+
+    public void checkUserAlreadyExist(String userEmail) {
+        if (professionalUserService.findProfessionalUserByEmailAddress(userEmail) != null) {
+            throw new HttpClientErrorException(HttpStatus.CONFLICT, "User already exists");
+        }
+    }
+
+    public Organisation checkOrganisationIsActive(String orgId) {
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
+        return existingOrganisation;
     }
 }

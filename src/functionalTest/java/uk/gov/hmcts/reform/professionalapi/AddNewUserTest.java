@@ -41,6 +41,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(pendingOrganisationCreationRequest.getSuperUser().getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.CONFLICT);
-        assertThat((String)newUserResponse.get("errorDescription")).contains("User already exists");
+        assertThat((String)newUserResponse.get("errorDescription")).contains("409 User already exists");
     }
 }

@@ -9,6 +9,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ACCESS_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.CONFLICT_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
+import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DUPLICATE_USER;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.MALFORMED_JSON;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -82,6 +84,13 @@ public class ExceptionMapper {
             DuplicateKeyException ex) {
         return errorDetailsResponseEntity(ex, CONFLICT, CONFLICT_EXCEPTION.getErrorMessage());
     }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<Object> handleHttpClientErrorException(
+            HttpClientErrorException ex) {
+        return errorDetailsResponseEntity(ex, CONFLICT, DUPLICATE_USER.getErrorMessage());
+    }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
