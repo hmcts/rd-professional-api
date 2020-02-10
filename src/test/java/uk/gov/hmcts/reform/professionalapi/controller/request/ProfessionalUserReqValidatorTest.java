@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.junit.Test;
+import org.springframework.dao.DuplicateKeyException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
@@ -91,7 +92,7 @@ public class ProfessionalUserReqValidatorTest {
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, UUID.randomUUID().toString());
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test(expected = DuplicateKeyException.class)
     public void should_throw_bad_request_when_user_already_exists() {
         ProfessionalUser professionalUser = new ProfessionalUser();
         ProfessionalUserReqValidator.checkUserAlreadyExist(professionalUser);

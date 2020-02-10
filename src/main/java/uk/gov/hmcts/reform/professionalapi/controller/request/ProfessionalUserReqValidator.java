@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -78,9 +79,8 @@ public class ProfessionalUserReqValidator {
 
     public static void checkUserAlreadyExist(ProfessionalUser professionalUser) {
         if (professionalUser != null) {
-            throw new InvalidRequest("User already exist");
+            throw new DuplicateKeyException("User already exists");
         }
     }
-
 
 }

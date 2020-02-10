@@ -37,10 +37,10 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         // create organisation to add normal user
         String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
 
-        // now invite same user/email used in above pending org should give BAD_REQUEST
+        // now invite same user/email used in above pending org should give CONFLICT
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(pendingOrganisationCreationRequest.getSuperUser().getEmail());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.BAD_REQUEST);
-        assertThat((String)newUserResponse.get("errorDescription")).contains("User already exist");
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.CONFLICT);
+        assertThat((String)newUserResponse.get("errorDescription")).contains("User already exists");
     }
 }

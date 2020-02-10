@@ -451,7 +451,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
-        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
-        assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"User already exist\"");
+        assertThat(newUserResponse.get("http_status")).isEqualTo("409");
+        assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"User already exists\"");
     }
 }
