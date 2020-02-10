@@ -15,7 +15,7 @@ public enum ErrorConstants {
 
     DATA_INTEGRITY_VIOLATION("6 : %s Invalid or already exists"),
 
-    DUPLICATE_USER("7 : User already present in the system"),
+    DUPLICATE_USER("7 : User with this email already exists"),
 
     UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
 

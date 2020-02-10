@@ -89,5 +89,4 @@ public class ProfessionalUserReqValidatorTest {
 
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, UUID.randomUUID().toString());
     }
-
 }
