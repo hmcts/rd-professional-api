@@ -28,7 +28,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void should_throw_400_when_add_duplicate_new_user_to_organisation() {
+    public void should_throw_409_when_add_duplicate_new_user_to_organisation() {
 
         // create pending org
         OrganisationCreationRequest pendingOrganisationCreationRequest = createOrganisationRequest().build();

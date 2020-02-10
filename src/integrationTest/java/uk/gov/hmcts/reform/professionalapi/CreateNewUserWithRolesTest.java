@@ -428,7 +428,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void should_return_400_when_same_invited_new_user_is_super_user_of_pending_org() {
+    public void should_return_409_when_same_invited_new_user_is_super_user_of_pending_org() {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
