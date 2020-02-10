@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -88,5 +89,16 @@ public class ProfessionalUserReqValidatorTest {
         when(userProfileUpdatedDataMock.getRolesDelete()).thenReturn(rolesDelete);
 
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, UUID.randomUUID().toString());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void should_throw_bad_request_when_user_already_exists() {
+        ProfessionalUser professionalUser = new ProfessionalUser();
+        ProfessionalUserReqValidator.checkUserAlreadyExist(professionalUser);
+    }
+
+    @Test(expected = Test.None.class)
+    public void should_not_throw_bad_request_when_user_not_exists() {
+        ProfessionalUserReqValidator.checkUserAlreadyExist(null);
     }
 }
