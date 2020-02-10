@@ -19,21 +19,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
 
-    private static String organisationIdentifier = null;
-
-    @BeforeClass
-    public static void  createOrganisation() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        organisationIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier, hmctsAdmin);
-    }
     @Test
     public void add_new_user_to_organisation() {
 
+        String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
+        assertThat((String)newUserResponse.get("userIdentifier")).isNotEmpty();
     }
 
     @Test
@@ -42,11 +35,14 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         // create pending org
         OrganisationCreationRequest pendingOrganisationCreationRequest = createOrganisationRequest().build();
         professionalApiClient.createOrganisation(pendingOrganisationCreationRequest);
-        String email = pendingOrganisationCreationRequest.getSuperUser().getEmail();
+
+        // create organisation to add normal user
+        String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
 
         // now invite same user/email used in above pending org should give BAD_REQUEST
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        newUserCreationRequest.setEmail(email);
+        newUserCreationRequest.setEmail(pendingOrganisationCreationRequest.getSuperUser().getEmail());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.BAD_REQUEST);
+        assertThat((String)newUserResponse.get("errorDescription")).contains("User already exist");
     }
 }
