@@ -35,7 +35,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     enableDbMigration('rd')
-    enableDockerBuild()
     installCharts()
     disableLegacyDeployment()
     enableAksStagingDeployment()
