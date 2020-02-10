@@ -329,10 +329,10 @@ public class OrganisationCreationRequestValidatorTest {
 
     }
 
-    @Test
+    @Test(expected = InvalidRequest.class)
     public void should_validate_valid_email_and_should_throw_exception() {
-        List<String> emailList = new ArrayList<>();
-        String[] invalidEmails = new String[] {
+
+        String[] validEmails = new String[] {
             "あいうえお@example.com",
             "emAil@1.com",
             "email@111",
@@ -356,14 +356,9 @@ public class OrganisationCreationRequestValidatorTest {
             "_email.23@email.com",
             "email.23@-email.com"};
 
-        for (String email : invalidEmails) {
-            try {
-                OrganisationCreationRequestValidator.validateEmail(email);
-            } catch (InvalidRequest ex) {
-                emailList.add(email);
-            }
+        for (String email : validEmails) {
+            OrganisationCreationRequestValidator.validateEmail(email);
         }
-        assertThat(invalidEmails.length).isEqualTo(emailList.size());
 
     }
 

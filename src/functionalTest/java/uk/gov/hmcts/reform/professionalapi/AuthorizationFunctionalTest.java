@@ -15,7 +15,6 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -55,7 +54,7 @@ public abstract class AuthorizationFunctionalTest {
     protected String professionalApiUrl;
 
     @Value("${exui.role.hmcts-admin}")
-    protected static String hmctsAdmin;
+    protected String hmctsAdmin;
 
     @Value("${exui.role.pui-user-manager}")
     protected String puiUserManager;
@@ -88,8 +87,8 @@ public abstract class AuthorizationFunctionalTest {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
-        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
+        /* SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
@@ -135,7 +134,6 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        //log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
@@ -161,7 +159,6 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        //log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
