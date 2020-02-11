@@ -102,8 +102,20 @@ public class ProfessionalUserInternalControllerTest {
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
-        professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
+        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedDataMock)).thenReturn(userProfileUpdatedDataMock);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier("123456A")).thenReturn(organisationMock);
+
+        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
+
+    @Test(expected = InvalidRequest.class)
+    public void testModifyRolesForExistingUserOfOrganisation_ThrowsInvalidRequestIfOrgIdInvalid() {
+        professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "INVALID-ORG-ID", UUID.randomUUID().toString(), Optional.of("EXUI"));
+    }
+
 }
