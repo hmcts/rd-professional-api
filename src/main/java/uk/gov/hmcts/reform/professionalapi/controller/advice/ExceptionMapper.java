@@ -86,7 +86,7 @@ public class ExceptionMapper {
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<Object> handleHttpClientErrorException(
+    public ResponseEntity<Object> handleDuplicateUserException(
             HttpClientErrorException ex) {
         return errorDetailsResponseEntity(ex, CONFLICT, DUPLICATE_USER.getErrorMessage());
     }

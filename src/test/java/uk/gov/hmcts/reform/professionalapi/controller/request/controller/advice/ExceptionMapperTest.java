@@ -212,10 +212,10 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void should_handle_HttpClientErrorException() {
+    public void should_handle_DuplicateUserException() {
         HttpClientErrorException httpClientErrorException = mock(HttpClientErrorException.class);
 
-        ResponseEntity<Object> responseEntity = exceptionMapper.handleHttpClientErrorException(httpClientErrorException);
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleDuplicateUserException(httpClientErrorException);
 
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
     }
