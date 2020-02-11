@@ -223,37 +223,34 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = new ArrayList<>();
         List<Organisation> resultingOrganisations = new ArrayList<>();
 
-        retrievedOrganisations.forEach(organisation -> {
-            if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
-                activeOrganisations.add(organisation);
-            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
-                pendingOrganisations.add(organisation);
-            }
-        });
-
-        if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
+        if (retrievedOrganisations.isEmpty()) {
 
             log.info("No Organisations Retrieved...");
             throw new EmptyResultDataAccessException(1);
         }
 
-        List<Organisation> updatedActiveOrganisations = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
 
-        activeOrganisations.forEach(organisation -> {
-            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+        retrievedOrganisations.forEach(organisation -> {
+            if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
+                activeOrganisations.add(organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+                }
+            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
+                pendingOrganisations.add(organisation);
             }
         });
+
+        List<Organisation> updatedActiveOrganisations = new ArrayList<>();
+
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted().collect(Collectors.toList()));
             updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
                     "false", activeOrganisationDetails);
-
         }
-
 
         switch (group) {
             case "ALL":
