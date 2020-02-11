@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 import feign.FeignException;
 import feign.Response;
@@ -18,10 +22,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.*;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -102,7 +116,7 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -112,7 +126,7 @@ public abstract class SuperController {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
 
-        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
+        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
@@ -132,8 +146,8 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
-        String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
-        String orgStatus = RefDataUtil.removeEmptySpaces(status);
+        String orgId = removeEmptySpaces(organisationIdentifier);
+        String orgStatus = removeEmptySpaces(status);
 
         Object organisationResponse = null;
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
@@ -170,7 +184,7 @@ public abstract class SuperController {
     protected ResponseEntity retrieveUserByEmail(String email) {
         validateEmail(email);
 
-        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(RefDataUtil.removeEmptySpaces(email).toLowerCase());
+        ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(removeEmptySpaces(email).toLowerCase());
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
         return ResponseEntity
@@ -181,7 +195,7 @@ public abstract class SuperController {
     protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(RefDataUtil.removeEmptySpaces(email).toLowerCase());
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(removeEmptySpaces(email).toLowerCase());
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);
@@ -195,7 +209,7 @@ public abstract class SuperController {
     protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
-        String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
+        String orgId = removeEmptySpaces(organisationIdentifier);
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -251,7 +265,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity retrieveAllOrganisationsByStatus(String status) {
-        String orgStatus = RefDataUtil.removeEmptySpaces(status);
+        String orgStatus = removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
         if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
@@ -267,24 +281,20 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
-        String orgId = RefDataUtil.removeEmptySpaces(organisationIdentifier);
+        String orgId = removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;
-        OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        validateEmail(newUserCreationRequest.getEmail());
-        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
-        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
-
-        OrganisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
-
+        validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
+        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
+        checkUserAlreadyExist(newUserCreationRequest.getEmail());
+        validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
+        validateRoles(roles, prdEnumList);
 
         ProfessionalUser newUser = new ProfessionalUser(
-                RefDataUtil.removeEmptySpaces(newUserCreationRequest.getFirstName()),
-                RefDataUtil.removeEmptySpaces(newUserCreationRequest.getLastName()),
+                removeEmptySpaces(newUserCreationRequest.getFirstName()),
+                removeEmptySpaces(newUserCreationRequest.getLastName()),
                 RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
 
@@ -333,5 +343,18 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);
+    }
+
+    public void checkUserAlreadyExist(String userEmail) {
+        if (professionalUserService.findProfessionalUserByEmailAddress(userEmail) != null) {
+            throw new HttpClientErrorException(HttpStatus.CONFLICT, "User already exists");
+        }
+    }
+
+    public Organisation checkOrganisationIsActive(String orgId) {
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
+        return existingOrganisation;
     }
 }
