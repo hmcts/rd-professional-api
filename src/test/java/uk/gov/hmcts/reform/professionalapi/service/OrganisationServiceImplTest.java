@@ -288,7 +288,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isEqualTo(404);
 
-        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class).name());
+        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
     }
 
 
@@ -321,12 +321,12 @@ public class OrganisationServiceImplTest {
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationsDetailResponse =
-                sut.retrieveOrganisations("ALL");
+                sut.retrieveAllOrganisations();
 
         assertThat(organisationsDetailResponse).isNull();
 
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING.name());
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE.name());
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.PENDING);
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
 
     }
 
@@ -387,7 +387,7 @@ public class OrganisationServiceImplTest {
 
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisationMock);
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE.name())).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(organisations);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -407,7 +407,7 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
 
-        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE.name());
+        verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
         verify(organisationMock, times(8)).getUsers();
     }
 
@@ -429,32 +429,14 @@ public class OrganisationServiceImplTest {
 
         organisations.add(organisationMock);
 
-        when(organisationRepository.findAll()).thenReturn(organisations);
+        when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations("PENDING");
-
-        assertThat(organisationDetailResponse).isNotNull();
-
-        verify(organisationRepository, times(1))
-                .findAll();
-    }
-
-    @Test
-    public void retrieveAnActiveOrganisation() {
-        List<Organisation> organisations = new ArrayList<>();
-        List<SuperUser> superUserList = new ArrayList<>();
-        superUserList.add(superUserMock);
-
-        organisations.add(organisationMock);
-
-        when(organisationRepository.findAll()).thenReturn(organisations);
-
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations("ACTIVE");
+        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.PENDING);
 
         assertThat(organisationDetailResponse).isNotNull();
 
         verify(organisationRepository, times(1))
-                .findAll();
+                .findByStatus(OrganisationStatus.PENDING);
     }
 
     @Test
@@ -466,7 +448,7 @@ public class OrganisationServiceImplTest {
 
         when(organisationRepository.findAll()).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations("ALL");
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
 
         assertThat(organisationDetailResponse).isNotNull();
 
@@ -493,7 +475,7 @@ public class OrganisationServiceImplTest {
         Mockito.when(organisationRepository.findAll())
                 .thenReturn(new ArrayList<>());
 
-        sut.retrieveOrganisations("ALL");
+        sut.retrieveAllOrganisations();
     }
 
 

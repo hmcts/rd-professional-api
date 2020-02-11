@@ -12,7 +12,7 @@ public interface OrganisationService {
 
     OrganisationResponse createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest);
 
-    OrganisationsDetailResponse retrieveOrganisations(String group);
+    OrganisationsDetailResponse retrieveAllOrganisations();
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier);
 

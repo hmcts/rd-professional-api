@@ -143,7 +143,7 @@ public class OrganisationInternalControllerTest {
     public void testRetrieveOrganisations() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisations("ALL")).thenReturn(organisationsDetailResponseMock);
+        when(organisationServiceMock.retrieveAllOrganisations()).thenReturn(organisationsDetailResponseMock);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, null);
 

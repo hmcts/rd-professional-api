@@ -197,7 +197,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE.name());
+        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
@@ -216,12 +216,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public OrganisationsDetailResponse retrieveOrganisations(String group) {
+    public OrganisationsDetailResponse retrieveAllOrganisations() {
         List<Organisation> retrievedOrganisations = organisationRepository.findAll();
-
-        List<Organisation> pendingOrganisations = new ArrayList<>();
-        List<Organisation> activeOrganisations = new ArrayList<>();
-        List<Organisation> resultingOrganisations = new ArrayList<>();
 
         if (retrievedOrganisations.isEmpty()) {
 
@@ -229,10 +225,14 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
         }
 
+        List<Organisation> pendingOrganisations = new ArrayList<>();
+        List<Organisation> activeOrganisations = new ArrayList<>();
+        List<Organisation> resultingOrganisations = new ArrayList<>();
+
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
 
         retrievedOrganisations.forEach(organisation -> {
-            if (organisation.getStatus() == OrganisationStatus.ACTIVE) {
+            if (organisation.isOrganisationStatusActive()) {
                 activeOrganisations.add(organisation);
                 if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
                     activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
@@ -252,20 +252,9 @@ public class OrganisationServiceImpl implements OrganisationService {
                     "false", activeOrganisationDetails);
         }
 
-        switch (group) {
-            case "ALL":
-                resultingOrganisations.addAll(pendingOrganisations);
-                resultingOrganisations.addAll(updatedActiveOrganisations);
-                break;
-            case "ACTIVE":
-                resultingOrganisations.addAll(updatedActiveOrganisations);
-                break;
-            case "PENDING":
-                resultingOrganisations.addAll(pendingOrganisations);
-                break;
-            default:
-                break;
-        }
+        resultingOrganisations.addAll(pendingOrganisations);
+        resultingOrganisations.addAll(updatedActiveOrganisations);
+
         return new OrganisationsDetailResponse(resultingOrganisations, true);
     }
 
@@ -315,7 +304,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
-            organisations = organisationRepository.findByStatus(status.name());
+            organisations = organisationRepository.findByStatus(status);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
 
