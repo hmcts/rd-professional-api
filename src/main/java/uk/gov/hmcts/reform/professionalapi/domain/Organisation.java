@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import lombok.Getter;
@@ -122,15 +121,15 @@ public class Organisation implements Serializable {
     }
 
     public List<SuperUser> getUsers() {
-        return users.stream().distinct().collect(Collectors.toList());
+        return users;
     }
 
     public List<PaymentAccount> getPaymentAccounts() {
-        return paymentAccounts.stream().distinct().collect(Collectors.toList());
+        return paymentAccounts;
     }
 
     public List<ContactInformation> getContactInformation() {
-        return contactInformations.stream().distinct().collect(Collectors.toList());
+        return contactInformations;
     }
 
     public OrganisationStatus getStatus() {
