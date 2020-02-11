@@ -83,6 +83,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return new NewUserResponse(persistedNewUser);
     }
 
+    @Override
     public ProfessionalUser findProfessionalUserByEmailAddress(String email) {
         return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
     }
