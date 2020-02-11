@@ -151,7 +151,7 @@ public class ProfessionalUserInternalController extends SuperController {
     ) {
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin, orgId);
 
     }
 }

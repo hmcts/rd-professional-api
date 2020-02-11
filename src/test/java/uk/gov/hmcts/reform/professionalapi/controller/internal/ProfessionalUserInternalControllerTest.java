@@ -6,12 +6,14 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doNothing;
 
 import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
@@ -100,15 +102,8 @@ public class ProfessionalUserInternalControllerTest {
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
 
-    @Test
+    @Test(expected = InvalidRequest.class)
     public void testModifyRolesForExistingUserOfOrganisation() {
-
-        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedDataMock)).thenReturn(userProfileUpdatedDataMock);
-
-        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
-
-        assertThat(actualData).isNotNull();
-        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-
+        professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
     }
 }

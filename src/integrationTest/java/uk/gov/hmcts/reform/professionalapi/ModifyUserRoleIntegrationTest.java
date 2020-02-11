@@ -179,6 +179,39 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
+    @Test
+    public void ac10_modify_roles_of_active_users_for_an_organisation_with_invalid_org_id_should_return_400() {
+
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(puiCaseManager);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        updateUserProfileRolesMock(HttpStatus.OK);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(randomAlphabetic(5) + "@email.com")
+                .roles(userRoles)
+                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .build();
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+
+        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, "invalid", userIdentifier, hmctsAdmin);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("400");
+
+    }
+
     private UserProfileUpdatedData createModifyUserProfileData() {
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();

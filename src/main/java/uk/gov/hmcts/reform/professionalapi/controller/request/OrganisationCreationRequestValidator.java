@@ -60,7 +60,7 @@ public class OrganisationCreationRequestValidator {
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
         if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
-            throw new EmptyResultDataAccessException(1);
+            throw new InvalidRequest("The given organisationIdentifier must be 7 Alphanumeric Characters");
         }
     }
 

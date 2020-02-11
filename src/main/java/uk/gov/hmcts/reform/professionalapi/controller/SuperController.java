@@ -324,7 +324,16 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
+    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin, String orgId) {
+
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation organisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        if (null == organisation) {
+            String errorMessage = "Unable to modify User Roles as no Organisation was found with the given organisationIdentifier: " + orgId;
+            log.error(errorMessage);
+            throw new InvalidRequest(errorMessage);
+        }
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
