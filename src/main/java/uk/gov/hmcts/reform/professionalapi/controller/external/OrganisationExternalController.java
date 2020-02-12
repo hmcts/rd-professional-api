@@ -93,7 +93,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Secured({"pui-organisation-manager", "pui-finance-manager"})
+    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
             @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
 
