@@ -26,10 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
@@ -154,9 +151,16 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 professionalReferenceDataClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<?>) orgResponse.get("organisations")).size()).isEqualTo(3);
+
         Map<String, Object> organisation1 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
         Map<String, Object> organisation2 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(1);
         Map<String, Object> organisation3 = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(2);
+
+        Map<String, Object> contactInfo1 = ((List<Map<String, Object>>) organisation1.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo2 = ((List<Map<String, Object>>) organisation2.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo3_1 = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo3_2 = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(1);
+
         assertThat(organisation1.get("name")).isEqualTo("some-org-name");
         assertThat(organisation2.get("name")).isEqualTo("some-other-org-name");
         assertThat(organisation3.get("name")).isEqualTo("some-other-org-nam3");
@@ -166,9 +170,18 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(organisation1.get("contactInformation")).asList().size().isEqualTo(1);
         assertThat(organisation2.get("contactInformation")).asList().size().isEqualTo(1);
         assertThat(organisation3.get("contactInformation")).asList().size().isEqualTo(3);
-        Map<String, Object> contactInfo = ((List<Map<String, Object>>) organisation2.get("contactInformation")).get(0);
-        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
-        Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(1);
+
+        assertThat(organisation2.get("paymentAccount").toString()).isEqualTo(paymentAccounts2ndOrg.toString());
+        assertThat(organisation3.get("paymentAccount").toString()).isEqualTo(paymentAccounts3rdOrg.toString());
+
+        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo2.get("addressLine1")).isEqualTo("SECOND org");
+        assertThat(contactInfo3_1.get("addressLine1")).isEqualTo("THIRD org");
+        assertThat(contactInfo3_2.get("addressLine1")).isEqualTo("THIRD org 2nd address");
+
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(0);
+        Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(1);
+
         assertThat(dxAddress.get("dxNumber")).isEqualTo("NI 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange1");
         assertThat(dxAddress2.get("dxNumber")).isEqualTo("NI 1200000000");
@@ -204,8 +217,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation("11AA116", puiFinanceManager);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
-
-
 
     @Test
     public void persists_and_returns_all_organisations_details_by_pending_status() {

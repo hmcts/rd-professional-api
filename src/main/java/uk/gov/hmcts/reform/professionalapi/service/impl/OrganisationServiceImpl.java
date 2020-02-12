@@ -220,8 +220,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> retrievedOrganisations = organisationRepository.findAll();
 
         if (retrievedOrganisations.isEmpty()) {
-
-            log.info("No Organisations Retrieved...");
             throw new EmptyResultDataAccessException(1);
         }
 
