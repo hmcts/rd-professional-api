@@ -70,7 +70,7 @@ public abstract class AuthorizationFunctionalTest {
 
     protected ProfessionalApiClient professionalApiClient;
 
-    protected RequestSpecification bearerTokenForPuiUserManager;
+    protected RequestSpecification bearerToken;
 
     @Autowired
     protected TestConfigProperties configProperties;
@@ -120,7 +120,7 @@ public abstract class AuthorizationFunctionalTest {
         return organisationIdentifier;
     }
 
-    public RequestSpecification generateBearerTokenForPuiManager() {
+    public RequestSpecification generateBearerTokenFor(String role) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
@@ -132,9 +132,8 @@ public abstract class AuthorizationFunctionalTest {
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
 
-        //log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
@@ -146,7 +145,7 @@ public abstract class AuthorizationFunctionalTest {
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
-        return bearerTokenForPuiUserManager;
+        return bearerToken;
     }
 
     public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
@@ -158,9 +157,8 @@ public abstract class AuthorizationFunctionalTest {
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        //log.info("Bearer token generated for non pui user manager:::: " + bearerTokenForPuiUserManager);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
@@ -172,7 +170,7 @@ public abstract class AuthorizationFunctionalTest {
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
-        return bearerTokenForPuiUserManager;
+        return bearerToken;
     }
 
     protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {

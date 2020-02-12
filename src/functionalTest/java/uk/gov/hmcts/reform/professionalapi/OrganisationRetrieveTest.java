@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -30,16 +31,19 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
         response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager);
-        assertThat(response.get("name")).isNotNull();
-        assertThat(response.get("status")).isEqualTo("PENDING");
-        assertThat(response.get("sraId")).isNotNull();
-        assertThat(response.get("sraRegulated")).isNotNull();
-        assertThat(response.get("companyNumber")).isNotNull();
-        assertThat(response.get("companyUrl")).isNotNull();
-        assertThat(response.get("superUser")).isNotNull();
-        assertThat(response.get("paymentAccount")).isNotNull();
-        assertThat(response.get("contactInformation")).isNotNull();
-        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        validateSingleOrgResponse(response, "PENDING");
+
+    }
+
+    @Test
+    public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        validateSingleOrgResponse(response, "ACTIVE");
+    }
+
+    @Test
+    public void retrieve_an_organisation_with_user_manager_rights_return_403() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
     }
 
     @Test
@@ -81,6 +85,22 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
         professionalApiClient
                 .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
+    }
+
+    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
+
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response.get("status")).isEqualTo(status);
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+
     }
 
 }
