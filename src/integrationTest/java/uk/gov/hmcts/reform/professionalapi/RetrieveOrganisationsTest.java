@@ -158,8 +158,8 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> contactInfo1 = ((List<Map<String, Object>>) organisation1.get("contactInformation")).get(0);
         Map<String, Object> contactInfo2 = ((List<Map<String, Object>>) organisation2.get("contactInformation")).get(0);
-        Map<String, Object> contactInfo3_1 = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(0);
-        Map<String, Object> contactInfo3_2 = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(1);
+        Map<String, Object> contactInfo3First = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo3Second = ((List<Map<String, Object>>) organisation3.get("contactInformation")).get(1);
 
         assertThat(organisation1.get("name")).isEqualTo("some-org-name");
         assertThat(organisation2.get("name")).isEqualTo("some-other-org-name");
@@ -176,8 +176,8 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
         assertThat(contactInfo2.get("addressLine1")).isEqualTo("SECOND org");
-        assertThat(contactInfo3_1.get("addressLine1")).isEqualTo("THIRD org");
-        assertThat(contactInfo3_2.get("addressLine1")).isEqualTo("THIRD org 2nd address");
+        assertThat(contactInfo3First.get("addressLine1")).isEqualTo("THIRD org");
+        assertThat(contactInfo3Second.get("addressLine1")).isEqualTo("THIRD org 2nd address");
 
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(0);
         Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo2.get("dxAddress")).get(1);
