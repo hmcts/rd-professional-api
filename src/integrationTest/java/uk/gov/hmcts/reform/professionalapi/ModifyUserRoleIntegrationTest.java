@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -181,35 +182,27 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     @Test
     public void ac10_modify_roles_of_active_users_for_an_organisation_with_invalid_org_id_should_return_400() {
-
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(puiCaseManager);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-
         updateUserProfileRolesMock(HttpStatus.OK);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
+                .roles(Arrays.asList(puiCaseManager))
                 .jurisdictions(OrganisationFixtures.createJurisdictions())
                 .build();
 
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
-        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, "invalid", userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "invalid", userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("400");
-
     }
 
     private UserProfileUpdatedData createModifyUserProfileData() {

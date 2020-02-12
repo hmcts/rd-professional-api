@@ -255,26 +255,18 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac5_modify_role_existing_user_to_organisation_internal_returns_400_if_org_id_invalid() {
-
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         String email = idamOpenIdClient.createUser("pui-organisation-manager");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
-        assertThat(newUserCreationRequest).isNotNull();
-
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
         Map professionalUsersResponse = getActiveUser(professionalUsersResponses);
-
-        assertThat(professionalUsersResponse.get("idamStatus")).isNotNull();
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();

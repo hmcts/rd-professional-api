@@ -23,7 +23,6 @@ public class ModifyUserRolesResponseTest {
     }
 
     private RoleAdditionResponse addRolesForUser() {
-
         RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();
         addRoleResponse.setIdamStatusCode("200");
         addRoleResponse.setIdamMessage("Success");
@@ -31,7 +30,6 @@ public class ModifyUserRolesResponseTest {
     }
 
     private List<RoleDeletionResponse> deleteRolesForUser() {
-
         List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
         RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamStatusCode("200");
@@ -50,7 +48,7 @@ public class ModifyUserRolesResponseTest {
         RoleDeletionResponse deleteRoleResponse = new RoleDeletionResponse();
         deleteRoleResponse.setIdamMessage("deleteMessage");
         deleteResponses.add(deleteRoleResponse);
-        ErrorResponse errorResponse = new ErrorResponse("failure","500","1200");
+        ErrorResponse errorResponse = new ErrorResponse("failure", "500", "1200");
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(errorResponse, addRoleResponse, deleteResponses, statusUpdateResponse);
 
         assertThat(modifyUserRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("addMessage");
