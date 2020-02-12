@@ -22,28 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 @Slf4j
 public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private String settingUpOrganisation(String role) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        return ((String) newUserResponse.get("userIdentifier"));
-    }
-
     @Test
     public void ac1_modify_roles_of_active_users_for_an_active_organisation_with_prd_admin_role_should_return_200() {
 
