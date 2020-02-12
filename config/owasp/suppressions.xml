@@ -2,9 +2,9 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
-   file name: selenium-opera-driver-4.0.0-alpha-4.jar
+   file name: selenium-opera-driver-3.141.59.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.seleniumhq\.selenium/selenium\-opera\-driver@.*$</packageUrl>
+        <sha1>6b11ed01182bfd8bb62ddeae34cf9eadd3cfc7ff</sha1>
         <cve>CVE-2003-1561</cve>
         <cve>CVE-2008-1761</cve>
         <cve>CVE-2008-1764</cve>
