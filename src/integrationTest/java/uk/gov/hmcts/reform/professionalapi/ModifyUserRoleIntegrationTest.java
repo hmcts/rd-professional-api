@@ -200,9 +200,18 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "invalid", userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%nvalid-org-id", userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("400");
+
+        Map<String, Object> response1 = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "$nvalid-org-id", userIdentifier, hmctsAdmin);
+        assertThat(response1.get("http_status")).isNotNull();
+        assertThat(response1.get("http_status")).isEqualTo("400");
+
+
+        Map<String, Object> response2 = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), ",nvalid-org-id", userIdentifier, hmctsAdmin);
+        assertThat(response2.get("http_status")).isNotNull();
+        assertThat(response2.get("http_status")).isEqualTo("400");
     }
 
     private UserProfileUpdatedData createModifyUserProfileData() {
