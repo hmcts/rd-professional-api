@@ -192,24 +192,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    @Override
-    public OrganisationsDetailResponse retrieveOrganisations() {
-
-        List<Organisation> pendingOrganisations = organisationRepository.findByStatus(OrganisationStatus.PENDING);
-
-        List<Organisation> activeOrganisations = retrieveActiveOrganisationDetails();
-
-        if (pendingOrganisations.isEmpty() && activeOrganisations.isEmpty()) {
-
-            log.info("No Organisations Retrieved...");
-            throw new EmptyResultDataAccessException(1);
-        }
-
-        pendingOrganisations.addAll(activeOrganisations);
-
-        return new OrganisationsDetailResponse(pendingOrganisations, true);
-    }
-
     public List<Organisation> retrieveActiveOrganisationDetails() {
 
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
@@ -231,6 +213,47 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         }
         return updatedOrganisationDetails;
+    }
+
+    @Override
+    public OrganisationsDetailResponse retrieveAllOrganisations() {
+        List<Organisation> retrievedOrganisations = organisationRepository.findAll();
+
+        if (retrievedOrganisations.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        List<Organisation> pendingOrganisations = new ArrayList<>();
+        List<Organisation> activeOrganisations = new ArrayList<>();
+        List<Organisation> resultingOrganisations = new ArrayList<>();
+
+        Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
+
+        retrievedOrganisations.forEach(organisation -> {
+            if (organisation.isOrganisationStatusActive()) {
+                activeOrganisations.add(organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+                }
+            } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
+                pendingOrganisations.add(organisation);
+            }
+        });
+
+        List<Organisation> updatedActiveOrganisations = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest
+                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted().collect(Collectors.toList()));
+            updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
+                    "false", activeOrganisationDetails);
+        }
+
+        resultingOrganisations.addAll(pendingOrganisations);
+        resultingOrganisations.addAll(updatedActiveOrganisations);
+
+        return new OrganisationsDetailResponse(resultingOrganisations, true);
     }
 
     @Override

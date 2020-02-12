@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,10 +65,27 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> newOrgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifierTwo,hmctsAdmin);
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(newOrgResponse.get("paymentAccount")).asList().size().isEqualTo(3);
+        assertThat(newOrgResponse.get("contactInformation")).asList().size().isEqualTo(2);
+
+        Map<String, Object> contactInfo1 = ((List<Map<String, Object>>) newOrgResponse.get("contactInformation")).get(0);
+        Map<String, Object> contactInfo2 = ((List<Map<String, Object>>) newOrgResponse.get("contactInformation")).get(1);
+
+        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addLine1");
+        assertThat(contactInfo2.get("addressLine1")).isEqualTo("addressLine1");
+
+        Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(0);
+        Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(1);
+
+        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 123452222");
+        assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
+        assertThat(dxAddress2.get("dxNumber")).isEqualTo("DX 123456333");
+        assertThat(dxAddress2.get("dxExchange")).isEqualTo("dxExchange");
     }
 
     @Test
