@@ -86,6 +86,7 @@ public class OrganisationServiceImplTest {
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+    private final SuperUser superUserMock = mock(SuperUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
@@ -320,7 +321,7 @@ public class OrganisationServiceImplTest {
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationsDetailResponse organisationsDetailResponse =
-                sut.retrieveOrganisations();
+                sut.retrieveAllOrganisations();
 
         assertThat(organisationsDetailResponse).isNull();
 
@@ -422,20 +423,37 @@ public class OrganisationServiceImplTest {
         sut.findByOrganisationStatus(OrganisationStatus.PENDING);
     }
 
-
     @Test
     public void retrieveAnPendingOrganisation() {
         List<Organisation> organisations = new ArrayList<>();
+
         organisations.add(organisationMock);
 
         when(organisationRepository.findByStatus(OrganisationStatus.PENDING)).thenReturn(organisations);
 
-        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveOrganisations();
+        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.PENDING);
 
         assertThat(organisationDetailResponse).isNotNull();
 
         verify(organisationRepository, times(1))
                 .findByStatus(OrganisationStatus.PENDING);
+    }
+
+    @Test
+    public void retrieveAllOrganisations() {
+        List<Organisation> organisations = new ArrayList<>();
+
+        organisations.add(organisationMock);
+        organisations.add(organisationMock);
+
+        when(organisationRepository.findAll()).thenReturn(organisations);
+
+        OrganisationsDetailResponse organisationDetailResponse = sut.retrieveAllOrganisations();
+
+        assertThat(organisationDetailResponse).isNotNull();
+
+        verify(organisationRepository, times(1))
+                .findAll();
     }
 
     @Test
@@ -457,7 +475,7 @@ public class OrganisationServiceImplTest {
         Mockito.when(organisationRepository.findAll())
                 .thenReturn(new ArrayList<>());
 
-        sut.retrieveOrganisations();
+        sut.retrieveAllOrganisations();
     }
 
 
