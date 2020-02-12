@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.validation.constraints.NotBlank;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 
-
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
 )
@@ -107,12 +106,11 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity retrieveOrganisations(
-            @ApiParam(name = "id", required = false)@RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status", required = false)@RequestParam(value = "status", required = false) String status) {
+            @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);
     }
-
 
 
     @ApiOperation(

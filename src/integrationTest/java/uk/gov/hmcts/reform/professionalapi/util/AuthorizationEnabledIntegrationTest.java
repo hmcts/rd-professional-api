@@ -234,7 +234,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
+    public void ccdUserProfileErrorWireMock(HttpStatus httpStatus) {
 
+        ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
+                .willReturn(aResponse()
+                        .withStatus(httpStatus.value())
+                ));
+    }
 
     @After
     public void cleanupTestData() {

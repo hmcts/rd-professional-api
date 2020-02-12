@@ -15,13 +15,27 @@ public enum ErrorConstants {
 
     DATA_INTEGRITY_VIOLATION("6 : %s Invalid or already exists"),
 
-    ILLEGAL_ARGUMENT("7 : method has been passed an illegal or inappropriate argument"),
+    DUPLICATE_USER("7 : User with this email already exists"),
 
     UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
 
     ACCESS_EXCEPTION("9 : Access Denied"),
 
-    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception");
+    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception"),
+
+    //error codes for CCD
+    INVALID_REQUEST_CCD("21 : There is a problem with your request. Please check and try again"),
+
+    RESOURCE_NOT_FOUND("22 : Resource not found"),
+
+    MISSING_TOKEN("23 : Missing Bearer Token"),
+
+    ACCESS_EXCEPTION_CCD("24 : Access Denied"),
+
+    USER_EXISTS("25 : User already exists"),
+
+    UNKNOWN_EXCEPTION_CCD("26 : error was caused by an unknown exception"),;
+
 
     private final String errorMessage;
 
