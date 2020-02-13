@@ -200,9 +200,10 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%nvalid-org-id", userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
-        assertThat(response.get("http_status")).isEqualTo("400");
+        //HTTP Status returns 500 due to RequestRejectedException: The request was rejected because the URL contained a potentially malicious String "%25"
+        assertThat(response.get("http_status")).isEqualTo("500");
 
         Map<String, Object> response1 = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "$nvalid-org-id", userIdentifier, hmctsAdmin);
         assertThat(response1.get("http_status")).isNotNull();
