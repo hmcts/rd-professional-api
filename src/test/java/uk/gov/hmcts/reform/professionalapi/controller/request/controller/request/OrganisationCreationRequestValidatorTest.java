@@ -111,6 +111,11 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
     }
 
+    @Test(expected = InvalidRequest.class) //value less than 7 char in length should throw invalid request
+    public void validateOrganisationIdentifierTooLongTest() {
+        organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
+    }
+
     @Test(expected = InvalidRequest.class) //incorrect format should throw invalid request exception
     public void validateOrganisationIdentifierWrongFormatTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");

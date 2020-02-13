@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.List;
@@ -59,7 +58,9 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
-        if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
+        if (StringUtils.isBlank(inputOrganisationIdentifier)) {
+            throw new InvalidRequest("The given organisationIdentifier cannot be null or empty");
+        } else if (!inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
             throw new InvalidRequest("The given organisationIdentifier must be 7 Alphanumeric Characters");
         }
     }
