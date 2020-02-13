@@ -6,12 +6,14 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doNothing;
 
 import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
@@ -102,13 +104,19 @@ public class ProfessionalUserInternalControllerTest {
 
     @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
-
+        when(organisationServiceMock.getOrganisationByOrgIdentifier("123456A")).thenReturn(organisationMock);
         when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedDataMock)).thenReturn(userProfileUpdatedDataMock);
 
         ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 
+    @Test(expected = ResourceNotFoundException.class)
+    public void testModifyRolesForExistingUserOfOrganisation_ThrowsInvalidRequestIfOrgIdInvalid() {
+        professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "INVALID-ORG-ID", UUID.randomUUID().toString(), Optional.of("EXUI"));
     }
 }
+
+

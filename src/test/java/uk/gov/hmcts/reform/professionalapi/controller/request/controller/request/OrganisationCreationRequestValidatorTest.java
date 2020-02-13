@@ -101,17 +101,22 @@ public class OrganisationCreationRequestValidatorTest {
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
+    @Test(expected = InvalidRequest.class) //null value should throw invalid request exception
     public void validateOrganisationIdentifierNullTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier(null);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //value less than 7 char in length should throw empty exception
+    @Test(expected = InvalidRequest.class) //value less than 7 char in length should throw invalid request exception
     public void validateOrganisationIdentifierTooShortTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //incorrect format should throw empty exception
+    @Test(expected = InvalidRequest.class) //value less than 7 char in length should throw invalid request
+    public void validateOrganisationIdentifierTooLongTest() {
+        organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
+    }
+
+    @Test(expected = InvalidRequest.class) //incorrect format should throw invalid request exception
     public void validateOrganisationIdentifierWrongFormatTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    private static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public static final String CHARACTERS = " characters";
 
@@ -60,8 +59,10 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
-        if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
-            throw new EmptyResultDataAccessException(1);
+        if (StringUtils.isBlank(inputOrganisationIdentifier)) {
+            throw new InvalidRequest("The given organisationIdentifier cannot be null or empty");
+        } else if (!inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
+            throw new InvalidRequest("The given organisationIdentifier must be 7 Alphanumeric Characters");
         }
     }
 

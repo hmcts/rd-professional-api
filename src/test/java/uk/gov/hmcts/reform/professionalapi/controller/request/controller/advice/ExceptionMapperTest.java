@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -187,6 +188,14 @@ public class ExceptionMapperTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains("EMAIL"));
+    }
+
+    @Test
+    public void should_handle_Request_Rejected_Exception() {
+        RequestRejectedException exception = mock(RequestRejectedException.class);
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleRequestRejectedException(exception);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
     @Test

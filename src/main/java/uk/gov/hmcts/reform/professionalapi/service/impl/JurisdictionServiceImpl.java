@@ -26,7 +26,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 
-    static final String successMessage = "Jurisdiction create user profile success!!";
+    static final String SUCCESS_MESSAGE = "Jurisdiction create user profile success!!";
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {
@@ -64,7 +64,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
                 responseCode = response.status();
                 throwException(responseCode);
             } else {
-                log.info(successMessage);
+                log.info(SUCCESS_MESSAGE);
             }
         } catch (FeignException ex) {
             log.warn("Feign exception while CCD call");
