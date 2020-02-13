@@ -160,8 +160,8 @@ public class ProfessionalUserInternalController extends SuperController {
             throw new ResourceNotFoundException(errorMessage);
         }
 
-        organisationIdentifierValidatorImpl.validateOrganisationExists(orgId)
-        ;
+        organisationIdentifierValidatorImpl.validateOrganisationExists(orgId);
+
         //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin, orgId);
 
