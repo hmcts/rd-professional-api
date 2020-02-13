@@ -19,6 +19,7 @@
         <cve>CVE-2010-5227</cve>
         <cve>CVE-2015-8960</cve>
         <cve>CVE-2019-19788</cve>
+        <cve>CVE-2008-4695</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
