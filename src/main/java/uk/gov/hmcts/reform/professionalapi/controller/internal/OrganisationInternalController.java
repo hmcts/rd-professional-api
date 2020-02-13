@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -109,6 +110,10 @@ public class OrganisationInternalController extends SuperController {
             @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
+        if (!StringUtils.isBlank(id)) {
+            organisationCreationRequestValidator.validateOrganisationIdentifier(id);
+        }
+
         return retrieveAllOrganisationOrById(id, status);
     }
 
@@ -176,6 +181,8 @@ public class OrganisationInternalController extends SuperController {
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+
         paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
 
@@ -216,6 +223,8 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
 
@@ -252,8 +261,9 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        //Received request to add a internal new user to an organisation
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
 
+        //Received request to add a internal new user to an organisation
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
     }
 }

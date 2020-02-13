@@ -77,6 +77,8 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
@@ -158,6 +160,8 @@ public class ProfessionalUserInternalController extends SuperController {
             throw new ResourceNotFoundException(errorMessage);
         }
 
+        organisationIdentifierValidatorImpl.validateOrganisationExists(orgId)
+        ;
         //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin, orgId);
 

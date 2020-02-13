@@ -3,18 +3,24 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Component
 @Slf4j
-public class OrganisationIdentifierIdentifierValidatorImpl implements OrganisationIdentifierValidator {
+public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifierValidator {
+
+    @Autowired
+    private OrganisationRepository organisationRepository;
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
@@ -66,6 +72,14 @@ public class OrganisationIdentifierIdentifierValidatorImpl implements Organisati
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.error("Organisation is not Active hence not returning any users");
             throw new EmptyResultDataAccessException(1);
+        }
+    }
+
+    public void validateOrganisationExists(String orgId) {
+        if (null == organisationRepository.findByOrganisationIdentifier(orgId)) {
+            String errorMessage = "Unable to modify User Roles as no Organisation was found with the given organisationIdentifier: " + orgId;
+            log.error(errorMessage);
+            throw new ResourceNotFoundException(errorMessage);
         }
     }
 }

@@ -52,7 +52,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         newPaymentAccounts.add("PBA0000004");
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
         Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, "this-does-not-exist", hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
