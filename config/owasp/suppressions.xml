@@ -51,6 +51,41 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+   file name: htmlunit-core-js-2.36.0.jar
+   ]]></notes>
+        <sha1>47bc8cf3a812169a4ce283515604c6cbab4aa13f</sha1>
+        <cpe>cpe:/a:htmlunit_project:htmlunit</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: htmlunit-driver-2.36.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.seleniumhq\.selenium/htmlunit\-driver@.*$</packageUrl>
+        <cpe>cpe:/a:htmlunit_project:htmlunit</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: htmlunit-2.36.0.jar
+   ]]></notes>
+        <sha1>efe6df9c5bc1284cd1d7952434ea4f85c5a32f72</sha1>
+        <cpe>cpe:/a:htmlunit_project:htmlunit</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: neko-htmlunit-2.36.0.jar
+   ]]></notes>
+        <sha1>6e999678a3b2813ea71fac4ebc5996b1406e954d</sha1>
+        <cpe>cpe:/a:htmlunit_project:htmlunit</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: htmlunit-cssparser-1.5.0.jar
+   ]]></notes>
+        <sha1>7e40e04f32622e63a30e92ac158f799f67d8ddf0</sha1>
+        <cpe>cpe:/a:htmlunit_project:htmlunit</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
    file name: groovy-xml-2.4.15.jar
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-xml:.*$</gav>
