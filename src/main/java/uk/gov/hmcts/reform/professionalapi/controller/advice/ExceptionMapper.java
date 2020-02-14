@@ -31,16 +31,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
 
@@ -143,16 +140,6 @@ public class ExceptionMapper {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleForbiddenException(Exception ex) {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage());
-    }
-
-    @ExceptionHandler(RequestRejectedException.class)
-    public ResponseEntity<Object> handleRequestRejectedException(Exception ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
-    }
-
-    @ExceptionHandler(HttpServerErrorException.class)
-    public ResponseEntity<Object> handleHttpServerErrorException(Exception ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
     @ExceptionHandler(Exception.class)

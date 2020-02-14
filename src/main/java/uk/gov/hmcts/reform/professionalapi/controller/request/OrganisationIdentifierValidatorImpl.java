@@ -12,18 +12,18 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Component
 @Slf4j
 public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifierValidator {
 
-    private OrganisationRepository organisationRepository;
+    private OrganisationService organisationService;
 
     @Autowired
-    public OrganisationIdentifierValidatorImpl(OrganisationRepository organisationRepository) {
-        this.organisationRepository = organisationRepository;
+    public OrganisationIdentifierValidatorImpl(OrganisationService organisationService) {
+        this.organisationService = organisationService;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     public void validateOrganisationExists(String orgId) {
-        if (null == organisationRepository.findByOrganisationIdentifier(orgId)) {
+        if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
             String errorMessage = "Unable to modify User Roles as no Organisation was found with the given organisationIdentifier: " + orgId;
             log.error(errorMessage);
             throw new ResourceNotFoundException(errorMessage);

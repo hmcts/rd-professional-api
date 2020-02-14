@@ -20,15 +20,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 public class OrganisationIdentifierValidatorImplTest {
 
     private Organisation organisationMock = mock(Organisation.class);
     private PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
-    private OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
+    private OrganisationService organisationServiceMock = mock(OrganisationService.class);
 
-    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl(organisationRepositoryMock);
+    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl(organisationServiceMock);
 
     @Test
     public void testValidate() {
