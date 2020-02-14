@@ -42,5 +42,10 @@
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_PUT": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations_POST": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
-  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10\u0026showDeleted=showDeleted\u0026size=10_GET": "ignore"
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users?page=10\u0026showDeleted=showDeleted\u0026size=10_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas?email=foo-bar@example.com_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/search/pba/foo-bar@example.com_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/accountId?email=foo-bar@example.com_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id\u0026status=status_GET": "ignore"
 }
