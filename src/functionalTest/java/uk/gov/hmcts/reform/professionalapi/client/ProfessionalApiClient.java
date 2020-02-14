@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,7 +99,7 @@ public class ProfessionalApiClient {
         paymentAccounts.add("PBA" + randomAlphabetic(7));
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
-        List<DxAddressCreationRequest> dx1 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
                 .dxExchange("dxExchange").build());
@@ -108,14 +109,14 @@ public class ProfessionalApiClient {
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456788")
                 .dxExchange("dxExchange").build());
-        List<DxAddressCreationRequest> dx2 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123452222")
                 .dxExchange("dxExchange").build());
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456333")
                 .dxExchange("dxExchange").build());
-        List<ContactInformationCreationRequest> contactInfoList = new ArrayList<>();
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
         contactInfoList.add(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
                 .addressLine2("addressLine2")
