@@ -38,7 +38,8 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test

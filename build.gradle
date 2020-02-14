@@ -185,7 +185,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
     // Nothing to do here
-    println 'pact tests have been moved to pactPublish'
 }
 
 jacoco {
@@ -358,7 +357,6 @@ dependencyCheck {
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     // FIXME temp disabled with 42
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 0 : 11
-    println 'Hi from dependencyCheck'
     suppressionFiles = ['config/owasp/suppressions.xml']
 }
 

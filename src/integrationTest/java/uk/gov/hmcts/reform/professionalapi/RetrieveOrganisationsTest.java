@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -89,7 +90,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     public void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiFinanceManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiFinanceManager);
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("http_status").toString().contains(OK.name()));
         assertThat(response.get("organisationIdentifier")).isNotNull();
     }
 
@@ -97,7 +98,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     public void return_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiOrgManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiOrgManager);
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("http_status").toString().contains(OK.name()));
         assertThat(response.get("organisationIdentifier")).isNotNull();
     }
 
