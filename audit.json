@@ -28,5 +28,14 @@
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10\u0026showDeleted=showDeleted\u0026size=10\u0026status=status_GET": "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/accountId?email=foo-bar@example.com_GET": "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/user?email=foo-bar@example.com_GET": "ignore",
-  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/user?email=foo-bar@example.com_GET": "ignore"
+  "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/user?email=foo-bar@example.com_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/userId?origin=EXUI_PUT": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId_PUT": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations?id=id\u0026status=status_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/users/_POST": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas?email=foo-bar@example.com_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/user?email=foo-bar@example.com_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/user?email=foo-bar@example.com_GET": "ignore",
+  "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/_GET": "ignore"
 }
