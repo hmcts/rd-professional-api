@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 
 import feign.FeignException;
 import feign.Response;
@@ -317,5 +318,12 @@ public class RefDataUtil {
 
         return newUserResponse;
 
+    }
+
+    public static void throwException(int statusCode) {
+        log.info("Error status code: " + statusCode);
+        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+        String errorMessage = resolveStatusAndReturnMessage(httpStatus);
+        throw new ExternalApiException(httpStatus, errorMessage);
     }
 }

@@ -32,21 +32,14 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
         response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager);
-        assertThat(response.get("name")).isNotNull();
-        assertThat(response.get("status")).isEqualTo("PENDING");
-        assertThat(response.get("sraId")).isNotNull();
-        assertThat(response.get("sraRegulated")).isNotNull();
-        assertThat(response.get("companyNumber")).isNotNull();
-        assertThat(response.get("companyUrl")).isNotNull();
-        assertThat(response.get("superUser")).isNotNull();
-        assertThat(response.get("paymentAccount")).isNotNull();
-        assertThat(response.get("contactInformation")).isNotNull();
-        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        validateSingleOrgResponse(response, "PENDING");
+
     }
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
@@ -76,15 +69,15 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         Map<String, Object> contactInfo1 = ((List<Map<String, Object>>) newOrgResponse.get("contactInformation")).get(0);
         Map<String, Object> contactInfo2 = ((List<Map<String, Object>>) newOrgResponse.get("contactInformation")).get(1);
 
-        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addLine1");
-        assertThat(contactInfo2.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
+        assertThat(contactInfo2.get("addressLine1")).isEqualTo("addLine1");
 
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(0);
         Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(1);
 
-        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 123452222");
+        assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
-        assertThat(dxAddress2.get("dxNumber")).isEqualTo("DX 123456333");
+        assertThat(dxAddress2.get("dxNumber")).isEqualTo("DX 123456777");
         assertThat(dxAddress2.get("dxExchange")).isEqualTo("dxExchange");
     }
 
@@ -110,6 +103,22 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
         professionalApiClient
                 .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
+    }
+
+    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
+
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response.get("status")).isEqualTo(status);
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+
     }
 
 }

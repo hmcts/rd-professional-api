@@ -6,7 +6,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,7 +99,7 @@ public class ProfessionalApiClient {
         paymentAccounts.add("PBA" + randomAlphabetic(7));
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
-        List<DxAddressCreationRequest> dx1 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
                 .dxExchange("dxExchange").build());
@@ -108,14 +109,14 @@ public class ProfessionalApiClient {
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456788")
                 .dxExchange("dxExchange").build());
-        List<DxAddressCreationRequest> dx2 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123452222")
                 .dxExchange("dxExchange").build());
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456333")
                 .dxExchange("dxExchange").build());
-        List<ContactInformationCreationRequest> contactInfoList = new ArrayList<>();
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
         contactInfoList.add(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
                 .addressLine2("addressLine2")
@@ -413,9 +414,9 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
         return response.body().as(Map.class);
     }
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
@@ -592,8 +593,8 @@ public class ProfessionalApiClient {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
-                .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
     private RequestSpecification getS2sTokenHeaders() {
@@ -618,8 +619,8 @@ public class ProfessionalApiClient {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
-                .header("Accepts", APPLICATION_JSON_UTF8_VALUE)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }

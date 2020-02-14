@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -21,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Test;
 
-import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -89,7 +90,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     public void return_organisation_payload_with_200_status_code_for_pui_finance_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiFinanceManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiFinanceManager);
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("http_status").toString().contains(OK.name()));
         assertThat(response.get("organisationIdentifier")).isNotNull();
     }
 
@@ -97,10 +98,9 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     public void return_organisation_payload_with_200_status_code_for_pui_organisation_manager_user_organisation_id() {
         String userId = settingUpOrganisation(puiOrgManager);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiOrgManager);
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("http_status").toString().contains(OK.name()));
         assertThat(response.get("organisationIdentifier")).isNotNull();
     }
-
 
     @Test
     public void persists_and_returns_all_organisations() {
@@ -245,7 +245,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(CREATED);
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,hmctsAdmin, organisationIdentifier);
 
@@ -296,7 +296,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void retrieve_organisation_should_have_single_super_user() {
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(CREATED);
 
         List<String> user1Roles = new ArrayList<>();
         user1Roles.add("pui-user-manager");
@@ -314,7 +314,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(CREATED);
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
                 .firstName("someName1")
                 .lastName("someLastName1")
@@ -325,7 +325,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(CREATED);
         NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
                 .firstName("someName2")
                 .lastName("someLastName2")
@@ -370,7 +370,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void  persists_and_return_pending_from_prd_and_active_org_details_from_up_and_combine_both() {
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(CREATED);
         OrganisationCreationRequest organisationRequest = anOrganisationCreationRequest()
                 .name("org-name")
                 .superUser(aUserCreationRequest()

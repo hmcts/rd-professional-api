@@ -35,14 +35,7 @@ public class PaymentAccountServiceTest {
     private final UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
     private final PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
     private final OrganisationRepository organisationRepositoryMock = mock(OrganisationRepository.class);
-    private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
-    private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
-    private final ContactInformationRepository contactInformationRepositoryMock = mock(ContactInformationRepository.class);
-    private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
-    private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
-    private final PrdEnumService prdEnumServiceMock = mock(PrdEnumService.class);
-    private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
     private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
