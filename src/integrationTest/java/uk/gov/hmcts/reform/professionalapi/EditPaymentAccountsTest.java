@@ -45,7 +45,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
+    public void test_editPaymentAccountsShouldThrow400IfOrgIdIsNotFound() {
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
