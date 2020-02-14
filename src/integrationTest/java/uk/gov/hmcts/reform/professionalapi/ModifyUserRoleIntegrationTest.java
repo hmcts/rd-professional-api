@@ -207,12 +207,12 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response1 = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "$nvalid-org-id", userIdentifier, hmctsAdmin);
         assertThat(response1.get("http_status")).isNotNull();
-        assertThat(response1.get("http_status")).isEqualTo("404");
+        assertThat(response1.get("http_status")).isEqualTo("400");
 
 
         Map<String, Object> response2 = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), ",nvalid-org-id", userIdentifier, hmctsAdmin);
         assertThat(response2.get("http_status")).isNotNull();
-        assertThat(response2.get("http_status")).isEqualTo("404");
+        assertThat(response2.get("http_status")).isEqualTo("400");
     }
 
     private UserProfileUpdatedData createModifyUserProfileData() {

@@ -153,10 +153,11 @@ public class ProfessionalUserInternalController extends SuperController {
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         organisationIdentifierValidatorImpl.validateOrganisationExists(orgId);
 
         //Received request to update user roles of an organisation
-        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin, orgId);
+        return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
 
     }
 }
