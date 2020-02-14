@@ -19,8 +19,12 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 @Slf4j
 public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifierValidator {
 
-    @Autowired
     private OrganisationRepository organisationRepository;
+
+    @Autowired
+    public OrganisationIdentifierValidatorImpl(OrganisationRepository organisationRepository) {
+        this.organisationRepository = organisationRepository;
+    }
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {

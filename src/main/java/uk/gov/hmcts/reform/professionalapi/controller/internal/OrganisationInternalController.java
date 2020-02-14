@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -109,10 +108,6 @@ public class OrganisationInternalController extends SuperController {
     public ResponseEntity retrieveOrganisations(
             @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
-
-        if (!StringUtils.isBlank(id)) {
-            organisationCreationRequestValidator.validateOrganisationIdentifier(id);
-        }
 
         return retrieveAllOrganisationOrById(id, status);
     }

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -153,12 +152,6 @@ public class ProfessionalUserInternalController extends SuperController {
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
-
-        if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
-            String errorMessage = "Unable to modify User Roles as no Organisation was found with the given organisationIdentifier: " + orgId;
-            log.error(errorMessage);
-            throw new ResourceNotFoundException(errorMessage);
-        }
 
         organisationIdentifierValidatorImpl.validateOrganisationExists(orgId);
 

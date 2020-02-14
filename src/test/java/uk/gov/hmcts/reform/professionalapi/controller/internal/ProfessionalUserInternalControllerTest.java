@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
@@ -111,11 +110,6 @@ public class ProfessionalUserInternalControllerTest {
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test(expected = ResourceNotFoundException.class)
-    public void testModifyRolesForExistingUserOfOrganisation_ThrowsInvalidRequestIfOrgIdInvalid() {
-        professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "INVALID-ORG-ID", UUID.randomUUID().toString(), Optional.of("EXUI"));
     }
 }
 
