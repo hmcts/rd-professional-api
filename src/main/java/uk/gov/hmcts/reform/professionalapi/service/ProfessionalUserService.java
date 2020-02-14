@@ -31,5 +31,7 @@ public interface ProfessionalUserService {
     ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin);
 
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
+
+    ProfessionalUser findProfessionalUserByEmailAddress(String email);
 }
 

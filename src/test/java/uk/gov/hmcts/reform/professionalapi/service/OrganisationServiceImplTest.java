@@ -86,7 +86,6 @@ public class OrganisationServiceImplTest {
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-    private final SuperUser superUserMock = mock(SuperUser.class);
     private final Organisation organisationMock = mock(Organisation.class);
     private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final ContactInformation contactInformationMock = mock(ContactInformation.class);
@@ -121,6 +120,7 @@ public class OrganisationServiceImplTest {
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
 
         Set<String> paymentAccountList = new HashSet<>();
 
@@ -332,6 +332,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
+
         SuperUser user = mock(SuperUser.class);
 
         String id = UUID.randomUUID().toString();

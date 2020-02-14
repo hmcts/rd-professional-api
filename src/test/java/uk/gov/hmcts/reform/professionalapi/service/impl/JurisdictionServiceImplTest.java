@@ -104,6 +104,17 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
+    public void should_throw_error_when_ccd_returns_error_less_than_zero() {
+
+        FeignException feignException = mock(FeignException.class);
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(feignException.status()).thenReturn(-1);
+        when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net","s2sToken", request)).thenThrow(feignException);
+
+        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+    }
+
+    @Test(expected = ExternalApiException.class)
     public void should_throw_error_when_ccd_returns_403() {
 
         when(authTokenGenerator.generate()).thenReturn("s2sToken");

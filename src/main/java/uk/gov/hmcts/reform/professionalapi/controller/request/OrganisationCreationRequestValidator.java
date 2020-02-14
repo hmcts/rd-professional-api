@@ -38,8 +38,9 @@ public class OrganisationCreationRequestValidator {
 
     public static void validateNewUserCreationRequestForMandatoryFields(NewUserCreationRequest request) {
         if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName()) || StringUtils.isBlank(request.getEmail())) {
-            throw new InvalidRequest("Manadatory fields are blank or null");
+            throw new InvalidRequest("Mandatory fields are blank or null");
         }
+        validateEmail(request.getEmail());
     }
 
     public void validate(OrganisationCreationRequest organisationCreationRequest) {
