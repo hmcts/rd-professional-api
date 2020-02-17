@@ -79,7 +79,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
     }
 
-    public void validateOrganisationExists(String orgId) {
+    public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
             String errorMessage = "Unable to modify User Roles as no Organisation was found with the given organisationIdentifier: " + orgId;
             log.error(errorMessage);

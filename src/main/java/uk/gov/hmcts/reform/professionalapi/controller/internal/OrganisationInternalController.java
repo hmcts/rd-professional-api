@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 
 import io.swagger.annotations.ApiOperation;
+
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -12,12 +15,14 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
 )
+@Validated
 @RestController
 @Slf4j
 @NoArgsConstructor
@@ -173,10 +179,8 @@ public class OrganisationInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
-                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+                                                     @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier) {
         log.info("Received request to edit payment accounts by organisation Id...");
-
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
 
         paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
@@ -215,10 +219,8 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
-
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
 
         return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
     }
@@ -253,10 +255,8 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
-
-        organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
 
         //Received request to add a internal new user to an organisation
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);

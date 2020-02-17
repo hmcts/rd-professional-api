@@ -106,6 +106,6 @@ public class OrganisationIdentifierValidatorImplTest {
     @Test(expected = ResourceNotFoundException.class)
     public void testValidateOrganisationExists_ThrowsResourceNotFoundIfOrgIdInvalid() {
         String orgId = "INVALID-ORG-ID";
-        organisationIdentifierValidatorImpl.validateOrganisationExists(orgId);
+        organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
     }
 }
