@@ -117,7 +117,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
+        System.out.println("Start Endpoint call");
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
+        System.out.println("End Endpoint call");
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");

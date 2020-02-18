@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -23,6 +25,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,6 +37,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@NamedEntityGraph(
+        name = "User.alljoins",
+        attributeNodes = {
+                @NamedAttributeNode(value = "userAttributes"),
+        }
+)
 public class ProfessionalUser implements Serializable {
 
     @Id
@@ -55,6 +65,7 @@ public class ProfessionalUser implements Serializable {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
@@ -69,7 +80,8 @@ public class ProfessionalUser implements Serializable {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
-    @OneToMany
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = UserAccountMap.class)
     @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
 

@@ -319,9 +319,11 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
-
+        System.out.println("Begin searchUsersByOrganisation");
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
+        System.out.println("Get Organisation");
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+        System.out.println("Done Got Organisation");
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
         ResponseEntity responseEntity;
@@ -332,8 +334,11 @@ public abstract class SuperController {
             Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION,"firstName"));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
+            System.out.println("Begin Find users");
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
+            System.out.println("End Find users");
         }
+        System.out.println("End searchUsersByOrganisation");
         return responseEntity;
     }
 

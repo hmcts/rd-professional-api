@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +21,7 @@ public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUs
 
     Page<ProfessionalUser> findByOrganisation(Organisation organisation, Pageable pageable);
 
+    @EntityGraph(value = "User.alljoins")
     List<ProfessionalUser> findByOrganisation(Organisation organisation);
 
     ProfessionalUser findByUserIdentifier(String userIdentifier);
