@@ -30,12 +30,10 @@ public class UserAttribute implements Serializable {
     @GeneratedValue(strategy = AUTO)
     private UUID id;
 
-    @Fetch(FetchMode.JOIN)
     @ManyToOne
     @JoinColumn(name = "PROFESSIONAL_USER_ID", nullable = false)
     private ProfessionalUser professionalUser;
 
-    @Fetch(FetchMode.JOIN)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "prd_enum_code", referencedColumnName = "enum_code"),
