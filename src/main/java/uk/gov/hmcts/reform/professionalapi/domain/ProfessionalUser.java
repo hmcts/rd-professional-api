@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 @NamedEntityGraph(
         name = "User.alljoins",
         attributeNodes = {
-                @NamedAttributeNode(value = "userAttributes"),
+                @NamedAttributeNode(value = "userAccountMap"),
         }
 )
 public class ProfessionalUser implements Serializable {
@@ -66,7 +66,7 @@ public class ProfessionalUser implements Serializable {
     private Organisation organisation;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = UserAttribute.class, mappedBy = "professionalUser", cascade = CascadeType.ALL)
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
     @Column(name = "DELETED")
@@ -88,6 +88,7 @@ public class ProfessionalUser implements Serializable {
     @Column(name = "USER_IDENTIFIER")
     private String userIdentifier;
 
+    @Fetch(FetchMode.SUBSELECT)
     @Transient
     private List<String> roles;
 

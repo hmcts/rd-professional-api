@@ -21,7 +21,7 @@ public class ProfessionalUsersEntityResponse {
             .map(professionalUser -> new ProfessionalUsersResponse(professionalUser))
             .collect(toList());
     }
-    
+
     @JsonGetter("users")
     public List<ProfessionalUsersResponse> getUserProfiles() {
         return userProfiles;
