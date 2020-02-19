@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -27,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")

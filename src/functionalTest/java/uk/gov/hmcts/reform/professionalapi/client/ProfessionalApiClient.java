@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,9 +39,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ProfessionalApiClient {

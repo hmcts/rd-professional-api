@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.*;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 @Slf4j

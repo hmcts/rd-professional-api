@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +23,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {

@@ -14,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 

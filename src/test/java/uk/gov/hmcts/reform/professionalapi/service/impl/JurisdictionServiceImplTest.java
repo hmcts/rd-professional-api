@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 
 public class JurisdictionServiceImplTest {
 

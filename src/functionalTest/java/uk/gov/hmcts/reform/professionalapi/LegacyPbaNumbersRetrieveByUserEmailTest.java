@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")

@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")

@@ -7,8 +7,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,8 +24,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {

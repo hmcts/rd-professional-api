@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {

@@ -23,8 +23,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)

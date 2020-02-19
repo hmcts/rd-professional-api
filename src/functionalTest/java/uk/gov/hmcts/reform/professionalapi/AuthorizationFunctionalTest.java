@@ -30,9 +30,9 @@ import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
