@@ -10,7 +10,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 
 public class UserAccountMapServiceImplTest {
