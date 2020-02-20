@@ -89,7 +89,7 @@ usermap:
     - "false"
 
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.ithc.platform.hmcts.net}
+auth.idam.client.baseUrl: ${idam_url:http://idam-api-ithc.service.core-compute-ithc.internal}
 
 auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
