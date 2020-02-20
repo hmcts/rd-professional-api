@@ -275,7 +275,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
 
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.INTERNAL_SERVER_ERROR, userProfileUpdatedData, "%7C", userId);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST, userProfileUpdatedData, "%7C", userId);
     }
 
     private Set<RoleName> createOrDeleteRoleName() {
