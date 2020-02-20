@@ -3,7 +3,7 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-c
 
 s2s-name: rd_professional_api
 
-idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
+idam.api.url: ${IDAM_URL:http://idam-api-ithc.service.core-compute-ithc.internal}
 generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
 test.user.password: ${TEST_USER_PASSWORD:Hmcts123}
 oauth2.client.id: ${OAUTH2_CLIENT_ID:rd-professional-api}
