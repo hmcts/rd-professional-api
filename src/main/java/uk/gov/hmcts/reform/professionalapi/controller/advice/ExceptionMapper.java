@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -140,6 +141,11 @@ public class ExceptionMapper {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleForbiddenException(Exception ex) {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage());
+    }
+
+    @ExceptionHandler(RequestRejectedException.class)
+    public ResponseEntity<Object> handleRequestRejectedException(RequestRejectedException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
     @ExceptionHandler(Exception.class)
