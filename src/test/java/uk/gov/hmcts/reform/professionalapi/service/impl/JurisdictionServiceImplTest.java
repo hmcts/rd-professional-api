@@ -78,7 +78,10 @@ public class JurisdictionServiceImplTest {
 
         JurisdictionUserCreationRequest request = jurisdictionServiceImpl.createJurisdictionUserProfileRequestForSuperUser(user);
         assertThat(request).isNotNull();
+        assertThat(request.getId()).isNotEmpty();
         assertThat(request.getId()).isEqualTo("some@hmcts.net");
+        assertThat(request.getJurisdictions().get(0).getId()).isEqualTo("PROBATE");
+        assertThat(request.getJurisdictions().get(1).getId()).isEqualTo("BULKSCAN");
         assertThat(request.getJurisdictions()).isNotEmpty();
         assertThat(request.getJurisdictions().size()).isEqualTo(2);
     }
