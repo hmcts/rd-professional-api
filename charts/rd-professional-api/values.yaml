@@ -14,4 +14,5 @@ java:
       secrets:
         - professional-api-POSTGRES-PASS
         - s2s-secret
+        - idam-url
         - AppInsightsInstrumentationKey
