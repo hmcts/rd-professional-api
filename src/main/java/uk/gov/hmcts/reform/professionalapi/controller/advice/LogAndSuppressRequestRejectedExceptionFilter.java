@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
+
 import java.io.IOException;
+import java.sql.Timestamp;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -22,6 +25,8 @@ import org.springframework.web.filter.GenericFilterBean;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterBean {
 
+    private Gson gson = new Gson();
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         try {
@@ -30,14 +35,14 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) res;
 
-            log.warn(
-                    "request_rejected: remote={}, user_agent={}, request_url={}",
-                    request.getRemoteHost(),
-                    request.getHeader(HttpHeaders.USER_AGENT),
-                    request.getRequestURL(),
-                    exception);
+            log.warn("request_rejected: remote={}, user_agent={}, request_url={}", request.getRemoteHost(), request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
 
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The request was rejected because the URL is potentially malicious");
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(400);
+            response.getWriter().print(this.gson.toJson(new ErrorResponse(ErrorConstants.INVALID_REQUEST.getErrorMessage(),
+                    "The request was rejected because the URL is potentially malicious",
+                    new Timestamp(System.currentTimeMillis()).toString())));
         }
     }
 }
