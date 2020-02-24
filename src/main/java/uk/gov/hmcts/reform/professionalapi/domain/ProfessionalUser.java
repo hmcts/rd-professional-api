@@ -80,7 +80,6 @@ public class ProfessionalUser implements Serializable {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
-    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = UserAccountMap.class)
     @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
