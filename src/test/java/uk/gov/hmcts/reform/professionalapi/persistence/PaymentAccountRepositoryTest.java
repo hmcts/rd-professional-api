@@ -22,7 +22,7 @@ public class PaymentAccountRepositoryTest {
     @Autowired
     PaymentAccountRepository paymentAccountRepository;
 
-    PaymentAccount paymentAccount = new PaymentAccount();
+    PaymentAccount paymentAccount = new PaymentAccount("pba1234567");
 
     @Before
     public void setUp() {

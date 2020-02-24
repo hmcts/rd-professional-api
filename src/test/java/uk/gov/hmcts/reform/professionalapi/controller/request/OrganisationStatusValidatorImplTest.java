@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 public class OrganisationStatusValidatorImplTest {
 
-    OrganisationStatusIdentifierValidatorImpl organisationStatusValidatorImpl = new OrganisationStatusIdentifierValidatorImpl();
+    OrganisationStatusValidatorImpl organisationStatusValidatorImpl = new OrganisationStatusValidatorImpl();
 
     Organisation dummyOrganisation = new Organisation(
             "dummyName",

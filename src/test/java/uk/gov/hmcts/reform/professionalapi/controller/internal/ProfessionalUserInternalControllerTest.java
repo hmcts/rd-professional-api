@@ -18,8 +18,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -51,7 +51,7 @@ public class ProfessionalUserInternalControllerTest {
         organisationMock = mock(Organisation.class);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
-        organisationIdentifierValidatorMock = mock(OrganisationIdentifierIdentifierValidatorImpl.class);
+        organisationIdentifierValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         responseEntityMock = mock(ResponseEntity.class);
         userProfileUpdatedDataMock = mock(UserProfileUpdatedData.class);

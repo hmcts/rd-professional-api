@@ -25,7 +25,7 @@ public class OrganisationIdentifierValidatorImplTest {
     private Organisation organisationMock = mock(Organisation.class);
     private PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
 
-    OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierIdentifierValidatorImpl();
+    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl();
 
     @Test
     public void testValidate() {

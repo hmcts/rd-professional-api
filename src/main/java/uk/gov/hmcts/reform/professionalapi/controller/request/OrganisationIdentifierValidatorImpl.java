@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Component
 @Slf4j
-public class OrganisationIdentifierIdentifierValidatorImpl implements OrganisationIdentifierValidator {
+public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifierValidator {
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {

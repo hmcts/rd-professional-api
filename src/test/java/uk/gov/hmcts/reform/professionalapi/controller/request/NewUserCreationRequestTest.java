@@ -10,6 +10,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 
 public class NewUserCreationRequestTest {
 

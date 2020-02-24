@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @Component
 @Slf4j
-public class OrganisationStatusIdentifierValidatorImpl implements OrganisationIdentifierValidator {
+public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
