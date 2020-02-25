@@ -115,7 +115,9 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac1_find_all_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
+        System.out.println(java.time.LocalTime.now());
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
+        System.out.println(java.time.LocalTime.now());
         validateRetrievedUsers(response, "ACTIVE");
     }
 
