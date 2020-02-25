@@ -31,7 +31,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_empty_result_exception() {
-        EmptyResultDataAccessException emptyResultDataAccessException = mock(EmptyResultDataAccessException.class);
+        EmptyResultDataAccessException emptyResultDataAccessException = new EmptyResultDataAccessException(1);
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
@@ -40,7 +40,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_resource_not_found_exception() {
-        ResourceNotFoundException resourceNotFoundException = mock(ResourceNotFoundException.class);
+        ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException("Resource not found");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleResourceNotFoundException(resourceNotFoundException);
 
@@ -49,7 +49,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_illegal_argument_exception() {
-        IllegalArgumentException exception = mock(IllegalArgumentException.class);
+        IllegalArgumentException exception = new IllegalArgumentException();
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleIllegalArgumentException(exception);
 
@@ -67,7 +67,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_http_media_type_not_supported_exception() {
-        IllegalArgumentException exception = mock(IllegalArgumentException.class);
+        IllegalArgumentException exception = new IllegalArgumentException();
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleHttpMediaTypeNotSupported(exception);
 
@@ -76,7 +76,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_forbidden_error_exception() {
-        AccessDeniedException exception = mock(AccessDeniedException.class);
+        AccessDeniedException exception = new AccessDeniedException("Access Denied");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleForbiddenException(exception);
 
@@ -96,7 +96,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_exception() {
-        Exception exception = mock(Exception.class);
+        Exception exception = new Exception();
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleException(exception);
 
@@ -114,7 +114,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_invalid_request_exception() {
-        InvalidRequest invalidRequestException = mock(InvalidRequest.class);
+        InvalidRequest invalidRequestException = new InvalidRequest("Invalid Request");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
 
@@ -133,7 +133,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_duplicate_key_exception() {
-        DuplicateKeyException duplicateKeyException = mock(DuplicateKeyException.class);
+        DuplicateKeyException duplicateKeyException = new DuplicateKeyException("Duplicate Key Exception");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.duplicateKeyException(duplicateKeyException);
 
@@ -142,7 +142,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_constraint_violation_exception() {
-        ConstraintViolationException constraintViolationException = mock(ConstraintViolationException.class);
+        ConstraintViolationException constraintViolationException = new ConstraintViolationException("Constraint Violation", null);
 
         ResponseEntity<Object> responseEntity = exceptionMapper.constraintViolationError(constraintViolationException);
 
@@ -151,7 +151,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_data_integrity_violation_exception() {
-        DataIntegrityViolationException dataIntegrityViolationException = mock(DataIntegrityViolationException.class);
+        DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException("Data Integrity Violation");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
 
@@ -209,7 +209,7 @@ public class ExceptionMapperTest {
 
     @Test
     public void should_handle_DuplicateUserException() {
-        HttpClientErrorException httpClientErrorException = mock(HttpClientErrorException.class);
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT);
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleDuplicateUserException(httpClientErrorException);
 

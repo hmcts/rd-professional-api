@@ -1,54 +1,42 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.mock;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator.validateRoles;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 
 public class UserCreationRequestValidatorTest {
 
-    static UserCreationRequestValidator userCreationRequestValidatorMock;
+    private List<PrdEnum> prdEnumList;
 
     final String userManagerRole = "pui-user-manager";
     final String caseManagerRole = "pui-case-manager";
+    final String sidamRole = "SIDAM_ROLE";
 
     @Before
     public void setUp() {
-        userCreationRequestValidatorMock = mock(UserCreationRequestValidator.class);
+        prdEnumList = asList(
+                new PrdEnum(new PrdEnumId(2, sidamRole), userManagerRole, sidamRole),
+                new PrdEnum(new PrdEnumId(3, sidamRole), caseManagerRole, sidamRole));
     }
 
     @Test
     public void test_validateRoles() {
-        List<String> roles = new ArrayList<>();
-        roles.add(userManagerRole);
-        roles.add(caseManagerRole);
-
-        List<PrdEnum> prdEnumList = new ArrayList<>();
-        prdEnumList.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), userManagerRole, "SIDAM_ROLE"));
-        prdEnumList.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), caseManagerRole, "SIDAM_ROLE"));
-
-        List<String> validatedRoles = userCreationRequestValidatorMock.validateRoles(roles, prdEnumList);
-
+        List<String> validatedRoles = validateRoles(asList(userManagerRole, caseManagerRole), prdEnumList);
         assertFalse(validatedRoles.isEmpty());
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_validateRolesThrows40WhenVerifiedRolesIsEmpty() {
-        List<String> roles = new ArrayList<>();
-        List<PrdEnum> prdEnumList = new ArrayList<>();
-        prdEnumList.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), userManagerRole, "SIDAM_ROLE"));
-        prdEnumList.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), caseManagerRole, "SIDAM_ROLE"));
-
-        userCreationRequestValidatorMock.validateRoles(roles, prdEnumList);
+        validateRoles(emptyList(), prdEnumList);
     }
 
     @Test

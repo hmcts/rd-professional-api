@@ -7,33 +7,19 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
 
 public class UserCreationRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private UserCreationRequest userCreationRequest;
-
-    private String firstName = "Joe";
-    private String lastName = "Bloggs";
-    private String email = "joe.BLOGGS@Email.Com";
-
-    @Before
-    public void setUp() {
-        userCreationRequest = new UserCreationRequest(firstName, lastName, email, OrganisationFixtures.createJurisdictions());
-    }
 
     @Test
     public void hasMandatoryFieldsSpecifiedNotNull() {
+        UserCreationRequest userCreationRequest = new UserCreationRequest(null, null, "some@email.com", OrganisationFixtures.createJurisdictions());
 
-        UserCreationRequest userCreationRequest =
-                new UserCreationRequest(null, null, "some@email.com", OrganisationFixtures.createJurisdictions());
-
-        Set<ConstraintViolation<UserCreationRequest>> violations =
-                validator.validate(userCreationRequest);
-
+        Set<ConstraintViolation<UserCreationRequest>> violations = validator.validate(userCreationRequest);
+        
         assertThat(violations.size()).isEqualTo(2);
     }
 
@@ -53,5 +39,4 @@ public class UserCreationRequestTest {
         assertThat(testUserCreationRequest.getLastName()).isEqualTo(lastName2);
         assertThat(testUserCreationRequest.getEmail()).isEqualTo(email2);
     }
-
 }

@@ -145,6 +145,7 @@ public class ProfessionalExternalUserControllerTest {
     @Test
     public void testFindUserByEmailWithPuiUserManager() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
         List<SuperUser> users = new ArrayList<>();
         users.add(professionalUser.toSuperUser());

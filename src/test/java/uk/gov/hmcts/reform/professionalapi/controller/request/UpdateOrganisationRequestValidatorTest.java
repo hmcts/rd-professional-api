@@ -12,15 +12,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisation
 
 public class UpdateOrganisationRequestValidatorTest {
 
+    private OrganisationIdentifierValidator organisationIdentifierValidator = mock(OrganisationIdentifierValidator.class);
+
     @Test
     public void test_UpdateOrganisationRequestValidator() {
-
         List<OrganisationIdentifierValidator> updateOrganisationRequestValidatorList = new ArrayList<>();
-        updateOrganisationRequestValidatorList.add(mock(OrganisationIdentifierValidator.class));
+        updateOrganisationRequestValidatorList.add(organisationIdentifierValidator);
 
         UpdateOrganisationRequestValidator updateOrganisationRequestValidator = new UpdateOrganisationRequestValidator(updateOrganisationRequestValidatorList);
 
         assertThat(updateOrganisationRequestValidator).isNotNull();
     }
-
 }

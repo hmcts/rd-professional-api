@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -7,9 +8,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,20 +23,20 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 public class OrganisationIdentifierValidatorImplTest {
 
-    private Organisation organisationMock = mock(Organisation.class);
-    private PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+    private Organisation organisation;
+    private PaymentAccount paymentAccount;
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl();
 
-    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl();
+    @Before
+    public void setUp() {
+        organisation = new Organisation("Company", OrganisationStatus.PENDING, "SraId", "12345678", false, "www.company.com");
+        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
+        paymentAccount = new PaymentAccount("PBA1234567");
+    }
 
     @Test
     public void testValidate() {
-        Organisation dummyOrganisation = new Organisation(
-                "dummyName",
-                OrganisationStatus.ACTIVE,
-                "sraId",
-                "12345678",
-                Boolean.FALSE,
-                "dummySite.com");
+        Organisation dummyOrganisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId", "12345678", Boolean.FALSE, "dummySite.com");
 
         organisationIdentifierValidatorImpl.validate(dummyOrganisation, dummyOrganisation.getStatus(), dummyOrganisation.getOrganisationIdentifier());
         try {
@@ -50,20 +51,23 @@ public class OrganisationIdentifierValidatorImplTest {
         organisationIdentifierValidatorImpl.validate(null, null, null);
     }
 
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+        organisation.setPaymentAccounts(new ArrayList<>());
+
+        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
+    }
+
     @Test(expected = AccessDeniedException.class)
-    public void shouldThrowAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(paymentAccountMock);
+    public void shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
+        organisation.setPaymentAccounts(singletonList(paymentAccount));
 
-        when(organisationMock.getOrganisationIdentifier()).thenReturn("huinkj");
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisationMock, UUID.randomUUID().toString());
+        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
-        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisationMock, UUID.randomUUID().toString());
+        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -96,7 +100,6 @@ public class OrganisationIdentifierValidatorImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.PENDING);
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisationMock);
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
     }
 }

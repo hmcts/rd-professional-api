@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static java.util.Collections.singleton;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.util.Set;
 import java.util.UUID;
 
-import org.antlr.v4.runtime.misc.Array2DHashSet;
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
@@ -16,8 +14,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 public class ProfessionalUserReqValidatorTest {
 
-    ProfessionalUserReqValidator profUserReqValidator = new ProfessionalUserReqValidator();
-    UserProfileUpdatedData userProfileUpdatedDataMock = mock(UserProfileUpdatedData.class);
+    private ProfessionalUserReqValidator profUserReqValidator;
+    private UserProfileUpdatedData userProfileUpdatedData;
+
+    @Before
+    public void setUp() {
+        profUserReqValidator = new ProfessionalUserReqValidator();
+        userProfileUpdatedData = new UserProfileUpdatedData();
+    }
 
     @Test(expected = InvalidRequest.class)
     public void testValidateRequestAllNull() {
@@ -65,28 +69,21 @@ public class ProfessionalUserReqValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_validateModifyRolesRequestThrows400WhenInvalidRequestWhenUserIdIsEmpty() {
-        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, "");
+        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, "");
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_validateModifyRolesRequestThrows400ForInvalidAddRoleName() {
-        Set<RoleName> rolesAdd = new Array2DHashSet<>();
-        rolesAdd.add(new RoleName(""));
-        when(userProfileUpdatedDataMock.getRolesAdd()).thenReturn(rolesAdd);
+        userProfileUpdatedData.setRolesAdd((singleton(new RoleName(""))));
 
-        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, UUID.randomUUID().toString());
+        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString());
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_validateModifyRolesRequestThrows400ForInvalidDeleteRoleName() {
-        Set<RoleName> rolesAdd = new Array2DHashSet<>();
-        rolesAdd.add(new RoleName("pui-user-manager"));
-        when(userProfileUpdatedDataMock.getRolesAdd()).thenReturn(rolesAdd);
+        userProfileUpdatedData.setRolesAdd((singleton(new RoleName("pui-user-manager"))));
+        userProfileUpdatedData.setRolesDelete((singleton(new RoleName(""))));
 
-        Set<RoleName> rolesDelete = new Array2DHashSet<>();
-        rolesDelete.add(new RoleName(""));
-        when(userProfileUpdatedDataMock.getRolesDelete()).thenReturn(rolesDelete);
-
-        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedDataMock, UUID.randomUUID().toString());
+        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString());
     }
 }

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,43 +21,25 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
 
-    @Mock
-    RequestValidator validator1;
+    @Mock //must be mocked as it is in interface
+    private RequestValidator validator1;
+    @Mock //must be mocked as it is in interface
+    private RequestValidator validator2;
 
-    @Mock
-    RequestValidator validator2;
-
-    @Mock
-    OrganisationCreationRequest orgCreateRequest;
-
-    @Mock
-    OrganisationCreationRequestValidator organisationCreationRequestValidator;
-
-    @Mock
-    Organisation org;
-
-    @Mock
-    UserCreationRequest userCreationRequest;
-
-    @Mock
-    Organisation organisation;
-
-    @Mock
-    OrganisationRepository organisationRepository;
-
-    Organisation myOrg;
-    Exception myExceptionalException;
-
+    private OrganisationCreationRequestValidator organisationCreationRequestValidator;
+    private UserCreationRequest userCreationRequest;
+    private OrganisationCreationRequest organisationCreationRequest;
+    private Exception myException;
 
     @Before
     public void setup() {
-        organisationCreationRequestValidator =
-                new OrganisationCreationRequestValidator(asList(validator1, validator2));
+        organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
+        userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName").email("test@email.com").build();
+        organisationCreationRequest = new OrganisationCreationRequest("Company","PENDING","SraId", "true", "12345678","www.company.com",userCreationRequest, new HashSet<>(),null);
     }
 
     public List<String> getEnumList() {
@@ -83,14 +64,10 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test
     public void testCallsAllValidators() {
+        organisationCreationRequestValidator.validate(organisationCreationRequest);
 
-        when(orgCreateRequest.getSuperUser()).thenReturn(userCreationRequest);
-
-        when(userCreationRequest.getEmail()).thenReturn("some@gmail.com");
-        organisationCreationRequestValidator.validate(orgCreateRequest);
-
-        verify(validator1, times(1)).validate(orgCreateRequest);
-        verify(validator2, times(1)).validate(orgCreateRequest);
+        verify(validator1, times(1)).validate(organisationCreationRequest);
+        verify(validator2, times(1)).validate(organisationCreationRequest);
 
         assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isEqualTo(true);
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
@@ -113,14 +90,14 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test //valid value should not throw exception
     public void validateOrganisationIdentifierNoExcepTest() {
-        myExceptionalException = null;
+        myException = null;
         try {
             organisationCreationRequestValidator.validateOrganisationIdentifier("Q90SB9S");
         } catch (Exception e) {
-            myExceptionalException = e;
+            myException = e;
         }
 
-        assertThat(myExceptionalException).isEqualTo(null);
+        assertThat(myException).isEqualTo(null);
     }
 
     @Test
@@ -138,17 +115,16 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test //Active value should not throw empty exception
     public void isOrganisationActive_Active_Test() {
-        Organisation myOrgg = new Organisation();
-        myOrgg.setStatus(OrganisationStatus.ACTIVE);
-        myExceptionalException = null;
+        Organisation organisation = new Organisation();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        myException = null;
 
         try {
-            organisationCreationRequestValidator.isOrganisationActive(myOrgg);
+            organisationCreationRequestValidator.isOrganisationActive(organisation);
         } catch (Exception e) {
-            myExceptionalException = e;
+            myException = e;
         }
-
-        assertThat(myExceptionalException).isEqualTo(null);
+        assertThat(myException).isEqualTo(null);
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
@@ -158,7 +134,7 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class) //empty value should throw empty exception
     public void isOrganisationActive_Empty_Test() {
-        organisationCreationRequestValidator.isOrganisationActive(org);
+        organisationCreationRequestValidator.isOrganisationActive(new Organisation());
     }
 
 
@@ -354,7 +330,6 @@ public class OrganisationCreationRequestValidatorTest {
         for (String email : validEmails) {
             OrganisationCreationRequestValidator.validateEmail(email);
         }
-
     }
 
     @Test(expected = Test.None.class)
@@ -372,7 +347,6 @@ public class OrganisationCreationRequestValidatorTest {
     @Test(expected = InvalidRequest.class)
     public void should_validate_company_no_length_and_throw_if_length_more_than_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "123456789","",null, new HashSet<>(),null);
-
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 }

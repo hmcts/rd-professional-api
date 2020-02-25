@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 
 public class ContactInformationCreationRequestTest {
 
@@ -23,7 +21,6 @@ public class ContactInformationCreationRequestTest {
 
     @Test
     public void has_mandatory_fields_specified_not_null() {
-
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null, null, null, null, null, null, null, null);
 
@@ -59,7 +56,7 @@ public class ContactInformationCreationRequestTest {
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1",  null, null, null, null, null, null, null);
+                "some-address1", null, null, null, null, null, null, null);
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isNull();
@@ -73,7 +70,6 @@ public class ContactInformationCreationRequestTest {
 
     @Test
     public void creates_contact_information_creation_request_correctly_without_dx_address() {
-
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 "some-address1", "some-address2", "some-address3", "some-town-city", "some-county", "some-country",
                 "some-post-code", null);
@@ -90,6 +86,8 @@ public class ContactInformationCreationRequestTest {
 
     @Test
     public void test_contactInformationCreationRequestBuilder() {
+        String dxNumber = "dxNumber";
+        String dxExchange = "dxExchange";
         String addressLine1 = "addressLine1";
         String addressLine2 = "addressLine2";
         String addressLine3 = "addressLine3";
@@ -97,9 +95,6 @@ public class ContactInformationCreationRequestTest {
         String county = "county";
         String country = "country";
         String postCode = "postC";
-        List<DxAddressCreationRequest> dxAddress = new ArrayList<>();
-        DxAddressCreationRequest dxAddressCreationRequestMock = mock(DxAddressCreationRequest.class);
-        dxAddress.add(dxAddressCreationRequestMock);
 
         ContactInformationCreationRequest contactInformationCreationRequest = ContactInformationCreationRequest.aContactInformationCreationRequest()
                 .addressLine1(addressLine1)
@@ -109,7 +104,7 @@ public class ContactInformationCreationRequestTest {
                 .county(county)
                 .country(country)
                 .postCode(postCode)
-                .dxAddress(dxAddress)
+                .dxAddress(singletonList(new DxAddressCreationRequest(dxNumber, dxExchange)))
                 .build();
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo(addressLine1);
@@ -119,6 +114,7 @@ public class ContactInformationCreationRequestTest {
         assertThat(contactInformationCreationRequest.getCounty()).isEqualTo(county);
         assertThat(contactInformationCreationRequest.getCountry()).isEqualTo(country);
         assertThat(contactInformationCreationRequest.getPostCode()).isEqualTo(postCode);
-        assertThat(contactInformationCreationRequest.getDxAddress()).isEqualTo(dxAddress);
+        assertThat(contactInformationCreationRequest.getDxAddress().get(0).getDxNumber()).isEqualTo(dxNumber);
+        assertThat(contactInformationCreationRequest.getDxAddress().get(0).getDxExchange()).isEqualTo(dxExchange);
     }
 }
