@@ -76,14 +76,14 @@ public class ProfessionalUserServiceImplTest {
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
-
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
-
     private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-
     private final FeignException feignExceptionMock = mock(FeignException.class);
-
     private final GetUserProfileResponse getUserProfileResponseMock = mock(GetUserProfileResponse.class);
+
+    private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
+            organisationRepository, professionalUserRepository, userAttributeRepository,
+            prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
             "some-lname",
@@ -94,12 +94,6 @@ public class ProfessionalUserServiceImplTest {
             "some-lname",
             "some-super-email",
             Mockito.mock(Organisation.class));
-
-    private List<ProfessionalUser> usersNonEmptyList = new ArrayList<ProfessionalUser>();
-
-    private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
-            organisationRepository, professionalUserRepository, userAttributeRepository,
-            prdEnumRepository, userAttributeService, userProfileFeignClient);
 
     private NewUserCreationRequest newUserCreationRequest;
 
