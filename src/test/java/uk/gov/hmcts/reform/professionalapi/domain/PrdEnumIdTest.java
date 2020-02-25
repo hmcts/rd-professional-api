@@ -10,7 +10,6 @@ public class PrdEnumIdTest {
 
     @Test
     public void creates_prd_enum_id_correctly() {
-
         PrdEnumId prdEnumId = new PrdEnumId(1, "enum-type");
 
         assertEquals(1, prdEnumId.getEnumCode());

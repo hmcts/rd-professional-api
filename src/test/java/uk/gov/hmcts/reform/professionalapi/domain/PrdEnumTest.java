@@ -1,18 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 
 public class PrdEnumTest {
 
     @Test
     public void creates_prd_enum_correctly() {
-
-        PrdEnumId prdEnumId = mock(PrdEnumId.class);
+        PrdEnumId prdEnumId = new PrdEnumId();
 
         PrdEnum prdEnum = new PrdEnum(prdEnumId, "enum-name", "enum-desc");
 
@@ -26,5 +22,4 @@ public class PrdEnumTest {
         PrdEnum prdEnum = new PrdEnum();
         assertThat(prdEnum).isNotNull();
     }
-
 }

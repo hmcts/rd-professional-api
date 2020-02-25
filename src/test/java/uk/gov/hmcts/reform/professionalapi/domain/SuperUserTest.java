@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,10 +9,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-
 public class SuperUserTest {
 
     @Test
@@ -21,29 +16,19 @@ public class SuperUserTest {
         List<String> roles = new ArrayList<>();
         roles.add("role");
 
-        Organisation organisation = mock(Organisation.class);
+        Organisation organisation = new Organisation();
+        SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
 
-        SuperUser superUser = new SuperUser(
-                                                                 "some-fname",
-                                                                 "some-lname",
-                                                                 "some-email-address",
-                                                                 organisation);
+        superUser.setLastUpdated(LocalDateTime.now());
+        superUser.setCreated(LocalDateTime.now());
 
         assertThat(superUser.getFirstName()).isEqualTo("some-fname");
         assertThat(superUser.getLastName()).isEqualTo("some-lname");
         assertThat(superUser.getEmailAddress()).isEqualTo("some-email-address");
         assertThat(superUser.getOrganisation()).isEqualTo(organisation);
-        assertThat(superUser.getLastUpdated()).isNull();
-        assertThat(superUser.getCreated()).isNull();
         assertThat(superUser.getUserIdentifier()).isNull();
-
         assertThat(superUser.getId()).isNull(); // hibernate generated
-
-        superUser.setLastUpdated(LocalDateTime.now());
-
-        superUser.setCreated(LocalDateTime.now());
         assertThat(superUser.getLastUpdated()).isNotNull();
-
         assertThat(superUser.getCreated()).isNotNull();
 
         ProfessionalUser user = new ProfessionalUser();
@@ -52,13 +37,9 @@ public class SuperUserTest {
 
     @Test
     public void test_toProfessionalUser() {
+        Organisation organisation = new Organisation();
+        SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
 
-        Organisation organisation = mock(Organisation.class);
-        SuperUser superUser = new SuperUser(
-                "some-fname",
-                "some-lname",
-                "some-email-address",
-                organisation);
         UUID id = UUID.randomUUID();
         superUser.setUserIdentifier(id.toString());
         superUser.setId(id);
@@ -67,9 +48,7 @@ public class SuperUserTest {
         superUser.setDeleted(LocalDateTime.now());
 
         SuperUser superUserNoArg = new SuperUser();
-
         assertThat(superUserNoArg).isNotNull();
-
 
         ProfessionalUser professionalUser = superUser.toProfessionalUser();
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");

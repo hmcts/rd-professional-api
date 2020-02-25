@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.domain;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.UUID;
+
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 
