@@ -9,10 +9,7 @@ public class PbaAccountResponseTest {
 
     @Test
     public void test_PbaAccountsResponse() {
-        PaymentAccount paymentAccount = new PaymentAccount("pba1234567");
-
-        PbaAccountResponse pbaAccountResponse = new PbaAccountResponse(paymentAccount);
-
-        assertThat(pbaAccountResponse.getPbaNumber()).isEqualTo(paymentAccount.getPbaNumber());
+        PbaAccountResponse pbaAccountResponse = new PbaAccountResponse(new PaymentAccount("pba1234567"));
+        assertThat(pbaAccountResponse.getPbaNumber()).isEqualTo("pba1234567");
     }
 }
