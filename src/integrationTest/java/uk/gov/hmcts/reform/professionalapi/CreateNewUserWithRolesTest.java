@@ -188,6 +188,26 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
 
+    @Test
+    public void returns_400_when_organisation_identifier_invalid() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
+
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id", userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
+    }
+
 
     @Test(expected = InvalidRequest.class)
     public void add_new_user_with_invalid_roles_returns_400_bad_request() {

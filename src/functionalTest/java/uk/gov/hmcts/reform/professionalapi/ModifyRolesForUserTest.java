@@ -253,6 +253,31 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
+    @Test
+    public void ac5_modify_role_existing_user_to_organisation_internal_returns_400_if_org_id_invalid() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String email = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        Map professionalUsersResponse = getActiveUser(professionalUsersResponses);
+        String userId = (String) professionalUsersResponse.get("userIdentifier");
+
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        RoleName role1 = new RoleName("pui-user-manager");
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(role1);
+        userProfileUpdatedData.setRolesAdd(roles);
+
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST, userProfileUpdatedData, "%7C", userId);
+    }
+
     private Set<RoleName> createOrDeleteRoleName() {
 
         RoleName roleName = new RoleName("pui-user-manager");
