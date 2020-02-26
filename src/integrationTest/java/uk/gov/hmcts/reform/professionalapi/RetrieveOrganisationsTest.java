@@ -121,7 +121,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     @Test
     public void error_if_organisation_id_invalid() {
         Map<String, Object> response = professionalReferenceDataClient.retrieveSingleOrganisation("They're taking the hobbits to Isengard!", hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test

@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
 
