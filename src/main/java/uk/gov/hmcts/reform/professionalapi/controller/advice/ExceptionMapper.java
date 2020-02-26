@@ -143,11 +143,6 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage());
     }
 
-    @ExceptionHandler(RequestRejectedException.class)
-    public ResponseEntity<Object> handleRequestRejectedException(RequestRejectedException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION.getErrorMessage());
