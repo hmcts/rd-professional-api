@@ -15,5 +15,4 @@ public class ProfessionalApiGeneratorConstantsTest {
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);
     }
-
 }

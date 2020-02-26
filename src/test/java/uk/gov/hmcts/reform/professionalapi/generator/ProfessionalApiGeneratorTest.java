@@ -6,14 +6,15 @@ import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGener
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.UUID;
+
 import org.junit.Test;
 
 public class ProfessionalApiGeneratorTest {
 
     @Test
     public void shouldReturnValidUuid() {
-
         UUID userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
+
         assertThat(userIdentifier).isNotNull();
         assertThat(userIdentifier.toString().length()).isEqualTo(LENGTH_OF_UUID);
     }
@@ -26,5 +27,4 @@ public class ProfessionalApiGeneratorTest {
         assertThat(uniqueAlphanumericString.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
         assertThat(uniqueAlphanumericString.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
     }
-
 }

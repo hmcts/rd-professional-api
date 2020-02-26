@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +24,9 @@ public class DxAddressRepositoryTest {
     @Autowired
     DxAddressRepository dxAddressRepository;
 
-    ContactInformation contactInformationMock = mock(ContactInformation.class);
+    ContactInformation contactInformation = new ContactInformation();
 
-    DxAddress dxAddress = new DxAddress("dx-number", "dx-exchange", contactInformationMock);
+    DxAddress dxAddress = new DxAddress("dx-number", "dx-exchange", contactInformation);
 
     @Before
     public void setUp() {

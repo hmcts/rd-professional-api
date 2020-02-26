@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class UserAccountMapRepositoryTest {
     @Autowired
     UserAccountMapRepository userAccountMapRepository;
 
-    UserAccountMapId userAccountMapId = mock(UserAccountMapId.class);
+    UserAccountMapId userAccountMapId = new UserAccountMapId();
 
     UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
 

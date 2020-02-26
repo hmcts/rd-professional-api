@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +24,9 @@ public class ProfessionalUserRepositoryTest {
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
 
-    Organisation organisationMock = mock(Organisation.class);
+    Organisation organisation = new Organisation();
 
-    ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisationMock);
+    ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisation);
 
     @Before
     public void setUp() {

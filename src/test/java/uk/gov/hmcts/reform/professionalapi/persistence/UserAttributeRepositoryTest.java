@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 
-
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @Ignore
@@ -27,11 +25,11 @@ public class UserAttributeRepositoryTest {
     @Autowired
     UserAttributeRepository userAttributeRepository;
 
-    ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-    PrdEnum prdEnumMock = mock(PrdEnum.class);
+    ProfessionalUser professionalUser = new ProfessionalUser();
+    PrdEnum prdEnum = new PrdEnum();
 
 
-    UserAttribute userAttribute = new UserAttribute(professionalUserMock, prdEnumMock);
+    UserAttribute userAttribute = new UserAttribute(professionalUser, prdEnum);
 
     @Before
     public void setUp() {

@@ -23,8 +23,8 @@ public class PrdEnumRepositoryTest {
     @Autowired
     PrdEnumRepository prdEnumRepository;
 
-    PrdEnumId prdEnumIdMock = new PrdEnumId();
-    PrdEnum prdEnum = new PrdEnum(prdEnumIdMock, "enum-name", "enum-desc");
+    PrdEnumId prdEnumId = new PrdEnumId();
+    PrdEnum prdEnum = new PrdEnum(prdEnumId, "enum-name", "enum-desc");
 
     @Before
     public void setUp() {
