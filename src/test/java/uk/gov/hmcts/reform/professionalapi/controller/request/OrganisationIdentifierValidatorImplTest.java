@@ -16,16 +16,19 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 
 import org.springframework.security.core.GrantedAuthority;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 public class OrganisationIdentifierValidatorImplTest {
 
     private Organisation organisationMock = mock(Organisation.class);
     private PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
+    private OrganisationService organisationServiceMock = mock(OrganisationService.class);
 
-    OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierIdentifierValidatorImpl();
+    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl(organisationServiceMock);
 
     @Test
     public void testValidate() {
@@ -98,5 +101,11 @@ public class OrganisationIdentifierValidatorImplTest {
     public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.PENDING);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisationMock);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void testValidateOrganisationExists_ThrowsResourceNotFoundIfOrgIdInvalid() {
+        String orgId = "INVALID-ORG-ID";
+        organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
     }
 }

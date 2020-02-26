@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doNothing;
 
 import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -13,8 +14,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -41,7 +42,7 @@ public class ProfessionalUserInternalControllerTest {
         organisationMock = mock(Organisation.class);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
-        organisationIdentifierValidatorMock = mock(OrganisationIdentifierIdentifierValidatorImpl.class);
+        organisationIdentifierValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         responseEntityMock = mock(ResponseEntity.class);
         userProfileUpdatedDataMock = mock(UserProfileUpdatedData.class);
@@ -102,13 +103,14 @@ public class ProfessionalUserInternalControllerTest {
 
     @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
-
+        when(organisationServiceMock.getOrganisationByOrgIdentifier("123456A")).thenReturn(organisationMock);
         when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedDataMock)).thenReturn(userProfileUpdatedDataMock);
 
         ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-
     }
 }
+
+
