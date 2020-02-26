@@ -12,27 +12,21 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
 
 public class UserAccountMapServiceImplTest {
 
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
-    private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
-
-
     private UserAccountMapServiceImpl sut = new UserAccountMapServiceImpl(userAccountMapRepositoryMock);
-
     private ProfessionalUser persistedSuperUser = new ProfessionalUser();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @Test
     public void persistedUserAccountMap() {
-
         PaymentAccount pba = new PaymentAccount("PBA1234567");
-        paymentAccounts.add(0,pba);
+        paymentAccounts.add(0, pba);
 
-        sut.persistedUserAccountMap(persistedSuperUser,paymentAccounts);
+        sut.persistedUserAccountMap(persistedSuperUser, paymentAccounts);
 
         verify(userAccountMapRepositoryMock, times(1)).saveAll(anyList());
     }

@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -27,52 +28,36 @@ public class UserAttributeServiceImplTest {
     private final PrdEnumServiceImpl prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
     private final UserAttributeServiceImpl userAttributeServiceMock = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
 
-    private final PrdEnumId prdEnumIdMock = mock(PrdEnumId.class);
-
-
-    private final ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+    private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "JURISD_ID");
+    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
+    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some@hmcts.net", organisation);
     private List<String> userRoles = new ArrayList<>();
     private List<PrdEnum> prdEnums = new ArrayList<>();
-
-    private final UserAttribute userAttributeMock = mock(UserAttribute.class);
-
     private PrdEnum anEnum;
-
-    private UserAttribute userAttribute = new UserAttribute(professionalUserMock, anEnum);
+    private UserAttribute userAttribute = new UserAttribute(professionalUser, anEnum);
     private List<UserAttribute> userAttributes =  new ArrayList<>();
 
     @Before
     public void setUp() {
         anEnum = new PrdEnum(prdEnumIdMock, "pui-user-manager", "SIDAM_ROLE");
-
         userAttributes.add(userAttribute);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
-
         prdEnums.add(anEnum);
-
         userRoles.add("pui-user-manager");
-
-        when(prdEnumIdMock.getEnumType()).thenReturn("JURISD_ID");
     }
 
     @Test
     public void adds_user_attributes_to_user_correctly() {
-
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
-        userAttributeServiceMock.addUserAttributesToUser(professionalUserMock, userRoles, prdEnums);
+        userAttributeServiceMock.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
 
-        assertThat(professionalUserMock.getUserAttributes()).isNotNull();
-
-        verify(
-                userAttributeRepositoryMock,
-                times(1)).saveAll(any());
-
+        assertThat(professionalUser.getUserAttributes()).isNotNull();
+        verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
 
     @Test
     public void testAddAllAttributes() {
-
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
@@ -89,8 +74,6 @@ public class UserAttributeServiceImplTest {
 
         assertThat(result.size()).isEqualTo(expectSize);
 
-        verify(
-                userAttributeRepositoryMock,
-                times(1)).saveAll(any());
+        verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
 }

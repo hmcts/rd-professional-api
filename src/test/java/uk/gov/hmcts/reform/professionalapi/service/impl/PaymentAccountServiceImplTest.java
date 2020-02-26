@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-
 public class PaymentAccountServiceImplTest {
 
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
@@ -53,7 +51,6 @@ public class PaymentAccountServiceImplTest {
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
     private final SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
-    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some@hmcts.net", organisation);
 
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
     private List<SuperUser> superUsers = new ArrayList<>();
@@ -85,45 +82,49 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    @Ignore //ignoring so I can push commit, will fix in next commit
     public void retrievePaymentAccountsByPbaEmailWhenConfigTrue() {
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        Organisation organisationMock = mock(Organisation.class);
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
-        List<UserAccountMap> userAccountMaps = new ArrayList<>();
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setPaymentAccounts(paymentAccounts);
-        professionalUser.setUserAccountMap(userAccountMaps);
-        paymentAccount.setId(UUID.randomUUID());
-
+        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
         when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("true");
-        when(professionalUserRepositoryMock.findByEmailAddress("some@hmcts.net")).thenReturn(professionalUser);
-
-        RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-
-        Organisation organisation = sut.findPaymentAccountsByEmail("some@hmcts.net");
-        assertThat(organisation).isNotNull();
-    }
-
-    @Test
-    @Ignore //ignoring so I can push commit, will fix in next commit
-    public void retrievePaymentAccountsByPbaEmailWhenConfigFalse() {
-        List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(new PaymentAccount());
-        List<UserAccountMap> userAccountMaps = new ArrayList<>();
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        organisation.setPaymentAccounts(paymentAccounts);
-        professionalUser.setUserAccountMap(userAccountMaps);
-        professionalUser.setOrganisation(organisation);
-
-        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("false");
-        when(professionalUserRepositoryMock.findByEmailAddress("some@hmcts.net")).thenReturn(professionalUser);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+        when(professionalUserRepositoryMock.findByEmailAddress("some-email")).thenReturn(professionalUserMock);
 
         RefDataUtil.getPaymentAccount(paymentAccounts);
 
-        Organisation organisation = sut.findPaymentAccountsByEmail("some@hmcts.net");
+        Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
         assertThat(organisation).isNotNull();
+
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(organisationMock, times(1)).setUsers(any());
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
+    }
+
+    @Test
+    public void retrievePaymentAccountsByPbaEmailWhenConfigFalse() {
+        Organisation organisationMock = mock(Organisation.class);
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
+
+        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
+        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("false");
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+        when(professionalUserRepositoryMock.findByEmailAddress("some-email")).thenReturn(professionalUserMock);
+
+        RefDataUtil.getPaymentAccount(paymentAccounts);
+
+        Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
+        assertThat(organisation).isNotNull();
+
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(organisationMock, times(1)).setUsers(any());
+        verify(organisationMock, times(1)).setPaymentAccounts(any());
     }
 
     @Test(expected = Exception.class)
