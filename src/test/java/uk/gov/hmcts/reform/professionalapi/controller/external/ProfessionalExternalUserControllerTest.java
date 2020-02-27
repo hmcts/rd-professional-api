@@ -48,16 +48,17 @@ public class ProfessionalExternalUserControllerTest {
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
 
-
     @Before
     public void setUp() throws Exception {
-        organisation = mock(Organisation.class);
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
         profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
+
+        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
 
         MockitoAnnotations.initMocks(this);
     }
@@ -74,7 +75,7 @@ public class ProfessionalExternalUserControllerTest {
 
         Authentication authentication = mock(Authentication.class);
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
         when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
 
@@ -85,8 +86,8 @@ public class ProfessionalExternalUserControllerTest {
         when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
-        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
-        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
@@ -98,6 +99,7 @@ public class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
         ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
+
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
     }
@@ -125,8 +127,8 @@ public class ProfessionalExternalUserControllerTest {
         when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
-        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
-        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
@@ -154,7 +156,7 @@ public class ProfessionalExternalUserControllerTest {
 
         Authentication authentication = mock(Authentication.class);
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
         when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
         ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
@@ -164,8 +166,8 @@ public class ProfessionalExternalUserControllerTest {
         when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
-        when(organisation.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
-        when(organisation.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("testing@email.com")).thenReturn(professionalUser);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER)).thenReturn(true);

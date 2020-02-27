@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class PaymentAccountServiceImplTest {
-
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
