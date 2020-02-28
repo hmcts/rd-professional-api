@@ -22,9 +22,6 @@ public class WelcomeControllerTest {
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertThat(
-                responseEntity.getBody(),
-                containsString(expectedMessage)
-        );
+        assertThat(responseEntity.getBody(), containsString(expectedMessage));
     }
 }

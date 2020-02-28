@@ -106,10 +106,10 @@ public class OrganisationExternalControllerTest {
         ResponseEntity<?> actual = organisationExternalController.createOrganisationUsingExternalController(organisationCreationRequest);
 
         verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
+        verify(organisationServiceMock, times(1)).createOrganisationFrom(organisationCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
     }
 
     @Test
@@ -126,5 +126,4 @@ public class OrganisationExternalControllerTest {
 
         verify(organisationServiceMock, times(1)).retrieveOrganisation(eq(id));
     }
-
 }

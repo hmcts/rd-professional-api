@@ -72,9 +72,7 @@ public class LegacyPbaControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(professionalUserRepository,
-                times(1))
-                .findByEmailAddress(email);
+        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -93,8 +91,6 @@ public class LegacyPbaControllerTest {
         assertThat(((LegacyPbaResponse) actual.getBody()).getPayment_accounts()).isEmpty();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(professionalUserRepository,
-                times(1))
-                .findByEmailAddress(email);
+        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
     }
 }

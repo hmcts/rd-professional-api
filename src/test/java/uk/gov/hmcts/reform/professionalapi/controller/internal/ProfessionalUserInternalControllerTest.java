@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -83,10 +85,14 @@ public class ProfessionalUserInternalControllerTest {
         ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "");
     }
 
     @Test
     public void testFindUserByEmailWithPuiUserManager() {
+        final String email = "testing@email.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
         List<SuperUser> users = new ArrayList<>();
@@ -95,24 +101,29 @@ public class ProfessionalUserInternalControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("testing@email.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress(email)).thenReturn(professionalUser);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
 
         doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity actual = professionalUserInternalController.findUserByEmail("testing@email.com");
+        ResponseEntity actual = professionalUserInternalController.findUserByEmail(email);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserProfileByEmailAddress(email);
     }
 
     @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
         when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
 
-        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
+        String userId = UUID.randomUUID().toString();
+        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 }

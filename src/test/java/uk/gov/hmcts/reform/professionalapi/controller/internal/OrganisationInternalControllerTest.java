@@ -134,6 +134,8 @@ public class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveAllOrganisations();
     }
 
     @Test
@@ -146,6 +148,8 @@ public class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveOrganisation(organisation.getOrganisationIdentifier());
     }
 
     @Test
@@ -158,6 +162,8 @@ public class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).retrieveOrganisation(organisation.getOrganisationIdentifier());
     }
 
     @Test
@@ -170,6 +176,8 @@ public class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).findByOrganisationStatus(OrganisationStatus.PENDING);
     }
 
     @Test(expected = InvalidRequest.class)
@@ -181,19 +189,20 @@ public class OrganisationInternalControllerTest {
 
     @Test
     public void testRetrievePaymentAccountByEmail() {
+        String email = "some-email@test.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
-
         organisation.setPaymentAccounts(paymentAccounts);
 
-        when(paymentAccountServiceMock.findPaymentAccountsByEmail("some-email@test.com")).thenReturn(organisation);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
 
-        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -220,5 +229,10 @@ public class OrganisationInternalControllerTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(paymentAccountServiceMock, times(1)).deleteUserAccountMaps(organisation);
+        verify(paymentAccountServiceMock, times(1)).deletePaymentAccountsFromOrganisation(organisation);
+        verify(paymentAccountServiceMock, times(1)).addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
+        verify(paymentAccountServiceMock, times(1)).addUserAndPaymentAccountsToUserAccountMap(organisation);
     }
 }
