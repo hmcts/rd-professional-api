@@ -137,7 +137,6 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(new Organisation());
     }
 
-
     @Test(expected = InvalidRequest.class)
     public void validateOrganisationRequestTest() {
         Set<String> paymentAccounts = new HashSet<>();
@@ -347,6 +346,12 @@ public class OrganisationCreationRequestValidatorTest {
     @Test(expected = InvalidRequest.class)
     public void should_validate_company_no_length_and_throw_if_length_more_than_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "123456789","",null, new HashSet<>(),null);
+        organisationCreationRequestValidator.validateCompanyNumber(orgReq);
+    }
+
+    @Test
+    public void should_validate_company_no_length_and_not_throw_if_length_is_8() {
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "12345678","",null, new HashSet<>(),null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 }

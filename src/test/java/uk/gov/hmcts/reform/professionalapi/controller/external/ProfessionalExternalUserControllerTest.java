@@ -2,12 +2,19 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import feign.Response;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,15 +32,18 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.helper.TestConstants;
+import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -41,11 +51,15 @@ public class ProfessionalExternalUserControllerTest {
 
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
+    private ProfessionalUserRepository professionalUserRepositoryMock;
     private Organisation organisation;
     private ProfessionalUserReqValidator profExtUsrReqValidator;
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
     private ResponseEntity<?> responseEntity;
+    private ProfessionalUser professionalUser;
+    private UserProfileFeignClient userProfileFeignClient;
+
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
@@ -53,12 +67,15 @@ public class ProfessionalExternalUserControllerTest {
     @Before
     public void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisation);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
+        professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
         organisationIdentifierValidatorImpl = mock(OrganisationIdentifierValidatorImpl.class);
         profExtUsrReqValidator = mock(ProfessionalUserReqValidator.class);
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
+        userProfileFeignClient = mock(UserProfileFeignClient.class);
 
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
 
@@ -190,6 +207,33 @@ public class ProfessionalExternalUserControllerTest {
         assertThat(actual.get().getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(professionalUserServiceMock, times(1)).findProfessionalUserProfileByEmailAddress("testing@email.com");
+    }
+
+    @Test
+    public void testFindUserStatusByEmail() throws JsonProcessingException {
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
+
+        when(professionalUserRepositoryMock.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("a123dfgr46");
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse, HttpStatus.OK);
+
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(professionalUserServiceMock.findUserStatusByEmailAddress(professionalUser.getEmailAddress())).thenReturn(responseEntity1);
+
+        ResponseEntity<NewUserResponse> newResponse = professionalExternalUserController.findUserStatusByEmail(professionalUser.getEmailAddress());
+
+        assertThat(newResponse).isNotNull();
+        assertThat(newResponse.getBody()).isNotNull();
+        assertThat(newResponse.getBody().getUserIdentifier()).isEqualTo("a123dfgr46");
+
+        verify(professionalUserServiceMock, times(1)).findUserStatusByEmailAddress(professionalUser.getEmailAddress());
     }
 
     @Test(expected = InvalidRequest.class)

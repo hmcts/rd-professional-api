@@ -3,15 +3,23 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import feign.Response;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,24 +29,31 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class OrganisationInternalControllerTest {
@@ -47,10 +62,12 @@ public class OrganisationInternalControllerTest {
     private OrganisationEntityResponse organisationEntityResponse;
     private OrganisationService organisationServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
+    private JurisdictionServiceImpl jurisdictionService;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
+    private ProfessionalUserService professionalUserServiceMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -66,6 +83,10 @@ public class OrganisationInternalControllerTest {
     private List<String> jurisdEnumIds;
     private List<Jurisdiction> jurisdictions;
 
+    private ProfessionalUser professionalUser;
+    private NewUserCreationRequest newUserCreationRequest;
+    private UserProfileFeignClient userProfileFeignClient;
+
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
 
@@ -77,11 +98,14 @@ public class OrganisationInternalControllerTest {
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
         organisationServiceMock = mock(OrganisationService.class);
+        professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
+        jurisdictionService = mock(JurisdictionServiceImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
+        userProfileFeignClient = mock(UserProfileFeignClient.class);
 
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
@@ -103,6 +127,15 @@ public class OrganisationInternalControllerTest {
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
 
         organisation.setOrganisationIdentifier("AK57L4T");
+
+        organisationResponse = new OrganisationResponse(organisation);
+        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions);
 
         MockitoAnnotations.initMocks(this);
     }
@@ -234,5 +267,34 @@ public class OrganisationInternalControllerTest {
         verify(paymentAccountServiceMock, times(1)).deletePaymentAccountsFromOrganisation(organisation);
         verify(paymentAccountServiceMock, times(1)).addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         verify(paymentAccountServiceMock, times(1)).addUserAndPaymentAccountsToUserAccountMap(organisation);
+    }
+
+    @Test
+    public void testInviteUserToOrganisation() throws JsonProcessingException {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        String userId = UUID.randomUUID().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+
+        ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest, orgId, userId);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
     }
 }

@@ -67,6 +67,12 @@ public class ProfessionalUserReqValidatorTest {
         profUserReqValidator.validateStatusIsActive(status);
     }
 
+    @Test
+    public void test_validateStatusIsActiveDoesNotThrow400ForValidStatus() {
+        String status = "ACTIVE";
+        profUserReqValidator.validateStatusIsActive(status);
+    }
+
     @Test(expected = InvalidRequest.class)
     public void test_validateModifyRolesRequestThrows400WhenInvalidRequestWhenUserIdIsEmpty() {
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, "");
@@ -84,6 +90,11 @@ public class ProfessionalUserReqValidatorTest {
         userProfileUpdatedData.setRolesAdd((singleton(new RoleName("pui-user-manager"))));
         userProfileUpdatedData.setRolesDelete((singleton(new RoleName(""))));
 
+        profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString());
+    }
+
+    @Test(expected = Test.None.class)
+    public void test_validateModifyRolesRequestDoesNotThrow400WhenRequestIsValid() {
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString());
     }
 }

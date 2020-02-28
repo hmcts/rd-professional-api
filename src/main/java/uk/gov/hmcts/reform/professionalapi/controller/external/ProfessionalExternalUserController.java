@@ -240,8 +240,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         validateEmail(email);
         //email is valid
-        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase()
-        );
+        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase());
     }
 
 }

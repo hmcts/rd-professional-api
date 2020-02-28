@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import feign.FeignException;
@@ -90,6 +92,8 @@ public class JurisdictionServiceImplTest {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }
 
     @Test(expected = ExternalApiException.class)
@@ -101,6 +105,8 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request)).thenThrow(feignException);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
     }
 
     @Test(expected = ExternalApiException.class)
@@ -112,6 +118,8 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request)).thenThrow(feignException);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
     }
 
     @Test(expected = ExternalApiException.class)
@@ -121,6 +129,8 @@ public class JurisdictionServiceImplTest {
 
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }
 
     @Test(expected = ExternalApiException.class)
@@ -129,6 +139,8 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request)).thenReturn(null);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
     }
 
     @Test(expected = Test.None.class)
@@ -137,6 +149,8 @@ public class JurisdictionServiceImplTest {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
         jurisdictionServiceImpl.propagateJurisdictionIdsForSuperUserToCcd(user, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }
 
     @Test(expected = Test.None.class)
@@ -145,5 +159,7 @@ public class JurisdictionServiceImplTest {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
         jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(OrganisationFixtures.createJurisdictions(), "some@hmcts.net", "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -15,7 +16,6 @@ import org.junit.Test;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-
 import org.springframework.security.core.GrantedAuthority;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -75,6 +75,16 @@ public class OrganisationIdentifierValidatorImplTest {
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(null, UUID.randomUUID().toString());
     }
 
+    @Test(expected = Test.None.class)
+    public void shouldTNothrowExceptionWhenOrganisationIsNotNull() {
+        PaymentAccount pba = new PaymentAccount("PBA1234567");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(pba);
+
+        organisation.setPaymentAccounts(paymentAccounts);
+        organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, organisation.getOrganisationIdentifier());
+    }
+
     @Test
     public void test_ifUserRoleExistsReturnsTrueForExistingRole() {
         String role = "pui-finance-manager";
@@ -100,6 +110,12 @@ public class OrganisationIdentifierValidatorImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_validateOrganisationIsActiveThrows404WhenOrganisationIsNotActive() {
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
+    }
+
+    @Test(expected = Test.None.class)
+    public void test_validateOrganisationIsActiveDoesNotThrow404WhenOrganisationIsActive() {
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation);
     }
 }

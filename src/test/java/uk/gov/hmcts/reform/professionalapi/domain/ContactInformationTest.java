@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 public class ContactInformationTest {
 
     private ContactInformation contactInformation;
+    private Organisation organisation = new Organisation();
 
     @Before
     public void setUp() {
@@ -22,12 +23,13 @@ public class ContactInformationTest {
         contactInformation.setCounty(RefDataUtil.removeEmptySpaces("some-county"));
         contactInformation.setCountry(RefDataUtil.removeEmptySpaces("some-country"));
         contactInformation.setPostCode(RefDataUtil.removeEmptySpaces("some-post-code"));
-        contactInformation.setOrganisation(new Organisation());
+        contactInformation.setOrganisation(organisation);
     }
 
     @Test
     public void creates_contact_information_correctly() {
         assertThat(contactInformation.getId()).isNull();
+        assertThat(contactInformation.getOrganisation()).isEqualTo(organisation);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ACCESS_EXCEPTION_CCD;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST_CCD;
@@ -9,6 +10,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstan
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.UNKNOWN_EXCEPTION_CCD;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.USER_EXISTS;
 
+import java.lang.reflect.Constructor;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -35,5 +37,13 @@ public class CcdErrorMessageResolverTest {
 
         httpStatusString = resolveStatusAndReturnMessage(HttpStatus.MULTI_STATUS);
         assertThat(httpStatusString).isEqualTo(UNKNOWN_EXCEPTION_CCD.getErrorMessage());
+    }
+
+    @Test
+    public void privateConstructorTest() throws Exception {
+        Constructor<CcdErrorMessageResolver> constructor = CcdErrorMessageResolver.class.getDeclaredConstructor();
+        assertFalse(constructor.isAccessible());
+        constructor.setAccessible(true);
+        constructor.newInstance((Object[]) null);
     }
 }

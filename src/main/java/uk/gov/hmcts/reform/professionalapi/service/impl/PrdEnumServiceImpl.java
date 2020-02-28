@@ -32,10 +32,8 @@ public class PrdEnumServiceImpl implements PrdEnumService {
     public List<PrdEnum> findAllPrdEnums() {
         if (CollectionUtils.isEmpty(enumList)) {
             enumList = prdEnumRepository.findByEnabled("YES");
-            return enumList;
-        } else {
-            return enumList;
         }
+        return enumList;
     }
 
     public List<String> getPrdEnumByEnumType(String enumType) {

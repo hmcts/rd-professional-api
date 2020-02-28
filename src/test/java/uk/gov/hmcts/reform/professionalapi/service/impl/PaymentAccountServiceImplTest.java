@@ -163,9 +163,8 @@ public class PaymentAccountServiceImplTest {
 
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
 
-        verify(userAccountMapServiceMock, times(1)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
-
         assertThat(sut.addUserAndPaymentAccountsToUserAccountMap(organisation)).isNotNull();
+        verify(userAccountMapServiceMock, times(2)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
     }
 
     @Test

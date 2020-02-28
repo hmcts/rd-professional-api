@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,30 +31,24 @@ public class StdSerializerTest {
 
     @Test
     public void should_serialize_argument_to_string() throws JsonProcessingException {
-
         Integer source = 123;
         String expectedSerializedSource = "123";
 
-        doReturn(expectedSerializedSource)
-                .when(mapper)
-                .writeValueAsString(source);
+        doReturn(expectedSerializedSource).when(mapper).writeValueAsString(source);
 
         String actualSerializedSource = stdSerializer.serialize(source);
 
         assertEquals(expectedSerializedSource, actualSerializedSource);
+
+        verify(mapper, times(1)).writeValueAsString(source);
     }
 
     @Test
     public void should_convert_checked_exception_to_runtime_on_error() throws JsonProcessingException {
-
         Integer source = 123;
 
-        doThrow(mock(JsonProcessingException.class))
-                .when(mapper)
-                .writeValueAsString(source);
+        doThrow(mock(JsonProcessingException.class)).when(mapper).writeValueAsString(source);
 
-        assertThatThrownBy(() -> stdSerializer.serialize(source))
-                .hasMessage("Could not serialize data")
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> stdSerializer.serialize(source)).hasMessage("Could not serialize data").isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }

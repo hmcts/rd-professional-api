@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
@@ -18,7 +20,6 @@ public class PrdEnumServiceImplTest {
     private final PrdEnumId prdEnumId = new PrdEnumId(1, "SIDAM_ROLE");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(5, "CCD_ROLE");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(4, "ADMIN_ROLE");
-    private List<String> userRoles = new ArrayList<>();
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private PrdEnumServiceImpl prdEnumService;
 
@@ -38,6 +39,8 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(2);
+
+        verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
 
     @Test
@@ -51,5 +54,7 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(0);
+
+        verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
 }

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -53,6 +55,8 @@ public class LegacyPbaAccountServiceImplTest {
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
         assertThat(paymentAccountPbaNumbers).isNotNull();
         assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
+
+        verify(configurationMock, times(1)).getPbaFromUserAccountMap();
     }
 
     @Test
@@ -63,10 +67,11 @@ public class LegacyPbaAccountServiceImplTest {
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
         userAccountMapData.add(userAccountMap);
 
-
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
 
         assertThat(paymentAccountPbaNumbers).isNotNull();
         assertThat(paymentAccountPbaNumbers.size()).isGreaterThanOrEqualTo(0);
+
+        verify(configurationMock, times(2)).getPbaFromUserAccountMap();
     }
 }
