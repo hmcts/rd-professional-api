@@ -94,7 +94,7 @@ public class ProfessionalUserServiceImplTest {
     @Before
     public void setup() {
         userRoles.add("pui-user-manager");
-        PrdEnumId prdEnumId = mock(PrdEnumId.class);
+        PrdEnumId prdEnumId = new PrdEnumId();
         PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
         prdEnums.add(anEnum);
 
