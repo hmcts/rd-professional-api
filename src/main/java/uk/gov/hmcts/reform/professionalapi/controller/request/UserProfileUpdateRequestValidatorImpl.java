@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Component

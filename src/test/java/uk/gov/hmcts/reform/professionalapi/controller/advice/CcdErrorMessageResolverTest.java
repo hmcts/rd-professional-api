@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.advice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ACCESS_EXCEPTION_CCD;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST_CCD;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.MISSING_TOKEN;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.RESOURCE_NOT_FOUND;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.UNKNOWN_EXCEPTION_CCD;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.USER_EXISTS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION_CCD;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST_CCD;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MISSING_TOKEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.RESOURCE_NOT_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION_CCD;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.USER_EXISTS;
 
 import java.lang.reflect.Constructor;
 import org.junit.Test;

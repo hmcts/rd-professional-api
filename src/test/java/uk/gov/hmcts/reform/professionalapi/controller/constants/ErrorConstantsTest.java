@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.professionalapi.controller.advice;
+package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants;
 
 public class ErrorConstantsTest {
 
