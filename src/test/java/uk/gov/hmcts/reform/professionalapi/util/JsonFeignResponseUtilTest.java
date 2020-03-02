@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
-public class JsonFeignResponseHelperTest {
+public class JsonFeignResponseUtilTest {
 
     @Test
     @SuppressWarnings("unchecked")
@@ -33,7 +33,7 @@ public class JsonFeignResponseHelperTest {
         header.put("content-encoding", list);
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
-        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseHelper.decode(response, ProfessionalUsersResponse.class);
+        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
 
         assertThat(createUserProfileResponseOptional).isNotEmpty();
     }
@@ -55,7 +55,7 @@ public class JsonFeignResponseHelperTest {
             e.printStackTrace();
         }
 
-        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseHelper.decode(response, ProfessionalUsersResponse.class);
+        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
         assertThat(createUserProfileResponseOptional).isEmpty();
     }
 
@@ -65,12 +65,12 @@ public class JsonFeignResponseHelperTest {
         Collection<String> list = new ArrayList<>(Arrays.asList("gzip", "request-context", "x-powered-by", "content-length"));
         header.put("content-encoding", list);
 
-        MultiValueMap<String, String> responseHeader = JsonFeignResponseHelper.convertHeaders(header);
+        MultiValueMap<String, String> responseHeader = JsonFeignResponseUtil.convertHeaders(header);
         assertThat(responseHeader).isNotEmpty();
 
         Collection<String> emptylist = new ArrayList<>();
         header.put("content-encoding", emptylist);
-        MultiValueMap<String, String> responseHeader1 = JsonFeignResponseHelper.convertHeaders(header);
+        MultiValueMap<String, String> responseHeader1 = JsonFeignResponseUtil.convertHeaders(header);
 
         assertThat(responseHeader1.get("content-encoding")).isEmpty();
     }
@@ -82,7 +82,7 @@ public class JsonFeignResponseHelperTest {
         header.put("content-encoding", list);
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
-        ResponseEntity entity = JsonFeignResponseHelper.toResponseEntity(response, ProfessionalUsersResponse.class);
+        ResponseEntity entity = JsonFeignResponseUtil.toResponseEntity(response, ProfessionalUsersResponse.class);
 
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCode().value()).isEqualTo(200);
@@ -92,7 +92,7 @@ public class JsonFeignResponseHelperTest {
 
     @Test
     public void privateConstructorTest() throws Exception {
-        Constructor<JsonFeignResponseHelper> constructor = JsonFeignResponseHelper.class.getDeclaredConstructor();
+        Constructor<JsonFeignResponseUtil> constructor = JsonFeignResponseUtil.class.getDeclaredConstructor();
         assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);

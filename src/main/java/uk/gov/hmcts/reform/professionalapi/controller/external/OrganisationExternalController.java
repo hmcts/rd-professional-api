@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -39,8 +39,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
@@ -429,6 +429,8 @@ public class OrganisationServiceImplTest {
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1)).addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes), eq(jurisdictionIds));
+        verify(professionalUserRepositoryMock, times(1)).save(any(ProfessionalUser.class));
+        verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 
     @Test

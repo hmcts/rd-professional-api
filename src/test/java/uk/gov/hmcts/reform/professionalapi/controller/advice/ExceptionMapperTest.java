@@ -36,6 +36,7 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals(emptyResultDataAccessException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
     }
 
     @Test
@@ -45,6 +46,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleResourceNotFoundException(resourceNotFoundException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals("Resource not found", ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -54,6 +57,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleIllegalArgumentException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -63,6 +68,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.httpMessageNotReadableExceptionError(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -72,6 +79,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleHttpMediaTypeNotSupported(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -81,6 +90,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleForbiddenException(exception);
 
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -92,6 +103,8 @@ public class ExceptionMapperTest {
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleHttpStatusException(exception);
         assertNotNull(responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -101,6 +114,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -110,6 +125,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.annotationDrivenValidationError(methodArgumentNotValidException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(methodArgumentNotValidException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -119,6 +136,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -129,6 +148,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.getUserProfileExceptionError(externalApiException);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(externalApiException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -138,6 +159,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.duplicateKeyException(duplicateKeyException);
 
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        assertEquals(duplicateKeyException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -147,6 +170,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.constraintViolationError(constraintViolationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(constraintViolationException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -156,6 +181,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(dataIntegrityViolationException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 
     @Test
@@ -194,6 +221,17 @@ public class ExceptionMapperTest {
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
     }
 
+    @Test
+    public void should_handle_DuplicateUserException() {
+        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT);
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleDuplicateUserException(httpClientErrorException);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        assertEquals(httpClientErrorException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
+    }
+
     private ResponseEntity<Object> generateCustomDataIntegrityViolationResponseMessageForSpecificCause(String errorCause) {
         DataIntegrityViolationException dataIntegrityViolationException = mock(DataIntegrityViolationException.class);
 
@@ -205,14 +243,5 @@ public class ExceptionMapperTest {
         when(dataIntegrityViolationException.getCause().getCause().getMessage()).thenReturn(errorCause);
 
         return exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
-    }
-
-    @Test
-    public void should_handle_DuplicateUserException() {
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT);
-
-        ResponseEntity<Object> responseEntity = exceptionMapper.handleDuplicateUserException(httpClientErrorException);
-
-        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
     }
 }

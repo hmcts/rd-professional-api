@@ -25,9 +25,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformation
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;

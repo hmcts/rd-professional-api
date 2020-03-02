@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +18,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;

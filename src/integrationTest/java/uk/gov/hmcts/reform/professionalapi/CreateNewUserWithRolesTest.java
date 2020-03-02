@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;

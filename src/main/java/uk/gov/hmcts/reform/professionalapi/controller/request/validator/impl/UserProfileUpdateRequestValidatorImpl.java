@@ -1,8 +1,10 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Component

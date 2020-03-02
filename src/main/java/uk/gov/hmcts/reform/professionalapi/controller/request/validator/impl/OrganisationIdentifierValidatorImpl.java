@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import java.util.Collection;
 
@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;

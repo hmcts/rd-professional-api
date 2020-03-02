@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,9 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;

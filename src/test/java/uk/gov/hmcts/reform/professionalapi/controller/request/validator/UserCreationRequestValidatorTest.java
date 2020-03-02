@@ -1,15 +1,17 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertFalse;
@@ -13,6 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
 
 public class PaymentAccountValidatorTest {

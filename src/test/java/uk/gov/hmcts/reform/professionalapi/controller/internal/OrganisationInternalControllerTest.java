@@ -33,11 +33,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -131,7 +131,6 @@ public class OrganisationInternalControllerTest {
         organisationResponse = new OrganisationResponse(organisation);
         professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
-
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");

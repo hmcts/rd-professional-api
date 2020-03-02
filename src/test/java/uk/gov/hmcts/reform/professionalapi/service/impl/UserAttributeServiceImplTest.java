@@ -60,8 +60,6 @@ public class UserAttributeServiceImplTest {
     public void testAddAllAttributes() {
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
-        when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
-        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
         when(userAttributeRepositoryMock.saveAll(any())).thenReturn(userAttributes);
 
         int expectSize = userAttributes.size() + 1;

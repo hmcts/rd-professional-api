@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
@@ -11,6 +11,13 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.controller.request;
+package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;

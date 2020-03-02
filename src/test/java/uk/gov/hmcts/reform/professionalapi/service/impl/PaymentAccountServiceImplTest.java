@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -101,6 +101,7 @@ public class PaymentAccountServiceImplTest {
         verify(organisationMock, times(1)).setPaymentAccounts(any());
         verify(organisationMock, times(1)).setUsers(any());
         verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(professionalUserRepositoryMock, times(1)).findByEmailAddress("some-email");
     }
 
     @Test
@@ -124,6 +125,7 @@ public class PaymentAccountServiceImplTest {
         verify(organisationMock, times(1)).setPaymentAccounts(any());
         verify(organisationMock, times(1)).setUsers(any());
         verify(organisationMock, times(1)).setPaymentAccounts(any());
+        verify(professionalUserRepositoryMock, times(1)).findByEmailAddress("some-email");
     }
 
     @Test(expected = Exception.class)

@@ -40,10 +40,10 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;

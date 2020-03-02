@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
@@ -132,7 +132,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
