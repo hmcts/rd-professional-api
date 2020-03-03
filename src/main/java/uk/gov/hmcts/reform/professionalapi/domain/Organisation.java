@@ -14,15 +14,23 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Entity(name = "organisation")
+@Entity
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@NamedEntityGraph(
+        name = "Organisation.alljoins",
+        attributeNodes = {
+                @NamedAttributeNode(value = "users"),
+        }
+)
 public class Organisation implements Serializable {
 
     @Id
@@ -33,15 +41,17 @@ public class Organisation implements Serializable {
     @Size(max = 255)
     private String name;
 
-    //@OneToMany(mappedBy = "organisation")
-    @OneToMany
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = SuperUser.class)
     @JoinColumn(name = "organisation_id", insertable = false, updatable = false)
     private List<SuperUser> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "organisation")
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = PaymentAccount.class, mappedBy = "organisation")
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "organisation")
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
     @Column(name = "STATUS")
