@@ -224,14 +224,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         List<Organisation> pendingOrganisations = new ArrayList<>();
-        List<Organisation> activeOrganisations = new ArrayList<>();
         List<Organisation> resultingOrganisations = new ArrayList<>();
 
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
 
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
-                activeOrganisations.add(organisation);
                 if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
                     activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
                 }
@@ -242,7 +240,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         List<Organisation> updatedActiveOrganisations = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(activeOrganisations)) {
+        if (!CollectionUtils.isEmpty(activeOrganisationDetails)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
                     = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted().collect(Collectors.toList()));
