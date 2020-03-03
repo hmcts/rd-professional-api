@@ -257,55 +257,6 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_validate_jurisdictions_successfully() {
-
-        OrganisationCreationRequestValidator.validateJurisdictions(createJurisdictions(), getEnumList());
-    }
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_are_empty() {
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(new ArrayList<>(), getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdictions not present");
-    }
-
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_id_has_null() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction1.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdiction value should not be blank or null");
-
-    }
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_id_has_invalid_value() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("id2");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdiction id not valid : id2");
-
-    }
-
-    @Test(expected = Test.None.class)
     public void should_validate_valid_email_and_should_not_throw_exception() {
 
         String[] validEmails = new String[] {
