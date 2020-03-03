@@ -163,20 +163,4 @@ public class OrganisationCreationRequestValidator {
             throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
         }
     }
-
-
-    public static void validateJurisdictions(List<Jurisdiction> jurisdictions, List<String> enumList) {
-
-        if (CollectionUtils.isEmpty(jurisdictions)) {
-            throw new InvalidRequest("Jurisdictions not present");
-        } else {
-            jurisdictions.forEach(jurisdiction -> {
-                if (StringUtils.isBlank(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction value should not be blank or null");
-                } else if (!enumList.contains(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction id not valid : " + jurisdiction.getId());
-                }
-            });
-        }
-    }
 }
