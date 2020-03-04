@@ -20,7 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.*;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
@@ -63,26 +62,6 @@ public class OrganisationCreationRequestValidatorTest {
     public void setup() {
         organisationCreationRequestValidator =
                 new OrganisationCreationRequestValidator(asList(validator1, validator2));
-    }
-
-    public List<String> getEnumList() {
-        ArrayList<String> enumStringList = new ArrayList<>();
-        enumStringList.add("Probate");
-        enumStringList.add("BULKSCAN");
-        enumStringList.add("Civil Money Claims");
-        return enumStringList;
-    }
-
-    public List<Jurisdiction> createJurisdictions() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("Probate");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-        return jurisdictions;
     }
 
     @Test
