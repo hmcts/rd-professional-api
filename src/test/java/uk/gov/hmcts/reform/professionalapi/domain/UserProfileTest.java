@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.UUID;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 
 public class UserProfileTest {
 
