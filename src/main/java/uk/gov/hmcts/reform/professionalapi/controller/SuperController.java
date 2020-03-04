@@ -21,7 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.*;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -62,7 +72,7 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
-    protected OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
@@ -99,7 +109,7 @@ public abstract class SuperController {
     private static final String SRA_REGULATED_FALSE = "false";
 
 
-    protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+    protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
@@ -139,7 +149,7 @@ public abstract class SuperController {
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(orgStatus)) {
             //Received request to retrieve all organisations
             organisationResponse =
-                    organisationService.retrieveOrganisations();
+                    organisationService.retrieveAllOrganisations();
 
         } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
                 || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
@@ -244,7 +254,7 @@ public abstract class SuperController {
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseHelper.toResponseEntity(response, clazz);
-        } catch (FeignException ex) {
+        }  catch (FeignException ex) {
             log.error("UserProfile api failed:: status code ::" + ex.status());
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
@@ -317,7 +327,7 @@ public abstract class SuperController {
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
 
         if (page != null) {
-            Pageable pageable = RefDataUtil.createPageableObject(page, size,  Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
+            Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION,"firstName"));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
@@ -333,5 +343,12 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(rolesResponse);
+    }
+
+    public Organisation checkOrganisationIsActive(String orgId) {
+        organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+        organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
+        return existingOrganisation;
     }
 }

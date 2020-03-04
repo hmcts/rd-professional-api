@@ -34,12 +34,10 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForPuiManager(), userCreationRequest.getEmail());
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenFor(puiUserManager), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
 
     }
-
-
 
     @Test
     public void ac2_find_user_status_by_email_with_pui_case_manager_role_should_return_200_with_user_status_active() {

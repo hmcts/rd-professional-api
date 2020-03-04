@@ -101,17 +101,22 @@ public class OrganisationCreationRequestValidatorTest {
         assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
+    @Test(expected = InvalidRequest.class) //null value should throw invalid request exception
     public void validateOrganisationIdentifierNullTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier(null);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //value less than 7 char in length should throw empty exception
+    @Test(expected = InvalidRequest.class) //value less than 7 char in length should throw invalid request exception
     public void validateOrganisationIdentifierTooShortTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //incorrect format should throw empty exception
+    @Test(expected = InvalidRequest.class) //value greater than 7 char in length should throw invalid request
+    public void validateOrganisationIdentifierTooLongTest() {
+        organisationCreationRequestValidator.validateOrganisationIdentifier("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    }
+
+    @Test(expected = InvalidRequest.class) //incorrect format should throw invalid request exception
     public void validateOrganisationIdentifierWrongFormatTest() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");
     }
@@ -364,13 +369,13 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = Test.None.class)
     public void should_validate_mandatory_user_fields_and_not_throw_exception() {
-        NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname", "a@hmcts.net", new ArrayList<String>(), new ArrayList<>());
+        NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname", "sl@hmcts.net", new ArrayList<String>(), new ArrayList<>());
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 
     @Test(expected = InvalidRequest.class)
     public void should_validate_mandatory_user_fields_and_throw_exception() {
-        NewUserCreationRequest request = new NewUserCreationRequest(null, null, "a@hmcts.net", new ArrayList<String>(), new ArrayList<>());
+        NewUserCreationRequest request = new NewUserCreationRequest(null, null, "al@hmcts.net", new ArrayList<String>(), new ArrayList<>());
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
+
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDeta
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+
 
 
 @Component
@@ -58,7 +61,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
                 orgId = organisation.getOrganisationIdentifier();
             } else {
                 log.error("ProfessionalUserUser info null::");
-                throw new AccessDeniedException("403 Forbidden");
+                throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
             }
 
         }
@@ -67,7 +70,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
                 || StringUtils.isEmpty(orgId)) {
 
             log.error(" ServiceAndUserDetails or OrganisationIdentifier is Null::");
-            throw new AccessDeniedException("403 Forbidden");
+            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
         return orgId;
     }

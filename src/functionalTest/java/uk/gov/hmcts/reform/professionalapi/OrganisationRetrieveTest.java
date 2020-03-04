@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -43,6 +44,16 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+    }
+
+    @Test
+    public void retrieve_an_organisation_with_user_manager_rights_return_403() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
+    }
+
+    @Test
     public void can_retrieve_Pending_and_Active_organisations() {
 
         Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
@@ -53,10 +64,14 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
+        Map<String, Object> newOrgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifierTwo,hmctsAdmin);
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
         Assertions.assertThat(finalResponse.size()).isGreaterThanOrEqualTo(1);
+        assertThat(newOrgResponse.get("paymentAccount")).asList().size().isEqualTo(3);
+        assertThat(newOrgResponse.get("contactInformation")).asList().size().isEqualTo(2);
+
     }
 
     @Test

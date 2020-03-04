@@ -19,29 +19,6 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    private String settingUpOrganisation(String role) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-
-        return (String) newUserResponse.get("userIdentifier");
-    }
-
-
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
         String organisationIdentifier = createOrganisationRequest();
@@ -75,10 +52,9 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
-    public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_404() {
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("123","False", hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("404");
-
+    public void retrieve_users_with_invalid_organisationIdentifier_should_return_status_400() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation("this-is-invalid","False", hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
