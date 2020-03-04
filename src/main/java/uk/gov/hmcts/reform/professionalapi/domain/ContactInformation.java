@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity(name = "contact_information")
@@ -65,20 +67,9 @@ public class ContactInformation implements Serializable {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(mappedBy = "contactInformation")
     private List<DxAddress> dxAddresses = new ArrayList<>();
-
-    public ContactInformation(String addressLine1, String addressLine2, String addressLine3, String townCity,
-                              String county, String country, String postCode, Organisation organisation) {
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
-        this.addressLine3 = addressLine3;
-        this.townCity = townCity;
-        this.county = county;
-        this.country = country;
-        this.postCode = postCode;
-        this.organisation = organisation;
-    }
 
     public void addDxAddress(DxAddress dxAddress) {
         dxAddresses.add(dxAddress);
