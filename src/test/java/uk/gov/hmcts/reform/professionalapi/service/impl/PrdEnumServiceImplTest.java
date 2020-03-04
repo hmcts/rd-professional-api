@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 
 public class PrdEnumServiceImplTest {
 
@@ -39,6 +39,8 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(2);
+        assertThat(roleList.get(0)).isEqualTo("PUI_USER_MANAGER");
+        assertThat(roleList.get(1)).isEqualTo("caseworker");
 
         verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
@@ -54,7 +56,6 @@ public class PrdEnumServiceImplTest {
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
         assertThat(roleList.size()).isEqualTo(0);
-
         verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
 }

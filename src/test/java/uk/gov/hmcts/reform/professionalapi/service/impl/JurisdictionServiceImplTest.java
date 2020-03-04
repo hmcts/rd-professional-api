@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import feign.FeignException;
 import feign.Request;
@@ -30,7 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 
 public class JurisdictionServiceImplTest {
 
@@ -84,6 +85,9 @@ public class JurisdictionServiceImplTest {
         assertThat(request.getId()).isEqualTo("some@hmcts.net");
         assertThat(request.getJurisdictions()).isNotEmpty();
         assertThat(request.getJurisdictions().size()).isEqualTo(2);
+        assertThat(request.getJurisdictions().get(0).getId()).isEqualTo("PROBATE");
+        assertThat(request.getJurisdictions().get(1).getId()).isEqualTo("BULKSCAN");
+
     }
 
     @Test(expected = Test.None.class)
@@ -158,7 +162,7 @@ public class JurisdictionServiceImplTest {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
-        jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(OrganisationFixtures.createJurisdictions(), "some@hmcts.net", "some@hmcts.net");
+        jurisdictionServiceImpl.propagateJurisdictionIdsForNewUserToCcd(createJurisdictions(), "some@hmcts.net", "some@hmcts.net");
 
         verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }

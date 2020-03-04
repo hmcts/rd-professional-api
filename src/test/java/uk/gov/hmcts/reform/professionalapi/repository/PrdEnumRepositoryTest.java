@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.persistence;
+package uk.gov.hmcts.reform.professionalapi.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

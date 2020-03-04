@@ -55,7 +55,7 @@ public class LegacyPbaAccountServiceImplTest {
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
         assertThat(paymentAccountPbaNumbers).isNotNull();
         assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
-
+        assertThat(paymentAccountPbaNumbers.get(0)).isEqualTo("PBA123");
         verify(configurationMock, times(1)).getPbaFromUserAccountMap();
     }
 

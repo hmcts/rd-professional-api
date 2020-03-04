@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -30,7 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -140,7 +141,7 @@ public abstract class AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
@@ -165,7 +166,7 @@ public abstract class AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
@@ -201,7 +202,7 @@ public abstract class AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         return userCreationRequest;
     }

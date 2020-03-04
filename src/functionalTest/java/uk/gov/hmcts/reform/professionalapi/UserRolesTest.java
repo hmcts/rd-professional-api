@@ -4,6 +4,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.specification.RequestSpecification;
@@ -24,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -104,7 +105,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles1)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
@@ -146,7 +147,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         return superUser;
     }
@@ -157,7 +158,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         return newUser;
     }

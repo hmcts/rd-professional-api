@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.HashSet;
@@ -16,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -36,7 +37,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
 
@@ -64,7 +65,7 @@ public class PaymentAccountRetrieveByEmailTest extends AuthorizationFunctionalTe
                                 .firstName("some-fname")
                                 .lastName("some-lname")
                                 .email(email)
-                                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                                .jurisdictions(createJurisdictions())
                                 .build())
                         .build());
 

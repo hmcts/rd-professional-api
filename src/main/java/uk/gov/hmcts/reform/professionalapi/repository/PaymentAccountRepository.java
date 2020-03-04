@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.persistence;
+package uk.gov.hmcts.reform.professionalapi.repository;
 
 import java.util.List;
 import java.util.Set;

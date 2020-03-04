@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -211,7 +211,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -226,7 +226,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;

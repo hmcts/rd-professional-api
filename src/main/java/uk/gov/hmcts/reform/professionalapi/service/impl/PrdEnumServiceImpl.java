@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 
 @Service

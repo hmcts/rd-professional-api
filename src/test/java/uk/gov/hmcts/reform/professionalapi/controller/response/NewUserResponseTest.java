@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -10,7 +11,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class NewUserResponseTest {
 
-    private String userIdentifier = "userIdentifier";
+    private String userIdentifier = UUID.randomUUID().toString();
     private ProfessionalUser professionalUser;
     private Organisation organisation;
     private NewUserResponse newUserResponse;

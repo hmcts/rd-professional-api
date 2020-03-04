@@ -14,7 +14,7 @@ public class ProfessionalUserTest {
     @Test
     public void creates_professional_user_correctly() {
         List<String> roles = new ArrayList<>();
-        roles.add("role");
+        roles.add("pui-user-manager");
 
         Organisation organisation = new Organisation();
         ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some-email-address", organisation);
@@ -31,6 +31,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getUserIdentifier()).isNull();
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
         assertThat(professionalUser.getRoles().size()).isEqualTo(1);
+        assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
         assertThat(professionalUser.getUserAccountMap()).isNotNull();

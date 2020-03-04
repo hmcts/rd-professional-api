@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
@@ -24,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures;
+
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
@@ -142,7 +143,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -209,7 +210,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -237,7 +238,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
                         .email("someone@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
@@ -266,7 +267,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -286,7 +287,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -307,7 +308,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         Arrays.stream(emails).forEach(email -> {
 
-            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(OrganisationFixtures.createJurisdictions()).build());
+            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(createJurisdictions()).build());
             Map<String, Object> response =
                     professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
             assertThat(response.get("http_status")).isEqualTo("201 CREATED");

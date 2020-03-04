@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +16,6 @@ import org.junit.Test;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -40,11 +38,7 @@ public class OrganisationIdentifierValidatorImplTest {
         Organisation dummyOrganisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId", "12345678", Boolean.FALSE, "dummySite.com");
 
         organisationIdentifierValidatorImpl.validate(dummyOrganisation, dummyOrganisation.getStatus(), dummyOrganisation.getOrganisationIdentifier());
-        try {
-            organisationIdentifierValidatorImpl.validate(dummyOrganisation, OrganisationStatus.ACTIVE, dummyOrganisation.getOrganisationIdentifier());
-        } catch (Exception e) {
-            fail();
-        }
+        organisationIdentifierValidatorImpl.validate(dummyOrganisation, OrganisationStatus.ACTIVE, dummyOrganisation.getOrganisationIdentifier());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)

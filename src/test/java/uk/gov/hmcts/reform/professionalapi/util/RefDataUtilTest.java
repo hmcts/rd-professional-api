@@ -184,6 +184,8 @@ public class RefDataUtilTest {
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
         assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
     }
 
     @Test(expected = ExternalApiException.class)
@@ -209,6 +211,9 @@ public class RefDataUtilTest {
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
         assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(3);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
+        assertThat(professionalUsersEntityResponse1.getUserProfiles().get(2)).isEqualTo(professionalUsersResponse2);
     }
 
     @Test(expected = ResourceNotFoundException.class)

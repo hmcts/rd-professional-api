@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 
 public class UserAccountMapServiceImplTest {
 

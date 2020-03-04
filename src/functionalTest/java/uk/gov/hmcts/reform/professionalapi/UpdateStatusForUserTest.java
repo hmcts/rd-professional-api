@@ -156,7 +156,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles1)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
@@ -164,7 +164,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .firstName("Leeroy")
                 .lastName("Jenkins")
                 .email("leeroy@jenkins.com")
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
@@ -191,7 +191,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles1)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
@@ -199,7 +199,7 @@ public class UpdateStatusForUserTest extends ModifyRolesForUserTest {
                 .firstName("Leeroy")
                 .lastName("Jenkins")
                 .email("leeroy@jenkins.com")
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
 
