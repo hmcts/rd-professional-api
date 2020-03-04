@@ -2,14 +2,9 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import io.restassured.specification.RequestSpecification;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
@@ -34,9 +28,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-
-    private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
-    private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
     @Test
     public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {
@@ -64,31 +55,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         assertThat(superUserRoles).contains("caseworker");
 
-    }
-
-    public RequestSpecification generateBearerTokenForPuiManager() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
-
-        List<String> userRoles1 = new ArrayList<>();
-        userRoles1.add("pui-organisation-manager");
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles1)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.OK);
-
-        return bearerToken;
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
@@ -131,14 +97,4 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         return superUser;
     }
 
-    private NewUserCreationRequest createNewUser(String email,List<String> userRoles) {
-        NewUserCreationRequest newUser = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-        return newUser;
-    }
 }
