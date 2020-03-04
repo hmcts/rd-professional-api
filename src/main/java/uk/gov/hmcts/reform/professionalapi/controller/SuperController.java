@@ -285,7 +285,7 @@ public abstract class SuperController {
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        validateRoles(roles, prdEnumList);
+        validateRoles(roles);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),

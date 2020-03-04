@@ -16,30 +16,13 @@ public class UserCreationRequestValidator {
     }
 
 
-    public static List<String> validateRoles(List<String> roles, List<PrdEnum> prdEnumList) {
+    public static List<String> validateRoles(List<String> roles) {
 
-        List<String> rolesWithoutDuplicates = roles.stream()
-                .distinct()
-                .collect(Collectors.toList());
-        List<String> verifiedUserRoles = rolesWithoutDuplicates.stream()
-                .map(role -> verifyRole(role, prdEnumList))
-                .collect(Collectors.toList());
-
-        if (CollectionUtils.isEmpty(verifiedUserRoles) || verifiedUserRoles.contains("false")) {
-            log.error("Invalid/No user role(s) provided");
-            throw new InvalidRequest("Invalid roles provided");
+        if (CollectionUtils.isEmpty(roles)) {
+            log.error("No user role(s) provided");
+            throw new InvalidRequest("No role(s) provided");
         }
 
-        return verifiedUserRoles;
-    }
-
-    public static String verifyRole(String amendedRole, List<PrdEnum> prdEnumList) {
-        AtomicReference<String> verifiedRole = new AtomicReference<>("false");
-        prdEnumList.forEach(prdEnum -> {
-            if (!StringUtils.isEmpty(amendedRole) && prdEnum.getEnumName().equals(amendedRole.toLowerCase().trim())) {
-                verifiedRole.set(amendedRole.toLowerCase().trim());
-            }
-        });
-        return verifiedRole.get();
+        return roles;
     }
 }
