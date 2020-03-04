@@ -237,5 +237,6 @@ public class ProfessionalExternalUserControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
     }
 }

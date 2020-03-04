@@ -295,5 +295,8 @@ public class OrganisationInternalControllerTest {
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
     }
 }
