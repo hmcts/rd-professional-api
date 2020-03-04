@@ -66,26 +66,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     }
 
-    @Test
-    public void ac5_internal_user_cannot_add_user_with_non_fpla_or_iac_roles() {
-
-        String orgIdentifier =  createAndUpdateOrganisationToActive(hmctsAdmin);
-
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        NewUserCreationRequest userCreationRequest = createNewUser(email, dummyRoles);
-
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.BAD_REQUEST);
-
-    }
-
-    //External endpoint for create new user is failing because PUM is unable to add new user with fpla and iac roles in AAT env
-    //Awaiting https://tools.hmcts.net/jira/browse/SIDM-3475 and https://tools.hmcts.net/jira/browse/SIDM-3476
-    public void ac6_external_user_cannot_add_user_with_non_fpla_or_iac_roles() {
-
-    }
-
-
     public RequestSpecification generateBearerTokenForPuiManager() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
