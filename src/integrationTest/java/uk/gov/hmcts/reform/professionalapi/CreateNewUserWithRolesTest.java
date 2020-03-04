@@ -21,10 +21,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
@@ -36,8 +34,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     OrganisationRepository organisationRepository;
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
-    @Autowired
-    PrdEnumRepository prdEnumRepository;
 
     private OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
     private NewUserCreationRequest userCreationRequest;
@@ -191,9 +187,9 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     @Test(expected = InvalidRequest.class)
     public void add_new_user_without_roles_returns_400_bad_request() {
-        List<String> userRoles = new ArrayList<>();
+        List<String> noUserRoles = new ArrayList<>();
 
-        userCreationRequestValidator.validateRoles(userRoles);
+        userCreationRequestValidator.validateRoles(noUserRoles);
     }
 
     @Test
