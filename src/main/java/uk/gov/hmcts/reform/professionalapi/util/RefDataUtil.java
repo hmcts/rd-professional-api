@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
 
 import feign.FeignException;
 import feign.Response;
@@ -212,7 +213,7 @@ public class RefDataUtil {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
 
-            throw new AccessDeniedException("403 Forbidden");
+            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
 
     }

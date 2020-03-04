@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -186,6 +185,26 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, hmctsAdmin);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
+    }
+
+    @Test
+    public void returns_400_when_organisation_identifier_invalid() {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email("some@email.com")
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
+
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id", userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("400");
     }
 
 
@@ -425,33 +444,5 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
-    }
-
-    @Test
-    public void should_return_409_when_same_invited_new_user_is_super_user_of_pending_org() {
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-
-        //create pending organisation #1
-        OrganisationCreationRequest organisationCreationRequestForPendingOrg = someMinimalOrganisationRequest().build();
-
-        Map<String, Object> pendingOrg =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequestForPendingOrg);
-
-        //create and update any other organisation #2
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().status("ACTIVE")
-                .superUser(UserCreationRequest.aUserCreationRequest().firstName("fname").lastName("lname").jurisdictions(createJurisdictions()).email("someone1@gmail.com").build()).build();
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, orgIdentifierResponse);
-
-        //invite same user used in creating pending organisation #1
-        userCreationRequest.setEmail(organisationCreationRequestForPendingOrg.getSuperUser().getEmail());
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
-
-        assertThat(newUserResponse.get("http_status")).isEqualTo("409");
-        assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
     }
 }
