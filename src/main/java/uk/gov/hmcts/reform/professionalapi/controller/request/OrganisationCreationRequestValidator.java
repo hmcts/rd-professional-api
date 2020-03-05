@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -165,19 +164,4 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-
-    public static void validateJurisdictions(List<Jurisdiction> jurisdictions, List<String> enumList) {
-
-        if (CollectionUtils.isEmpty(jurisdictions)) {
-            throw new InvalidRequest("Jurisdictions not present");
-        } else {
-            jurisdictions.forEach(jurisdiction -> {
-                if (StringUtils.isBlank(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction value should not be blank or null");
-                } else if (!enumList.contains(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction id not valid : " + jurisdiction.getId());
-                }
-            });
-        }
-    }
 }
