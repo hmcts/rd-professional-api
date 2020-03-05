@@ -11,8 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 
 public class UserCreationRequestValidatorTest {
 
@@ -32,11 +30,7 @@ public class UserCreationRequestValidatorTest {
         roles.add(userManagerRole);
         roles.add(caseManagerRole);
 
-        List<PrdEnum> prdEnumList = new ArrayList<>();
-        prdEnumList.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), userManagerRole, "SIDAM_ROLE"));
-        prdEnumList.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), caseManagerRole, "SIDAM_ROLE"));
-
-        List<String> validatedRoles = userCreationRequestValidatorMock.validateRoles(roles, prdEnumList);
+        List<String> validatedRoles = userCreationRequestValidatorMock.validateRoles(roles);
 
         assertFalse(validatedRoles.isEmpty());
     }
@@ -44,11 +38,8 @@ public class UserCreationRequestValidatorTest {
     @Test(expected = InvalidRequest.class)
     public void test_validateRolesThrows40WhenVerifiedRolesIsEmpty() {
         List<String> roles = new ArrayList<>();
-        List<PrdEnum> prdEnumList = new ArrayList<>();
-        prdEnumList.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), userManagerRole, "SIDAM_ROLE"));
-        prdEnumList.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), caseManagerRole, "SIDAM_ROLE"));
 
-        userCreationRequestValidatorMock.validateRoles(roles, prdEnumList);
+        userCreationRequestValidatorMock.validateRoles(roles);
     }
 
     @Test

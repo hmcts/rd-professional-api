@@ -20,10 +20,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
@@ -35,8 +33,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     OrganisationRepository organisationRepository;
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
-    @Autowired
-    PrdEnumRepository prdEnumRepository;
 
     private OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
     private NewUserCreationRequest userCreationRequest;
@@ -209,75 +205,10 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
     @Test(expected = InvalidRequest.class)
-    public void add_new_user_with_invalid_roles_returns_400_bad_request() {
-        List<String> userRolesDuplicate = new ArrayList<>();
-        userRolesDuplicate.add("pui-uer-manager");
-        userRolesDuplicate.add("pui-user-manager");
-        userRolesDuplicate.add("pui-case-manager");
+    public void add_new_user_without_roles_returns_400_bad_request() {
+        List<String> noUserRoles = new ArrayList<>();
 
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-
-        userCreationRequestValidator.validateRoles(userRolesDuplicate, prdEnums);
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void add_new_user_with_invalid_roles_with_empty_space_returns_400_bad_request() {
-        List<String> userRolesDuplicate = new ArrayList<>();
-        userRolesDuplicate.add(" ");
-        userRolesDuplicate.add("pui-user-manager");
-        userRolesDuplicate.add("pui-case-manager");
-
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-
-        userCreationRequestValidator.validateRoles(userRolesDuplicate, prdEnums);
-    }
-
-    @Test
-    public void add_new_user_with_same_role_multiple_times_in_request_only_returns_role_once() {
-        List<String> userRolesDuplicate = new ArrayList<>();
-        userRolesDuplicate.add("PUI-CASE-MANAGER ");
-        userRolesDuplicate.add("pui-user-manager");
-        userRolesDuplicate.add("pui-user-manager");
-
-        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
-
-        List<String> validatedRoles = userCreationRequestValidator.validateRoles(userRolesDuplicate,prdEnums);
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email("somenewuser@email.com")
-                .roles(validatedRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-
-        OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
-        professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
-
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-
-        assertThat(newUserResponse).isNotNull();
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
-        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(users.size()).isEqualTo(2);
-
-        ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(userIdentifierResponse);
-        assertThat(persistedProfessionalUser).isNotNull();
-        assertThat(persistedProfessionalUser.getUserAttributes().size()).isEqualTo(2);
+        userCreationRequestValidator.validateRoles(noUserRoles);
     }
 
     @Test
