@@ -112,7 +112,6 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse>  createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -121,8 +120,6 @@ public abstract class SuperController {
         if (null != organisationCreationRequest.getSuperUser()) {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
-
-        OrganisationCreationRequestValidator.validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
@@ -286,11 +283,9 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
 
-        OrganisationCreationRequestValidator.validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
-
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        UserCreationRequestValidator.validateRoles(roles, prdEnumList);
+        UserCreationRequestValidator.validateRoles(roles);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 RefDataUtil.removeEmptySpaces(newUserCreationRequest.getFirstName()),
