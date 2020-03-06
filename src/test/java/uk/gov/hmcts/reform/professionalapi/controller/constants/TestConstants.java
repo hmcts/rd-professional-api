@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.helper;
+package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
 public class TestConstants {
 
