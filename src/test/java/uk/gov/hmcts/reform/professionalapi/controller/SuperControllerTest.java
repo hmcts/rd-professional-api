@@ -138,6 +138,7 @@ public class SuperControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
+        verify(prdEnumServiceMock, times(2)).getPrdEnumByEnumType(any());
         verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1)).createOrganisationFrom(organisationCreationRequest);
     }
@@ -205,6 +206,8 @@ public class SuperControllerTest {
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(1)).getPrdEnumByEnumType(any());
+        verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 
     @Test
@@ -226,6 +229,7 @@ public class SuperControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(email)).thenReturn(professionalUser);
 
         superController.checkUserAlreadyExist(email);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress(email);
     }
 
     @Test(expected = Test.None.class)
@@ -234,6 +238,8 @@ public class SuperControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(email)).thenReturn(null);
 
         superController.checkUserAlreadyExist(email);
+
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress(email);
     }
 
     @Test
@@ -244,5 +250,7 @@ public class SuperControllerTest {
 
         assertThat(existingOrg).isNotNull();
         assertThat(existingOrg).isEqualTo(organisation);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
 }
