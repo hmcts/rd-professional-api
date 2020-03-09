@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -172,7 +172,6 @@ public class OrganisationExternalController extends SuperController {
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
         validateEmail(email);
-        //In retrievePaymentAccountByUserEmail method
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

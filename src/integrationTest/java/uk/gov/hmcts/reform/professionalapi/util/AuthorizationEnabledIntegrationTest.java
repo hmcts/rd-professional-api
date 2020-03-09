@@ -1,13 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
@@ -32,18 +39,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.persistence.ContactInformationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.DxAddressRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PaymentAccountRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+
+import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -221,7 +228,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(201)
                 ));
 
-        userProfileService.stubFor(WireMock.get(urlPathMatching("/v1/userprofile.*"))
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
@@ -265,7 +272,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -296,7 +303,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;

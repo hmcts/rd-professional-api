@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,15 +33,15 @@ import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -211,7 +211,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -226,7 +226,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;

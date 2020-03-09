@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
-
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 import feign.FeignException;
@@ -31,13 +29,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.ProfessionalUserReqValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -58,7 +56,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
-import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseHelper;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @RestController
@@ -78,7 +76,7 @@ public abstract class SuperController {
     @Autowired
     protected OrganisationCreationRequestValidator organisationCreationRequestValidator;
     @Autowired
-    protected OrganisationIdentifierIdentifierValidatorImpl organisationIdentifierValidatorImpl;
+    protected OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     @Autowired
     protected ProfessionalUserReqValidator profExtUsrReqValidator;
     @Autowired
@@ -259,7 +257,7 @@ public abstract class SuperController {
 
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
-            return JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
             log.error("UserProfile api failed:: status code ::" + ex.status());
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");

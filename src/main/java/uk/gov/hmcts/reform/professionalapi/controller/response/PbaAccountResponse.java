@@ -5,11 +5,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 public class PbaAccountResponse {
 
-
-
     @JsonProperty
     private String pbaNumber;
-
 
     public PbaAccountResponse(PaymentAccount paymentAccount) {
         getPbaAccountResponse(paymentAccount);

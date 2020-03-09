@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.JurisdictionUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.service.JurisdictionService;
 
@@ -25,8 +25,6 @@ public class JurisdictionServiceImpl implements JurisdictionService {
 
     @Autowired
     AuthTokenGenerator authTokenGenerator;
-
-    static final String successMessage = "Jurisdiction create user profile success!!";
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {
@@ -63,8 +61,6 @@ public class JurisdictionServiceImpl implements JurisdictionService {
             } else if (response.status() > 300) {
                 responseCode = response.status();
                 throwException(responseCode);
-            } else {
-                log.info(successMessage);
             }
         } catch (FeignException ex) {
             log.warn("Feign exception while CCD call");

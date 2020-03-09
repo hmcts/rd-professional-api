@@ -2,21 +2,34 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationIdentifierValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
@@ -24,29 +37,29 @@ public class ProfessionalUserInternalControllerTest {
 
     private OrganisationService organisationServiceMock;
     private ProfessionalUserService professionalUserServiceMock;
-    private Organisation organisationMock;
+    private Organisation organisation;
     private OrganisationIdentifierValidator organisationIdentifierValidatorMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
     private ResponseEntity<?> responseEntityMock;
-    private UserProfileUpdatedData userProfileUpdatedDataMock;
-
+    private UserProfileUpdatedData userProfileUpdatedData;
 
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
 
-
     @Before
     public void setUp() {
-        organisationMock = mock(Organisation.class);
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName", "lastName", IdamStatus.ACTIVE.name(), null, null);
+
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
-        organisationIdentifierValidatorMock = mock(OrganisationIdentifierIdentifierValidatorImpl.class);
+        organisationIdentifierValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
-        responseEntityMock = mock(ResponseEntity.class);
-        userProfileUpdatedDataMock = mock(UserProfileUpdatedData.class);
         userProfileUpdateRequestValidatorMock = mock(UserProfileUpdateRequestValidator.class);
+        responseEntityMock = mock(ResponseEntity.class);
 
+        organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
 
         MockitoAnnotations.initMocks(this);
     }
@@ -54,16 +67,14 @@ public class ProfessionalUserInternalControllerTest {
     @Test
     public void testFindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisationMock);
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
         List<SuperUser> users = new ArrayList<>();
         users.add(professionalUser.toSuperUser());
-        organisationMock.setUsers(users);
-        organisationMock.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        when(organisationMock.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
@@ -71,44 +82,48 @@ public class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisationMock.getOrganisationIdentifier(), "true", null, null);
+        ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "");
     }
 
     @Test
     public void testFindUserByEmailWithPuiUserManager() {
+        final String email = "testing@email.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisationMock);
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
         List<SuperUser> users = new ArrayList<>();
         users.add(professionalUser.toSuperUser());
-        organisationMock.setUsers(users);
-        organisationMock.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setUsers(users);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
 
-
-        when(organisationMock.getOrganisationIdentifier()).thenReturn(UUID.randomUUID().toString());
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisationMock.getOrganisationIdentifier())).thenReturn(organisationMock);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("testing@email.com")).thenReturn(professionalUser);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress(email)).thenReturn(professionalUser);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
 
         doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity actual = professionalUserInternalController.findUserByEmail("testing@email.com");
+        ResponseEntity actual = professionalUserInternalController.findUserByEmail(email);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserProfileByEmailAddress(email);
     }
 
     @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
+        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
 
-        when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedDataMock)).thenReturn(userProfileUpdatedDataMock);
-
-        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedDataMock, "123456A", UUID.randomUUID().toString(), Optional.of("EXUI"));
+        String userId = UUID.randomUUID().toString();
+        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 }
