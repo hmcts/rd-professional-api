@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -10,10 +13,12 @@ import io.swagger.annotations.Authorization;
 
 import java.util.Optional;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
         path = "refdata/internal/v1/organisations",
         produces = APPLICATION_JSON_VALUE
 )
+@Validated
 @RestController
 @Slf4j
 public class ProfessionalUserInternalController extends SuperController {
@@ -71,7 +77,7 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity findUsersByOrganisation(@PathVariable("orgId") @NotBlank String organisationIdentifier,
+    public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
@@ -146,10 +152,12 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
-            @PathVariable("orgId")  String orgId,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId")  String orgId,
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
+
+        organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(orgId);
 
         //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
