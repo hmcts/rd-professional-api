@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -28,7 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepositor
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
-
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired

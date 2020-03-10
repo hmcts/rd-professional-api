@@ -8,7 +8,9 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 @Slf4j
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
