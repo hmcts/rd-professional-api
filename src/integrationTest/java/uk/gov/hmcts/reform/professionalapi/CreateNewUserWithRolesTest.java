@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +18,16 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.OrganisationRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
@@ -81,7 +82,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> response =
@@ -252,7 +253,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(validatedRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> response =
@@ -301,7 +302,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -313,7 +314,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -325,7 +326,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("lname")
                 .email("")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -354,7 +355,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -366,7 +367,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName(null)
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -378,7 +379,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("lname")
                 .email(null)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -407,7 +408,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("a.adison@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
@@ -437,12 +438,40 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("a.adisonemail.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
+    }
+
+    @Test
+    public void should_return_409_when_same_invited_new_user_is_super_user_of_pending_org() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        //create pending organisation #1
+        OrganisationCreationRequest organisationCreationRequestForPendingOrg = someMinimalOrganisationRequest().build();
+
+        Map<String, Object> pendingOrg =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequestForPendingOrg);
+
+        //create and update any other organisation #2
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().status("ACTIVE")
+                .superUser(UserCreationRequest.aUserCreationRequest().firstName("fname").lastName("lname").jurisdictions(createJurisdictions()).email("someone1@gmail.com").build()).build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, hmctsAdmin, orgIdentifierResponse);
+
+        //invite same user used in creating pending organisation #1
+        userCreationRequest.setEmail(organisationCreationRequestForPendingOrg.getSuperUser().getEmail());
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        assertThat(newUserResponse.get("http_status")).isEqualTo("409");
+        assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
     }
 }

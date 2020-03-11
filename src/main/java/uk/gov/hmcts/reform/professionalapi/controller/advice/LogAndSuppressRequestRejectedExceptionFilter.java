@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.advice;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
+
 import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+
 
 @Component
 @Slf4j
@@ -40,7 +43,7 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.setStatus(400);
-            response.getWriter().print(this.gson.toJson(new ErrorResponse(ErrorConstants.INVALID_REQUEST.getErrorMessage(),
+            response.getWriter().print(this.gson.toJson(new ErrorResponse(INVALID_REQUEST.getErrorMessage(),
                     "The request was rejected because the URL is potentially malicious",
                     new Timestamp(System.currentTimeMillis()).toString())));
         }

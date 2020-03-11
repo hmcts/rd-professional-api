@@ -1,35 +1,40 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import java.util.UUID;
+import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-
 
 public class NewUserResponseTest {
 
+    private String userIdentifier = UUID.randomUUID().toString();
+    private ProfessionalUser professionalUser;
+    private Organisation organisation;
+    private NewUserResponse newUserResponse;
+
+    @Before
+    public void setUp() {
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
+        professionalUser.setUserIdentifier(userIdentifier);
+        newUserResponse = new NewUserResponse(professionalUser);
+    }
+
     @Test
     public void test_getUserIdentifier() {
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-        when(professionalUserMock.getUserIdentifier()).thenReturn("userIdentifier");
-
-        NewUserResponse newUserResponse = new NewUserResponse(professionalUserMock);
-
-        when(newUserResponse.getUserIdentifier()).thenReturn("userIdentifier");
-
-        assertThat(newUserResponse.getUserIdentifier()).isEqualTo("userIdentifier");
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
     }
 
     @Test
     public void test_userIdentifier_with_setter() {
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-        when(professionalUserMock.getUserIdentifier()).thenReturn("userIdentifier");
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setUserIdentifier("userIdentifier");
+        newUserResponse.setUserIdentifier(userIdentifier);
         newUserResponse.setIdamStatus("ACTIVE");
-        assertThat(newUserResponse.getUserIdentifier()).isEqualTo("userIdentifier");
+
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
     }
 }

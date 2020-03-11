@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,8 +25,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
@@ -142,7 +143,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -209,7 +210,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -237,7 +238,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
                         .email("someone@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
@@ -266,7 +267,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -286,7 +287,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some_one_gh@somewhere.com")
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build())).build();
@@ -307,7 +308,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         Arrays.stream(emails).forEach(email -> {
 
-            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(OrganisationFixtures.createJurisdictions()).build());
+            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(createJurisdictions()).build());
             Map<String, Object> response =
                     professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
             assertThat(response.get("http_status")).isEqualTo("201 CREATED");
