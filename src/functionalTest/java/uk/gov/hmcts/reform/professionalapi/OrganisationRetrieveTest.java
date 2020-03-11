@@ -71,8 +71,8 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
         log.info("contactInfo1 ::" + contactInfo1);
         log.info("contactInfo2 ::" + contactInfo2);
-        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addressLine1");
-        assertThat(contactInfo2.get("addressLine1")).isEqualTo("addLine1");
+        assertThat(contactInfo1.get("addressLine1")).isEqualTo("addLine1");
+        assertThat(contactInfo2.get("addressLine1")).isEqualTo("addressLine1");
 
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(0);
         Map<String, Object> dxAddress2 = ((List<Map<String, Object>>) contactInfo1.get("dxAddress")).get(1);
