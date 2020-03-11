@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class ContactInformationResponseTest {
         final String expectCountry = "England";
         final String expectTownCity = "London";
         List<DxAddress> dxAddressList = new ArrayList<>();
-        dxAddressList.add(mock(DxAddress.class));
+        dxAddressList.add(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);

@@ -14,8 +14,10 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,72 +47,44 @@ public class JwtAccessTokenDecoderTest {
 
     @Test
     public void can_decode_token_and_return_claims() throws IOException {
-
         String serializedClaimsInToken = "{\"sub\":\"16\",\"name\":\"Test\",\"jti\":\"1234\",\"iat\":1526929952,\"exp\":1526933589}";
 
         Map<String, String> deserializedClaims = mock(Map.class);
 
-        doReturn(deserializedClaims)
-                .when(objectMapper)
-                .readValue(
-                        eq(serializedClaimsInToken),
-                        isA(TypeReference.class));
+        doReturn(deserializedClaims).when(objectMapper).readValue(eq(serializedClaimsInToken), isA(TypeReference.class));
 
         Map<String, String> actualClaims = jwtAccessTokenDecoder.decode(testToken);
 
-        verify(objectMapper, times(1))
-                .readValue(
-                        eq(serializedClaimsInToken),
-                        isA(TypeReference.class));
+        verify(objectMapper, times(1)).readValue(eq(serializedClaimsInToken), isA(TypeReference.class));
 
         assertSame(actualClaims, deserializedClaims);
     }
 
     @Test
     public void can_decode_token_with_bearer_marker_and_return_claims() throws IOException {
-
         String serializedClaimsInToken = "{\"sub\":\"16\",\"name\":\"Test\",\"jti\":\"1234\",\"iat\":1526929952,\"exp\":1526933589}";
 
         Map<String, String> deserializedClaims = mock(Map.class);
 
-        doReturn(deserializedClaims)
-                .when(objectMapper)
-                .readValue(
-                        eq(serializedClaimsInToken),
-                        isA(TypeReference.class));
+        doReturn(deserializedClaims).when(objectMapper).readValue(eq(serializedClaimsInToken), isA(TypeReference.class));
 
         Map<String, String> actualClaims = jwtAccessTokenDecoder.decode("Bearer " + testToken);
 
-        verify(objectMapper, times(1))
-                .readValue(
-                        eq(serializedClaimsInToken),
-                        isA(TypeReference.class));
+        verify(objectMapper, times(1)).readValue(eq(serializedClaimsInToken), isA(TypeReference.class));
 
         assertSame(actualClaims, deserializedClaims);
     }
 
     @Test
     public void wraps_decode_exceptions() throws IOException {
+        doThrow(JWTDecodeException.class).when(objectMapper).readValue(isA(String.class), isA(TypeReference.class));
 
-        doThrow(JWTDecodeException.class)
-                .when(objectMapper)
-                .readValue(
-                        isA(String.class),
-                        isA(TypeReference.class));
-
-        assertThatThrownBy(() -> jwtAccessTokenDecoder.decode(testToken))
-                .hasMessage("Access Token cannot be decoded")
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> jwtAccessTokenDecoder.decode(testToken)).hasMessage("Access Token cannot be decoded").isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     public void wraps_deserialization_exceptions() throws IOException {
-
-        doThrow(JsonProcessingException.class)
-                .when(objectMapper)
-                .readValue(
-                        isA(String.class),
-                        isA(TypeReference.class));
+        doThrow(JsonProcessingException.class).when(objectMapper).readValue(isA(String.class), isA(TypeReference.class));
 
         assertThatThrownBy(() -> jwtAccessTokenDecoder.decode(testToken))
                 .hasMessage("Access Token cannot be decoded")

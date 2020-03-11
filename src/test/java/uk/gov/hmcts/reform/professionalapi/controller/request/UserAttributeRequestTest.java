@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -13,11 +12,11 @@ import org.junit.Test;
 public class UserAttributeRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private String puiUserManager = "pui-user-manager";
 
     @Test
     public void has_mandatory_fields_specified_not_null() {
-        UserAttributeRequest userAttributeRequest =
-                new UserAttributeRequest(null);
+        UserAttributeRequest userAttributeRequest = new UserAttributeRequest(null);
 
         Set<ConstraintViolation<UserAttributeRequest>> violations = validator.validate(userAttributeRequest);
 
@@ -26,23 +25,17 @@ public class UserAttributeRequestTest {
 
     @Test
     public void creates_new_user_creation_request_correctly() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-
-        UserAttributeRequest userAttributeRequest = new UserAttributeRequest(userRoles);
+        UserAttributeRequest userAttributeRequest = new UserAttributeRequest(singletonList(puiUserManager));
 
         assertThat(userAttributeRequest.getUserRoles()).hasSize(1);
+        assertThat(userAttributeRequest.getUserRoles().get(0)).isEqualTo(puiUserManager);
     }
 
     @Test
     public void userAttributeBuilderTest() {
-        List<String> testUserRoles = new ArrayList<>();
-        testUserRoles.add("pui-user-manager");
+        UserAttributeRequest testUserAttributeRequest = UserAttributeRequest.aUserAttributeCreationRequest().userRoles(singletonList(puiUserManager)).build();
 
-        UserAttributeRequest testUserAttributeRequest = UserAttributeRequest.aUserAttributeCreationRequest()
-                .userRoles(testUserRoles)
-                .build();
-
-        assertThat(testUserAttributeRequest.getUserRoles()).isEqualTo(testUserRoles);
+        assertThat(testUserAttributeRequest.getUserRoles()).hasSize(1);
+        assertThat(testUserAttributeRequest.getUserRoles().get(0)).isEqualTo(puiUserManager);
     }
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,7 +19,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.persistence.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
 
 

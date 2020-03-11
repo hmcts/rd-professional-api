@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.generator;
 
 import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants;
 
 
 /**

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
 
 import feign.FeignException;
 import feign.Response;
@@ -107,7 +106,7 @@ public class RefDataUtil {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
@@ -131,7 +130,7 @@ public class RefDataUtil {
 
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (response.status() < 300) {
 
                 modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDetails);
@@ -213,7 +212,7 @@ public class RefDataUtil {
 
         if (!extOrgId.trim().equals(orgId.trim())) {
 
-            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
+            throw new AccessDeniedException("403 Forbidden");
         }
 
     }
@@ -285,7 +284,7 @@ public class RefDataUtil {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
         Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
         if (isFailureFromUp) {
             ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
             modifyUserRolesResponse.setErrorResponse(errorResponse);
@@ -301,7 +300,7 @@ public class RefDataUtil {
         try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseHelper.toResponseEntity(response, clazz);
+            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() == 200) {
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,8 +17,8 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 
 @Slf4j
@@ -41,7 +42,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
@@ -82,7 +83,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
@@ -180,7 +181,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
