@@ -306,10 +306,8 @@ dependencies {
 
     testCompile group: 'com.h2database', name: 'h2'
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
-
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.1'
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.1.0'
-
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.4'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
@@ -360,7 +358,6 @@ dependencyCheck {
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     // FIXME temp disabled with 42
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 0 : 11
-    println 'Hi from dependencyCheck'
     suppressionFiles = ['config/owasp/suppressions.xml']
 }
 

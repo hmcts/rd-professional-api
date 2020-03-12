@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.HashSet;
 import java.util.List;
@@ -48,14 +48,14 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     }
 
     @Test
-    public void test_editPaymentAccountsShouldThrow400IfOrgIdIsNotFound() {
+    public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
         PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
-        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, "this-does-not-exist", hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("400");
+        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, "A7BNM89", hmctsAdmin);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test

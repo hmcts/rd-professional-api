@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
-
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 
 
 @Getter

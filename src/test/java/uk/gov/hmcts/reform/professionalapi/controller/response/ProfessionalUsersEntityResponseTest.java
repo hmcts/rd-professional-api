@@ -17,16 +17,11 @@ public class ProfessionalUsersEntityResponseTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testProfessionalUsersEntityResponse() throws Exception {
-        final int lengthOfUuid = 36;
         final String dummyFirstName = "Joe";
         final String dummyLastName = "Bloggs";
         final String dummyEmail = "joe.bloggs@email.com";
 
-        ProfessionalUser professionalUser = new ProfessionalUser(
-                dummyFirstName,
-                dummyLastName,
-                dummyEmail,
-                new Organisation());
+        ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail, new Organisation());
         List<ProfessionalUser> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalUser);
 
