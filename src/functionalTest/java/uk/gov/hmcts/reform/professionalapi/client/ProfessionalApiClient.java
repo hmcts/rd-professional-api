@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,15 +33,15 @@ import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -98,7 +99,7 @@ public class ProfessionalApiClient {
         paymentAccounts.add("PBA" + randomAlphabetic(7));
         paymentAccounts.add("PBA" + randomAlphabetic(7));
 
-        List<DxAddressCreationRequest> dx1 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 1234567890")
                 .dxExchange("dxExchange").build());
@@ -108,14 +109,14 @@ public class ProfessionalApiClient {
         dx1.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456788")
                 .dxExchange("dxExchange").build());
-        List<DxAddressCreationRequest> dx2 = new ArrayList<>();
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123452222")
                 .dxExchange("dxExchange").build());
         dx2.add(dxAddressCreationRequest()
                 .dxNumber("DX 123456333")
                 .dxExchange("dxExchange").build());
-        List<ContactInformationCreationRequest> contactInfoList = new ArrayList<>();
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
         contactInfoList.add(aContactInformationCreationRequest()
                 .addressLine1("addressLine1")
                 .addressLine2("addressLine2")
@@ -230,7 +231,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -245,7 +246,7 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -433,9 +434,9 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
         return response.body().as(Map.class);
     }
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 

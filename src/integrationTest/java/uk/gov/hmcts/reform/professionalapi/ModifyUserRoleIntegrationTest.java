@@ -2,10 +2,11 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,8 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -41,7 +42,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
@@ -75,7 +76,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
@@ -164,7 +165,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse =
@@ -193,8 +194,8 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .firstName("someName")
                 .lastName("someLastName")
                 .email(randomAlphabetic(5) + "@email.com")
-                .roles(Arrays.asList(puiCaseManager))
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .roles(asList(puiCaseManager))
+                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);

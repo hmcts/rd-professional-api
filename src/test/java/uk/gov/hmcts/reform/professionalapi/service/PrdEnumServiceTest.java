@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import java.util.List;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class PrdEnumServiceTest {
@@ -20,14 +20,9 @@ public class PrdEnumServiceTest {
 
     @Test
     public void testRetrievesPrdEnumsCorrectly() {
-
         List<PrdEnum> prdEnums = prdEnumService.findAllPrdEnums();
 
-        verify(
-                prdEnumRepositoryMock,
-                times(1)).findByEnabled("YES");
-
+        verify(prdEnumRepositoryMock, times(1)).findByEnabled("YES");
         assertThat(prdEnums).isNotNull();
     }
-
 }
