@@ -188,6 +188,26 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> createOrganisationWithUnknownJurisdictionId() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
+        organisationCreationRequest.getSuperUser().setJurisdictions(createUnknownJurisdiction());
+        return createOrganisation(organisationCreationRequest);
+    }
+
+    public List<Jurisdiction> createUnknownJurisdiction() {
+        List<Jurisdiction> jurisdictionIds = new ArrayList<>();
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("UNKNOWN");
+        jurisdictionIds.add(jurisdiction);
+        return  jurisdictionIds;
+    }
+
+    public Map<String, Object> createOrganisationWithNoJurisdictionId() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
+        organisationCreationRequest.getSuperUser().setJurisdictions(new ArrayList<>());
+        return createOrganisation(organisationCreationRequest);
+    }
+
     public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
@@ -424,8 +444,20 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
+    public void updateOrganisation(String organisationIdentifier, String role, HttpStatus expectedStatus) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, expectedStatus);
+    }
+
     //with OPENID implementation
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
+    }
+
+    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(organisationCreationRequest)
@@ -436,7 +468,7 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(expectedStatus.value());
     }
 
     public void updateUser(UserCreationRequest userCreationRequest, String role, String userIdentifier) {

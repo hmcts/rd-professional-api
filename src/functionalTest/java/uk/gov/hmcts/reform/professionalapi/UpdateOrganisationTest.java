@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -22,6 +23,24 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+    }
+
+    @Test
+    public void can_update_an_organisation_with_unknown_jurisdiction() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisationWithUnknownJurisdictionId();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void can_update_an_organisation_with_no_jurisdiction() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisationWithNoJurisdictionId();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
     }
 
 
