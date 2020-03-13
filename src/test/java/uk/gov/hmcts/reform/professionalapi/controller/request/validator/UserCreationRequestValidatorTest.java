@@ -23,7 +23,7 @@ public class UserCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void test_validateRolesThrows40WhenVerifiedRolesIsEmpty() {
+    public void test_validateRolesThrows400WhenVerifiedRolesIsEmpty() {
         validateRoles(emptyList());
     }
 
