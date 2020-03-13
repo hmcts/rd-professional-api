@@ -23,10 +23,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Before
     public void createAndUpdateOrganisation() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
     }
 
     @Test
@@ -38,7 +35,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction() {
+    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_400() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setJurisdictions(new ArrayList<>());
@@ -47,7 +44,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void add_new_user_to_organisation_with_unknown_roles() {
+    public void add_new_user_to_organisation_with_unknown_roles_should_return_404() {
 
         List<String> roles = new ArrayList<>();
         roles.add("unknown");

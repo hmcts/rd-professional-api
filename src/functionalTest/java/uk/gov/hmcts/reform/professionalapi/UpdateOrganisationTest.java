@@ -26,7 +26,7 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void can_update_an_organisation_with_unknown_jurisdiction() {
+    public void can_update_an_organisation_with_unknown_jurisdiction_should_return_400() {
 
         Map<String, Object> response = professionalApiClient.createOrganisationWithUnknownJurisdictionId();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
@@ -35,7 +35,7 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void can_update_an_organisation_with_no_jurisdiction() {
+    public void can_update_an_organisation_with_no_jurisdiction_should_return_400() {
 
         Map<String, Object> response = professionalApiClient.createOrganisationWithNoJurisdictionId();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
