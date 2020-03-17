@@ -11,4 +11,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 public interface PrdEnumRepository extends JpaRepository<PrdEnum, UUID> {
 
     List<PrdEnum> findByEnabled(String flag);
+
+    PrdEnum findByEnumName(String enumName);
 }

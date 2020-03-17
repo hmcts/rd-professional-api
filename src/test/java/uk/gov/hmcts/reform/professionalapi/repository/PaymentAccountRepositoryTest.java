@@ -5,29 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Ignore
-public class PaymentAccountRepositoryTest {
-
-    @Autowired
-    PaymentAccountRepository paymentAccountRepository;
-
-    PaymentAccount paymentAccount = new PaymentAccount("pba1234567");
-
-    @Before
-    public void setUp() {
-        paymentAccountRepository.save(paymentAccount);
-    }
+public class PaymentAccountRepositoryTest extends RepositorySetUp {
 
     @Test
     public void test_findAll() {
