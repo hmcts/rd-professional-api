@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,5 +31,24 @@ public class PaymentAccountRepositoryTest extends RepositorySetUp {
         Optional<PaymentAccount> paymentAcc = paymentAccountRepository.findById(paymentAccount.getId());
 
         assertThat(paymentAcc.get()).isEqualTo(paymentAccount);
+    }
+
+    @Test
+    public void test_findByPbaNumber() {
+        List<PaymentAccount> paymentAccounts = paymentAccountRepository.findByPbaNumber(paymentAccount.getPbaNumber());
+
+        assertThat(paymentAccounts).hasSize(1);
+        assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+    }
+
+    @Test
+    public void test_findByPbaNumberIn() {
+        Set<String> pbaNumbers = new HashSet<>();
+        pbaNumbers.add(paymentAccount.getPbaNumber());
+
+        List<PaymentAccount> paymentAccounts = paymentAccountRepository.findByPbaNumberIn(pbaNumbers);
+
+        assertThat(paymentAccounts).hasSize(1);
+        assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
     }
 }

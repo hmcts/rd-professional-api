@@ -23,4 +23,20 @@ public class PrdEnumRepositoryTest extends RepositorySetUp {
         assertThat(prdEnums).hasSize(37);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
     }
+
+    @Test
+    public void test_findByEnabledYes() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+
+        assertThat(prdEnums).hasSize(31);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
+    }
+
+    @Test
+    public void test_findByEnabledNo() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+
+        assertThat(prdEnums).hasSize(31);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
+    }
 }

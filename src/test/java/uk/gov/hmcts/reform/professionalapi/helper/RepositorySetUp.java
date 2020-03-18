@@ -82,7 +82,7 @@ public class RepositorySetUp {
         userAccountMap = new UserAccountMap(userAccountMapId);
         userAccountMapRepository.save(userAccountMap);
 
-        prdEnum = prdEnumRepository.findByEnumName("PUI_USER_MANAGER");
+        prdEnum = prdEnumRepository.findAll().get(0);
 
         userAttribute = new UserAttribute(professionalUser, prdEnum);
         userAttributeRepository.save(userAttribute);

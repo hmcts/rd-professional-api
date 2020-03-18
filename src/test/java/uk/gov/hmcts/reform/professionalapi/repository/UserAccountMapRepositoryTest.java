@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,5 +24,14 @@ public class UserAccountMapRepositoryTest extends RepositorySetUp {
         assertThat(professionalUsers).hasSize(1);
         assertThat(professionalUsers.get(0).getUserAccountMapId().getProfessionalUser()).isEqualTo(professionalUser);
         assertThat(professionalUsers.get(0).getUserAccountMapId().getPaymentAccount()).isEqualTo(paymentAccount);
+    }
+
+    @Test
+    public void test_findByUserAccountMapId() {
+        Optional<UserAccountMap> user = userAccountMapRepository.findByUserAccountMapId(userAccountMap.getUserAccountMapId());
+
+        assertThat(user.isPresent()).isTrue();
+        assertThat(user.get().getUserAccountMapId().getProfessionalUser()).isEqualTo(userAccountMap.getUserAccountMapId().getProfessionalUser());
+        assertThat(user.get().getUserAccountMapId().getPaymentAccount()).isEqualTo(userAccountMap.getUserAccountMapId().getPaymentAccount());
     }
 }

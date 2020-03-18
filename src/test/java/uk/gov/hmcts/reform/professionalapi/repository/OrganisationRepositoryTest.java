@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -36,5 +37,17 @@ public class OrganisationRepositoryTest extends RepositorySetUp {
 
         assertThat(activeOrganisations).hasSize(1);
         assertThat(activeOrganisations.get(0)).isEqualTo(organisation);
+    }
+
+    @Test
+    public void test_findByName() {
+        Organisation org = organisationRepository.findByName(organisation.getName());
+        assertThat(org).isEqualTo(organisation);
+    }
+
+    @Test
+    public void test_findByCompanyNumber() {
+        Organisation org = organisationRepository.findByCompanyNumber(organisation.getCompanyNumber());
+        assertThat(org).isEqualTo(organisation);
     }
 }

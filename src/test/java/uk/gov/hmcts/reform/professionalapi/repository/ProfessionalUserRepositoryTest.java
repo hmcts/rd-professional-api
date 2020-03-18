@@ -30,4 +30,25 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
 
         assertThat(profUser.get()).isEqualTo(professionalUser);
     }
+
+    @Test
+    public void test_findByEmailAddress() {
+        ProfessionalUser profUser = professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress());
+
+        assertThat(profUser).isEqualTo(professionalUser);
+    }
+
+    @Test
+    public void test_findByOrganisation() {
+        List<ProfessionalUser> profUser = professionalUserRepository.findByOrganisation(professionalUser.getOrganisation());
+
+        assertThat(profUser.get(0)).isEqualTo(professionalUser);
+    }
+
+    @Test
+    public void test_findByUserIdentifier() {
+        ProfessionalUser profUser = professionalUserRepository.findByUserIdentifier(professionalUser.getUserIdentifier());
+
+        assertThat(profUser).isEqualTo(professionalUser);
+    }
 }
