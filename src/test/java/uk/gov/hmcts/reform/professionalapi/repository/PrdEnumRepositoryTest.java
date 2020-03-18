@@ -4,38 +4,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Ignore
-public class PrdEnumRepositoryTest {
-
-    @Autowired
-    PrdEnumRepository prdEnumRepository;
-
-    PrdEnumId prdEnumId = new PrdEnumId();
-    PrdEnum prdEnum = new PrdEnum(prdEnumId, "enum-name", "enum-desc");
-
-    @Before
-    public void setUp() {
-        prdEnumRepository.save(prdEnum);
-    }
+public class PrdEnumRepositoryTest extends RepositorySetUp {
 
     @Test
     public void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(1);
-        assertThat(prdEnums.get(0)).isEqualTo(prdEnum);
+        assertThat(prdEnums).hasSize(37);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
+    }
+
+    @Test
+    public void test_findByEnabledYes() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+
+        assertThat(prdEnums).hasSize(31);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
+    }
+
+    @Test
+    public void test_findByEnabledNo() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+
+        assertThat(prdEnums).hasSize(31);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
     }
 }
