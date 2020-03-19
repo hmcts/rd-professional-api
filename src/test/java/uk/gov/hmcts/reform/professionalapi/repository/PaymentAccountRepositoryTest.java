@@ -2,32 +2,21 @@ package uk.gov.hmcts.reform.professionalapi.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Ignore
-public class PaymentAccountRepositoryTest {
-
-    @Autowired
-    PaymentAccountRepository paymentAccountRepository;
-
-    PaymentAccount paymentAccount = new PaymentAccount("pba1234567");
-
-    @Before
-    public void setUp() {
-        paymentAccountRepository.save(paymentAccount);
-    }
+public class PaymentAccountRepositoryTest extends BaseRepository {
 
     @Test
     public void test_findAll() {
@@ -35,6 +24,7 @@ public class PaymentAccountRepositoryTest {
 
         assertThat(paymentAccounts).hasSize(1);
         assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
     }
 
     @Test
@@ -42,5 +32,27 @@ public class PaymentAccountRepositoryTest {
         Optional<PaymentAccount> paymentAcc = paymentAccountRepository.findById(paymentAccount.getId());
 
         assertThat(paymentAcc.get()).isEqualTo(paymentAccount);
+        assertThat(paymentAcc.get().getId()).isEqualTo(paymentAccount.getId());
+    }
+
+    @Test
+    public void test_findByPbaNumber() {
+        List<PaymentAccount> paymentAccounts = paymentAccountRepository.findByPbaNumber(paymentAccount.getPbaNumber());
+
+        assertThat(paymentAccounts).hasSize(1);
+        assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
+    }
+
+    @Test
+    public void test_findByPbaNumberIn() {
+        Set<String> pbaNumbers = new HashSet<>();
+        pbaNumbers.add(paymentAccount.getPbaNumber());
+
+        List<PaymentAccount> paymentAccounts = paymentAccountRepository.findByPbaNumberIn(pbaNumbers);
+
+        assertThat(paymentAccounts).hasSize(1);
+        assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
     }
 }
