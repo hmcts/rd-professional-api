@@ -10,11 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
+import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ProfessionalUserRepositoryTest extends RepositorySetUp {
+public class ProfessionalUserRepositoryTest extends BaseRepository {
 
     @Test
     public void test_findAll() {
@@ -22,6 +22,7 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
 
         assertThat(professionalUsers).hasSize(1);
         assertThat(professionalUsers.get(0)).isEqualTo(professionalUser);
+        assertThat(professionalUsers.get(0).getId()).isEqualTo(professionalUser.getId());
     }
 
     @Test
@@ -29,6 +30,7 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
         Optional<ProfessionalUser> profUser = professionalUserRepository.findById(professionalUser.getId());
 
         assertThat(profUser.get()).isEqualTo(professionalUser);
+        assertThat(profUser.get().getId()).isEqualTo(professionalUser.getId());
     }
 
     @Test
@@ -36,6 +38,7 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
         ProfessionalUser profUser = professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(profUser).isEqualTo(professionalUser);
+        assertThat(profUser.getId()).isEqualTo(professionalUser.getId());
     }
 
     @Test
@@ -43,6 +46,7 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
         List<ProfessionalUser> profUser = professionalUserRepository.findByOrganisation(professionalUser.getOrganisation());
 
         assertThat(profUser.get(0)).isEqualTo(professionalUser);
+        assertThat(profUser.get(0).getId()).isEqualTo(professionalUser.getId());
     }
 
     @Test
@@ -50,5 +54,6 @@ public class ProfessionalUserRepositoryTest extends RepositorySetUp {
         ProfessionalUser profUser = professionalUserRepository.findByUserIdentifier(professionalUser.getUserIdentifier());
 
         assertThat(profUser).isEqualTo(professionalUser);
+        assertThat(profUser.getId()).isEqualTo(professionalUser.getId());
     }
 }

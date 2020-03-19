@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-public class RepositorySetUp {
+public class BaseRepository {
 
     @Autowired
     public ContactInformationRepository contactInformationRepository;
