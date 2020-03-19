@@ -61,6 +61,14 @@ withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
     env.OAUTH2_REDIRECT_URI = params.OAUTH2_REDIRECT_URI_TO_TEST
     env.S2S_SECRET = params.S2S_SECRET_TO_TEST
 
+    after('integrationTest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    }
+
+    after('integrationTest:aat') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    }
+
     after('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }

@@ -15,9 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -28,7 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
