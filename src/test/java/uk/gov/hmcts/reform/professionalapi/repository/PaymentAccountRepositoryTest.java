@@ -12,11 +12,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
+import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class PaymentAccountRepositoryTest extends RepositorySetUp {
+public class PaymentAccountRepositoryTest extends BaseRepository {
 
     @Test
     public void test_findAll() {
@@ -24,6 +24,7 @@ public class PaymentAccountRepositoryTest extends RepositorySetUp {
 
         assertThat(paymentAccounts).hasSize(1);
         assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
     }
 
     @Test
@@ -31,6 +32,7 @@ public class PaymentAccountRepositoryTest extends RepositorySetUp {
         Optional<PaymentAccount> paymentAcc = paymentAccountRepository.findById(paymentAccount.getId());
 
         assertThat(paymentAcc.get()).isEqualTo(paymentAccount);
+        assertThat(paymentAcc.get().getId()).isEqualTo(paymentAccount.getId());
     }
 
     @Test
@@ -39,6 +41,7 @@ public class PaymentAccountRepositoryTest extends RepositorySetUp {
 
         assertThat(paymentAccounts).hasSize(1);
         assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
     }
 
     @Test
@@ -50,5 +53,6 @@ public class PaymentAccountRepositoryTest extends RepositorySetUp {
 
         assertThat(paymentAccounts).hasSize(1);
         assertThat(paymentAccounts.get(0)).isEqualTo(paymentAccount);
+        assertThat(paymentAccounts.get(0).getId()).isEqualTo(paymentAccount.getId());
     }
 }

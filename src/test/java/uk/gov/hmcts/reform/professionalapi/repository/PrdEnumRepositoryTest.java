@@ -10,11 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
+import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class PrdEnumRepositoryTest extends RepositorySetUp {
+public class PrdEnumRepositoryTest extends BaseRepository {
 
     @Test
     public void test_findAll() {
