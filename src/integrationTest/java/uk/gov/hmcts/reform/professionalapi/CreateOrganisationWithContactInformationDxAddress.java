@@ -15,8 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 
 @Slf4j
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithContactInformationDxAddress extends AuthorizationEnabledIntegrationTest {
 
     @Test
