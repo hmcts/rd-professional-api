@@ -10,11 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
+import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ContactInformationRepositoryTest extends RepositorySetUp {
+public class ContactInformationRepositoryTest extends BaseRepository {
 
     @Test
     public void findAllTest() {
@@ -22,6 +22,7 @@ public class ContactInformationRepositoryTest extends RepositorySetUp {
 
         assertThat(contactInformationList).hasSize(1);
         assertThat(contactInformationList.get(0)).isEqualTo(contactInformation);
+        assertThat(contactInformationList.get(0).getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
     }
 
     @Test
@@ -29,6 +30,7 @@ public class ContactInformationRepositoryTest extends RepositorySetUp {
         Optional<ContactInformation> contactInfo = contactInformationRepository.findById(contactInformation.getId());
 
         assertThat(contactInfo.get()).isEqualTo(contactInformation);
+        assertThat(contactInfo.get().getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
     }
 }
 
