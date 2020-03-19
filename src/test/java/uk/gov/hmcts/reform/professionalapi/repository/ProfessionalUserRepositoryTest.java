@@ -5,33 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.helper.RepositorySetUp;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Ignore
-public class ProfessionalUserRepositoryTest {
-
-    @Autowired
-    ProfessionalUserRepository professionalUserRepository;
-
-    Organisation organisation = new Organisation();
-
-    ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisation);
-
-    @Before
-    public void setUp() {
-        professionalUserRepository.save(professionalUser);
-    }
+public class ProfessionalUserRepositoryTest extends RepositorySetUp {
 
     @Test
     public void test_findAll() {
@@ -46,5 +29,26 @@ public class ProfessionalUserRepositoryTest {
         Optional<ProfessionalUser> profUser = professionalUserRepository.findById(professionalUser.getId());
 
         assertThat(profUser.get()).isEqualTo(professionalUser);
+    }
+
+    @Test
+    public void test_findByEmailAddress() {
+        ProfessionalUser profUser = professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress());
+
+        assertThat(profUser).isEqualTo(professionalUser);
+    }
+
+    @Test
+    public void test_findByOrganisation() {
+        List<ProfessionalUser> profUser = professionalUserRepository.findByOrganisation(professionalUser.getOrganisation());
+
+        assertThat(profUser.get(0)).isEqualTo(professionalUser);
+    }
+
+    @Test
+    public void test_findByUserIdentifier() {
+        ProfessionalUser profUser = professionalUserRepository.findByUserIdentifier(professionalUser.getUserIdentifier());
+
+        assertThat(profUser).isEqualTo(professionalUser);
     }
 }
