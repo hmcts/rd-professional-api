@@ -16,54 +16,62 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 
-import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.service.Service;
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
 
 @EnableWebSecurity
 @Slf4j
-public class SecurityConfiguration  {
+public class SecurityConfiguration {
 
     @Configuration
     @Order(1)
     public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
+        private  ServiceAuthFilter serviceAuthFilter;
 
-        public PostApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
-
-                                                       AuthenticationManager authenticationManager) {
-
-            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
-
-            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
-
+        public PostApiSecurityConfigurationAdapter(ServiceAuthFilter serviceAuthFilter)
+        {
+            this.serviceAuthFilter = serviceAuthFilter;
         }
 
-        protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    public void configure(WebSecurity web) {
+            web.ignoring().antMatchers("/swagger-ui.html",
+                    "/webjars/springfox-swagger-ui/**",
+                    "/swagger-resources/**",
+                    "/v2/**",
+                    "/health",
+                    "/health/liveness",
+                    "/status/health",
+                    "/loggers/**",
+                    "/");
+        }
+
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
 
             http.requestMatchers()
                     .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
                     .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
                     .and()
-                    .addFilter(authCheckerServiceOnlyFilter)
+                    .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
                     .csrf().disable()
                     .authorizeRequests()
                     .anyRequest().authenticated();
+
         }
+
     }
 
-    @ConfigurationProperties(prefix = "security")
+   /* @ConfigurationProperties(prefix = "security")
     @Configuration
     @Order(2)
     public static class RestAllApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         List<String> anonymousPaths;
 
-        private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
+       // private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
 
         public List<String> getAnonymousPaths() {
             return anonymousPaths;
@@ -80,7 +88,7 @@ public class SecurityConfiguration  {
         }
 
 
-        public RestAllApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
+       *//* public RestAllApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
 
                                                        RequestAuthorizer<Service> serviceRequestAuthorizer,
 
@@ -90,7 +98,7 @@ public class SecurityConfiguration  {
 
             authCheckerServiceAndUserFilter.setAuthenticationManager(authenticationManager);
 
-        }
+        }*//*
 
         @Override
         protected void configure(HttpSecurity http) throws AccessDeniedException,Exception {
@@ -111,11 +119,11 @@ public class SecurityConfiguration  {
                     .authorizeRequests()
                     .anyRequest()
                     .authenticated()
-                    .and()
-                    .addFilter(authCheckerServiceAndUserFilter);
-        }
+                    .and();
+                  //  .addFilter(authCheckerServiceAndUserFilter);
+        }*/
 
 
-    }
+    //}
 
 }

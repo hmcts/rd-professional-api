@@ -11,7 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+//import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 
 
 @Slf4j
@@ -34,7 +34,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         String userId = null;
         //Inside UserIdArgumentResolver
-        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
+      /*  ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
         if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
@@ -42,7 +42,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
             //Inside UserIdArgumentResolver
             Object[] roles  =  serviceAndUserDetails.getAuthorities().toArray();
             String serviceName = serviceAndUserDetails.getServicename();
-        }
+        }*/
 
         return userId;
     }

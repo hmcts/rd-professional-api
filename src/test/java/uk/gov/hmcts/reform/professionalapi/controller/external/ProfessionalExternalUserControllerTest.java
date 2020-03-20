@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+//import uk.gov.hmcts.reform.auth.checker.spring.serviceandus/er.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -95,11 +95,11 @@ public class ProfessionalExternalUserControllerTest {
         when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
 
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+      //  ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+      //  when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+     //   when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -139,11 +139,10 @@ public class ProfessionalExternalUserControllerTest {
         when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
 
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+        //ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+        when(securityContext.getAuthentication()).thenReturn(authentication);//when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+       // when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
@@ -181,11 +180,11 @@ public class ProfessionalExternalUserControllerTest {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
+        //ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
+       // when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
+       // when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
         SecurityContextHolder.setContext(securityContext);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
