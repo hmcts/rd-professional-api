@@ -320,11 +320,11 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
+    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
         force = true
     }
 
-    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
         force = true
     }
 
