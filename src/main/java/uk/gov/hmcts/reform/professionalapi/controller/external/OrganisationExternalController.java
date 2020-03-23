@@ -44,8 +44,7 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Creates an Organisation",
             authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                        @Authorization(value = "Authorization")
+                    @Authorization(value = "ServiceAuthorization")
             }
     )
     @ApiResponses({

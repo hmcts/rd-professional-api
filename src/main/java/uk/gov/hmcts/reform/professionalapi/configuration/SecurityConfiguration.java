@@ -1,25 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
-import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.RequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
+import uk.gov.hmcts.reform.professionalapi.authchecker.serviceonly.AuthCheckerServiceOnlyFilter;
 
-
+@ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfiguration {
@@ -28,40 +23,29 @@ public class SecurityConfiguration {
     @Order(1)
     public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-        private  ServiceAuthFilter serviceAuthFilter;
+        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
 
-        public PostApiSecurityConfigurationAdapter(ServiceAuthFilter serviceAuthFilter)
-        {
-            this.serviceAuthFilter = serviceAuthFilter;
+        public PostApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
+
+                                                   AuthenticationManager authenticationManager) {
+
+            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
+
+            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
+
         }
 
-    @Override
-    public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/swagger-ui.html",
-                    "/webjars/springfox-swagger-ui/**",
-                    "/swagger-resources/**",
-                    "/v2/**",
-                    "/health",
-                    "/health/liveness",
-                    "/status/health",
-                    "/loggers/**",
-                    "/");
-        }
-
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
+        protected void configure(HttpSecurity http) throws Exception {
 
             http.requestMatchers()
                     .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
                     .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
                     .and()
-                    .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+                    .addFilter(authCheckerServiceOnlyFilter)
                     .csrf().disable()
                     .authorizeRequests()
                     .anyRequest().authenticated();
-
         }
-
     }
 
    /* @ConfigurationProperties(prefix = "security")

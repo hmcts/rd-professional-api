@@ -67,7 +67,7 @@ public class AuthCheckerConfiguration {
         return any -> Optional.empty();
     }
 
-    @Bean(name = {"serviceTokenParserHttpClient", "userTokenParserHttpClient"})
+    /*@Bean(name = {"serviceTokenParserHttpClient"})
     @ConditionalOnProperty(
             value = "ssl.verification.enable",
             havingValue = "false",
@@ -98,5 +98,5 @@ public class AuthCheckerConfiguration {
 
         CloseableHttpClient client = httpClientBuilder.build();
         return client;
-    }
+    }*/
 }
