@@ -252,6 +252,22 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
+    public  NewUserCreationRequest createReInviteUserRequest(String email) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(email == "RANDOMEMAIL" ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .resendInvite(true)
+                .build();
+
+        return userCreationRequest;
+    }
+
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
