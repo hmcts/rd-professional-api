@@ -7,11 +7,13 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 
 
 @Getter
+@Setter
 @Builder(builderMethodName = "aUserCreationRequest")
 public class UserCreationRequest {
 

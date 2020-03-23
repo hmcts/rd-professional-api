@@ -138,7 +138,6 @@ public class SuperControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        verify(prdEnumServiceMock, times(2)).getPrdEnumByEnumType(any());
         verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
         verify(organisationServiceMock, times(1)).createOrganisationFrom(organisationCreationRequest);
     }
@@ -206,7 +205,6 @@ public class SuperControllerTest {
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
-        verify(prdEnumServiceMock, times(1)).getPrdEnumByEnumType(any());
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 
