@@ -13,7 +13,6 @@ import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -70,39 +68,34 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
     @Test
     public void post_request_adds_new_user_to_an_active_organisation() {
-
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email("somenewuser@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email("somenewuser@email.com").roles(userRoles).jurisdictions(createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+
+        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        String userIdentifier = users.get(0).getId().toString();
+
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
         assertThat(newUserResponse).isNotNull();
         assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-        Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(users.size()).isEqualTo(2);
+        Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        List<ProfessionalUser> updatedUsers = professionalUserRepository.findByOrganisation(updatedOrganisation);
+        assertThat(updatedUsers.size()).isEqualTo(2);
 
         ProfessionalUser persistedProfessionalUser = professionalUserRepository.findByUserIdentifier(userIdentifierResponse);
         assertThat(persistedProfessionalUser).isNotNull();
@@ -131,9 +124,14 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        String userIdentifier = users.get(0).getId().toString();
+
+
         userProfileCreateUserWireMock(HttpStatus.BAD_REQUEST);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, userIdentifier);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
@@ -155,7 +153,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
@@ -181,7 +179,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation("AB83N5K", userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("404");
     }
@@ -201,7 +199,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id", userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation("invalid-org-id", userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
     }
@@ -238,7 +236,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
@@ -250,7 +248,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse1.get("http_status")).isEqualTo("400");
 
@@ -262,7 +260,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
@@ -291,7 +289,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
@@ -303,7 +301,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse1.get("http_status")).isEqualTo("400");
 
@@ -315,7 +313,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse2.get("http_status")).isEqualTo("400");
     }
@@ -343,8 +341,13 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        String userIdentifier = users.get(0).getId().toString();
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, userIdentifier);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("201 CREATED");
 
@@ -374,7 +377,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("400");
 
@@ -402,9 +405,9 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         //invite same user used in creating pending organisation #1
         userCreationRequest.setEmail(organisationCreationRequestForPendingOrg.getSuperUser().getEmail());
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin, null);
 
         assertThat(newUserResponse.get("http_status")).isEqualTo("409");
-        assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
+        assertThat((String) newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
     }
 }

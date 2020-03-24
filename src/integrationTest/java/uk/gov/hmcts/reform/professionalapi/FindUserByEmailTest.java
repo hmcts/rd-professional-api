@@ -81,8 +81,13 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        String userIdentifier = users.get(0).getId().toString();
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         assertThat(userIdentifierResponse).isNotNull();
@@ -106,7 +111,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, null);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -128,7 +133,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, null);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);

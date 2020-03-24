@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_403_USER_IS_NOT_ACTIVE;
+
 import feign.FeignException;
 import feign.Response;
 
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -193,7 +196,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new EmptyResultDataAccessException(1);
         }
 
-        newUserResponse  =  RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
+        newUserResponse = RefDataUtil.findUserProfileStatusByEmail(emailAddress, userProfileFeignClient);
 
         if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
             // If we dont find active user in up will send it to user 404 status code in the header
@@ -207,6 +210,21 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity
                 .status(statusCode)
                 .body(newUserResponse);
+    }
+
+    public void checkUserStatusIsActiveByUserId(String userId) {
+        NewUserResponse newUserResponse = null;
+        Optional<ProfessionalUser> user = professionalUserRepository.findById(UUID.fromString(userId));
+
+        if (user.isPresent()) {
+            newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.get().getEmailAddress(), userProfileFeignClient);
+        } else {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+            throw new AccessDeniedException(ERROR_403_USER_IS_NOT_ACTIVE);
+        }
     }
 
 }

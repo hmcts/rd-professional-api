@@ -49,7 +49,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         //modify user details
@@ -91,7 +91,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         //modify user details
         String userIdentifier = (String) newUserResponse.get("userIdentifier");

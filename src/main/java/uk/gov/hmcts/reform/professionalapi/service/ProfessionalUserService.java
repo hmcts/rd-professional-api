@@ -32,6 +32,8 @@ public interface ProfessionalUserService {
 
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 
+    void checkUserStatusIsActiveByUserId(String userId);
+
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
 }
 

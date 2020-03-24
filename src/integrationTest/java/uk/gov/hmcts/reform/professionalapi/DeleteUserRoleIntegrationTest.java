@@ -49,7 +49,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
@@ -90,7 +90,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -124,6 +124,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.OK);
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
+
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         assertThat(response.get("http_status")).isNotNull();
@@ -188,7 +189,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 

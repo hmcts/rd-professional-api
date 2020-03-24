@@ -34,6 +34,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -51,6 +54,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -78,6 +82,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected UserAttributeRepository userAttributeRepository;
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
+
+    @Autowired
+    public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     @Autowired
     protected UserProfileFeignClient userProfileFeignClient;
@@ -221,6 +228,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Before
     public void userProfileGetUserWireMock() {
 
         ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
@@ -275,9 +287,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .jurisdictions(createJurisdictions())
                 .build();
 
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        String userIdentifier = users.get(0).getId().toString();
+
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, userIdentifier);
 
         return (String) newUserResponse.get("userIdentifier");
     }

@@ -49,7 +49,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -83,7 +83,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -172,7 +172,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -201,7 +201,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);
