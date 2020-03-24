@@ -58,7 +58,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .roles(userRoles1)
                 .jurisdictions(createJurisdictions())
                 .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
 
         return bearerTokenForPuiUserManager;
     }
@@ -86,7 +86,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                     .roles(userRoles)
                     .jurisdictions(createJurisdictions())
                     .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
 
             return bearerTokenForNonPuiUserManager;
         } else {
@@ -110,7 +110,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, bearerToken);
 
         assertThat(newUserResponse).isNotNull();
 
@@ -184,7 +184,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
         // inviting the user
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, bearerToken);
 
         assertThat(newUserResponse).isNotNull();
         // search active user

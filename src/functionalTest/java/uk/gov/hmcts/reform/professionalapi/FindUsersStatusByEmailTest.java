@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -11,6 +13,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,23 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
+    @Before
+    public void createAndUpdateOrganisation() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(hmctsAdmin, firstName, lastName, userEmail);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName(firstName).lastName(lastName).email(userEmail).roles(userRoles).jurisdictions(createJurisdictions()).build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
+    }
 
     @Test
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
@@ -33,7 +53,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenFor(puiUserManager), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
 
@@ -50,7 +70,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // creating user in idam with the same email used in the invite user so that status automatically will be update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED, bearerToken);
         String email = userCreationRequest.getEmail().toUpperCase();
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRoles),email);
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -64,7 +84,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-finance-manager");
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
         // find the status of the user
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND, generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNull();
@@ -83,7 +103,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
         // find the status of the user
         List<String> userRolesForToken = new ArrayList<>();
         userRolesForToken.add("pui-organisation-manager");
@@ -107,7 +127,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
 
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient.getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname", "externalLname", email);

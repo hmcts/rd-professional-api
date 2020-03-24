@@ -59,7 +59,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerTokenForUser);
 
         return bearerTokenForUser;
     }

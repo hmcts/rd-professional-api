@@ -133,7 +133,7 @@ public abstract class AuthorizationFunctionalTest {
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal("prd-admin", firstName, lastName, userEmail);
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
@@ -143,7 +143,7 @@ public abstract class AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
 
 
         return bearerToken;
@@ -160,7 +160,6 @@ public abstract class AuthorizationFunctionalTest {
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -168,7 +167,7 @@ public abstract class AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
 
 
         return bearerToken;
