@@ -80,7 +80,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             String orgIdentifierResponse = (String) response.get("organisationIdentifier");
             professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-            return bearerTokenForPuiUserManager;
+            return bearerTokenForNonPuiUserManager;
         } else {
             return bearerTokenForNonPuiUserManager;
         }
