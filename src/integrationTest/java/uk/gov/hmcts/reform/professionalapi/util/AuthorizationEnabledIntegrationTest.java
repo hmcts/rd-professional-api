@@ -228,11 +228,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     @Before
-    public void initMocks() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Before
     public void userProfileGetUserWireMock() {
 
         ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
