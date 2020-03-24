@@ -52,7 +52,7 @@ public class ServiceTokenParserConfiguration {
 
             httpClientBuilder.setSSLSocketFactory(allowAllSslSocketFactory);
 
-            // also disable SSL valiation for plain java httpurlconnection
+            // also disable SSL validation for plain java http url connection
             HttpsURLConnection.setDefaultHostnameVerifier(allowAllHostnameVerifier);
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContextWithoutValidation.getSocketFactory());
 

@@ -67,13 +67,6 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
-  authorisedServices:
-    - rd_user_profile_api
-    - rd_professional_api
-    - xui_webapp
-    - finrem_payment_service
-    - fpl_case_service
-    - iac
 ### dependency configuration
 auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
@@ -87,7 +80,6 @@ idam:
 
 auth.idam.client.baseUrl: ${idam_url:http://idam-api.aat.platform.hmcts.net}
 
-#auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
 exui.role:
     hmcts-admin: prd-admin
