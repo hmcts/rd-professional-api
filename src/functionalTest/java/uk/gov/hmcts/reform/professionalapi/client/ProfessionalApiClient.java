@@ -50,6 +50,7 @@ public class ProfessionalApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     private final String professionalApiUrl;
     private final String s2sToken;
@@ -259,7 +260,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(email == "RANDOMEMAIL" ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
+                .email(email == RANDOM_EMAIL ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .resendInvite(true)

@@ -20,7 +20,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     String orgIdentifierResponse = null;
     private IdamOpenIdClient idamOpenIdClient = null;
-    public static final String RANDOM_EMAIL = "RANDOMEMAIL";
+    public static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     @Before
     public void createAndUpdateOrganisation() {
