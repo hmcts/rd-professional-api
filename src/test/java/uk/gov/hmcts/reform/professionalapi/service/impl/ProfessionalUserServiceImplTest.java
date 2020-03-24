@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.SneakyThrows;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,6 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -570,6 +572,47 @@ public class ProfessionalUserServiceImplTest {
         assertThat(status.getStatusCode()).isEqualTo(500);
         verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+    }
+
+    @SneakyThrows
+    @Test(expected = Test.None.class)
+    public void checkUserStatusIsActiveByUserId() {
+        professionalUser.setIdamStatus(IdamStatus.ACTIVE);
+
+        when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        String userId = UUID.randomUUID().toString();
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void checkUserStatusIsActiveByUserId_Throws400_WhenNoUserFoundWithGivenId() {
+        professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString());
+    }
+
+    @SneakyThrows
+    @Test(expected = AccessDeniedException.class)
+    public void checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
+        professionalUser.setIdamStatus(IdamStatus.PENDING);
+
+        when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setIdamStatus("PENDING");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        String userId = UUID.randomUUID().toString();
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
     }
 
     private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
