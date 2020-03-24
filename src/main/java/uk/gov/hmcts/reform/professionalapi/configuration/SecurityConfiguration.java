@@ -10,9 +10,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.RequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.RequestAuthorizer;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
-import uk.gov.hmcts.reform.professionalapi.authchecker.serviceonly.AuthCheckerServiceOnlyFilter;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.AuthCheckerServiceOnlyFilter;
 
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
@@ -32,6 +32,7 @@ public class SecurityConfiguration {
             authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
 
             authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
+
 
         }
 

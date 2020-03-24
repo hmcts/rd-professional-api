@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.parser.idam.service.token;
+package uk.gov.hmcts.reform.professionalapi.authchecker.core.exception;
 
 public class ServiceTokenParsingException extends RuntimeException {
     public ServiceTokenParsingException() {

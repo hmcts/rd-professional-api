@@ -1,18 +1,16 @@
 package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
-import static java.util.stream.Collectors.toSet;
 
-import java.util.Collection;
-import java.util.function.Function;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.SubjectResolver;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.RequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.AuthCheckerException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.BearerTokenInvalidException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.BearerTokenMissingException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.UnauthorisedServiceException;
-import uk.gov.hmcts.reform.professionalapi.authchecker.parser.idam.service.token.ServiceTokenInvalidException;
-import uk.gov.hmcts.reform.professionalapi.authchecker.parser.idam.service.token.ServiceTokenParsingException;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenInvalidException;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenParsingException;
 
 
 public class ServiceRequestAuthorizer implements RequestAuthorizer<Service> {
@@ -20,16 +18,15 @@ public class ServiceRequestAuthorizer implements RequestAuthorizer<Service> {
     public static final String AUTHORISATION = "ServiceAuthorization";
 
     private final SubjectResolver<Service> serviceResolver;
-    private final Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor;
+    private final Set<String> authorizedServices;
 
-    public ServiceRequestAuthorizer(SubjectResolver<Service> serviceResolver, Function<HttpServletRequest, Collection<String>> authorizedServicesExtractor) {
+    public ServiceRequestAuthorizer(SubjectResolver<Service> serviceResolver, Set<String> authorizedServices) {
         this.serviceResolver = serviceResolver;
-        this.authorizedServicesExtractor = authorizedServicesExtractor;
+        this.authorizedServices = authorizedServices;
     }
 
     @Override
     public Service authorise(HttpServletRequest request) throws UnauthorisedServiceException {
-        Collection<String> authorizedServices = authorizedServicesExtractor.apply(request).stream().map(String::toLowerCase).collect(toSet());
         if (authorizedServices.isEmpty()) {
             throw new IllegalArgumentException("Must have at least one service defined");
         }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.serviceonly;
+package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
 
 import java.util.Collections;
 

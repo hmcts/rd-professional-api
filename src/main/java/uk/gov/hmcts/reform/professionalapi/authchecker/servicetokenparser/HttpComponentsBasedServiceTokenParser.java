@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.parser.idam.service.token;
+package uk.gov.hmcts.reform.professionalapi.authchecker.servicetokenparser;
 
 import java.io.IOException;
 
@@ -7,6 +7,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenInvalidException;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenParsingException;
 
 public class HttpComponentsBasedServiceTokenParser implements ServiceTokenParser {
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.core;
+package uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver;
 
 public abstract class Subject {
 
