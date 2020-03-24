@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +28,26 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Before
     public void createAndUpdateOrganisation() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someName";
 
+        // creating user in idam with the same email used to create Organisation so that status is already Active in UP
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(hmctsAdmin, firstName, lastName, userEmail);
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName(firstName).lastName(lastName).email(userEmail).roles(userRoles).jurisdictions(createJurisdictions()).build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
+        //create organisation with the same Super User Email
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .jurisdictions(createJurisdictions())
+                .build()).build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
     }
 
     @Test

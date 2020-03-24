@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -33,62 +35,56 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @Slf4j
 public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
-
     RequestSpecification bearerTokenForPuiUserManager;
     RequestSpecification bearerTokenForNonPuiUserManager;
     String orgIdentifierResponse;
 
     public RequestSpecification generateBearerTokenForPuiManager() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someName";
 
+        // creating user in idam with the same email used to create Organisation so that status is already Active in UP
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
-        List<String> userRoles1 = new ArrayList<>();
-        userRoles1.add("pui-organisation-manager");
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+        //create organisation with the same Super User Email
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
-                .roles(userRoles1)
                 .jurisdictions(createJurisdictions())
-                .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
+                .build()).build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         return bearerTokenForPuiUserManager;
     }
 
     public RequestSpecification generateBearerTokenForNonPuiManager() {
-
         if (bearerTokenForNonPuiUserManager == null) {
 
-            Map<String, Object> response = professionalApiClient.createOrganisation();
-            String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-            professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-            List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-case-manager");
             String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
             String lastName = "someLastName";
             String firstName = "someName";
 
+            // creating user in idam with the same email used to create Organisation so that status is already Active in UP
             bearerTokenForNonPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, userEmail);
 
-            NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+            //create organisation with the same Super User Email
+            OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(userEmail)
-                    .roles(userRoles)
                     .jurisdictions(createJurisdictions())
-                    .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED, bearerToken);
+                    .build()).build();
 
-            return bearerTokenForNonPuiUserManager;
+            Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+            String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+            professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+            return bearerTokenForPuiUserManager;
         } else {
             return bearerTokenForNonPuiUserManager;
         }

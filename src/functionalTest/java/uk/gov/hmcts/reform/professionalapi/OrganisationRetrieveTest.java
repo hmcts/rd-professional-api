@@ -1,6 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+
+import io.restassured.specification.RequestSpecification;
 
 import java.util.List;
 import java.util.Map;
@@ -12,11 +18,66 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
+
+    RequestSpecification bearerTokenForPuiUserManager;
+    RequestSpecification bearerTokenForNonPuiUserManager;
+
+    public RequestSpecification generateBearerTokenForPuiManager() {
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        // creating user in idam with the same email used to create Organisation so that status is already Active in UP
+        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+
+        //create organisation with the same Super User Email
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .jurisdictions(createJurisdictions())
+                .build()).build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        return bearerTokenForPuiUserManager;
+    }
+
+    public RequestSpecification generateBearerTokenForNonPuiManager() {
+        if (bearerTokenForNonPuiUserManager == null) {
+
+            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+            String lastName = "someLastName";
+            String firstName = "someName";
+
+            // creating user in idam with the same email used to create Organisation so that status is already Active in UP
+            bearerTokenForNonPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, userEmail);
+
+            //create organisation with the same Super User Email
+            OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(userEmail)
+                    .jurisdictions(createJurisdictions())
+                    .build()).build();
+
+            Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+            String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+            professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+            return bearerTokenForPuiUserManager;
+        } else {
+            return bearerTokenForNonPuiUserManager;
+        }
+    }
 
     @Test
     public void can_retrieve_all_organisations() {
@@ -38,13 +99,13 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager());
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
     public void retrieve_an_organisation_with_user_manager_rights_return_403() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForPuiManager());
     }
 
     @Test
