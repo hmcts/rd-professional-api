@@ -7,12 +7,12 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -25,9 +25,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     String orgIdentifierResponse = null;
+    RequestSpecification bearerToken;
 
-    @Before
-    public void createAndUpdateOrganisation() {
+
+    public RequestSpecification generateSuperUserBearerToken() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
@@ -48,12 +49,14 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        return bearerToken;
     }
 
     @Test
     public void add_new_user_to_organisation() {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, generateSuperUserBearerToken());
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -62,7 +65,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setJurisdictions(new ArrayList<>());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST, generateSuperUserBearerToken());
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -74,7 +77,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setRoles(roles);
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND, generateSuperUserBearerToken());
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -91,7 +94,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         // now invite same user/email used in above pending org should give CONFLICT
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(pendingOrganisationCreationRequest.getSuperUser().getEmail());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT, generateSuperUserBearerToken());
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
     }
 }
