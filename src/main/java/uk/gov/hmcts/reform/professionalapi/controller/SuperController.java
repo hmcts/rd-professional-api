@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Professi
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOrganisationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -44,7 +46,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
@@ -107,6 +108,9 @@ public abstract class SuperController {
 
     @Value("${jurisdictionIdType}")
     private String jurisdictionIds;
+
+    @Value("${resendInviteEnabled}")
+    private boolean resendInviteEnabled;
 
 
     private static final String SRA_REGULATED_FALSE = "false";
@@ -223,7 +227,7 @@ public abstract class SuperController {
             //Organisation is getting activated
 
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
-            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
+            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true, false);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 //Idam registration success
@@ -239,7 +243,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
+    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser, boolean isResendInvite) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
@@ -249,7 +253,8 @@ public abstract class SuperController {
                 LanguagePreference.EN,
                 UserCategory.PROFESSIONAL,
                 UserType.EXTERNAL,
-                userRoles);
+                userRoles,
+                isResendInvite);
 
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
@@ -277,30 +282,27 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
-        String orgId = removeEmptySpaces(organisationIdentifier);
+
+        List<String> roles = newUserCreationRequest.getRoles();
+        ProfessionalUser professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest, removeEmptySpaces(organisationIdentifier), roles);
+        if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
+            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles);
+        } else {
+            return inviteNewUserToOrganisation(newUserCreationRequest, userId, professionalUser, roles);
+        }
+    }
+
+    private ResponseEntity inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String userId, ProfessionalUser professionalUser, List<String> roles) {
 
         Object responseBody = null;
-        validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
-        List<String> roles = newUserCreationRequest.getRoles();
-        validateRoles(roles);
-
-        ProfessionalUser newUser = new ProfessionalUser(
-                removeEmptySpaces(newUserCreationRequest.getFirstName()),
-                removeEmptySpaces(newUserCreationRequest.getLastName()),
-                RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
-                existingOrganisation);
-
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-
-        ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
+        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
-            newUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-            responseBody = professionalUserService.addNewUserToAnOrganisation(newUser, roles, prdEnumList);
+            professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
+            responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
             responseBody = responseEntity.getBody();
@@ -309,6 +311,41 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(responseEntity.getStatusCode().value())
                 .body(responseBody);
+    }
+
+    private ResponseEntity reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles) {
+
+        Object responseBody = null;
+        ProfessionalUser existingProfessionalUser = professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
+        if (existingProfessionalUser == null) {
+            throw new ResourceNotFoundException("User does not exist");
+        }
+
+        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            responseBody = new NewUserResponse(existingProfessionalUser);
+        } else {
+            log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+            responseBody = responseEntity.getBody();
+        }
+
+        return ResponseEntity
+                .status(responseEntity.getStatusCode().value())
+                .body(responseBody);
+    }
+
+    private ProfessionalUser validateInviteUserRequestAndCreateNewUserObject(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, List<String> roles) {
+
+        validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
+        final Organisation existingOrganisation = checkOrganisationIsActive(removeEmptySpaces(organisationIdentifier));
+        validateRoles(roles);
+        ProfessionalUser newUser = new ProfessionalUser(
+                removeEmptySpaces(newUserCreationRequest.getFirstName()),
+                removeEmptySpaces(newUserCreationRequest.getLastName()),
+                RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
+                existingOrganisation);
+        return newUser;
+
     }
 
     protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
