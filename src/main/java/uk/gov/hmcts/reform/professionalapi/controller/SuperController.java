@@ -281,12 +281,12 @@ public abstract class SuperController {
 
         Object responseBody = null;
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
+        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
         validateRoles(roles);
-
         ProfessionalUser newUser = new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),
                 removeEmptySpaces(newUserCreationRequest.getLastName()),
@@ -294,8 +294,6 @@ public abstract class SuperController {
                 existingOrganisation);
 
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
