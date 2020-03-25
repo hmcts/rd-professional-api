@@ -1,25 +1,18 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -28,30 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @ActiveProfiles("functional")
 @Slf4j
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
-
-    @Before
-    public void createAndUpdateOrganisation() {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        // creating user in idam with the same email used to create Organisation so that status is already Active in UP
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(hmctsAdmin, firstName, lastName, userEmail);
-
-        //create organisation with the same Super User Email
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().superUser(aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .jurisdictions(createJurisdictions())
-                .build()).build();
-
-        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-    }
 
     @Test
     public void rdcc_418_ac1_update_user_status_from_suspended_to_active() {
