@@ -252,10 +252,9 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus, RequestSpecification requestSpecification) {
-        Response response = requestSpecification
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
+        Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
-                .proxy("proxyout.reform.hmcts.net", 8080)
                 .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()

@@ -283,7 +283,7 @@ public abstract class SuperController {
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
         validateRoles(roles);

@@ -165,7 +165,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiParam(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
-
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }

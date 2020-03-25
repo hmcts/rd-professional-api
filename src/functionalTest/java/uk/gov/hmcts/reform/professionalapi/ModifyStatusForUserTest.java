@@ -67,7 +67,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
 
@@ -113,7 +113,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED, bearerToken);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
 
