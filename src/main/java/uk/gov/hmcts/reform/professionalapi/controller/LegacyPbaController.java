@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,26 +36,25 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 @AllArgsConstructor
 public class LegacyPbaController {
 
-
     private LegacyPbaAccountServiceImpl legacyPbaAccountService;
     private ProfessionalUserServiceImpl professionalUserService;
 
     @ApiOperation(
-            value = "Retrieve pba numbers by user email address"
+            value = "Retrieve Payment Accounts by a User's Email Address"
     )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "Details of one or more payment accounts",
+                    message = "Details of one or more Payment Accounts",
                     response = LegacyPbaResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid email was provided"
+                    message = "An invalid Email Address was provided"
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No payment users was found with the email"
+                    message = "No Users or Payment Accounts were found with the Email Address provided"
             )
     })
     @GetMapping(
@@ -63,19 +63,19 @@ public class LegacyPbaController {
     )
     @ResponseBody
     public ResponseEntity<LegacyPbaResponse> retrievePbaAccountsByEmail(@PathVariable("email") @NotBlank String email) {
-
         List<String> pbaNumbers;
-        ProfessionalUser professionalUser =  professionalUserService.findProfessionalUserByEmailAddress(RefDataUtil.removeEmptySpaces(email));
-        if (professionalUser == null) {
+        ProfessionalUser professionalUser = professionalUserService.findProfessionalUserByEmailAddress(RefDataUtil.removeEmptySpaces(email));
 
+        if (professionalUser == null) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        pbaNumbers =  legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);
-        if (null == pbaNumbers) {
+        pbaNumbers = legacyPbaAccountService.findLegacyPbaAccountByUserEmail(professionalUser);
 
+        if (null == pbaNumbers) {
             pbaNumbers = new ArrayList<>();
         }
+
         return ResponseEntity
                 .status(200)
                 .body(new LegacyPbaResponse(pbaNumbers));
