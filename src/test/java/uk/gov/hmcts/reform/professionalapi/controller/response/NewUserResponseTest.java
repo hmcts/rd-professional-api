@@ -15,6 +15,7 @@ public class NewUserResponseTest {
     private ProfessionalUser professionalUser;
     private Organisation organisation;
     private NewUserResponse newUserResponse;
+    private UserProfileCreationResponse userProfileCreationResponse;
 
     @Before
     public void setUp() {
@@ -22,6 +23,8 @@ public class NewUserResponseTest {
         professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
         professionalUser.setUserIdentifier(userIdentifier);
         newUserResponse = new NewUserResponse(professionalUser);
+        userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("ACM1QR");
     }
 
     @Test
@@ -36,5 +39,11 @@ public class NewUserResponseTest {
 
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
+    }
+
+    @Test
+    public void test_NewUserResponse_with_constructor() {
+        newUserResponse = new NewUserResponse(userProfileCreationResponse);
+        assertThat(newUserResponse.getUserIdentifier()).isEqualTo("ACM1QR");
     }
 }

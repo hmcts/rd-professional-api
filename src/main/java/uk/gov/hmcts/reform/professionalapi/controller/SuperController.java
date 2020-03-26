@@ -316,14 +316,13 @@ public abstract class SuperController {
     private ResponseEntity reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles) {
 
         Object responseBody = null;
-        ProfessionalUser existingProfessionalUser = professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
-        if (existingProfessionalUser == null) {
+        if (professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail()) == null) {
             throw new ResourceNotFoundException("User does not exist");
         }
 
         ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            responseBody = new NewUserResponse(existingProfessionalUser);
+            responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
             log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
             responseBody = responseEntity.getBody();
