@@ -281,14 +281,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        String userIdentifier = users.get(0).getId().toString();
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, userIdentifier);
 
         return (String) newUserResponse.get("userIdentifier");
+    }
+
+    public String retrieveSuperUserIdFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getId().toString();
     }
 
     public String createOrganisationRequest() {

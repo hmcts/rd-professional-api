@@ -592,8 +592,8 @@ public class ProfessionalUserServiceImplTest {
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void checkUserStatusIsActiveByUserId_Throws400_WhenNoUserFoundWithGivenId() {
+    @Test(expected = AccessDeniedException.class)
+    public void checkUserStatusIsActiveByUserId_Throws403_WhenNoUserFoundWithGivenId() {
         professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString());
     }
 

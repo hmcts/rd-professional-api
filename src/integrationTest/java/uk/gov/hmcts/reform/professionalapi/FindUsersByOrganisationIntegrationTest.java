@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -134,9 +132,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        String userIdentifier = users.get(0).getId().toString();
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email(randomAlphabetic(5) + "@email.com").roles(userRoles).jurisdictions(createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);

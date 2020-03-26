@@ -82,9 +82,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        String userIdentifier = users.get(0).getId().toString();
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);

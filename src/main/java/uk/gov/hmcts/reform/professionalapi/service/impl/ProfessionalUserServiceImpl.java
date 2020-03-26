@@ -218,11 +218,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         if (user.isPresent()) {
             newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.get().getEmailAddress(), userProfileFeignClient);
-        } else {
-            throw new EmptyResultDataAccessException(1);
         }
 
-        if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+        if (newUserResponse == null || !IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
             throw new AccessDeniedException(ERROR_403_USER_IS_NOT_ACTIVE);
         }
     }

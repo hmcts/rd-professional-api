@@ -312,9 +312,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
 
-        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
-        String userIdentifier = users.get(0).getId().toString();
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
 
         userProfileCreateUserWireMock(CREATED);
         NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest().firstName("someName1").lastName("someLastName1").email("some@email.com").roles(user1Roles).jurisdictions(createJurisdictions()).build();
