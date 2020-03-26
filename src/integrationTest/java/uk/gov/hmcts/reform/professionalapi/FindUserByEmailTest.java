@@ -84,7 +84,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         assertThat(userIdentifierResponse).isNotNull();
@@ -108,7 +108,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -130,7 +130,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);

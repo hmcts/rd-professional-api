@@ -38,7 +38,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.OK);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
@@ -71,7 +71,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -162,7 +162,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 

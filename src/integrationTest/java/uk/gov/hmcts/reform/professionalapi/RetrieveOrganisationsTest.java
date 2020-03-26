@@ -313,10 +313,10 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
 
         userProfileCreateUserWireMock(CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, inviteUserCreationRequest("some@email.com", user1Roles), hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse, inviteUserCreationRequest("some@email.com", user1Roles), hmctsAdmin, userIdentifier);
 
         userProfileCreateUserWireMock(CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, inviteUserCreationRequest("some@email2.com", user2Roles), hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse, inviteUserCreationRequest("some@email2.com", user2Roles), hmctsAdmin, userIdentifier);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
         List<ProfessionalUser> persistedUsers = professionalUserRepository.findByOrganisation(persistedOrganisation);

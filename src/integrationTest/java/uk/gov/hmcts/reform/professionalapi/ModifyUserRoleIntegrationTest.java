@@ -38,7 +38,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.OK);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -64,7 +64,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -145,7 +145,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -166,7 +166,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         updateUserProfileRolesMock(HttpStatus.OK);
 
-        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", asList(puiCaseManager)), hmctsAdmin, null);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", asList(puiCaseManager)), hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);

@@ -87,8 +87,12 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
     }
 
-    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role, String userId) {
+    public Map<String, Object> addUserToOrganisationWithUserId(String orgId, NewUserCreationRequest newUserCreationRequest, String role, String userId) {
         return postRequest(baseIntUrl + "/" + orgId + "/users/", newUserCreationRequest, role, userId);
+    }
+
+    public Map<String, Object> addUserToOrganisation(String orgId, NewUserCreationRequest newUserCreationRequest, String role) {
+        return postRequest(baseIntUrl + "/" + orgId + "/users/", newUserCreationRequest, role, null);
     }
 
     public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role) {

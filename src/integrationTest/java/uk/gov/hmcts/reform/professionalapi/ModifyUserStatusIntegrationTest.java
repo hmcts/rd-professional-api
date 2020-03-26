@@ -38,7 +38,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         updateUserProfileRolesMock(HttpStatus.OK);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         //modify user details
@@ -73,7 +73,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         userRoles.add(puiCaseManager);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
 
         //modify user details
         String userIdentifier = (String) newUserResponse.get("userIdentifier");

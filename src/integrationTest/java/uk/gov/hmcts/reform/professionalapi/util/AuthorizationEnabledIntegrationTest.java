@@ -277,7 +277,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
 
         return (String) newUserResponse.get("userIdentifier");
     }

@@ -134,16 +134,16 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
 
         NewUserCreationRequest userCreationRequest = inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest, hmctsAdmin, userIdentifier);
         NewUserCreationRequest userCreationRequest1 = inviteUserCreationRequest(randomAlphabetic(6) + "@email.com", userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest1, hmctsAdmin, userIdentifier);
         NewUserCreationRequest userCreationRequest2 = inviteUserCreationRequest(randomAlphabetic(7) + "@email.com", userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest2, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest2, hmctsAdmin, userIdentifier);
         NewUserCreationRequest userCreationRequest3 = inviteUserCreationRequest(randomAlphabetic(8) + "@email.com", userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest3, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, userCreationRequest3, hmctsAdmin, userIdentifier);
 
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier, "False", hmctsAdmin);
 
