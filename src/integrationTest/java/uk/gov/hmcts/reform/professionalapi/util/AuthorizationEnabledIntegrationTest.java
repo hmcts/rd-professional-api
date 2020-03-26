@@ -273,18 +273,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
 
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, userIdentifier);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
 
         return (String) newUserResponse.get("userIdentifier");
     }

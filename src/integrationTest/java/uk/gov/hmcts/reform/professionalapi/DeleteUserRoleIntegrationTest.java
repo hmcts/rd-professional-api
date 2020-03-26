@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +14,6 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -40,16 +37,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         updateUserProfileRolesMock(HttpStatus.OK);
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
@@ -81,16 +70,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -180,16 +161,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin, null);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, null);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 

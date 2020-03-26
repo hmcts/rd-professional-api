@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -27,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -315,12 +313,10 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
 
         userProfileCreateUserWireMock(CREATED);
-        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest().firstName("someName1").lastName("someLastName1").email("some@email.com").roles(user1Roles).jurisdictions(createJurisdictions()).build();
-        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, inviteUserCreationRequest("some@email.com", user1Roles), hmctsAdmin, userIdentifier);
 
         userProfileCreateUserWireMock(CREATED);
-        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest().firstName("someName2").lastName("someLastName2").email("some@email2.com").roles(user2Roles).jurisdictions(createJurisdictions()).build();
-        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin, userIdentifier);
+        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, inviteUserCreationRequest("some@email2.com", user2Roles), hmctsAdmin, userIdentifier);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
         List<ProfessionalUser> persistedUsers = professionalUserRepository.findByOrganisation(persistedOrganisation);

@@ -79,7 +79,6 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
