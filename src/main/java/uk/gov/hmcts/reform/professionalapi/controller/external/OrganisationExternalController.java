@@ -8,8 +8,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -40,7 +42,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
-
     @ApiOperation(
             value = "Creates an Organisation",
             authorizations = {
@@ -50,8 +51,12 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "A representation of the created organisation",
+                    message = "The Organisation Identifier of the created Organisation",
                     response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request has been provided"
             )
     })
     @PostMapping(
@@ -67,7 +72,7 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves organisation details based on id",
+            value = "Retrieves an Organisation's details by ID",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -76,12 +81,12 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "Details of one organisation",
+                    message = "Details of an Organisation",
                     response = OrganisationsDetailResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Invalid  id provided for an organisation"
+                    message = "An invalid ID was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -89,13 +94,13 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Not Found"
+                    message = "No Organisation found with the given ID"
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-            @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+            @ApiParam(hidden = true) @OrgId String extOrgIdentifier) {
 
         return retrieveOrganisationOrById(extOrgIdentifier);
     }
@@ -127,7 +132,7 @@ public class OrganisationExternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
-    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true)@OrgId  String orgId) {
+    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
@@ -135,11 +140,11 @@ public class OrganisationExternalController extends SuperController {
 
 
     @ApiOperation(
-        value = "Add an user to an organisation",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        }
+            value = "Add an user to an organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
     )
     @ApiResponses({
             @ApiResponse(
@@ -161,7 +166,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured("pui-user-manager")
     public ResponseEntity addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @ApiParam(hidden = true)@OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
@@ -177,7 +182,7 @@ public class OrganisationExternalController extends SuperController {
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         serviceAndUserDetails.getAuthorities();
 
-        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
+        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
