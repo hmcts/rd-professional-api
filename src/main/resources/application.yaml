@@ -80,6 +80,17 @@ idam:
 
 auth.idam.client.baseUrl: ${idam_url:http://idam-api.aat.platform.hmcts.net}
 
+# open id
+spring.security.oauth2.client.provider.oidc.issuer-uri: ${auth.idam.client.baseUrl}/o
+# Dummy oidc client required even though data-store doesn't use
+spring.security.oauth2.client.registration.oidc.client-id: internal
+spring.security.oauth2.client.registration.oidc.client-secret: internal
+oidc.issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+
+#cache implementation
+spring.cache.cache-names: userInfoCache
+spring.cache.caffeine.spec: expireAfterAccess=3600s
+
 ## Secure roles configuration
 exui.role:
     hmcts-admin: prd-admin
