@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -16,15 +19,40 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 @ActiveProfiles("functional")
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
+    String orgIdentifierResponse = null;
+
+    @Before
+    public void createAndUpdateOrganisation() {
+        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+    }
 
     @Test
     public void add_new_user_to_organisation() {
 
-        String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+    }
+
+    @Test
+    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_400() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin,newUserCreationRequest, HttpStatus.CREATED);
-        assertThat((String)newUserResponse.get("userIdentifier")).isNotEmpty();
+        newUserCreationRequest.setJurisdictions(new ArrayList<>());
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+        assertThat(newUserResponse).isNotNull();
+    }
+
+    @Test
+    public void add_new_user_to_organisation_with_unknown_roles_should_return_404() {
+
+        List<String> roles = new ArrayList<>();
+        roles.add("unknown");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        newUserCreationRequest.setRoles(roles);
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,newUserCreationRequest, HttpStatus.NOT_FOUND);
+        assertThat(newUserResponse).isNotNull();
     }
 
     @Test

@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegrationTest {
 

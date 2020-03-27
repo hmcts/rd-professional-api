@@ -22,6 +22,7 @@ public class OrganisationRepositoryTest extends BaseRepository {
 
         assertThat(organisations).hasSize(1);
         assertThat(organisations.get(0)).isEqualTo(organisation);
+        assertThat(organisations.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
     }
 
     @Test

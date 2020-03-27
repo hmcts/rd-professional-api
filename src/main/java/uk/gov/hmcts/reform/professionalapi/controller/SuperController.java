@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
@@ -116,7 +115,6 @@ public abstract class SuperController {
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
-        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
@@ -125,8 +123,6 @@ public abstract class SuperController {
         if (null != organisationCreationRequest.getSuperUser()) {
             validateEmail(organisationCreationRequest.getSuperUser().getEmail());
         }
-
-        validateJurisdictions(organisationCreationRequest.getSuperUser().getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
 
         if (organisationCreationRequest.getCompanyNumber() != null) {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
@@ -287,10 +283,9 @@ public abstract class SuperController {
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        validateJurisdictions(newUserCreationRequest.getJurisdictions(), prdEnumService.getPrdEnumByEnumType(jurisdictionIds));
         List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
         List<String> roles = newUserCreationRequest.getRoles();
-        validateRoles(roles, prdEnumList);
+        validateRoles(roles);
 
         ProfessionalUser newUser = new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),

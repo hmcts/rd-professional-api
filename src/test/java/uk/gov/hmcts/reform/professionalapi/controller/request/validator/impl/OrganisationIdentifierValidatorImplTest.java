@@ -19,12 +19,13 @@ import org.springframework.security.core.GrantedAuthority;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 public class OrganisationIdentifierValidatorImplTest {
 
     private Organisation organisation;
     private PaymentAccount paymentAccount;
-    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl();
+    private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl = new OrganisationIdentifierValidatorImpl(mock(OrganisationService.class));
 
     @Before
     public void setUp() {

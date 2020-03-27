@@ -41,5 +41,4 @@ public class MultipleUserProfilesResponseTest {
 
         assertThat(multipleUserProfilesResponse.getUserProfiles()).isEqualTo(getUserProfileResponses);
     }
-
 }

@@ -33,3 +33,4 @@ public class ContactInformationRepositoryTest extends BaseRepository {
         assertThat(contactInfo.get().getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
     }
 }
+
