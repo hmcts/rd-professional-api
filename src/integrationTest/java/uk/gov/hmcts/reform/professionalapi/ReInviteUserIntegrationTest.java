@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -21,10 +23,12 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     private NewUserCreationRequest userCreationRequest;
     List<String> userRoles;
     String organisationIdentifier = null;
+    @Value(("${resendInviteEnabled}"))
+    protected boolean resendInvite;
 
     @Before
     public void setUp() {
-        org.junit.Assume.assumeTrue(resendInvite);
+        assumeTrue(resendInvite);
         userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         userCreationRequest = inviteUserCreationRequest("some@somedomain.com", userRoles);
@@ -96,7 +100,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
         Map<String, Object> reInviteUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
         assertThat(reInviteUserResponse.get("http_status")).isEqualTo("429");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains("The request was last made less than 1 hour ago. Please try after some time");
+        assertThat((String)reInviteUserResponse.get("response_body")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
 
     }
 
@@ -116,7 +120,7 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
         Map<String, Object> reInviteUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
         assertThat(reInviteUserResponse.get("http_status")).isEqualTo("409");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains("Resend invite failed as user is already active. Wait for one hour for the system to refresh.");
+        assertThat((String)reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
 
     }
 

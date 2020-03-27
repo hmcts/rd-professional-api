@@ -112,8 +112,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-    @Value(("${resendInviteEnabled}"))
-    protected boolean resendInvite;
+    @Value("${resendInterval}")
+    protected String resendInterval;
+
+    @Value("${syncInterval}")
+    protected String syncInterval;
 
     protected static final String ACTIVE = "ACTIVE";
 
@@ -520,13 +523,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
             body = "{"
                     + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after some time\","
-                    + "  \"errorDescription\": \"The request was last made less than 1 hour ago. Please try after some time\","
+                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval) + "\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
         } else if (status == HttpStatus.CONFLICT) {
             body = "{"
                     + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
-                    + "  \"errorDescription\": \"Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
+                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval) + "\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
         }

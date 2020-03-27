@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -9,6 +10,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -22,17 +24,16 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
     private IdamOpenIdClient idamOpenIdClient = null;
     public static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
+    @Value(("${resendInviteEnabled}"))
+    protected boolean resendInvite;
+
+    @Value("${resendInterval}")
+    protected String resendInterval;
+
     @Before
     public void createAndUpdateOrganisation() {
+        assumeTrue(resendInvite);
         orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-    }
-
-    @Test
-    public void add_new_user_to_organisation() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
     }
 
     //AC3: resend invite to a given user who does not exist
@@ -72,11 +73,10 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         //re inviting active user should return 400
         NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient.createReInviteUserRequest(newUserCreationRequest.getEmail());
         Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, reInviteUserCreationRequest, HttpStatus.TOO_MANY_REQUESTS);
-        assertThat((String)reinviteUserResponse.get("errorDescription")).contains("The request was last made less than 1 hour ago. Please try after some time");
+        assertThat((String)reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time"), resendInterval);
     }
 
     //AC7:  professional(external) user resend invite user who is not in the 'Pending' state
-    //AC10: professional(external) user resend invite to a given user who was invited more than an hour ago but has recently activated their account
     @Test
     public void should_return_400_when_user_reinvited_by_extrenal_user_is_active() throws Exception {
 
@@ -115,6 +115,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         // get PUM bearer token and reinvite
         String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
         Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient.getMultipleAuthHeaders(pumBearerToken), HttpStatus.BAD_REQUEST);
-        assertThat((String)reinviteUserResponse.get("errorDescription")).contains("The request was last made less than 1 hour ago. Please try after some time");
+        assertThat((String)reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes. Please try after some time"), resendInterval);
     }
 }
