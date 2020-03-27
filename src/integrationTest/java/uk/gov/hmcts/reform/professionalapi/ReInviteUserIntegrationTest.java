@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,63 +23,68 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     List<String> userRoles;
     String organisationIdentifier = null;
     @Value(("${resendInviteEnabled}"))
-    protected boolean resendInvite;
+    protected boolean resendInviteEnabled;
 
     @Before
     public void setUp() {
-        assumeTrue(resendInvite);
-        userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        userCreationRequest = inviteUserCreationRequest("some@somedomain.com", userRoles);
-        organisationIdentifier = createAndActivateOrganisation();
+        if (resendInviteEnabled) {
+            userRoles = new ArrayList<>();
+            userRoles.add("pui-user-manager");
+            userCreationRequest = inviteUserCreationRequest("some@somedomain.com", userRoles);
+            organisationIdentifier = createAndActivateOrganisation();
+        }
     }
 
     // AC1: resend invite to a given user
     @Test
     public void should_return_201_when_user_reinvited() {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        if (resendInviteEnabled) {
+            userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            Map<String, Object> newUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-        NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
-        Map<String, Object> reInviteUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
-        assertNotNull(reInviteUserResponse.get("userIdentifier"));
-
-
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+            assertNotNull(reInviteUserResponse.get("userIdentifier"));
+        }
     }
 
     // AC3: resend invite to a given user who does not exist
     @Test
     public void should_return_404_when_user_doesnt_exists() throws Exception {
 
-        NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
-        Map<String, Object> reInviteUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
-        assertThat(reInviteUserResponse.get("http_status")).isEqualTo("404");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains("User does not exist");
+        if (resendInviteEnabled) {
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+            assertThat(reInviteUserResponse.get("http_status")).isEqualTo("404");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains("User does not exist");
+        }
     }
 
     // AC4: resend invite to a given user who is not in the 'Pending' state
     @Test
     public void should_return_400_when_user_reinvited_is_not_pending() {
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        if (resendInviteEnabled) {
+            userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            Map<String, Object> newUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-        reinviteUserMock(HttpStatus.BAD_REQUEST);
-        NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
-        Map<String, Object> reInviteUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
-        assertThat(reInviteUserResponse.get("http_status")).isEqualTo("400");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains("User is not in PENDING state");
+            reinviteUserMock(HttpStatus.BAD_REQUEST);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+            assertThat(reInviteUserResponse.get("http_status")).isEqualTo("400");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains("User is not in PENDING state");
+        }
 
     }
 
@@ -88,19 +92,21 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     public void should_return_429_when_user_reinvited_within_one_hour() {
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        if (resendInviteEnabled) {
+            userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            Map<String, Object> newUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-        reinviteUserMock(HttpStatus.TOO_MANY_REQUESTS);
-        NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
-        Map<String, Object> reInviteUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
-        assertThat(reInviteUserResponse.get("http_status")).isEqualTo("429");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
+            reinviteUserMock(HttpStatus.TOO_MANY_REQUESTS);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+            assertThat(reInviteUserResponse.get("http_status")).isEqualTo("429");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
+        }
 
     }
 
@@ -108,21 +114,20 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     public void should_return_409_when_reinvited_user_gets_active_in_sidam_but_pending_in_up() {
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        if (resendInviteEnabled) {
+            userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            Map<String, Object> newUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-        reinviteUserMock(HttpStatus.CONFLICT);
-        NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
-        Map<String, Object> reInviteUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
-        assertThat(reInviteUserResponse.get("http_status")).isEqualTo("409");
-        assertThat((String)reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
-
+            reinviteUserMock(HttpStatus.CONFLICT);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+            assertThat(reInviteUserResponse.get("http_status")).isEqualTo("409");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
+        }
     }
-
-
 }
