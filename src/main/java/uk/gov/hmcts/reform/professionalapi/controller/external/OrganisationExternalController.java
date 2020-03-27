@@ -106,7 +106,7 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves an organisations payment accounts by super user email",
+            value = "Retrieves an Organisation's Payment Accounts by its Super User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -115,8 +115,12 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The organisations associated payment accounts",
+                    message = "The Organisation's associated Payment Accounts",
                     response = OrganisationPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid Email Address was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -124,7 +128,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Not Found"
+                    message = "No Payment Accounts found with the given Email Address"
             )
     })
     @GetMapping(
@@ -138,9 +142,8 @@ public class OrganisationExternalController extends SuperController {
         return retrievePaymentAccountByUserEmail(email, orgId);
     }
 
-
     @ApiOperation(
-            value = "Add an user to an organisation",
+            value = "Add a new User to an Organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -149,12 +152,24 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "User has been added",
+                    message = "The new User has been added to the Organisation",
                     response = OrganisationResponse.class
             ),
             @ApiResponse(
+                    code = 400,
+                    message = "An invalid request was provided"
+            ),
+            @ApiResponse(
                     code = 403,
-                    message = "Forbidden"
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No Organisation found with the given ID to add new User to"
+            ),
+            @ApiResponse(
+                    code = 409,
+                    message = "A User already exists with the given Email Address"
             )
     })
     @PostMapping(
