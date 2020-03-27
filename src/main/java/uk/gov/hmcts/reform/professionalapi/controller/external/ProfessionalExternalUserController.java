@@ -161,7 +161,7 @@ public class ProfessionalExternalUserController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Modify the Roles of a User",
+            value = "Modify the Roles of a User with the given ID",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")

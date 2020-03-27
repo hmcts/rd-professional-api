@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -41,6 +42,12 @@ public class LegacyPbaController {
 
     @ApiOperation(
             value = "Retrieve Payment Accounts by a User's Email Address"
+    )
+    @ApiParam(
+            name = "email",
+            type = "string",
+            value = "The Email of the User who's Payment Accounts are to be retrieved",
+            required = false
     )
     @ApiResponses({
             @ApiResponse(
