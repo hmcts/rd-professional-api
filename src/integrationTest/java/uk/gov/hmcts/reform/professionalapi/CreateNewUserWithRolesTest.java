@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -45,7 +46,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     @Before
     public void setUp() {
         userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
         userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
@@ -58,7 +59,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     public void post_request_adds_new_user_to_an_organisation() {
         List<String> userRoles = new ArrayList<>();
 
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
 
         userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -167,7 +168,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     @Test
     public void returns_404_when_organisation_identifier_not_found() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
@@ -189,7 +190,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     @Test
     public void returns_400_when_organisation_identifier_invalid() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import static java.util.Collections.singleton;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import java.util.UUID;
 
@@ -88,7 +89,7 @@ public class ProfessionalUserReqValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_validateModifyRolesRequestThrows400ForInvalidDeleteRoleName() {
-        userProfileUpdatedData.setRolesAdd((singleton(new RoleName("pui-user-manager"))));
+        userProfileUpdatedData.setRolesAdd((singleton(new RoleName(PUI_USER_MANAGER))));
         userProfileUpdatedData.setRolesDelete((singleton(new RoleName(""))));
 
         profUserReqValidator.validateModifyRolesRequest(userProfileUpdatedData, UUID.randomUUID().toString());

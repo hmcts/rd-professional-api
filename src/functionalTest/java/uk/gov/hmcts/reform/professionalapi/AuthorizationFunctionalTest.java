@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
+
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
@@ -128,7 +130,7 @@ public abstract class AuthorizationFunctionalTest {
 
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someName";

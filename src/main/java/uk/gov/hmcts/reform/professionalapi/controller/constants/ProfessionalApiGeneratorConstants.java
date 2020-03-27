@@ -12,4 +12,11 @@ public class ProfessionalApiGeneratorConstants {
     public static final String NO_ORG_FOUND_FOR_GIVEN_ID = "No Organisation was found with the given organisationIdentifier ";
     public static final String ORG_NOT_ACTIVE_NO_USERS_RETURNED = "Organisation is not Active hence not returning any users";
     public static final String ERROR_MESSAGE_403_FORBIDDEN = "403 Forbidden";
+    public static final String FORBIDDEN_ERROR_ACCESS_DENIED = "Forbidden Error: Access denied";
+
+    public static final String PUI_ORGANISATION_MANAGER = "pui-organisation-manager";
+    public static final String PUI_FINANCE_MANAGER = "pui-finance-manager";
+    public static final String PUI_USER_MANAGER = "pui-user-manager";
+    public static final String PUI_CASE_MANAGER = "pui-case-manager";
+    public static final String PRD_ADMIN = "prd-admin";
 }

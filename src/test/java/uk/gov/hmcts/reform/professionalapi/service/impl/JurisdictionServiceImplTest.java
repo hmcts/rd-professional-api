@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import feign.FeignException;
@@ -51,7 +52,7 @@ public class JurisdictionServiceImplTest {
     private final PrdEnumId prdEnumId3 = new PrdEnumId(3, "PRD_ROLE");
     private final PrdEnum anEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "JURISD_ID");
     private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
-    private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
+    private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, PUI_CASE_MANAGER, "PRD_ROLE");
     private final UserAttribute userAttribute1 = new UserAttribute(user, anEnum1);
     private final UserAttribute userAttribute2 = new UserAttribute(user, anEnum2);
     private final UserAttribute userAttribute3 = new UserAttribute(user, anEnum3);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +78,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
+        userRoles.add(PUI_FINANCE_MANAGER);
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -101,7 +102,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
+        userRoles.add(PUI_FINANCE_MANAGER);
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -123,7 +124,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
+        userRoles.add(PUI_FINANCE_MANAGER);
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);

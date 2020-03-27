@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
@@ -17,7 +20,7 @@ public class UserProfileCreationRequestTest {
 
     @Test
     public void has_mandatory_fields_specified_not_null() {
-        List<String> roles = asList("pui-user-manager", "pui-organisation-manager");
+        List<String> roles = asList(PUI_USER_MANAGER, PUI_ORGANISATION_MANAGER);
         UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName, lastName, EN, PROFESSIONAL, EXTERNAL, roles);
 
         userProfileCreationRequest.setEmail("somebody@hmcts.net");
@@ -29,8 +32,8 @@ public class UserProfileCreationRequestTest {
         assertThat(userProfileCreationRequest.getUserCategory()).isEqualTo(PROFESSIONAL);
         assertThat(userProfileCreationRequest.getUserType()).isEqualTo(EXTERNAL);
         assertThat(userProfileCreationRequest.getRoles().size()).isEqualTo(2);
-        assertThat(userProfileCreationRequest.getRoles().get(0)).isEqualTo("pui-user-manager");
-        assertThat(userProfileCreationRequest.getRoles().get(1)).isEqualTo("pui-organisation-manager");
+        assertThat(userProfileCreationRequest.getRoles().get(0)).isEqualTo(PUI_USER_MANAGER);
+        assertThat(userProfileCreationRequest.getRoles().get(1)).isEqualTo(PUI_ORGANISATION_MANAGER);
     }
 
     @Test

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -34,7 +35,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String lastName = "some-lname";
 
     private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
-    private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
+    private List<String> puiUserManagerRoleOnly = Arrays.asList(PUI_USER_MANAGER);
 
     @Test
     public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {

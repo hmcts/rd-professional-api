@@ -7,6 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import feign.Request;
 import feign.Response;
@@ -64,7 +66,7 @@ public class RefDataUtilTest {
         profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
         getUserProfileResponse = new GetUserProfileResponse(profile, false);
         paymentAccount.setId(UUID.randomUUID());
-        professionalUser.setRoles(asList("pui-user-manager", "pui-case-manager"));
+        professionalUser.setRoles(asList(PUI_USER_MANAGER, PUI_CASE_MANAGER));
         getUserProfileResponse.setIdamStatusCode("400");
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
     }

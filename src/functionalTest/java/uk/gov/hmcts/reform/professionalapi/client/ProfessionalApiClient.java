@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -224,7 +225,7 @@ public class ProfessionalApiClient {
 
     public  NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")

@@ -10,6 +10,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
@@ -37,7 +40,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -93,7 +95,7 @@ public class OrganisationExternalControllerTest {
 
     private final PrdEnum anEnum1 = new PrdEnum(prdEnumId1, "PROBATE", "JURISD_ID");
     private final PrdEnum anEnum2 = new PrdEnum(prdEnumId2, "BULKSCAN", "JURISD_ID");
-    private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
+    private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, PUI_CASE_MANAGER, "PRD_ROLE");
 
     private List<PrdEnum> prdEnumList;
     private List<String> jurisdEnumIds;
@@ -136,7 +138,7 @@ public class OrganisationExternalControllerTest {
         jurisdictions.add(jurisdiction2);
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
@@ -186,7 +188,7 @@ public class OrganisationExternalControllerTest {
         Authentication authentication = mock(Authentication.class);
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
+        when(grantedAuthority.getAuthority()).thenReturn(PUI_USER_MANAGER);
         authorities.add(grantedAuthority);
 
         ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
@@ -207,7 +209,7 @@ public class OrganisationExternalControllerTest {
     public void testInviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
-        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setRoles(singletonList(PUI_CASE_MANAGER));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);

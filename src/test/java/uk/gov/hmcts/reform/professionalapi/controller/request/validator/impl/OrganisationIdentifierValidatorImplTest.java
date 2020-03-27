@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,7 +84,7 @@ public class OrganisationIdentifierValidatorImplTest {
 
     @Test
     public void test_ifUserRoleExistsReturnsTrueForExistingRole() {
-        String role = "pui-finance-manager";
+        String role = PUI_FINANCE_MANAGER;
         GrantedAuthority grantedAuthorityMock = mock(GrantedAuthority.class);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(grantedAuthorityMock);
@@ -98,7 +99,7 @@ public class OrganisationIdentifierValidatorImplTest {
         GrantedAuthority grantedAuthorityMock = mock(GrantedAuthority.class);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(grantedAuthorityMock);
-        when(grantedAuthorityMock.getAuthority()).thenReturn("pui-finance-manager");
+        when(grantedAuthorityMock.getAuthority()).thenReturn(PUI_FINANCE_MANAGER);
 
         Boolean result = organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, "this-is-a-fake-role");
         assertThat(result).isFalse();

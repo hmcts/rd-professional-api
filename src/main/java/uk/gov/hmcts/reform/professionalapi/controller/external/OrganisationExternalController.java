@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FORBIDDEN_ERROR_ACCESS_DENIED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -90,7 +95,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied"
+                    message = FORBIDDEN_ERROR_ACCESS_DENIED
             ),
             @ApiResponse(
                     code = 404,
@@ -98,7 +103,7 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager"})
+    @Secured({PUI_ORGANISATION_MANAGER, PUI_FINANCE_MANAGER, PUI_CASE_MANAGER})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
             @ApiParam(hidden = true) @OrgId String extOrgIdentifier) {
 
@@ -124,7 +129,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied"
+                    message = FORBIDDEN_ERROR_ACCESS_DENIED
             ),
             @ApiResponse(
                     code = 404,
@@ -135,7 +140,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/pbas",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
+    @Secured({PUI_FINANCE_MANAGER, PUI_USER_MANAGER, PUI_ORGANISATION_MANAGER, PUI_CASE_MANAGER})
     public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
@@ -161,7 +166,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied"
+                    message = FORBIDDEN_ERROR_ACCESS_DENIED
             ),
             @ApiResponse(
                     code = 404,
@@ -178,7 +183,7 @@ public class OrganisationExternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    @Secured("pui-user-manager")
+    @Secured(PUI_USER_MANAGER)
     public ResponseEntity addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,

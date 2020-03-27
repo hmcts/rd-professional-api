@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
@@ -147,7 +149,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         Set<RoleName> deleteRoles = new HashSet<>();
         deleteRoles.add(roleName1);
         userProfileUpdatedData.setRolesDelete(deleteRoles);
-        String userIdentifier = settingUpOrganisation("pui-user-manager");
+        String userIdentifier = settingUpOrganisation(PUI_USER_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isNotNull();
@@ -159,7 +161,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
         UserProfileUpdatedData userProfileUpdatedData = createDeleteRolesUserProfileData();
-        String userIdentifier = settingUpOrganisation("pui-user-manager");
+        String userIdentifier = settingUpOrganisation(PUI_USER_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         verifyDeleteRolesResponse(response);
@@ -173,7 +175,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-case-manager");
+        userRoles.add(PUI_CASE_MANAGER);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 

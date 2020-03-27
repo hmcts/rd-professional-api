@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -12,7 +13,7 @@ import org.junit.Test;
 public class UserAttributeRequestTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private String puiUserManager = "pui-user-manager";
+    private String puiUserManager = PUI_USER_MANAGER;
 
     @Test
     public void has_mandatory_fields_specified_not_null() {

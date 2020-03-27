@@ -9,6 +9,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_ADMIN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
@@ -135,7 +140,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
 
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-finance-manager"))
+                .withHeader("Authorization", containing(PUI_FINANCE_MANAGER))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -152,7 +157,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withTransformers("external_user-token-response")));
 
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-case-manager"))
+                .withHeader("Authorization", containing(PUI_CASE_MANAGER))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -168,7 +173,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "}")
                         .withTransformers("external_user-token-response")));
 
-        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing("prd-admin"))
+        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing(PRD_ADMIN))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -185,7 +190,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withTransformers("external_user-token-response")));
 
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-organisation-manager"))
+                .withHeader("Authorization", containing(PUI_ORGANISATION_MANAGER))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -202,7 +207,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withTransformers("external_user-token-response")));
 
         sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-user-manager"))
+                .withHeader("Authorization", containing(PUI_USER_MANAGER))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

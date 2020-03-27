@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertFalse;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 
 import java.lang.reflect.Constructor;
@@ -12,8 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
 public class UserCreationRequestValidatorTest {
 
-    final String userManagerRole = "pui-user-manager";
-    final String caseManagerRole = "pui-case-manager";
+    final String userManagerRole = PUI_USER_MANAGER;
+    final String caseManagerRole = PUI_CASE_MANAGER;
 
 
     @Test

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
@@ -100,27 +102,27 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
 
     @Test
     public void retrieve_active_users_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
-        String id = settingUpOrganisation("pui-case-manager");
+        String id = settingUpOrganisation(PUI_CASE_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiCaseManager, id);
         validateUsers(response, 2);
     }
 
     @Test
     public void retrieve_active_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
-        String id = settingUpOrganisation("pui-user-manager");
+        String id = settingUpOrganisation(PUI_USER_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Active", puiUserManager, id);
         validateUsers(response, 2);
     }
 
     @Test
     public void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
-        String id = settingUpOrganisation("pui-user-manager");
+        String id = settingUpOrganisation(PUI_USER_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","Deleted", puiUserManager, id);
     }
 
     @Test
     public void retrieve_all_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
-        String id = settingUpOrganisation("pui-user-manager");
+        String id = settingUpOrganisation(PUI_USER_MANAGER);
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false","", puiUserManager, id);
         validateUsers(response, 3);
     }
@@ -130,7 +132,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest().firstName("someName").lastName("someLastName").email(randomAlphabetic(5) + "@email.com").roles(userRoles).jurisdictions(createJurisdictions()).build();
         userProfileCreateUserWireMock(HttpStatus.CREATED);

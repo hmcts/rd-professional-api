@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
@@ -50,7 +53,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
 
         List<String> userRoles1 = new ArrayList<>();
-        userRoles1.add("pui-organisation-manager");
+        userRoles1.add(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -72,7 +75,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
             professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
             List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-case-manager");
+            userRoles.add(PUI_CASE_MANAGER);
             String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
             String lastName = "someLastName";
             String firstName = "someName";
@@ -105,7 +108,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
+        String email = idamOpenIdClient.createUser(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();
@@ -123,7 +126,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        RoleName role1 = new RoleName("pui-user-manager");
+        RoleName role1 = new RoleName(PUI_USER_MANAGER);
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
@@ -138,7 +141,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         List<String> rolesSize = (List) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize).contains("caseworker").contains("pui-organisation-manager").contains("pui-user-manager");
+        assertThat(rolesSize).contains("caseworker").contains(PUI_ORGANISATION_MANAGER).contains(PUI_USER_MANAGER);
     }
 
     @Test
@@ -152,7 +155,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        RoleName role1 = new RoleName("pui-organisation-manager");
+        RoleName role1 = new RoleName(PUI_ORGANISATION_MANAGER);
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
@@ -164,7 +167,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         List<String> rolesSize = (List<String>) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(2);
-        assertThat(rolesSize).contains("pui-user-manager").contains("pui-organisation-manager");
+        assertThat(rolesSize).contains(PUI_USER_MANAGER).contains(PUI_ORGANISATION_MANAGER);
     }
 
 
@@ -179,7 +182,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
+        String email = idamOpenIdClient.createUser(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();
@@ -204,7 +207,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesSize = searchUserInfo(orgIdentifier);
         assertThat(rolesSize.size()).isEqualTo(3);
-        assertThat(rolesSize).contains("caseworker").contains("pui-organisation-manager").contains("pui-user-manager");
+        assertThat(rolesSize).contains("caseworker").contains(PUI_ORGANISATION_MANAGER).contains(PUI_USER_MANAGER);
 
         UserProfileUpdatedData deleteRoleReqest = new UserProfileUpdatedData();
         deleteRoleReqest.setRolesDelete(createOrDeleteRoleName());
@@ -212,7 +215,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterDelete = searchUserInfo(orgIdentifier);
         assertThat(rolesAfterDelete.size()).isEqualTo(2);
-        assertThat(rolesSize).contains("pui-organisation-manager").contains("caseworker");
+        assertThat(rolesSize).contains(PUI_ORGANISATION_MANAGER).contains("caseworker");
 
     }
 
@@ -228,7 +231,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         String userId = (String) professionalUsersResponse.get("userIdentifier");
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-        RoleName role1 = new RoleName("pui-organisation-manager");
+        RoleName role1 = new RoleName(PUI_ORGANISATION_MANAGER);
         Set<RoleName> roles = new HashSet<>();
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
@@ -237,11 +240,11 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesAfterAdd = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesAfterAdd.size()).isEqualTo(2);
-        assertThat(rolesAfterAdd).contains("pui-organisation-manager").contains("pui-user-manager");
+        assertThat(rolesAfterAdd).contains(PUI_ORGANISATION_MANAGER).contains(PUI_USER_MANAGER);
 
         // roles to delete
         UserProfileUpdatedData deleteRoleRequest = new UserProfileUpdatedData();
-        RoleName roleName = new RoleName("pui-organisation-manager");
+        RoleName roleName = new RoleName(PUI_ORGANISATION_MANAGER);
         Set<RoleName> rolesDelete = new HashSet<>();
         rolesDelete.add(roleName);
         deleteRoleRequest.setRolesDelete(rolesDelete);
@@ -251,12 +254,12 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //search active user
         List<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
-        //assertThat(!rolesInfo.contains("pui-organisation-manager"));
+        //assertThat(!rolesInfo.contains(PUI_ORGANISATION_MANAGER));
     }
 
     private Set<RoleName> createOrDeleteRoleName() {
 
-        RoleName roleName = new RoleName("pui-user-manager");
+        RoleName roleName = new RoleName(PUI_USER_MANAGER);
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName);
         return roles;
@@ -264,7 +267,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
     private Set<RoleName> createAddRoleName() {
 
-        RoleName roleName = new RoleName("pui-user-manager");
+        RoleName roleName = new RoleName(PUI_USER_MANAGER);
         Set<RoleName> roles = new HashSet<>();
         roles.add(roleName);
         return roles;

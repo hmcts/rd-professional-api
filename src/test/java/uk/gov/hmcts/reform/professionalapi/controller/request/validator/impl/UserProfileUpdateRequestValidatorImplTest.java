@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,9 +21,9 @@ public class UserProfileUpdateRequestValidatorImplTest {
     private String email = "test@test.com";
     private String firstName = "fname";
     private String lastName = "lname";
-    private String puiOrganisationManager = "pui-organisation-manager";
-    private String puiCaseManager = "pui-case-manager";
-    private String puiFinanceManager = "pui-finance-manager";
+    private String puiOrganisationManager = PUI_ORGANISATION_MANAGER;
+    private String puiCaseManager = PUI_CASE_MANAGER;
+    private String puiFinanceManager = PUI_FINANCE_MANAGER;
 
     private Set<RoleName> rolesData = new HashSet<>();
     private Set<RoleName> rolesToDeleteData = new HashSet<>();

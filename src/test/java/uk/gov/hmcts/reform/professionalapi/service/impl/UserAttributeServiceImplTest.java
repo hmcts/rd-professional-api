@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,11 @@ public class UserAttributeServiceImplTest {
 
     @Before
     public void setUp() {
-        anEnum = new PrdEnum(prdEnumIdMock, "pui-user-manager", "SIDAM_ROLE");
+        anEnum = new PrdEnum(prdEnumIdMock, PUI_USER_MANAGER, "SIDAM_ROLE");
         userAttributes.add(userAttribute);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
         prdEnums.add(anEnum);
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
     }
 
     @Test

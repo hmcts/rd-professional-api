@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class ProfessionalUserTest {
     @Test
     public void creates_professional_user_correctly() {
         List<String> roles = new ArrayList<>();
-        roles.add("pui-user-manager");
+        roles.add(PUI_USER_MANAGER);
 
         Organisation organisation = new Organisation();
         ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some-email-address", organisation);
@@ -31,7 +32,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getUserIdentifier()).isNull();
         assertThat(professionalUser.getId()).isNull(); // hibernate generated
         assertThat(professionalUser.getRoles().size()).isEqualTo(1);
-        assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
+        assertThat(professionalUser.getRoles().get(0)).isEqualTo(PUI_USER_MANAGER);
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
         assertThat(professionalUser.getUserAccountMap()).isNotNull();

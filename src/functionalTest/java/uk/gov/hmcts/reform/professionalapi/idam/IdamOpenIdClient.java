@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_ADMIN;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -76,7 +77,7 @@ public class IdamOpenIdClient {
     }
 
     public String getInternalOpenIdToken() {
-        String userEmail = createUser("prd-admin");
+        String userEmail = createUser(PRD_ADMIN);
         return getOpenIdToken(userEmail);
     }
 

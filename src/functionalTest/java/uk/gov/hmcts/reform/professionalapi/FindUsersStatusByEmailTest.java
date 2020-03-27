@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -27,7 +31,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-case-manager");
+        userRoles.add(PUI_CASE_MANAGER);
         // creating new user request
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
@@ -44,7 +48,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-case-manager");
+        userRoles.add(PUI_CASE_MANAGER);
         // creating new user request
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // creating user in idam with the same email used in the invite user so that status automatically will be update in the up
@@ -61,7 +65,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // creating new user request
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
+        userRoles.add(PUI_FINANCE_MANAGER);
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
@@ -75,8 +79,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // creating new user request
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        userRoles.add("pui-finance-manager");
+        userRoles.add(PUI_USER_MANAGER);
+        userRoles.add(PUI_FINANCE_MANAGER);
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(), userCreationRequest.getLastName(), userCreationRequest.getEmail());
@@ -86,7 +90,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         List<String> userRolesForToken = new ArrayList<>();
-        userRolesForToken.add("pui-organisation-manager");
+        userRolesForToken.add(PUI_ORGANISATION_MANAGER);
 
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK, generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -100,7 +104,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // creating new user request
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-organisation-manager");
+        userRoles.add(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
 
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up
@@ -124,7 +128,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // creating new user request
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-organisation-manager");
+        userRoles.add(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
 
         // creating user in idam with the same email used in the invite user so that status automatically will update in the up

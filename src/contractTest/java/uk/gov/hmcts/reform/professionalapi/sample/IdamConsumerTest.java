@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.sample;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
 
 import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.Pact;
@@ -228,7 +229,7 @@ public class IdamConsumerTest {
     }
 
     private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("pui-case-manager");
+        PactDslJsonArray array = new PactDslJsonArray().stringValue(PUI_CASE_MANAGER);
 
         return new PactDslJsonBody()
                 .stringValue("id", "123")

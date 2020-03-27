@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -302,10 +303,10 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         userProfileCreateUserWireMock(CREATED);
 
         List<String> user1Roles = new ArrayList<>();
-        user1Roles.add("pui-user-manager");
+        user1Roles.add(PUI_USER_MANAGER);
 
         List<String> user2Roles = new ArrayList<>();
-        user2Roles.add("pui-user-manager");
+        user2Roles.add(PUI_USER_MANAGER);
         user2Roles.add("organisation-admin");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();

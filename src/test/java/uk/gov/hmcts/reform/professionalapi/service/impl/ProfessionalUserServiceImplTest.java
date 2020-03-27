@@ -11,6 +11,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -93,9 +97,9 @@ public class ProfessionalUserServiceImplTest {
 
     @Before
     public void setup() {
-        userRoles.add("pui-user-manager");
+        userRoles.add(PUI_USER_MANAGER);
         PrdEnumId prdEnumId = new PrdEnumId();
-        PrdEnum anEnum = new PrdEnum(prdEnumId, "pui-user-manager", "SIDAM_ROLE");
+        PrdEnum anEnum = new PrdEnum(prdEnumId, PUI_USER_MANAGER, "SIDAM_ROLE");
         prdEnums.add(anEnum);
 
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
@@ -108,7 +112,7 @@ public class ProfessionalUserServiceImplTest {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
+        roles.add(PUI_CASE_MANAGER);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
@@ -143,7 +147,7 @@ public class ProfessionalUserServiceImplTest {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
+        roles.add(PUI_CASE_MANAGER);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
         organisation.setUsers(users);
@@ -243,19 +247,19 @@ public class ProfessionalUserServiceImplTest {
     public void modify_user_roles() throws Exception {
 
         Set<RoleName> rolesData = new HashSet<RoleName>();
-        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName1 = new RoleName(PUI_CASE_MANAGER);
         RoleName roleName2 = new RoleName("pui-case-organisation");
         rolesData.add(roleName1);
         rolesData.add(roleName2);
 
 
         /*List<RoleName> rolesData = new ArrayList<>();
-        rolesData.add("pui-case-manager");
-        rolesData.add("pui-organisation-manager");*/
+        rolesData.add(PUI_CASE_MANAGER);
+        rolesData.add(PUI_ORGANISATION_MANAGER);*/
 
 
         Set<RoleName> rolesToDeleteData = new HashSet<RoleName>();
-        RoleName roleToDeleteName = new RoleName("pui-finance-manager");
+        RoleName roleToDeleteName = new RoleName(PUI_FINANCE_MANAGER);
         rolesToDeleteData.add(roleToDeleteName);
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
@@ -297,7 +301,7 @@ public class ProfessionalUserServiceImplTest {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
 
         Set<RoleName> roles = new HashSet<>();
-        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName1 = new RoleName(PUI_CASE_MANAGER);
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);
@@ -332,7 +336,7 @@ public class ProfessionalUserServiceImplTest {
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         Set<RoleName> roles = new HashSet<RoleName>();
-        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName1 = new RoleName(PUI_CASE_MANAGER);
         RoleName roleName2 = new RoleName("pui-case-organisation");
         roles.add(roleName1);
         roles.add(roleName2);

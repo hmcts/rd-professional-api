@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,7 @@ public class UserProfileUpdatedDataTest {
 
     @Test
     public void should_add_roles_add_when_modified() {
-        RoleName roleName1 = new RoleName("pui-case-manager");
+        RoleName roleName1 = new RoleName(PUI_CASE_MANAGER);
         RoleName roleName2 = new RoleName("pui-case-organisation");
         Set<RoleName> rolesAdd = new HashSet<>();
         rolesAdd.add(roleName1);

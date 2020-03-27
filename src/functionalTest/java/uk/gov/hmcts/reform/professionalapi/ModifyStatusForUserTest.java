@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
+        String email = idamOpenIdClient.createUser(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();
@@ -77,7 +78,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
+        String email = idamOpenIdClient.createUser(PUI_ORGANISATION_MANAGER);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
 
         assertThat(newUserCreationRequest).isNotNull();

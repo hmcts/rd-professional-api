@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
 
 import java.util.Collection;
 
@@ -58,7 +59,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void verifyNonPuiFinanceManagerOrgIdentifier(Collection<GrantedAuthority> authorities, Organisation organisation, String extOrgIdentifier) {
 
-        boolean isPuiFinanceManExist = ifUserRoleExists(authorities, "pui-finance-manager");
+        boolean isPuiFinanceManExist = ifUserRoleExists(authorities, PUI_FINANCE_MANAGER);
 
         if (!isPuiFinanceManExist) {
             authorities.forEach(role -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));

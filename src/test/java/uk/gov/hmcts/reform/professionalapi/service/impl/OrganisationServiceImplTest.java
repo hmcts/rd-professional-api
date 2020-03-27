@@ -10,6 +10,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_FINANCE_MANAGER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_ORGANISATION_MANAGER;
+
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -182,7 +187,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesAnOrganisation() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), PUI_USER_MANAGER, "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
@@ -409,17 +414,17 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testAllAttributesAddedToSuperUser() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
-        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), PUI_USER_MANAGER, "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), PUI_USER_MANAGER, "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), PUI_USER_MANAGER, "SIDAM_ROLE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(3, "SIDAM_ROLE"), PUI_USER_MANAGER, "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
-        userRoles.add("pui-user-manager");
-        userRoles.add("pui-organisation-manager");
-        userRoles.add("pui-finance-manager");
-        userRoles.add("pui-case-manager");
+        userRoles.add(PUI_USER_MANAGER);
+        userRoles.add(PUI_ORGANISATION_MANAGER);
+        userRoles.add(PUI_FINANCE_MANAGER);
+        userRoles.add(PUI_CASE_MANAGER);
         userRoles.add("organisation-admin");
 
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);

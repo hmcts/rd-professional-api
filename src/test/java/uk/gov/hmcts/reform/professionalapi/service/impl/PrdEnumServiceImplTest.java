@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_ADMIN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class PrdEnumServiceImplTest {
     public void gets_no_user_roles_of_user_by_admin_role_type() {
 
         List<PrdEnum> prdEnums = new ArrayList<>();
-        PrdEnum anEnum = new PrdEnum(prdEnumId3, "PRD-ADMIN", "ADMIN_ROLE");
+        PrdEnum anEnum = new PrdEnum(prdEnumId3, PRD_ADMIN, "ADMIN_ROLE");
         prdEnums.add(anEnum);
 
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
