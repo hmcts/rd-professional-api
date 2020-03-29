@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
 
 import lombok.Data;
 
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.User;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 
 @Data
 public class ServiceAndUserPair {

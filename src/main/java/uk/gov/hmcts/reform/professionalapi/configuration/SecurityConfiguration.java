@@ -26,17 +26,19 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.RequestAuthorizer;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.AuthCheckerServiceOnlyFilter;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer.RequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
+import uk.gov.hmcts.reform.professionalapi.authchecker.filter.AuthCheckerServiceOnlyFilter;
+import uk.gov.hmcts.reform.professionalapi.authchecker.usertoken.JwtGrantedAuthoritiesConverter;
 
 
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 @Slf4j
+@SuppressWarnings("unchecked")
 public class SecurityConfiguration {
 
     @Configuration

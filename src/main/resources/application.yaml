@@ -26,7 +26,14 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
+  security.oauth2.client.provider.oidc.issuer-uri: ${OPEN_ID_API_BASE_URI:${https://idam-web-public.aat.platform.hmcts.net/o}
+  security.oauth2.
 
+
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -78,18 +85,20 @@ idam:
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
 
-auth.idam.client.baseUrl: ${idam_url:http://idam-api.aat.platform.hmcts.net}
+auth.idam.client.baseUrl: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
 
-# open id
-spring.security.oauth2.client.provider.oidc.issuer-uri: ${auth.idam.client.baseUrl}/o
-# Dummy oidc client required even though data-store doesn't use
-spring.security.oauth2.client.registration.oidc.client-id: internal
-spring.security.oauth2.client.registration.oidc.client-secret: internal
-oidc.issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+oidc.issuer: ${OIDC_ISSUER:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
 #cache implementation
-spring.cache.cache-names: userInfoCache
-spring.cache.caffeine.spec: expireAfterAccess=3600s
+#definitions cache parameters
+#max idle time in seconds that applies to all definition cache entries
+definition.cache.max-idle.secs: ${DEFINITION_CACHE_MAX_IDLE_SEC:259200}
+#max size of cache map in terms of number of entries
+definition.cache.max.size: ${DEFINITION_CACHE_MAX_SIZE:5000}
+#eviction policy. If set to NONE the cache can grow arbitrarily large and definition.cache.max.size is ignored
+definition.cache.eviction.policy: ${DEFINITION_CACHE_EVICTION_POLICY:NONE}
+#time to live for user cache entries
+user.cache.ttl.secs: 1800
 
 ## Secure roles configuration
 exui.role:

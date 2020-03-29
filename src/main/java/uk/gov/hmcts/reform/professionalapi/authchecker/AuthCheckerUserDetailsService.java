@@ -4,7 +4,7 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.ServiceAndUserPair;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.ServiceDetails;

@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
+package uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer;
 
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.RequestAuthorizer;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.AuthCheckerException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.BearerTokenInvalidException;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.BearerToke
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.UnauthorisedServiceException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenInvalidException;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.ServiceTokenParsingException;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 
 
 public class ServiceRequestAuthorizer implements RequestAuthorizer<Service> {

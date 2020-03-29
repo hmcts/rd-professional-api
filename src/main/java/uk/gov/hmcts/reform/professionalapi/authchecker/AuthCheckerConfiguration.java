@@ -13,10 +13,10 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.CachingSubjectResolver;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.ServiceRequestAuthorizer;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.ServiceResolver;
-import uk.gov.hmcts.reform.professionalapi.authchecker.servicetokenparser.ServiceTokenParser;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer.ServiceRequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.ServiceResolver;
+import uk.gov.hmcts.reform.professionalapi.authchecker.servicetoken.ServiceTokenParser;
 
 @Lazy
 @Configuration

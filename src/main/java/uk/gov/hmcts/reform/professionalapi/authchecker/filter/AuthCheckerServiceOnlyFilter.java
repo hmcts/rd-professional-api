@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
+package uk.gov.hmcts.reform.professionalapi.authchecker.filter;
 
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.RequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer.RequestAuthorizer;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.exception.AuthCheckerException;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.service.Service;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 
 @Slf4j
 public class AuthCheckerServiceOnlyFilter extends AbstractPreAuthenticatedProcessingFilter {

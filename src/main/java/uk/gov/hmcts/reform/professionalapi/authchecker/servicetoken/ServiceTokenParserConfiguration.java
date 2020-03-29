@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.servicetokenparser;
+package uk.gov.hmcts.reform.professionalapi.authchecker.servicetoken;
 
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;

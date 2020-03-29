@@ -1,7 +1,6 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
+package uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver;
 
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
-import uk.gov.hmcts.reform.professionalapi.authchecker.servicetokenparser.ServiceTokenParser;
+import uk.gov.hmcts.reform.professionalapi.authchecker.servicetoken.ServiceTokenParser;
 
 public class ServiceResolver implements SubjectResolver<Service> {
 
