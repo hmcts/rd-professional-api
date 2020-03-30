@@ -25,5 +25,5 @@ exui.role.pui-case-manager: pui-case-manager
 # resent user invite interval in minutes
 resendInterval: 60
 
-# suppress resend invite until User profile goes to aat
-resendInviteEnabled : true
+# toggle for resendInvite
+resendInviteEnabled : false

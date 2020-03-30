@@ -293,21 +293,6 @@ public abstract class SuperController {
     }
 
     private ResponseEntity inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String userId, ProfessionalUser professionalUser, List<String> roles) {
-        String orgId = removeEmptySpaces(organisationIdentifier);
-
-        Object responseBody = null;
-        validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
-        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
-        checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
-        List<String> roles = newUserCreationRequest.getRoles();
-        validateRoles(roles);
-
-        ProfessionalUser newUser = new ProfessionalUser(
-                removeEmptySpaces(newUserCreationRequest.getFirstName()),
-                removeEmptySpaces(newUserCreationRequest.getLastName()),
-                RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
-                existingOrganisation);
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
