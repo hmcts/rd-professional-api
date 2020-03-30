@@ -579,7 +579,7 @@ public class ProfessionalUserServiceImplTest {
     public void checkUserStatusIsActiveByUserId() {
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
 
-        when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));
+        when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
 
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setIdamStatus("ACTIVE");

@@ -214,15 +214,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     public void checkUserStatusIsActiveByUserId(String userId) {
         NewUserResponse newUserResponse = null;
-        Optional<ProfessionalUser> user = professionalUserRepository.findById(UUID.fromString(userId));
+        ProfessionalUser user = professionalUserRepository.findByUserIdentifier(userId);
 
-        if (user.isPresent()) {
-            newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.get().getEmailAddress(), userProfileFeignClient);
+        if (null != user) {
+            newUserResponse = RefDataUtil.findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
         }
 
         if (newUserResponse == null || !IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
             throw new AccessDeniedException(ERROR_403_USER_IS_NOT_ACTIVE);
         }
     }
-
 }
