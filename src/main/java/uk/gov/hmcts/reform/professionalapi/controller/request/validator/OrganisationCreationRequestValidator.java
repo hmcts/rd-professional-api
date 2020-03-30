@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -172,19 +170,4 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-
-    public static void validateJurisdictions(List<Jurisdiction> jurisdictions, List<String> enumList) {
-
-        if (CollectionUtils.isEmpty(jurisdictions)) {
-            throw new InvalidRequest("Jurisdictions not present");
-        } else {
-            jurisdictions.forEach(jurisdiction -> {
-                if (StringUtils.isBlank(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction value should not be blank or null");
-                } else if (!enumList.contains(jurisdiction.getId())) {
-                    throw new InvalidRequest("Jurisdiction id not valid : " + jurisdiction.getId());
-                }
-            });
-        }
-    }
 }

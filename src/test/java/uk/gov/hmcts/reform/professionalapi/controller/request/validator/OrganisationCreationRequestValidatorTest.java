@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,8 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -48,26 +45,6 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName").email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company","PENDING","SraId", "true", "12345678","www.company.com",userCreationRequest, new HashSet<>(),null);
-    }
-
-    public List<String> getEnumList() {
-        ArrayList<String> enumStringList = new ArrayList<>();
-        enumStringList.add("Probate");
-        enumStringList.add("BULKSCAN");
-        enumStringList.add("Civil Money Claims");
-        return enumStringList;
-    }
-
-    public List<Jurisdiction> createJurisdictions() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("Probate");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-        return jurisdictions;
     }
 
     @Test
@@ -232,55 +209,6 @@ public class OrganisationCreationRequestValidatorTest {
         contactList.add(contactInfoCreateRequest);
 
         organisationCreationRequestValidator.requestContactInformation(contactList);
-    }
-
-    @Test(expected = Test.None.class)
-    public void should_validate_jurisdictions_successfully() {
-
-        OrganisationCreationRequestValidator.validateJurisdictions(createJurisdictions(), getEnumList());
-    }
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_are_empty() {
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(new ArrayList<>(), getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdictions not present");
-    }
-
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_id_has_null() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction1.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdiction value should not be blank or null");
-
-    }
-
-    @Test
-    public void should_throw_exception_when_jurisdictions_id_has_invalid_value() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("id2");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("BULKSCAN");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-
-        assertThatThrownBy(() -> OrganisationCreationRequestValidator.validateJurisdictions(jurisdictions, getEnumList()))
-                .isInstanceOf(InvalidRequest.class)
-                .hasMessage("Jurisdiction id not valid : id2");
-
     }
 
     @Test(expected = Test.None.class)

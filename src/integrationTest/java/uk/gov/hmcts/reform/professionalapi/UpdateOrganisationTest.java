@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
-
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
         updateAndValidateOrganisation("AA11NNF", "ACTIVE",404);
@@ -32,12 +31,12 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-        updateAndValidateOrganisation(null, "ACTIVE",404);
+        updateAndValidateOrganisation(null, "ACTIVE",400);
     }
 
     @Test
     public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-        updateAndValidateOrganisation("1234ab12", "ACTIVE",404);
+        updateAndValidateOrganisation("1234ab12", "ACTIVE",400);
     }
 
     @Test
