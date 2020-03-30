@@ -27,13 +27,8 @@ spring:
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
   security.oauth2.client.provider.oidc.issuer-uri: ${OPEN_ID_API_BASE_URI:${https://idam-web-public.aat.platform.hmcts.net/o}
-  security.oauth2.
-
-
-        registration:
-          oidc:
-            client-id: microservicekey-rd-professional-api
-            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
+  security.oauth2.registration.oidc.client-id: microservicekey-rd-professional-api
+  security.oauth2.registration.oidc.client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -84,6 +79,8 @@ idam:
     pbaFromUserAccountMap: false
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
+  api:
+    url: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
 
 auth.idam.client.baseUrl: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
 
