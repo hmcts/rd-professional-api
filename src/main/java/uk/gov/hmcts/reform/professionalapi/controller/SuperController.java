@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 import feign.FeignException;
@@ -341,7 +342,7 @@ public abstract class SuperController {
         ProfessionalUser newUser = new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),
                 removeEmptySpaces(newUserCreationRequest.getLastName()),
-                RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
+                removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
         return newUser;
 

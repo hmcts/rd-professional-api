@@ -324,11 +324,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public NewUserCreationRequest reInviteUserCreationRequest(String userEmail, List<String> userRoles) {
 
-        String lastName = "someLastName";
-        String firstName = "1Aaron";
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
+                .firstName("firstName")
+                .lastName("lastName")
                 .email(userEmail)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
