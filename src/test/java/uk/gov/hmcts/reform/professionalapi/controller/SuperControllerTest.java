@@ -255,7 +255,7 @@ public class SuperControllerTest {
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
-
+  
     @Test
     public void testReInviteUserToOrganisation() throws JsonProcessingException {
 
@@ -338,5 +338,4 @@ public class SuperControllerTest {
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
-
 }

@@ -113,7 +113,6 @@ public abstract class SuperController {
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
 
-
     private static final String SRA_REGULATED_FALSE = "false";
 
 
@@ -294,6 +293,21 @@ public abstract class SuperController {
     }
 
     private ResponseEntity inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String userId, ProfessionalUser professionalUser, List<String> roles) {
+        String orgId = removeEmptySpaces(organisationIdentifier);
+
+        Object responseBody = null;
+        validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
+        final Organisation existingOrganisation = checkOrganisationIsActive(orgId);
+        checkUserAlreadyExist(newUserCreationRequest.getEmail());
+        List<PrdEnum> prdEnumList = prdEnumService.findAllPrdEnums();
+        List<String> roles = newUserCreationRequest.getRoles();
+        validateRoles(roles);
+
+        ProfessionalUser newUser = new ProfessionalUser(
+                removeEmptySpaces(newUserCreationRequest.getFirstName()),
+                removeEmptySpaces(newUserCreationRequest.getLastName()),
+                RefDataUtil.removeAllSpaces(newUserCreationRequest.getEmail()),
+                existingOrganisation);
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
@@ -357,7 +371,6 @@ public abstract class SuperController {
         ResponseEntity responseEntity;
 
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
-
         if (page != null) {
             Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION,"firstName"));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);

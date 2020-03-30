@@ -40,7 +40,7 @@ public class NewUserResponseTest {
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo(userIdentifier);
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
     }
-
+  
     @Test
     public void test_NewUserResponse_with_constructor() {
         newUserResponse = new NewUserResponse(userProfileCreationResponse);

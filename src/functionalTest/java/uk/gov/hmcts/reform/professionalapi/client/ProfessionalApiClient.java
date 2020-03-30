@@ -517,6 +517,37 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
+                .statusCode(expectedStatus.value());
+    }
+
+    public void updateUser(UserCreationRequest userCreationRequest, String role, String userIdentifier) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(userCreationRequest)
+                .put("/refdata/internal/v1/users/" + userIdentifier)
+                .andReturn();
+
+        log.info("Update user response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+    }
+
+    //with Bearer token
+    public void updateOrganisationWithOldBearerToken(String organisationIdentifier) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        Response response = getMultipleAuthHeadersInternalWithOldBearerToken()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
                 .statusCode(OK.value());
     }
 
