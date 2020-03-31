@@ -127,15 +127,4 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes. Please try after some time"), resendInterval);
         }
     }
-
-    // This is to test if EXUI sends resendInvite = false, then normal invite user should work
-    @Test
-    public void add_new_user_to_organisation_with_resend_Invite_false() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        newUserCreationRequest.setResendInvite(false);
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
-    }
 }
