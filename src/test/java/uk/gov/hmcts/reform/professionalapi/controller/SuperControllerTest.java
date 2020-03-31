@@ -343,11 +343,10 @@ public class SuperControllerTest {
     public void testReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", false);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         newUserCreationRequest.setResendInvite(true);
         organisation.setStatus(OrganisationStatus.ACTIVE);
-
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
