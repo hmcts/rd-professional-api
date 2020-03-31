@@ -68,6 +68,15 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 400,
                     message = "An invalid request has been provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR_ACCESS_DENIED
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @PostMapping(
@@ -110,6 +119,11 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation(s) found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
 
@@ -124,7 +138,7 @@ public class OrganisationInternalController extends SuperController {
 
 
     @ApiOperation(
-            value = "Retrieves an Organisation's Payment Accounts by its Super User's Email Address",
+            value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -147,6 +161,11 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Payment Accounts found with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @GetMapping(
@@ -183,6 +202,11 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @PutMapping(
@@ -232,6 +256,11 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @PutMapping(
@@ -276,6 +305,11 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 409,
                     message = "A User already exists with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @PostMapping(

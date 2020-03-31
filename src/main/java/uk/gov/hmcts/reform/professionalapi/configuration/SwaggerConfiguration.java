@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,23 +21,20 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket api() {
-
         return new Docket(DocumentationType.SWAGGER_2)
-            .useDefaultResponseMessages(false)
-            .genericModelSubstitutes(Optional.class)
-            .select()
-            .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
-            .paths(PathSelectors.any())
-            .build()
-           .securitySchemes(apiKeyList());
+                .genericModelSubstitutes(Optional.class)
+                .select()
+                .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
+                .paths(PathSelectors.any())
+                .build()
+                .useDefaultResponseMessages(false)
+                .securitySchemes(apiKeyList());
     }
 
     private List<ApiKey> apiKeyList() {
-        return
-            newArrayList(
-                new ApiKey("Authorization", "Authorization","header"),
+        return newArrayList(
+                new ApiKey("Authorization", "Authorization", "header"),
                 new ApiKey("ServiceAuthorization", "ServiceAuthorization", "header")
-            );
+        );
     }
-
 }

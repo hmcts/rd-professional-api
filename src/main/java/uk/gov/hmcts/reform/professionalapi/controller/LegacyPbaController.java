@@ -62,6 +62,11 @@ public class LegacyPbaController {
             @ApiResponse(
                     code = 404,
                     message = "No Users or Payment Accounts were found with the Email Address provided"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @GetMapping(

@@ -79,6 +79,11 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation or Users found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @GetMapping(
@@ -138,6 +143,11 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No User found with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @GetMapping(
@@ -184,6 +194,15 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No User found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 412,
+                    message = "One or more of the Roles provided is already assigned to the User"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @PutMapping(
@@ -234,6 +253,11 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No User belonging to an Active Organisation was found with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error",
+                    response = String.class
             )
     })
     @GetMapping(
