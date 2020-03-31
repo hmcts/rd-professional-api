@@ -69,8 +69,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(
@@ -112,8 +111,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -151,8 +149,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -197,8 +194,7 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(

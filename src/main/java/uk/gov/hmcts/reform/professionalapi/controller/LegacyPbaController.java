@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FORBIDDEN_ERROR_ACCESS_DENIED;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -60,13 +61,16 @@ public class LegacyPbaController {
                     message = "An invalid Email Address was provided"
             ),
             @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR_ACCESS_DENIED
+            ),
+            @ApiResponse(
                     code = 404,
                     message = "No Users or Payment Accounts were found with the Email Address provided"
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(

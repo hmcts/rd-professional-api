@@ -75,8 +75,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(
@@ -122,8 +121,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
 
@@ -164,8 +162,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -205,8 +202,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PutMapping(
@@ -259,8 +255,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PutMapping(
@@ -308,8 +303,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error",
-                    response = String.class
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(
