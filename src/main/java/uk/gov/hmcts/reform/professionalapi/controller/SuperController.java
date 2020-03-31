@@ -114,6 +114,7 @@ public abstract class SuperController {
     private boolean resendInviteEnabled;
 
     private static final String SRA_REGULATED_FALSE = "false";
+    private static final String IDAM_ERROR_MESSAGE = "Idam register user failed with status code : %s";
 
 
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
@@ -235,7 +236,7 @@ public abstract class SuperController {
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
-                log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+                log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
@@ -304,7 +305,7 @@ public abstract class SuperController {
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
-            log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+            log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
@@ -324,7 +325,7 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error("Idam register user failed with status code : " + responseEntity.getStatusCode());
+            log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
@@ -338,12 +339,11 @@ public abstract class SuperController {
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         final Organisation existingOrganisation = checkOrganisationIsActive(removeEmptySpaces(organisationIdentifier));
         validateRoles(roles);
-        ProfessionalUser newUser = new ProfessionalUser(
+        return new ProfessionalUser(
                 removeEmptySpaces(newUserCreationRequest.getFirstName()),
                 removeEmptySpaces(newUserCreationRequest.getLastName()),
                 removeAllSpaces(newUserCreationRequest.getEmail()),
                 existingOrganisation);
-        return newUser;
 
     }
 

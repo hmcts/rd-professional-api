@@ -338,4 +338,39 @@ public class SuperControllerTest {
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
+
+    @Test
+    public void testReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", false);
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        String userId = UUID.randomUUID().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
+    }
 }
