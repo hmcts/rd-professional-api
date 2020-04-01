@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -46,6 +45,8 @@ public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            response = ProfessionalUsersResponse.class,
+            responseContainer = "list",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -59,8 +60,7 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "List of Professional Users and their details",
-                    response = ProfessionalUsersEntityResponse.class
+                    message = "List of Professional Users and their details"
             ),
             @ApiResponse(
                     code = 400,
