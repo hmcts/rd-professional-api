@@ -8,9 +8,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
@@ -27,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -40,7 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
-
     @ApiOperation(
             value = "Creates an Organisation",
             authorizations = {
@@ -50,14 +54,27 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "A representation of the created organisation",
+                    message = "The Organisation Identifier of the created Organisation",
                     response = OrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request has been provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
@@ -67,7 +84,7 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves organisation details based on id",
+            value = "Retrieves Organisation details of the requesting User",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -76,12 +93,12 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "Details of one organisation",
+                    message = "Details of an Organisation",
                     response = OrganisationsDetailResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Invalid  id provided for an organisation"
+                    message = "An invalid ID was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -89,19 +106,23 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Not Found"
+                    message = "No Organisation found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationEntityResponse> retrieveOrganisationUsingOrgIdentifier(
-            @ApiParam(hidden = true)@OrgId  String extOrgIdentifier) {
+            @ApiParam(hidden = true) @OrgId String extOrgIdentifier) {
 
         return retrieveOrganisationOrById(extOrgIdentifier);
     }
 
     @ApiOperation(
-            value = "Retrieves an organisations payment accounts by super user email",
+            value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -110,8 +131,12 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The organisations associated payment accounts",
+                    message = "The Organisation's associated Payment Accounts",
                     response = OrganisationPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid Email Address was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -119,7 +144,11 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Not Found"
+                    message = "No Payment Accounts found with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -127,29 +156,44 @@ public class OrganisationExternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
-    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true)@OrgId  String orgId) {
+    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
     }
 
-
     @ApiOperation(
-        value = "Add an user to an organisation",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        }
+            value = "Add a new User to an Organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
     )
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "User has been added",
-                    response = OrganisationResponse.class
+                    message = "The new User has been added to the Organisation",
+                    response = NewUserResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request was provided"
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden"
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No Organisation found with the given ID to add new User to"
+            ),
+            @ApiResponse(
+                    code = 409,
+                    message = "A User already exists with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @PostMapping(
@@ -157,11 +201,12 @@ public class OrganisationExternalController extends SuperController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("pui-user-manager")
     public ResponseEntity addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
-            @ApiParam(hidden = true)@OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
@@ -177,7 +222,7 @@ public class OrganisationExternalController extends SuperController {
         ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         serviceAndUserDetails.getAuthorities();
 
-        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation,extOrgIdentifier);
+        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(serviceAndUserDetails.getAuthorities(), organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
