@@ -166,7 +166,7 @@ public class ProfessionalExternalUserController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Modify the Roles of a User with the given ID",
+            value = "Modify the Roles or Status of a User with the given ID",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -175,7 +175,7 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "The User's Roles have been modified",
+                    message = "The User's Roles/Status have been modified",
                     response = OrganisationResponse.class
             ),
             @ApiResponse(

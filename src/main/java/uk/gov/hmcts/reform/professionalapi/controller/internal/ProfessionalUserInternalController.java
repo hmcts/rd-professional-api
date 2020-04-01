@@ -139,7 +139,7 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Modify the Roles of a User",
+            value = "Modify the Roles or Status of a User",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -148,7 +148,7 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "The User's Roles have been modified",
+                    message = "The User's Roles/Status have been modified",
                     response = OrganisationResponse.class
             ),
             @ApiResponse(
@@ -162,6 +162,10 @@ public class ProfessionalUserInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation or User found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 412,
+                    message = "One or more of the Roles provided is already assigned to the User"
             ),
             @ApiResponse(
                     code = 500,
