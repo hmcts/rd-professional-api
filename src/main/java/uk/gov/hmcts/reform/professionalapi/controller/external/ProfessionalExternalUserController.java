@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -62,7 +63,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 200,
                     message = "List of Professional Users and their details",
-                    response = ProfessionalUsersResponse.class
+                    response = ProfessionalUsersEntityResponse.class
             ),
             @ApiResponse(
                     code = 400,
