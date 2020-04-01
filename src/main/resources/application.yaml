@@ -23,10 +23,12 @@ spring:
             non_contextual_creation: true
   application:
     name: Professional Reference Data API
+  main:
+    allow-bean-definition-overriding: true
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
-  security.oauth2.client.provider.oidc.issuer-uri: ${OPEN_ID_API_BASE_URI:${https://idam-web-public.aat.platform.hmcts.net/o}
+  security.oauth2.client.provider.oidc.issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
   security.oauth2.registration.oidc.client-id: microservicekey-rd-professional-api
   security.oauth2.registration.oidc.client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 ### database configuration
@@ -79,8 +81,8 @@ idam:
     pbaFromUserAccountMap: false
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
-  api:
-    url: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
+  api.url: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
+
 
 auth.idam.client.baseUrl: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
 
