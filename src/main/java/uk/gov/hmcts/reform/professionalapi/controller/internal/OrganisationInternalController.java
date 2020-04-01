@@ -187,7 +187,7 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The Organisation's associated Payment Accounts",
+                    message = "The Payment Account's have been updated",
                     response = PbaResponse.class
             ),
             @ApiResponse(
