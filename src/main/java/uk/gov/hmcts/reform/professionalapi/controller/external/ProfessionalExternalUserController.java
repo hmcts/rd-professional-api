@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -176,7 +175,7 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 201,
                     message = "The User's Roles/Status have been modified",
-                    response = OrganisationResponse.class
+                    response = ModifyUserRolesResponse.class
             ),
             @ApiResponse(
                     code = 400,
