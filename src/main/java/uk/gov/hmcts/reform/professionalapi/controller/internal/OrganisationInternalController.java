@@ -242,7 +242,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses(value = {
             @ApiResponse(
                     code = 200,
-                    message = "Organisation has been updated"
+                    message = "Organisation has been updated",
+                    response = String.class
             ),
             @ApiResponse(
                     code = 400,

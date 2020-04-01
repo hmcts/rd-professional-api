@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -177,7 +178,7 @@ public class OrganisationExternalController extends SuperController {
             @ApiResponse(
                     code = 201,
                     message = "The new User has been added to the Organisation",
-                    response = OrganisationResponse.class
+                    response = NewUserResponse.class
             ),
             @ApiResponse(
                     code = 400,
