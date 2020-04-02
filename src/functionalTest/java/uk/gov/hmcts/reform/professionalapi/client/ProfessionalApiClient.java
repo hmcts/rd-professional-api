@@ -260,7 +260,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(email == RANDOM_EMAIL ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .resendInvite(true)
