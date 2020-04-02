@@ -25,12 +25,20 @@ spring:
     name: Professional Reference Data API
   main:
     allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
-  security.oauth2.client.provider.oidc.issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
-  security.oauth2.registration.oidc.client-id: microservicekey-rd-professional-api
-  security.oauth2.registration.oidc.client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
+
 ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
@@ -71,7 +79,7 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
-### dependency configuration
+### dependency configuration https://idam-web-public.aat.platform.hmcts.net
 auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:

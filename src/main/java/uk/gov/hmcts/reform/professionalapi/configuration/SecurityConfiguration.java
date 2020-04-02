@@ -122,7 +122,6 @@ public class SecurityConfiguration {
                     .formLogin().disable()
                     .logout().disable()
                     .authorizeRequests()
-                    // To preserve v1EndpointsPathParamSecurityFilter 403 response
                     .antMatchers("/error").permitAll()
                     .anyRequest()
                     .authenticated()
@@ -143,8 +142,9 @@ public class SecurityConfiguration {
             // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
             OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
             OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
-            OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
-
+            // FIXME : enable `withIssuer` once idam migration is done
+            //OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
+            OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
             jwtDecoder.setJwtValidator(validator);
             return jwtDecoder;
         }
