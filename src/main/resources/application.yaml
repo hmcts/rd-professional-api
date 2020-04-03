@@ -89,10 +89,14 @@ idam:
     pbaFromUserAccountMap: false
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
-  api.url: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
+  api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+  client:
+    redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
+    id: rd-professional-api
+    secret: cc5f2a6-9690-11e9-bc42-526af7764f64
 
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-web-public.aat.platform.hmcts.net}
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 oidc.issuer: ${OIDC_ISSUER:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
@@ -118,8 +122,8 @@ exui.role:
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
-ccdUrl: ${CCD_URL:http://ccd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-demo.service.core-compute-demo.internal}
+ccdUrl: ${CCD_URL:http://ccd-user-profile-api-demo.service.core-compute-demo.internal}
 
 feign:
   allow:

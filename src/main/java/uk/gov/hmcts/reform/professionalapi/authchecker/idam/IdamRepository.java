@@ -16,7 +16,7 @@ public class IdamRepository {
         this.idamClient = idamClient;
     }
 
-    @Cacheable(value = "userInfoCache")
+   // @Cacheable(value = "userInfoCache")
     public UserInfo getUserInfo(String jwtToken) {
         return idamClient.getUserInfo("Bearer " + jwtToken);
     }
