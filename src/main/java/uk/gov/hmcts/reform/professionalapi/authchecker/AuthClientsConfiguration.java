@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @Configuration
 @Lazy
-@EnableFeignClients(basePackageClasses = {IdamApi.class, ServiceAuthorisationApi.class})
+//@EnableFeignClients(basePackageClasses = {IdamApi.class, ServiceAuthorisationApi.class})
 public class AuthClientsConfiguration {
 
     @Bean
