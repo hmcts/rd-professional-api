@@ -5,11 +5,7 @@ buildscript {
     dependencies {
         classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.83")
     }
-  //  dependencies {
-   //     classpath ("org.jsonschema2pojo:jsonschema2pojo-gradle-plugin:0.5.1")
-   // }
-
-}
+ }
 
 plugins {
     id 'application'
@@ -31,7 +27,6 @@ apply plugin: 'java'
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'project-report'
 apply plugin: 'idea'
-//apply plugin: 'jsonschema2pojo'
 
 def versions = [
         lombok             : '1.18.4',
@@ -305,10 +300,6 @@ dependencies {
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.7.0'
     compile('org.springframework.boot:spring-boot-starter-cache')
 
-
-
-    // compile "io.github.openfeign:feign-httpclient:10.7.0"
-    // compile('org.springframework.cloud:spring-cloud-starter-openfeign')
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'

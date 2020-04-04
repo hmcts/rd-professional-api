@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker;
+package uk.gov.hmcts.reform.professionalapi.configuration;
 
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

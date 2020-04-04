@@ -27,7 +27,6 @@ import org.apache.http.ssl.SSLContexts;
 public class ServiceTokenParserConfiguration {
 
     @Bean(name = "serviceTokenParserHttpClient")
-    //@ConditionalOnMissingBean(name = "serviceTokenParserHttpClient")
     @ConditionalOnProperty(
             value = "ssl.verification.enable",
             havingValue = "false",

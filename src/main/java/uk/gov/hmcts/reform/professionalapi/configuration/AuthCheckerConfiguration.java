@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker;
+package uk.gov.hmcts.reform.professionalapi.configuration;
 
 import java.util.Collections;
 import java.util.Set;
@@ -11,12 +11,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.CachingSubjectResolver;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer.ServiceRequestAuthorizer;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.CachingSubjectResolver;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
 import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.ServiceResolver;
 import uk.gov.hmcts.reform.professionalapi.authchecker.servicetoken.ServiceTokenParser;
+import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.SubjectResolver;
+
 
 @Lazy
 @Configuration
@@ -25,7 +26,7 @@ public class AuthCheckerConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "serviceResolver")
-    public SubjectResolver<Service> serviceResolver(ServiceTokenParser serviceTokenParser, AuthCheckerProperties properties) {
+    public SubjectResolver<Service> serviceResolver(ServiceTokenParser serviceTokenParser, AuthCheckerServiceCacheConfiguration properties) {
         return new CachingSubjectResolver<>(new ServiceResolver(serviceTokenParser), properties.getService().getTtlInSeconds(), properties.getService().getMaximumSize());
     }
 

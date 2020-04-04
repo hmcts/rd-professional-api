@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker;
+package uk.gov.hmcts.reform.professionalapi.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "auth.checker.cache")
-public class AuthCheckerProperties {
+public class AuthCheckerServiceCacheConfiguration {
 
     @Data
     @AllArgsConstructor

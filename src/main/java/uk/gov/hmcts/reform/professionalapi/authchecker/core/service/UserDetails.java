@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.authchecker.core.service;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 
-import static java.util.stream.Collectors.toList;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class UserDetails extends org.springframework.security.core.userdetails.User {
 
