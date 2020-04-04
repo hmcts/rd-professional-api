@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.authchecker.usertoken;
+package uk.gov.hmcts.reform.professionalapi.authchecker;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
 

@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,13 +26,9 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.authorizer.RequestAuthorizer;
-import uk.gov.hmcts.reform.professionalapi.authchecker.core.resolver.Service;
-import uk.gov.hmcts.reform.professionalapi.authchecker.filter.AuthCheckerServiceOnlyFilter;
-import uk.gov.hmcts.reform.professionalapi.authchecker.usertoken.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.authchecker.JwtGrantedAuthoritiesConverter;
 
 
 @ConfigurationProperties(prefix = "security")
@@ -42,40 +37,10 @@ import uk.gov.hmcts.reform.professionalapi.authchecker.usertoken.JwtGrantedAutho
 @SuppressWarnings("unchecked")
 public class SecurityConfiguration {
 
-    @Configuration
-    @Order(1)
-    public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
-
-        public PostApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
-
-                                                   AuthenticationManager authenticationManager) {
-
-            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
-
-            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
-
-
-        }
-
-        protected void configure(HttpSecurity http) throws Exception {
-
-            http.requestMatchers()
-                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
-                    .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
-                    .and()
-                    .addFilter(authCheckerServiceOnlyFilter)
-                    .csrf().disable()
-                    .authorizeRequests()
-                    .anyRequest().authenticated();
-        }
-    }
-
     @ConfigurationProperties(prefix = "security")
     @Configuration
     @Order(2)
-    public static class RestAllApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public static class RestApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
 
         @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
@@ -104,7 +69,7 @@ public class SecurityConfiguration {
         }
 
          @Inject
-         public RestAllApiSecurityConfigurationAdapter(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
+         public RestApiSecurityConfigurationAdapter(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
                                                        final ServiceAuthFilter serviceAuthFilter
                                                       ) {
 
@@ -124,6 +89,8 @@ public class SecurityConfiguration {
                     .logout().disable()
                     .authorizeRequests()
                     .antMatchers("/error").permitAll()
+                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations").permitAll()
+                    .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
                     .anyRequest()
                     .authenticated()
                     .and()
@@ -133,6 +100,8 @@ public class SecurityConfiguration {
                     .and()
                     .and()
                     .oauth2Client();
+
+
 
         }
 
