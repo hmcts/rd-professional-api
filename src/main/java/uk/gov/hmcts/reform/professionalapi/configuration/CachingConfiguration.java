@@ -29,7 +29,7 @@ public class CachingConfiguration {
 
     private void configCaches(Config config) {
         final int definitionCacheMaxIdle = applicationParams.getDefinitionCacheMaxIdleSecs();
-        config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTTLSecs()));
+        config.addMapConfig(newMapConfigWithMaxIdle("userInfoCache", applicationParams.getUserCacheTtlSecs()));
     }
 
     private MapConfig newMapConfigWithMaxIdle(final String name, final Integer maxIdle) {

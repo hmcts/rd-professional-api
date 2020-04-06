@@ -20,14 +20,14 @@ public class ApplicationParams {
     private EvictionPolicy definitionCacheEvictionPolicy;
 
     @Value("${user.cache.ttl.secs}")
-    private Integer userCacheTTLSecs;
+    private Integer userCacheTtlSecs;
 
     public int getDefinitionCacheMaxIdleSecs() {
         return definitionCacheMaxIdleSecs;
     }
 
-    public Integer getUserCacheTTLSecs() {
-        return userCacheTTLSecs;
+    public Integer getUserCacheTtlSecs() {
+        return userCacheTtlSecs;
     }
 
     public int getDefinitionCacheMaxSize() {

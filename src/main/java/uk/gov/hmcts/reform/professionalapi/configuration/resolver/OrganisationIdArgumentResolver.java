@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-//import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.authchecker.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
@@ -29,6 +29,9 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
     @Autowired
     ProfessionalUserRepository professionalUserRepository;
+
+    @Autowired
+    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -49,11 +52,11 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
         String orgId = null;
         ProfessionalUser professionalUser;
         Organisation organisation;
-       /* ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
 
-        if (null != serviceAndUserDetails && StringUtils.isNotEmpty(serviceAndUserDetails.getUsername())) {
-            userId = serviceAndUserDetails.getUsername();
+        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+
+        if (null != userInfo && StringUtils.isNotEmpty(userInfo.getUid())) {
+            userId = userInfo.getUid();
             professionalUser = professionalUserRepository.findByUserIdentifier(userId.trim());
             if (null != professionalUser && null != professionalUser.getOrganisation()) {
 
@@ -66,12 +69,11 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
         }
 
-        if (null == serviceAndUserDetails || null == serviceAndUserDetails.getAuthorities()
-                || StringUtils.isEmpty(orgId)) {
+        if (null == userInfo || StringUtils.isEmpty(orgId)) {
 
-            log.error(" ServiceAndUserDetails or OrganisationIdentifier is Null::");
+            log.error(" userInfo or OrganisationIdentifier is Null::");
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
-        }*/
+        }
         return orgId;
     }
 }

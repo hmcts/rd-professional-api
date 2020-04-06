@@ -16,7 +16,6 @@ import feign.Response;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,11 +26,8 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-//import uk.gov.hmcts.reform.auth.checker.spring.serviceandus/er.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.authchecker.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -57,6 +53,8 @@ public class ProfessionalExternalUserControllerTest {
     private ResponseEntity<?> responseEntity;
     private ProfessionalUser professionalUser;
     private UserProfileFeignClient userProfileFeignClient;
+    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    private UserInfo userInfoMock;
 
 
     @InjectMocks
@@ -73,6 +71,8 @@ public class ProfessionalExternalUserControllerTest {
         organisationCreationRequestValidator = mock(OrganisationCreationRequestValidator.class);
         responseEntity = mock(ResponseEntity.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
+        userInfoMock = mock(UserInfo.class);
 
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
 
@@ -89,18 +89,11 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        Authentication authentication = mock(Authentication.class);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
-        authorities.add(grantedAuthority);
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_USER_MANAGER);
 
-      //  ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-      //  when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-     //   when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
-        SecurityContextHolder.setContext(securityContext);
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
@@ -120,7 +113,7 @@ public class ProfessionalExternalUserControllerTest {
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
-        //verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "");
+        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "");
     }
 
     @Test
@@ -133,17 +126,11 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        Authentication authentication = mock(Authentication.class);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
-        authorities.add(grantedAuthority);
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_CASE_MANAGER);
 
-        //ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);//when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-       // when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
-        SecurityContextHolder.setContext(securityContext);
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
@@ -175,17 +162,10 @@ public class ProfessionalExternalUserControllerTest {
         organisation.setUsers(users);
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        Authentication authentication = mock(Authentication.class);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
-        authorities.add(grantedAuthority);
-        //ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-       // when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-       // when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
-        SecurityContextHolder.setContext(securityContext);
+        UserInfo userInfoMock = mock(UserInfo.class);
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_USER_MANAGER);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
 
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
