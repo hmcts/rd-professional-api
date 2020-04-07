@@ -83,18 +83,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected UserProfileFeignClient userProfileFeignClient;
 
     @Rule
-    public WireMockRule s2sService = new WireMockRule(8990);
+    public  WireMockRule s2sService = new WireMockRule(8990);
 
     @Rule
-    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+    public   WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
             .extensions(new ExternalTransformer()));
 
     @Rule
-    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    public  WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
     @Rule
-    public WireMockRule ccdService = new WireMockRule(8092);
+    public  WireMockRule ccdService = new WireMockRule(8092);
 
 
     @Value("${exui.role.hmcts-admin}")
@@ -132,7 +132,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("it")));
+                        .withBody("rd_professional_api")));
 
         s2sService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
@@ -190,6 +190,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "}")
                         .withTransformers("external_user-token-response")));
 
+
+
+
         sidamService.stubFor(get(urlEqualTo("/details"))
                 .withHeader("Authorization", containing("pui-organisation-manager"))
                 .willReturn(aResponse()
@@ -223,6 +226,122 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  ]"
                                 +  "}")
                         .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("pui-organisation-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-organisation-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("pui-user-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-user-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("pui-case-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-user-manager\","
+                                +  "  \"pui-case-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("pui-finance-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-user-manager\","
+                                +  "  \"pui-finance-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("pui-organisation-manager"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"pui-user-manager\","
+                                +  "  \"pui-organisation-manager\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+                .withHeader("Authorization", containing("prd-admin"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                +  "  \"uid\": \"%s\","
+                                +  "  \"name\": \"Super\","
+                                +  "  \"family_name\": \"User\","
+                                +  "  \"given_name\": \"User\","
+                                +  "  \"sub\": \"super.user@hmcts.net\","
+                                +  "  \"accountStatus\": \"active\","
+                                +  "  \"roles\": ["
+                                +  "  \"prd-admin\""
+                                +  "  ]"
+                                +  "}")
+                        .withTransformers("external_user-token-response")));
+
+
+
+
+
 
     }
 

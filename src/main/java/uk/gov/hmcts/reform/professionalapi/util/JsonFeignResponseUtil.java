@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class JsonFeignResponseUtil {
 
     public static Optional decode(Response response, Class clazz) {
         try {
-            return Optional.of(json.readValue(response.body().asReader(), clazz));
+            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()), clazz));
         } catch (IOException e) {
             return Optional.empty();
         }

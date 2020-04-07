@@ -6,6 +6,8 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
+  main:
+    allow-bean-definition-overriding: true
 
   datasource:
     driverClassName: org.h2.Driver
@@ -13,10 +15,13 @@ spring:
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
 
-security:
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
+idam:
+  s2s-authorised:
+    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
 
-  authorisedServices:
-    - "it"
+
+
 ## IDAM feign connection
 auth.idam.client.baseUrl: ${IDAM_URL:http://127.0.0.1:5000}
 
