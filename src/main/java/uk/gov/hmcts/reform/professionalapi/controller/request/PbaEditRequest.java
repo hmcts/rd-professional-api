@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ import lombok.Setter;
 @Builder(builderMethodName = "anPbaEditRequest")
 public class PbaEditRequest {
 
+    @JsonIgnore
     private Set<String> paymentAccounts;
 
     @JsonCreator
