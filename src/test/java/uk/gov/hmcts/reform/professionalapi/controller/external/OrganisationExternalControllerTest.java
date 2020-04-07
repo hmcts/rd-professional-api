@@ -137,10 +137,11 @@ public class OrganisationExternalControllerTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions);
+
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions,false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
-        userProfileCreationRequest = new UserProfileCreationRequest("some@email.com", "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles);
+        userProfileCreationRequest = new UserProfileCreationRequest("some@email.com", "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles, false);
         response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class)).request(mock(Request.class)).build();
 
         MockitoAnnotations.initMocks(this);

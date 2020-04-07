@@ -303,7 +303,11 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 409,
-                    message = "A User already exists with the given Email Address"
+                    message = "A User already exists with the given Email Address or is already active in SIDAM during resend invite"
+            ),
+            @ApiResponse(
+                    code = 429,
+                    message = "Too many requests for resend invite"
             ),
             @ApiResponse(
                     code = 500,
