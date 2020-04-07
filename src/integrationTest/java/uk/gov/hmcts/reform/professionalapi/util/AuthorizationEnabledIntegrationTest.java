@@ -112,6 +112,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${resendInterval}")
+    protected String resendInterval;
+
+    @Value("${syncInterval}")
+    protected String syncInterval;
+
     protected static final String ACTIVE = "ACTIVE";
 
     @Before
@@ -294,6 +300,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 
+    public String createAndActivateOrganisation() {
+        String orgIdentifier = createOrganisationRequest();
+        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE);
+        return orgIdentifier;
+    }
+
     public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
 
         String lastName = "someLastName";
@@ -304,6 +316,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .email(userEmail)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+
+    }
+
+    public NewUserCreationRequest reInviteUserCreationRequest(String userEmail, List<String> userRoles) {
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .resendInvite(true)
                 .build();
 
         return userCreationRequest;
@@ -470,6 +497,47 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         );
 
 
+    }
+
+    public void reinviteUserMock(HttpStatus status) {
+        String body = null;
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamRegistrationResponse\":\"201\""
+                    + "}";
+        } else if (status == HttpStatus.BAD_REQUEST) {
+            body = "{"
+                    + "  \"errorMessage\": \"3 : There is a problem with your request. Please check and try again\","
+                    + "  \"errorDescription\": \"User is not in PENDING state\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.NOT_FOUND) {
+            body = "{"
+                    + "  \"errorMessage\": \"4 : Resource not found\","
+                    + "  \"errorDescription\": \"could not find user profile\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
+            body = "{"
+                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after some time\","
+                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval) + "\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.CONFLICT) {
+            body = "{"
+                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
+                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval) + "\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        }
+
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(status.value())
+                ));
     }
 
     public void updateUserProfileMock(HttpStatus status) {

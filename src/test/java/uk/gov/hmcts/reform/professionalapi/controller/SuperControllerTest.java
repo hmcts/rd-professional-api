@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
@@ -25,7 +26,10 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -121,7 +125,7 @@ public class SuperControllerTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions);
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions, false);
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
 
@@ -250,5 +254,122 @@ public class SuperControllerTest {
         assertThat(existingOrg).isEqualTo(organisation);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+    }
+  
+    @Test
+    public void testReInviteUserToOrganisation() throws JsonProcessingException {
+
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        String userId = UUID.randomUUID().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
+    }
+
+
+    @Test
+    public void testReInviteUserToOrganisation_when_up_fails() throws JsonProcessingException {
+
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
+
+        ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription", "23:13");
+        String userId = UUID.randomUUID().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(errorDetails);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
+
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getBody()).isExactlyInstanceOf(ErrorResponse.class);
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
+    }
+
+    @Test
+    public void testReInviteUserToOrganisation_when_user_does_not_exists() throws JsonProcessingException {
+
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(null);
+
+        final Throwable raisedException = catchThrowable(() -> superController.inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+
+        assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
+    }
+
+    @Test
+    public void testReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", false);
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
+        when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        String userId = UUID.randomUUID().toString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 }

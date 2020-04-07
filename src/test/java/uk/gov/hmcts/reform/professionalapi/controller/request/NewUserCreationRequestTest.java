@@ -19,7 +19,7 @@ public class NewUserCreationRequestTest {
         jurisdictions.add(jurisdiction);
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, jurisdictions);
+                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, jurisdictions, false);
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
