@@ -3043,11 +3043,4 @@
         <sha1>e5778e3273f8201bf9e0ff65fb8118f37b84beba</sha1>
         <cve>CVE-2019-17221</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: flexmark-ext-gitlab-0.34.30.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark\-ext\-gitlab@.*$</packageUrl>
-        <cpe>cpe:/a:gitlab:gitlab</cpe>
-    </suppress>
 </suppressions>
