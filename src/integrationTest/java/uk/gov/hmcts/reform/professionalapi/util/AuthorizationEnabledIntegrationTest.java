@@ -33,17 +33,15 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -79,23 +77,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
-    @Autowired
-    protected UserProfileFeignClient userProfileFeignClient;
+    @ClassRule
+    public static WireMockRule s2sService = new WireMockRule(8990);
 
-    @Rule
-    public WireMockRule s2sService = new WireMockRule(8990);
-
-    @Rule
-    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+    @ClassRule
+    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
             .extensions(new ExternalTransformer()));
 
-    @Rule
-    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
-    @Rule
-    public WireMockRule ccdService = new WireMockRule(8092);
-
+    @ClassRule
+    public static WireMockRule ccdService = new WireMockRule(8092);
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
