@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -149,6 +150,22 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
 
             assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes. Please try after some time"), resendInterval);
+        }
+    }
+
+    // should not re invite when user does not exists in organisation
+    @Test
+    public void should_return_403_when_reinvited_user_not_exists_in_same_organisation() {
+        if (resendInviteEnabled) {
+
+            OrganisationCreationRequest organisationCreationRequest1 = someMinimalOrganisationRequest().build();
+            createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest1);
+            String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin, someMinimalOrganisationRequest().build());
+
+            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createReInviteUserRequest(organisationCreationRequest1.getSuperUser().getEmail());
+            newUserCreationRequest.setJurisdictions(new ArrayList<>());
+            Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.FORBIDDEN);
+            assertThat((String) newUserResponse.get("errorDescription")).contains("User does not belong to same organisation");
         }
     }
 }
