@@ -40,7 +40,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -79,11 +78,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
 
-    @Autowired
-    protected UserProfileFeignClient userProfileFeignClient;
-
     @ClassRule
-    public  static WireMockRule s2sService = new WireMockRule(8990);
+    public static WireMockRule s2sService = new WireMockRule(8990);
+
 
 
     //@ClassRule
@@ -95,7 +92,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .extensions(new MultipleUsersResponseTransformer()));
 
     @ClassRule
-    public  static WireMockRule ccdService = new WireMockRule(8092);
+    public static WireMockRule ccdService = new WireMockRule(8092);
 
 
     @Value("${exui.role.hmcts-admin}")
