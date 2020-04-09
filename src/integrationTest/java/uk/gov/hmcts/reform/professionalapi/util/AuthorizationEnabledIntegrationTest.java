@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -34,8 +35,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -51,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
+@AutoConfigureWireMock(port = 5000)
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -83,8 +85,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public  static WireMockRule s2sService = new WireMockRule(8990);
 
-    @ClassRule
-    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+
+    //@ClassRule
+    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000).withRootDirectory("src/test/resources/mappings")
             .extensions(new ExternalTransformer()));
 
     @ClassRule
@@ -118,30 +121,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected static final String ACTIVE = "ACTIVE";
 
-    @Value("classpath:_idam_default_details.json")
-    protected Resource resourceJwksFile;
-
-    protected String jwksResponse = "";
-
-
-
-    /* @Before
-    public void setUpClient() {
-
-        try {
-            jwksResponse = FileUtils.readFileToString(resourceJwksFile.getFile());
-        } catch (IOException e) {
-            // ignore this
-        }
-
-        sidamService.stubFor(get(urlEqualTo("/o/.well-known/openid-configuration"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(jwksResponse)));
-
-    }*/
-
     @Before
     public void setupIdamStubs() throws Exception {
 
@@ -162,9 +141,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                 .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6Ik")));*/
+                        .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6Ik")));
 
-        /*         "{"
+
+         "{"
                             + " \"request_parameter_supported=true \","
                             + " \"claims_parameter_supported=false\","
                             + " \"scopes_supported= \"["
@@ -311,7 +291,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                             + "] "
                             +  "}")));*/
 
-        /*  sidamService.stubFor(get(urlEqualTo("/details"))
+
+        sidamService.stubFor(get(urlEqualTo("/details"))
                 .withHeader("Authorization", containing("pui-finance-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -396,9 +377,10 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"pui-user-manager\""
                                 +  "  ]"
                                 +  "}")
-                        .withTransformers("external_user-token-response")));*/
+                        .withTransformers("external_user-token-response")));
 
-        /*sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+
+        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
                 .withHeader("Authorization", containing("pui-organisation-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -508,7 +490,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  ]"
                                 +  "}")
                         .withTransformers("external_user-token-response")));
-    */
+
+
 
 
 
