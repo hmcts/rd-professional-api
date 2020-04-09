@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,3 +110,4 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
     }
 
 }
+*/

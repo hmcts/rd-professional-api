@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
@@ -139,3 +140,4 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     }
 }
+*/

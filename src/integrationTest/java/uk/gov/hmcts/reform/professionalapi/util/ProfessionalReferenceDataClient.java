@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -341,3 +342,4 @@ public class ProfessionalReferenceDataClient {
         return  getResponse(responseEntity);
     }
 }
+*/

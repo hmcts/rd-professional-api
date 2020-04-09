@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -134,7 +135,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")));
 
 
-        /*sidamService.stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
+        */
+/*sidamService.stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
                 .willReturn(aResponse()
                 .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -286,7 +288,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                             + " \" PS256\","
                             + " \" PS512\","
                             + "] "
-                            +  "}")));*/
+                            +  "}")));*//*
+
 
 
         sidamService.stubFor(get(urlEqualTo("/details"))
@@ -920,3 +923,4 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 }
 
+*/

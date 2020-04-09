@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -132,4 +133,4 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
         }
     }
-}
+}*/

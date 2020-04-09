@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -409,4 +410,4 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse.get("http_status")).isEqualTo("409");
         assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
     }
-}
+}*/

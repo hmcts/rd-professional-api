@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -229,3 +230,4 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
     }
 }
+*/
