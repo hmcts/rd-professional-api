@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -287,7 +288,7 @@ public abstract class SuperController {
         List<String> roles = newUserCreationRequest.getRoles();
         ProfessionalUser professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest, removeEmptySpaces(organisationIdentifier), roles);
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
-            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles);
+            return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
         } else {
             return inviteNewUserToOrganisation(newUserCreationRequest, userId, professionalUser, roles);
         }
@@ -314,11 +315,14 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    private ResponseEntity reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles) {
+    private ResponseEntity reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles, String organisationIdentifier) {
 
         Object responseBody = null;
-        if (professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail()) == null) {
+        ProfessionalUser existingUser = professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
+        if (existingUser == null) {
             throw new ResourceNotFoundException("User does not exist");
+        } else if (!existingUser.getOrganisation().getOrganisationIdentifier().equalsIgnoreCase(organisationIdentifier)) {
+            throw new AccessDeniedException("User does not belong to same organisation");
         }
 
         ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);

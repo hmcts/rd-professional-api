@@ -26,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -278,12 +279,12 @@ public class SuperControllerTest {
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
@@ -308,19 +309,19 @@ public class SuperControllerTest {
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getBody()).isExactlyInstanceOf(ErrorResponse.class);
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 
     @Test
-    public void testReInviteUserToOrganisation_when_user_does_not_exists() throws JsonProcessingException {
+    public void testReInviteUserToOrganisation_when_user_does_not_exists() {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -371,5 +372,25 @@ public class SuperControllerTest {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
+    }
+
+    @Test
+    public void testReInviteUserToOrganisation_when_user_does_not_exists_in_organisation() {
+
+        ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
+        newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
+        newUserCreationRequest.setResendInvite(true);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
+
+        final Throwable raisedException = catchThrowable(() -> superController.inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+
+        assertThat(raisedException).isExactlyInstanceOf(AccessDeniedException.class);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 }
