@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 

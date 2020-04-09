@@ -22,6 +22,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@Ignore
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {

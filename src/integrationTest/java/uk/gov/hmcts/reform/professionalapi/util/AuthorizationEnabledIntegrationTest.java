@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -30,20 +29,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -77,24 +75,24 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     protected UserAttributeRepository userAttributeRepository;
 
-    protected ProfessionalReferenceDataClient professionalReferenceDataClient;
+    protected ProfessionalReferenceDataClient professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
 
     @Autowired
     protected UserProfileFeignClient userProfileFeignClient;
 
-    @Rule
-    public  WireMockRule s2sService = new WireMockRule(8990);
+    @ClassRule
+    public  static WireMockRule s2sService = new WireMockRule(8990);
 
-    @Rule
-    public   WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+    @ClassRule
+    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
             .extensions(new ExternalTransformer()));
 
-    @Rule
-    public  WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
-    @Rule
-    public  WireMockRule ccdService = new WireMockRule(8092);
+    @ClassRule
+    public  static WireMockRule ccdService = new WireMockRule(8092);
 
 
     @Value("${exui.role.hmcts-admin}")
@@ -120,10 +118,29 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected static final String ACTIVE = "ACTIVE";
 
-    @Before
+    @Value("classpath:_idam_default_details.json")
+    protected Resource resourceJwksFile;
+
+    protected String jwksResponse = "";
+
+
+
+    /* @Before
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
-    }
+
+        try {
+            jwksResponse = FileUtils.readFileToString(resourceJwksFile.getFile());
+        } catch (IOException e) {
+            // ignore this
+        }
+
+        sidamService.stubFor(get(urlEqualTo("/o/.well-known/openid-configuration"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(jwksResponse)));
+
+    }*/
 
     @Before
     public void setupIdamStubs() throws Exception {
@@ -138,9 +155,163 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
+                        .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")));
 
-        sidamService.stubFor(get(urlEqualTo("/details"))
+
+        /*sidamService.stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
+                .willReturn(aResponse()
+                .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6Ik")));*/
+
+        /*         "{"
+                            + " \"request_parameter_supported=true \","
+                            + " \"claims_parameter_supported=false\","
+                            + " \"scopes_supported= \"["
+                            + " \"acr\","
+                            + " \"openid\","
+                            + " \"profile\","
+                            + " \"roles\","
+                            + " \"authorities\","
+                            + " \"email\""
+                            +  "],"
+                            +  " \"issuer= https" + " \":"
+                            +  " \"id_token_encryption_enc_values_supported= \"["
+                            +  " \"A256GCM\","
+                            +  " \"A192GCM\","
+                            +  " \"A128GCM\","
+                            +  " \"A128CBC-HS256\","
+                            +  " \"A192CBC-HS384\","
+                            +  " \"A256CBC-HS512\","
+                            +  " ],"
+                            +  " \"acr_values_supported= \"["
+
+                            + "],"
+                            +   " \"authorization_endpoint=https" + " \":"
+                            +  " \"request_object_encryption_enc_values_supported= \"["
+                            +  " \"A256GCM\","
+                            +  " \"A192GCM\","
+                            +  " \"A128GCM\","
+                            +  " \"A128CBC-HS256\","
+                            +  " \"A192CBC-HS384\","
+                            +  " \"A256CBC-HS512\","
+                            + " ],"
+
+                            + " \"rcs_request_encryption_alg_values_supported= \"["
+                            + " \"RSA-OAEP\","
+                            + " \"RSA-OAEP-256\","
+                            + " \"A128KW\","
+                            + " \"RSA1_5\","
+                            + " \"dir\""
+                            + " ],"
+                            + " \"claims_supported= \"["
+
+                            + " ],"
+                            + " \"rcs_request_signing_alg_values_supported= \"["
+                            + " \" PS384\","
+                            + " \" RS384\","
+                            + " \" HS256\","
+                            + " \" HS512\","
+                            + " \" PS384\","
+                            + " \" ES384\" "
+                            +  " ],"
+                            + " \"token_endpoint_auth_methods_supported= \"["
+                            + " \"client_secret_post\","
+                            + " \"private_key_jwt\","
+                            + " \"self_signed_tls_client_auth\","
+                            + " \"tls_client_auth\","
+                            + " \"none\","
+                            + " \"client_secret_basic\""
+                            + " ],"
+                            + " \"token_endpoint=https\":,"
+                            + " \"response_types_supported=\"["
+                            + " \"code token id_token\","
+                            + " \"code\","
+                            + " \"code id_token\","
+                            + " \"device_code\","
+                            + " \"id_token\","
+                            + " \"code token\","
+                            + " \"token\","
+                            + " \"token id_token\""
+                            + " ],"
+                            + " \"request_uri_parameter_supported= true\","
+                            + " \"rcs_response_encryption_enc_values_supported= \"["
+                            + " \" A256GCM\","
+                            + " \" A192GCM\","
+                            + " \" A128GCM\","
+                            + " \" A128CBC-HS256\","
+                            + " \" A192CBC-HS384\","
+                            + " \" A256CBC-HS512\" "
+                            + "],"
+                            + " \"end_session_endpoint=https\":,"
+                            + " \"rcs_request_encryption_enc_values_supported= \"["
+                            + " \" A256GCM\","
+                            + " \" A192GCM\","
+                            + " \" A128GCM\","
+                            + " \" A128CBC-HS256\","
+                            + " \" A192CBC-HS384\","
+                            + " \" A256CBC-HS512\" "
+                            + "],"
+                            + " \"version=3.0\","
+                            + " \"rcs_response_encryption_alg_values_supported= \"["
+                            + " \"RSA-OAEP \","
+                            + " \"A128KW\","
+                            + " \"RSA-OAEP-256\","
+                            + " \" A256KW\","
+                            + " \"dir\","
+                            + " \" A192KW\" "
+                            + "],"
+                            + " \"userinfo_endpoint=https\":,"
+                            + " \"id_token_encryption_alg_values_supported= \"["
+                            + " \"RSA-OAEP\","
+                            + " \"RSA-OAEP-256\","
+                            + " \"A128KW\","
+                            + " \"RSA-OAEP-256\","
+                            + " \" A256KW\","
+                            + " \"dir\","
+                            + " \" A192KW\" "
+                            + "], "
+                            + " \"jwks_uri=https \":,"
+                            + " \"subject_types_supported= \"["
+                            + " \"public\" "
+                            + "],"
+                            + " \"id_token_signing_alg_values_supported= \"["
+                            + " \" ES384\","
+                            + " \" HS256\","
+                            + " \" HS512\","
+                            + " \" ES256\","
+                            + " \" HS384\","
+                            + " \" ES512\" "
+                            + "], "
+                            + " \" ES384\","
+                            + " \" HS256\","
+                            + " \" HS512\","
+                            + " \" ES256\","
+                            + " \" HS384\","
+                            + " \" ES512\" "
+                            + " \"request_object_encryption_alg_values_supported= \"["
+                            + " \"RSA-OAEP\","
+                            + " \"RSA-OAEP-256\","
+                            + " \"A128KW\","
+                            + " \"RSA-OAEP-256\","
+                            + " \" A256KW\","
+                            + " \"dir\","
+                            + " \" A192KW\" "
+                            + "], "
+                            + " \"rcs_response_signing_alg_values_supported= \"["
+                            + " \" PS384\","
+                            + " \" ES384\","
+                            + " \" HS512\","
+                            + " \" HS256\","
+                            + " \" HS384\","
+                            + " \" RS256\" "
+                            + " \" HS384\","
+                            + " \" PS256\","
+                            + " \" PS512\","
+                            + "] "
+                            +  "}")));*/
+
+        /*  sidamService.stubFor(get(urlEqualTo("/details"))
                 .withHeader("Authorization", containing("pui-finance-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -225,9 +396,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"pui-user-manager\""
                                 +  "  ]"
                                 +  "}")
-                        .withTransformers("external_user-token-response")));
+                        .withTransformers("external_user-token-response")));*/
 
-        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+        /*sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
                 .withHeader("Authorization", containing("pui-organisation-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -337,7 +508,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  ]"
                                 +  "}")
                         .withTransformers("external_user-token-response")));
-
+    */
 
 
 

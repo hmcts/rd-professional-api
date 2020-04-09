@@ -18,6 +18,8 @@ locals {
   s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
   idam_url = "https://idam-api.${local.local_env}.platform.hmcts.net"
   USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
+  OIDC_ISSUER_URL = "https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts"
+  OPEN_ID_API_BASE_URI = "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -44,6 +46,17 @@ data "azurerm_key_vault_secret" "idam_url" {
   name = "idam-url"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
+
+data "azurerm_key_vault_secret" "OIDC_ISSUER_URL" {
+  name = "OIDC-ISSUER-URL"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "OPEN_ID_API_BASE_URI" {
+  name = "OPEN-ID-API-BASE-URI"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 
 data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
  name = "USER-PROFILE-URL"
@@ -159,6 +172,8 @@ module "rd_professional_api" {
     IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
     USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
     CCD_URL = "${data.azurerm_key_vault_secret.CCD_URL.value}"
+    OIDC_ISSUER_URL = "${data.azurerm_key_vault_secret.OIDC_ISSUER_URL.value}"
+    OPEN_ID_API_BASE_URI = "${data.azurerm_key_vault_secret.OPEN_ID_API_BASE_URI.value}"
 
     OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
     OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"

@@ -232,9 +232,9 @@ public class ProfessionalReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
         String bearerToken = sidamTokenMap.get(role);
         if (userId != null) {
-            bearerToken = userId + " " + bearerToken;
+            bearerToken = "Bearer " + userId + " " + bearerToken;
         } else {
-            bearerToken = "1f5f2769-90ca-4216-9987-3fe87f0e7641" + " " + bearerToken;
+            bearerToken = "Bearer " + "1f5f2769-90ca-4216-9987-3fe87f0e7641" + " " + bearerToken;
         }
 
         headers.add("Authorization", bearerToken);

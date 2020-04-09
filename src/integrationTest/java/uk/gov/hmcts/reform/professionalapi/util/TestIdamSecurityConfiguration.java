@@ -1,75 +1,81 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import org.junit.ClassRule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+import org.springframework.web.context.ContextCleanupListener;
 
 
-@TestConfiguration
-public class TestIdamSecurityConfiguration  {
 
+@Configuration
+public class TestIdamSecurityConfiguration extends ContextCleanupListener {
 
-    private final ClientRegistration clientRegistration;
+    @Value("classpath:_idam_default_details.json")
+    protected Resource resourceJwksFile;
 
-    public TestIdamSecurityConfiguration() {
-        this.clientRegistration = clientRegistration().build();
-    }
+    protected String jwksResponse = "";
 
-    @MockBean
-    ServiceAuthFilter serviceAuthFilter;
+    @ClassRule
+    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000));
 
-    @MockBean
-    private JwtDecoder jwtDecoder;
 
     @Bean
-    ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(clientRegistration);
+    // Overriding as OAuth2ClientRegistrationRepositoryConfiguration loading before wire-mock mappings for /o/.well-known/openid-configuration
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        setUpClient();
+        return new InMemoryClientRegistrationRepository(clientRegistration());
     }
 
-    private ClientRegistration.Builder clientRegistration() {
-
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("end_session_endpoint", "https://jhipster.org/logout");
-
+    private ClientRegistration clientRegistration() {
         return ClientRegistration.withRegistrationId("oidc")
-                    .redirectUriTemplate("{baseUrl}/{action}/oauth2/code/{registrationId}")
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .scope("read:user")
-                    .authorizationUri("https://jhipster.org/login/oauth/authorize")
-                    .tokenUri("https://jhipster.org/login/oauth/access_token")
-                    .jwkSetUri("https://jhipster.org/oauth/jwk")
-                    .userInfoUri("https://api.jhipster.org/user")
-                    .providerConfigurationMetadata(metadata)
-                    .userNameAttributeName("id")
-                    .clientName("Client Name")
-                    .clientId("client-id")
-                    .clientSecret("client-secret");
+                .redirectUriTemplate("{baseUrl}/{action}/oauth2/code/{registrationId}")
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .scope("read:user")
+                .authorizationUri("http://127.0.0.1:5000/o/authorize")
+                .tokenUri("http://127.0.0.1:5000/o/access_token")
+                .userInfoUri("http://127.0.0.1:5000/o/userinfo")
+                .userNameAttributeName("id")
+                .clientName("Client Name")
+                .clientId("client-id")
+                .clientSecret("client-secret")
+                .build();
     }
 
-    @Bean
-    public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
-        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+
+    public void setUpClient() {
+
+        sidamService.stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{"
+                                + " \"response\":{"
+                                + "  \"status\":200"
+                                + "  \"headers\":{"
+                                + "  \"issuer\": \"application/json"
+                                + "},"
+                                + "  \"jsonBody\": ["
+                                + "  {"
+                                + "  \"issuer\": \"http://localhost:5000/o\","
+                                + "  \"jwks_uri\": \"http://localhost:5000/jwks\" "
+                                + "}]}}")));
+
+
     }
 
-    @Bean
-    public OAuth2AuthorizedClientRepository authorizedClientRepository(OAuth2AuthorizedClientService authorizedClientService) {
-        return new AuthenticatedPrincipalOAuth2AuthorizedClientRepository(authorizedClientService);
-    }
 }
 
 
