@@ -23,7 +23,11 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     String orgIdentifierResponse;
+
     private IdamOpenIdClient idamOpenIdClient;
+
+    private OrganisationCreationRequest organisationCreationRequest;
+
     public static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     @Value(("${resendInviteEnabled}"))
@@ -35,7 +39,8 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
     @Before
     public void createAndUpdateOrganisation() {
         if (resendInviteEnabled) {
-            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+            organisationCreationRequest = someMinimalOrganisationRequest().build();
+            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
         }
     }
 
@@ -153,9 +158,9 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         }
     }
 
-    // should not re invite when user does not exists in organisation
+    // should not re invite when user does not exists in organisation for internal user
     @Test
-    public void should_return_403_when_reinvited_user_not_exists_in_same_organisation() {
+    public void should_return_403_when_internal_user_reinvites_user_which_does_not_exists_in_same_organisation() {
         if (resendInviteEnabled) {
 
             OrganisationCreationRequest organisationCreationRequest1 = someMinimalOrganisationRequest().build();
@@ -166,6 +171,26 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             newUserCreationRequest.setJurisdictions(new ArrayList<>());
             Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.FORBIDDEN);
             assertThat((String) newUserResponse.get("errorDescription")).contains("User does not belong to same organisation");
+        }
+    }
+
+    // should not re invite when user does not exists in organisation for external user
+    @Test
+    public void should_return_403_when_external_user_reinvites_user_which_does_not_exists_in_same_organisation() {
+        if (resendInviteEnabled) {
+            if (resendInviteEnabled) {
+                // create active PUM sidam user and invite
+                String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
+                NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
+                professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+
+                // get PUM bearer token and reinvite with any other user present in another org
+                String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
+                newUserCreationRequest.setResendInvite(true);
+                newUserCreationRequest.setEmail(organisationCreationRequest.getSuperUser().getEmail());
+                Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient.getMultipleAuthHeaders(pumBearerToken), HttpStatus.FORBIDDEN);
+                assertThat((String) reinviteUserResponse.get("errorDescription")).contains("User does not belong to same organisation");
+            }
         }
     }
 }
