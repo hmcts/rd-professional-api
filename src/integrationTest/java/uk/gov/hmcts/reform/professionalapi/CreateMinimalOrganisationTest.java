@@ -59,7 +59,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
-        assertThat(persistedSuperUser.getEmailAddress()).isEqualTo("someone@somewhere.com");
+        assertThat(persistedSuperUser.getEmailAddress()).isEqualTo(organisationCreationRequest.getSuperUser().getEmail());
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
