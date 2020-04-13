@@ -73,6 +73,15 @@ compileTestJava {
 
 sourceSets {
 
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
+    }
+
     functionalTest {
         java {
             compileClasspath += main.output + test.output
@@ -148,6 +157,10 @@ pmd {
     ]
 }
 
+task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
 
@@ -316,26 +329,6 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
     testCompile 'io.github.openfeign:feign-jackson:10.7.0'
-
-    testCompile (group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity)
-    {
-        exclude group: 'com.vladsch.flexmark', module: 'flexmark-all'
-    }
-    testCompile (group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity)
-    {
-        exclude group: 'com.vladsch.flexmark', module: 'flexmark-all'
-    }
-    testCompile (group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity)
-    {
-        exclude group: 'com.vladsch.flexmark', module: 'flexmark-all'
-    }
-    testCompile (group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity)
-    {
-        exclude group: 'com.vladsch.flexmark', module: 'flexmark-all'
-    }
-
-
-    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE'
 
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
         force = true
