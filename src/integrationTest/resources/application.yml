@@ -8,12 +8,6 @@ spring:
         enable_lazy_load_no_trans: true
   main:
     allow-bean-definition-overriding: true
-  security:
-    oauth2:
-      client:
-        provider:
-          oidc:
-            issuer-uri: ${IDAM_URL:http://localhost:${wiremock.server.port}/o}
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
@@ -43,7 +37,7 @@ exui.role:
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://0.0.0.0:5000/o}
-oidc.issuer: ${OIDC_ISSUER:http://0.0.0.0:5000/openam/oauth2/hmcts}
+#oidc.issuer: ${OIDC_ISSUER:http://0.0.0.0:5000/openam/oauth2/hmcts}
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://0.0.0.0:5000/o}
 

@@ -73,15 +73,6 @@ compileTestJava {
 
 sourceSets {
 
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integrationTest/java')
-        }
-        resources.srcDir file('src/integrationTest/resources')
-    }
-
     functionalTest {
         java {
             compileClasspath += main.output + test.output
@@ -157,10 +148,6 @@ pmd {
     ]
 }
 
-task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
 
