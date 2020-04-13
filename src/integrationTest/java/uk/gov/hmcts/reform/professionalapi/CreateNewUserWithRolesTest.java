@@ -95,7 +95,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+            professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
