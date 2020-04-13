@@ -46,8 +46,8 @@ public class ProfessionalReferenceDataClient {
     private String baseUrl;
     private String baseIntUrl;
 
-    public ProfessionalReferenceDataClient(int prdApiPort) {
-        this.prdApiPort = prdApiPort;
+    public ProfessionalReferenceDataClient() {
+        this.prdApiPort = 8080;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl =  "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
     }

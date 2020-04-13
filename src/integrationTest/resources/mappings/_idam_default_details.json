@@ -11,8 +11,8 @@
           "Content-Type": "application/json"
         },
         "jsonBody": {
-          "issuer": "http://127.0.0.1:5000/o",
-          "jwks_uri": "http://127.0.0.1:5000/jwks"
+          "issuer": "http://0.0.0.0:{{request.requestLine.port}}/o",
+          "jwks_uri": "http://0.0.0.0:{{request.requestLine.port}}/jwks"
         }
       }
     }

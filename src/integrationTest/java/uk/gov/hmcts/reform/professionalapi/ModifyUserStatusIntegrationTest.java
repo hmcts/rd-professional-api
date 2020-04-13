@@ -127,4 +127,5 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         userProfileUpdatedData.setRolesAdd(roles);
         return userProfileUpdatedData;
     }
-}*/
+}
+*/

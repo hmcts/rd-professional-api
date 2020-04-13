@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@Ignore
 @Slf4j
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -36,13 +34,13 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        // userProfileCreateUserWireMock(HttpStatus.CREATED);
         List<String> userRoles = new ArrayList<>();
         userRoles.add(puiCaseManager);
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        //userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        updateUserProfileRolesMock(HttpStatus.OK);
+        //updateUserProfileRolesMock(HttpStatus.OK);
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -71,7 +69,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
-    //TODO review validation with biz requirements
+   /* @Ignore
     //@Test
     public void ac3_delete_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
 
@@ -110,6 +108,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(response.get("response_body")).isNotNull();
     }
 
+    @Ignore
     @Test
     public void ac4_modify_roles_of_active_users_with_other_role_should_return_403() {
 
@@ -122,6 +121,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(response.get("response_body")).isNotNull();
     }
 
+    @Ignore
     @Test
     public void ac5_add_and_delete_roles_of_active_users_for_an_active_organisation_with_pui_user_manager_role_should_return_200() {
 
@@ -141,7 +141,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
-    //TODO review validation with biz requirements
+    @Ignore
     //@Test
     public void ac6_delete_roles_of_active_users_for_with_pui_user_manager_role_should_return_400_for_bad_request() {
 
@@ -158,6 +158,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
+    @Ignore
     @Test
     public void ac8_delete_roles_of_active_users_for_with_pui_user_manager_role_should_return_500_for_Internal_server() {
 
@@ -170,6 +171,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
+    @Ignore
     @Test
     public void ac9_delete_roles_with_prd_admin_role_should_return_500_internal_server_error() {
 
@@ -202,7 +204,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
         verifyDeleteRolesResponse(response);
 
-    }
+    }*/
 
     private UserProfileUpdatedData createAddRolesUserProfileData() {
 
@@ -235,4 +237,4 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(deleteRoleResponse.get("idamStatusCode")).isEqualTo("500");
         assertThat(deleteRoleResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
-}*/
+}

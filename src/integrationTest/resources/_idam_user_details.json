@@ -1,5 +1,5 @@
 {
-  "priority": 1,
+  "priority": 2,
   "mappings": [
     {
       "request": {
@@ -12,10 +12,9 @@
           "Content-Type": "application/json"
         },
         "jsonBody": {
-          "issuer": "http://localhost:5000/o",
-          "jwks_uri": "http://localhost:5000/o/jwks"
-        },
-        "transformers": ["response-template"]
+          "issuer": "http://0.0.0.0:5000/o",
+          "jwks_uri": "http://0.0.0.0:5000/o/jwks"
+        }
       }
     },
     {

@@ -7,8 +7,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -17,7 +19,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
@@ -34,11 +35,13 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -52,8 +55,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
-@AutoConfigureWireMock(port = 5000)
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+@AutoConfigureWireMock(port = 0)
+@DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -77,23 +80,33 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     protected UserAttributeRepository userAttributeRepository;
 
-    protected ProfessionalReferenceDataClient professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+    protected ProfessionalReferenceDataClient professionalReferenceDataClient = new ProfessionalReferenceDataClient();
 
-    @ClassRule
-    public static WireMockRule s2sService = new WireMockRule(8990);
+    */
+/*@ClassRule
+    public static  WireMockRule s2sService = new WireMockRule(8990);*//*
 
 
 
-    //@ClassRule
-    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000).withRootDirectory("src/test/resources/mappings")
-            .extensions(new ExternalTransformer()));
+    //WireMockServer sidamService = new WireMockServer(options().port(5000).withRootDirectory("src/test/resources/mappings"));
 
-    @ClassRule
-    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
-            .extensions(new MultipleUsersResponseTransformer()));
+    */
+/*@Rule
+    public  WireMockRule sidamService = new WireMockRule(wireMockPort);*//*
 
-    @ClassRule
-    public static WireMockRule ccdService = new WireMockRule(8092);
+            //.withRootDirectory("src/integrationTest/resources/mappings")
+
+
+    */
+/*@ClassRule
+    public  static WireMockRule userProfileService = new WireMockRule(options().port(8091)
+            .extensions(new MultipleUsersResponseTransformer()));*//*
+
+
+    */
+/*@ClassRule
+    public static WireMockRule ccdService = new WireMockRule(8092);*//*
+
 
 
     @Value("${exui.role.hmcts-admin}")
@@ -122,28 +135,38 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void setupIdamStubs() throws Exception {
 
-        s2sService.stubFor(get(urlEqualTo("/details"))
+     */
+/*   sidamService.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("rd_professional_api")));
 
-        s2sService.stubFor(post(urlEqualTo("/lease"))
+        sidamService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")));
+*//*
 
 
-        */
-/*sidamService.stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
+       */
+/* stubFor(get(urlPathMatching("/o/.well-known/openid-configuration"))
                 .willReturn(aResponse()
                 .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("eyJhbGciOiJIUzI1NiIsInR5cCI6Ik")));
 
 
-         "{"
+        stubFor(get(urlEqualTo("/o"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("abcd")));*//*
+
+
+        */
+/* "{"
                             + " \"request_parameter_supported=true \","
                             + " \"claims_parameter_supported=false\","
                             + " \"scopes_supported= \"["
@@ -292,7 +315,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
 
 
-        sidamService.stubFor(get(urlEqualTo("/details"))
+
+       */
+/* sidamService.stubFor(get(urlEqualTo("/details"))
                 .withHeader("Authorization", containing("pui-finance-manager"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -471,9 +496,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  \"pui-organisation-manager\""
                                 +  "  ]"
                                 +  "}")
-                        .withTransformers("external_user-token-response")));
+                        .withTransformers("external_user-token-response")));*//*
 
-        sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
+
+       */
+/* sidamService.stubFor(get(urlEqualTo("/o/userinfo"))
                 .withHeader("Authorization", containing("prd-admin"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -490,6 +517,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 +  "  ]"
                                 +  "}")
                         .withTransformers("external_user-token-response")));
+        *//*
 
 
 
@@ -502,12 +530,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void userProfileGetUserWireMock() {
 
-        ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
+       */
+/* sidamService.stubFor(post(urlEqualTo("/user-profile/users"))
                 .willReturn(aResponse()
                         .withStatus(201)
                 ));
 
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+        sidamService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
@@ -517,16 +546,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"lastName\": \"rao\","
                                 + "  \"email\": \"super.user@hmcts.net\","
                                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
-                                + "}")));
+                                + "}")));*//*
+
     }
 
-    public void ccdUserProfileErrorWireMock(HttpStatus httpStatus) {
+   */
+/* public void ccdUserProfileErrorWireMock(HttpStatus httpStatus) {
 
-        ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
+        sidamService.stubFor(post(urlEqualTo("/user-profile/users"))
                 .willReturn(aResponse()
                         .withStatus(httpStatus.value())
                 ));
-    }
+    }*//*
+
 
     @After
     public void cleanupTestData() {
@@ -540,7 +572,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     protected String settingUpOrganisation(String role) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        //userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
@@ -554,7 +586,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        //userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
 
@@ -568,7 +600,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     public void updateOrganisation(String organisationIdentifier, String role, String status) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        //userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
@@ -610,291 +642,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
-    public void userProfileCreateUserWireMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStaus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                    + "  \"idamRegistrationResponse\":\"201\""
-                    + "}";
-            returnHttpStaus = 201;
-        }
 
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(body)
-                        .withStatus(returnHttpStaus)
-                ));
-
-        String usersBody = "{"
-                + "  \"userProfiles\": ["
-                + "  {"
-                + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"prashanth\","
-                + "  \"lastName\": \"rao\","
-                + "  \"email\": \"super.user@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": ["
-                + "  \"pui-organisation-manager\""
-                + "  ],"
-                + "  \"idamStatusCode\": \"0\","
-                + "  \"idamMessage\": \"\""
-                + "  },"
-                + "  {"
-                + "  \"userIdentifier\":\" %s" + "\","
-                + "  \"firstName\": \"Shreedhar\","
-                + "  \"lastName\": \"Lomte\","
-                + "  \"email\": \"super.user@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": ["
-                + "  \"pui-case-manager\""
-                + "  ],"
-                + "  \"idamStatusCode\": \"0\","
-                + "  \"idamMessage\": \"\""
-                + "  },"
-                + " {"
-                + "  \"userIdentifier\":\"%s"  + "\","
-                + "  \"firstName\": \"adil\","
-                + "  \"lastName\": \"oozeerally\","
-                + "  \"email\": \"adil.ooze@hmcts.net\","
-                + "  \"idamStatus\": \"DELETED\","
-                + "  \"roles\": [],"
-                + "  \"idamStatusCode\": \"404\","
-                + "  \"idamMessage\": \"16 Resource not found\""
-                + "  } "
-                + " ]"
-                + "}";
-
-        userProfileService.stubFor(
-                post(urlPathMatching("/v1/userprofile/users.*"))
-                        .willReturn(
-                                aResponse()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody(usersBody)
-                                        .withTransformers("transformer-multi-user-response")
-                                        .withStatus(200)
-                        )
-        );
-
-        String usersBodyWithoutRoles = " {"
-                + "  \"userProfiles\": ["
-                + "  {"
-                + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"prashanth\","
-                + "  \"lastName\": \"rao\","
-                + "  \"email\": \"super.user@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": [],"
-                + "  \"idamStatusCode\": \"0\","
-                + "  \"idamMessage\": \"\""
-                + "  },"
-                + "  {"
-                + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"Shreedhar\","
-                + "  \"lastName\": \"Lomte\","
-                + "  \"email\": \"super.user@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
-                + "  \"roles\": [],"
-                + "  \"idamStatusCode\": \"0\","
-                + "  \"idamMessage\": \"\""
-                + "  },"
-                + " {"
-                + "  \"userIdentifier\":\"%s"  + "\","
-                + "  \"firstName\": \"adil\","
-                + "  \"lastName\": \"oozeerally\","
-                + "  \"email\": \"adil.ooze@hmcts.net\","
-                + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\","
-                + "  \"roles\": [],"
-                + "  \"idamStatusCode\": \"0\","
-                + "  \"idamMessage\": \"\""
-                + "  } "
-                + " ]"
-                + "}";
-
-        userProfileService.stubFor(
-                post(urlPathMatching("/v1/userprofile/users.*"))
-                        .withQueryParam("rolesRequired", equalTo("false"))
-                        .willReturn(
-                                aResponse()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody(usersBodyWithoutRoles)
-                                        .withTransformers("transformer-multi-user-response")
-                                        .withStatus(200)
-                        )
-        );
-    }
-
-    public void updateUserProfileRolesMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStatus = 200;
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"statusUpdateResponse\": {"
-                    + "  \"idamStatusCode\": \"200\","
-                    + "  \"idamMessage\": \"Success\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 200;
-        } else if (status.is4xxClientError()) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
-        } else if (status.is5xxServerError()) {
-
-            body = "{"
-                    + "  \"roleAdditionResponse\": {"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } ,"
-                    + "  \"roleDeletionResponse\": ["
-                    +   "{"
-                    + "  \"idamStatusCode\": \"500\","
-                    + "  \"idamMessage\": \"Internal Server Error\""
-                    + "  } "
-                    + "  ]"
-                    + "}";
-        }
-
-        userProfileService.stubFor(
-                put(urlPathMatching("/v1/userprofile/.*"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
-
-
-    }
-
-    public void reinviteUserMock(HttpStatus status) {
-        String body = null;
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                    + "  \"idamRegistrationResponse\":\"201\""
-                    + "}";
-        } else if (status == HttpStatus.BAD_REQUEST) {
-            body = "{"
-                    + "  \"errorMessage\": \"3 : There is a problem with your request. Please check and try again\","
-                    + "  \"errorDescription\": \"User is not in PENDING state\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.NOT_FOUND) {
-            body = "{"
-                    + "  \"errorMessage\": \"4 : Resource not found\","
-                    + "  \"errorDescription\": \"could not find user profile\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
-            body = "{"
-                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after some time\","
-                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval) + "\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        } else if (status == HttpStatus.CONFLICT) {
-            body = "{"
-                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
-                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval) + "\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-        }
-
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(body)
-                        .withStatus(status.value())
-                ));
-    }
-
-    public void updateUserProfileMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStatus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"statusUpdateResponse\": {"
-                    + "  \"idamStatusCode\": \"200\","
-                    + "  \"idamMessage\": \"Success\""
-                    + "  } "
-                    + "}";
-            returnHttpStatus = 200;
-        } else if (status.is4xxClientError()) {
-            body = "{"
-                    + "  \"errorMessage\": \"400\","
-                    + "  \"errorDescription\": \"BAD REQUEST\","
-                    + "  \"timeStamp\": \"23:10\""
-                    + "}";
-            returnHttpStatus = 400;
-        }
-
-        userProfileService.stubFor(
-                put(urlPathMatching("/v1/userprofile/.*"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
-
-
-    }
-
-
-    public static class MultipleUsersResponseTransformer extends ResponseTransformer {
-        @Override
-        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
-            String requestBodyAsString = request.getBodyAsString();
-            ObjectMapper mapper = new ObjectMapper();
-            Optional<HashMap<String, List<String>>> ids = Optional.empty();
-            try {
-                ids =  Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
-            } catch (IOException e) {
-                //Do Nothing
-            }
-            String formatResponse = response.getBodyAsString();
-            int replaceParams = formatResponse.split("%s").length - 1;
-            List<String> userIds = new ArrayList<>();
-
-            if (ids.isPresent()) {
-                userIds = ids.get().get("userIds");
-            }
-
-            if (replaceParams > 0) {
-                if (replaceParams > userIds.size()) {
-                    while (replaceParams != userIds.size()) {
-                        userIds.add(UUID.randomUUID().toString());
-                    }
-                }
-
-                if (replaceParams < userIds.size()) {
-                    while (replaceParams != userIds.size()) {
-                        userIds.remove(userIds.size() - 1);
-                    }
-                }
-            }
-
-            formatResponse = String.format(formatResponse, userIds.toArray());
-
-            return Response.Builder.like(response)
-                    .but().body(formatResponse)
-                    .build();
-        }
-
-        @Override
-        public String getName() {
-            return "transformer-multi-user-response";
-        }
-
-        public boolean applyGlobally() {
-            return false;
-        }
-    }
 
     public static class ExternalTransformer extends ResponseTransformer {
         @Override

@@ -266,4 +266,5 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         }
         return persistedOrganisation;
     }
-}*/
+}
+*/

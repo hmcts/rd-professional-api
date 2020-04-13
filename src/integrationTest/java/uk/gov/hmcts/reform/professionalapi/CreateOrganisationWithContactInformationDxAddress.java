@@ -468,4 +468,5 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getSraRegulated()).isFalse();
     }
-}*/
+}
+*/

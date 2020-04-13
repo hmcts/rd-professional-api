@@ -13,7 +13,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: http://127.0.0.1:5000/o
+            issuer-uri: ${IDAM_URL:http://localhost:${wiremock.server.port}/o}
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
@@ -24,7 +24,7 @@ spring:
 idam:
   s2s-authorised:
     services: rd_professional_api
-  api.url: ${IDAM_URL:http://127.0.0.1:5000/o}
+  api.url: ${IDAM_URL:http://0.0.0.0:5000/o}
   client:
     redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
     id: rd-professional-api
@@ -32,7 +32,7 @@ idam:
 
 
 ## IDAM feign connection
-auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
+auth.idam.client.baseUrl: ${http://0.0.0.0:5000/o}
 
 exui.role:
   hmcts-admin: prd-admin
@@ -42,10 +42,10 @@ exui.role:
   pui-case-manager: pui-case-manager
 
 ## user profile feign connection
-user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
-oidc.issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+user.profile.api.url: ${USER_PROFILE_URL:http://0.0.0.0:5000/o}
+oidc.issuer: ${OIDC_ISSUER:http://0.0.0.0:5000/openam/oauth2/hmcts}
 ## ccd jurisdiction feign connection
-ccdUrl: ${CCD_URL:http://127.0.0.1:8092}
+ccdUrl: ${CCD_URL:http://0.0.0.0:5000/o}
 
 # resent user invite interval in minutes
 resendInterval: 60
