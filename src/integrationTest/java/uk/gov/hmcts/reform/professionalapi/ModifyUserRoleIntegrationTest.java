@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -242,4 +241,4 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         assertThat(addRolesResponse.get("idamStatusCode")).isEqualTo("500");
         assertThat(addRolesResponse.get("idamMessage")).isEqualTo("Internal Server Error");
     }
-}*/
+}

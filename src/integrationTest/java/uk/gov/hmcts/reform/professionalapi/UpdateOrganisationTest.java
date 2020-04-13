@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -267,4 +266,3 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         return persistedOrganisation;
     }
 }
-*/

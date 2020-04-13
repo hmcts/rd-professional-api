@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -469,4 +468,3 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         assertThat(persistedOrganisation.getSraRegulated()).isFalse();
     }
 }
-*/

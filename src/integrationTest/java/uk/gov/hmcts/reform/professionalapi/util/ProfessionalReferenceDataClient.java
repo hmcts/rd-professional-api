@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -46,8 +45,8 @@ public class ProfessionalReferenceDataClient {
     private String baseUrl;
     private String baseIntUrl;
 
-    public ProfessionalReferenceDataClient() {
-        this.prdApiPort = 8080;
+    public ProfessionalReferenceDataClient(int port) {
+        this.prdApiPort = port;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl =  "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
     }
@@ -342,4 +341,3 @@ public class ProfessionalReferenceDataClient {
         return  getResponse(responseEntity);
     }
 }
-*/

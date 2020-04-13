@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi.util;
 
 
@@ -20,4 +19,3 @@ public abstract class SpringBootIntegrationTest {
     protected Integer wireMockPort;
 
 }
-*/

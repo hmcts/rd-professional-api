@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -187,4 +186,3 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
     }
 }
-*/

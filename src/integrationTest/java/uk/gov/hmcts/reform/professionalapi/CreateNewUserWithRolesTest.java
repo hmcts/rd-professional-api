@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -94,11 +93,11 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE").build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdationRequest, hmctsAdmin, orgIdentifierResponse);
 
-        //userProfileCreateUserWireMock(HttpStatus.CREATED);
-        //Map<String, Object> newUserResponse =
-        //        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Map<String, Object> newUserResponse =
+        professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
-        //String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
         assertThat(newUserResponse).isNotNull();
         assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
@@ -411,4 +410,3 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat((String)newUserResponse.get("response_body")).contains("\"errorDescription\":\"409 User already exists\"");
     }
 }
-*/
