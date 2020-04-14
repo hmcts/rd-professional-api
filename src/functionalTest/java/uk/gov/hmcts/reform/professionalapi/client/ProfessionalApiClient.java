@@ -489,9 +489,24 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
     }
 
+
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+    }
+
+    public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier, HttpStatus expectedStatus) {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+        Response response = getMultipleAuthHeadersWithEmptyBearerToken("")
                 .body(organisationCreationRequest)
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
@@ -688,6 +703,15 @@ public class ProfessionalApiClient {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
+    public RequestSpecification getMultipleAuthHeadersWithEmptyBearerToken(String userToken) {
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer ");
+    }
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);

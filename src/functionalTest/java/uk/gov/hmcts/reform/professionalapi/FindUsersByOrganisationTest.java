@@ -163,7 +163,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 + "uLEOK4d-z4FEDFKgQvlYOMAqrjMjvS-XivSLpKf__FcQ4uXT87x5NkLvFJsVyF_QZmJmmZWUB51Oh7XsrCswRDWua6d6cJK-3nuRwhEoOUGpLobuLKH"
                 + "JpX1O5y_hrudPCq_q0m5W1Iqq_xEcNaOg-dqrtpEPXtebfCVZw";
 
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.FORBIDDEN, professionalApiClient.getMultipleAuthHeaders(invalidBearerToken), "");
+        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.UNAUTHORIZED, professionalApiClient.getMultipleAuthHeaders(invalidBearerToken), "");
     }
 
     @Test
