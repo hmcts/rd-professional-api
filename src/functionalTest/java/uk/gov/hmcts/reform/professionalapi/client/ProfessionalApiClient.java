@@ -453,7 +453,12 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
     }
 
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
