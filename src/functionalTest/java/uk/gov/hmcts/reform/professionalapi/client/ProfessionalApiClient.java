@@ -712,6 +712,7 @@ public class ProfessionalApiClient {
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
                 .header(AUTHORIZATION_HEADER, "Bearer ");
     }
+
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
