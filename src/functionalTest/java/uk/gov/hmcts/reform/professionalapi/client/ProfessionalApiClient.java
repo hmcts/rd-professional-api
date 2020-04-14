@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -186,6 +187,19 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest organisationCreationRequest) {
+        Response response = withUnauthenticatedRequest()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
 
         return response.body().as(Map.class);
     }

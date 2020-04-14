@@ -28,6 +28,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
+
     @Test
     public void ac1_can_create_an_organisation_with_valid_Dx_Number_and_valid_Dx_Exchange() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
@@ -35,6 +36,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
+
 
     @Test
     public void ac2_5_can_create_an_organisation_with_Dx_Number_less_than_13() {
@@ -87,6 +89,14 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .build();
 
         professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+    }
+
+    @Test
+    public void ac7_can_throw_Unauthorized_Error_code_without_service_token_create_an_organisation_401() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
     @Test
