@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_403_USER_IS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -129,7 +128,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
-        
+
         UserProfileUpdatedData data = new UserProfileUpdatedData();
         data.setFirstName("UpdatedFirstName");
         data.setLastName("UpdatedLastName");
@@ -152,6 +151,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         //adding new user with Suspended Super User Bearer Token
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.FORBIDDEN);
         assertThat(newUserResponse).isNotNull();
-        assertThat((String) newUserResponse.get("errorDescription")).contains(ERROR_403_USER_IS_NOT_ACTIVE);
+        assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }
 }
