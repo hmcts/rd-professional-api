@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_403_USER_IS_NOT_ACTIVE;
-
 import feign.FeignException;
 import feign.Response;
 
@@ -221,7 +219,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if (newUserResponse == null || !IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-            throw new AccessDeniedException(ERROR_403_USER_IS_NOT_ACTIVE);
+            throw new AccessDeniedException("403 Forbidden: User status must be Active to invite users");
         }
     }
 }
