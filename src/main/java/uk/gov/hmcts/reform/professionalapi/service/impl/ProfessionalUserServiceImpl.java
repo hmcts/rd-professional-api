@@ -105,9 +105,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUser.orElse(null);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
         ResponseEntity responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status);
@@ -117,9 +116,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
@@ -129,9 +127,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
     }
 
-    @SuppressWarnings("unchecked")
-    private ResponseEntity retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
-        ResponseEntity responseEntity;
+    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
+        ResponseEntity<Object> responseEntity;
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 

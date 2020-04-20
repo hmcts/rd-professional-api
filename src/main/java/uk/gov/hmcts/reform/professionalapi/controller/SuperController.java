@@ -141,8 +141,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
         String orgId = removeEmptySpaces(organisationIdentifier);
         String orgStatus = removeEmptySpaces(status);
 
@@ -178,8 +177,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity retrieveUserByEmail(String email) {
+    protected ResponseEntity<Object> retrieveUserByEmail(String email) {
         validateEmail(email);
 
         ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(removeEmptySpaces(email).toLowerCase());
@@ -190,8 +188,7 @@ public abstract class SuperController {
                 .body(professionalUsersResponse);
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
+    protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(removeEmptySpaces(email).toLowerCase());
@@ -205,8 +202,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -243,8 +239,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    @SuppressWarnings("unchecked")
-    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
+    private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
@@ -265,8 +260,7 @@ public abstract class SuperController {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity retrieveAllOrganisationsByStatus(String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsByStatus(String status) {
         String orgStatus = removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
@@ -282,7 +276,6 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    @SuppressWarnings("unchecked")
     protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
         String orgId = removeEmptySpaces(organisationIdentifier);
 
@@ -318,14 +311,13 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    @SuppressWarnings("unchecked")
-    protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
-        ResponseEntity responseEntity;
+        ResponseEntity<Object> responseEntity;
 
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
 
