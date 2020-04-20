@@ -283,7 +283,7 @@ public abstract class SuperController {
     }
 
     @SuppressWarnings("unchecked")
-    protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity<? extends Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
         String orgId = removeEmptySpaces(organisationIdentifier);
 
         Object responseBody = null;

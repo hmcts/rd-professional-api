@@ -159,8 +159,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ResponseBody
     @Secured("pui-user-manager")
-    @SuppressWarnings("unchecked")
-    public ResponseEntity addUserToOrganisationUsingExternalController(
+    public ResponseEntity<? extends Object> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true)@OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
