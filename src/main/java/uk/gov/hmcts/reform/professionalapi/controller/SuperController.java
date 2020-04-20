@@ -141,6 +141,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
         String orgId = removeEmptySpaces(organisationIdentifier);
         String orgStatus = removeEmptySpaces(status);
@@ -177,6 +178,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity retrieveUserByEmail(String email) {
         validateEmail(email);
 
@@ -188,6 +190,7 @@ public abstract class SuperController {
                 .body(professionalUsersResponse);
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
@@ -202,6 +205,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
@@ -239,6 +243,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
+    @SuppressWarnings("unchecked")
     private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
@@ -260,6 +265,7 @@ public abstract class SuperController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity retrieveAllOrganisationsByStatus(String status) {
         String orgStatus = removeEmptySpaces(status);
 
@@ -276,6 +282,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
         String orgId = removeEmptySpaces(organisationIdentifier);
 
@@ -311,6 +318,7 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
+    @SuppressWarnings("unchecked")
     protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);

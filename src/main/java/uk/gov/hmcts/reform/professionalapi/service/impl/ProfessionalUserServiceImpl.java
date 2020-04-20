@@ -105,6 +105,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUser.orElse(null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
@@ -116,6 +117,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
@@ -127,6 +129,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
     }
 
+    @SuppressWarnings("unchecked")
     private ResponseEntity retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
         ResponseEntity responseEntity;
 

@@ -22,8 +22,10 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
+    @SuppressWarnings("unchecked")
     ResponseEntity findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status);
 
+    @SuppressWarnings("unchecked")
     ResponseEntity findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable);
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
