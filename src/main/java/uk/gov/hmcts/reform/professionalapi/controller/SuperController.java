@@ -223,7 +223,7 @@ public abstract class SuperController {
             //Organisation is getting activated
 
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
-            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true);
+            ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 //Idam registration success
@@ -239,6 +239,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
+    @SuppressWarnings("unchecked")
     private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
@@ -295,7 +296,7 @@ public abstract class SuperController {
 
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
-        ResponseEntity responseEntity = createUserProfileFor(newUser, roles, false);
+        ResponseEntity<Object>  responseEntity = createUserProfileFor(newUser, roles, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success

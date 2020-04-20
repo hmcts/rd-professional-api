@@ -22,7 +22,7 @@ public class JsonFeignResponseUtil {
 
     }
 
-    public static Optional decode(Response response, Class clazz) {
+    public static Optional<Object> decode(Response response, Class clazz) {
         try {
             return Optional.of(json.readValue(response.body().asReader(), clazz));
         } catch (IOException e) {
@@ -31,9 +31,9 @@ public class JsonFeignResponseUtil {
     }
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Class clazz) {
-        Optional payload = decode(response, clazz);
+        Optional<Object>  payload = decode(response, clazz);
 
-        return new ResponseEntity(
+        return new ResponseEntity<>(
                 payload.orElse(null),
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
