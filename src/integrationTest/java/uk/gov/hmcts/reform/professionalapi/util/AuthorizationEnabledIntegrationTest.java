@@ -44,6 +44,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -51,6 +53,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -78,6 +81,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected UserAttributeRepository userAttributeRepository;
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
+
+    @Autowired
+    public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     @Autowired
     protected UserProfileFeignClient userProfileFeignClient;
@@ -267,19 +273,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
 
         return (String) newUserResponse.get("userIdentifier");
+    }
+
+    public String retrieveSuperUserIdFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getId().toString();
     }
 
     public String createOrganisationRequest() {

@@ -79,10 +79,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         assertThat(userIdentifierResponse).isNotNull();
