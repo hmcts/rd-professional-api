@@ -133,7 +133,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+            Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
         } catch (FeignException ex) {

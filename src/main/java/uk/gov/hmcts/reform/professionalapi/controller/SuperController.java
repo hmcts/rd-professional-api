@@ -253,7 +253,7 @@ public abstract class SuperController {
                 userRoles);
 
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
-            Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
+            Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
             log.error("UserProfile api failed:: status code ::" + ex.status());
