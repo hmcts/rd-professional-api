@@ -24,8 +24,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     String orgIdentifierResponse;
 
-    private IdamOpenIdClient idamOpenIdClient;
-
     private OrganisationCreationRequest organisationCreationRequest;
 
     public static final String RANDOM_EMAIL = "RANDOM_EMAIL";
@@ -50,7 +48,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             NewUserCreationRequest newUserCreationRequest = professionalApiClient.createReInviteUserRequest(RANDOM_EMAIL);
             newUserCreationRequest.setJurisdictions(new ArrayList<>());
-            Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+            Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND);
             assertThat((String) newUserResponse.get("errorDescription")).contains("User does not exist");
         }
     }
@@ -61,6 +59,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
         if (resendInviteEnabled) {
             // create active user in UP
+            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
             String email = idamOpenIdClient.createUser("pui-user-manager");
             NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
             Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
@@ -86,7 +85,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             //re inviting active user should return 400
             NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient.createReInviteUserRequest(newUserCreationRequest.getEmail());
             Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, reInviteUserCreationRequest, HttpStatus.TOO_MANY_REQUESTS);
-            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time"), resendInterval);
+            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
         }
     }
 
@@ -96,10 +95,10 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
+            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
             String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
             NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-
 
             // create active caseworker sidam user and invite
             String email = idamOpenIdClient.createUser("caseworker");
@@ -120,6 +119,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
+            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
             String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
             NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
@@ -133,8 +133,8 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             // get PUM bearer token and reinvite
             String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
             newUserCreationRequest.setResendInvite(true);
-            Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient.getMultipleAuthHeaders(pumBearerToken), HttpStatus.BAD_REQUEST);
-            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes. Please try after some time"), resendInterval);
+            Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient.getMultipleAuthHeaders(pumBearerToken), HttpStatus.TOO_MANY_REQUESTS);
+            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
         }
     }
 
@@ -152,9 +152,9 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             // re invite super user
             NewUserCreationRequest newUserCreationRequest = professionalApiClient.createReInviteUserRequest(organisationCreationRequest.getSuperUser().getEmail());
 
-            Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+            Map<String, Object> reinviteUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.TOO_MANY_REQUESTS);
 
-            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes. Please try after some time"), resendInterval);
+            assertThat((String) reinviteUserResponse.get("errorDescription")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
         }
     }
 
@@ -180,11 +180,14 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             if (resendInviteEnabled) {
                 // create active PUM sidam user and invite
+                IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
                 String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
                 NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
                 professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
                 // get PUM bearer token and reinvite with any other user present in another org
+                organisationCreationRequest = someMinimalOrganisationRequest().build();
+                orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
                 String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
                 newUserCreationRequest.setResendInvite(true);
                 newUserCreationRequest.setEmail(organisationCreationRequest.getSuperUser().getEmail());
