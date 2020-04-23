@@ -134,7 +134,7 @@ public class OrganisationInternalControllerTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions);
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions, false);
 
         MockitoAnnotations.initMocks(this);
     }

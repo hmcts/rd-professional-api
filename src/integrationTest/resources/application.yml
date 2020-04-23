@@ -32,3 +32,9 @@ user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://127.0.0.1:8092}
+
+# resent user invite interval in minutes
+resendInterval: 60
+
+# sync time interval in minutes
+syncInterval: 60
