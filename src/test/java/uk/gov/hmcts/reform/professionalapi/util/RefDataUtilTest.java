@@ -134,7 +134,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void mapUserInfoCorrectly_with_roles() {
+    public void test_mapUserInfoCorrectly_with_roles() {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
