@@ -21,6 +21,10 @@ public class NewUserResponse {
         this.userIdentifier = user.getUserIdentifier();
     }
 
+    public NewUserResponse(UserProfileCreationResponse userProfileCreationResponse) {
+        this.userIdentifier = userProfileCreationResponse.getIdamId();
+    }
+
     public String getUserIdentifier() {
         return userIdentifier;
     }

@@ -50,6 +50,7 @@ public class ProfessionalApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     private final String professionalApiUrl;
     private final String s2sToken;
@@ -247,6 +248,22 @@ public class ProfessionalApiClient {
                 .email(email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+    }
+
+    public  NewUserCreationRequest createReInviteUserRequest(String email) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .resendInvite(true)
                 .build();
 
         return userCreationRequest;

@@ -45,6 +45,8 @@ public class UserProfileCreationRequest  {
     @NotEmpty
     private List<String> roles;
 
+    private boolean resendInvite;
+
     @JsonCreator
     public UserProfileCreationRequest(@JsonProperty(value = "email") String email,
                                       @JsonProperty(value = "firstName") String firstName,
@@ -52,7 +54,8 @@ public class UserProfileCreationRequest  {
                                       @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
                                       @JsonProperty(value = "userCategory") UserCategory userCategory,
                                       @JsonProperty(value = "userType") UserType userType,
-                                      @JsonProperty(value = "roles") List<String> roles) {
+                                      @JsonProperty(value = "roles") List<String> roles,
+                                      @JsonProperty(value = "resendInvite") boolean resendInvite) {
 
         this.email = email;
         this.firstName = firstName;
@@ -61,5 +64,6 @@ public class UserProfileCreationRequest  {
         this.userCategory = userCategory;
         this.userType = userType;
         this.roles = roles;
+        this.resendInvite = resendInvite;
     }
 }

@@ -31,6 +31,7 @@ import org.assertj.core.api.Assertions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -114,7 +115,8 @@ public class OrganisationServiceImplTest {
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
 
-    private OrganisationServiceImpl sut = new OrganisationServiceImpl();
+    @InjectMocks
+    private OrganisationServiceImpl sut;
 
     @Before
     public void setUp() {

@@ -112,3 +112,5 @@ feign:
       - serviceauthorization
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
+
+resendInviteEnabled : true

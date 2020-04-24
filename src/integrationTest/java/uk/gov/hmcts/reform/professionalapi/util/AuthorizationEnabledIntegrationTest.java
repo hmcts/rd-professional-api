@@ -33,14 +33,13 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
@@ -53,7 +52,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
@@ -82,26 +80,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
-    @Autowired
-    public ProfessionalUserServiceImpl professionalUserServiceImpl;
+    @ClassRule
+    public static WireMockRule s2sService = new WireMockRule(8990);
 
-    @Autowired
-    protected UserProfileFeignClient userProfileFeignClient;
-
-    @Rule
-    public WireMockRule s2sService = new WireMockRule(8990);
-
-    @Rule
-    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
+    @ClassRule
+    public static WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
             .extensions(new ExternalTransformer()));
 
-    @Rule
-    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
-    @Rule
-    public WireMockRule ccdService = new WireMockRule(8092);
-
+    @ClassRule
+    public static WireMockRule ccdService = new WireMockRule(8092);
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
@@ -117,6 +108,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
+
+    @Value("${resendInterval}")
+    protected String resendInterval;
+
+    @Value("${syncInterval}")
+    protected String syncInterval;
 
     protected static final String ACTIVE = "ACTIVE";
 
@@ -294,10 +291,33 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
+    public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
+
     public void updateOrganisation(String organisationIdentifier, String role, String status) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public void updateOrganisation(String organisationIdentifier, String role, String status, OrganisationCreationRequest organisationUpdateRequest) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        organisationUpdateRequest.setStatus(status);
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
+    public String createAndActivateOrganisation() {
+        String orgIdentifier = createOrganisationRequest();
+        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE);
+        return orgIdentifier;
+    }
+
+    public String createAndActivateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
+        String orgIdentifier = createOrganisationRequest(organisationCreationRequest);
+        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE, organisationCreationRequest);
+        return orgIdentifier;
     }
 
     public NewUserCreationRequest inviteUserCreationRequest(String userEmail, List<String> userRoles) {
@@ -310,6 +330,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .email(userEmail)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
+                .build();
+
+        return userCreationRequest;
+
+    }
+
+    public NewUserCreationRequest reInviteUserCreationRequest(String userEmail, List<String> userRoles) {
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .resendInvite(true)
                 .build();
 
         return userCreationRequest;
@@ -476,6 +511,47 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         );
 
 
+    }
+
+    public void reinviteUserMock(HttpStatus status) {
+        String body = null;
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamRegistrationResponse\":\"201\""
+                    + "}";
+        } else if (status == HttpStatus.BAD_REQUEST) {
+            body = "{"
+                    + "  \"errorMessage\": \"3 : There is a problem with your request. Please check and try again\","
+                    + "  \"errorDescription\": \"User is not in PENDING state\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.NOT_FOUND) {
+            body = "{"
+                    + "  \"errorMessage\": \"4 : Resource not found\","
+                    + "  \"errorDescription\": \"could not find user profile\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
+            body = "{"
+                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after some time\","
+                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval) + "\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        } else if (status == HttpStatus.CONFLICT) {
+            body = "{"
+                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
+                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval) + "\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+        }
+
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(status.value())
+                ));
     }
 
     public void updateUserProfileMock(HttpStatus status) {
