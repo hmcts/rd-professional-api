@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -141,15 +142,32 @@ public class OrganisationExternalController extends SuperController {
             @Authorization(value = "Authorization")
         }
     )
+
     @ApiResponses({
             @ApiResponse(
                     code = 201,
                     message = "User has been added",
-                    response = OrganisationResponse.class
+                    response = NewUserResponse.class
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden"
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Bad request"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found"
+            ),
+            @ApiResponse(
+                    code = 409,
+                    message = "User already active in SIDAM while resend invite"
+            ),
+            @ApiResponse(
+                    code = 429,
+                    message = "Too many requests for resend invite"
             )
     })
     @PostMapping(

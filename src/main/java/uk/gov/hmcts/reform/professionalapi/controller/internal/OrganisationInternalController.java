@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -235,7 +236,7 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 201,
                     message = "User has been added",
-                    response = OrganisationResponse.class
+                    response = NewUserResponse.class
             ),
             @ApiResponse(
                     code = 403,
@@ -244,6 +245,14 @@ public class OrganisationInternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "Not Found"
+            ),
+            @ApiResponse(
+                    code = 409,
+                    message = "User already active in SIDAM while resend invite"
+            ),
+            @ApiResponse(
+                    code = 429,
+                    message = "Too many requests for resend invite"
             )
     })
     @PostMapping(
