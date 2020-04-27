@@ -253,7 +253,8 @@ public class OrganisationInternalControllerTest {
 
         Set<String> pbas = new HashSet<>();
         pbas.add("PBA0000001");
-        PbaEditRequest pbaEditRequest = new PbaEditRequest(pbas);
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
 

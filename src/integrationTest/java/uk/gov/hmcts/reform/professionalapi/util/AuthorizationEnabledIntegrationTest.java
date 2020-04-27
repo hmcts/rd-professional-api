@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
@@ -34,17 +33,15 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -55,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+@DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -80,15 +78,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
-    @ClassRule
-    public static WireMockRule s2sService = new WireMockRule(8990);
 
     @ClassRule
-    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
+
+
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
     @ClassRule
-    public static WireMockRule ccdService = new WireMockRule(8092);
+    public static WireMockRule ccdService = new WireMockRule(wireMockConfig().port(8092));
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;

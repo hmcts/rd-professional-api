@@ -45,7 +45,7 @@ public class ProfessionalReferenceDataClient {
         this.prdApiPort = port;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
         this.baseIntUrl =  "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
-        this.issuer =issuer;
+        this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
 
