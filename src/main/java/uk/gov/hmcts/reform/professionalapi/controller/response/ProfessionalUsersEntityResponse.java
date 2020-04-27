@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @NoArgsConstructor
 public class ProfessionalUsersEntityResponse {
 
-    @JsonProperty("User Profiles")
     private List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
     public ProfessionalUsersEntityResponse(List<ProfessionalUser> professionalUsers) {
