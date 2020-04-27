@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -27,12 +26,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @Slf4j
@@ -298,7 +295,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void retrieve_organisation_should_have_single_super_user() {
-
         userProfileCreateUserWireMock(CREATED);
 
         List<String> user1Roles = new ArrayList<>();
@@ -309,45 +305,24 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         user2Roles.add("organisation-admin");
 
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
-
-        Map<String, Object> organisationResponse =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
+        Map<String, Object> organisationResponse = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
 
         professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
 
-        userProfileCreateUserWireMock(CREATED);
-        NewUserCreationRequest userCreationRequest1 = aNewUserCreationRequest()
-                .firstName("someName1")
-                .lastName("someLastName1")
-                .email("some@email.com")
-                .roles(user1Roles)
-                .jurisdictions(createJurisdictions())
-                .build();
-        Map<String, Object> newUserResponse1 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest1, hmctsAdmin);
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
 
         userProfileCreateUserWireMock(CREATED);
-        NewUserCreationRequest userCreationRequest2 = aNewUserCreationRequest()
-                .firstName("someName2")
-                .lastName("someLastName2")
-                .email("some@email2.com")
-                .roles(user2Roles)
-                .jurisdictions(createJurisdictions())
-                .build();
-        Map<String, Object> newUserResponse2 =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest2, hmctsAdmin);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse, inviteUserCreationRequest("some@email.com", user1Roles), hmctsAdmin, userIdentifier);
+
+        userProfileCreateUserWireMock(CREATED);
+        professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse, inviteUserCreationRequest("some@email2.com", user2Roles), hmctsAdmin, userIdentifier);
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
-        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(users.size()).isEqualTo(3);
+        List<ProfessionalUser> persistedUsers = professionalUserRepository.findByOrganisation(persistedOrganisation);
+        assertThat(persistedUsers.size()).isEqualTo(3);
 
-        SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
-
-        Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
-
+        Map<String, Object> orgResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
         assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
 

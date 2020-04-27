@@ -54,7 +54,7 @@ public class ProfessionalExternalUserControllerTest {
     private ProfessionalUserReqValidator profExtUsrReqValidator;
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
     private OrganisationCreationRequestValidator organisationCreationRequestValidator;
-    private ResponseEntity<?> responseEntity;
+    private ResponseEntity<Object> responseEntity;
     private ProfessionalUser professionalUser;
     private UserProfileFeignClient userProfileFeignClient;
 
@@ -63,6 +63,7 @@ public class ProfessionalExternalUserControllerTest {
     private ProfessionalExternalUserController professionalExternalUserController;
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
         professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisation);

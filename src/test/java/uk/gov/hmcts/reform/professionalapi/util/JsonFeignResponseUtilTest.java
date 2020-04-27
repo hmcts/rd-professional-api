@@ -33,7 +33,7 @@ public class JsonFeignResponseUtilTest {
         header.put("content-encoding", list);
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
-        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
+        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
 
         assertThat(createUserProfileResponseOptional).isNotEmpty();
     }
@@ -55,7 +55,7 @@ public class JsonFeignResponseUtilTest {
             e.printStackTrace();
         }
 
-        Optional<ProfessionalUsersResponse> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
+        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
         assertThat(createUserProfileResponseOptional).isEmpty();
     }
 

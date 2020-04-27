@@ -209,13 +209,13 @@ public class OrganisationExternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity addUserToOrganisationUsingExternalController(
+    public ResponseEntity<Object> addUserToOrganisationUsingExternalController(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
         //Received request to add a new user to an organisation for external
-
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
 
     }
