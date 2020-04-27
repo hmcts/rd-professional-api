@@ -309,4 +309,494 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.pdfbox/pdfbox@.*$</packageUrl>
         <cve>CVE-2018-8036</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: xmpbox-2.0.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.pdfbox/xmpbox@.*$</packageUrl>
+        <cpe>cpe:/a:apache:pdfbox</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: xmpbox-2.0.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.pdfbox/xmpbox@.*$</packageUrl>
+        <cve>CVE-2018-11797</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: xmpbox-2.0.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.pdfbox/xmpbox@.*$</packageUrl>
+        <cve>CVE-2018-8036</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: phantomjsdriver-1.4.4.jar
+   ]]></notes>
+        <sha1>e5778e3273f8201bf9e0ff65fb8118f37b84beba</sha1>
+        <cpe>cpe:/a:phantomjs:phantomjs</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: phantomjsdriver-1.4.4.jar
+   ]]></notes>
+        <sha1>e5778e3273f8201bf9e0ff65fb8118f37b84beba</sha1>
+        <cve>CVE-2019-17221</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: commons-beanutils-core-1.8.3.jar
+       ]]></notes>
+        <sha1>75812698e5e859f2cb587c622c4cdfcd61676426</sha1>
+        <cpe>cpe:/a:apache:commons_beanutils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: commons-beanutils-core-1.8.3.jar
+       ]]></notes>
+        <sha1>75812698e5e859f2cb587c622c4cdfcd61676426</sha1>
+        <cve>CVE-2014-0114</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: commons-beanutils-core-1.8.3.jar
+       ]]></notes>
+        <sha1>75812698e5e859f2cb587c622c4cdfcd61676426</sha1>
+        <cve>CVE-2019-10086</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: xstream-1.4.9.jar
+       ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+        <cpe>cpe:/a:xstream_project:xstream</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: xstream-1.4.9.jar
+       ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+        <cve>CVE-2017-7957</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: filters-2.0.235.jar
+       ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.jhlabs/filters@.*$</packageUrl>
+        <cpe>cpe:/a:image_processing_software:image_processing_software</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: filters-2.0.235.jar
+       ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.jhlabs/filters@.*$</packageUrl>
+        <cve>CVE-2005-0406</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: asciidoctorj-1.5.6.jar
+       ]]></notes>
+        <sha1>bb757d4b8b0f8438ce2ed781f6688cc6c01d9237</sha1>
+        <cpe>cpe:/a:asciidoctor:asciidoctor</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: asciidoctorj-1.5.6.jar
+       ]]></notes>
+        <sha1>bb757d4b8b0f8438ce2ed781f6688cc6c01d9237</sha1>
+        <cve>CVE-2018-18385</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cpe>cpe:/a:xwiki:xwiki</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2007-4898</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2010-4641</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2010-4642</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flexmark-ext-xwiki-macros-0.34.30.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vladsch\.flexmark/flexmark-ext-xwiki-macros@.*$</packageUrl>
+        <cve>CVE-2018-16277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: openhtmltopdf-jsoup-dom-converter-0.0.1-RC13.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.openhtmltopdf/openhtmltopdf-jsoup-dom-converter@.*$</packageUrl>
+        <cpe>cpe:/a:jsoup:jsoup</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: openhtmltopdf-jsoup-dom-converter-0.0.1-RC13.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.openhtmltopdf/openhtmltopdf-jsoup-dom-converter@.*$</packageUrl>
+        <cve>CVE-2015-6748</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cpe>cpe:/a:bouncycastle:legion-of-the-bouncy-castle-java-crytography-api</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000338</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000339</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000340</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000341</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000342</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000343</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000344</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000345</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000346</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-1000352</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2016-2427</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2017-13098</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2018-1000180</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: bcprov-jdk15on-1.54.jar
+   ]]></notes>
+        <sha1>1acdedeb89f1d950d67b73d481eb7736df65eedb</sha1>
+        <cve>CVE-2018-1000613</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: readline.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jruby/readline@.*$</packageUrl>
+        <cpe>cpe:/a:jruby:jruby</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: readline.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jruby/readline@.*$</packageUrl>
+        <cve>CVE-2010-1330</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jruby-complete-1.7.26.jar: readline.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jruby/readline@.*$</packageUrl>
+        <cve>CVE-2011-4838</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: cucumber-jvm-deps-1.0.6.jar (shaded: com.thoughtworks.xstream:xstream:1.4.7)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+        <cpe>cpe:/a:xstream_project:xstream</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: cucumber-jvm-deps-1.0.6.jar (shaded: com.thoughtworks.xstream:xstream:1.4.7)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+        <cve>CVE-2016-3674</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: cucumber-jvm-deps-1.0.6.jar (shaded: com.thoughtworks.xstream:xstream:1.4.7)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.thoughtworks\.xstream/xstream@.*$</packageUrl>
+        <cve>CVE-2017-7957</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-http:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-http@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-http:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-http@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-http:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-http@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-http:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-http@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-jmx:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-jmx@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-jmx:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-jmx@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-jmx:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-jmx@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-jmx:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-jmx@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-security:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-security@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-security:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-security@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-security:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-security@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-security:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-security@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-server:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-server@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-server:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-server@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-server:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-server@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-server:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-server@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-servlet:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-servlet@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-servlet:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-servlet@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-servlet:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-servlet@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-servlet:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-servlet@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-util:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-util@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-util:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-util@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-util:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-util@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-util:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-util@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-xml:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-xml@.*$</packageUrl>
+        <cpe>cpe:/a:eclipse:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-xml:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-xml@.*$</packageUrl>
+        <cpe>cpe:/a:jetty:jetty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-xml:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-xml@.*$</packageUrl>
+        <cve>CVE-2019-10241</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: jetty-repacked-9.4.12.v20180830.jar (shaded: org.eclipse.jetty:jetty-xml:9.4.12.v20180830)
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty/jetty-xml@.*$</packageUrl>
+        <cve>CVE-2019-10247</cve>
+    </suppress>
 </suppressions>
