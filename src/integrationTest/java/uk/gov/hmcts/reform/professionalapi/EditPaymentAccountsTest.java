@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@Ignore
+
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
 

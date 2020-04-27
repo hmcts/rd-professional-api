@@ -14,7 +14,4 @@ public abstract class SpringBootIntegrationTest {
     @LocalServerPort
     protected int port;
 
-    @Value("${wiremock.server.port}")
-    protected Integer wireMockPort;
-
 }

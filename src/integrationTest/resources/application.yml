@@ -13,13 +13,23 @@ spring:
     url: jdbc:h2:mem:dbrefdata
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
 auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
 idam:
   s2s-authorised:
     services: rd_professional_api
-  api.url: ${IDAM_URL:http://127.0.0.1:5000/o}
+  api.url: ${IDAM_URL:http://127.0.0.1:5000}
   client:
     redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
     id: rd-professional-api
@@ -38,7 +48,11 @@ exui.role:
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
-oidc.issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+
+oidc:
+  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+  expiration: 14400000 # milliseconds 4 hours
+
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://127.0.0.1:8092}
 

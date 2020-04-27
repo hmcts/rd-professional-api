@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +54,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -79,23 +80,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
-    @Autowired
-    protected UserProfileFeignClient userProfileFeignClient;
+    @ClassRule
+    public static WireMockRule s2sService = new WireMockRule(8990);
 
-    @Rule
-    public WireMockRule s2sService = new WireMockRule(8990);
-
-    @Rule
-    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
-            .extensions(new ExternalTransformer()));
-
-    @Rule
-    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
-    @Rule
-    public WireMockRule ccdService = new WireMockRule(8092);
-
+    @ClassRule
+    public static WireMockRule ccdService = new WireMockRule(8092);
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
@@ -118,11 +111,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${syncInterval}")
     protected String syncInterval;
 
+    @Value("${oidc.issuer}")
+    private String issuer;
+
+    @Value("${oidc.expiration}")
+    private long expiration;
+
     protected static final String ACTIVE = "ACTIVE";
 
     @Before
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
     }
 
     @Before
@@ -132,98 +131,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("rd-professional-api")));
+                        .withBody("rd_professional_api")));
 
         s2sService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-finance-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-finance-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-case-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-case-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing("prd-admin"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"prd-admin\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-organisation-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-organisation-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-user-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-user-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
     }
 
     @Before
@@ -623,30 +537,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         }
     }
 
-    public static class ExternalTransformer extends ResponseTransformer {
-        @Override
-        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
 
-            String formatResponse = response.getBodyAsString();
-
-            String token = request.getHeader("Authorization");
-            String userId = token.split(" ")[1];
-
-            formatResponse = String.format(formatResponse, userId);
-
-            return Response.Builder.like(response)
-                    .but().body(formatResponse)
-                    .build();
-        }
-
-        @Override
-        public String getName() {
-            return "external_user-token-response";
-        }
-
-        public boolean applyGlobally() {
-            return false;
-        }
-    }
 }
 
