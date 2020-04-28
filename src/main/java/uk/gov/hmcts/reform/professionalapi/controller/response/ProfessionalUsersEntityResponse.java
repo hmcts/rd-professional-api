@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @NoArgsConstructor
 public class ProfessionalUsersEntityResponse {
-
     private List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
     public ProfessionalUsersEntityResponse(List<ProfessionalUser> professionalUsers) {
