@@ -52,7 +52,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
-@DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
