@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Slf4j
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     String orgIdentifierResponse = null;
@@ -39,7 +41,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Test
     public void add_new_user_to_organisation() {
-
+        log.info("Inside AddNewUserTest:");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
