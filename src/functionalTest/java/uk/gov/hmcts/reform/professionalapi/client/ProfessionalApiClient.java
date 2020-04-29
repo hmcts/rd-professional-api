@@ -20,6 +20,10 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,12 +65,13 @@ public class ProfessionalApiClient {
 
     public ProfessionalApiClient(
             String professionalApiUrl,
-            String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) {
+            String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) throws MalformedURLException, UnknownHostException {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
         this.idamClient = idamClient;
         log.info("ProfessionalApiRequest:URL:: " + professionalApiUrl);
+        log.info("IP ADDRESS : " +  InetAddress.getByName(new URL(professionalApiUrl).getHost()));
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {
