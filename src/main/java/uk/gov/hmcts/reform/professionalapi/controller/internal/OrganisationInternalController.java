@@ -19,7 +19,6 @@ import javax.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
@@ -63,27 +61,14 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "The Organisation Identifier of the created Organisation",
+                    message = "A representation of the created organisation",
                     response = OrganisationResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request has been provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
             )
     })
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<OrganisationResponse> createOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest) {
@@ -93,7 +78,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
+            value = "Retrieves all organisation details for external users if no value entered then get all org details or based on id or status, if both values present then get the details based on id",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -106,12 +91,12 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "Details of one or more Organisations",
+                    message = "Details of one or more organisations",
                     response = OrganisationsDetailResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Invalid request (Status or ID) provided"
+                    message = "Invalid status or id provided for an organisation"
             ),
             @ApiResponse(
                     code = 403,
@@ -119,26 +104,22 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Organisation(s) found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    message = "Data not found"
             )
     })
 
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity retrieveOrganisations(
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);
     }
 
 
     @ApiOperation(
-            value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            value = "Retrieves an organisations payment accounts by super user email for user",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -147,12 +128,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The Organisation's associated Payment Accounts",
+                    message = "The organisations associated payment accounts",
                     response = OrganisationPbaResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Email Address was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -160,11 +137,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Payment Accounts found with the given Email Address"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    message = "Data not found"
             )
     })
     @GetMapping(
@@ -187,12 +160,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The Payment Account's have been updated",
+                    message = "The Organisation's associated payment accounts",
                     response = PbaResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -200,11 +169,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Organisation found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    message = "Data not found"
             )
     })
     @PutMapping(
@@ -234,33 +199,16 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Updates an Organisation",
+            value = "Updates an organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
             })
     @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "Organisation has been updated",
-                    response = String.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "If Organisation request sent with null/invalid values for mandatory fields"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation found with the given ID"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
+            @ApiResponse(code = 200, message = "Updated an organisation"),
+            @ApiResponse(code = 404, message = "If Organisation is not found"),
+            @ApiResponse(code = 403, message = "Forbidden Error"),
+            @ApiResponse(code = 400, message = "If Organisation request sent with null/invalid values for mandatory fields")
     })
     @PutMapping(
             value = "/{orgId}",
@@ -277,7 +225,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Add a new User to an Organisation",
+            value = "Add an user to an organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -286,12 +234,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "The new User has been added to the Organisation",
+                    message = "User has been added",
                     response = NewUserResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid request was provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -299,26 +243,21 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Organisation found with the given ID to add new User to"
+                    message = "Not Found"
             ),
             @ApiResponse(
                     code = 409,
-                    message = "A User already exists with the given Email Address or is already active in SIDAM during resend invite"
+                    message = "User already active in SIDAM while resend invite"
             ),
             @ApiResponse(
                     code = 429,
                     message = "Too many requests for resend invite"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
             )
     })
     @PostMapping(
             path = "/{orgId}/users/",
             produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("prd-admin")
     public ResponseEntity addUserToOrganisation(
