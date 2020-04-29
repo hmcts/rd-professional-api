@@ -183,6 +183,7 @@ public class ProfessionalApiClient {
 
         log.info("Request:URL:: " + professionalApiUrl + "/refdata/external/v1/organisations");
 
+
         if (response.statusCode() != CREATED.value()) {
             log.info("Create organisation response: " + response.asString());
         }
