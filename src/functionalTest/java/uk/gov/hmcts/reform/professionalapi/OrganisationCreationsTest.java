@@ -10,6 +10,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import java.util.Arrays;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +21,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Slf4j
 public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_create_an_organisation() {
+        log.info("Inside OrganisationCreationsTest:");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -30,6 +34,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac1_can_create_an_organisation_with_valid_Dx_Number_and_valid_Dx_Exchange() {
+        log.info("Inside OrganisationCreationsTest:");
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
