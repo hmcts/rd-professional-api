@@ -89,6 +89,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
+        log.info("Inside FindUsersByOrganisationTest:");
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), "any");
     }
 
