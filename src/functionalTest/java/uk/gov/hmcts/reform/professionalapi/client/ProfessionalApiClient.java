@@ -66,6 +66,7 @@ public class ProfessionalApiClient {
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
         this.idamClient = idamClient;
+        log.info("ProfessionalApiRequest:URL:: " + professionalApiUrl);
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {
@@ -178,6 +179,8 @@ public class ProfessionalApiClient {
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
                 .andReturn();
+
+        log.info("Request:URL:: " + professionalApiUrl + ":" + "/refdata/external/v1/organisations");
 
         if (response.statusCode() != CREATED.value()) {
             log.info("Create organisation response: " + response.asString());
