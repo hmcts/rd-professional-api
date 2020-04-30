@@ -33,6 +33,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
+
         updateAndValidateOrganisation(null, "ACTIVE",400);
     }
 
