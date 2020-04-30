@@ -12,6 +12,7 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
+
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
@@ -46,20 +48,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     public void setUp() {
         userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email("somenewuser@email.com")
-                .roles(userRoles)
-                .build();
-    }
-
-    @Test
-    public void post_request_adds_new_user_to_an_organisation() {
-        List<String> userRoles = new ArrayList<>();
-
-        userRoles.add("pui-user-manager");
-
         userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
@@ -93,7 +81,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
+            professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest, hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 

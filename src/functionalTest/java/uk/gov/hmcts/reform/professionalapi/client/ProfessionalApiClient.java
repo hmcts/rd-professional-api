@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
@@ -186,6 +187,19 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(CREATED.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest organisationCreationRequest) {
+        Response response = withUnauthenticatedRequest()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
 
         return response.body().as(Map.class);
     }
@@ -439,7 +453,12 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
     }
 
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
@@ -475,9 +494,24 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
     }
 
+
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+    }
+
+    public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier, HttpStatus expectedStatus) {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+        Response response = getMultipleAuthHeadersWithEmptyBearerToken("")
                 .body(organisationCreationRequest)
                 .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
                 .andReturn();
@@ -672,6 +706,16 @@ public class ProfessionalApiClient {
                 .header("Accepts", APPLICATION_JSON_VALUE)
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
+    public RequestSpecification getMultipleAuthHeadersWithEmptyBearerToken(String userToken) {
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer ");
     }
 
     @SuppressWarnings("unused")

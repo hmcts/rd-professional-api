@@ -23,6 +23,18 @@ spring:
             non_contextual_creation: true
   application:
     name: Professional Reference Data API
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
@@ -67,30 +79,30 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
-  authorisedServices:
-    - rd_professional_api
-    - rd_user_profile_api
-    - xui_webapp
-    - finrem_payment_service
-    - fpl_case_service
-    - iac
-
 ### dependency configuration
-auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:
     totp_secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: false
-usermap:
-    pbaFromUserAccountMap:
-    - "false"
+  s2s-authorised:
+    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
+  api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
+oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+#cache implementation
+#definitions cache parameters
+#max idle time in seconds that applies to all definition cache entries
+definition.cache.max-idle.secs: ${DEFINITION_CACHE_MAX_IDLE_SEC:259200}
+#max size of cache map in terms of number of entries
+definition.cache.max.size: ${DEFINITION_CACHE_MAX_SIZE:5000}
+#eviction policy. If set to NONE the cache can grow arbitrarily large and definition.cache.max.size is ignored
+definition.cache.eviction.policy: ${DEFINITION_CACHE_EVICTION_POLICY:NONE}
+#time to live for user cache entries
+user.cache.ttl.secs: 1800
 
-auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
 exui.role:
     hmcts-admin: prd-admin
@@ -102,7 +114,7 @@ exui.role:
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 
-userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 ccdUrl: ${CCD_URL:http://ccd-user-profile-api-aat.service.core-compute-aat.internal}
 
 feign:

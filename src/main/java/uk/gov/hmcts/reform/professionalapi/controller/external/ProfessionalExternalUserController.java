@@ -12,9 +12,9 @@ import io.swagger.annotations.Authorization;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -34,8 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-
-
+import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -44,6 +43,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @RestController
 @Slf4j
 public class ProfessionalExternalUserController extends SuperController {
+
+    @Autowired
+    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
             value = "Retrieves the given organisation based on user with the given email address if organisation is active or showDeleted flag ",
@@ -89,8 +91,8 @@ public class ProfessionalExternalUserController extends SuperController {
                                                      @RequestParam(value = "size", required = false) Integer size) {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
-        ServiceAndUserDetails serviceAndUserDetails = (ServiceAndUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(serviceAndUserDetails.getAuthorities(), "pui-user-manager");
+        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        boolean isRolePuiUserManager  = organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), "pui-user-manager");
         ResponseEntity profUsersEntityResponse;
 
         if (!isRolePuiUserManager) {

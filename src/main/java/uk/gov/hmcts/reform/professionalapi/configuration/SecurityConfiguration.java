@@ -3,119 +3,112 @@ package uk.gov.hmcts.reform.professionalapi.configuration;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import java.util.List;
+import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 
-import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.service.Service;
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.AuthCheckerServiceAndUserFilter;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceonly.AuthCheckerServiceOnlyFilter;
-
+@Configuration
+@ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 @Slf4j
-public class SecurityConfiguration  {
+@SuppressWarnings("unchecked")
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Configuration
-    @Order(1)
-    public static class PostApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
-        private AuthCheckerServiceOnlyFilter authCheckerServiceOnlyFilter;
+    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
 
-        public PostApiSecurityConfigurationAdapter(RequestAuthorizer<Service> serviceRequestAuthorizer,
+    @Value("${oidc.issuer}")
+    private String issuerOverride;
 
-                                                       AuthenticationManager authenticationManager) {
+    private  ServiceAuthFilter serviceAuthFilter;
+    List<String> anonymousPaths;
 
-            authCheckerServiceOnlyFilter = new AuthCheckerServiceOnlyFilter(serviceRequestAuthorizer);
+    private JwtAuthenticationConverter jwtAuthenticationConverter;
 
-            authCheckerServiceOnlyFilter.setAuthenticationManager(authenticationManager);
-
-        }
-
-        protected void configure(HttpSecurity http) throws Exception {
-
-            http.requestMatchers()
-                    .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations")
-                    .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations")
-                    .and()
-                    .addFilter(authCheckerServiceOnlyFilter)
-                    .csrf().disable()
-                    .authorizeRequests()
-                    .anyRequest().authenticated();
-        }
+    public List<String> getAnonymousPaths() {
+        return anonymousPaths;
     }
 
-    @ConfigurationProperties(prefix = "security")
-    @Configuration
-    @Order(2)
-    public static class RestAllApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public void setAnonymousPaths(List<String> anonymousPaths) {
+        this.anonymousPaths = anonymousPaths;
+    }
 
-        List<String> anonymousPaths;
-
-        private AuthCheckerServiceAndUserFilter authCheckerServiceAndUserFilter;
-
-        public List<String> getAnonymousPaths() {
-            return anonymousPaths;
-        }
-
-        public void setAnonymousPaths(List<String> anonymousPaths) {
-            this.anonymousPaths = anonymousPaths;
-        }
-
-        @Override
-        public void configure(WebSecurity web) {
-            web.ignoring()
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring()
                     .antMatchers(anonymousPaths.toArray(new String[0]));
-        }
+    }
 
+    @Inject
+    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
+                                                       final ServiceAuthFilter serviceAuthFilter
+    ) {
 
-        public RestAllApiSecurityConfigurationAdapter(RequestAuthorizer<User> userRequestAuthorizer,
-
-                                                       RequestAuthorizer<Service> serviceRequestAuthorizer,
-
-                                                       AuthenticationManager authenticationManager) {
-
-            authCheckerServiceAndUserFilter = new AuthCheckerServiceAndUserFilter(serviceRequestAuthorizer, userRequestAuthorizer);
-
-            authCheckerServiceAndUserFilter.setAuthenticationManager(authenticationManager);
-
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) throws AccessDeniedException,Exception {
-
-            http.authorizeRequests()
-                    .antMatchers("/actuator/**","/search/**")
-                    .permitAll()
-                    .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(STATELESS)
-                    .and()
-                    .csrf()
-                    .disable()
-                    .formLogin()
-                    .disable()
-                    .logout()
-                    .disable()
-                    .authorizeRequests()
-                    .anyRequest()
-                    .authenticated()
-                    .and()
-                    .addFilter(authCheckerServiceAndUserFilter);
-        }
-
+        this.serviceAuthFilter = serviceAuthFilter;
+        jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
     }
 
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
+        http
+           .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+           .sessionManagement().sessionCreationPolicy(STATELESS).and()
+           .csrf().disable()
+           .formLogin().disable()
+           .logout().disable()
+           .authorizeRequests()
+           .antMatchers("/error").permitAll()
+           .antMatchers(HttpMethod.POST, "/refdata/external/v1/organisations").permitAll()
+           .antMatchers(HttpMethod.POST, "/refdata/internal/v1/organisations").permitAll()
+           .anyRequest()
+           .authenticated()
+           .and()
+           .oauth2ResourceServer()
+           .jwt()
+           .jwtAuthenticationConverter(jwtAuthenticationConverter)
+           .and()
+           .and()
+            .oauth2Client();
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder() {
+
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromOidcIssuerLocation(issuerUri);
+
+        // We are using issuerOverride instead of issuerUri as SIDAM has the wrong issuer at the moment
+        OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
+        OAuth2TokenValidator<Jwt> withIssuer = new JwtIssuerValidator(issuerOverride);
+        // FIXME : enable `withIssuer` once idam migration is done
+        //OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer);
+        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withTimestamp);
+        jwtDecoder.setJwtValidator(validator);
+        return jwtDecoder;
+    }
 }
+
+

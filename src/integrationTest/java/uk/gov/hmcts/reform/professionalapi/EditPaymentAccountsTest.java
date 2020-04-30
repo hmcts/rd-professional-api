@@ -10,12 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
@@ -30,7 +32,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         newPaymentAccounts.add("PBA0000007");
         newPaymentAccounts.add("PBA0000008");
 
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
@@ -49,7 +51,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
     @Test
     public void test_editPaymentAccountsShouldThrow404IfOrgIdIsNotFound() {
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
@@ -63,7 +65,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
@@ -77,7 +79,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     public void test_editPaymentAccountsShouldDeleteAllAccountsIfEmptyListIsSent() {
 
         Set<String> newPaymentAccounts = new HashSet<>();
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
@@ -99,7 +101,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
 
-        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFieldsAreUpdated().status("PENDING").paymentAccount(existingPaymentAccounts).build();
+        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFieldsAreUpdated().status("PENDING").paymentAccount(existingPaymentAccounts).sraId("someSra").build();
         java.util.Map<String, Object> responseForFirstOrganisationCreation = professionalReferenceDataClient.createOrganisation(firstOrganisationCreationRequest);
         String firstOrgId = (String) responseForFirstOrganisationCreation.get("organisationIdentifier");
         updateOrganisation(firstOrgId, hmctsAdmin, ACTIVE);
@@ -108,7 +110,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000005");
 
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
@@ -124,7 +126,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         Set<String> newPaymentAccounts = new HashSet<>();
         newPaymentAccounts.add("this-is-invalid");
 
-        PbaEditRequest pbaEditRequest = PbaEditRequest.anPbaEditRequest().build();
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
 
         String orgId = createActiveOrganisationAndPbaEditRequest();

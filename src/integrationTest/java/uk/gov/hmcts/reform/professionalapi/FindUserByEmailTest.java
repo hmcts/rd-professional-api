@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {

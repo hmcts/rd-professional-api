@@ -54,7 +54,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
-        PbaEditRequest pbaEditRequest = new PbaEditRequest(paymentAccountsEdit);
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
 
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest, orgIdentifierResponse, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
