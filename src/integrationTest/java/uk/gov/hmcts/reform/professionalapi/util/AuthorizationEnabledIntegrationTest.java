@@ -1,22 +1,25 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
+import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
@@ -26,6 +29,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,17 +37,16 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -53,7 +56,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990","IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092", "OPEN_ID_API_URI:http://0.0.0.0:7000/o"})
+@DirtiesContext()
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -79,23 +83,23 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
-    @Autowired
-    protected UserProfileFeignClient userProfileFeignClient;
 
-    @Rule
-    public WireMockRule s2sService = new WireMockRule(8990);
+    @ClassRule
+    public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
 
-    @Rule
-    public WireMockRule sidamService = new WireMockRule(WireMockConfiguration.options().port(5000)
-            .extensions(new ExternalTransformer()));
 
-    @Rule
-    public WireMockRule userProfileService = new WireMockRule(WireMockConfiguration.options().port(8091)
+    @ClassRule
+    public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
 
-    @Rule
-    public WireMockRule ccdService = new WireMockRule(8092);
+    @ClassRule
+    public static WireMockRule ccdService = new WireMockRule(wireMockConfig().port(8092));
 
+    @ClassRule
+    public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000).extensions(ExternalTransformer.class));
+
+    @ClassRule
+    public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
 
     @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
@@ -118,11 +122,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${syncInterval}")
     protected String syncInterval;
 
+    @Value("${oidc.issuer}")
+    private String issuer;
+
+    @Value("${oidc.expiration}")
+    private long expiration;
+
     protected static final String ACTIVE = "ACTIVE";
 
     @Before
     public void setUpClient() {
-        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port);
+        professionalReferenceDataClient = new ProfessionalReferenceDataClient(port, issuer, expiration);
     }
 
     @Before
@@ -132,7 +142,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("rd-professional-api")));
+                        .withBody("rd_professional_api")));
 
         s2sService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
@@ -140,90 +150,28 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withHeader("Content-Type", "application/json")
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
 
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-finance-manager"))
+        sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
                                 +  "  \"id\": \"%s\","
+                                +  "  \"uid\": \"%s\","
                                 +  "  \"forename\": \"Super\","
                                 +  "  \"surname\": \"User\","
                                 +  "  \"email\": \"super.user@hmcts.net\","
                                 +  "  \"accountStatus\": \"active\","
                                 +  "  \"roles\": ["
-                                +  "  \"pui-finance-manager\""
+                                +  "  \"%s\""
                                 +  "  ]"
                                 +  "}")
                         .withTransformers("external_user-token-response")));
 
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-case-manager"))
+        mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-case-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details")).withHeader("Authorization", containing("prd-admin"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"prd-admin\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-organisation-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-organisation-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
-        sidamService.stubFor(get(urlEqualTo("/details"))
-                .withHeader("Authorization", containing("pui-user-manager"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"pui-user-manager\""
-                                +  "  ]"
-                                +  "}")
-                        .withTransformers("external_user-token-response")));
-
+                        .withBody(getDynamicJwksResponse())));
     }
 
     @Before
@@ -623,6 +571,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         }
     }
 
+
     public static class ExternalTransformer extends ResponseTransformer {
         @Override
         public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
@@ -630,9 +579,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             String formatResponse = response.getBodyAsString();
 
             String token = request.getHeader("Authorization");
-            String userId = token.split(" ")[1];
-
-            formatResponse = String.format(formatResponse, userId);
+            String tokenBody = decodeJwtToken(token.split(" ")[1]);
+            LinkedList tokenInfo = getUserIdAndRoleFromToken(tokenBody);
+            formatResponse = format(formatResponse, tokenInfo.get(1), tokenInfo.get(1), tokenInfo.get(0));
 
             return Response.Builder.like(response)
                     .but().body(formatResponse)

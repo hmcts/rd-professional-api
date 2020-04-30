@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -13,8 +12,5 @@ public abstract class SpringBootIntegrationTest {
 
     @LocalServerPort
     protected int port;
-
-    @Value("${wiremock.server.port}")
-    protected Integer wireMockPort;
 
 }
