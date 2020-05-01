@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-@Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test

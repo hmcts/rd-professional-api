@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,13 +18,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
 
     @Test
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
-        log.info("Inside FindUsersStatusByEmailTest:");
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");

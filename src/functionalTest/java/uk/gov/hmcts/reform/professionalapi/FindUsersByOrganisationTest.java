@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.junit.Test;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Slf4j
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     RequestSpecification bearerTokenForPuiUserManager;
@@ -89,7 +87,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        log.info("Inside FindUsersByOrganisationTest:");
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), "any");
     }
 

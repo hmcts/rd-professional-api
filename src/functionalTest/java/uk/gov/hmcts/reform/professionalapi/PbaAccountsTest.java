@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Slf4j
 public class PbaAccountsTest extends AuthorizationFunctionalTest {
 
 
@@ -44,7 +42,6 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
                         .build())
                 .build();
 
-        log.info("Inside PbaAccountsTest:");
         Map<String, Object> response =  professionalApiClient.createOrganisation(request);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
