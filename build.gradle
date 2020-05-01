@@ -279,7 +279,7 @@ dependencies {
 
     }
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.4.1'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
 
 
