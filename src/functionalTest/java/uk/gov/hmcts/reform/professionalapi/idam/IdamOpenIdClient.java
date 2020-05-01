@@ -70,6 +70,9 @@ public class IdamOpenIdClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
+
+        log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -105,6 +108,8 @@ public class IdamOpenIdClient {
                 .params(tokenParams)
                 .post("/o/token")
                 .andReturn();
+
+        log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
