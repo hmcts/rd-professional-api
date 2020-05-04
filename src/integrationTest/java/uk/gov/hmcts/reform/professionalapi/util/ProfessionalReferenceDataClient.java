@@ -339,4 +339,26 @@ public class ProfessionalReferenceDataClient {
 
         return  getResponse(responseEntity);
     }
+
+    public Map<String, Object> deleteOrganisation(
+            String role, String organisationIdentifier) {
+
+        ResponseEntity<OrganisationResponse> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, OrganisationResponse.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> organisationResponse = new HashMap<>();
+        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return organisationResponse;
+    }
+
+
 }
