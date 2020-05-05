@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -38,6 +39,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -45,6 +48,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -68,6 +73,10 @@ public class OrganisationServiceImpl implements OrganisationService {
     ContactInformationRepository contactInformationRepository;
     @Autowired
     PrdEnumRepository prdEnumRepository;
+    @Autowired
+    UserAccountMapRepository userAccountMapRepository;
+    @Autowired
+    UserAttributeRepository userAttributeRepository;
     @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
@@ -314,8 +323,113 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         }
         return new OrganisationsDetailResponse(organisations, true);
+
     }
 
+
+    @Override
+    public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
+        DeleteOrganisationResponse deleteOrganisationResponse = null;
+        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
+
+            deleteOrganisationResponse = deleteOrganisationInfo(organisation);
+
+        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
+
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        return deleteOrganisationResponse;
+    }
+
+    @Transactional
+    private DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
+        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        try {
+
+            //deleting contactInfo and DxAddress
+            deleteContactInformation(organisation.getContactInformation());
+            //deleting payment accounts and userAccountMap
+            deletePaymentAccounts(organisation.getPaymentAccounts());
+            //deleting userAttributes, super user view and professional user
+            deleteProfessionalUser(organisation.getUsers().get(0));
+
+            //deleting organisation
+            deletePendingOrganisation(organisation);
+
+            deleteOrganisationResponse.setStatusCode(204);
+            deleteOrganisationResponse.setMessage("Organisation deleted successfully");
+
+        } catch (Exception ex) {
+            deleteOrganisationResponse.setStatusCode(500);
+            deleteOrganisationResponse.setMessage("Organisation not deleted");
+            deleteOrganisationResponse.setErrorDescription(ex.getMessage());
+        }
+        return deleteOrganisationResponse;
+    }
+
+
+    private void deleteContactInformation(List<ContactInformation> contactInformations) {
+
+        List<DxAddress> dxAddresses;
+        if (!CollectionUtils.isEmpty(contactInformations) && contactInformations.size() > 0) {
+            dxAddresses = new ArrayList<DxAddress>();
+            contactInformations.stream().forEach(contactInformation -> dxAddresses.addAll(contactInformation.getDxAddresses()));
+            deleteDxAddress(dxAddresses);
+            contactInformationRepository.deleteAll(contactInformations);
+        }
+    }
+
+    private void deleteDxAddress(List<DxAddress> dxAddresses) {
+
+        if (!CollectionUtils.isEmpty(dxAddresses) && dxAddresses.size() > 0) {
+
+            dxAddressRepository.deleteAll(dxAddresses);
+        }
+    }
+
+    private void deletePaymentAccounts(List<PaymentAccount> paymentAccounts) {
+
+        List<UserAccountMap> userAccountMap;
+        if (!CollectionUtils.isEmpty(paymentAccounts) && paymentAccounts.size() > 0) {
+            userAccountMap = new ArrayList<>();
+            paymentAccounts.forEach(paymentAccount -> userAccountMap.addAll(paymentAccount.getUserAccountMap()));
+            deleteUserAccountMapService(userAccountMap);
+            paymentAccountRepository.deleteAll(paymentAccounts);
+        }
+    }
+
+    private void deleteUserAccountMapService(List<UserAccountMap> userAccountMap) {
+
+        if (!CollectionUtils.isEmpty(userAccountMap) && userAccountMap.size() > 0) {
+
+            userAccountMapRepository.deleteAll(userAccountMap);
+        }
+    }
+
+
+    private void deleteProfessionalUser(SuperUser superUser) {
+
+
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(superUser.getUserIdentifier());
+
+        deleteUserAttributes(professionalUser.getUserAttributes());
+        professionalUserRepository.delete(professionalUser);
+
+    }
+
+    private void deleteUserAttributes(List<UserAttribute> userAttributes) {
+
+        if (!CollectionUtils.isEmpty(userAttributes) && userAttributes.size() > 0) {
+
+            userAttributeRepository.deleteAll(userAttributes);
+        }
+    }
+
+    private void deletePendingOrganisation(Organisation organisation) {
+
+        organisationRepository.delete(organisation);
+    }
 
 }
 

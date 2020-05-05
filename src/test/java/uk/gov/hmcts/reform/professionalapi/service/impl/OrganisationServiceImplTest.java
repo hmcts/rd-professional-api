@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -60,6 +61,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -69,6 +71,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -83,6 +86,7 @@ public class OrganisationServiceImplTest {
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final OrganisationRepository organisationRepositoryImplNullReturnedMock = mock(OrganisationRepository.class);
+    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
@@ -114,6 +118,7 @@ public class OrganisationServiceImplTest {
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
+    private DeleteOrganisationResponse deleteOrganisationResponse;
 
     @InjectMocks
     private OrganisationServiceImpl sut;
@@ -128,6 +133,7 @@ public class OrganisationServiceImplTest {
         sut.setDxAddressRepository(dxAddressRepositoryMock);
         sut.setContactInformationRepository(contactInformationRepositoryMock);
         sut.setPrdEnumRepository(prdEnumRepositoryMock);
+        sut.setUserAttributeRepository(userAttributeRepositoryMock);
         sut.setUserAccountMapService(userAccountMapServiceMock);
         sut.setUserProfileFeignClient(userProfileFeignClient);
         sut.setPrdEnumService(prdEnumService);
@@ -167,6 +173,8 @@ public class OrganisationServiceImplTest {
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "sra-id", "false", "number01", "company-url", superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted",null);
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
@@ -461,4 +469,99 @@ public class OrganisationServiceImplTest {
         assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
     }
+
+    @Test
+    public void testDeletePendingOrganisation() {
+
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        List<SuperUser> users = new ArrayList<>();
+        users.add(superUser);
+
+        organisation.setStatus(OrganisationStatus.PENDING);
+        organisation.setUsers(users);
+
+        contactInformation.setAddressLine1("addressLine1");
+
+        List<DxAddress> dxAddresses = new ArrayList<>();
+        List<ContactInformation> contactInformations = new ArrayList<>();
+
+        dxAddresses.add(dxAddress);
+        contactInformation.setDxAddresses(dxAddresses);
+        contactInformations.add(contactInformation);
+        organisation.setContactInformations(contactInformations);
+
+        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
+        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
+        userAttributes.add(userAttribute);
+        professionalUser.setUserAttributes(userAttributes);
+
+        UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
+        UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
+        userAccountMaps.add(userAccountMap);
+        paymentAccount.setUserAccountMap(userAccountMaps);
+        organisation.addPaymentAccount(paymentAccount);
+
+        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(204);
+        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Organisation deleted successfully");
+        assertThat(deleteOrganisationResponse.getErrorDescription()).isNull();
+        verify(organisationRepository, times(1)).delete(organisation);
+        verify(professionalUserRepositoryMock, times(1)).delete(professionalUser);
+        verify(contactInformationRepositoryMock, times(1)).deleteAll(contactInformations);
+        verify(dxAddressRepositoryMock, times(1)).deleteAll(dxAddresses);
+        verify(userAccountMapRepositoryMock, times(1)).deleteAll(any());
+        verify(paymentAccountRepositoryMock, times(1)).deleteAll(paymentAccounts);
+        verify(userAttributeRepositoryMock, times(1)).deleteAll(userAttributes);
+
+    }
+
+    @Test
+    public void testPenidngOrganisationNotDeletedSuccessfully() {
+
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
+        List<SuperUser> users = new ArrayList<>();
+        organisation.setStatus(OrganisationStatus.PENDING);
+        contactInformation.setAddressLine1("addressLine1");
+
+        List<DxAddress> dxAddresses = new ArrayList<>();
+        List<ContactInformation> contactInformations = new ArrayList<>();
+
+        dxAddresses.add(dxAddress);
+        contactInformation.setDxAddresses(dxAddresses);
+        contactInformations.add(contactInformation);
+        organisation.setContactInformations(contactInformations);
+
+        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
+        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
+        userAttributes.add(userAttribute);
+        professionalUser.setUserAttributes(userAttributes);
+
+        UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
+        UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
+        userAccountMaps.add(userAccountMap);
+        paymentAccount.setUserAccountMap(userAccountMaps);
+        organisation.addPaymentAccount(paymentAccount);
+
+        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
+        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(500);
+        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Organisation not deleted");
+        assertThat(deleteOrganisationResponse.getErrorDescription()).isNotNull();
+        verify(organisationRepository, times(0)).delete(organisation);
+        verify(professionalUserRepositoryMock, times(0)).delete(professionalUser);
+        verify(contactInformationRepositoryMock, times(1)).deleteAll(contactInformations);
+        verify(dxAddressRepositoryMock, times(1)).deleteAll(dxAddresses);
+        verify(paymentAccountRepositoryMock, times(1)).deleteAll(paymentAccounts);
+        verify(userAttributeRepositoryMock, times(0)).deleteAll(userAttributes);
+
+    }
+
 }

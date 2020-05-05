@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -343,11 +344,11 @@ public class ProfessionalReferenceDataClient {
     public Map<String, Object> deleteOrganisation(
             String role, String organisationIdentifier) {
 
-        ResponseEntity<OrganisationResponse> responseEntity = null;
+        ResponseEntity<DeleteOrganisationResponse> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
         try {
             HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
-            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, OrganisationResponse.class);
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, DeleteOrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
             statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
@@ -355,9 +356,9 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
-        Map<String, Object> organisationResponse = new HashMap<>();
-        organisationResponse.put("http_status", responseEntity.getStatusCodeValue());
-        return organisationResponse;
+        Map<String, Object> deleteOrganisationResponse = new HashMap<>();
+        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return deleteOrganisationResponse;
     }
 
 

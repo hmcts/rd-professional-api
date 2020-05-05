@@ -38,10 +38,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -64,12 +66,14 @@ public class OrganisationInternalControllerTest {
     private PaymentAccountService paymentAccountServiceMock;
     private JurisdictionServiceImpl jurisdictionService;
     private Organisation organisation;
+    private ContactInformation contactInformation;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
 
     private PrdEnumRepository prdEnumRepository;
+
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(3, "PRD_ROLE");
@@ -86,6 +90,7 @@ public class OrganisationInternalControllerTest {
     private ProfessionalUser professionalUser;
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
+    private DeleteOrganisationResponse deleteOrganisationResponse;
 
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
@@ -93,10 +98,11 @@ public class OrganisationInternalControllerTest {
     @Before
     public void setUp() throws Exception {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
-
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted",null);
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
@@ -299,5 +305,30 @@ public class OrganisationInternalControllerTest {
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+    }
+
+    @Test
+    public void testDeleteOrganisation() {
+
+        final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        organisation.setStatus(OrganisationStatus.PENDING);
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(organisation)).thenReturn(deleteOrganisationResponse);
+        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId);
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1)).deleteOrganisation(organisation);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testDeleteOrganisationThrows404WhenNoOrgFound() {
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
+        organisationInternalController.deleteOrganisation(orgId);
     }
 }
