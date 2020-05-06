@@ -519,49 +519,4 @@ public class OrganisationServiceImplTest {
         verify(userAttributeRepositoryMock, times(1)).deleteAll(userAttributes);
 
     }
-
-    @Test
-    public void testPenidngOrganisationNotDeletedSuccessfully() {
-
-        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
-        List<SuperUser> users = new ArrayList<>();
-        organisation.setStatus(OrganisationStatus.PENDING);
-        contactInformation.setAddressLine1("addressLine1");
-
-        List<DxAddress> dxAddresses = new ArrayList<>();
-        List<ContactInformation> contactInformations = new ArrayList<>();
-
-        dxAddresses.add(dxAddress);
-        contactInformation.setDxAddresses(dxAddresses);
-        contactInformations.add(contactInformation);
-        organisation.setContactInformations(contactInformations);
-
-        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
-        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
-        userAttributes.add(userAttribute);
-        professionalUser.setUserAttributes(userAttributes);
-
-        UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
-        UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
-        userAccountMaps.add(userAccountMap);
-        paymentAccount.setUserAccountMap(userAccountMaps);
-        organisation.addPaymentAccount(paymentAccount);
-
-        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
-        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(500);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Organisation not deleted");
-        assertThat(deleteOrganisationResponse.getErrorDescription()).isNotNull();
-        verify(organisationRepository, times(0)).delete(organisation);
-        verify(professionalUserRepositoryMock, times(0)).delete(professionalUser);
-        verify(contactInformationRepositoryMock, times(1)).deleteAll(contactInformations);
-        verify(dxAddressRepositoryMock, times(1)).deleteAll(dxAddresses);
-        verify(paymentAccountRepositoryMock, times(1)).deleteAll(paymentAccounts);
-        verify(userAttributeRepositoryMock, times(0)).deleteAll(userAttributes);
-
-    }
-
 }

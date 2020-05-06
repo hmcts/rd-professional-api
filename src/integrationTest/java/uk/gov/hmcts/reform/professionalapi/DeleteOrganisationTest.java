@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -104,14 +103,10 @@ public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest 
     public void return_400_when_invalid_org_identifier_in_the_request_to_delete_pending_organisation() {
 
         Map<String, Object> deleteResponse =
-                professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,"O12DEF");
+                professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, "O12DEF");
         assertThat(deleteResponse.get("http_status")).isEqualTo("400");
 
     }
 
-    @After
-    public void cleanupTestData() {
-
-    }
 
 }
