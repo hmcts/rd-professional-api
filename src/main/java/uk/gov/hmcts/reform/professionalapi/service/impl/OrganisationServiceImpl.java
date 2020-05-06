@@ -343,7 +343,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Transactional
-    private DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
+    public DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         try {
 
