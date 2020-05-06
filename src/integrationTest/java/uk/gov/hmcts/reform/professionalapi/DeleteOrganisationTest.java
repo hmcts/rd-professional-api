@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-@Slf4j
 public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test

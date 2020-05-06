@@ -351,7 +351,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             deleteContactInformation(organisation.getContactInformation());
             //deleting payment accounts and userAccountMap
             deletePaymentAccounts(organisation.getPaymentAccounts());
-            //deleting userAttributes, super user view and professional user
+            //deleting userAttributes and professional user
             deleteProfessionalUser(organisation.getUsers().get(0));
 
             //deleting organisation
@@ -372,7 +372,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void deleteContactInformation(List<ContactInformation> contactInformations) {
 
         List<DxAddress> dxAddresses;
-        if (!CollectionUtils.isEmpty(contactInformations) && contactInformations.size() > 0) {
+        if (!CollectionUtils.isEmpty(contactInformations)) {
             dxAddresses = new ArrayList<DxAddress>();
             contactInformations.stream().forEach(contactInformation -> dxAddresses.addAll(contactInformation.getDxAddresses()));
             deleteDxAddress(dxAddresses);
@@ -382,7 +382,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void deleteDxAddress(List<DxAddress> dxAddresses) {
 
-        if (!CollectionUtils.isEmpty(dxAddresses) && dxAddresses.size() > 0) {
+        if (!CollectionUtils.isEmpty(dxAddresses)) {
 
             dxAddressRepository.deleteAll(dxAddresses);
         }
@@ -391,7 +391,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private void deletePaymentAccounts(List<PaymentAccount> paymentAccounts) {
 
         List<UserAccountMap> userAccountMap;
-        if (!CollectionUtils.isEmpty(paymentAccounts) && paymentAccounts.size() > 0) {
+        if (!CollectionUtils.isEmpty(paymentAccounts)) {
             userAccountMap = new ArrayList<>();
             paymentAccounts.forEach(paymentAccount -> userAccountMap.addAll(paymentAccount.getUserAccountMap()));
             deleteUserAccountMapService(userAccountMap);
@@ -401,7 +401,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void deleteUserAccountMapService(List<UserAccountMap> userAccountMap) {
 
-        if (!CollectionUtils.isEmpty(userAccountMap) && userAccountMap.size() > 0) {
+        if (!CollectionUtils.isEmpty(userAccountMap)) {
 
             userAccountMapRepository.deleteAll(userAccountMap);
         }
@@ -420,7 +420,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private void deleteUserAttributes(List<UserAttribute> userAttributes) {
 
-        if (!CollectionUtils.isEmpty(userAttributes) && userAttributes.size() > 0) {
+        if (!CollectionUtils.isEmpty(userAttributes)) {
 
             userAttributeRepository.deleteAll(userAttributes);
         }
