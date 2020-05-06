@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -35,6 +36,10 @@ public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,orgIdentifier);
         assertThat(deleteResponse.get("http_status")).isEqualTo(204);
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
     }
 
@@ -56,6 +61,11 @@ public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,orgIdentifier);
         assertThat(deleteResponse.get("http_status")).isEqualTo(204);
+
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
+
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
 
     }
 
@@ -96,6 +106,11 @@ public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,"O12DEF");
         assertThat(deleteResponse.get("http_status")).isEqualTo("400");
+
+    }
+
+    @After
+    public void cleanupTestData() {
 
     }
 

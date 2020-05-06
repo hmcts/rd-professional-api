@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -87,6 +88,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeService userAttributeService;
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
+    @Autowired
+    PaymentAccountService paymentAccountService;
 
     @Override
     @Transactional
@@ -328,7 +331,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     @Override
-    @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
@@ -343,28 +345,22 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
+
     public DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
+
+        //deleting contactInfo and DxAddress
+        deleteContactInformation(organisation.getContactInformation());
+        //deleting payment accounts and userAccountMap
+        deletePaymentAccounts(organisation.getPaymentAccounts());
+        //deleting userAttributes and professional user
+        deleteProfessionalUser(organisation.getUsers().get(0));
+
+        //deleting organisation
+        deletePendingOrganisation(organisation);
+
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        try {
-
-            //deleting contactInfo and DxAddress
-            deleteContactInformation(organisation.getContactInformation());
-            //deleting payment accounts and userAccountMap
-            deletePaymentAccounts(organisation.getPaymentAccounts());
-            //deleting userAttributes and professional user
-            deleteProfessionalUser(organisation.getUsers().get(0));
-
-            //deleting organisation
-            deletePendingOrganisation(organisation);
-
-            deleteOrganisationResponse.setStatusCode(204);
-            deleteOrganisationResponse.setMessage("Organisation deleted successfully");
-
-        } catch (Exception ex) {
-            deleteOrganisationResponse.setStatusCode(500);
-            deleteOrganisationResponse.setMessage("Organisation not deleted");
-            deleteOrganisationResponse.setErrorDescription(ex.getMessage());
-        }
+        deleteOrganisationResponse.setStatusCode(204);
+        deleteOrganisationResponse.setMessage("Organisation deleted successfully");
         return deleteOrganisationResponse;
     }
 
@@ -409,7 +405,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     private void deleteProfessionalUser(SuperUser superUser) {
-
 
         ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(superUser.getUserIdentifier());
 
