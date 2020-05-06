@@ -328,6 +328,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
 
     @Override
+    @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
@@ -342,7 +343,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         return deleteOrganisationResponse;
     }
 
-    @Transactional
     public DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         try {
