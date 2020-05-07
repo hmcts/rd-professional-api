@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -74,7 +75,7 @@ public class ContactInformation implements Serializable {
     private LocalDateTime created;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(mappedBy = "contactInformation")
+    @OneToMany(mappedBy = "contactInformation", cascade = CascadeType.ALL)
     private List<DxAddress> dxAddresses = new ArrayList<>();
 
     public void addDxAddress(DxAddress dxAddress) {
