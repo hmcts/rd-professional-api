@@ -46,10 +46,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
-import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -73,10 +70,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     PrdEnumRepository prdEnumRepository;
     @Autowired
-    UserAccountMapRepository userAccountMapRepository;
-    @Autowired
-    UserAttributeRepository userAttributeRepository;
-    @Autowired
     UserAccountMapService userAccountMapService;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
@@ -86,8 +79,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeService userAttributeService;
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
-    @Autowired
-    PaymentAccountService paymentAccountService;
 
     @Override
     @Transactional
