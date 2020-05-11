@@ -326,7 +326,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+    public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
@@ -338,9 +338,13 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
 
     }
 

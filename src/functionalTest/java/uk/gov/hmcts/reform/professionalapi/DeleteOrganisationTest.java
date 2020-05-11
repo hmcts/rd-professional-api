@@ -19,7 +19,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         String orgIdentifier = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifier).isNotEmpty();
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NO_CONTENT);
-
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifier,hmctsAdmin, HttpStatus.NOT_FOUND);
 
     }
 
