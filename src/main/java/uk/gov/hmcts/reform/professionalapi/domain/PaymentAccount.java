@@ -54,7 +54,7 @@ public class PaymentAccount implements Serializable {
     private LocalDateTime created;
 
     @OneToMany
-    @JoinColumn(name = "PAYMENT_ACCOUNT_ID",referencedColumnName = "id")
+    @JoinColumn(name = "PAYMENT_ACCOUNT_ID", referencedColumnName = "id")
     private List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     public PaymentAccount(String pbaNumber) {

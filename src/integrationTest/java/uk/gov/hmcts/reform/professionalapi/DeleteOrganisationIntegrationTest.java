@@ -15,32 +15,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-public class DeleteOrganisationTest extends AuthorizationEnabledIntegrationTest {
+public class DeleteOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    @Test
-    public void returns_204_when_delete_pending_organisation_successfully() {
-
-        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-
-        Map<String, Object> response =
-                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifier = (String) response.get("organisationIdentifier");
-
-        assertThat(orgIdentifier).isNotNull();
-        assertThat(orgIdentifier.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
-        assertThat(orgIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
-
-
-        Map<String, Object> deleteResponse =
-                professionalReferenceDataClient.deleteOrganisation(hmctsAdmin,orgIdentifier);
-        assertThat(deleteResponse.get("http_status")).isEqualTo(204);
-        Map<String, Object> orgResponse =
-                professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifier, hmctsAdmin);
-
-        assertThat(orgResponse.get("http_status").toString().contains("OK"));
-
-    }
 
     @Test
     public void returns_204_when_delete_minimal_pending_organisation_successfully() {

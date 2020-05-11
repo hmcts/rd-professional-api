@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -40,9 +39,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
@@ -311,9 +307,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-
         List<Organisation> organisations = null;
-
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
             organisations = organisationRepository.findByStatus(status);
@@ -331,144 +325,24 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
-
-            deleteOrganisationResponse = deleteOrganisationInfo(organisation);
-
+            deleteOrganisationResponse = deletePendingOrganisation(organisation);
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
-
             throw new EmptyResultDataAccessException(1);
         }
-
         return deleteOrganisationResponse;
     }
 
-
-    public DeleteOrganisationResponse deleteOrganisationInfo(Organisation organisation) {
-
-        //deleting contactInfo and DxAddress
-          deleteContactInformation(organisation.getContactInformation());
-        //deleting payment accounts and userAccountMap
-        // deletePaymentAccounts(organisation.getPaymentAccounts());
-
-          deleteUserAccountMaps(organisation);
-          deletePaymentAccountsFromOrganisation(organisation);
-
-        //deleting userAttributes and professional user
-         deleteProfessionalUser(organisation.getUsers().get(0));
-
-        //deleting organisation
-        deletePendingOrganisation(organisation);
-
+    private DeleteOrganisationResponse deletePendingOrganisation(Organisation organisation) {
+        organisationRepository.deleteById(organisation.getId());
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         deleteOrganisationResponse.setStatusCode(204);
         deleteOrganisationResponse.setMessage("Organisation deleted successfully");
         return deleteOrganisationResponse;
-    }
-
-
-    private void deleteContactInformation(List<ContactInformation> contactInformations) {
-
-        List<DxAddress> dxAddresses;
-        if (!CollectionUtils.isEmpty(contactInformations)) {
-            dxAddresses = new ArrayList<DxAddress>();
-            contactInformations.stream().forEach(contactInformation -> dxAddresses.addAll(contactInformation.getDxAddresses()));
-            deleteDxAddress(dxAddresses);
-            contactInformationRepository.deleteAll(contactInformations);
-        }
-    }
-
-    private void deleteDxAddress(List<DxAddress> dxAddresses) {
-
-        if (!CollectionUtils.isEmpty(dxAddresses)) {
-
-            dxAddressRepository.deleteAll(dxAddresses);
-        }
-    }
-
-    private void deletePaymentAccounts(List<PaymentAccount> paymentAccounts) {
-
-        List<UserAccountMap> userAccountMap;
-        if (!CollectionUtils.isEmpty(paymentAccounts)) {
-            userAccountMap = new ArrayList<>();
-            paymentAccounts.forEach(paymentAccount -> userAccountMap.addAll(paymentAccount.getUserAccountMap()));
-            deleteUserAccountMapService(userAccountMap);
-            paymentAccountRepository.deleteAll(paymentAccounts);
-        }
-    }
-
-    private void deleteUserAccountMapService(List<UserAccountMap> userAccountMap) {
-
-        if (!CollectionUtils.isEmpty(userAccountMap)) {
-
-            userAccountMapRepository.deleteAll(userAccountMap);
-        }
-    }
-
-
-    private void deleteProfessionalUser(SuperUser superUser) {
-
-        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(superUser.getId().toString());
-
-        deleteUserAttributes(professionalUser.getUserAttributes());
-        professionalUserRepository.delete(professionalUser);
-
-    }
-
-    private void deleteUserAttributes(List<UserAttribute> userAttributes) {
-
-        if (!CollectionUtils.isEmpty(userAttributes)) {
-
-            userAttributeRepository.deleteAll(userAttributes);
-        }
-    }
-
-    private void deletePendingOrganisation(Organisation organisation) {
-
-       // organisation.getPaymentAccounts().forEach(paymentAccount -> paymentAccount.getUserAccountMap().remove(0));
-        organisationRepository.delete(organisation);
-    }
-
-    public List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
-
-        return accounts.stream().filter(account -> null != user && null != account)
-                .map(account -> new UserAccountMapId(user, account))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public void deleteUserAccountMaps(Organisation organisation) {
-        /** Please note:
-         * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
-         * If this changes then the below logic will need to change accordingly */
-        ProfessionalUser user = organisation.getUsers().get(0).toProfessionalUser();
-
-        List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
-        List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
-        userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
-
-    }
-
-
-
-    @Transactional
-    public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
-        List<UUID> accountIds = new ArrayList<>();
-
-        organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
-
-        paymentAccountRepository.deleteByIdIn(accountIds);
-
-        /** Please Note:
-         * The below lines are required to set the Organisation's Payment Accounts List to be empty.
-         * If this is not done, the Organisation's list will still contain the previous Accounts */
-        List<PaymentAccount> resetOrganisationPaymentAccounts = new ArrayList<>();
-        organisation.setPaymentAccounts(resetOrganisationPaymentAccounts);
     }
 }
 

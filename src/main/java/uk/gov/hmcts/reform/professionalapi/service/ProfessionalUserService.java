@@ -33,5 +33,6 @@ public interface ProfessionalUserService {
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
+
 }
 

@@ -503,20 +503,12 @@ public class OrganisationServiceImplTest {
         organisation.addPaymentAccount(paymentAccount);
 
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
-        when(professionalUserRepositoryMock.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
         deleteOrganisationResponse = sut.deleteOrganisation(organisation);
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(204);
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Organisation deleted successfully");
         assertThat(deleteOrganisationResponse.getErrorDescription()).isNull();
-        verify(organisationRepository, times(1)).delete(organisation);
-        verify(professionalUserRepositoryMock, times(1)).delete(professionalUser);
-        verify(contactInformationRepositoryMock, times(1)).deleteAll(contactInformations);
-        verify(dxAddressRepositoryMock, times(1)).deleteAll(dxAddresses);
-        verify(userAccountMapRepositoryMock, times(1)).deleteAll(any());
-        verify(paymentAccountRepositoryMock, times(1)).deleteAll(paymentAccounts);
-        verify(userAttributeRepositoryMock, times(1)).deleteAll(userAttributes);
-
+        verify(organisationRepository, times(1)).deleteById(any());
     }
 }
