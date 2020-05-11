@@ -133,7 +133,6 @@ public class OrganisationServiceImplTest {
         sut.setDxAddressRepository(dxAddressRepositoryMock);
         sut.setContactInformationRepository(contactInformationRepositoryMock);
         sut.setPrdEnumRepository(prdEnumRepositoryMock);
-        sut.setUserAttributeRepository(userAttributeRepositoryMock);
         sut.setUserAccountMapService(userAccountMapServiceMock);
         sut.setUserProfileFeignClient(userProfileFeignClient);
         sut.setPrdEnumService(prdEnumService);
