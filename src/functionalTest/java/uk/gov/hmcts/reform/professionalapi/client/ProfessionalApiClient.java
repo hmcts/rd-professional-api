@@ -673,7 +673,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> deleteOrganisation(String organisationId, String role, HttpStatus status) {
+    public void deleteOrganisation(String organisationId, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .delete("/refdata/internal/v1/organisations/" + organisationId)
@@ -686,9 +686,21 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
+    }
 
-        return response.body().as(Map.class);
+    public void deleteOrganisationByExternalUser(String organisationId, String role, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .delete("/refdata/external/v1/organisations/" + organisationId)
+                .andReturn();
 
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
