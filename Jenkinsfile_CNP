@@ -4,7 +4,6 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
-
 def type = "java"
 def product = "rd"
 def component = "professional-api"
@@ -17,10 +16,10 @@ def secrets = [
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     [$class     : 'AzureKeyVaultSecret',
-     secretType : 'Secret',
-     name       : secretName,
-     version    : '',
-     envVariable: envVar
+        secretType : 'Secret',
+        name       : secretName,
+        version    : '',
+        envVariable: envVar
     ]
 }
 
@@ -36,10 +35,9 @@ withPipeline(type, product, component) {
 
     enableDbMigration('rd')
     installCharts()
+    disableLegacyDeployment()
+    enableAksStagingDeployment()
 
-    //enableAksStagingDeployment()
-    // **enable below for AKS deployment**
-    //disableLegacyDeployment()
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
 
@@ -60,7 +58,6 @@ withPipeline(type, product, component) {
     }
 
     enablePactAs([
-            AppPipelineDsl.PactRoles.CONSUMER
+        AppPipelineDsl.PactRoles.CONSUMER
     ])
-
 }
