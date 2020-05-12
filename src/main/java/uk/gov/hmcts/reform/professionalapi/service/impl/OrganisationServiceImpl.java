@@ -322,7 +322,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
             deleteOrganisationResponse = deletePendingOrganisation(organisation);
-        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
+        } else  {
             throw new EmptyResultDataAccessException(1);
         }
         return deleteOrganisationResponse;
