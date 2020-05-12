@@ -71,7 +71,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -86,7 +85,6 @@ public class OrganisationServiceImplTest {
     private final DxAddressRepository dxAddressRepositoryMock = mock(DxAddressRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final OrganisationRepository organisationRepositoryImplNullReturnedMock = mock(OrganisationRepository.class);
-    private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
@@ -211,7 +209,6 @@ public class OrganisationServiceImplTest {
     @Test
     public void testSavesOrganisationWithInvalidRequest() {
         when(organisationRepository.save(any(Organisation.class))).thenThrow(ConstraintViolationException.class);
-
         Assertions.assertThatThrownBy(() -> sut.createOrganisationFrom(organisationCreationRequest))
                 .isExactlyInstanceOf(ConstraintViolationException.class);
 
@@ -501,7 +498,6 @@ public class OrganisationServiceImplTest {
         paymentAccount.setUserAccountMap(userAccountMaps);
         organisation.addPaymentAccount(paymentAccount);
 
-        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
         deleteOrganisationResponse = sut.deleteOrganisation(organisation);
 
         assertThat(deleteOrganisationResponse).isNotNull();

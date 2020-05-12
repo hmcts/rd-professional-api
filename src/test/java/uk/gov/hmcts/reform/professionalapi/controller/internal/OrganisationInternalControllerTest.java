@@ -330,5 +330,6 @@ public class OrganisationInternalControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
         organisationInternalController.deleteOrganisation(orgId);
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
 }
