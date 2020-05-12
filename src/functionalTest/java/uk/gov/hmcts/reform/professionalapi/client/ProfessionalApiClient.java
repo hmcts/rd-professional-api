@@ -692,7 +692,7 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
     }
 
-    public void deleteOrganisationByExternalUser(String organisationId, String role, HttpStatus status) {
+    public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .delete("/refdata/external/v1/organisations/" + organisationId)

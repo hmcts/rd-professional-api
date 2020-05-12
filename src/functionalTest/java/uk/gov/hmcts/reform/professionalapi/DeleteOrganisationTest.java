@@ -29,7 +29,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifier = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifier).isNotEmpty();
-        professionalApiClient.deleteOrganisationByExternalUser(orgIdentifier, puiCaseManager, HttpStatus.NOT_FOUND);
+        professionalApiClient.deleteOrganisationByExternalUser(orgIdentifier, HttpStatus.NOT_FOUND);
 
     }
 
@@ -41,7 +41,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void ac4_error_when_delete_an_organisation_with_unknown_org_identifier_should_return_400() {
+    public void ac4_error_when_delete_an_organisation_with_invalid_org_id_should_return_400() {
 
         String orgIdentifier = "C345DF";
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);

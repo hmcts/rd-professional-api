@@ -320,7 +320,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
-        if (OrganisationStatus.PENDING.name().equalsIgnoreCase(organisation.getStatus().name())) {
+        if (OrganisationStatus.PENDING == organisation.getStatus()) {
             deleteOrganisationResponse = deletePendingOrganisation(organisation);
         } else  {
             throw new EmptyResultDataAccessException(1);
