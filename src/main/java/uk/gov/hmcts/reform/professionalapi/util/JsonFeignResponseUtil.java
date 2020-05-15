@@ -23,18 +23,18 @@ public class JsonFeignResponseUtil {
 
     }
 
-    public static Optional decode(Response response, Class clazz) {
+    public static Optional<Object> decode(Response response, Object clazz) {
         try {
-            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()), clazz));
+            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()), (Class<Object>) clazz));
         } catch (IOException e) {
             return Optional.empty();
         }
     }
 
-    public static ResponseEntity toResponseEntity(Response response, Class clazz) {
-        Optional payload = decode(response, clazz);
+    public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
+        Optional<Object>  payload = decode(response, clazz);
 
-        return new ResponseEntity(
+        return new ResponseEntity<>(
                 payload.orElse(null),
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
