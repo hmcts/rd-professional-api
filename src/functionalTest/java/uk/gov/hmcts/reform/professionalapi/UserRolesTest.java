@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -113,15 +114,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         });
     }
 
-    public static <T> T getNestedValue(Map map, String... keys) {
-        Object value = map;
-
-        for (String key : keys) {
-            value = ((Map) value).get(key);
-        }
-
-        return (T) value;
-    }
 
     private UserCreationRequest createSuperUser(String email) {
         UserCreationRequest superUser = aUserCreationRequest()
