@@ -79,8 +79,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
         List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-caa");
-        userRoles.add("caseworker-caa");
+        //userRoles.add("pui-caa");
+        //userRoles.add("caseworker-caa");
 
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
@@ -99,7 +99,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         Map superUserDetails = users.get(1);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
-        assertThat(superUserRoles).contains("pui-caa");
-        assertThat(superUserRoles).contains("caseworker-caa");
+        assertThat(superUserRoles).doesNotContain("pui-caa");
+        assertThat(superUserRoles).doesNotContain("caseworker-caa");
     }
 }
