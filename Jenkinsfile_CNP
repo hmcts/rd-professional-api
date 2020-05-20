@@ -29,7 +29,7 @@ def vaultOverrides = [
 ]
 
 withPipeline(type, product, component) {
-  
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
@@ -40,7 +40,6 @@ withPipeline(type, product, component) {
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.TEST_URL = "http://rd-professional-api-demo.service.core-compute-demo.internal"
 
     after('integrationTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
