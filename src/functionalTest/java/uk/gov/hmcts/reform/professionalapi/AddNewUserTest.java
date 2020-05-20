@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,23 +81,29 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         List<String> userRoles = new ArrayList<>();
         //userRoles.add("pui-caa");
         //userRoles.add("caseworker-caa");
-        //NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-        //        .firstName("someName")
-        //        .lastName("someLastName")
-        //        .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
-        //        .roles(userRoles)
-        //        .jurisdictions(createJurisdictions())
-        //        .build();
+        userRoles.add("pui-user-manager");
+        String firstName = "someName";
+        String lastName = "someLastName";
+        String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
 
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
 
         Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, "false", HttpStatus.OK);
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
-        Map superUserDetails = users.get(1);
-        List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
+        Map newUserDetails = users.get(1);
+        List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
 
         assertThat(superUserRoles).doesNotContain("pui-caa");
         assertThat(superUserRoles).doesNotContain("caseworker-caa");
