@@ -64,11 +64,9 @@ public class ProfessionalApiClient {
             String professionalApiUrl,
             String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) {
         this.professionalApiUrl = professionalApiUrl;
-        log.info("PROFESSIONAL API URL::::::" + professionalApiUrl);
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
         this.idamClient = idamClient;
-        log.info("IDAM CLIENT API URL::::::" + idamClient);
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {

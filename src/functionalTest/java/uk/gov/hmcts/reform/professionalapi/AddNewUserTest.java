@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,15 +78,15 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         List<String> userRoles = new ArrayList<>();
         //userRoles.add("pui-caa");
         //userRoles.add("caseworker-caa");
+        //NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
+        //        .firstName("someName")
+        //        .lastName("someLastName")
+        //        .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+        //        .roles(userRoles)
+        //        .jurisdictions(createJurisdictions())
+        //        .build();
 
-        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
 
