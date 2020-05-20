@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -100,7 +101,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
-    @Ignore //currently being ignored due to response status code coming 500 from SIDAM - but comes 403 when testing in Swagger
+    //@Ignore //currently being ignored due to response status code coming 500 from SIDAM - but comes 403 when testing in Swagger
     @Test
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
@@ -150,8 +151,10 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
 
+        RequestSpecification bearerTokenForSuspendedUser = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(email));
+
         //adding new user with Suspended Super User Bearer Token
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.FORBIDDEN);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerTokenForSuspendedUser, HttpStatus.FORBIDDEN);
         assertThat(newUserResponse).isNotNull();
         assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }

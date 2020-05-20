@@ -77,6 +77,8 @@ public abstract class AuthorizationFunctionalTest {
 
     protected RequestSpecification bearerToken;
 
+    protected IdamOpenIdClient idamOpenIdClient;
+
     @Autowired
     protected TestConfigProperties configProperties;
 
@@ -89,7 +91,7 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
