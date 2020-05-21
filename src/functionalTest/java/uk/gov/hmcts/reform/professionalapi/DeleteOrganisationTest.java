@@ -1,17 +1,28 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
+
+    @Value(("${deleteOrganisationEnabled}"))
+    protected boolean deleteOrganisationEnabled;
 
     @Test
     public void ac1_can_delete_an_organisation_with_valid_org_identifier_by_prd_admin() {
@@ -45,5 +56,56 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
         String orgIdentifier = "C345DF";
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void ac5_delete_an_active_organisation_with_pending_user_profile_by_prd_admin_successfully() {
+        if (deleteOrganisationEnabled) {
+            String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.NO_CONTENT);
+            professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse,hmctsAdmin, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Test
+    public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
+        if (deleteOrganisationEnabled) {
+            String firstName = "some-fname";
+            String lastName = "some-lname";
+            String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+            UserCreationRequest superUser = aUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .jurisdictions(createJurisdictions())
+                    .build();
+
+            bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+            OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                    .superUser(superUser)
+                    .build();
+
+            Map<String, Object> response = professionalApiClient.createOrganisation(request);
+            String orgIdentifier = (String) response.get("organisationIdentifier");
+            request.setStatus("ACTIVE");
+            professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
+
+        }
+    }
+
+    @Test
+    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_user_profile_by_prd_admin_successfully() {
+        if (deleteOrganisationEnabled) {
+            // create and update organisation
+            String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+            // invite user to the organisation
+            Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
+            assertThat(newUserResponse).isNotNull();
+
+            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
+
+        }
     }
 }

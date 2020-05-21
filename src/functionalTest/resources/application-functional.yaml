@@ -27,3 +27,5 @@ resendInterval: 60
 
 # toggle for resendInvite
 resendInviteEnabled : false
+# toggle for resendInvite
+deleteOrganisationEnabled : false

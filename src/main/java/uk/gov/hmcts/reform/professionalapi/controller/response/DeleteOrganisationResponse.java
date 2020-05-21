@@ -11,12 +11,9 @@ public class DeleteOrganisationResponse {
 
     private int statusCode;
     private String message;
-    private String errorDescription;
 
-    public DeleteOrganisationResponse(int statusCode, String message, String errorDescription) {
+    public DeleteOrganisationResponse(int statusCode, String message) {
         this.statusCode = statusCode;
         this.message = message;
-        this.errorDescription = errorDescription;
-
     }
 }

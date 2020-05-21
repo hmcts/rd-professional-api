@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -287,6 +287,10 @@ public class OrganisationInternalController extends SuperController {
                     code = 204,
                     message = "A representation of the Deleted organisation",
                     response = DeleteOrganisationResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "The orgId provided for an organisation is not valid or organisation admin is not in Pending state "
             ),
             @ApiResponse(
                     code = 401,
