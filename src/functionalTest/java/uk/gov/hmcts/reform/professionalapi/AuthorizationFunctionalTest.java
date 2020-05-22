@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
@@ -32,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
+import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -73,6 +77,8 @@ public abstract class AuthorizationFunctionalTest {
 
     protected RequestSpecification bearerToken;
 
+    protected IdamOpenIdClient idamOpenIdClient;
+
     @Autowired
     protected TestConfigProperties configProperties;
 
@@ -85,7 +91,7 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
@@ -205,6 +211,29 @@ public abstract class AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
         return userCreationRequest;
+    }
+
+    public RequestSpecification generateSuperUserBearerToken() {
+        String firstName = "some-fname";
+        String lastName = "some-lname";
+        String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
+
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .superUser(superUser)
+                .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+        return bearerToken;
     }
 
 }
