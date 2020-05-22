@@ -8,16 +8,15 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.cr
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
+import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -101,7 +100,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
-    //@Ignore //currently being ignored due to response status code coming 500 from SIDAM - but comes 403 when testing in Swagger
+    //currently being ignored due to response status code coming 500 from SIDAM - but comes 403 when testing in Swagger
     @Test
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
