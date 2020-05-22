@@ -326,30 +326,28 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
-        DeleteOrganisationResponse deleteOrganisationResponse;
+        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         if (OrganisationStatus.PENDING == organisation.getStatus()) {
-            deleteOrganisationResponse = deleteOrganisationEntity(organisation);
+            deleteOrganisationResponse = deleteOrganisationEntity(organisation, deleteOrganisationResponse);
         } else if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
-            deleteOrganisationResponse = deleteUserProfile(organisation);
+            deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
             deleteOrganisationResponse = deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
-                    ? deleteOrganisationEntity(organisation) : deleteOrganisationResponse;
+                    ? deleteOrganisationEntity(organisation, deleteOrganisationResponse) : deleteOrganisationResponse;
         } else  {
             throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
         }
         return deleteOrganisationResponse;
     }
 
-    private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation) {
+    private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation, DeleteOrganisationResponse deleteOrganisationResponse) {
         organisationRepository.deleteById(organisation.getId());
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         return deleteOrganisationResponse;
     }
 
-    private DeleteOrganisationResponse deleteUserProfile(Organisation organisation) {
+    private DeleteOrganisationResponse deleteUserProfile(Organisation organisation, DeleteOrganisationResponse deleteOrganisationResponse) {
 
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         // if user count more than one in the current organisation then throw exception
         if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository.findByUserCountByOrganisationId(organisation.getId())) {
             ProfessionalUser user = organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
@@ -361,7 +359,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_500_ADMIN_NOT_FOUND_UP);
 
             } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-                // If we dont find active user in up will send it to user to delete
+                // If user is not active in the up will send the request to delete
                 Set<String> userIds = new HashSet<>();
                 userIds.add(user.getUserIdentifier());
                 DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);

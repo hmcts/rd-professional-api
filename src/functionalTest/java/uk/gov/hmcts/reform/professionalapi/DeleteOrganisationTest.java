@@ -62,7 +62,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     public void ac5_delete_an_active_organisation_with_pending_user_profile_by_prd_admin_successfully() {
         if (deleteOrganisationEnabled) {
             String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.NO_CONTENT);
+            professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.NO_CONTENT);
             professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse,hmctsAdmin, HttpStatus.NOT_FOUND);
         }
     }
@@ -89,7 +89,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
             String orgIdentifier = (String) response.get("organisationIdentifier");
             request.setStatus("ACTIVE");
             professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
+            professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
 
         }
     }
@@ -104,7 +104,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
             Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,  newUserCreationRequest, HttpStatus.CREATED);
             assertThat(newUserResponse).isNotNull();
 
-            Map<String, Object> delResponse = professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
+            professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
 
         }
     }
