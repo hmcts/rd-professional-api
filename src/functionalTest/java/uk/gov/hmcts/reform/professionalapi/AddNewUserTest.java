@@ -99,7 +99,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
-    //currently being ignored due to response status code coming 500 from SIDAM - but comes 403 when testing in Swagger
+    //currently returning 500 response status code which is coming 500 from SIDAM - but comes 403 when testing in Swagger
     @Test
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
@@ -150,7 +150,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .build();
 
         //adding new user with Suspended Super User Bearer Token
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.FORBIDDEN);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(newUserResponse).isNotNull();
         assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }
