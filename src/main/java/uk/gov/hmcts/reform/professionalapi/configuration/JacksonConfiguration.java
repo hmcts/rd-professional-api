@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.configuration;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
@@ -31,7 +32,8 @@ public class JacksonConfiguration {
         return new ObjectMapper()
                 .registerModule(new Jdk8Module())
                 .registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
-                .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES,false);
     }
 
     @Bean
