@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.cr
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
-import io.restassured.specification.RequestSpecification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,10 +149,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        RequestSpecification bearerTokenForSuspendedUser = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(email));
-
         //adding new user with Suspended Super User Bearer Token
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerTokenForSuspendedUser, HttpStatus.FORBIDDEN);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.FORBIDDEN);
         assertThat(newUserResponse).isNotNull();
         assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }
