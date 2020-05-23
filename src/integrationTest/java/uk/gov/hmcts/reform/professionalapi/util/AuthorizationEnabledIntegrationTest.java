@@ -48,6 +48,8 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -55,6 +57,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092","OPEN_ID_API_URI:http://0.0.0.0:7000/o"})
@@ -84,6 +87,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
+    @Autowired
+    public ProfessionalUserServiceImpl professionalUserServiceImpl;
 
     @ClassRule
     public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
@@ -222,17 +227,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add(role);
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(randomAlphabetic(5) + "@email.com")
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
+
+
 
         return (String) newUserResponse.get("userIdentifier");
     }
@@ -284,6 +287,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         return userCreationRequest;
 
+    }
+
+    public String retrieveSuperUserIdFromOrganisationId(String orgId) {
+        Organisation organisation = organisationRepository.findByOrganisationIdentifier(orgId);
+        List<ProfessionalUser> users = professionalUserRepository.findByOrganisation(organisation);
+        return users.get(0).getId().toString();
     }
 
     public void userProfileCreateUserWireMock(HttpStatus status) {
