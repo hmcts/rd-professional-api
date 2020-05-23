@@ -10,7 +10,6 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
@@ -81,10 +79,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         assertThat(userIdentifierResponse).isNotNull();

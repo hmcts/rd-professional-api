@@ -147,7 +147,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationOrById(String organisationIdentifier, String status) {
         String orgId = removeEmptySpaces(organisationIdentifier);
         String orgStatus = removeEmptySpaces(status);
 
@@ -183,7 +183,7 @@ public abstract class SuperController {
                 .body(organisationResponse);
     }
 
-    protected ResponseEntity retrieveUserByEmail(String email) {
+    protected ResponseEntity<Object> retrieveUserByEmail(String email) {
         validateEmail(email);
 
         ProfessionalUser user = professionalUserService.findProfessionalUserProfileByEmailAddress(removeEmptySpaces(email).toLowerCase());
@@ -194,7 +194,7 @@ public abstract class SuperController {
                 .body(professionalUsersResponse);
     }
 
-    protected ResponseEntity retrievePaymentAccountByUserEmail(String email) {
+    protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(removeEmptySpaces(email).toLowerCase());
@@ -208,7 +208,7 @@ public abstract class SuperController {
                 .body(new OrganisationPbaResponse(organisation, false));
     }
 
-    protected ResponseEntity updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier, String userId) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -229,7 +229,7 @@ public abstract class SuperController {
             //Organisation is getting activated
 
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
-            ResponseEntity responseEntity = createUserProfileFor(professionalUser, null, true, false);
+            ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true, false);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
                 //Idam registration success
@@ -245,7 +245,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    private ResponseEntity createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser, boolean isResendInvite) {
+    private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser, boolean isResendInvite) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
@@ -259,7 +259,7 @@ public abstract class SuperController {
                 isResendInvite);
 
         try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
-            Class clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
+            Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
             log.error("UserProfile api failed:: status code ::" + ex.status());
@@ -267,7 +267,7 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity retrieveAllOrganisationsByStatus(String status) {
+    protected ResponseEntity<Object> retrieveAllOrganisationsByStatus(String status) {
         String orgStatus = removeEmptySpaces(status);
 
         OrganisationsDetailResponse organisationsDetailResponse;
@@ -283,7 +283,7 @@ public abstract class SuperController {
         return ResponseEntity.status(200).body(organisationsDetailResponse);
     }
 
-    protected ResponseEntity inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
+    protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {
 
         List<String> roles = newUserCreationRequest.getRoles();
         ProfessionalUser professionalUser = validateInviteUserRequestAndCreateNewUserObject(newUserCreationRequest, removeEmptySpaces(organisationIdentifier), roles);
@@ -294,12 +294,12 @@ public abstract class SuperController {
         }
     }
 
-    private ResponseEntity inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String userId, ProfessionalUser professionalUser, List<String> roles) {
+    private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String userId, ProfessionalUser professionalUser, List<String> roles) {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, false);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
@@ -315,7 +315,7 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    private ResponseEntity reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles, String organisationIdentifier) {
+    private ResponseEntity<Object> reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles, String organisationIdentifier) {
 
         Object responseBody = null;
         ProfessionalUser existingUser = professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
@@ -325,7 +325,7 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
@@ -351,13 +351,13 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
         organisationIdentifierValidatorImpl.validate(existingOrganisation, null, organisationIdentifier);
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
-        ResponseEntity responseEntity;
+        ResponseEntity<Object> responseEntity;
 
         showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
         if (page != null) {

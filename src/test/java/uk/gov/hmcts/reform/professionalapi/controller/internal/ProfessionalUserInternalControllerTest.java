@@ -41,13 +41,14 @@ public class ProfessionalUserInternalControllerTest {
     private OrganisationIdentifierValidator organisationIdentifierValidatorMock;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private UserProfileUpdateRequestValidator userProfileUpdateRequestValidatorMock;
-    private ResponseEntity<?> responseEntityMock;
+    private ResponseEntity<Object> responseEntityMock;
     private UserProfileUpdatedData userProfileUpdatedData;
 
     @InjectMocks
     private ProfessionalUserInternalController professionalUserInternalController;
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
         userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName", "lastName", IdamStatus.ACTIVE.name(), null, null);
