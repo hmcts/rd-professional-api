@@ -327,16 +327,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Transactional
     public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if (OrganisationStatus.PENDING == organisation.getStatus()) {
-            deleteOrganisationResponse = deleteOrganisationEntity(organisation, deleteOrganisationResponse);
-        } else if (OrganisationStatus.ACTIVE == organisation.getStatus()) {
-            deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
-            deleteOrganisationResponse = deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
-                    ? deleteOrganisationEntity(organisation, deleteOrganisationResponse) : deleteOrganisationResponse;
-        } else  {
-            throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
+        switch (organisation.getStatus()) {
+            case PENDING:
+                return deleteOrganisationEntity(organisation, deleteOrganisationResponse);
+            case ACTIVE:
+                deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
+                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse) : deleteOrganisationResponse;
+            default:
+                throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
         }
-        return deleteOrganisationResponse;
+
     }
 
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation, DeleteOrganisationResponse deleteOrganisationResponse) {
@@ -374,7 +375,6 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
         return deleteOrganisationResponse;
     }
-
 
 }
 

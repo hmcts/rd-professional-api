@@ -26,6 +26,6 @@ exui.role.pui-case-manager: pui-case-manager
 resendInterval: 60
 
 # toggle for resendInvite
-resendInviteEnabled : false
+resendInviteEnabled : true
 # toggle for resendInvite
 deleteOrganisationEnabled : false
