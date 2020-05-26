@@ -132,8 +132,8 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity retrieveOrganisations(
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
+            @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);
     }
