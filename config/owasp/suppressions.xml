@@ -580,4 +580,99 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: javax.websocket-api-1.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/javax\.websocket/javax\.websocket\-api@.*$</packageUrl>
+        <cpe>cpe:/a:java-websocket_project:java-websocket</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: selenium-server-3.141.59.jar: jquery-3.1.1.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2019-11358</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-core-2.0.23.jar: jquery.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2012-6708</cve>
+        <cve>CVE-2019-11358</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-report-resources-2.0.23.jar: jquery-ui.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery\-ui\-dialog@.*$</packageUrl>
+        <cve>CVE-2016-7103</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-report-resources-2.0.23.jar: jquery.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2011-4969</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: wiremock-2.19.0.jar: handlebars-4.0.5.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/handlebars@.*$</packageUrl>
+        <vulnerabilityName>A prototype pollution vulnerability in handlebars is exploitable if an attacker can control the template</vulnerabilityName>
+        <vulnerabilityName>Disallow calling helperMissing and blockHelperMissing directly</vulnerabilityName>
+        <vulnerabilityName>Prototype pollution</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-core-2.0.23.jar: jquery.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <vulnerabilityName>Regex in its jQuery.htmlPrefilter  sometimes may introduce XSS</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: selenium-server-3.141.59.jar: jquery-3.1.1.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <vulnerabilityName>Regex in its jQuery.htmlPrefilter  sometimes may introduce XSS</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: wiremock-2.19.0.jar: jquery-1.8.0.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <vulnerabilityName>Regex in its jQuery.htmlPrefilter  sometimes may introduce XSS</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: wiremock-2.19.0.jar: jquery-3.2.1.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+        <vulnerabilityName>Regex in its jQuery.htmlPrefilter  sometimes may introduce XSS</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-report-resources-2.0.23.jar: bootstrap.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
+        <cve>CVE-2018-14040</cve>
+        <cve>CVE-2018-14041</cve>
+        <cve>CVE-2018-14042</cve>
+        <cve>CVE-2019-8331</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: serenity-report-resources-2.0.23.jar: bootstrap.min.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/bootstrap@.*$</packageUrl>
+        <cve>CVE-2018-14040</cve>
+        <cve>CVE-2018-14041</cve>
+        <cve>CVE-2018-14042</cve>
+        <cve>CVE-2019-8331</cve>
+    </suppress>
 </suppressions>
