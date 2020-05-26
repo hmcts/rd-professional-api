@@ -52,7 +52,6 @@ withParameterizedPipeline(type, product, component, 'sandbox', 'sandbox') {
 
     enableDbMigration()
     enableDockerBuild()
-    installCharts()
 
     env.S2S_URL_FOR_TESTS = params.S2S_URL_TO_TEST
     env.IDAM_URL = params.IDAM_URL_TO_TEST
