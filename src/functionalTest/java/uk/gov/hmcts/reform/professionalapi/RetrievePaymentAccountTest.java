@@ -66,19 +66,19 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc117_ac1_pui_finance_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiFinanceManager));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenForUser(puiFinanceManager));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
     }
 
     @Test
     public void rdcc117_ac2_pui_organisation_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiOrgManager));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenForUser(puiOrgManager));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
     }
 
     @Test
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiUserManager));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiUserManager));
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
@@ -95,7 +95,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName, email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
 
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
@@ -135,6 +135,20 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                         .build());
 
         professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, hmctsAdmin);
+    }
+
+    @Test
+    public void can_retrieve_organisation_by_orgIdentifier_for_pui_user_manager_External() {
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenForUser(puiUserManager));
+        assertThat(response).isNotEmpty();
+        responseValidate(response);
+    }
+
+    @Test
+    public void can_retrieve_organisation_by_orgIdentifier_for_pui_caa_External() {
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenForUser(puiCaa));
+        assertThat(response).isNotEmpty();
+        responseValidate(response);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {

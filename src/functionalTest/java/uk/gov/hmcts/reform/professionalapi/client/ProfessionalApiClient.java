@@ -471,7 +471,7 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
+    public Map<String, Object> retrieveOrganisationByOrgIdExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations")

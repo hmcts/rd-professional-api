@@ -38,13 +38,13 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
     public void retrieve_an_organisation_with_user_manager_rights_return_403() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
+        professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
     }
 
     @Test
