@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -252,6 +253,61 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         List<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
         //assertThat(!rolesInfo.contains("pui-organisation-manager"));
+    }
+
+    @Test
+    public void should_get_400_when_modify_roles_for_pending_user_internal() {
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        Map<String, Object> createUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
+                professionalApiClient.createNewUserRequest("nonactiveuser@somewhere.com"), HttpStatus.CREATED);
+
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST, getUserProfileAddRoleRequest(),
+                orgIdentifier, (String)createUserResponse.get("userIdentifier"));
+
+        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("UserId status is not active");
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("3 : There is a problem with your request. Please check and try again");
+    }
+
+    @Test
+    public void should_get_400_when_modify_roles_for_unknown_user_internal() {
+
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.NOT_FOUND, getUserProfileAddRoleRequest(),
+                createAndUpdateOrganisationToActive(hmctsAdmin), UUID.randomUUID().toString());
+
+        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("ResourceNotFoundException- could not find user profile");
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("4 : Resource not found");
+    }
+
+    @Test
+    public void should_get_403_when_non_active_external_user_modify_roles() {
+
+        String externalUserEmail = "nonactiveuser1234@somewhere.com";
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+
+        //create test sidam user and add same user in org
+        idamOpenIdClient.createUser(puiUserManager, externalUserEmail, "firstName", "lastName");
+        Map<String, Object> createUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
+                professionalApiClient.createNewUserRequest(externalUserEmail), HttpStatus.CREATED);
+        String userId = (String)createUserResponse.get("userIdentifier");
+
+        //update status to suspended so that while adding roles by ext user will be non active
+        UserProfileUpdatedData updateStatusRequest = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, updateStatusRequest, orgIdentifier, userId);
+
+        //use external suspended user to add roles should give 403 back
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
+                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail)), userId);
+
+        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("User status must be Active to perform this operation");
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
+    }
+
+    public UserProfileUpdatedData getUserProfileAddRoleRequest() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setRolesAdd(createAddRoleName());
+        return userProfileUpdatedData;
     }
 
     private Set<RoleName> createOrDeleteRoleName() {

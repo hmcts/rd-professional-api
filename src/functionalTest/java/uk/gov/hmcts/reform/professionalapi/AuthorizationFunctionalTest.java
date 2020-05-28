@@ -34,10 +34,12 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -82,6 +84,9 @@ public abstract class AuthorizationFunctionalTest {
     @Autowired
     protected TestConfigProperties configProperties;
 
+    IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+    IdamClient idamClient = new IdamClient(configProperties);
+
     @Before
     public void setUp() throws MalformedURLException, UnknownHostException {
         RestAssured.useRelaxedHTTPSValidation();
@@ -90,9 +95,6 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
-
-        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
@@ -234,6 +236,14 @@ public abstract class AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         return bearerToken;
+    }
+
+    public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(status.name());
+        return data;
     }
 
 }
