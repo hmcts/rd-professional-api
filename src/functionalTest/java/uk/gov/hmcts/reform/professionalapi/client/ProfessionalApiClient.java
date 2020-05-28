@@ -707,6 +707,21 @@ public class ProfessionalApiClient {
 
     }
 
+    public void deleteOrganisationByExternalUsersBearerToken(String organisationId, RequestSpecification requestSpecification, HttpStatus status) {
+        Response response = requestSpecification
+                .body("")
+                .delete("/refdata/internal/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+    }
+
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()

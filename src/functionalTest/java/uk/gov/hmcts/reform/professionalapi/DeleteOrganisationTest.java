@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
+import io.restassured.specification.RequestSpecification;
 import java.util.Map;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -105,6 +108,26 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
             assertThat(newUserResponse).isNotNull();
 
             professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.BAD_REQUEST);
+
+        }
+    }
+
+    @Test
+    public void ac8_could_not_delete_an_active_organisation_with_pending_user_profile_by_other_than_prd_admin_throw_403() {
+        if (deleteOrganisationEnabled) {
+            String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+            String firstName = "some-fname";
+            String lastName = "some-lname";
+            UserCreationRequest superUser = createSuperUser(email,firstName,lastName);
+            OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                    .superUser(superUser)
+                    .build();
+            Map<String, Object> response = professionalApiClient.createOrganisation(request);
+            String orgIdentifier = (String) response.get("organisationIdentifier");
+            request.setStatus("ACTIVE");
+            RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+            professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+            professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier, requestSpecification, HttpStatus.FORBIDDEN);
 
         }
     }

@@ -235,4 +235,14 @@ public abstract class AuthorizationFunctionalTest {
         return bearerToken;
     }
 
+    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
+        return superUser;
+    }
+
 }
