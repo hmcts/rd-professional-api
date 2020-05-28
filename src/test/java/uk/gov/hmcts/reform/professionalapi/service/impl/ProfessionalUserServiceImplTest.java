@@ -313,11 +313,12 @@ public class ProfessionalUserServiceImplTest {
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+        ResponseEntity<Object> response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
 
-        assertThat(response).isNotNull();
-        assertThat(response.getRoleAdditionResponse()).isNotNull();
-        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
+        ModifyUserRolesResponse modifyUserRolesResponseFromTest = (ModifyUserRolesResponse) response.getBody();
+        assertThat(modifyUserRolesResponseFromTest).isNotNull();
+        assertThat(modifyUserRolesResponseFromTest.getRoleAdditionResponse()).isNotNull();
+        assertThat(modifyUserRolesResponseFromTest.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
@@ -340,13 +341,15 @@ public class ProfessionalUserServiceImplTest {
         roles.add(roleName2);
         userProfileUpdatedData.setRolesAdd(roles);
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
-
-        assertThat(response).isNotNull();
-        assertThat(response.getRoleAdditionResponse()).isNotNull();
-        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Internal Server Error");
+        professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(feignExceptionMock, times(1)).status();
+
+        professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(feignExceptionMock, times(1)).status();
     }
 
     @Test

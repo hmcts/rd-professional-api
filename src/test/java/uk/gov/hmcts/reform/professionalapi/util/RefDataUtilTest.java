@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,12 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import feign.Request;
-import feign.Response;
-
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +31,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -321,42 +315,6 @@ public class RefDataUtilTest {
         assertFalse(constructor.isAccessible());
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);
-    }
-
-    @Test
-    public void test_decodeResponseFromUp() {
-        Map<String, Collection<String>> header = new HashMap<>();
-        Collection<String> list = new ArrayList<>();
-        header.put("content-encoding", list);
-        String body = "{"
-                + "  \"statusUpdateResponse\": {"
-                + "  \"idamStatusCode\": \"200\","
-                + "  \"idamMessage\": \"Success\""
-                + "  } "
-                + "}";
-
-        Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
-        ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
-        assertThat(modifyUserRolesResponse.getStatusUpdateResponse().getIdamStatusCode()).isEqualTo("200");
-        assertThat(modifyUserRolesResponse.getStatusUpdateResponse().getIdamMessage()).isEqualTo("Success");
-    }
-
-    @Test
-    public void test_decodeResponseFromUp_with_UP_failed() {
-        Map<String, Collection<String>> header = new HashMap<>();
-        Collection<String> list = new ArrayList<>();
-        header.put("content-encoding", list);
-        String body = "{"
-                + "  \"errorMessage\": \"400\","
-                + "  \"errorDescription\": \"BAD REQUEST\","
-                + "  \"timeStamp\": \"23:10\""
-                + "}";
-
-        Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
-        ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
-        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorMessage()).isEqualTo("400");
-        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorDescription()).isEqualTo("BAD REQUEST");
-        assertThat(modifyUserRolesResponse.getErrorResponse().getTimeStamp()).isEqualTo("23:10");
     }
 
     @Test
