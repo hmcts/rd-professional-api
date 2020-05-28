@@ -39,6 +39,8 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     RequestSpecification bearerTokenForNonPuiUserManager;
     String orgIdentifierResponse;
 
+
+
     public RequestSpecification generateBearerTokenForPuiManager() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         orgIdentifierResponse = (String) response.get("organisationIdentifier");
@@ -261,7 +263,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
 
         Map<String, Object> createUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
-                professionalApiClient.createNewUserRequest("nonactiveuser@somewhere.com"), HttpStatus.CREATED);
+                professionalApiClient.createNewUserRequest(), HttpStatus.CREATED);
 
         Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST, getUserProfileAddRoleRequest(),
                 orgIdentifier, (String)createUserResponse.get("userIdentifier"));
@@ -273,35 +275,37 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     @Test
     public void should_get_400_when_modify_roles_for_unknown_user_internal() {
 
+        String unknownUseeId = UUID.randomUUID().toString();
         Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.NOT_FOUND, getUserProfileAddRoleRequest(),
-                createAndUpdateOrganisationToActive(hmctsAdmin), UUID.randomUUID().toString());
+                createAndUpdateOrganisationToActive(hmctsAdmin), unknownUseeId);
 
-        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("ResourceNotFoundException- could not find user profile");
+        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("could not find user profile for userId: or status is not active " + unknownUseeId);
         assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("4 : Resource not found");
     }
 
     @Test
     public void should_get_403_when_non_active_external_user_modify_roles() {
 
-        String externalUserEmail = "nonactiveuser1234@somewhere.com";
+
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
 
         //create test sidam user and add same user in org
-        idamOpenIdClient.createUser(puiUserManager, externalUserEmail, "firstName", "lastName");
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String externalUserEmail = idamOpenIdClient.createUser(puiUserManager);
         Map<String, Object> createUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
                 professionalApiClient.createNewUserRequest(externalUserEmail), HttpStatus.CREATED);
         String userId = (String)createUserResponse.get("userIdentifier");
-
+        RequestSpecification bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail));
         //update status to suspended so that while adding roles by ext user will be non active
         UserProfileUpdatedData updateStatusRequest = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, updateStatusRequest, orgIdentifier, userId);
 
         //use external suspended user to add roles should give 403 back
         Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
-                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail)), userId);
+                bearerToken, userId);
 
-        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("User status must be Active to perform this operation");
-        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
+        assertThat(modifiedUserResponse.get("error")).isEqualTo("Forbidden");
+        assertThat(modifiedUserResponse.get("message")).isEqualTo("Access Denied");
     }
 
     public UserProfileUpdatedData getUserProfileAddRoleRequest() {
