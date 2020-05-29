@@ -5,7 +5,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -33,6 +37,7 @@ import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -55,6 +60,8 @@ public class RefDataUtilTest {
     private UserProfile profile;
     private GetUserProfileResponse getUserProfileResponse;
 
+    private UserProfileFeignClient userProfileFeignClient;
+
     @Before
     public void setUp() {
         paymentAccount = new PaymentAccount("PBA1234567");
@@ -69,6 +76,7 @@ public class RefDataUtilTest {
         getUserProfileResponse.setIdamStatusCode("400");
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
         paymentAccount.setId(UUID.randomUUID());
+        userProfileFeignClient = mock(UserProfileFeignClient.class);
     }
 
     @Test
@@ -407,5 +415,24 @@ public class RefDataUtilTest {
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
         assertThat(response).isEmpty();
 
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void testGetSingleUserIdFromUserProfile() throws Exception {
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        String body = "{"
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
+
+        Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
+        when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
+
+        ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
+        Assert.assertEquals(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), result);
+        verify(userProfileFeignClient.getUserProfileById(any()),times(1));
     }
 }
