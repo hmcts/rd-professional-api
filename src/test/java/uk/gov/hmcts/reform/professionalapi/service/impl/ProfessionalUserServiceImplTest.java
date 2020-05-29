@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.UP_SERVICE_MSG;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -45,8 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -238,60 +238,6 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
-    }
-
-    //@Test
-    // not yet implemented (tdd)
-    public void modify_user_roles() throws Exception {
-
-        Set<RoleName> rolesData = new HashSet<RoleName>();
-        RoleName roleName1 = new RoleName("pui-case-manager");
-        RoleName roleName2 = new RoleName("pui-case-organisation");
-        rolesData.add(roleName1);
-        rolesData.add(roleName2);
-
-
-        /*List<RoleName> rolesData = new ArrayList<>();
-        rolesData.add("pui-case-manager");
-        rolesData.add("pui-organisation-manager");*/
-
-
-        Set<RoleName> rolesToDeleteData = new HashSet<RoleName>();
-        RoleName roleToDeleteName = new RoleName("pui-finance-manager");
-        rolesToDeleteData.add(roleToDeleteName);
-
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
-
-        UserProfileUpdatedData userProfileUpdatedData1 =
-                new UserProfileUpdatedData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
-        UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
-        UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
-        assertThat(actualModifyProfileData).isNotNull();
-        assertThat(actualModifyProfileData.getEmail()).isNull();
-        assertThat(actualModifyProfileData.getIdamStatus()).isNull();
-
-        /*ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
-        modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        String body = mapper.writeValueAsString(modifyUserRolesResponse);
-
-        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
-
-
-
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
-        assertThat(response.getDeleteRolesResponse()).isNotNull();
-        assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");*/
     }
 
     @Test
@@ -632,5 +578,34 @@ public class ProfessionalUserServiceImplTest {
         List<RoleDeletionResponse> deleteRoleResponses = new ArrayList<>();
         deleteRoleResponses.add(deleteRoleResponse);
         return deleteRoleResponses;
+    }
+
+    @Test
+    public void modify_user_roles_feign_error_with_no_status() throws Exception {
+
+        when(feignExceptionMock.status()).thenReturn(-1);
+        callModifyRolesForUser(HttpStatus.INTERNAL_SERVER_ERROR);
+        verify(feignExceptionMock, times(1)).status();
+
+    }
+
+    @Test
+    public void modify_user_roles_feign_error_with_no_400_status() throws Exception {
+
+        when(feignExceptionMock.status()).thenReturn(400);
+        callModifyRolesForUser(HttpStatus.BAD_REQUEST);
+        verify(feignExceptionMock, times(2)).status();
+
+    }
+
+    public void callModifyRolesForUser(HttpStatus status) {
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
+
+        Throwable thrown = catchThrowable(() ->  professionalUserService.modifyRolesForUser(new UserProfileUpdatedData(), UUID.randomUUID().toString(), Optional.of("")));
+        assertThat(thrown)
+                .isInstanceOf(ExternalApiException.class)
+                .hasMessageContaining(UP_SERVICE_MSG);
+        assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 }
