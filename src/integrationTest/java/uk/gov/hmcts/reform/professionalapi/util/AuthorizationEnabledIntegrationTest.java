@@ -60,7 +60,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 
 @Configuration
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
-@DirtiesContext()
+@DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -245,15 +245,32 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
+    public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
+
     public void updateOrganisation(String organisationIdentifier, String role, String status) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 
+    public void updateOrganisation(String organisationIdentifier, String role, String status, OrganisationCreationRequest organisationUpdateRequest) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        organisationUpdateRequest.setStatus(status);
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
+    }
+
     public String createAndActivateOrganisation() {
         String orgIdentifier = createOrganisationRequest();
         updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE);
+        return orgIdentifier;
+    }
+
+    public String createAndActivateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
+        String orgIdentifier = createOrganisationRequest(organisationCreationRequest);
+        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE, organisationCreationRequest);
         return orgIdentifier;
     }
 
