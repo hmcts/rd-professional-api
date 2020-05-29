@@ -17,7 +17,6 @@ import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.commons.lang.RandomStringUtils;
-
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -30,7 +29,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {

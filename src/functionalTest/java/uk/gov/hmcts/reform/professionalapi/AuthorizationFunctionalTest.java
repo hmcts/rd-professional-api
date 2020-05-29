@@ -12,6 +12,8 @@ import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,13 +79,11 @@ public abstract class AuthorizationFunctionalTest {
 
     protected RequestSpecification bearerToken;
 
-    protected IdamOpenIdClient idamOpenIdClient;
-
     @Autowired
     protected TestConfigProperties configProperties;
 
     @Before
-    public void setUp() {
+    public void setUp() throws MalformedURLException, UnknownHostException {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.defaultParser = Parser.JSON;
 
@@ -91,7 +91,7 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);

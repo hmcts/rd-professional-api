@@ -3,20 +3,20 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -130,6 +130,27 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("409");
             assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
+        }
+    }
+
+    // should not allow re invite of user who is not in organisation
+    @Test
+    public void should_return_403_when_reinvited_user_not_present_in_organisation() {
+
+        if (resendInviteEnabled) {
+            userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+            OrganisationCreationRequest organisationCreationRequest1 = someMinimalOrganisationRequest().build();
+            createAndActivateOrganisation(organisationCreationRequest1);
+
+            OrganisationCreationRequest organisationCreationRequest2 = someMinimalOrganisationRequest().build();
+            String org2 = createAndActivateOrganisation(organisationCreationRequest2);
+
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(organisationCreationRequest1.getSuperUser().getEmail(), userRoles);
+            Map<String, Object> reInviteUserResponse =
+                    professionalReferenceDataClient.addUserToOrganisation(org2, reinviteRequest, hmctsAdmin);
+            assertThat(reInviteUserResponse.get("http_status")).isEqualTo("403");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains("User does not belong to same organisation");
         }
     }
 }

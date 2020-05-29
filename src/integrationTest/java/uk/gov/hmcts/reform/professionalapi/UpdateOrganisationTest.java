@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -33,7 +31,6 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-
         updateAndValidateOrganisation(null, "ACTIVE",400);
     }
 
