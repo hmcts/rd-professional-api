@@ -152,6 +152,5 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         //adding new user with Suspended Super User Bearer Token
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(newUserResponse).isNotNull();
-        //assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }
 }

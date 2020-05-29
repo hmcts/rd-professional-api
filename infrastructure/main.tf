@@ -16,6 +16,7 @@ locals {
   s2s_url = "http://rpe-service-auth-provider-${local.local_env}.service.core-compute-${local.local_env}.internal"
   s2s_vault_name = "s2s-${local.local_env}"
   s2s_vault_uri = "https://s2s-${local.local_env}.vault.azure.net/"
+  idam_url = "https://idam-api.${local.local_env}.platform.hmcts.net"
   USER_PROFILE_URL = "http://rd-user-profile-api-${local.local_env}.service.core-compute-${local.local_env}.internal"
 }
 
@@ -134,4 +135,49 @@ module "db-professional-ref-data" {
   postgresql_user = "dbrefdata"
   database_name = "dbrefdata"
   common_tags = "${var.common_tags}"
+}
+
+module "rd_professional_api" {
+  source = "git@github.com:hmcts/cnp-module-webapp?ref=master"
+  product = "${var.product}-${var.component}"
+  location = "${var.location}"
+  env = "${var.env}"
+  ilbIp = "${var.ilbIp}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  subscription = "${var.subscription}"
+  capacity = "${var.capacity}"
+  instance_size = "${var.instance_size}"
+  common_tags = "${merge(var.common_tags, map("lastUpdated", "${timestamp()}"))}"
+  appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
+  asp_name = "${local.app_service_plan}"
+  asp_rg = "${local.app_service_plan}"
+  enable_ase = "${var.enable_ase}"
+
+  app_settings = {
+    LOGBACK_REQUIRE_ALERT_LEVEL = false
+    LOGBACK_REQUIRE_ERROR_CODE = false
+
+    POSTGRES_HOST = "${module.db-professional-ref-data.host_name}"
+    POSTGRES_PORT = "${module.db-professional-ref-data.postgresql_listen_port}"
+    POSTGRES_DATABASE = "${module.db-professional-ref-data.postgresql_database}"
+    POSTGRES_USER = "${module.db-professional-ref-data.user_name}"
+    POSTGRES_USERNAME = "${module.db-professional-ref-data.user_name}"
+    POSTGRES_PASSWORD = "${module.db-professional-ref-data.postgresql_password}"
+    POSTGRES_CONNECTION_OPTIONS = "?"
+
+    S2S_URL = "${data.azurerm_key_vault_secret.s2s_url.value}"
+    S2S_SECRET = "${data.azurerm_key_vault_secret.s2s_secret.value}"
+    IDAM_URL = "${data.azurerm_key_vault_secret.idam_url.value}"
+    USER_PROFILE_URL = "${data.azurerm_key_vault_secret.USER_PROFILE_URL.value}"
+    CCD_URL = "${data.azurerm_key_vault_secret.CCD_URL.value}"
+
+    OAUTH2_REDIRECT_URI = "${data.azurerm_key_vault_secret.oauth2_redirect_uri.value}"
+    OAUTH2_CLIENT_ID = "${data.azurerm_key_vault_secret.oauth2_client_id.value}"
+    OAUTH2_CLIENT_SECRET = "${data.azurerm_key_vault_secret.oauth2_client_secret.value}"
+
+    ROOT_LOGGING_LEVEL = "${var.root_logging_level}"
+    LOG_LEVEL_SPRING_WEB = "${var.log_level_spring_web}"
+    LOG_LEVEL_RD = "${var.log_level_rd}"
+    EXCEPTION_LENGTH = 100
+  }
 }
