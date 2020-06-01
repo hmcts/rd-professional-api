@@ -186,7 +186,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         Map newUserDetails = users.get(1);
         List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
 
-        //assertThat(superUserRoles).doesNotContain("pui-caa");
-        //assertThat(superUserRoles).doesNotContain("caseworker-caa");
+        assertThat(superUserRoles).doesNotContain("pui-caa");
+        assertThat(superUserRoles).doesNotContain("caseworker-caa");
     }
 }
