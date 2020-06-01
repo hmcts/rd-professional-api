@@ -30,8 +30,11 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -172,8 +175,6 @@ public class RefDataUtil {
         return activeOrganisationDtls;
     }
 
-
-
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
@@ -307,7 +308,7 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
+                log.error("Response from UserProfileByEmail service call " + errorResponse);
                 newUserResponse = new NewUserResponse();
             }
 
@@ -318,6 +319,26 @@ public class RefDataUtil {
 
         return newUserResponse;
 
+    }
+
+    public static DeleteOrganisationResponse deleteUserProfilesFromUp(DeleteUserProfilesRequest deleteUserRequest, UserProfileFeignClient userProfileFeignClient) {
+
+        DeleteOrganisationResponse deleteOrganisationResponse = null;
+        try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
+
+            if (ProfessionalApiConstants.STATUS_CODE_204 == response.status()) {
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.STATUS_CODE_204,ProfessionalApiConstants.DELETION_SUCCESS_MSG);
+            } else if (ProfessionalApiConstants.ERROR_CODE_500 <= response.status())  {
+                log.error("DeleteUserProfiles service call failed in PRD::" + response.reason());
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.ERROR_CODE_500, UP_SERVICE_MSG);
+            }
+
+        }  catch (FeignException ex) {
+            log.error("DeleteUserProfiles service call failed in PRD:: " + ex);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+
+        }
+        return deleteOrganisationResponse;
     }
 
     public static void throwException(int statusCode) {

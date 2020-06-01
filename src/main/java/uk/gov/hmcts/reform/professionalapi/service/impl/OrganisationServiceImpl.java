@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,14 +21,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import org.springframework.util.StringUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -78,6 +85,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeService userAttributeService;
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
+
 
     @Override
     @Transactional
@@ -200,8 +208,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
-            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).getUserIdentifier()) {
+                activeOrganisationDtls.put(organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).getUserIdentifier(), organisation);
             }
         });
 
@@ -232,8 +240,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
                 activeOrganisations.add(organisation);
-                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).getUserIdentifier(), organisation);
                 }
             } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);
@@ -285,7 +293,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
-            throw new EmptyResultDataAccessException(1);
+            throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
@@ -297,9 +305,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-
         List<Organisation> organisations = null;
-
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
             organisations = organisationRepository.findByStatus(status);
@@ -310,12 +316,65 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
 
         if (CollectionUtils.isEmpty(organisations)) {
-            throw new EmptyResultDataAccessException(1);
+            throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
 
         }
         return new OrganisationsDetailResponse(organisations, true);
+
     }
 
+    @Override
+    @Transactional
+    public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
+        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        switch (organisation.getStatus()) {
+            case PENDING:
+                return deleteOrganisationEntity(organisation, deleteOrganisationResponse);
+            case ACTIVE:
+                deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
+                return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
+                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse) : deleteOrganisationResponse;
+            default:
+                throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
+        }
+
+    }
+
+    private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation, DeleteOrganisationResponse deleteOrganisationResponse) {
+        organisationRepository.deleteById(organisation.getId());
+        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
+        deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
+        return deleteOrganisationResponse;
+    }
+
+    private DeleteOrganisationResponse deleteUserProfile(Organisation organisation, DeleteOrganisationResponse deleteOrganisationResponse) {
+
+        // if user count more than one in the current organisation then throw exception
+        if (ProfessionalApiConstants.USER_COUNT == professionalUserRepository.findByUserCountByOrganisationId(organisation.getId())) {
+            ProfessionalUser user = organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
+            NewUserResponse newUserResponse  =  RefDataUtil.findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
+
+            if (StringUtils.isEmpty(newUserResponse.getIdamStatus())) {
+
+                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
+                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_500_ADMIN_NOT_FOUND_UP);
+
+            } else if (!IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
+                // If user is not active in the up will send the request to delete
+                Set<String> userIds = new HashSet<>();
+                userIds.add(user.getUserIdentifier());
+                DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
+                deleteOrganisationResponse = RefDataUtil.deleteUserProfilesFromUp(deleteUserRequest, userProfileFeignClient);
+            } else {
+                deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+                deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
+            }
+        } else {
+            deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
+            deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
+        }
+        return deleteOrganisationResponse;
+    }
 
 }
 

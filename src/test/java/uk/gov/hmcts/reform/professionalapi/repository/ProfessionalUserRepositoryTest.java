@@ -56,4 +56,10 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
         assertThat(profUser).isEqualTo(professionalUser);
         assertThat(profUser.getId()).isEqualTo(professionalUser.getId());
     }
+
+    @Test
+    public void test_findByUserCountByOrganisationId() {
+        int count = professionalUserRepository.findByUserCountByOrganisationId(organisation.getId());
+        assertThat(count).isEqualTo(1);
+    }
 }
