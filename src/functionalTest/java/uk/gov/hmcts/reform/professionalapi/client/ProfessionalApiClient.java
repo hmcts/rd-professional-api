@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -325,7 +326,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+    public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
@@ -337,9 +338,13 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
 
     }
 
@@ -670,6 +675,51 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         return response.body().as(Map.class);
+    }
+
+    public void deleteOrganisation(String organisationId, String role, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .delete("/refdata/internal/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+    }
+
+    public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .delete("/refdata/external/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+
+    }
+
+    public void deleteOrganisationByExternalUsersBearerToken(String organisationId, RequestSpecification requestSpecification, HttpStatus status) {
+        Response response = requestSpecification
+                .body("")
+                .delete("/refdata/internal/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {

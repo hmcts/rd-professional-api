@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -59,8 +60,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
-@DirtiesContext()
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092","OPEN_ID_API_URI:http://0.0.0.0:7000/o"})
+@DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -529,6 +530,67 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
+    public void deleteUserProfileMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStatus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+
+                    + "  \"statusCode\": \"204\","
+                    + "  \"message\": \"User Profile Deleted Successfully\""
+
+                    + "}";
+            returnHttpStatus = 204;
+        }  else if (status == HttpStatus.BAD_REQUEST) {
+            body = "{"
+
+                    + "  \"statusCode\": \"400\","
+                    + "  \"message\": \"User Profile Delete Request has some problem\""
+
+                + "}";
+        } else if (status == HttpStatus.NOT_FOUND) {
+            body = "{"
+
+                    + "  \"statusCode\": \"404\","
+                    + "  \"message\": \"User Profile Not Found To Delete\""
+
+                + "}";
+        }
+
+        userProfileService.stubFor(
+                delete(urlEqualTo("/v1/userprofile"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        )
+        );
+
+    }
+
+    public void getUserProfileByEmailWireMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStaus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamStatus\": \"PENDING\""
+                    + "}";
+            returnHttpStaus = 200;
+        } else {
+            body = "{"
+                    + "  \"idamStatus\": \" \""
+                    + "}";
+            returnHttpStaus = 500;
+        }
+
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(returnHttpStaus)
+                ));
+
+    }
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override
@@ -606,5 +668,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             return false;
         }
     }
+
 }
 
