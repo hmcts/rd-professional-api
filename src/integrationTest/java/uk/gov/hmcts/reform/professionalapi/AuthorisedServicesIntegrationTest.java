@@ -36,6 +36,9 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
     @Value("${oidc.expiration}")
     private long expiration;
 
+    @Value("${idam.s2s-authorised.services}")
+    protected String authorisedServices;
+
     protected ProfessionalReferenceDataClient professionalReferenceDataClient;
 
     @ClassRule
@@ -88,7 +91,7 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
     }
 
     private String getAnAuthorisedServiceName() {
-        List<String> authorisedServices = Arrays.asList("rd_professional_api", "rd_user_profile_api", "xui_webapp", "finrem_payment_service", "fpl_case_service", "iac", "aac-manage-case-assignment");
-        return authorisedServices.get(new Random().nextInt(authorisedServices.size()));
+        List<String> items = Arrays.asList(authorisedServices.split("\\s*,\\s*"));
+        return items.get(new Random().nextInt(items.size()));
     }
 }
