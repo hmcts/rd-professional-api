@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -460,4 +461,23 @@ public class OrganisationServiceImplTest {
         assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
     }
+
+    @Test
+    public void testAddContactInformationToOrganisation() throws NoSuchMethodException, IllegalAccessException {
+        List<ContactInformationCreationRequest> contactInformationCreationRequest = contactInformationCreationRequests;
+        ContactInformationCreationRequest contactInformationCreationRequestMock = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
+        contactInformationCreationRequest.add(contactInformationCreationRequestMock);
+        Organisation organisationMock1 = new Organisation("some-org-name", OrganisationStatus.ACTIVE, "PENDING", "Test", Boolean.TRUE, "Demo");
+
+        sut.addContactInformationToOrganisation(contactInformationCreationRequest,organisationMock1);
+
+        assertEquals("addressLine-1", contactInformationCreationRequest.get(0).getAddressLine1());
+        assertEquals("addressLine-2", contactInformationCreationRequest.get(0).getAddressLine2());
+        assertEquals("addressLine-3", contactInformationCreationRequest.get(0).getAddressLine3());
+        assertEquals("townCity", contactInformationCreationRequest.get(0).getTownCity());
+        assertEquals("county", contactInformationCreationRequest.get(0).getCounty());
+        assertEquals("country", contactInformationCreationRequest.get(0).getCountry());
+        assertEquals("postCode", contactInformationCreationRequest.get(0).getPostCode());
+    }
+
 }
