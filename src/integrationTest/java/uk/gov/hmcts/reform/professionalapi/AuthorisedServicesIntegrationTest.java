@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -27,7 +26,6 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.professionalapi.util.ProfessionalReferenceDataClient;
 import uk.gov.hmcts.reform.professionalapi.util.SpringBootIntegrationTest;
 
-@Slf4j
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:9990"})
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest {
@@ -91,11 +89,6 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
 
     private String getAnAuthorisedServiceName() {
         List<String> authorisedServices = Arrays.asList("rd_professional_api", "rd_user_profile_api", "xui_webapp", "finrem_payment_service", "fpl_case_service", "iac", "aac-manage-case-assignment");
-
-        String authorisedService = authorisedServices.get(new Random().nextInt(authorisedServices.size()));
-        
-        log.info("Authorised Service: " + authorisedService);
-
-        return authorisedService;
+        return authorisedServices.get(new Random().nextInt(authorisedServices.size()));
     }
 }
