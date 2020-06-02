@@ -35,5 +35,6 @@ public interface ProfessionalUserService {
     void checkUserStatusIsActiveByUserId(String userId);
 
     ProfessionalUser findProfessionalUserByEmailAddress(String email);
+
 }
 

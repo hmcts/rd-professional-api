@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -237,6 +236,16 @@ public abstract class AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         return bearerToken;
+    }
+
+    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
+        return superUser;
     }
 
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -55,7 +54,7 @@ public class ProfessionalUser implements Serializable {
     @JoinColumn(name = "ORGANISATION_ID", nullable = false)
     private Organisation organisation;
 
-    @OneToMany(mappedBy = "professionalUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "professionalUser")
     private List<UserAttribute> userAttributes = new ArrayList<>();
 
     @Column(name = "DELETED")
