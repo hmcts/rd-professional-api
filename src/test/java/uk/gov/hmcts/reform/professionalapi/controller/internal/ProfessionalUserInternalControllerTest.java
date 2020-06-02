@@ -139,5 +139,6 @@ public class ProfessionalUserInternalControllerTest {
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
+        verify(userProfileUpdateRequestValidatorMock, times(1)).validateRequest(userProfileUpdatedData);
     }
 }

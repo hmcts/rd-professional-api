@@ -106,7 +106,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void retrieveUserByEmail() throws JsonProcessingException {
+    public void test_retrieveUserByEmail() throws JsonProcessingException {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
@@ -141,7 +141,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieveUserByEmail_EmptyData() throws JsonProcessingException {
+    public void test_retrieveUserByEmail_EmptyData() throws JsonProcessingException {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
@@ -171,7 +171,7 @@ public class ProfessionalUserServiceImplTest {
 
 
     @Test
-    public void findUsersByOrganisation_with_deleted_users() throws Exception {
+    public void test_findUsersByOrganisation_with_deleted_users() throws Exception {
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUser);
 
@@ -200,7 +200,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUsersByOrganisation_with_status_active() throws Exception {
+    public void test_findUsersByOrganisation_with_status_active() throws Exception {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
@@ -241,7 +241,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void modify_user_roles_bad_request() throws Exception {
+    public void test_modify_user_roles_bad_request() throws Exception {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
 
         Set<RoleName> roles = new HashSet<>();
@@ -270,7 +270,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void modify_user_roles_server_error() throws Exception {
+    public void test_modify_user_roles_server_error() throws Exception {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
@@ -299,7 +299,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void addNewUserToAnOrganisation() {
+    public void test_addNewUserToAnOrganisation() {
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
         NewUserResponse newUserResponse = professionalUserService.addNewUserToAnOrganisation(professionalUser, userRoles, prdEnums);
@@ -310,7 +310,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUsersByOrganisationEmptyResultExceptionTest() throws Exception {
+    public void test_findUsersByOrganisationEmptyResultException() throws Exception {
         List<String> ids = new ArrayList<>();
         ids.add(professionalUser.getUserIdentifier());
         List<ProfessionalUser> users = new ArrayList<>();
@@ -446,7 +446,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUserStatusByEmail() throws Exception {
+    public void test_findUserStatusByEmail() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
@@ -471,7 +471,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUserStatusByEmailForPending() throws Exception {
+    public void test_findUserStatusByEmailForPending() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -490,7 +490,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
+    public void test_findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
         organisation.setStatus(OrganisationStatus.PENDING);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -509,7 +509,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
+    public void test_findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -525,7 +525,7 @@ public class ProfessionalUserServiceImplTest {
 
     @SneakyThrows
     @Test(expected = Test.None.class)
-    public void checkUserStatusIsActiveByUserId() {
+    public void test_UserStatusIsActiveByUserId() {
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
 
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
@@ -548,7 +548,7 @@ public class ProfessionalUserServiceImplTest {
 
     @SneakyThrows
     @Test(expected = AccessDeniedException.class)
-    public void checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
+    public void test_checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
         professionalUser.setIdamStatus(IdamStatus.PENDING);
 
         when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));
@@ -581,7 +581,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void modify_user_roles_feign_error_with_no_status() throws Exception {
+    public void test_modify_user_roles_feign_error_with_no_status() throws Exception {
 
         when(feignExceptionMock.status()).thenReturn(-1);
         callModifyRolesForUser(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -590,7 +590,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void modify_user_roles_feign_error_with_no_400_status() throws Exception {
+    public void test_modify_user_roles_feign_error_with_no_400_status() throws Exception {
 
         when(feignExceptionMock.status()).thenReturn(400);
         callModifyRolesForUser(HttpStatus.BAD_REQUEST);
