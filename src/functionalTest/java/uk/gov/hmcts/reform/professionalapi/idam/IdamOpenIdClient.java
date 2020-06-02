@@ -114,7 +114,7 @@ public class IdamOpenIdClient {
     }
 
 
-    private String nextUserEmail() {
+    public String nextUserEmail() {
         return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
     }
 

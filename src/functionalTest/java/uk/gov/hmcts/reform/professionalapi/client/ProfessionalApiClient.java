@@ -18,11 +18,13 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.google.gson.Gson;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -60,6 +63,7 @@ public class ProfessionalApiClient {
 
     protected IdamOpenIdClient idamOpenIdClient;
     protected IdamClient idamClient;
+    private Gson gson = new Gson();
 
     public ProfessionalApiClient(
             String professionalApiUrl,
@@ -771,5 +775,17 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
+    }
+
+    public List<OrganisationEntityResponse> retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/status/" + status)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        return Arrays.asList(response.getBody().as(OrganisationEntityResponse[].class));
     }
 }
