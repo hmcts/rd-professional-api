@@ -42,10 +42,8 @@ public class MinimalOrganisationInfoRetrieveTest extends AuthorizationFunctional
 
         setUpTestData();
         List<OrganisationEntityResponse> responseList = professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
-        assertThat(responseList).contains(activeOrgs.get(orgIdentifier1));
-        assertThat(responseList).contains(activeOrgs.get(orgIdentifier2));
-        assertThat(responseList).doesNotContain(activeOrgs.get(orgIdentifier3));
-        assertThat(responseList).doesNotContain(activeOrgs.get(orgIdentifier4));
+        assertThat(responseList).contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
+        assertThat(responseList).doesNotContain(activeOrgs.get(orgIdentifier3), activeOrgs.get(orgIdentifier4));
 
     }
 
