@@ -89,6 +89,8 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
 
     private String getAnAuthorisedServiceName() {
         List<String> authorisedServices = Arrays.asList("rd_professional_api", "rd_user_profile_api", "xui_webapp", "finrem_payment_service", "fpl_case_service", "iac", "aac-manage-case-assignment");
-        return authorisedServices.get(new Random().nextInt(authorisedServices.size()));
+        int index = new Random().nextInt(authorisedServices.size());
+        System.out.println(authorisedServices.get(index));
+        return authorisedServices.get(index);
     }
 }
