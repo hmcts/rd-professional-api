@@ -475,7 +475,7 @@ public class RefDataUtilTest {
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
         assertEquals(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), result);
-        verify(userProfileFeignClient.getUserProfileById(any()),times(1));
+        verify(userProfileFeignClient, times(1)).getUserProfileById(any());
     }
 
     @Test
