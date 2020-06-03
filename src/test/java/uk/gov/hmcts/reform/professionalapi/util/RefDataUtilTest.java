@@ -397,7 +397,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_updateUserDetailsForActiveOrganisation_entity_reponse_empt12() {
+    public void test_updateUserDetailsForActiveOrganisation_entity_reponse_emp() {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
