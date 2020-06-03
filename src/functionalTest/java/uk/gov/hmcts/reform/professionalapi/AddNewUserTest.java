@@ -154,7 +154,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         //adding new user with Suspended Super User Bearer Token
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(newUserResponse).isNotNull();
-        //assertThat((String) newUserResponse.get("message")).contains("Access Denied");
     }
 
     @Test
@@ -162,7 +161,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-caa");
         userRoles.add("caseworker-caa");
-        userRoles.add("pui-user-manager");
         String firstName = "someName";
         String lastName = "someLastName";
         String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
