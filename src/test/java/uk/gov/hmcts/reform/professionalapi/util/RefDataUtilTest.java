@@ -479,7 +479,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_mapUserInfo_without_rolestrue() {
+    public void test_mapUserInfo_without_rolesTrue() {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
