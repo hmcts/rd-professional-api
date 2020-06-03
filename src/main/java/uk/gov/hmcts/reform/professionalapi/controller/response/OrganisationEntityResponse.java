@@ -8,12 +8,8 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-public class OrganisationEntityResponse  {
+public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
-    @JsonProperty
-    private String organisationIdentifier;
-    @JsonProperty
-    private String name;
     @JsonProperty
     private OrganisationStatus status;
     @JsonProperty
@@ -36,14 +32,11 @@ public class OrganisationEntityResponse  {
         getOrganisationEntityResponse(organisation, isRequiredAllEntities);
     }
 
-    public OrganisationEntityResponse(String organisationIdentifier, String name) {
-
-        setOrgIdAndName(organisationIdentifier, name);
-    }
-
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        setOrgIdAndName(organisation.getOrganisationIdentifier(), organisation.getName());
+        this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
+                ? "" : organisation.getOrganisationIdentifier();
+        this.name = organisation.getName();
         this.status = organisation.getStatus();
         this.sraId = organisation.getSraId();
         this.sraRegulated = organisation.getSraRegulated();
@@ -62,11 +55,5 @@ public class OrganisationEntityResponse  {
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))
                     .collect(toList());
         }
-    }
-
-    private void setOrgIdAndName(String organisationIdentifier, String name) {
-        this.organisationIdentifier = StringUtils.isEmpty(organisationIdentifier)
-                ? "" : organisationIdentifier;
-        this.name = name;
     }
 }

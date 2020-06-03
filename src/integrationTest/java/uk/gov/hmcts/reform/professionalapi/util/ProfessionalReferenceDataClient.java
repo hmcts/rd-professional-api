@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,13 +17,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -79,6 +83,19 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String,Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Object retrieveOrganisationsWithMinimalInfo(String id, String role , String orgStatus) {
+        ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, OrganisationMinimalInfoResponse[].class);
+        HttpStatus status = responseEntity.getStatusCode();
+        if (status.is2xxSuccessful()) {
+            return Arrays.asList(convertResponseFromResponseBody(responseEntity, OrganisationMinimalInfoResponse[].class));
+        } else {
+            Map<String, Object> errorResposneMap = new HashMap<>();
+            errorResposneMap.put("response_body", convertResponseFromResponseBody(responseEntity, ErrorResponse.class));
+            errorResposneMap.put("http_status", responseEntity.getStatusCode());
+            return errorResposneMap;
+        }
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
@@ -182,6 +199,24 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Object> getRequestForExternalWithGivenResponseType(String uriPath, String role, String userId, Class clasz, Object... params) {
+
+        ResponseEntity<Object> responseEntity;
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            clasz,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+        }
+        return responseEntity;
+    }
+
     private Map<String, Object> getRequestForExternalRoles(String uriPath,String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
@@ -269,6 +304,14 @@ public class ProfessionalReferenceDataClient {
         response.put("headers", responseEntity.getHeaders().toString());
 
         return response;
+    }
+
+    private Object convertResponseFromResponseBody(ResponseEntity<Object> responseEntity, Class desiredClass) {
+
+        return objectMapper
+                .convertValue(
+                        responseEntity.getBody(),
+                        desiredClass);
     }
 
     public  Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {

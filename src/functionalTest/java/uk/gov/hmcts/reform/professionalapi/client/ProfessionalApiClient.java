@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -777,7 +777,7 @@ public class ProfessionalApiClient {
         return mapper.readTree(jsonString);
     }
 
-    public List<OrganisationEntityResponse> retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
+    public List<OrganisationMinimalInfoResponse> retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/status/" + status)
                 .andReturn();
@@ -786,6 +786,6 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(expectedStatus.value());
 
-        return Arrays.asList(response.getBody().as(OrganisationEntityResponse[].class));
+        return Arrays.asList(response.getBody().as(OrganisationMinimalInfoResponse[].class));
     }
 }
