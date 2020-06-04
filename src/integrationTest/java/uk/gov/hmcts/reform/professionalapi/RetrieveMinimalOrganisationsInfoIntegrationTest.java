@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 @SuppressWarnings("unchecked")
@@ -35,34 +35,25 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     List<String> validRoles;
     String userIdentifier;
 
-    public void setUpTestData() {
-        createActiveOrganisation1();
-        createActiveOrganisation2();
-        createPendingOrganisation1();
-        createPendingOrganisation2();
-        inviteUser(true);
-    }
-
-    public void inviteUser(boolean useExistingOrg) {
-
-        if (!useExistingOrg) {
-            createActiveOrganisation1();
-        }
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        NewUserCreationRequest newUserCreationRequest = inviteUserCreationRequest(randomAlphabetic(5) + "@somedomain.com", getValidRoleList());
-        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(orgIdentifier1, newUserCreationRequest, hmctsAdmin);
-        userIdentifier = (String)newUserResponse.get("userIdentifier");
-    }
-
     @Test
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() throws JsonProcessingException {
 
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", OrganisationStatus.ACTIVE.toString(), OrganisationMinimalInfoResponse[].class);
+                userIdentifier, "pui-caa", ACTIVE, OrganisationMinimalInfoResponse[].class);
         assertThat(responseList).usingFieldByFieldElementComparator().contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
         assertThat(responseList).usingFieldByFieldElementComparator().doesNotContain(activeOrgs.get(orgIdentifier3), activeOrgs.get(orgIdentifier4));
+    }
+
+    @Test
+    //AC:2
+    public void should_fail_to_retrieve_organisations_info_with_403_with_correct_roles_and_status_active_and_caller_user_is_pending() throws JsonProcessingException {
+        inviteUser(false);
+        getUserProfileByEmailWireMock(HttpStatus.OK);
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                userIdentifier, "pui-caa", ACTIVE, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "403 Forbidden: User status must be Active to invite users");
     }
 
     @Test
@@ -70,7 +61,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() throws JsonProcessingException {
         inviteUser(false);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa-manager", OrganisationStatus.ACTIVE.toString(), ErrorResponse.class);
+                userIdentifier, "pui-caa-manager", ACTIVE, ErrorResponse.class);
         validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "Access is denied");
     }
 
@@ -79,7 +70,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending() throws JsonProcessingException {
         inviteUser(false);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", OrganisationStatus.PENDING.toString(), ErrorResponse.class);
+                userIdentifier, "pui-caa", PENDING.toString(), ErrorResponse.class);
         validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, "4 : Resource not found", "Please check status param passed as this is invalid status.");
     }
 
@@ -99,6 +90,24 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         assertThat(errorResponse.getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
 
+    public void setUpTestData() {
+        createActiveOrganisation1();
+        createActiveOrganisation2();
+        createPendingOrganisation1();
+        createPendingOrganisation2();
+        inviteUser(true);
+    }
+
+    public void inviteUser(boolean useExistingOrg) {
+
+        if (!useExistingOrg) {
+            createActiveOrganisation1();
+        }
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        NewUserCreationRequest newUserCreationRequest = inviteUserCreationRequest(randomAlphabetic(5) + "@somedomain.com", getValidRoleList());
+        Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(orgIdentifier1, newUserCreationRequest, hmctsAdmin);
+        userIdentifier = (String)newUserResponse.get("userIdentifier");
+    }
 
     public String createActiveOrganisation1() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
