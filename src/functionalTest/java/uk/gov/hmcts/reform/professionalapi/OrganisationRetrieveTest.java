@@ -31,20 +31,9 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
-        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager);
+        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),puiCaseManager,HttpStatus.OK);
         validateSingleOrgResponse(response, "PENDING");
 
-    }
-
-    @Test
-    public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(puiCaseManager));
-        validateSingleOrgResponse(response, "ACTIVE");
-    }
-
-    @Test
-    public void retrieve_an_organisation_with_user_manager_rights_return_403() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
     }
 
     @Test
@@ -58,7 +47,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierTwo).isNotEmpty();
 
         professionalApiClient.updateOrganisation(orgIdentifierTwo, hmctsAdmin);
-        Map<String, Object> newOrgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifierTwo,hmctsAdmin);
+        Map<String, Object> newOrgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifierTwo,hmctsAdmin,HttpStatus.OK);
         Map<String, Object> finalResponse = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
 
         assertThat(finalResponse.get("organisations")).isNotNull();
