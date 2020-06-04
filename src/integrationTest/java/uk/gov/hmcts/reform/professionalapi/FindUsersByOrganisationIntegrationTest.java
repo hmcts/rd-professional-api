@@ -124,6 +124,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
+    public void retrieve_active_users_for_an_organisation_with_pui_caa_role_should_return_200() {
+        String id = settingUpOrganisation("pui-caa");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Active", puiCaa, id);
+        validateUsers(response, 2);
+    }
+
+    @Test
     public void retrieve_all_users_for_an_organisation_with_pagination() {
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
