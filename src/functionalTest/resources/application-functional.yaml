@@ -21,6 +21,7 @@ exui.role.pui-user-manager: pui-user-manager
 exui.role.pui-organisation-manager: pui-organisation-manager
 exui.role.pui-finance-manager: pui-finance-manager
 exui.role.pui-case-manager: pui-case-manager
+exui.role.pui-caa: pui-caa
 
 # resent user invite interval in minutes
 resendInterval: 60
