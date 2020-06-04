@@ -79,7 +79,6 @@ public class RefDataUtilTest {
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
         paymentAccount.setId(UUID.randomUUID());
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-
     }
 
     @Test
@@ -384,20 +383,6 @@ public class RefDataUtilTest {
 
     @Test
     public void test_updateUserDetailsForActiveOrganisation_entity_reponse_empty() {
-
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(APPLICATION_JSON);
-
-        Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
-        Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
-        assertThat(response).isEmpty();
-
-    }
-
-    @Test
-    public void test_updateUserDetailsForActiveOrganisation_entity_reponse_emp() {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
@@ -460,7 +445,7 @@ public class RefDataUtilTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void testGetSingleUserIdFromUserProfile() throws Exception {
+    public void testGetSingleUserIdFromUserProfileForException() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -474,7 +459,6 @@ public class RefDataUtilTest {
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
-        assertEquals(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), result);
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
     }
 
@@ -496,7 +480,7 @@ public class RefDataUtilTest {
         assertNull(responseUser.getCreated());
         assertEquals("pui-case-manager", responseUser.getRoles().get(0));
 
-        assertEquals(uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.ACTIVE, responseUser.getIdamStatus());
+        assertEquals(IdamStatus.ACTIVE, responseUser.getIdamStatus());
         assertEquals("400", responseUser.getIdamStatusCode());
         assertEquals("BAD REQUEST", responseUser.getIdamMessage());
 
