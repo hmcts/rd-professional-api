@@ -87,6 +87,31 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         }
     }
 
+    public RequestSpecification generateBearerTokenForPuiCaa() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-caa");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerTokenForPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaa, firstName, lastName, userEmail);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+
+        return bearerTokenForPuiUserManager;
+    }
+
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), "any");
@@ -212,7 +237,16 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
     }
 
+    @Test
+    public void find_active_users_only_for_an_organisation_with_pui_caa_should_return_200() {
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForPuiCaa(), "Active");
+        validateRetrievedUsers(response, "ACTIVE");
+    }
 
+    @Test
+    public void find_pending_users_for_an_organisation_with_pui_caa_should_return_400() {
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForPuiCaa(), "Pending");
+    }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();

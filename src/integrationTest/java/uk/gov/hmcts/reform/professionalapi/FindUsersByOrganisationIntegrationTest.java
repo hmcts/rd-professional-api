@@ -124,10 +124,18 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
-    public void retrieve_active_users_for_an_organisation_with_pui_caa_role_should_return_200() {
+    public void retrieve_active_users_only_for_an_organisation_with_pui_caa_role_should_return_200() {
         String id = settingUpOrganisation("pui-caa");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Active", puiCaa, id);
         validateUsers(response, 2);
+    }
+
+    @Test
+    public void retrieve_pending_users_only_for_an_organisation_with_pui_caa_role_should_return_400() {
+        String id = createOrganisationRequest();
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
+
     }
 
     @Test

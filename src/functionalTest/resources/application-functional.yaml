@@ -16,11 +16,15 @@ s2s-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
-exui.role.hmcts-admin: prd-admin
-exui.role.pui-user-manager: pui-user-manager
-exui.role.pui-organisation-manager: pui-organisation-manager
-exui.role.pui-finance-manager: pui-finance-manager
-exui.role.pui-case-manager: pui-case-manager
+prd:
+  security:
+    roles:
+      hmcts-admin: prd-admin
+      pui-user-manager: pui-user-manager
+      pui-organisation-manager: pui-organisation-manager
+      pui-finance-manager: pui-finance-manager
+      pui-case-manager: pui-case-manager
+      pui-caa: pui-caa
 
 # resent user invite interval in minutes
 resendInterval: 60

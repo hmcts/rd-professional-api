@@ -89,7 +89,7 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker","pui-caa"})
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                   @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                   @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
