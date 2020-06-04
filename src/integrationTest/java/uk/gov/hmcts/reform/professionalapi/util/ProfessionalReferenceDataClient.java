@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -85,16 +87,18 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
 
-    public Object retrieveOrganisationsWithMinimalInfo(String id, String role , String orgStatus) {
-        ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, OrganisationMinimalInfoResponse[].class);
+    public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus, Class expectedClass) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
         if (status.is2xxSuccessful()) {
-            return Arrays.asList(convertResponseFromResponseBody(responseEntity, OrganisationMinimalInfoResponse[].class));
+            OrganisationMinimalInfoResponse[]  responseArray = (OrganisationMinimalInfoResponse[]) objectMapper.convertValue(responseEntity.getBody(), expectedClass);
+            List<OrganisationMinimalInfoResponse> list = Arrays.asList(responseArray);
+            return list;
         } else {
-            Map<String, Object> errorResposneMap = new HashMap<>();
-            errorResposneMap.put("response_body", convertResponseFromResponseBody(responseEntity, ErrorResponse.class));
-            errorResposneMap.put("http_status", responseEntity.getStatusCode());
-            return errorResposneMap;
+            Map<String, Object> errorResponseMap = new HashMap<>();
+            errorResponseMap.put("response_body",  objectMapper.readValue(responseEntity.getBody().toString(), ErrorResponse.class));
+            errorResponseMap.put("http_status", responseEntity.getStatusCode());
+            return errorResponseMap;
         }
     }
 
@@ -306,13 +310,6 @@ public class ProfessionalReferenceDataClient {
         return response;
     }
 
-    private Object convertResponseFromResponseBody(ResponseEntity<Object> responseEntity, Class desiredClass) {
-
-        return objectMapper
-                .convertValue(
-                        responseEntity.getBody(),
-                        desiredClass);
-    }
 
     public  Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
