@@ -339,11 +339,11 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-        + "  \"statusUpdateResponse\": {"
-        + "  \"idamStatusCode\": \"200\","
-        + "  \"idamMessage\": \"Success\""
-        + "  } "
-        + "}";
+            + "  \"statusUpdateResponse\": {"
+            + "  \"idamStatusCode\": \"200\","
+            + "  \"idamMessage\": \"Success\""
+            + "  } "
+            + "}";
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
@@ -357,10 +357,10 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-        + "  \"errorMessage\": \"400\","
-        + "  \"errorDescription\": \"BAD REQUEST\","
-        + "  \"timeStamp\": \"23:10\""
-        + "}";
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
@@ -452,10 +452,10 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-        + "  \"errorMessage\": \"400\","
-        + "  \"errorDescription\": \"BAD REQUEST\","
-        + "  \"timeStamp\": \"23:10\""
-        + "}";
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
