@@ -467,9 +467,9 @@ public class OrganisationServiceImplTest {
         List<ContactInformationCreationRequest> contactInformationCreationRequest = contactInformationCreationRequests;
         ContactInformationCreationRequest contactInformationCreationRequestMock = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
         contactInformationCreationRequest.add(contactInformationCreationRequestMock);
-        Organisation organisationMock1 = new Organisation("some-org-name", OrganisationStatus.ACTIVE, "PENDING", "Test", Boolean.TRUE, "Demo");
+        Organisation organisation = new Organisation("some-org-name", OrganisationStatus.ACTIVE, "PENDING", "Test", Boolean.TRUE, "Demo");
 
-        sut.addContactInformationToOrganisation(contactInformationCreationRequest,organisationMock1);
+        sut.addContactInformationToOrganisation(contactInformationCreationRequest,organisation);
 
         assertEquals("addressLine-1", contactInformationCreationRequest.get(0).getAddressLine1());
         assertEquals("addressLine-2", contactInformationCreationRequest.get(0).getAddressLine2());
@@ -479,5 +479,6 @@ public class OrganisationServiceImplTest {
         assertEquals("country", contactInformationCreationRequest.get(0).getCountry());
         assertEquals("postCode", contactInformationCreationRequest.get(0).getPostCode());
     }
+
 
 }
