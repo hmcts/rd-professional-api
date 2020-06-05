@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -98,13 +99,9 @@ public class ProfessionalExternalUserController extends SuperController {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-        boolean isRolePuiUserManager  = organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), "pui-user-manager");
         ResponseEntity profUsersEntityResponse;
-
-        if (!isRolePuiUserManager) {
-            if (StringUtils.isEmpty(status)) {
-                status = "Active";
-            }
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), ProfessionalApiConstants.PUI_USER_MANAGER)) {
+            status = StringUtils.isEmpty(status) ? ProfessionalApiConstants.ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
