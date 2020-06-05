@@ -464,20 +464,19 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testAddContactInformationToOrganisation() throws NoSuchMethodException, IllegalAccessException {
-        List<ContactInformationCreationRequest> contactInformationCreationRequest = contactInformationCreationRequests;
-        ContactInformationCreationRequest contactInformationCreationRequestMock = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
-        contactInformationCreationRequest.add(contactInformationCreationRequestMock);
+        ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
+        contactInformationCreationRequests.add(contactInformationCreationRequest);
         Organisation organisation = new Organisation("some-org-name", OrganisationStatus.ACTIVE, "PENDING", "Test", Boolean.TRUE, "Demo");
 
-        sut.addContactInformationToOrganisation(contactInformationCreationRequest,organisation);
+        sut.addContactInformationToOrganisation(contactInformationCreationRequests, this.organisation);
 
-        assertEquals("addressLine-1", contactInformationCreationRequest.get(0).getAddressLine1());
-        assertEquals("addressLine-2", contactInformationCreationRequest.get(0).getAddressLine2());
-        assertEquals("addressLine-3", contactInformationCreationRequest.get(0).getAddressLine3());
-        assertEquals("townCity", contactInformationCreationRequest.get(0).getTownCity());
-        assertEquals("county", contactInformationCreationRequest.get(0).getCounty());
-        assertEquals("country", contactInformationCreationRequest.get(0).getCountry());
-        assertEquals("postCode", contactInformationCreationRequest.get(0).getPostCode());
+        assertEquals("addressLine-1", contactInformationCreationRequests.get(0).getAddressLine1());
+        assertEquals("addressLine-2", contactInformationCreationRequests.get(0).getAddressLine2());
+        assertEquals("addressLine-3", contactInformationCreationRequests.get(0).getAddressLine3());
+        assertEquals("townCity", contactInformationCreationRequests.get(0).getTownCity());
+        assertEquals("county", contactInformationCreationRequests.get(0).getCounty());
+        assertEquals("country", contactInformationCreationRequests.get(0).getCountry());
+        assertEquals("postCode", contactInformationCreationRequests.get(0).getPostCode());
     }
 
 
