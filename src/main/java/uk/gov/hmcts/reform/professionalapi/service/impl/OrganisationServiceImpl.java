@@ -163,7 +163,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     }
 
-    private void addContactInformationToOrganisation(
+    public void addContactInformationToOrganisation(
             List<ContactInformationCreationRequest> contactInformationCreationRequest,
             Organisation organisation) {
 

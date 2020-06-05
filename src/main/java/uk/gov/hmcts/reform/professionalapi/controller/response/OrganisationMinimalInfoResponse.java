@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrganisationMinimalInfoResponse {
     @JsonProperty
-    protected String organisationIdentifier;
-    @JsonProperty
     protected String name;
+    @JsonProperty
+    protected String organisationIdentifier;
 }
