@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -435,7 +434,7 @@ public class RefDataUtilTest {
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
-        Organisation organisationRes =(Organisation)response.get(1);
+        Organisation organisationRes = (Organisation)response.get("1");
         assertEquals(organisation,organisationRes);
 
         SuperUser item = ((SuperUser)users.get(0));
