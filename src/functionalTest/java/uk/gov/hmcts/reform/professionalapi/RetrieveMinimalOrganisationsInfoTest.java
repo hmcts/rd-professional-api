@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +40,8 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
-        assertThat(responseList).contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
-        assertThat(responseList).doesNotContain(pendingOrgs.get(orgIdentifier3), pendingOrgs.get(orgIdentifier4));
+        assertThat(responseList).usingFieldByFieldElementComparator().contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
+        assertThat(responseList).usingFieldByFieldElementComparator().doesNotContain(pendingOrgs.get(orgIdentifier3), pendingOrgs.get(orgIdentifier4));
 
     }
 
@@ -118,7 +118,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
             idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName());
         }
 
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier1 == null ? createActiveOrganisation1() : orgIdentifier1, hmctsAdmin, newUserCreationRequest, HttpStatus.OK);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier1 == null ? createActiveOrganisation1() : orgIdentifier1, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(email));
     }
@@ -126,40 +126,39 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     public List<String> getValidRoleList() {
         if (CollectionUtils.isEmpty(validRoles)) {
             validRoles = new ArrayList<>();
-            List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-user-manager");
-            userRoles.add("pui-case-manager");
-            userRoles.add("pui-organisation-manager");
-            userRoles.add("pui-finance-manager");
-            userRoles.add("pui-caa");
+            validRoles.add(puiUserManager);
+            validRoles.add(puiCaseManager);
+            validRoles.add("pui-organisation-manager");
+            validRoles.add("pui-finance-manager");
+            validRoles.add("pui-caa");
         }
         return validRoles;
     }
 
     public String createActiveOrganisation1() {
         String orgName1 = randomAlphabetic(7);
-        orgIdentifier1 = createAndUpdateOrganisationToActive(hmctsAdmin, anOrganisationCreationRequest().name(orgName1).build());
-        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(orgIdentifier1, orgName1);
+        orgIdentifier1 = createAndUpdateOrganisationToActive(hmctsAdmin, someMinimalOrganisationRequest().name(orgName1).sraId(randomAlphabetic(10)).build());
+        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(orgName1, orgIdentifier1);
         return orgIdentifier1;
     }
 
     public String createActiveOrganisation2() {
         String orgName2 = randomAlphabetic(7);
-        orgIdentifier2 = createAndUpdateOrganisationToActive(hmctsAdmin, anOrganisationCreationRequest().name(orgName2).build());
-        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(orgIdentifier2, orgName2);
+        orgIdentifier2 = createAndUpdateOrganisationToActive(hmctsAdmin, someMinimalOrganisationRequest().name(orgName2).sraId(randomAlphabetic(10)).build());
+        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(orgName2, orgIdentifier2);
         return orgIdentifier2;
     }
 
     public void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
-        orgIdentifier3 = (String)professionalApiClient.createOrganisation(anOrganisationCreationRequest().name(orgName3).build()).get("organisationIdentifier");
-        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(orgIdentifier3, orgName3);
+        orgIdentifier3 = (String)professionalApiClient.createOrganisation(someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10)).build()).get("organisationIdentifier");;
+        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(orgName3, orgIdentifier3);
     }
 
     public void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
-        orgIdentifier4 = (String)professionalApiClient.createOrganisation(anOrganisationCreationRequest().name(orgName4).build()).get("organisationIdentifier");
-        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(orgIdentifier4, orgName4);
+        orgIdentifier4 = (String)professionalApiClient.createOrganisation(someMinimalOrganisationRequest().name(orgName4).sraId(randomAlphabetic(10)).build()).get("organisationIdentifier");
+        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(orgName4, orgIdentifier4);
     }
 
 

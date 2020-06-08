@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -91,13 +90,11 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
         if (status.is2xxSuccessful()) {
-            OrganisationMinimalInfoResponse[]  responseArray = (OrganisationMinimalInfoResponse[]) objectMapper.convertValue(responseEntity.getBody(), expectedClass);
-            List<OrganisationMinimalInfoResponse> list = Arrays.asList(responseArray);
-            return list;
+            return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(responseEntity.getBody(), expectedClass));
         } else {
             Map<String, Object> errorResponseMap = new HashMap<>();
             errorResponseMap.put("response_body",  objectMapper.readValue(responseEntity.getBody().toString(), ErrorResponse.class));
-            errorResponseMap.put("http_status", responseEntity.getStatusCode());
+            errorResponseMap.put("http_status", status);
             return errorResponseMap;
         }
     }

@@ -53,7 +53,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         getUserProfileByEmailWireMock(HttpStatus.OK);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
                 userIdentifier, "pui-caa", ACTIVE, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "403 Forbidden: User status must be Active to invite users");
+        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "User status must be Active to perform this operation");
     }
 
     @Test
@@ -113,7 +113,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName1 = randomAlphabetic(7);
         orgIdentifier1 = createAndActivateOrganisationWithGivenRequest(someMinimalOrganisationRequest().name(orgName1).sraId(randomAlphabetic(10)).build());
-        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(orgIdentifier1, orgName1);
+        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(orgName1, orgIdentifier1);
         activeOrgs.put(orgIdentifier1, organisationEntityResponse1);
         return orgIdentifier1;
     }
@@ -122,7 +122,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName2 = randomAlphabetic(7);
         orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(someMinimalOrganisationRequest().name(orgName2).sraId(randomAlphabetic(10)).build());
-        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(orgIdentifier2, orgName2);
+        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(orgName2, orgIdentifier2);
         activeOrgs.put(orgIdentifier2, organisationEntityResponse2);
         return orgIdentifier2;
     }
@@ -130,14 +130,14 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
         orgIdentifier3 = createOrganisationRequestWithRequest(someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10)).build());
-        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(orgIdentifier3, orgName3);
+        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(orgName3, orgIdentifier3);
         pendingOrgs.put(orgIdentifier3, organisationEntityResponse3);
     }
 
     public void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
         orgIdentifier4 = createOrganisationRequestWithRequest(someMinimalOrganisationRequest().name(orgName4).sraId(randomAlphabetic(10)).build());
-        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(orgIdentifier4, orgName4);
+        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(orgName4, orgIdentifier4);
         pendingOrgs.put(orgIdentifier4, organisationEntityResponse4);
     }
 

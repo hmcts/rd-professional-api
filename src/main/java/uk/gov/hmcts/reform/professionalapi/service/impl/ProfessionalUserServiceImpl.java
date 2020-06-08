@@ -220,7 +220,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if (newUserResponse == null || !IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-            throw new AccessDeniedException("403 Forbidden: User status must be Active to invite users");
+            throw new AccessDeniedException("User status must be Active to perform this operation");
         }
     }
 }

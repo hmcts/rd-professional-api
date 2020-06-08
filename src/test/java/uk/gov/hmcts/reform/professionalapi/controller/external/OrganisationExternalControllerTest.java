@@ -239,7 +239,7 @@ public class OrganisationExternalControllerTest {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation1);
-        OrganisationMinimalInfoResponse organisationMinimalInfoResponse = new OrganisationMinimalInfoResponse(organisation1.getOrganisationIdentifier(), organisation1.getName());
+        OrganisationMinimalInfoResponse organisationMinimalInfoResponse = new OrganisationMinimalInfoResponse(organisation1.getName(), organisation1.getOrganisationIdentifier());
         when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(organisations);
 
         ResponseEntity<List<OrganisationMinimalInfoResponse>> responseEntity =
