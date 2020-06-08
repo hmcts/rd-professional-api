@@ -48,8 +48,8 @@ def jarName = 'rd-professional-api.jar'
 group = 'uk.gov.hmcts.reform.refdata'
 version = '0.0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 jacocoTestCoverageVerification {
     violationRules {
