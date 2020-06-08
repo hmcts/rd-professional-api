@@ -92,7 +92,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
 
         List paymentAccounts = (List) retrievePaymentAccountsByEmailResponse.get("paymentAccount");
-        assertThat(paymentAccounts).hasSize(0);
+        assertThat(paymentAccounts).isNull();
     }
 
     @Test
