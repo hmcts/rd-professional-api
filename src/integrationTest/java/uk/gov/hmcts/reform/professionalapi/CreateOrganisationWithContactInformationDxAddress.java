@@ -77,7 +77,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_address_line1_empty() {
 
-        OrganisationCreationRequest organisationCreationRequest =organisationRequestWithAllFields()
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("DX 1234567890")
