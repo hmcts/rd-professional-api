@@ -4,7 +4,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -33,6 +39,7 @@ import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -41,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
@@ -54,6 +62,8 @@ public class RefDataUtilTest {
     private UserAccountMap userAccountMap;
     private UserProfile profile;
     private GetUserProfileResponse getUserProfileResponse;
+    private UserProfileFeignClient userProfileFeignClient;
+
 
     @Before
     public void setUp() {
@@ -69,6 +79,7 @@ public class RefDataUtilTest {
         getUserProfileResponse.setIdamStatusCode("400");
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
         paymentAccount.setId(UUID.randomUUID());
+        userProfileFeignClient = mock(UserProfileFeignClient.class);
     }
 
     @Test
@@ -330,11 +341,11 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-                + "  \"statusUpdateResponse\": {"
-                + "  \"idamStatusCode\": \"200\","
-                + "  \"idamMessage\": \"Success\""
-                + "  } "
-                + "}";
+            + "  \"statusUpdateResponse\": {"
+            + "  \"idamStatusCode\": \"200\","
+            + "  \"idamMessage\": \"Success\""
+            + "  } "
+            + "}";
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
@@ -348,10 +359,10 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-                + "  \"errorMessage\": \"400\","
-                + "  \"errorDescription\": \"BAD REQUEST\","
-                + "  \"timeStamp\": \"23:10\""
-                + "}";
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
@@ -374,20 +385,6 @@ public class RefDataUtilTest {
 
     @Test
     public void test_updateUserDetailsForActiveOrganisation_entity_reponse_empty() {
-
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(APPLICATION_JSON);
-
-        Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
-        Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
-        assertThat(response).isEmpty();
-
-    }
-
-    @Test
-    public void test_updateUserDetailsForActiveOrganisation() {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
@@ -399,7 +396,6 @@ public class RefDataUtilTest {
         List<ProfessionalUsersResponse> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1, professionalUsersResponse2);
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
-
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
 
@@ -407,6 +403,90 @@ public class RefDataUtilTest {
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
         assertThat(response).isEmpty();
+
+
+    }
+
+
+    @Test
+    public void test_updateUserDetailsForActiveOrganisation() {
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        professionalUsersResponse.setUserIdentifier("1");
+        professionalUsersResponse1.setUserIdentifier("2");
+        professionalUsersResponse2.setUserIdentifier("3");
+        professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
+        professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
+
+        List<ProfessionalUsersResponse> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1, professionalUsersResponse2);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        List<SuperUser> users = new ArrayList<>();
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
+        Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
+        activeOrganisationDtls.put("1",organisation);
+        activeOrganisationDtls.put("2",organisation);
+        activeOrganisationDtls.put("3",organisation);
+        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
+
+        Organisation organisationRes = (Organisation)response.get("1");
+        assertEquals(organisation,organisationRes);
+
+        SuperUser item = ((SuperUser)users.get(0));
+        assertNull(item.getId());
+        assertEquals("fName", item.getFirstName());
+        assertEquals("lName", item.getLastName());
+        assertEquals("some@email.com", item.getEmailAddress());
+        assertNull(item.getOrganisation().getId());
+        assertEquals("Org-Name", item.getOrganisation().getName());
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void testGetSingleUserIdFromUserProfileForException() throws Exception {
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        String body = "{"
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
+
+        Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
+        when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
+
+        ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
+        verify(userProfileFeignClient, times(1)).getUserProfileById(any());
+    }
+
+    @Test
+    public void test_mapUserInfo_without_rolesTrue() {
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(APPLICATION_JSON);
+        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
+        ProfessionalUser responseUser = RefDataUtil.mapUserInfo(new ProfessionalUser(), realResponseEntity, true);
+        assertNull(responseUser.getId());
+        assertEquals("firstName", responseUser.getFirstName());
+        assertEquals("lastName", responseUser.getLastName());
+        assertEquals("email@org.com", responseUser.getEmailAddress());
+        assertNull(responseUser.getOrganisation());
+
+        assertNull(responseUser.getDeleted());
+        assertNull(responseUser.getLastUpdated());
+        assertNull(responseUser.getCreated());
+        assertEquals("pui-case-manager", responseUser.getRoles().get(0));
+
+        assertEquals(IdamStatus.ACTIVE, responseUser.getIdamStatus());
+        assertEquals("400", responseUser.getIdamStatusCode());
+        assertEquals("BAD REQUEST", responseUser.getIdamMessage());
 
     }
 }
