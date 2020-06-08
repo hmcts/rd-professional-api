@@ -432,7 +432,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
 
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest2);
-
         assertThat(response2.get("http_status")).isEqualTo("400");
     }
 
