@@ -185,6 +185,7 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
     // Nothing to do here
+    println 'pact tests have been moved to pactPublish'
 }
 
 jacoco {
