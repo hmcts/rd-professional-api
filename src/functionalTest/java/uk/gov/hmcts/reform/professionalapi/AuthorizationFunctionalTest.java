@@ -72,6 +72,10 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${exui.role.pui-caa}")
+    protected String puiCaa;
+
+
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -80,6 +84,9 @@ public abstract class AuthorizationFunctionalTest {
 
     @Autowired
     protected TestConfigProperties configProperties;
+
+    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
     public void setUp() {
@@ -117,6 +124,14 @@ public abstract class AuthorizationFunctionalTest {
 
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         return activateOrganisation(response, role);
+    }
+
+    protected String createAndctivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest, String role) {
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+        return organisationIdentifier;
     }
 
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {

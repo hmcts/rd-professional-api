@@ -35,6 +35,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -777,7 +778,7 @@ public class ProfessionalApiClient {
         return mapper.readTree(jsonString);
     }
 
-    public List<OrganisationMinimalInfoResponse> retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
+    public Object retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/status/" + status)
                 .andReturn();
@@ -785,7 +786,10 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
-
-        return Arrays.asList(response.getBody().as(OrganisationMinimalInfoResponse[].class));
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationMinimalInfoResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
     }
 }

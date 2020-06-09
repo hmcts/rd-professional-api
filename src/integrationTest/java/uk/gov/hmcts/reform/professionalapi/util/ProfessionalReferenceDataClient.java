@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.*;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 @SuppressWarnings("unchecked")
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
+    private static final String STATUS_PARAM_INVALID_MESSAGE = "Please check status param passed as this is invalid status.";
     Map<String, OrganisationMinimalInfoResponse> activeOrgs = new HashMap<>();
     Map<String, OrganisationMinimalInfoResponse> pendingOrgs = new HashMap<>();
 
@@ -41,7 +44,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
 
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", ACTIVE, OrganisationMinimalInfoResponse[].class);
+                userIdentifier, puiCaa, ACTIVE, OrganisationMinimalInfoResponse[].class);
         assertThat(responseList).usingFieldByFieldElementComparator().contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
         assertThat(responseList).usingFieldByFieldElementComparator().doesNotContain(activeOrgs.get(orgIdentifier3), activeOrgs.get(orgIdentifier4));
     }
@@ -52,8 +55,8 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         inviteUser(false);
         getUserProfileByEmailWireMock(HttpStatus.OK);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", ACTIVE, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "User status must be Active to perform this operation");
+                userIdentifier, puiCaa, ACTIVE, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(), STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE);
     }
 
     @Test
@@ -61,8 +64,8 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() throws JsonProcessingException {
         inviteUser(false);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa-manager", ACTIVE, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, "9 : Access Denied", "Access is denied");
+                userIdentifier, "pui-invalid-role", ACTIVE, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);
     }
 
     @Test
@@ -70,8 +73,8 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending() throws JsonProcessingException {
         inviteUser(false);
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", PENDING.toString(), ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, "4 : Resource not found", "Please check status param passed as this is invalid status.");
+                userIdentifier, puiCaa, PENDING.toString(), ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
     }
 
     @Test
@@ -79,8 +82,8 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed() throws JsonProcessingException {
         inviteUser(false);
         Map<String, Object> errorResponseMap = (Map<String,Object>) professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                userIdentifier, "pui-caa", null, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, "4 : Resource not found", "Please check status param passed as this is invalid status.");
+                userIdentifier, puiCaa, null, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
     }
 
     public void validateErrorResponse(Map<String, Object> errorResponseMap, HttpStatus expectedStatus, String expectedErrorMessage, String expectedErrorDescription) {
@@ -144,11 +147,11 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public List<String> getValidRoleList() {
         if (CollectionUtils.isEmpty(validRoles)) {
             validRoles = new ArrayList<>();
-            validRoles.add("pui-user-manager");
-            validRoles.add("pui-case-manager");
-            validRoles.add("pui-organisation-manager");
-            validRoles.add("pui-finance-manager");
-            validRoles.add("pui-caa");
+            validRoles.add(puiUserManager);
+            validRoles.add(puiCaseManager);
+            validRoles.add(puiOrgManager);
+            validRoles.add(puiFinanceManager);
+            validRoles.add(puiCaa);
         }
         return validRoles;
     }

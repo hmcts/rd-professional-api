@@ -46,6 +46,7 @@ exui.role:
   pui-organisation-manager: pui-organisation-manager
   pui-finance-manager: pui-finance-manager
   pui-case-manager: pui-case-manager
+  pui-caa: pui-caa
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}

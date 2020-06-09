@@ -122,6 +122,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${exui.role.pui-caa}")
+    protected String puiCaa;
+
     @Value("${resendInterval}")
     protected String resendInterval;
 
@@ -135,6 +138,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     private long expiration;
 
     protected static final String ACTIVE = "ACTIVE";
+    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
     public void setUpClient() {
