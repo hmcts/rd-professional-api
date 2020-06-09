@@ -340,8 +340,6 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                 .build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(response.get("http_status")).asString().contains("400");
     }
 }

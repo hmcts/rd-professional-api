@@ -49,7 +49,7 @@ public class OrganisationEntityResponse  {
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
-        if (!StringUtils.isEmpty(organisation.getPaymentAccounts()) && organisation.getPaymentAccounts().size() > 0) {
+        if (organisation.getPaymentAccounts().size() > 0) {
             this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
