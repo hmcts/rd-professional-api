@@ -72,7 +72,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
 
-        if(assignAccessRoleEnabled) {
+        if (assignAccessRoleEnabled) {
             String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
             UserCreationRequest superUser = createSuperUser(email);
 
