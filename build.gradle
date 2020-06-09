@@ -22,6 +22,7 @@ plugins {
     id 'au.com.dius.pact' version '4.0.7'
 }
 
+
 apply plugin: 'java'
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'project-report'
