@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:https://rd-professional-api-pr-583.service.core-compute-preview.internal}
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
 s2s-name: rd_professional_api
@@ -30,3 +30,6 @@ resendInterval: 60
 resendInviteEnabled : true
 # toggle for resendInvite
 deleteOrganisationEnabled : false
+
+# toggle for assign access roles
+assignAccessRoleEnabled : false

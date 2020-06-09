@@ -312,7 +312,6 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
-            log.info("New user invited with ID:" + userProfileCreationResponse.getIdamId());
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
