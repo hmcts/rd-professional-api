@@ -289,6 +289,16 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
+    public static <T> T getNestedValue(Map map, String... keys) {
+        Object value = map;
+
+        for (String key : keys) {
+            value = ((Map) value).get(key);
+        }
+
+        return (T) value;
+    }
+
     public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
@@ -471,7 +481,7 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
+    public Map<String, Object> retrieveOrganisationByOrgIdExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations")

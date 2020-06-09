@@ -75,7 +75,6 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-caa}")
     protected String puiCaa;
 
-
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;

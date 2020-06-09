@@ -29,7 +29,7 @@ auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
 idam:
   s2s-authorised:
-    services: rd_professional_api
+    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac,aac-manage-case-assignment}
   api.url: ${IDAM_URL:http://127.0.0.1:5000}
   client:
     redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
