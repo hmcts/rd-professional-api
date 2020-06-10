@@ -22,6 +22,7 @@ plugins {
     id 'au.com.dius.pact' version '4.0.7'
 }
 
+
 apply plugin: 'java'
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'project-report'
@@ -48,8 +49,7 @@ def jarName = 'rd-professional-api.jar'
 group = 'uk.gov.hmcts.reform.refdata'
 version = '0.0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
 
 jacocoTestCoverageVerification {
     violationRules {
@@ -185,7 +185,6 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
     // Nothing to do here
-    println 'pact tests have been moved to pactPublish'
 }
 
 jacoco {
