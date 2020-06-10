@@ -4,13 +4,12 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
 
-import java.util.Collection;
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -56,7 +55,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
     }
 
-    public void verifyNonPuiFinanceManagerOrgIdentifier(Collection<GrantedAuthority> authorities, Organisation organisation, String extOrgIdentifier) {
+    public void verifyNonPuiFinanceManagerOrgIdentifier(List<String> authorities, Organisation organisation, String extOrgIdentifier) {
 
         boolean isPuiFinanceManExist = ifUserRoleExists(authorities, "pui-finance-manager");
 
@@ -65,11 +64,11 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
     }
 
-    public boolean ifUserRoleExists(Collection<GrantedAuthority> authorities, String role) {
+    public boolean ifUserRoleExists(List<String> roles, String role) {
         boolean doesRoleExist = false;
-        for (GrantedAuthority authority : authorities) {
+        for (String roleName : roles) {
 
-            if (!StringUtils.isEmpty(authority.getAuthority()) && role.equals(authority.getAuthority().trim())) {
+            if (!StringUtils.isEmpty(roleName) && role.equals(roleName.trim())) {
                 doesRoleExist = true;
                 break;
             }
