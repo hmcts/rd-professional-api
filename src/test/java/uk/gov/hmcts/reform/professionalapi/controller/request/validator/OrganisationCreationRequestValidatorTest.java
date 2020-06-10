@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
@@ -35,7 +36,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationCreationRequestValidatorTest {
 
-    private static final String INVALID_STATUS_PARAM = "Please check status param passed as this is invalid status.";
     @Mock //must be mocked as it is in interface
     private RequestValidator validator1;
     @Mock //must be mocked as it is in interface
@@ -328,6 +328,6 @@ public class OrganisationCreationRequestValidatorTest {
 
     public void verifyResourceNotFoundExceptionThrown(Throwable raisedException) {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
-                .hasMessageStartingWith(INVALID_STATUS_PARAM);
+                .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
 }
