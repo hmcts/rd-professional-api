@@ -99,8 +99,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
 
-
-
     @Test
     public void can_retrieve_organisation_by_orgIdentifier_for_pui_user_manager_External() {
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK, generateBearerTokenForUser(puiUserManager));

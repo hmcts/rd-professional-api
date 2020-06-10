@@ -273,12 +273,7 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        if ("True".equalsIgnoreCase(showDeleted)) {
-            showDeleted = "true";
-        } else {
-            showDeleted = "false";
-        }
-        return showDeleted;
+        return "True".equalsIgnoreCase(showDeleted) ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {

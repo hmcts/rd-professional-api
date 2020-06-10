@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
-@TestPropertySource("classpath:application-functional.yaml")
+@TestPropertySource("classpath:application-functional.yml")
 @Slf4j
 public abstract class AuthorizationFunctionalTest {
 
@@ -57,22 +57,22 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
-    @Value("${exui.role.hmcts-admin}")
+    @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
 
-    @Value("${exui.role.pui-user-manager}")
+    @Value("${prd.security.roles.pui-user-manager}")
     protected String puiUserManager;
 
-    @Value("${exui.role.pui-organisation-manager}")
+    @Value("${prd.security.roles.pui-organisation-manager}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.pui-finance-manager}")
+    @Value("${prd.security.roles.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.pui-case-manager}")
+    @Value("${prd.security.roles.pui-case-manager}")
     protected String puiCaseManager;
 
-    @Value("${exui.role.pui-caa}")
+    @Value("${prd.security.roles.pui-caa}")
     protected String puiCaa;
 
     protected ProfessionalApiClient professionalApiClient;
@@ -96,7 +96,7 @@ public abstract class AuthorizationFunctionalTest {
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        /* SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
