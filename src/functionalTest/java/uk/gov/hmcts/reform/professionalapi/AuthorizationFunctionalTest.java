@@ -84,7 +84,6 @@ public abstract class AuthorizationFunctionalTest {
     @Autowired
     protected TestConfigProperties configProperties;
 
-    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
