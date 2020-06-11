@@ -326,7 +326,7 @@ dependencies {
     testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
     testCompile 'io.github.openfeign:feign-jackson:10.7.0'
 
-    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.1.RELEASE'
+    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.3.RELEASE'
 
     testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
         force = true
