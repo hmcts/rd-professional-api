@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import static java.util.Collections.singleton;
 import static org.mockito.Mockito.mock;
 
-import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,14 +64,5 @@ public class PaymentAccountValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
-    }
-
-
-    @Test
-    public void privateConstructorTest() throws Exception {
-        Constructor<PaymentAccountValidator> constructor = PaymentAccountValidator.class.getDeclaredConstructor();
-        //assertFalse(constructor.isAccessible());
-        constructor.setAccessible(true);
-        constructor.newInstance((Object[]) null);
     }
 }
