@@ -12,6 +12,7 @@ import feign.Response;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,7 +52,7 @@ public class JsonFeignResponseUtilTest {
 
         try {
             when(bodyMock.asInputStream()).thenThrow(new IOException());
-            when(bodyMock.asReader()).thenThrow(new IOException());
+            when(bodyMock.asReader(Charset.defaultCharset())).thenThrow(new IOException());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -23,6 +23,18 @@ spring:
             non_contextual_creation: true
   application:
     name: Professional Reference Data API
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
@@ -67,30 +79,19 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
-  authorisedServices:
-    - rd_professional_api
-    - rd_user_profile_api
-    - xui_webapp
-    - finrem_payment_service
-    - fpl_case_service
-    - iac
-
 ### dependency configuration
-auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 idam:
   s2s-auth:
     totp_secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: false
-usermap:
-    pbaFromUserAccountMap:
-    - "false"
+  s2s-authorised:
+    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac}
+  api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
+oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
-auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
-
-auth.idam.client.detailsUri: "/o/userinfo"
 ## Secure roles configuration
 exui.role:
     hmcts-admin: prd-admin

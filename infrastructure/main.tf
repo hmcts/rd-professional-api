@@ -45,6 +45,17 @@ data "azurerm_key_vault_secret" "idam_url" {
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+data "azurerm_key_vault_secret" "OIDC_ISSUER_URL" {
+  name = "OIDC-ISSUER-URL"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+data "azurerm_key_vault_secret" "OPEN_ID_API_BASE_URI" {
+  name = "OPEN-ID-API-BASE-URI"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+
 data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
  name = "USER-PROFILE-URL"
  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"

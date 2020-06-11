@@ -55,7 +55,7 @@ public class PaymentAccountServiceImplTest {
     private List<SuperUser> superUsers = new ArrayList<>();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
     private Set<String> pbas = new HashSet<>();
-    private PbaEditRequest pbaEditRequest = new PbaEditRequest(null);
+    private PbaEditRequest pbaEditRequest = new PbaEditRequest();
 
     @Before
     public void setUp() {
