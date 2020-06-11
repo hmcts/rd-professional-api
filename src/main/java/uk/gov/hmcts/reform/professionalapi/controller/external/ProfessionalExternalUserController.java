@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -95,7 +96,8 @@ public class ProfessionalExternalUserController extends SuperController {
                                                   @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                   @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
                                                   @RequestParam(value = "page", required = false) Integer page,
-                                                  @RequestParam(value = "size", required = false) Integer size) {
+                                                  @RequestParam(value = "size", required = false) Integer size,
+                                                  @ApiParam(hidden = true) @UserId String userId) {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
@@ -104,7 +106,8 @@ public class ProfessionalExternalUserController extends SuperController {
             status = StringUtils.isEmpty(status) ? ProfessionalApiConstants.ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
-
+        // verify the invited user status active or not?
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
         profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
 
         return profUsersEntityResponse;
