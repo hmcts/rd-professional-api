@@ -211,6 +211,50 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
 
+    @Test(expected = InvalidRequest.class)
+    public void requestDxAddwithEmptySpaceDxNumberAndDxExchangeInvalidTest() {
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest(" ", "DxExchange1234567890");
+        List<DxAddressCreationRequest> dxList = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", " ");
+        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
+        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
+        contactList1.add(contactInfoCreateRequest1);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void requestDxAddwithNoValueDxExchangeInvalidTest() {
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("", "DxExchange1234567890");
+        List<DxAddressCreationRequest> dxList = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
+        contactList.add(contactInfoCreateRequest);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", "");
+        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
+        dxList.add(dxRequest);
+        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
+        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
+        contactList1.add(contactInfoCreateRequest1);
+
+        organisationCreationRequestValidator.requestContactInformation(contactList);
+
+    }
+
     @Test(expected = Test.None.class)
     public void should_validate_valid_email_and_should_not_throw_exception() {
 
