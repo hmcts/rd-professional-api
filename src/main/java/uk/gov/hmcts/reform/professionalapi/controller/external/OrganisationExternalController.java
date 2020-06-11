@@ -249,6 +249,14 @@ public class OrganisationExternalController extends SuperController {
             @ApiResponse(
                     code = 404,
                     message = "No Organisation found"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
