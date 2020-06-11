@@ -1,8 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.hibernate.internal.util.StringHelper.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
@@ -11,6 +17,7 @@ import feign.Response;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -39,15 +46,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOr
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
@@ -114,6 +120,9 @@ public abstract class SuperController {
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
 
+    @Value("${allowedStatus}")
+    private String allowedOrganisationStatus;
+
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "Idam register user failed with status code : %s";
 
@@ -122,7 +131,7 @@ public abstract class SuperController {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
-        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+        if (isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
@@ -134,7 +143,7 @@ public abstract class SuperController {
             organisationCreationRequestValidator.validateCompanyNumber(organisationCreationRequest);
         }
 
-        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+        if (isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
@@ -157,21 +166,21 @@ public abstract class SuperController {
             organisationResponse =
                     organisationService.retrieveAllOrganisations();
 
-        } else if (StringUtils.isEmpty(orgStatus) && StringUtils.isNotEmpty(orgId)
-                || (StringUtils.isNotEmpty(orgStatus) && StringUtils.isNotEmpty(orgId))) {
+        } else if (StringUtils.isEmpty(orgStatus) && isNotEmpty(orgId)
+                || (isNotEmpty(orgStatus) && isNotEmpty(orgId))) {
             //Received request to retrieve organisation with ID
 
             organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
             organisationResponse =
                     organisationService.retrieveOrganisation(orgId);
 
-        } else if (StringUtils.isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
+        } else if (isNotEmpty(orgStatus) && StringUtils.isEmpty(orgId)) {
 
             if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
 
                 //Received request to retrieve organisation with status
                 organisationResponse =
-                        organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
+                        organisationService.findByOrganisationStatus(valueOf(orgStatus.toUpperCase()));
             } else {
                 log.error("Invalid Request param for status field");
                 throw new InvalidRequest("400");
@@ -213,14 +222,14 @@ public abstract class SuperController {
 
         String orgId = removeEmptySpaces(organisationIdentifier);
 
-        if (StringUtils.isBlank(organisationCreationRequest.getSraRegulated())) {
+        if (isBlank(organisationCreationRequest.getSraRegulated())) {
             organisationCreationRequest.setSraRegulated(SRA_REGULATED_FALSE);
         }
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, OrganisationStatus.valueOf(organisationCreationRequest.getStatus()), orgId);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, valueOf(organisationCreationRequest.getStatus()), orgId);
 
         SuperUser superUser = existingOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
@@ -267,20 +276,20 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationsByStatus(String status) {
-        String orgStatus = removeEmptySpaces(status);
+    protected ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveAllOrganisationsByStatus(String status) {
 
-        OrganisationsDetailResponse organisationsDetailResponse;
-        if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+        isInputOrganisationStatusValid(status, allowedOrganisationStatus);
 
-            organisationsDetailResponse =
-                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
-        } else {
-            log.error("Invalid Request param for status field");
-            throw new InvalidRequest("400");
+        List<Organisation> organisations = organisationService.getOrganisationByStatus(ACTIVE);
+
+        if (isEmpty(organisations)) {
+            throw new ResourceNotFoundException("No Organisations found");
         }
-        //Received response for status...
-        return ResponseEntity.status(200).body(organisationsDetailResponse);
+
+        List<OrganisationMinimalInfoResponse> organisationMinimalInfoResponses =
+                organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation.getName(), organisation.getOrganisationIdentifier()))
+                        .collect(Collectors.toList());
+        return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
 
     protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, String userId) {

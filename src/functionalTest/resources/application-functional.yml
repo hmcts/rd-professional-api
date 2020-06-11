@@ -30,3 +30,6 @@ resendInterval: 60
 resendInviteEnabled : true
 # toggle for resendInvite
 deleteOrganisationEnabled : false
+
+# toggle for assign access roles
+assignAccessRoleEnabled : false
