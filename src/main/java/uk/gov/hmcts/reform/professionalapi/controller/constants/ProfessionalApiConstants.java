@@ -23,5 +23,9 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_INTERNAL_SERVER = "Internal Server Error";
     public static final String ERROR_MESSAGE_500_ADMIN_NOT_FOUND_UP = "The Organisation admin details could not be retrieved";
     public static final String DELETION_SUCCESS_MSG = "The organisation has deleted successfully";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+    public static final String PUI_USER_MANAGER = "pui-user-manager";
+    public static final String ACTIVE = "Active";
     public static final String  ERROR_MESSAGE_INVALID_STATUS_PASSED = "Please check status param passed as this is invalid status.";
 }
