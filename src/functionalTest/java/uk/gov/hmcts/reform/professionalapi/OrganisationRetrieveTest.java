@@ -43,8 +43,8 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void retrieve_an_organisation_with_user_manager_rights_return_403() {
-        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenFor(puiUserManager));
+    public void retrieve_an_organisation_without_approoriate_rights_return_403() {
+        professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenFor(hmctsAdmin));
     }
 
     @Test
