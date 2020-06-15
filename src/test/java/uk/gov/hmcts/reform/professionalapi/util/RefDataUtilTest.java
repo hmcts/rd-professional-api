@@ -63,7 +63,6 @@ public class RefDataUtilTest {
     private GetUserProfileResponse getUserProfileResponse;
     private UserProfileFeignClient userProfileFeignClient;
 
-
     @Before
     public void setUp() {
         paymentAccount = new PaymentAccount("PBA1234567");
@@ -386,6 +385,10 @@ public class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
+      
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
 
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -407,9 +410,11 @@ public class RefDataUtilTest {
     @Test
     public void test_updateUserDetailsForActiveOrganisation() {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
-
+        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
+        professionalUsersResponse.setUserIdentifier("1");
+        professionalUsersResponse1.setUserIdentifier("2");
+        professionalUsersResponse2.setUserIdentifier("3");
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
@@ -424,6 +429,7 @@ public class RefDataUtilTest {
         users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
+
         activeOrganisationDtls.put("1",organisation);
         activeOrganisationDtls.put("2",organisation);
         activeOrganisationDtls.put("3",organisation);

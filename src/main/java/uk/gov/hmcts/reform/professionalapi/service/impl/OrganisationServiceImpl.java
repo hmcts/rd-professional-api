@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
@@ -204,7 +205,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+        List<Organisation> activeOrganisations = getOrganisationByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ProfessionalApiConstants.ZERO_INDEX).getUserIdentifier()) {
@@ -294,7 +295,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (organisation == null) {
             throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
 
-        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
+        } else if (ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
         }
@@ -307,9 +308,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> organisations = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
-            organisations = organisationRepository.findByStatus(status);
+            organisations = getOrganisationByStatus(status);
 
-        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
+        } else if (ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             organisations = retrieveActiveOrganisationDetails();
         }
@@ -373,6 +374,10 @@ public class OrganisationServiceImpl implements OrganisationService {
             deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         }
         return deleteOrganisationResponse;
+    }
+
+    public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
+        return organisationRepository.findByStatus(status);
     }
 
 }

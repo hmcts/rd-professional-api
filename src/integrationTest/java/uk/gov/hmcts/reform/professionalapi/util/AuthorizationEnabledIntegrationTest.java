@@ -138,6 +138,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     private long expiration;
 
     protected static final String ACTIVE = "ACTIVE";
+    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
     public void setUpClient() {
@@ -249,7 +251,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
+    public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
+
+    public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
@@ -272,9 +279,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public String createAndActivateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
-        String orgIdentifier = createOrganisationRequest(organisationCreationRequest);
-        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE, organisationCreationRequest);
+    public String createAndActivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
+        String orgIdentifier = createOrganisationWithGivenRequest(organisationCreationRequest);
+        updateOrganisationWithGivenRequest(organisationCreationRequest, orgIdentifier, hmctsAdmin, ACTIVE);
         return orgIdentifier;
     }
 

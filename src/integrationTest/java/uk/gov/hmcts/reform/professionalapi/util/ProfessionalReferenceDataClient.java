@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.*;
+import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,13 +18,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -79,6 +84,19 @@ public class ProfessionalReferenceDataClient {
 
     public Map<String,Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
+    }
+
+    public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus, Class expectedClass) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, expectedClass);
+        HttpStatus status = responseEntity.getStatusCode();
+        if (status.is2xxSuccessful()) {
+            return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(responseEntity.getBody(), expectedClass));
+        } else {
+            Map<String, Object> errorResponseMap = new HashMap<>();
+            errorResponseMap.put("response_body",  objectMapper.readValue(responseEntity.getBody().toString(), ErrorResponse.class));
+            errorResponseMap.put("http_status", status);
+            return errorResponseMap;
+        }
     }
 
     public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
@@ -182,6 +200,24 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    @SuppressWarnings("unchecked")
+    private ResponseEntity<Object> getRequestForExternalWithGivenResponseType(String uriPath, String role, String userId, Class clasz, Object... params) {
+
+        ResponseEntity<Object> responseEntity;
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role, userId));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            clasz,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+        }
+        return responseEntity;
+    }
+
     private Map<String, Object> getRequestForExternalRoles(String uriPath,String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
@@ -270,6 +306,7 @@ public class ProfessionalReferenceDataClient {
 
         return response;
     }
+
 
     public  Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
