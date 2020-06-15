@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
@@ -274,6 +275,10 @@ public class RefDataUtil {
 
     public static String getShowDeletedValue(String showDeleted) {
         return "True".equalsIgnoreCase(showDeleted) ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
+    }
+
+    public static Boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
+        return "True".equalsIgnoreCase(rolesRequired) ? TRUE : FALSE;
     }
 
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
