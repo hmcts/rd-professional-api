@@ -76,7 +76,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
 
     @Test
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_organisation_by_orgIdentifier_for_external() {
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser("caseworker-caa"));
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(hmctsAdmin));
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
     }
