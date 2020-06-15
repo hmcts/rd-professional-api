@@ -475,6 +475,18 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> retrieveOrganisationByOrgIdExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
@@ -655,20 +667,6 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
 
-        return response.body().as(Map.class);
-
-    }
-
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
-
-        Response response = requestSpecification
-                .body(userProfileUpdatedData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
         return response.body().as(Map.class);
 
     }

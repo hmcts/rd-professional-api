@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
