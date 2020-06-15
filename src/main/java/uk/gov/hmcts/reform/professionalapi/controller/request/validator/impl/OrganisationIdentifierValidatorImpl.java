@@ -76,10 +76,6 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         return doesRoleExist;
     }
 
-    public boolean isSystemRolesUser(List<String> roles) {
-        return roles.size() == 1 && roles.contains("prd-aac-system");
-    }
-
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
             log.error(ORG_NOT_ACTIVE_NO_USERS_RETURNED);

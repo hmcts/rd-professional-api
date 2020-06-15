@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
+import static java.lang.Boolean.FALSE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.BLANK;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getBooleanFromRolesRequiredParam;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -86,10 +91,17 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                      @RequestParam(value = "rolesRequired", required = false) String rolesRequired,
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
+        String status = BLANK;
+        boolean rolesRequiredFlag = getBooleanFromRolesRequiredParam(rolesRequired);
+        if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
+            status = ACTIVE;
+            rolesRequiredFlag = FALSE;
+        }
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, rolesRequiredFlag, status, page, size);
     }
 
     @ApiOperation(

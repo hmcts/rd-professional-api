@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_CAA_SYSTEM;
 
 import feign.FeignException;
 import feign.Response;
@@ -13,9 +16,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -179,7 +183,7 @@ public class RefDataUtil {
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
-        if (!StringUtils.isEmpty(userProfileResponse)) {
+        if (nonNull(userProfileResponse)) {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
@@ -277,10 +281,6 @@ public class RefDataUtil {
         return "True".equalsIgnoreCase(showDeleted) ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
-    public static Boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
-        return "True".equalsIgnoreCase(rolesRequired) ? TRUE : FALSE;
-    }
-
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
@@ -346,5 +346,13 @@ public class RefDataUtil {
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
+    }
+
+    public static boolean isSystemRoleUser(List<String> roles) {
+        return roles.size() == 1 && roles.contains(PRD_CAA_SYSTEM);
+    }
+
+    public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
+        return isBlank(rolesRequired) ? true : "false".equalsIgnoreCase(rolesRequired) ? FALSE : TRUE;
     }
 }
