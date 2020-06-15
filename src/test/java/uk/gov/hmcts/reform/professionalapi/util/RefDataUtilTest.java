@@ -385,10 +385,6 @@ public class RefDataUtilTest {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
-      
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
 
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -441,9 +437,9 @@ public class RefDataUtilTest {
 
         SuperUser item = ((SuperUser)users.get(0));
         assertNull(item.getId());
-        assertEquals("some-fname", item.getFirstName());
-        assertEquals("some-lname", item.getLastName());
-        assertEquals("soMeone@somewhere.com", item.getEmailAddress());
+        assertEquals("fName", item.getFirstName());
+        assertEquals("lName", item.getLastName());
+        assertEquals("some@email.com", item.getEmailAddress());
         assertNull(item.getOrganisation().getId());
         assertEquals("Org-Name", item.getOrganisation().getName());
     }
