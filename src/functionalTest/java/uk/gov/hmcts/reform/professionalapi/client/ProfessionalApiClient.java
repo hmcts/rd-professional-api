@@ -461,6 +461,23 @@ public class ProfessionalApiClient {
 
     }
 
+    public Map<String, Object> searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status, RequestSpecification requestSpecification,  String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
