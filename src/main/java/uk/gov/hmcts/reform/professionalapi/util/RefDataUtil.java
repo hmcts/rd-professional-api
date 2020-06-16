@@ -280,6 +280,15 @@ public class RefDataUtil {
         return showDeleted;
     }
 
+    public static String getReturnRolesValue(String returnRoles) {
+        if ("False".equalsIgnoreCase(returnRoles)) {
+            returnRoles = "false";
+        } else {
+            returnRoles = "true";
+        }
+        return returnRoles;
+    }
+
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
