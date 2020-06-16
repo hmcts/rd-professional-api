@@ -167,7 +167,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(organisation1.get("name")).isEqualTo("some-org-name");
         assertThat(organisation2.get("name")).isEqualTo("some-other-org-name");
         assertThat(organisation3.get("name")).isEqualTo("some-other-org-nam3");
-        assertThat(organisation1.get("paymentAccount")).isNull();
+        assertThat(organisation1.get("paymentAccount")).asList().size().isEqualTo(0);
         assertThat(organisation2.get("paymentAccount")).asList().size().isEqualTo(3);
         assertThat(organisation3.get("paymentAccount")).asList().size().isEqualTo(4);
         assertThat(organisation1.get("contactInformation")).asList().size().isEqualTo(1);
