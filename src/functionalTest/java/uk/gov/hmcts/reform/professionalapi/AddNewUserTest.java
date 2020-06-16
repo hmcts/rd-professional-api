@@ -127,7 +127,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
         //Retrieve User Identifier to update status
-        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
+        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK,"true");
         assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
 

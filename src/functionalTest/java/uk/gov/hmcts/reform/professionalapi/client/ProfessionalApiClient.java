@@ -404,7 +404,7 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status,String roleRequired) {
 
         log.info("Inside searchUsersByOrganisation:");
         Response response = getMultipleAuthHeadersInternal()

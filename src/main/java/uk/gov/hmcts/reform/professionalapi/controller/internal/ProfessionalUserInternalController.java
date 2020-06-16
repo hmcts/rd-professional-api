@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getBooleanFromRolesRequiredParam;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -80,9 +80,12 @@ public class ProfessionalUserInternalController extends SuperController {
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                       @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size) {
+                                                      @RequestParam(value = "size", required = false) Integer size,
+                                                      @RequestParam(value = "returnRoles", required = false) String returnRoles) {
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
+        boolean returnRolesDef = getBooleanFromRolesRequiredParam(returnRoles);
+
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRolesDef, "", page, size);
     }
 
     @ApiOperation(

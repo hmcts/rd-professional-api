@@ -83,7 +83,7 @@ public class ProfessionalUserInternalControllerTest {
         doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null);
+        ResponseEntity<?> actual = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null, "true");
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
