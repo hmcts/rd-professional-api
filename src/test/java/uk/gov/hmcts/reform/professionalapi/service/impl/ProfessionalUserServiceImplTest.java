@@ -190,7 +190,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "");
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -231,7 +231,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "Active");
 
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
@@ -372,7 +372,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "");
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
@@ -460,7 +460,7 @@ public class ProfessionalUserServiceImplTest {
         Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", "false", "Active", pageableMock);
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
@@ -478,7 +478,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
+        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", "false", "Active", pageableMock);
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
     }
@@ -491,7 +491,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", false, "Active");
+        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "false", "Active");
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
     }
