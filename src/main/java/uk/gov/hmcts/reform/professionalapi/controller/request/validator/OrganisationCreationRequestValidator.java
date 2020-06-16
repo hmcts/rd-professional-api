@@ -108,13 +108,17 @@ public class OrganisationCreationRequestValidator {
     private void requestPaymentAccount(Set<String> paymentAccounts) {
 
         if (paymentAccounts != null) {
-            paymentAccounts.stream()
-                    .forEach(paymentAccount -> {
-                        if (isEmptyValue(paymentAccount)) {
-                            throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
-                        }
-                    });
+
+            for (String paymentAccount : paymentAccounts) {
+
+                if (isEmptyValue(paymentAccount)) {
+
+                    throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
+                }
+
+            }
         }
+
     }
 
     public void requestValues(String... values) {
@@ -130,21 +134,20 @@ public class OrganisationCreationRequestValidator {
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
         if (null != contactInformations) {
 
-            contactInformations.stream()
-                    .forEach(contactInformation -> {
-                        if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
-                                || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
-                                || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
+            for (ContactInformationCreationRequest contactInformation : contactInformations) {
 
-                            throw new InvalidRequest("Empty contactInformation value");
-                        }
-                        if (null != contactInformation.getDxAddress()) {
-                            contactInformation.getDxAddress().stream().forEach(dxAddress -> {
-                                isDxAddressValid(dxAddress);
-                            });
-                        }
-                    });
+                if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
+                        || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
+                        || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
 
+                    throw new InvalidRequest("Empty contactInformation value");
+                }
+                if (null != contactInformation.getDxAddress()) {
+                    for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
+                        isDxAddressValid(dxAddress);
+                    }
+                }
+            }
         }
     }
 
@@ -158,7 +161,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
-        if (StringUtils.isBlank(dxAddress.getDxNumber()) || StringUtils.isBlank(dxAddress.getDxExchange())) {
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
             throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
         } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
             throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
