@@ -27,7 +27,7 @@ public class ContactInformationResponse {
     @JsonProperty
     private final String postCode;
     @JsonProperty
-    private final List<DxAddressResponse> dxAddress;
+    private  List<DxAddressResponse> dxAddress;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
         this.addressLine1 = contactInfo.getAddressLine1();
@@ -37,10 +37,12 @@ public class ContactInformationResponse {
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
         this.postCode = contactInfo.getPostCode();
-        this.dxAddress = contactInfo.getDxAddresses()
-                .stream()
-                .map(dxAddres ->  new DxAddressResponse(dxAddres))
-                .collect(toList());
+        if (contactInfo.getDxAddresses().size() > 0) {
+            this.dxAddress = contactInfo.getDxAddresses()
+                    .stream()
+                    .map(dxAddres -> new DxAddressResponse(dxAddres))
+                    .collect(toList());
+        }
     }
 
 }
