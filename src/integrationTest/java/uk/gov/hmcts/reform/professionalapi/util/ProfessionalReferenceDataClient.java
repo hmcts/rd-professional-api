@@ -105,6 +105,10 @@ public class ProfessionalReferenceDataClient {
         return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",role, id, showDeleted, status);
     }
 
+    public Map<String, Object> findUsersByOrganisationWithReturnRoles(String returnRoles, String role, String id) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?returnRoles={returnRoles}",role, id, returnRoles);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 

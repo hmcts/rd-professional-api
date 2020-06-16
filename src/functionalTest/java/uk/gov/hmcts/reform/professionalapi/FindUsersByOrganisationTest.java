@@ -232,7 +232,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc1439_ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_401() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForGivenRole("caseworker-caa"), "false");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.FORBIDDEN, generateBearerTokenForGivenRole("caseworker-caa"), "false");
         validateRetrievedUsers(response, "ACTIVE");
     }
 
