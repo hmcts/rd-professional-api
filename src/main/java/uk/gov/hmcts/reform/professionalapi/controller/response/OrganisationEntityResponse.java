@@ -45,13 +45,11 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
-        if (organisation.getPaymentAccounts().size() > 0) {
-            this.paymentAccount = organisation.getPaymentAccounts()
+
+        this.paymentAccount = organisation.getPaymentAccounts()
                     .stream()
                     .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
                     .collect(toList());
-
-        }
 
         if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()

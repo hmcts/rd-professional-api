@@ -37,12 +37,10 @@ public class ContactInformationResponse {
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
         this.postCode = contactInfo.getPostCode();
-        if (contactInfo.getDxAddresses().size() > 0) {
-            this.dxAddress = contactInfo.getDxAddresses()
+        this.dxAddress = contactInfo.getDxAddresses()
                     .stream()
                     .map(dxAddres -> new DxAddressResponse(dxAddres))
                     .collect(toList());
-        }
     }
 
 }
