@@ -363,7 +363,7 @@ public abstract class SuperController {
         ResponseEntity<Object> responseEntity;
 
         showDeleted = getShowDeletedValue(showDeleted);
-        returnRoles = getReturnRolesValue(showDeleted);
+        returnRoles = getReturnRolesValue(returnRoles);
 
         if (page != null) {
             Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
