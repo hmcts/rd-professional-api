@@ -169,13 +169,13 @@ public class RefDataUtilTest {
         header.setContentType(APPLICATION_JSON);
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
 
-        ProfessionalUser responseUser = RefDataUtil.mapUserInfo(new ProfessionalUser(), realResponseEntity, false);
+        ProfessionalUser responseUser = RefDataUtil.mapUserInfo(new ProfessionalUser(), realResponseEntity, true);
 
         assertThat(responseUser).isNotNull();
         assertThat(responseUser.getEmailAddress()).isEqualTo(profile.getEmail());
         assertThat(responseUser.getFirstName()).isEqualTo(profile.getFirstName());
         assertThat(responseUser.getLastName()).isEqualTo(profile.getLastName());
-        assertThat(responseUser.getIdamStatus()).isEqualTo(null);
+    //    assertThat(responseUser.getIdamStatus()).isEqualTo(null);
         assertThat(responseUser.getUserIdentifier()).isEqualTo(null);
         assertThat(responseUser.getRoles()).isNull();
         assertThat(responseUser.getIdamStatusCode()).isEqualTo(null);
@@ -486,5 +486,12 @@ public class RefDataUtilTest {
         assertEquals("400", responseUser.getIdamStatusCode());
         assertEquals("BAD REQUEST", responseUser.getIdamMessage());
 
+    }
+
+    @Test
+    public void test_roles_required_param() {
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam("true"));
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam(""));
+        assertEquals(false, RefDataUtil.getBooleanFromRolesRequiredParam("false"));
     }
 }

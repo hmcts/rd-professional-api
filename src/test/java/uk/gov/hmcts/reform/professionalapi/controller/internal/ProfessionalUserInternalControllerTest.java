@@ -87,6 +87,14 @@ public class ProfessionalUserInternalControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
+        ResponseEntity<?> actualRolesFalse = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null, "false");
+        assertThat(actualRolesFalse).isNotNull();
+        assertThat(actualRolesFalse.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
+        ResponseEntity<?> actualRolesDefault = professionalUserInternalController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", null, null, "");
+        assertThat(actualRolesDefault).isNotNull();
+        assertThat(actualRolesDefault.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
+
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "");
     }
@@ -127,4 +135,5 @@ public class ProfessionalUserInternalControllerTest {
 
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
+
 }

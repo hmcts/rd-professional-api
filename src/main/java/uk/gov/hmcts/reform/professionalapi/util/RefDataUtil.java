@@ -183,7 +183,12 @@ public class RefDataUtil {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
-            if (TRUE.equals(isRequiredRoles)) {
+            if (FALSE.equals(isRequiredRoles)) {
+                user.setUserIdentifier(userProfileResponse.getIdamId());
+                user.setIdamStatus(userProfileResponse.getIdamStatus());
+                user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
+                user.setIdamMessage(userProfileResponse.getIdamMessage());
+            } else { //This is the condition where the role required is either true or empty in default case
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
