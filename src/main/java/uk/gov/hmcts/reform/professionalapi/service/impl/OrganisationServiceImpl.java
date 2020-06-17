@@ -87,7 +87,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
 
-
     @Override
     @Transactional
     public OrganisationResponse createOrganisationFrom(

@@ -664,20 +664,6 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
-
-        Response response = requestSpecification
-                .body(userProfileUpdatedData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-        return response.body().as(Map.class);
-
-    }
-
     public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
 
         Response response = requestSpecification

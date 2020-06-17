@@ -143,7 +143,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void mapUserInfoCorrectly_with_roles() {
+    public void test_mapUserInfoCorrectly_with_roles() {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
@@ -338,11 +338,11 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-                + "  \"statusUpdateResponse\": {"
-                + "  \"idamStatusCode\": \"200\","
-                + "  \"idamMessage\": \"Success\""
-                + "  } "
-                + "}";
+            + "  \"statusUpdateResponse\": {"
+            + "  \"idamStatusCode\": \"200\","
+            + "  \"idamMessage\": \"Success\""
+            + "  } "
+            + "}";
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         ModifyUserRolesResponse modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
@@ -382,11 +382,9 @@ public class RefDataUtilTest {
 
     @Test
     public void test_updateUserDetailsForActiveOrganisation_entity_reponse_empty() {
-
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
-
 
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -427,16 +425,17 @@ public class RefDataUtilTest {
         users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        activeOrganisationDtls.put("1", organisation);
-        activeOrganisationDtls.put("2", organisation);
-        activeOrganisationDtls.put("3", organisation);
+
+        activeOrganisationDtls.put("1",organisation);
+        activeOrganisationDtls.put("2",organisation);
+        activeOrganisationDtls.put("3",organisation);
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
-        Organisation organisationRes = (Organisation) response.get("1");
-        assertEquals(organisation, organisationRes);
+        Organisation organisationRes = (Organisation)response.get("1");
+        assertEquals(organisation,organisationRes);
 
-        SuperUser item = ((SuperUser) users.get(0));
+        SuperUser item = ((SuperUser)users.get(0));
         assertNull(item.getId());
         assertEquals("fName", item.getFirstName());
         assertEquals("lName", item.getLastName());
@@ -451,10 +450,10 @@ public class RefDataUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String body = "{"
-                + "  \"errorMessage\": \"400\","
-                + "  \"errorDescription\": \"BAD REQUEST\","
-                + "  \"timeStamp\": \"23:10\""
-                + "}";
+            + "  \"errorMessage\": \"400\","
+            + "  \"errorDescription\": \"BAD REQUEST\","
+            + "  \"timeStamp\": \"23:10\""
+            + "}";
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
@@ -484,7 +483,6 @@ public class RefDataUtilTest {
         assertEquals(IdamStatus.ACTIVE, responseUser.getIdamStatus());
         assertEquals("400", responseUser.getIdamStatusCode());
         assertEquals("BAD REQUEST", responseUser.getIdamMessage());
-
 
     }
 }

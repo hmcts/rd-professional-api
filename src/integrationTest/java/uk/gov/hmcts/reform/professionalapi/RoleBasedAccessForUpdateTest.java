@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegrationTest {
 
