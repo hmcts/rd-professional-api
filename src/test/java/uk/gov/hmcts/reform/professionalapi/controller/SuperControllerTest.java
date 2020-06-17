@@ -256,7 +256,7 @@ public class SuperControllerTest {
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
-  
+
     @Test
     public void testReInviteUserToOrganisation() throws JsonProcessingException {
 

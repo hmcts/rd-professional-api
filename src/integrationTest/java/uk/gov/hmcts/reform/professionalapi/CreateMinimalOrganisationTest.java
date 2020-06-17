@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrationTest {
 

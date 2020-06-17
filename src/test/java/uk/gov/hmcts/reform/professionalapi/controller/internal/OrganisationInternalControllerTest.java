@@ -103,6 +103,10 @@ public class OrganisationInternalControllerTest {
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+        organisationResponse = new OrganisationResponse(organisation);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
