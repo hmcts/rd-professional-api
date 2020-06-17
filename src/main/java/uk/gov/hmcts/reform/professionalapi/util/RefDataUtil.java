@@ -183,12 +183,7 @@ public class RefDataUtil {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
-            if (FALSE.equals(isRequiredRoles)) {
-                user.setUserIdentifier(userProfileResponse.getIdamId());
-                user.setIdamStatus(userProfileResponse.getIdamStatus());
-                user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
-                user.setIdamMessage(userProfileResponse.getIdamMessage());
-            } else { //This is the condition where the role required is either true or empty in default case
+            if (TRUE.equals(isRequiredRoles)) {
                 user.setUserIdentifier(userProfileResponse.getIdamId());
                 user.setIdamStatus(userProfileResponse.getIdamStatus());
                 user.setRoles(userProfileResponse.getRoles());
@@ -287,11 +282,6 @@ public class RefDataUtil {
         return showDeleted;
     }
 
-    /* This method will convert string param to boolean.*/
-    public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
-        return isBlank(rolesRequired) ? true : "false".equalsIgnoreCase(rolesRequired) ? FALSE : TRUE;
-    }
-
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
@@ -337,5 +327,10 @@ public class RefDataUtil {
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
+    }
+
+    /* This method will convert string param to boolean.*/
+    public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
+        return isBlank(rolesRequired) ? true : "false".equalsIgnoreCase(rolesRequired) ? FALSE : TRUE;
     }
 }
