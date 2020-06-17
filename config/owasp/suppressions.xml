@@ -610,10 +610,8 @@ file name: ant*.jar: readline.jar
         <notes><![CDATA[
    file name: spring-security-oauth2*.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security@.*$</packageUrl>
+
         <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
         <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
@@ -634,8 +632,7 @@ file name: ant*.jar: readline.jar
         <notes><![CDATA[
    file name: tomcat-embed*.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed@.*$</packageUrl>
         <cpe>cpe:/a:apache:tomcat</cpe>
         <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
         <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
