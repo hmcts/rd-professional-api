@@ -57,7 +57,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         return bearerTokenForPuiUserManager;
     }
 
-    public RequestSpecification generateBearerTokenForGivenRole(String role) {
+    public RequestSpecification generateBearerTokenForNonPuiManager() {
         if (bearerTokenForNonPuiUserManager == null) {
 
             Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -65,7 +65,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
             List<String> userRoles = new ArrayList<>();
-            userRoles.add(role);
+            userRoles.add("pui-case-manager");
             String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
             String lastName = "someLastName";
             String firstName = "someName";
@@ -116,13 +116,13 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac1_find_all_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForGivenRole("pui-case-manager"), "Active");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
         validateRetrievedUsers(response, "ACTIVE", true);
     }
 
     @Test
     public void ac2_should_return_200_and_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_when_no_status_provided() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForGivenRole("pui-case-manager"), "");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
         validateRetrievedUsers(response, "ACTIVE", true);
     }
 
@@ -155,7 +155,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac9_find_non_active_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForGivenRole("pui-case-manager"), "INVALID");
+        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
     }
 
     @Test
@@ -214,19 +214,19 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc1439_ac1_find_all_active_users_without_roles_for_an_organisation_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForGivenRole("pui-case-manager"), "false");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "false");
         validateRetrievedUsers(response, "ACTIVE", false);
     }
 
     @Test
     public void rdcc1439_ac2_find_all_active_users_with_roles_for_an_organisation_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForGivenRole("pui-caa"), "true");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "true");
         validateRetrievedUsers(response, "ACTIVE", true);
     }
 
     @Test
     public void rdcc1439_ac3_find_all_active_users_with_no_param_given_for_an_organisation_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForGivenRole("pui-finance-manager"), "");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
         validateRetrievedUsers(response, "ACTIVE", true);
     }
 
