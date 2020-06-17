@@ -170,6 +170,10 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     private void validateUsers(Map<String, Object> response, int expectedUserCount) {
+        validateUsers(response, expectedUserCount, true);
+    }
+
+    private void validateUsers(Map<String, Object> response, int expectedUserCount, boolean rolesRequired) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
@@ -180,7 +184,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesRequired) {
                 assertThat(((List) user.get("roles")).size()).isEqualTo(1);
             } else {
                 assertThat(user.get("idamStatus")).isNotNull();
@@ -188,4 +192,29 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             }
         });
     }
+
+    @Test
+    public void can_retrieve_users_when_false_should_return_status_200_without_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,"false");
+        validateUsers(response, 3, false);
+    }
+
+    @Test
+    public void can_retrieve_users_when_true_should_return_status_200_with_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,"true");
+        validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void can_retrieve_users_when_default_should_return_status_200_with_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,null);
+        validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void cannot_retrieve_users_when_invalid_user_roles_should_return_status_403() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", "InvalidRole",null);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
 }

@@ -410,10 +410,10 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status, String roleRequired) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&returnRoles=" + roleRequired)
                 .andReturn();
         response.then()
                 .assertThat()

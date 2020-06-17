@@ -484,7 +484,15 @@ public class RefDataUtilTest {
         assertEquals(IdamStatus.ACTIVE, responseUser.getIdamStatus());
         assertEquals("400", responseUser.getIdamStatusCode());
         assertEquals("BAD REQUEST", responseUser.getIdamMessage());
+    }
 
-
+    @Test
+    public void test_roles_required_param() {
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam("true"));
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam("True"));
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam(""));
+        assertEquals(false, RefDataUtil.getBooleanFromRolesRequiredParam("false"));
+        assertEquals(false, RefDataUtil.getBooleanFromRolesRequiredParam("False"));
+        assertEquals(true, RefDataUtil.getBooleanFromRolesRequiredParam("xykkjldfld")); //Garbage check
     }
 }

@@ -115,6 +115,11 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}", role, showDeleted);
     }
 
+    // Override the method to support return roles param
+    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role, String returnRoles) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
+    }
+
     public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier, String showDeleted, String role) {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
     }

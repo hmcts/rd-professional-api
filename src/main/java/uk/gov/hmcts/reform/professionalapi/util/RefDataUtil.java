@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 
 import feign.FeignException;
@@ -341,5 +343,10 @@ public class RefDataUtil {
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
+    }
+
+    /* This method will convert string param to boolean.*/
+    public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
+        return isBlank(rolesRequired) ? true : "false".equalsIgnoreCase(rolesRequired) ? FALSE : TRUE;
     }
 }
