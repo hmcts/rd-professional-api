@@ -100,7 +100,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     //RDCC-1531-AC3
     public void find_users_by_active_organisation_with_system_user_role_should_return_404_when_user_are_not_active() {
-       professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, False, HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, False, HttpStatus.NOT_FOUND);
     }
 
     @Test

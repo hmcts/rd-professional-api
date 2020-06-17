@@ -91,7 +91,6 @@ public class ProfessionalUserInternalControllerTest {
     public void testFindUsersByOrganisation(List<String> userRoles) {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
-        UserInfo userInfo = new UserInfo("","", "", "", "", userRoles);
 
         List<SuperUser> users = new ArrayList<>();
         users.add(professionalUser.toSuperUser());
@@ -102,7 +101,7 @@ public class ProfessionalUserInternalControllerTest {
         when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntityMock);
         when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfo);
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(new UserInfo("","", "", "", "", userRoles));
 
         doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
