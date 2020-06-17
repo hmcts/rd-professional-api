@@ -112,7 +112,7 @@ public class ProfessionalUserInternalControllerTest {
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(any(), any(), true, any());
+        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class));
         verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
     }
 

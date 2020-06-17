@@ -87,13 +87,26 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void find_users_by_active_organisation_with_system_user_role() {
+    //RDCC-1531-AC1
+    public void find_users_by_active_organisation_with_system_user_role_should_return_active_users() {
         String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
         inviteUser(organisationIdentifier, "", puiUserManager);
         Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, systemUser, False, HttpStatus.OK);
         List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
         assertThat(professionalUsers.size()).isEqualTo(1);
         validateRetrievedUsers(searchResponse, ACTIVE);
+    }
+
+    @Test
+    //RDCC-1531-AC3
+    public void find_users_by_active_organisation_with_system_user_role_should_return_404_when_user_are_not_active() {
+       professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, False, HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    //RDCC-1531-AC4
+    public void find_users_by_active_organisation_with_invalid_role_should_return_403() {
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), INVALID, False, HttpStatus.NOT_FOUND);
     }
 
     @Test
