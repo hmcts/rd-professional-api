@@ -23,26 +23,20 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
 
     @Test
     public void can_retrieve_users_with_showDeleted_true_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier, "True", hmctsAdmin);
-        validateUsers(response, 3);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin);
+        validateUsers(response, 3,true);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_false_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier, "False", hmctsAdmin);
-        validateUsers(response, 3);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "False", hmctsAdmin);
+        validateUsers(response, 3, true);
     }
 
     @Test
     public void can_retrieve_users_with_showDeleted_null_should_return_status_200() {
-        String organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier, null, hmctsAdmin);
-        validateUsers(response, 3);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), null, hmctsAdmin);
+        validateUsers(response, 3, true);
 
     }
 
@@ -100,14 +94,14 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_active_users_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-case-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Active", puiCaseManager, id);
-        validateUsers(response, 2);
+        validateUsers(response, 2, true);
     }
 
     @Test
     public void retrieve_active_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Active", puiUserManager, id);
-        validateUsers(response, 2);
+        validateUsers(response, 2, true);
     }
 
     @Test
@@ -120,14 +114,14 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_all_users_for_an_organisation_with_pui_user_manager_role_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "", puiUserManager, id);
-        validateUsers(response, 3);
+        validateUsers(response, 3, true);
     }
 
     @Test
     public void retrieve_active_users_only_for_an_organisation_with_pui_caa_role_should_return_200() {
         String id = settingUpOrganisation("pui-caa");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Active", puiCaa, id);
-        validateUsers(response, 2);
+        validateUsers(response, 2, true);
     }
 
     @Test
@@ -136,6 +130,19 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
         assertThat(response.get("http_status")).isEqualTo("400");
 
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_system_role_role_should_return_200() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(),"false", systemUser);
+        validateUsers(response, 2, false);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_invalid_role_role_should_return_403() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(),"false", "invalidRole");
+        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat((String)response.get("response_body")).contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
     }
 
     @Test
@@ -169,7 +176,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(((List<ProfessionalUsersResponse>) response2.get("users")).size()).isEqualTo(3);
     }
 
-    private void validateUsers(Map<String, Object> response, int expectedUserCount) {
+    private void validateUsers(Map<String, Object> response, int expectedUserCount, boolean roleRequired) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
@@ -180,7 +187,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && roleRequired) {
                 assertThat(((List) user.get("roles")).size()).isEqualTo(1);
             } else {
                 assertThat(user.get("idamStatus")).isNotNull();

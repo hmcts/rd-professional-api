@@ -2,19 +2,17 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.SUSPENDED;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -30,122 +28,118 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     RequestSpecification bearerTokenForExternalRole;
     RequestSpecification bearerTokenForNonPuiUserManager;
+    String lastName = "someLastName";
+    String firstName = "someFirstName";
+    private static final String ACTIVE = "ACTIVE";
+    private static final String ANY = "ANY";
+    private static final String False = "False";
+    private static final String True = "True";
+    private static final String INVALID = "INVALID";
 
 
     public RequestSpecification generateBearerTokenForExternalRole(String role) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add(role);
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        String lastName = "someLastName";
-        String firstName = "someName";
-
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        String userEmail = generateRandomEmail();
         bearerTokenForExternalRole = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
+        inviteUser(orgIdentifierResponse, userEmail, role);
         return bearerTokenForExternalRole;
     }
 
     public RequestSpecification generateBearerTokenForNonPuiManager() {
         if (bearerTokenForNonPuiUserManager == null) {
-
-            Map<String, Object> response = professionalApiClient.createOrganisation();
-            String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-            professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-            List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-case-manager");
-            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-            String lastName = "someLastName";
-            String firstName = "someName";
-
+            String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+            String userEmail = generateRandomEmail();
             bearerTokenForNonPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, firstName, lastName, userEmail);
-
-            NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .email(userEmail)
-                    .roles(userRoles)
-                    .jurisdictions(createJurisdictions())
-                    .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
+            inviteUser(orgIdentifierResponse, userEmail, puiCaseManager);
             return bearerTokenForNonPuiUserManager;
         } else {
             return bearerTokenForNonPuiUserManager;
         }
     }
 
+    public void inviteUser(String orgIdentifierResponse, String userEmail, String role) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(role);
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(ANY.equalsIgnoreCase(userEmail) ? generateRandomEmail() : userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+    }
+
     @Test
     public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, "False", HttpStatus.OK), "any");
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin, False, HttpStatus.OK), ANY);
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"True", HttpStatus.OK), "any");
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,True, HttpStatus.OK), ANY);
     }
 
     @Test
     public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK), "any");
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,INVALID, HttpStatus.OK), ANY);
+    }
+
+    @Test
+    public void find_users_by_active_organisation_with_system_user_role() {
+        String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        inviteUser(organisationIdentifier, "", puiUserManager);
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, systemUser, False, HttpStatus.OK);
+        List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsers.size()).isEqualTo(1);
+        validateRetrievedUsers(searchResponse, ACTIVE);
     }
 
     @Test
     public void find_users_for_non_active_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
-        professionalApiClient.searchUsersByOrganisation(organisationIdentifier, hmctsAdmin,"False", HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation(organisationIdentifier, hmctsAdmin,False, HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,"False", HttpStatus.NOT_FOUND);
+        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,False, HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void ac1_find_all_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "Active");
-        validateRetrievedUsers(response, "ACTIVE");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), ACTIVE);
+        validateRetrievedUsers(response, ACTIVE);
     }
 
     @Test
     public void ac2_should_return_200_and_active_users_with_roles_for_an_organisation_with_non_pui_user_manager_role_when_no_status_provided() {
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForNonPuiManager(), "");
-        validateRetrievedUsers(response, "ACTIVE");
+        validateRetrievedUsers(response, ACTIVE);
     }
 
     @Test
     public void ac3_find_all_status_users_for_an_organisation_with_pui_user_manager_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForExternalRole(puiUserManager), "");
-        validateRetrievedUsers(response, "any");
+        validateRetrievedUsers(response, ANY);
     }
 
     @Test
     public void ac4_find_all_active_users_for_an_organisation_with_pui_user_manager_should_return_200() {
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForExternalRole(puiUserManager), "Active");
-        validateRetrievedUsers(response, "ACTIVE");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForExternalRole(puiUserManager), ACTIVE);
+        validateRetrievedUsers(response, ACTIVE);
     }
 
     @Test
     public void ac5_find_all_suspended_users_for_an_organisation_with_pui_user_manager_when_no_suspended_user_exists_should_return_404() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.NOT_FOUND, generateBearerTokenForExternalRole(puiUserManager), "Suspended");
+        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.NOT_FOUND, generateBearerTokenForExternalRole(puiUserManager), SUSPENDED.toString());
     }
     
     @Test
     public void ac6_find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForExternalRole(puiUserManager), "INVALID");
+        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForExternalRole(puiUserManager), INVALID);
     }
 
     @Test
@@ -155,7 +149,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac9_find_non_active_status_users_for_an_organisation_with_non_pui_user_manager_where_status_is_not_active_should_return_400() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "INVALID");
+        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), INVALID);
     }
 
     @Test
@@ -179,17 +173,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "0", "1");
+        Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, False, HttpStatus.OK, "0", "1");
 
-        validateRetrievedUsers(searchResponse, "any");
+        validateRetrievedUsers(searchResponse, ANY);
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
 
         assertThat(professionalUsersResponses.size()).isEqualTo(1);
         assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
 
-        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, "False", HttpStatus.OK, "1", "1");
+        Map<String, Object> searchResponse2 = professionalApiClient.searchUsersByOrganisationWithPagination(orgIdentifierResponse, hmctsAdmin, False, HttpStatus.OK, "1", "1");
 
-        validateRetrievedUsers(searchResponse2, "any");
+        validateRetrievedUsers(searchResponse2, ANY);
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
     }
@@ -198,16 +192,16 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void find_all_users_for_an_organisation_external_with_pagination_should_return_200() {
 
         RequestSpecification specification = generateBearerTokenForExternalRole(puiUserManager);
-        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", "0", "1");
+        Map<String, Object> searchResponse = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "0", "1");
 
-        validateRetrievedUsers(searchResponse, "any");
+        validateRetrievedUsers(searchResponse, ANY);
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
 
         assertThat(professionalUsersResponses.size()).isEqualTo(1);
 
-        Map<String, Object> searchResponse2 = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification, "Active", "1", "1");
+        Map<String, Object> searchResponse2 = professionalApiClient.searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus.OK, specification,  "1", "1");
 
-        validateRetrievedUsers(searchResponse2, "any");
+        validateRetrievedUsers(searchResponse2, ANY);
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
     }
@@ -215,7 +209,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void find_active_users_only_for_an_organisation_with_pui_caa_should_return_200() {
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK, generateBearerTokenForExternalRole(puiCaa), "Active");
-        validateRetrievedUsers(response, "ACTIVE");
+        validateRetrievedUsers(response, ACTIVE);
     }
 
     @Test
@@ -234,7 +228,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
-            if (!expectedStatus.equals("any")) {
+            if (!expectedStatus.equalsIgnoreCase(ANY)) {
                 assertThat(user.get("idamStatus").equals(expectedStatus));
             }
             if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {

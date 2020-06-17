@@ -125,6 +125,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${prd.security.roles.pui-caa}")
     protected String puiCaa;
 
+    @Value("${prd.security..roles.prd-caa-system}")
+    protected String systemUser;
+
     @Value("${resendInterval}")
     protected String resendInterval;
 

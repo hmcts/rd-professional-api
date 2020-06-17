@@ -88,7 +88,7 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/{orgId}/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("prd-admin")
+    @Secured({"prd-admin", "prd-caa-system"})
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                       @RequestParam(value = "rolesRequired", required = false) String rolesRequired,

@@ -437,7 +437,7 @@ public class ProfessionalApiClient {
         }
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String pageNumber, String size) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)

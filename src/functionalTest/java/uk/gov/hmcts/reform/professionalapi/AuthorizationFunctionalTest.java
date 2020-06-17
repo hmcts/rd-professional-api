@@ -75,6 +75,9 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${prd.security.roles.pui-caa}")
     protected String puiCaa;
 
+    @Value("${prd.security.roles.prd-caa-system}")
+    protected String systemUser;
+
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -256,6 +259,10 @@ public abstract class AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
         return superUser;
+    }
+
+    public static String generateRandomEmail() {
+        return randomAlphabetic(10).toLowerCase() + "@somewhere.com";
     }
 
 }

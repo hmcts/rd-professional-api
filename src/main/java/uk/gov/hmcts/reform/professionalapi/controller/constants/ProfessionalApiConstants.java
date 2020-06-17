@@ -28,6 +28,6 @@ public class ProfessionalApiConstants {
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String ACTIVE = "Active";
     public static final String  ERROR_MESSAGE_INVALID_STATUS_PASSED = "Please check status param passed as this is invalid status.";
-    public static final String PRD_CAA_SYSTEM = "prd-caa-system";
+    public static final String PRD_CAA_SYSTEM = "prd-aac-system";
     public static final String BLANK = "";
 }
