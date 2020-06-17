@@ -267,7 +267,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 
-    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest, String organisationIdentifier, String role, String status) {
+    public void updateOrganisation(String organisationIdentifier, String role, String status, OrganisationCreationRequest organisationUpdateRequest) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
@@ -694,6 +694,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
+    }
+
+    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest, String organisationIdentifier, String role, String status) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        organisationUpdateRequest.setStatus(status);
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 }
 

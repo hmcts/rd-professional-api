@@ -17,7 +17,6 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
