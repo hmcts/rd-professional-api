@@ -34,6 +34,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
@@ -412,7 +413,14 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
 
-        Response response = getMultipleAuthHeadersInternal()
+        RequestSpecification requestSpecification;
+        if (!StringUtils.isBlank(role)) {
+            requestSpecification = getMultipleAuthHeadersWithGivenRole(role);
+        } else {
+            requestSpecification = getMultipleAuthHeadersInternal();
+        }
+
+        Response response = requestSpecification
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
                 .andReturn();
         response.then()
@@ -749,6 +757,10 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
+    }
+
+    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
     }
 
     private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {

@@ -80,6 +80,10 @@ public class IdamOpenIdClient {
         return getOpenIdToken(userEmail);
     }
 
+    public String getOpenIdTokenWithGivenRole(String role) {
+        String userEmail = createUser(role);
+        return getOpenIdToken(userEmail);
+    }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);

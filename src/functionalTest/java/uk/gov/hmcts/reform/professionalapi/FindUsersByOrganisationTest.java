@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -26,10 +27,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 @Slf4j
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
-    RequestSpecification bearerTokenForExternalRole;
-    RequestSpecification bearerTokenForNonPuiUserManager;
-    String lastName = "someLastName";
-    String firstName = "someFirstName";
+    private RequestSpecification bearerTokenForExternalRole;
+    private RequestSpecification bearerTokenForNonPuiUserManager;
+    private String lastName = "someLastName";
+    private String firstName = "someFirstName";
     private static final String ACTIVE = "ACTIVE";
     private static final String ANY = "ANY";
     private static final String False = "False";
@@ -89,24 +90,38 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     //RDCC-1531-AC1
     public void find_users_by_active_organisation_with_system_user_role_should_return_active_users() {
+
+        // create active user in sidam
+        List<String> roles = new ArrayList<>();
+        roles.add(puiUserManager);
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String email = idamOpenIdClient.nextUserEmail();
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        newUserCreationRequest.setEmail(email);
+        newUserCreationRequest.setRoles(roles);
+        idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName());
+
+        // create and update org
         String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
-        inviteUser(organisationIdentifier, "", puiUserManager);
+        // invite new user who is active
+        professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        // search
         Map<String, Object> searchResponse = professionalApiClient.searchUsersByOrganisation(organisationIdentifier, systemUser, False, HttpStatus.OK);
         List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
         assertThat(professionalUsers.size()).isEqualTo(1);
-        validateRetrievedUsers(searchResponse, ACTIVE);
+        validateRetrievedUsers(searchResponse, ACTIVE, false);
     }
 
     @Test
-    //RDCC-1531-AC3
-    public void find_users_by_active_organisation_with_system_user_role_should_return_404_when_user_are_not_active() {
+    //RDCC-1531-AC2
+    public void find_users_by_active_organisation_with_system_user_role_should_return_404_when_users_are_not_active_under_org() {
         professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, False, HttpStatus.NOT_FOUND);
     }
 
     @Test
-    //RDCC-1531-AC4
-    public void find_users_by_active_organisation_with_invalid_role_should_return_403() {
-        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), INVALID, False, HttpStatus.NOT_FOUND);
+    //RDCC-1531-AC3
+    public void find_users_by_active_organisation_with_non_permitted_role_should_return_403() {
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), puiCaseManager, False, HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -231,6 +246,10 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
+        validateRetrievedUsers(searchResponse, expectedStatus, true);
+    }
+
+    void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, boolean rolesRequired) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
@@ -244,7 +263,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             if (!expectedStatus.equalsIgnoreCase(ANY)) {
                 assertThat(user.get("idamStatus").equals(expectedStatus));
             }
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesRequired) {
                 assertThat(user.get("roles")).isNotNull();
             } else {
                 assertThat(user.get("roles")).isNull();
