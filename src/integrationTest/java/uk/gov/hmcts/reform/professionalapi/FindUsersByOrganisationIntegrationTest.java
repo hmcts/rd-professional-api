@@ -114,6 +114,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     public void retrieve_deleted_users_for_an_organisation_with_pui_user_manager_role_should_return_400() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus("false", "Deleted", puiUserManager, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test
@@ -176,7 +177,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
-    public void  ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_401() {
+    public void  ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_403() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("", "caseworker-caa", id);
         assertThat(response.get("http_status")).isEqualTo("403");
