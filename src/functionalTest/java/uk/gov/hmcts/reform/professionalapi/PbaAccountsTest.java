@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -22,13 +21,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
-@Slf4j
 public class PbaAccountsTest extends AuthorizationFunctionalTest {
 
 
     @Test
     public void can_edit_active_organisation_payment_accounts_by_orgId() {
-
         String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
 
         Set<String> paymentAccounts = new HashSet<>();
@@ -44,7 +41,6 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
                         .build())
                 .build();
 
-        log.info("Inside PbaAccountsTest:");
         Map<String, Object> response =  professionalApiClient.createOrganisation(request);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -58,7 +54,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
-        PbaEditRequest pbaEditRequest = new PbaEditRequest(paymentAccountsEdit);
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
 
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest, orgIdentifierResponse, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();

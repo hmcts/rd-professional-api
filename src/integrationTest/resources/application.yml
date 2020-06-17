@@ -6,19 +6,38 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
-
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
-security:
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
-  authorisedServices:
-    - "it"
+idam:
+  s2s-authorised:
+    services: rd_professional_api
+  api.url: ${IDAM_URL:http://127.0.0.1:5000}
+  client:
+    redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
+    id: rd-professional-api
+    secret: cc5f2a6-9690-11e9-bc42-526af7764f64
+
+
 ## IDAM feign connection
-auth.idam.client.baseUrl: ${IDAM_URL:http://127.0.0.1:5000}
+auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
 
 exui.role:
   hmcts-admin: prd-admin
@@ -29,6 +48,10 @@ exui.role:
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+
+oidc:
+  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+  expiration: 14400000 # milliseconds 4 hours
 
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://127.0.0.1:8092}

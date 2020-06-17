@@ -21,7 +21,6 @@ import feign.Response;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,11 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import uk.gov.hmcts.reform.auth.checker.spring.serviceanduser.ServiceAndUserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -55,6 +50,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
@@ -85,6 +81,8 @@ public class OrganisationExternalControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private Response response;
+    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+    private UserInfo userInfoMock;
 
 
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -110,6 +108,8 @@ public class OrganisationExternalControllerTest {
         jurisdictionService = mock(JurisdictionServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
+        userInfoMock = mock(UserInfo.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
@@ -180,22 +180,13 @@ public class OrganisationExternalControllerTest {
     @Test
     public void testRetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
-
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-
-        Authentication authentication = mock(Authentication.class);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        when(grantedAuthority.getAuthority()).thenReturn(TestConstants.PUI_USER_MANAGER);
-        authorities.add(grantedAuthority);
-
-        ServiceAndUserDetails serviceAndUserDetails = mock(ServiceAndUserDetails.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(serviceAndUserDetails);
-        when(serviceAndUserDetails.getAuthorities()).thenReturn(authorities);
-        SecurityContextHolder.setContext(securityContext);
 
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email, UUID.randomUUID().toString().substring(0, 7));
 

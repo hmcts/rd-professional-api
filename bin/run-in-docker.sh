@@ -44,10 +44,11 @@ execute_script() {
 
   clean_old_docker_artifacts
 
-    build_s2s_image
+    #build_s2s_image
 
-    build_service_auth_app
-
+    #build_service_auth_app
+    docker-compose down -v
+    docker system prune
     ./gradlew clean assemble
 
     export SERVER_PORT="${SERVER_PORT:-8090}"

@@ -16,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
@@ -25,10 +26,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -43,9 +43,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Slf4j
 public class ProfessionalUserInternalController extends SuperController {
 
-
     @ApiOperation(
-            value = "Retrieves the users with the given organisation",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            response = ProfessionalUsersResponse.class,
+            responseContainer = "list",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -54,22 +55,28 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiParam(
             name = "showDeleted",
             type = "string",
-            value = "flag (True/False) to decide deleted users needs to be shown",
-            required = false
+            value = "Flag (True/False) to decide whether Deleted Users are included in the response"
     )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "List of a professional users along with details",
-                    response = ProfessionalUsersEntityResponse.class
+                    message = "List of Professional Users and their details"
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid organisation identifier was provided"
+                    message = "An invalid Organisation Identifier was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No organisation was found with the provided organisation identifier"
+                    message = "No Organisation or Users found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -89,7 +96,7 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves the user with the given email address if organisation is active",
+            value = "Retrieves an Active User with the given Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -98,22 +105,30 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiParam(
             name = "email",
             type = "string",
-            value = "The email address of the user to return",
+            value = "The Email Address of the User to be retrieved",
             required = true
     )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "A representation of a professional user",
+                    message = "A User and their details",
                     response = ProfessionalUsersResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid email address was provided"
+                    message = "An invalid Email Address has been provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No user was found with the provided email address"
+                    message = "No User found with the given Email Address"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @GetMapping(
@@ -127,7 +142,7 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Modify roles for user",
+            value = "Modify the Roles or Status of a User",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -136,8 +151,12 @@ public class ProfessionalUserInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "User Roles has been added",
-                    response = OrganisationResponse.class
+                    message = "The User's Roles/Status have been modified",
+                    response = ModifyUserRolesResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Invalid request provided"
             ),
             @ApiResponse(
                     code = 403,
@@ -145,17 +164,26 @@ public class ProfessionalUserInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "Not Found"
+                    message = "No Organisation or User found with the given ID"
+            ),
+            @ApiResponse(
+                    code = 412,
+                    message = "One or more of the Roles provided is already assigned to the User"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
             )
     })
     @PutMapping(
             path = "/{orgId}/users/{userId}",
             produces = APPLICATION_JSON_VALUE
     )
+    @ResponseStatus(value = HttpStatus.CREATED)
     @Secured("prd-admin")
     public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId")  String orgId,
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {

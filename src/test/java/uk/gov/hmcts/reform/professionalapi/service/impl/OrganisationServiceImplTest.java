@@ -264,6 +264,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
@@ -281,7 +282,7 @@ public class OrganisationServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty())).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),null)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
 
