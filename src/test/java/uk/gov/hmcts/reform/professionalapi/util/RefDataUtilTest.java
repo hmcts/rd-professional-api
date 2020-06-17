@@ -326,6 +326,22 @@ public class RefDataUtilTest {
     }
 
     @Test
+    public void test_getReturnRolesValueTrue() {
+        String returnRoles = "True";
+        String response = RefDataUtil.getReturnRolesValue(returnRoles);
+
+        assertThat(response.equals("true")).isTrue();
+    }
+
+    @Test
+    public void test_getReturnRolesValueFalse() {
+        String returnRoles = "false";
+        String response = RefDataUtil.getReturnRolesValue(returnRoles);
+
+        assertThat(response.equals("false")).isTrue();
+    }
+
+    @Test
     public void privateConstructorTest() throws Exception {
         Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
         assertFalse(constructor.isAccessible());
