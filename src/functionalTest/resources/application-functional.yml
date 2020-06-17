@@ -22,7 +22,7 @@ prd.security.roles.pui-organisation-manager: pui-organisation-manager
 prd.security.roles.pui-finance-manager: pui-finance-manager
 prd.security.roles.pui-case-manager: pui-case-manager
 prd.security.roles.pui-caa: pui-caa
-prd.security.roles.prd-caa-system: prd-caa-system
+prd.security.roles.prd-aac-system: prd-aac-system
 
 # resent user invite interval in minutes
 resendInterval: 60

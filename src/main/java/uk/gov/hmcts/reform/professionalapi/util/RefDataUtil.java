@@ -6,7 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_CAA_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 
 import feign.FeignException;
 import feign.Response;
@@ -348,7 +348,7 @@ public class RefDataUtil {
     }
 
     public static boolean isSystemRoleUser(List<String> roles) {
-        return roles.size() == 1 && roles.contains(PRD_CAA_SYSTEM);
+        return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
     }
 
     public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {

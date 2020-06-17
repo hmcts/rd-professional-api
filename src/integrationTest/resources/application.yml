@@ -48,7 +48,7 @@ prd:
       pui-finance-manager: pui-finance-manager
       pui-case-manager: pui-case-manager
       pui-caa: pui-caa
-      prd-caa-system: prd-caa-system
+      prd-aac-system: prd-aac-system
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
