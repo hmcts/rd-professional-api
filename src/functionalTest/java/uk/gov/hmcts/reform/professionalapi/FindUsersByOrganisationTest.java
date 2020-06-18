@@ -114,7 +114,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void find_users_by_active_organisation_with_returnRoles_invalid() {
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,"invalid", HttpStatus.OK,""), "any",true);
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), puiCaseManager,"True", HttpStatus.FORBIDDEN,"");
     }
 
     @Test
