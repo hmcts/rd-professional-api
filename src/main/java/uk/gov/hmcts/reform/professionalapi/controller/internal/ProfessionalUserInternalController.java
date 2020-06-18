@@ -45,7 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted/returnRoles flag",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
