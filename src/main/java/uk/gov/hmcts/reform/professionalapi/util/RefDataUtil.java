@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FALSE_LITERAL;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.TRUE_LITERAL;
 
 import feign.FeignException;
 import feign.Response;
@@ -128,7 +129,7 @@ public class RefDataUtil {
                                                                    String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,FALSE_LITERAL)) {
 
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
@@ -274,10 +275,10 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        if ("True".equalsIgnoreCase(showDeleted)) {
-            showDeleted = "true";
+        if (TRUE_LITERAL.equalsIgnoreCase(showDeleted)) {
+            showDeleted = TRUE_LITERAL;
         } else {
-            showDeleted = "false";
+            showDeleted = FALSE_LITERAL;
         }
         return showDeleted;
     }
@@ -331,6 +332,10 @@ public class RefDataUtil {
 
     /* This method will convert string param to boolean.*/
     public static boolean getBooleanFromRolesRequiredParam(String rolesRequired) {
-        return isBlank(rolesRequired) ? true : "false".equalsIgnoreCase(rolesRequired) ? FALSE : TRUE;
+        if (isNotBlank(rolesRequired) && FALSE_LITERAL.equalsIgnoreCase(rolesRequired)) {
+            return false;
+        } else  {
+            return true;
+        }
     }
 }
