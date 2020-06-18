@@ -99,7 +99,7 @@ public class ProfessionalExternalUserController extends SuperController {
                                                   @RequestParam(value = "page", required = false) Integer page,
                                                   @RequestParam(value = "size", required = false) Integer size,
                                                   @ApiParam(hidden = true) @UserId String userId) {
-
+        log.info(" Request param : "+ returnRoles);
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
         ResponseEntity profUsersEntityResponse;
