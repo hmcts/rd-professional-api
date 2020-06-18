@@ -39,4 +39,8 @@ public class ProfessionalUsersEntityResponse {
     public void setOrganisationIdentifier(String organisationIdentifier) {
         this.organisationIdentifier = organisationIdentifier;
     }
+
+    public String getOrganisationIdentifier() {
+        return this.organisationIdentifier;
+    }
 }

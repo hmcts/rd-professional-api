@@ -225,7 +225,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
-
+        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
 
         professionalUsersResponses.stream().forEach(user -> {
