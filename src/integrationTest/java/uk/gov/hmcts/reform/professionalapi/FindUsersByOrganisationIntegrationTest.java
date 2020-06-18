@@ -217,4 +217,29 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             }
         });
     }
+
+    @Test
+    public void can_retrieve_users_when_false_should_return_status_200_without_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,"false");
+        validateUsers(response, 3, false);
+    }
+
+    @Test
+    public void can_retrieve_users_when_true_should_return_status_200_with_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,"true");
+        validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void can_retrieve_users_when_default_should_return_status_200_with_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,null);
+        validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void cannot_retrieve_users_when_invalid_user_roles_should_return_status_403() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", "InvalidRole",null);
+        assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
 }
