@@ -172,6 +172,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     private void validateUsers(Map<String, Object> response, int expectedUserCount) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
