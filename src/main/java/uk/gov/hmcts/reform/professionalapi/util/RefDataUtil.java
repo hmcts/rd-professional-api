@@ -276,6 +276,10 @@ public class RefDataUtil {
         return "True".equalsIgnoreCase(showDeleted) ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
+    public static String getReturnRolesValue(String returnRoles) {
+        return "False".equalsIgnoreCase(returnRoles) ? ProfessionalApiConstants.FALSE : ProfessionalApiConstants.TRUE;
+    }
+
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;

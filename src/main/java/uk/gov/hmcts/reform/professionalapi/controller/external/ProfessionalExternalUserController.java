@@ -91,10 +91,11 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker","pui-caa"})
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "pui-caa", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                   @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                   @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
+                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "True") String returnRoles,
                                                   @RequestParam(value = "page", required = false) Integer page,
                                                   @RequestParam(value = "size", required = false) Integer size,
                                                   @ApiParam(hidden = true) @UserId String userId) {
@@ -108,8 +109,8 @@ public class ProfessionalExternalUserController extends SuperController {
         }
         // verify the invited user status active or not?
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
 
+        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
         return profUsersEntityResponse;
     }
 

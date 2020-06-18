@@ -221,7 +221,7 @@ public class ProfessionalApiClient {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId("UNKNOWN");
         jurisdictionIds.add(jurisdiction);
-        return  jurisdictionIds;
+        return jurisdictionIds;
     }
 
     public Map<String, Object> createOrganisationWithNoJurisdictionId() {
@@ -243,7 +243,7 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
-    public  NewUserCreationRequest createNewUserRequest() {
+    public NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -258,7 +258,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public  NewUserCreationRequest createNewUserRequest(String email) {
+    public NewUserCreationRequest createNewUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
 
@@ -273,7 +273,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public  NewUserCreationRequest createReInviteUserRequest(String email) {
+    public NewUserCreationRequest createReInviteUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -492,6 +492,23 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status, RequestSpecification requestSpecification, String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
 
     public void updateOrganisation(String organisationIdentifier, String role) {
 
@@ -618,7 +635,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(userProfileUpdatedData)
@@ -649,7 +666,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
