@@ -5,8 +5,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -18,6 +18,7 @@ import feign.Request;
 import feign.Response;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -328,7 +329,7 @@ public class RefDataUtilTest {
     @Test
     public void privateConstructorTest() throws Exception {
         Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
-        assertFalse(constructor.isAccessible());
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);
     }
