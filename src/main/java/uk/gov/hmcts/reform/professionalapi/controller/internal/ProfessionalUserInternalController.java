@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -89,7 +91,7 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, TRUE, EMPTY, page, size);
     }
 
     @ApiOperation(

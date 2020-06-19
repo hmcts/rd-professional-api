@@ -3,12 +3,16 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.hibernate.internal.util.StringHelper.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
@@ -65,7 +69,6 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
-import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @RestController
 @Slf4j
@@ -360,7 +363,7 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, boolean rolesRequired, String status, Integer page, Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, String returnRoles, String status, Integer page, Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -368,12 +371,14 @@ public abstract class SuperController {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
         ResponseEntity<Object> responseEntity;
 
-        showDeleted = RefDataUtil.getShowDeletedValue(showDeleted);
+        showDeleted = getShowDeletedValue(showDeleted);
+        returnRoles = getReturnRolesValue(returnRoles);
+
         if (page != null) {
-            Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
-            responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, rolesRequired, status, pageable);
+            Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
+            responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles, status, pageable);
         } else {
-            responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, rolesRequired, status);
+            responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, returnRoles, status);
         }
         return responseEntity;
     }

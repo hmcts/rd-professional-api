@@ -309,19 +309,29 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void test_getShowDeletedValueTrue() {
-        String showDeleted = "True";
-        String response = RefDataUtil.getShowDeletedValue(showDeleted);
-
-        assertThat(response.equals("true")).isTrue();
+    public void test_getShowDeletedValue() {
+        assertThat(RefDataUtil.getShowDeletedValue("True").equals("true")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("true").equals("true")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("TRUE").equals("true")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("False").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("false").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("FALSE").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("invalid").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue("").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue(" ").equals("false")).isTrue();
     }
 
     @Test
-    public void test_getShowDeletedValueFalse() {
-        String showDeleted = "false";
-        String response = RefDataUtil.getShowDeletedValue(showDeleted);
-
-        assertThat(response.equals("false")).isTrue();
+    public void test_getReturnRolesValue() {
+        assertThat(RefDataUtil.getReturnRolesValue("True").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("true").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("TRUE").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("False").equals("false")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("false").equals("false")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("FALSE").equals("false")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("invalid").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue("").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(" ").equals("true")).isTrue();
     }
 
     @Test
