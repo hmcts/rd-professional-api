@@ -5,6 +5,8 @@ public class ProfessionalApiConstants {
     private ProfessionalApiConstants() {
     }
 
+
+
     public static final int LENGTH_OF_UUID = 36;
     public static final int LENGTH_OF_ORGANISATION_IDENTIFIER = 7;
     public static final String ORG_ID_VALIDATION_ERROR_MESSAGE = "The given organisationIdentifier must be 7 Alphanumeric Characters";
@@ -27,5 +29,7 @@ public class ProfessionalApiConstants {
     public static final String FALSE = "false";
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String ACTIVE = "Active";
-    public static final String  ERROR_MESSAGE_INVALID_STATUS_PASSED = "Please check status param passed as this is invalid status.";
+    public static final String ERROR_MESSAGE_INVALID_STATUS_PASSED = "Please check status param passed as this is invalid status.";
+    public static final String FIRST_NAME = "firstName";
+    public static final String EMPTY = "";
 }
