@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -73,6 +73,10 @@ public class ProfessionalExternalUserController extends SuperController {
                     message = "An invalid Organisation Identifier was provided"
             ),
             @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
                     code = 403,
                     message = "Forbidden Error: Access denied"
             ),
@@ -98,13 +102,13 @@ public class ProfessionalExternalUserController extends SuperController {
                                                   @RequestParam(value = "size", required = false) Integer size) {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), "pui-user-manager");
+
+        boolean isRolePuiUserManager = organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles(), "pui-user-manager");
 
         ResponseEntity profUsersEntityResponse;
         if (!isRolePuiUserManager) {
             if (StringUtils.isEmpty(status)) {
-                status = "Active";
+                status = ACTIVE;
             }
             profExtUsrReqValidator.validateStatusIsActive(status);
         }

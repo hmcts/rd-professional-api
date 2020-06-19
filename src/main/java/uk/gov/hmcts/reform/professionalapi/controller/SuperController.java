@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
@@ -366,7 +367,7 @@ public abstract class SuperController {
         returnRoles = getReturnRolesValue(returnRoles);
 
         if (page != null) {
-            Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
+            Pageable pageable = RefDataUtil.createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, returnRoles, status);
