@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.hibernate.internal.util.StringHelper.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -374,7 +375,7 @@ public abstract class SuperController {
         returnRoles = getReturnRolesValue(returnRoles);
 
         if (page != null) {
-            Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, "firstName"));
+            Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
             responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles, status, pageable);
         } else {
             responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, returnRoles, status);

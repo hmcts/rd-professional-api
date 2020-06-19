@@ -318,6 +318,7 @@ public class RefDataUtilTest {
         assertThat(RefDataUtil.getShowDeletedValue("FALSE").equals("false")).isTrue();
         assertThat(RefDataUtil.getShowDeletedValue("invalid").equals("false")).isTrue();
         assertThat(RefDataUtil.getShowDeletedValue("").equals("false")).isTrue();
+        assertThat(RefDataUtil.getShowDeletedValue(" ").equals("false")).isTrue();
     }
 
     @Test
@@ -330,6 +331,7 @@ public class RefDataUtilTest {
         assertThat(RefDataUtil.getReturnRolesValue("FALSE").equals("false")).isTrue();
         assertThat(RefDataUtil.getReturnRolesValue("invalid").equals("true")).isTrue();
         assertThat(RefDataUtil.getReturnRolesValue("").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(" ").equals("true")).isTrue();
     }
 
     @Test

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -28,12 +30,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -52,7 +52,7 @@ public class ProfessionalExternalUserController extends SuperController {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if returnRoles is False",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -73,6 +73,10 @@ public class ProfessionalExternalUserController extends SuperController {
             @ApiResponse(
                     code = 400,
                     message = "An invalid Organisation Identifier was provided"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
             ),
             @ApiResponse(
                     code = 403,
@@ -99,16 +103,18 @@ public class ProfessionalExternalUserController extends SuperController {
                                                   @RequestParam(value = "page", required = false) Integer page,
                                                   @RequestParam(value = "size", required = false) Integer size,
                                                   @ApiParam(hidden = true) @UserId String userId) {
-        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-        ResponseEntity profUsersEntityResponse;
-        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), ProfessionalApiConstants.PUI_USER_MANAGER)) {
-            status = StringUtils.isEmpty(status) ? ProfessionalApiConstants.ACTIVE : status;
-            profExtUsrReqValidator.validateStatusIsActive(status);
-        }
+
         // verify the invited user status active or not?
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
+        profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
+
+        ResponseEntity profUsersEntityResponse;
+
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles(), PUI_USER_MANAGER)) {
+            status = StringUtils.isEmpty(status) ? ACTIVE : status;
+            profExtUsrReqValidator.validateStatusIsActive(status);
+        }
         profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
         return profUsersEntityResponse;
     }
