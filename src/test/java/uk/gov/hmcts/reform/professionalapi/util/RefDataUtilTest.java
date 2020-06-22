@@ -323,15 +323,12 @@ public class RefDataUtilTest {
 
     @Test
     public void test_getReturnRolesValue() {
-        assertThat(RefDataUtil.getReturnRolesValue("True").equals("true")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("true").equals("true")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("TRUE").equals("true")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("False").equals("false")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("false").equals("false")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("FALSE").equals("false")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("invalid").equals("true")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue("").equals("true")).isTrue();
-        assertThat(RefDataUtil.getReturnRolesValue(" ").equals("true")).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("True")).equals(true)).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("true")).equals(true)).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("TRUE")).equals(true)).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("False")).equals(false)).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("false")).equals(false)).isTrue();
+        assertThat(RefDataUtil.getReturnRolesValue(Boolean.valueOf("FALSE")).equals(false)).isTrue();
     }
 
     @Test

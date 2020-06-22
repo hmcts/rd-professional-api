@@ -276,8 +276,8 @@ public class RefDataUtil {
         return ProfessionalApiConstants.TRUE.equalsIgnoreCase(showDeleted) ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
-    public static String getReturnRolesValue(String returnRoles) {
-        return ProfessionalApiConstants.FALSE.equalsIgnoreCase(returnRoles) ? ProfessionalApiConstants.FALSE : ProfessionalApiConstants.TRUE;
+    public static Boolean getReturnRolesValue(Boolean returnRoles) {
+        return ProfessionalApiConstants.FALSE.equalsIgnoreCase(returnRoles.toString()) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
