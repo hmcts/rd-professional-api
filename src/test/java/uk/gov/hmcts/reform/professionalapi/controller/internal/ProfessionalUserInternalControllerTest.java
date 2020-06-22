@@ -91,6 +91,7 @@ public class ProfessionalUserInternalControllerTest {
         verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", "true", "");
     }
 
+
     @Test
     public void testFindUsersByOrganisationwithoutRoles() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
