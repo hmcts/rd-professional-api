@@ -45,7 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted/returnRoles flag",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag, returnRole flag",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -86,10 +86,10 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @Secured("prd-admin")
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                      @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                      @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size,
-                                                      @RequestParam(value = "returnRoles", required = false) String returnRoles) {
+                                                  @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                  @RequestParam(value = "page", required = false) Integer page,
+                                                  @RequestParam(value = "size", required = false) Integer size,
+                                                  @RequestParam(value = "returnRoles", required = false) String returnRoles) {
 
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, EMPTY, page, size);
     }
