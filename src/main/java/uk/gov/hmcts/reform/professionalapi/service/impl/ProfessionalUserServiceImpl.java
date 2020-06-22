@@ -136,6 +136,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
+            if (responseEntity.getStatusCode().is2xxSuccessful() && !rolesRequired) {
+                ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+                professionalUsersEntityResponse.getUserProfiles().stream().filter(user -> user.getIdamStatus().equals(IdamStatus.ACTIVE.name())).forEach(user -> user.setIdamMessage(""));
+                responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            }
+
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }

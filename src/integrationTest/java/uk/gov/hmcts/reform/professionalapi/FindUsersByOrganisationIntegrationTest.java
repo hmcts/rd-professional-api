@@ -185,17 +185,24 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
-    public void  ac3_find_all_active_users_with_no_param_given_for_an_organisation_should_return_200() {
+    public void ac3_find_all_active_users_with_no_param_given_for_an_organisation_should_return_200() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("", puiCaseManager, id);
         validateUsers(response, 2, true);
     }
 
     @Test
-    public void  ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_403() {
+    public void ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_403() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("", "caseworker-caa", id);
         assertThat(response.get("http_status")).isEqualTo("403");
+    }
+
+    @Test
+    public void ac7_find_all_active_users_for_an_organisation_should_return_200() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("infealfnk", puiCaseManager, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     private void validateUsers(Map<String, Object> response, int expectedUserCount, Boolean rolesReturned) {
@@ -214,6 +221,9 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             } else {
                 assertThat(user.get("idamStatus")).isNotNull();
                 assertThat(((List) user.get("roles"))).isEmpty();
+            }
+            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && !rolesReturned) {
+                assertThat(user.get("idamMessage")).isEqualTo("");
             }
         });
     }
