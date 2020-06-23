@@ -199,7 +199,7 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
-    public void ac7_find_all_active_users_for_an_organisation_should_return_200() {
+    public void ac7_find_all_active_users_for_an_organisation_with_invalid_param_should_return_400() {
         String id = settingUpOrganisation("pui-user-manager");
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("infealfnk", puiCaseManager, id);
         assertThat(response.get("http_status")).isEqualTo("400");
