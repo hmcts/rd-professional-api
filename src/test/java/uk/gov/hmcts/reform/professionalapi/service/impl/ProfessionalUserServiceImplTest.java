@@ -379,6 +379,25 @@ public class ProfessionalUserServiceImplTest {
         assertThat(responseEntity).isNotNull();
     }
 
+    @Test(expected = ExternalApiException.class)
+    public void findUsersByOrganisationExternalExceptionWith300StatusTest() throws Exception {
+        List<String> ids = new ArrayList<>();
+        ids.add(professionalUser.getUserIdentifier());
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUser);
+
+        FeignException exceptionMock = mock(FeignException.class);
+        when(exceptionMock.status()).thenReturn(300);
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
+
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        assertThat(responseEntity).isNotNull();
+    }
+
     @Test
     public void shouldPersistUser() {
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
@@ -614,6 +633,7 @@ public class ProfessionalUserServiceImplTest {
         verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
+
 
     @SneakyThrows
     @Test(expected = Test.None.class)
