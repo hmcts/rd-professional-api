@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.UP_SERVICE_MSG;
+
 import feign.FeignException;
 import feign.Response;
 
@@ -41,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 @Service
@@ -134,7 +136,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, rolesRequired)) {
 
             Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            responseEntity = toResponseEntity(response, clazz);
 
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
@@ -175,15 +177,12 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
-        ModifyUserRolesResponse modifyUserRolesResponse;
-
+    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
         try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
-            modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
+            return toResponseEntity(response, response.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status() > 0 ? ex.status() : 500), UP_SERVICE_MSG);
         }
-        return modifyUserRolesResponse;
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {

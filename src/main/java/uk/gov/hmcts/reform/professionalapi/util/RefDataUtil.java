@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileRes
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -54,7 +53,7 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
+    public  static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -278,20 +277,6 @@ public class RefDataUtil {
 
     public static String getReturnRolesValue(String returnRoles) {
         return ProfessionalApiConstants.FALSE.equalsIgnoreCase(returnRoles) ? ProfessionalApiConstants.FALSE : ProfessionalApiConstants.TRUE;
-    }
-
-    public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        boolean isFailureFromUp = response.status() > 300;
-        Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
-        if (isFailureFromUp) {
-            ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
-            modifyUserRolesResponse.setErrorResponse(errorResponse);
-        } else {
-            modifyUserRolesResponse = (ModifyUserRolesResponse) responseEntity.getBody();
-        }
-        return modifyUserRolesResponse;
     }
 
     public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
