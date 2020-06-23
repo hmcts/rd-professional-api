@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
@@ -303,7 +304,7 @@ public class RefDataUtil {
     }
 
     public static Boolean getReturnRolesValue(Boolean returnRoles) {
-        return ProfessionalApiConstants.FALSE.equalsIgnoreCase(returnRoles.toString()) ? Boolean.FALSE : Boolean.TRUE;
+        return FALSE.equals(returnRoles) ? FALSE : TRUE;
     }
 
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
