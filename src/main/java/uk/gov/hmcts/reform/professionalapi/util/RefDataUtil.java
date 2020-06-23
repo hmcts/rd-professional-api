@@ -38,7 +38,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -49,12 +51,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 @Slf4j
 public class RefDataUtil {
 
-    private RefDataUtil() {}
+    private RefDataUtil() {
+    }
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
+    private static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -97,7 +100,7 @@ public class RefDataUtil {
 
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
-        for (SuperUser user: users) {
+        for (SuperUser user : users) {
             professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient, isRequiredRoles);
             userProfileDtls.add(professionalUser.toSuperUser());
         }
@@ -106,7 +109,7 @@ public class RefDataUtil {
 
 
     public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
-        try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
+        try (Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
@@ -117,7 +120,7 @@ public class RefDataUtil {
 
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
@@ -129,7 +132,7 @@ public class RefDataUtil {
                                                                    String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, "false")) {
 
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
@@ -140,7 +143,7 @@ public class RefDataUtil {
             }
 
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
@@ -150,7 +153,7 @@ public class RefDataUtil {
     public static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
                                                                                    Map<String, Organisation> activeOrganisationDtls) {
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
         if (null != professionalUsersEntityResponse
                 && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
 
@@ -215,28 +218,51 @@ public class RefDataUtil {
 
             throw new AccessDeniedException("403 Forbidden");
         }
-
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static Object filterUsersByStatus(ResponseEntity responseEntity, String status) {
 
-        if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
 
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+            if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
 
-            List<ProfessionalUsersResponse> filteredUsers =  professionalUsersEntityResponse.getUserProfiles().stream()
-                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
-                    .collect(Collectors.toList());
+                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(), status);
 
-            if (CollectionUtils.isEmpty(filteredUsers)) {
-                throw new ResourceNotFoundException("No users found with status :" + status);
+            } else {
+
+                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody(), status);
             }
-
-            professionalUsersEntityResponse.setUserProfiles(filteredUsers);
-            return professionalUsersEntityResponse;
 
         } else {
             throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve Users from UP");
+        }
+    }
+
+    public static ProfessionalUsersEntityResponse filterUsersByStatusWithRoles(ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
+        List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse.getUserProfiles().stream()
+                .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
+                .collect(Collectors.toList());
+
+        checkListIsEmpty(filteredUsers, status);
+
+        professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponse;
+    }
+
+    public static ProfessionalUsersEntityResponseWithoutRoles filterUsersByStatusWithoutRoles(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles, String status) {
+        List<ProfessionalUsersResponseWithoutRoles> filteredUsers = professionalUsersEntityResponseWithoutRoles.getUserProfiles().stream()
+                .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
+                .collect(Collectors.toList());
+
+        checkListIsEmpty(filteredUsers, status);
+
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponseWithoutRoles;
+    }
+
+    public static void checkListIsEmpty(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers, String status) {
+        if (CollectionUtils.isEmpty(filteredUsers)) {
+            throw new ResourceNotFoundException("No users found with status :" + status);
         }
     }
 
@@ -297,7 +323,7 @@ public class RefDataUtil {
     public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
 
         NewUserResponse newUserResponse;
-        try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
+        try (Response response = userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
@@ -311,7 +337,7 @@ public class RefDataUtil {
                 newUserResponse = new NewUserResponse();
             }
 
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             log.error("Error while invoking UserProfileByEmail service call", ex);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
@@ -326,13 +352,13 @@ public class RefDataUtil {
         try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
 
             if (ProfessionalApiConstants.STATUS_CODE_204 == response.status()) {
-                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.STATUS_CODE_204,ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-            } else if (ProfessionalApiConstants.ERROR_CODE_500 <= response.status())  {
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.STATUS_CODE_204, ProfessionalApiConstants.DELETION_SUCCESS_MSG);
+            } else if (ProfessionalApiConstants.ERROR_CODE_500 <= response.status()) {
                 log.error("DeleteUserProfiles service call failed in PRD::" + response.reason());
                 deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.ERROR_CODE_500, UP_SERVICE_MSG);
             }
 
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
             log.error("DeleteUserProfiles service call failed in PRD:: " + ex);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
 

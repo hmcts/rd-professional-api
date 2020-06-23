@@ -216,14 +216,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesReturned) {
-                assertThat(((List) user.get("roles")).size()).isEqualTo(1);
-            } else {
-                assertThat(user.get("idamStatus")).isNotNull();
-                assertThat(((List) user.get("roles"))).isEmpty();
-            }
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && !rolesReturned) {
-                assertThat(user.get("idamMessage")).isEqualTo("");
+            assertThat(user.get("idamStatus")).isNotNull();
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(((List) user.get("roles")).size()).isEqualTo(1);
+                } else {
+                    assertThat(((List) user.get("roles"))).isEmpty();
+                }
             }
         });
     }
