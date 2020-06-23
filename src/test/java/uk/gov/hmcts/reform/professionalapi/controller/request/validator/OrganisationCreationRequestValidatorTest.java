@@ -60,8 +60,8 @@ public class OrganisationCreationRequestValidatorTest {
         verify(validator1, times(1)).validate(organisationCreationRequest);
         verify(validator2, times(1)).validate(organisationCreationRequest);
 
-        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isEqualTo(true);
-        assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
@@ -88,7 +88,7 @@ public class OrganisationCreationRequestValidatorTest {
             myException = e;
         }
 
-        assertThat(myException).isEqualTo(null);
+        assertThat(myException).isNull();
     }
 
     @Test
@@ -115,7 +115,7 @@ public class OrganisationCreationRequestValidatorTest {
         } catch (Exception e) {
             myException = e;
         }
-        assertThat(myException).isEqualTo(null);
+        assertThat(myException).isNull();
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception

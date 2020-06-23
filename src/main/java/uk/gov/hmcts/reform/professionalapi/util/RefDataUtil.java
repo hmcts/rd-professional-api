@@ -221,7 +221,7 @@ public class RefDataUtil {
         }
     }
 
-    public static Object filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static Object filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
 
