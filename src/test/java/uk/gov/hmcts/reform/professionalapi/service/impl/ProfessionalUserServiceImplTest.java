@@ -629,7 +629,7 @@ public class ProfessionalUserServiceImplTest {
         ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(status).isNull();
-        assertThat(status.getStatusCode().value()).isEqualTo(500);
+        assertThat(status.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }

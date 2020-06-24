@@ -268,7 +268,7 @@ public class ProfessionalExternalUserControllerTest {
         Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
         assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.get().getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
     }
 }
