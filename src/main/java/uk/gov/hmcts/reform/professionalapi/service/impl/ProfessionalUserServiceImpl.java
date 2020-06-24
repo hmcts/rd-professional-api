@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
+
 import feign.FeignException;
 import feign.Response;
 
@@ -45,7 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
 
 @Service
 @Slf4j
