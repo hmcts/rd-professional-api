@@ -247,6 +247,10 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.FORBIDDEN, bearerTokenForCaseworkerCaa, "");
     }
 
+    @Test
+    public void rdcc1439_ac7_find_all_active_users_with_invalid_param_given_for_an_organisation_should_return_400() {
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "infealfnk");
+    }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
@@ -262,10 +266,12 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             if (!expectedStatus.equals("any")) {
                 assertThat(user.get("idamStatus").equals(expectedStatus));
             }
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesReturned) {
-                assertThat(user.get("roles")).isNotNull();
-            } else {
-                assertThat(user.get("roles")).isNull();
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(user.get("roles")).isNotNull();
+                } else {
+                    assertThat(user.get("roles")).isNull();
+                }
             }
         });
     }

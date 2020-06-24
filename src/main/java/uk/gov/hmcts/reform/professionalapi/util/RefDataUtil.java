@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FALSE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.TRUE;
+
 
 import feign.FeignException;
 import feign.Response;
@@ -31,12 +32,15 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -218,25 +222,49 @@ public class RefDataUtil {
 
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static Object filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
 
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+            if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
 
-            List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse.getUserProfiles().stream()
-                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
-                    .collect(Collectors.toList());
+                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(), status);
 
-            if (CollectionUtils.isEmpty(filteredUsers)) {
-                throw new ResourceNotFoundException("No users found with status :" + status);
+            } else {
+
+                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody(), status);
             }
-
-            professionalUsersEntityResponse.setUserProfiles(filteredUsers);
-            return professionalUsersEntityResponse;
 
         } else {
             throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to retrieve Users from UP");
+        }
+    }
+
+    public static ProfessionalUsersEntityResponse filterUsersByStatusWithRoles(ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
+        List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse.getUserProfiles().stream()
+                .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
+                .collect(Collectors.toList());
+
+        checkListIsEmpty(filteredUsers, status);
+
+        professionalUsersEntityResponse.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponse;
+    }
+
+    public static ProfessionalUsersEntityResponseWithoutRoles filterUsersByStatusWithoutRoles(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles, String status) {
+        List<ProfessionalUsersResponseWithoutRoles> filteredUsers = professionalUsersEntityResponseWithoutRoles.getUserProfiles().stream()
+                .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
+                .collect(Collectors.toList());
+
+        checkListIsEmpty(filteredUsers, status);
+
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(filteredUsers);
+        return professionalUsersEntityResponseWithoutRoles;
+    }
+
+    public static void checkListIsEmpty(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers, String status) {
+        if (CollectionUtils.isEmpty(filteredUsers)) {
+            throw new ResourceNotFoundException("No users found with status :" + status);
         }
     }
 
@@ -273,11 +301,11 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        return TRUE.equalsIgnoreCase(showDeleted) ? TRUE : FALSE;
+        return ProfessionalApiGeneratorConstants.TRUE.equalsIgnoreCase(showDeleted) ? ProfessionalApiGeneratorConstants.TRUE : ProfessionalApiGeneratorConstants.FALSE;
     }
 
-    public static String getReturnRolesValue(String returnRoles) {
-        return FALSE.equalsIgnoreCase(returnRoles) ? FALSE : TRUE;
+    public static Boolean getReturnRolesValue(Boolean returnRoles) {
+        return FALSE.equals(returnRoles) ? FALSE : TRUE;
     }
 
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {

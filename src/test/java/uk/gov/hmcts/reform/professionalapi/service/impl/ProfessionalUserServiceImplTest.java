@@ -190,7 +190,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -231,7 +231,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "Active");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
 
         Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
@@ -372,7 +372,26 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void findUsersByOrganisationExternalExceptionWith300StatusTest() throws Exception {
+        List<String> ids = new ArrayList<>();
+        ids.add(professionalUser.getUserIdentifier());
+        List<ProfessionalUser> users = new ArrayList<>();
+        users.add(professionalUser);
+
+        FeignException exceptionMock = mock(FeignException.class);
+        when(exceptionMock.status()).thenReturn(300);
+        when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
+
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
@@ -460,7 +479,7 @@ public class ProfessionalUserServiceImplTest {
         Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", "false", "Active", pageableMock);
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
@@ -478,7 +497,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", "false", "Active", pageableMock);
+        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
     }
@@ -491,7 +510,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "false", "Active");
+        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", false, "Active");
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
     }
@@ -525,7 +544,7 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", "true", "Active");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
 
         assertThat(responseEntity).isNotNull();
 
@@ -610,7 +629,7 @@ public class ProfessionalUserServiceImplTest {
         ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(status).isNull();
-        assertThat(status.getStatusCode()).isEqualTo(500);
+        assertThat(status.getStatusCode().value()).isEqualTo(500);
         verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
@@ -655,8 +674,6 @@ public class ProfessionalUserServiceImplTest {
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
     }
-
-
 
     private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
         RoleAdditionResponse addRoleResponse = new RoleAdditionResponse();

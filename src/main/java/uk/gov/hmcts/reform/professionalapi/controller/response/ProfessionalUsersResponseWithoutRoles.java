@@ -1,35 +1,33 @@
+
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutRoles {
+public class ProfessionalUsersResponseWithoutRoles {
 
     @JsonProperty
-    private List<String> roles;
+    public String userIdentifier;
     @JsonProperty
-    private String idamStatusCode;
+    public String firstName;
     @JsonProperty
-    private String idamMessage;
+    public String lastName;
+    @JsonProperty
+    public String email;
+    @JsonProperty
+    public String idamStatus;
 
-    public ProfessionalUsersResponse(ProfessionalUser user) {
+    public ProfessionalUsersResponseWithoutRoles(ProfessionalUser user) {
         this.userIdentifier = user.getUserIdentifier();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmailAddress();
-        this.roles = user.getRoles();
         this.idamStatus = user.getIdamStatus() == null ? "" : user.getIdamStatus().toString();
-        this.idamStatusCode = StringUtils.isBlank(user.getIdamStatusCode()) ? "" : user.getIdamStatusCode();
-        this.idamMessage = StringUtils.isBlank(user.getIdamMessage()) ? "" : user.getIdamMessage();
     }
 }

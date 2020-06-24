@@ -91,7 +91,7 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size) {
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, TRUE, EMPTY, page, size);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, Boolean.TRUE, EMPTY, page, size);
     }
 
     @ApiOperation(

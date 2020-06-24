@@ -183,6 +183,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
+    @Test
+    public void ac7_find_all_active_users_for_an_organisation_with_invalid_param_should_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles("infealfnk", puiCaseManager, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
     private void validateUsers(Map<String, Object> response, int expectedUserCount, Boolean rolesReturned) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
@@ -194,11 +201,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesReturned) {
-                assertThat(((List) user.get("roles")).size()).isEqualTo(1);
-            } else {
-                assertThat(user.get("idamStatus")).isNotNull();
-                assertThat(((List) user.get("roles"))).isEmpty();
+            assertThat(user.get("idamStatus")).isNotNull();
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(((List) user.get("roles")).size()).isEqualTo(1);
+                } else {
+                    assertThat(((List) user.get("roles"))).isEmpty();
+                }
             }
         });
     }
