@@ -11,7 +11,7 @@ public class ExternalApiExceptionTest {
     public void getExternalApiExceptionTest() {
         ExternalApiException externalApiException = new ExternalApiException(BAD_REQUEST, "BAD REQUEST");
 
-        assertThat(externalApiException.getHttpStatus().toString()).isEqualTo("400 BAD_REQUEST");
+        assertThat(externalApiException.getHttpStatus()).hasToString("400 BAD_REQUEST");
         assertThat(externalApiException.getErrorMessage()).isEqualTo("BAD REQUEST");
     }
 }
