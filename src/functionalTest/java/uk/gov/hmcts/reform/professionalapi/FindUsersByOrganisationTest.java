@@ -263,7 +263,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "infealfnk");
     }
 
-
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
