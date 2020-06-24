@@ -234,7 +234,7 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -480,7 +480,7 @@ public class OrganisationServiceImplTest {
         final int orgIdLength = 7;
         assertThat(organisationResponse).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
+        assertThat(organisationResponse.getOrganisationIdentifier()).hasSize(orgIdLength);
     }
 
     @Test

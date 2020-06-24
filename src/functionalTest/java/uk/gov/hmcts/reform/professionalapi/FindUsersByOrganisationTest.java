@@ -157,7 +157,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void ac5_find_all_suspended_users_for_an_organisation_with_pui_user_manager_when_no_suspended_user_exists_should_return_404() {
         professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.NOT_FOUND, generateBearerTokenForExternalRole(puiUserManager), "Suspended");
     }
-    
+
     @Test
     public void ac6_find_all_status_users_for_an_organisation_with_pui_user_manager_with_invalid_status_provided_should_return_400() {
         professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForExternalRole(puiUserManager), "INVALID");
@@ -273,6 +273,10 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.FORBIDDEN, bearerTokenForCaseworkerCaa, "");
     }
 
+    @Test
+    public void rdcc1439_ac7_find_all_active_users_with_invalid_param_given_for_an_organisation_should_return_400() {
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.BAD_REQUEST, generateBearerTokenForNonPuiManager(), "infealfnk");
+    }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();

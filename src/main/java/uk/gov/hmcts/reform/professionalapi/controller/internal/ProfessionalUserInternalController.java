@@ -87,9 +87,10 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
+                                                      @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
                                                       @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size,
-                                                      @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "True") String returnRoles) {
+                                                      @RequestParam(value = "size", required = false) Integer size
+    ) {
 
         return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, EMPTY, page, size);
     }

@@ -15,11 +15,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -251,8 +253,9 @@ public class SuperControllerTest {
 
         Organisation existingOrg = superController.checkOrganisationIsActive(organisation.getOrganisationIdentifier());
 
-        assertThat(existingOrg).isNotNull();
-        assertThat(existingOrg).isEqualTo(organisation);
+        assertThat(existingOrg)
+                .isNotNull()
+                .isEqualTo(organisation);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
