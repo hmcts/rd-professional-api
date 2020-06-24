@@ -411,7 +411,7 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status, String roleRequired) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status, String returnRoles) {
 
         // Use the role supplied to generate tokens appropritely
         RequestSpecification requestSpecification;
@@ -421,7 +421,7 @@ public class ProfessionalApiClient {
             requestSpecification = getMultipleAuthHeadersInternal();
         }
         Response response = requestSpecification
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&returnRoles=" + roleRequired)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&returnRoles=" + returnRoles)
                 .andReturn();
         response.then()
                 .assertThat()

@@ -251,4 +251,9 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
+    @Test
+    public void can_retrieve_users_when_param_is_invalid_should_return_status_400_with_roles() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(createAndActivateOrganisation(), "True", hmctsAdmin,"thisisinvalid");
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
 }

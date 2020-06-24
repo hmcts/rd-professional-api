@@ -237,6 +237,7 @@ public class OrganisationServiceImplTest {
         OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
+
     @Test(expected = EmptyResultDataAccessException.class)
     public void throwsEmptyResultDataAccessException() {
         Organisation testOrganisation = new Organisation();

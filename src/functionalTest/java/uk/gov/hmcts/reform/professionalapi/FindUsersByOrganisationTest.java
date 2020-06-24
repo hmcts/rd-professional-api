@@ -292,10 +292,12 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
             if (!expectedStatus.equals("any")) {
                 assertThat(user.get("idamStatus").equals(expectedStatus));
             }
-            if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString()) && rolesReturned) {
-                assertThat(user.get("roles")).isNotNull();
-            } else {
-                assertThat(user.get("roles")).isNull();
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(user.get("roles")).isNotNull();
+                } else {
+                    assertThat(user.get("roles")).isNull();
+                }
             }
         });
     }
