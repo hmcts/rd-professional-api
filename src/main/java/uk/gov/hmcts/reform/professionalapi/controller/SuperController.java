@@ -303,7 +303,7 @@ public abstract class SuperController {
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, false);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
@@ -329,7 +329,7 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
