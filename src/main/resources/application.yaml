@@ -115,3 +115,5 @@ feign:
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 resendInviteEnabled : true
+
+logging-component-name: "RD-Professional-Api"

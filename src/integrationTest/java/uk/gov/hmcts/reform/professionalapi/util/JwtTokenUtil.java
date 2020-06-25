@@ -85,7 +85,7 @@ public final class JwtTokenUtil {
                 .collect(Collectors.toList());
 
         if (elements.isEmpty()) {
-            throw new InvalidTokenException("{}:: Token did not returned 'subject' element");
+            throw new InvalidTokenException("Token did not returned 'subject' element");
         }
 
         String[] tokenisedSubValue = elements.get(0).split(" ");
