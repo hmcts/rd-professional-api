@@ -13,12 +13,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 
 @Slf4j
 public final class JwtTokenUtil {
 
     private static final String SUBJECT = "sub";
+
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
 
     private JwtTokenUtil() {
     }
@@ -52,7 +56,7 @@ public final class JwtTokenUtil {
                     builder.build());
             signedJwt.sign(new RSASSASigner(KeyGenUtil.getRsaJwk()));
         } catch (JOSEException e) {
-            log.error("error while creating bearer token : " + (e.getMessage()));
+            log.error("{}:: error while creating bearer token : ", loggingComponentName, (e.getMessage()));
         }
         return signedJwt.serialize();
     }
@@ -81,7 +85,7 @@ public final class JwtTokenUtil {
                 .collect(Collectors.toList());
 
         if (elements.isEmpty()) {
-            throw new InvalidTokenException("Token did not returned 'subject' element");
+            throw new InvalidTokenException("{}:: Token did not returned 'subject' element");
         }
 
         String[] tokenisedSubValue = elements.get(0).split(" ");

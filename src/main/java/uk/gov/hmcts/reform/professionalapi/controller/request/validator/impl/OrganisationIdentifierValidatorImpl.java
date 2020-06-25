@@ -8,6 +8,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     private OrganisationService organisationService;
 
+    @Value("${logging-component-name}")
+    protected String loggingComponentName;
+
     @Autowired
     public OrganisationIdentifierValidatorImpl(OrganisationService organisationService) {
         this.organisationService = organisationService;
@@ -40,7 +44,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = NO_ORG_FOUND_FOR_GIVEN_ID + inputOrganisationIdentifier;
-            log.error(errorMessage);
+            log.error(loggingComponentName,errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }

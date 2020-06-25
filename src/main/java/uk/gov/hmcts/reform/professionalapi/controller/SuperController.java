@@ -114,8 +114,11 @@ public abstract class SuperController {
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
 
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
+
     private static final String SRA_REGULATED_FALSE = "false";
-    private static final String IDAM_ERROR_MESSAGE = "Idam register user failed with status code : %s";
+    private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
 
 
     protected ResponseEntity<OrganisationResponse> createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
@@ -173,11 +176,11 @@ public abstract class SuperController {
                 organisationResponse =
                         organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
             } else {
-                log.error("Invalid Request param for status field");
+                log.error("{}:: Invalid Request param for status field", loggingComponentName);
                 throw new InvalidRequest("400");
             }
         }
-        log.debug("Received response to retrieve organisation details");
+        log.debug("{}:: Received response to retrieve organisation details", loggingComponentName);
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
