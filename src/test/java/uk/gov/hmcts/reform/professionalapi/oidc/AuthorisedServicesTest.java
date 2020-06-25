@@ -17,12 +17,13 @@ public class AuthorisedServicesTest {
 
     @Test
     public void authorisedServicesList() {
-        assertThat(authorisedServices).contains("rd_professional_api");
-        assertThat(authorisedServices).contains("rd_user_profile_api");
-        assertThat(authorisedServices).contains("xui_webapp");
-        assertThat(authorisedServices).contains("finrem_payment_service");
-        assertThat(authorisedServices).contains("fpl_case_service");
-        assertThat(authorisedServices).contains("iac");
-        assertThat(authorisedServices).contains("aac-manage-case-assignment");
+        assertThat(authorisedServices)
+                .contains("rd_professional_api")
+                .contains("rd_user_profile_api")
+                .contains("xui_webapp")
+                .contains("finrem_payment_service")
+                .contains("fpl_case_service")
+                .contains("iac")
+                .contains("aac-manage-case-assignment");
     }
 }

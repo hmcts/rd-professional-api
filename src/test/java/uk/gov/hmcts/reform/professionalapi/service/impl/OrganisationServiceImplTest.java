@@ -481,7 +481,7 @@ public class OrganisationServiceImplTest {
         final int orgIdLength = 7;
         assertThat(organisationResponse).isNotNull();
         assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
+        assertThat(organisationResponse.getOrganisationIdentifier()).hasSize(orgIdLength);
     }
 
     @Test

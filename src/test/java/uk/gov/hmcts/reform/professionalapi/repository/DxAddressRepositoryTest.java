@@ -29,7 +29,7 @@ public class DxAddressRepositoryTest extends BaseRepository {
     public void test_findById() {
         Optional<DxAddress> dxAdd = dxAddressRepository.findById(dxAddress.getId());
 
-        assertThat(dxAdd.get()).isEqualTo(dxAddress);
+        assertThat(dxAdd).contains(dxAddress);
         assertThat(dxAdd.get().getId()).isEqualTo(dxAddress.getId());
     }
 }

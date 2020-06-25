@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
+
 import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.UP_SERVICE_MSG;
 
@@ -33,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -44,7 +49,9 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
 
 @Service
 @Slf4j
@@ -108,10 +115,10 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, String rolesRequired, String status, Pageable pageable) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
-        ResponseEntity<Object> responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status);
+        ResponseEntity<Object> responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
 
         HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers, responseEntity);
 
@@ -119,34 +126,43 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, String rolesRequired, String status) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
     }
 
     @SuppressWarnings("unchecked")
-    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, String rolesRequired, String status) {
+    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status, String organisationIdentifier) {
         ResponseEntity<Object> responseEntity;
+        Object clazz;
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, rolesRequired)) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
-            Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            responseEntity = toResponseEntity(response, clazz);
+            if (response.status() > 300) {
+                clazz = ErrorResponse.class;
+            } else {
+                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class : ProfessionalUsersEntityResponseWithoutRoles.class;
+            }
+
+            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
+            }
 
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
         if (!StringUtils.isBlank(status)) {
             //Filtering users by status
 
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
-            responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            Object response = filterUsersByStatus(responseEntity, status);
+            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
 
         return responseEntity;
