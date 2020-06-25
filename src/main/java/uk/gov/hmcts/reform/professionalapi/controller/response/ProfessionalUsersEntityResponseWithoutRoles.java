@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.ArrayList;
@@ -10,6 +11,9 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ProfessionalUsersEntityResponseWithoutRoles {
+
+    @JsonProperty
+    private String organisationIdentifier;
 
     private List<ProfessionalUsersResponseWithoutRoles> userProfiles = new ArrayList<>();
 
@@ -21,5 +25,13 @@ public class ProfessionalUsersEntityResponseWithoutRoles {
     @JsonSetter("userProfiles")
     public void setUserProfiles(List<ProfessionalUsersResponseWithoutRoles> userProfiles) {
         this.userProfiles = userProfiles;
+    }
+
+    public String getOrganisationIdentifier() {
+        return organisationIdentifier;
+    }
+
+    public void setOrganisationIdentifier(String organisationIdentifier) {
+        this.organisationIdentifier = organisationIdentifier;
     }
 }
