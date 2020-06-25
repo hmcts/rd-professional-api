@@ -11,9 +11,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.UP_SERVICE_MSG;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -692,7 +692,7 @@ public class ProfessionalUserServiceImplTest {
         Throwable thrown = catchThrowable(() ->  professionalUserService.modifyRolesForUser(new UserProfileUpdatedData(), UUID.randomUUID().toString(), Optional.of("")));
         assertThat(thrown)
                 .isInstanceOf(ExternalApiException.class)
-                .hasMessageContaining(UP_SERVICE_MSG);
+                .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);
         assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
