@@ -373,4 +373,18 @@ public class RefDataUtil {
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
     }
+
+    public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity, String organisationIdentifier) {
+        ResponseEntity<Object> newResponseEntity;
+        if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+            professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
+        } else {
+            ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
+            professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
+        }
+        return newResponseEntity;
+    }
 }

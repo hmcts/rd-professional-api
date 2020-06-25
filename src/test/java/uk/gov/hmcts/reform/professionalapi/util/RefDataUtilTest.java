@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
 
 import feign.Request;
 import feign.Response;
@@ -534,5 +535,33 @@ public class RefDataUtilTest {
         assertEquals("400", responseUser.getIdamStatusCode());
         assertEquals("BAD REQUEST", responseUser.getIdamMessage());
 
+    }
+
+    @Test
+    public void test_setOrgIdInGetUserResponse_with_roles_response() {
+        List<ProfessionalUsersResponse> professionalUsersResponses = new ArrayList<>();
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
+        professionalUsersResponses.add(professionalUsersResponse);
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
+        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
+        assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
+        ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse)responseEntityOutput.getBody();
+        assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
+    }
+
+    @Test
+    public void test_setOrgIdInGetUserResponse_without_roles_response() {
+        List<ProfessionalUsersResponseWithoutRoles> professionalUsersEntityResponsesWithoutRoles = new ArrayList<>();
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponseWithoutRoles = new ProfessionalUsersResponseWithoutRoles(professionalUser);
+        professionalUsersEntityResponsesWithoutRoles.add(professionalUsersResponseWithoutRoles);
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = new ProfessionalUsersEntityResponseWithoutRoles();
+        professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
+        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
+        assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
+        ProfessionalUsersEntityResponseWithoutRoles output = (ProfessionalUsersEntityResponseWithoutRoles)responseEntityOutput.getBody();
+        assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
     }
 }
