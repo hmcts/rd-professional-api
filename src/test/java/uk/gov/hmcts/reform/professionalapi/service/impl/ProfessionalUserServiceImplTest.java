@@ -235,7 +235,7 @@ public class ProfessionalUserServiceImplTest {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = ((ProfessionalUsersEntityResponse)responseEntity.getBody());
 
-        Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         assertThat(professionalUsersEntityResponse1.getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
@@ -245,12 +245,12 @@ public class ProfessionalUserServiceImplTest {
         });
 
 
-        verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
     }
 
     @Test
-    public void test_findUsersByOrganisation_failure_in_Uo() throws Exception {
+    public void test_findUsersByOrganisation_failure_in_Up() throws Exception {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
         List<ProfessionalUser> users = new ArrayList<>();
@@ -259,10 +259,10 @@ public class ProfessionalUserServiceImplTest {
         ErrorResponse errorResponse = new ErrorResponse("some error message", "some error description", "21:10");
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(mapper.writeValueAsString(errorResponse), Charset.defaultCharset()).status(400).build());
         ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
-        Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getBody()).isExactlyInstanceOf(ErrorResponse.class);
-        verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
+        verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
     }
 
