@@ -145,16 +145,19 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             } else {
                 clazz = rolesRequired ? ProfessionalUsersEntityResponse.class : ProfessionalUsersEntityResponseWithoutRoles.class;
             }
+
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
             }
+
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
         if (!StringUtils.isBlank(status)) {
             //Filtering users by status
+
             Object response = filterUsersByStatus(responseEntity, status);
             responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
