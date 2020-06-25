@@ -84,6 +84,8 @@ public abstract class AuthorizationFunctionalTest {
     @Autowired
     protected TestConfigProperties configProperties;
 
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+
     @Before
     public void setUp() {
         RestAssured.useRelaxedHTTPSValidation();
@@ -120,6 +122,14 @@ public abstract class AuthorizationFunctionalTest {
 
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         return activateOrganisation(response, role);
+    }
+
+    protected String createAndctivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest, String role) {
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+        return organisationIdentifier;
     }
 
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {

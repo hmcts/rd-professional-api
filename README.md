@@ -42,7 +42,6 @@ docker-compose up
 
 application will listen on 8090 when started using the above methods.
 
-
 Alternatively, you can start the application from the current source files using Gradle as follows:
 
 ```

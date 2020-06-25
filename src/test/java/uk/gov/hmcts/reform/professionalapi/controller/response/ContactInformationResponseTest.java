@@ -67,7 +67,7 @@ public class ContactInformationResponseTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
-        assertThat(sut.getDxAddress()).isNull();
+        assertThat(sut.getDxAddress()).isEmpty();
 
     }
 
