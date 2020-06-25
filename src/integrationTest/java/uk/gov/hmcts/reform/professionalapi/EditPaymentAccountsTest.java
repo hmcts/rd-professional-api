@@ -10,14 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
@@ -92,7 +90,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
 
         List paymentAccounts = (List) retrievePaymentAccountsByEmailResponse.get("paymentAccount");
-        assertThat(paymentAccounts).isNull();
+        assertThat(paymentAccounts).hasSize(0);
     }
 
     @Test

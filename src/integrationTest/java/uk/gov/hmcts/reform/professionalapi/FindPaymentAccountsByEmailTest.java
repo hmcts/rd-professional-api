@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguratio
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
-
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrationTest {

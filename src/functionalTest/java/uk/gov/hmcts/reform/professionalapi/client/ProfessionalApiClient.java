@@ -18,11 +18,13 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.google.gson.Gson;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,13 +34,16 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
@@ -60,6 +65,7 @@ public class ProfessionalApiClient {
 
     protected IdamOpenIdClient idamOpenIdClient;
     protected IdamClient idamClient;
+    private Gson gson = new Gson();
 
     public ProfessionalApiClient(
             String professionalApiUrl,
@@ -216,7 +222,7 @@ public class ProfessionalApiClient {
         Jurisdiction jurisdiction = new Jurisdiction();
         jurisdiction.setId("UNKNOWN");
         jurisdictionIds.add(jurisdiction);
-        return  jurisdictionIds;
+        return jurisdictionIds;
     }
 
     public Map<String, Object> createOrganisationWithNoJurisdictionId() {
@@ -238,7 +244,7 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
-    public  NewUserCreationRequest createNewUserRequest() {
+    public NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -253,7 +259,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public  NewUserCreationRequest createNewUserRequest(String email) {
+    public NewUserCreationRequest createNewUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
 
@@ -268,7 +274,7 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public  NewUserCreationRequest createReInviteUserRequest(String email) {
+    public NewUserCreationRequest createReInviteUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -405,10 +411,17 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status, String returnRoles) {
 
-        Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+        // Use the role supplied to generate tokens appropritely
+        RequestSpecification requestSpecification;
+        if (!StringUtils.isBlank(role)) {
+            requestSpecification = getMultipleAuthHeadersWithGivenRole(role);
+        } else {
+            requestSpecification = getMultipleAuthHeadersInternal();
+        }
+        Response response = requestSpecification
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&returnRoles=" + returnRoles)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -485,6 +498,23 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
         return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status, RequestSpecification requestSpecification, String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
     }
 
 
@@ -613,7 +643,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(userProfileUpdatedData)
@@ -644,7 +674,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
@@ -655,20 +685,6 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
 
-        return response.body().as(Map.class);
-
-    }
-
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
-
-        Response response = requestSpecification
-                .body(userProfileUpdatedData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
         return response.body().as(Map.class);
 
     }
@@ -748,6 +764,10 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
     }
 
+    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
+    }
+
     private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {
         return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
@@ -780,5 +800,20 @@ public class ProfessionalApiClient {
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
+    }
+
+    public Object retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification, HttpStatus expectedStatus, String status) {
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/status/" + status)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationMinimalInfoResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
     }
 }

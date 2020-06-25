@@ -29,7 +29,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     public void test_findById() {
         Optional<ProfessionalUser> profUser = professionalUserRepository.findById(professionalUser.getId());
 
-        assertThat(profUser.get()).isEqualTo(professionalUser);
+        assertThat(profUser).contains(professionalUser);
         assertThat(profUser.get().getId()).isEqualTo(professionalUser.getId());
     }
 

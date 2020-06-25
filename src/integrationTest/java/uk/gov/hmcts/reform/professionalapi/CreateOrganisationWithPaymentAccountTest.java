@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
@@ -152,6 +151,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void returns_400_when_a_null_pba_number_is_received() {
+        cleanupTestData();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(null);
 

@@ -35,7 +35,7 @@ public class OrganisationTest {
         assertThat(organisation.getCreated()).isNotNull();
         assertThat(organisation.getContactInformations()).isNotNull();
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisation.getOrganisationIdentifier().length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(organisation.getOrganisationIdentifier()).hasSize(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
     @Test
