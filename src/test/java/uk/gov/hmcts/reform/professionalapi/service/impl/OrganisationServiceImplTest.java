@@ -233,7 +233,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieve_an_organisations_by_status() {
+    public void test_retrieve_an_organisations_by_status() {
         sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
