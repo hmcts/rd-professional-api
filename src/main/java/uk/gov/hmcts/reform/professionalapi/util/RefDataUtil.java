@@ -4,7 +4,10 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 import feign.FeignException;
 import feign.Response;
@@ -335,11 +338,11 @@ public class RefDataUtil {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
 
-            if (ProfessionalApiConstants.STATUS_CODE_204 == response.status()) {
-                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.STATUS_CODE_204, ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-            } else if (ProfessionalApiConstants.ERROR_CODE_500 <= response.status()) {
+            if (STATUS_CODE_204 == response.status()) {
+                deleteOrganisationResponse = new DeleteOrganisationResponse(STATUS_CODE_204, DELETION_SUCCESS_MSG);
+            } else if (ERROR_CODE_500 <= response.status()) {
                 log.error("DeleteUserProfiles service call failed in PRD::" + response.reason());
-                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.ERROR_CODE_500, ERROR_MESSAGE_UP_FAILED);
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ERROR_CODE_500, ERROR_MESSAGE_UP_FAILED);
             }
 
         } catch (FeignException ex) {

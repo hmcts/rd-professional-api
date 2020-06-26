@@ -405,6 +405,7 @@ public class SuperControllerTest {
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
+        verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 }
