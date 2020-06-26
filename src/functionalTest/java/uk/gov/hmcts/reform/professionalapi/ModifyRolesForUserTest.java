@@ -288,7 +288,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //update status to suspended so that while adding roles by ext user will be non active
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, getUserStatusUpdateRequest(IdamStatus.SUSPENDED), orgIdentifier, userId);
         //use external suspended user to add roles should give 403 back
-        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.INTERNAL_SERVER_ERROR, getUserProfileAddRoleRequest(),
                 bearerToken, userId);
     }
 
