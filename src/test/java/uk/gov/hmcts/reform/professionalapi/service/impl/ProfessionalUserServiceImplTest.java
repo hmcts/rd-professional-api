@@ -627,6 +627,8 @@ public class ProfessionalUserServiceImplTest {
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -650,6 +652,8 @@ public class ProfessionalUserServiceImplTest {
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        verify(professionalUserRepository, times(1)).findById(any(UUID.class));
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
