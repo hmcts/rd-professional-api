@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
@@ -15,5 +17,9 @@ public class UserAccountMapTest {
         UserAccountMapId userAccountMapId = new UserAccountMapId();
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
         assertThat(userAccountMap.getUserAccountMapId()).isEqualTo(userAccountMapId);
+
+        UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
+        when(userAccountMapMock.getDefaulted()).thenReturn(true);
+        assertThat(userAccountMapMock.getDefaulted()).isEqualTo(true);
     }
 }

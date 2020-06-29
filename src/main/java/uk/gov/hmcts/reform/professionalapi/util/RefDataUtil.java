@@ -51,7 +51,7 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
+    public static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 

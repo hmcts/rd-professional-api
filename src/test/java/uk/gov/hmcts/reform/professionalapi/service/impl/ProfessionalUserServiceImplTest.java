@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -223,7 +224,10 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+        Response realResponse = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+        Response response = mock(Response.class);
+        when(response.body()).thenReturn(realResponse.body());
+        when(response.status()).thenReturn(realResponse.status());
 
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUser);
@@ -238,6 +242,9 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
+        verify(response, times(1)).body();
+        verify(response, times(2)).status();
+        verify(response, times(1)).close();
     }
 
     //@Test
@@ -594,6 +601,8 @@ public class ProfessionalUserServiceImplTest {
 
     @Test(expected = AccessDeniedException.class)
     public void checkUserStatusIsActiveByUserId_Throws403_WhenNoUserFoundWithGivenId() {
+        when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(null);
+
         professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString());
     }
 

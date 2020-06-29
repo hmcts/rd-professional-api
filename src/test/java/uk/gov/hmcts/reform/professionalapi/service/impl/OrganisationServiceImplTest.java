@@ -73,6 +73,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class OrganisationServiceImplTest {
 
@@ -115,6 +116,7 @@ public class OrganisationServiceImplTest {
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
+    Set<String> paymentAccountList;
 
     @InjectMocks
     private OrganisationServiceImpl sut;
@@ -135,7 +137,7 @@ public class OrganisationServiceImplTest {
         sut.setUserAttributeService(userAttributeServiceMock);
         sut.setPaymentAccountValidator(paymentAccountValidator);
 
-        Set<String> paymentAccountList = new HashSet<>();
+        paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
 
@@ -204,14 +206,58 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void testSavesOrganisationWithInvalidRequest() {
+        Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.save(any(Organisation.class))).thenThrow(ConstraintViolationException.class);
 
-        Assertions.assertThatThrownBy(() -> sut.createOrganisationFrom(organisationCreationRequest))
+        Assertions.assertThatThrownBy(() -> sut.saveOrganisation(organisationMock))
                 .isExactlyInstanceOf(ConstraintViolationException.class);
 
         verify(organisationRepository, times(2)).save(any(Organisation.class));
 
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
+        verify(organisationMock, times(1)).setOrganisationIdentifier(any(String.class));
+    }
+
+    @Test
+    public void test_addPbaAccountToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        sut.addPbaAccountToOrganisation(paymentAccountList, organisationMock);
+
+        verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void test_addSuperUserToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("PROBATE");
+        List<Jurisdiction> jurisdictions = new ArrayList<>();
+        jurisdictions.add(jurisdiction);
+
+        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some-email", jurisdictions);
+
+        sut.addSuperUserToOrganisation(userCreationRequest, organisationMock);
+
+        verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
+    }
+
+    @Test
+    public void test_setNewContactInformationFromRequest(){
+        ContactInformation contactInformationMock = mock(ContactInformation.class);
+        Organisation organisationMock = mock(Organisation.class);
+
+        sut.setNewContactInformationFromRequest(contactInformationMock, contactInformationCreationRequest, organisationMock);
+
+        verify(contactInformationMock, times(1)).setAddressLine1(any(String.class));
+        verify(contactInformationMock, times(1)).setAddressLine2(any(String.class));
+        verify(contactInformationMock, times(1)).setAddressLine3(any(String.class));
+        verify(contactInformationMock, times(1)).setTownCity(any(String.class));
+        verify(contactInformationMock, times(1)).setCounty(any(String.class));
+        verify(contactInformationMock, times(1)).setCountry(any(String.class));
+        verify(contactInformationMock, times(1)).setPostCode(any(String.class));
+        verify(contactInformationMock, times(1)).setOrganisation(any(Organisation.class));
     }
 
     @Test
@@ -223,6 +269,27 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
+
+    @Test
+    public void testUpdatesAnOrganisationVerifySetMethodsAreCalled() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
+
+        OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest, organisationIdentifier);
+
+        assertThat(organisationResponse).isNotNull();
+
+        verify(organisationMock, times(1)).setName((organisationCreationRequest.getName()));
+        verify(organisationMock, times(1)).setStatus((OrganisationStatus.valueOf(organisationCreationRequest.getStatus())));
+        verify(organisationMock, times(1)).setSraId((organisationCreationRequest.getSraId()));
+        verify(organisationMock, times(1)).setCompanyNumber(organisationCreationRequest.getCompanyNumber());
+        verify(organisationMock, times(1)).setSraRegulated(Boolean.parseBoolean(organisationCreationRequest.getSraRegulated()));
+        verify(organisationMock, times(1)).setCompanyUrl((organisationCreationRequest.getCompanyUrl()));
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
+        verify(organisationRepository, times(1)).save(any(Organisation.class));
+    }
+
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrieve_an_organisations_by_status() {
@@ -322,6 +389,21 @@ public class OrganisationServiceImplTest {
 
         assertThat(organisationDetailResponse).isNotNull();
         verify(organisationRepository, times(1)).findByStatus(OrganisationStatus.ACTIVE);
+    }
+
+    @Test
+    public void retrieveAnOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
+        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
+
+        OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
+
+        assertThat(organisationEntityResponse).isNotNull();
+
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(organisationIdentifier);
+        verify(organisationMock, times(2)).getStatus();
+        verify(organisationMock, times(1)).setUsers(anyList());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)

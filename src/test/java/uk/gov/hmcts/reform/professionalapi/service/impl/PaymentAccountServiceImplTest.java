@@ -143,11 +143,15 @@ public class PaymentAccountServiceImplTest {
 
     @Test
     public void deletePaymentAccountsFromOrganisationTest() {
-        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        Organisation organisationMock = mock(Organisation.class);
+        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
 
-        sut.deletePaymentAccountsFromOrganisation(organisation);
+        sut.deletePaymentAccountsFromOrganisation(organisationMock);
 
         verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+        verify(organisationMock, times(1)).getPaymentAccounts();
+        verify(organisationMock, times(1)).setPaymentAccounts(anyList());
     }
 
     @Test

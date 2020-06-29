@@ -63,5 +63,6 @@ public class OrganisationTest {
         organisation.addContactInformation(contactInformation);
 
         assertThat(organisation.getContactInformation()).containsExactly(contactInformation);
+        assertThat(organisation.getContactInformations()).isNotEmpty();
     }
 }

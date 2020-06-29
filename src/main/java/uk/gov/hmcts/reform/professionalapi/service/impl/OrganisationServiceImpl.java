@@ -104,7 +104,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    private Organisation saveOrganisation(Organisation organisation) {
+    public Organisation saveOrganisation(Organisation organisation) {
         Organisation persistedOrganisation = null;
         try {
             persistedOrganisation = organisationRepository.save(organisation);
@@ -128,7 +128,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void addSuperUserToOrganisation(
+    public void addSuperUserToOrganisation(
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
 
@@ -161,14 +161,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (contactInformationCreationRequest != null) {
             contactInformationCreationRequest.forEach(contactInfo -> {
                 ContactInformation newContactInformation = new ContactInformation();
-                newContactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
-                newContactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
-                newContactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
-                newContactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
-                newContactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
-                newContactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
-                newContactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
-                newContactInformation.setOrganisation(organisation);
+                newContactInformation = setNewContactInformationFromRequest(newContactInformation, contactInfo, organisation);
 
                 ContactInformation contactInformation = contactInformationRepository.save(newContactInformation);
 
@@ -176,6 +169,18 @@ public class OrganisationServiceImpl implements OrganisationService {
 
             });
         }
+    }
+
+    public ContactInformation setNewContactInformationFromRequest(ContactInformation contactInformation, ContactInformationCreationRequest contactInfo, Organisation organisation) {
+        contactInformation.setAddressLine1(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine1()));
+        contactInformation.setAddressLine2(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine2()));
+        contactInformation.setAddressLine3(RefDataUtil.removeEmptySpaces(contactInfo.getAddressLine3()));
+        contactInformation.setTownCity(RefDataUtil.removeEmptySpaces(contactInfo.getTownCity()));
+        contactInformation.setCounty(RefDataUtil.removeEmptySpaces(contactInfo.getCounty()));
+        contactInformation.setCountry(RefDataUtil.removeEmptySpaces(contactInfo.getCountry()));
+        contactInformation.setPostCode(RefDataUtil.removeEmptySpaces(contactInfo.getPostCode()));
+        contactInformation.setOrganisation(organisation);
+        return contactInformation;
     }
 
     private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
