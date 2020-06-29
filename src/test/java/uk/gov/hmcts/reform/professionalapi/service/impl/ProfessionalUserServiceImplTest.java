@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -285,11 +287,12 @@ public class ProfessionalUserServiceImplTest {
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+        ResponseEntity<Object> response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
 
-        assertThat(response).isNotNull();
-        assertThat(response.getRoleAdditionResponse()).isNotNull();
-        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
+        ModifyUserRolesResponse modifyUserRolesResponseFromTest = (ModifyUserRolesResponse) response.getBody();
+        assertThat(modifyUserRolesResponseFromTest).isNotNull();
+        assertThat(modifyUserRolesResponseFromTest.getRoleAdditionResponse()).isNotNull();
+        assertThat(modifyUserRolesResponseFromTest.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Request Not Valid");
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
@@ -312,13 +315,15 @@ public class ProfessionalUserServiceImplTest {
         roles.add(roleName2);
         userProfileUpdatedData.setRolesAdd(roles);
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
-
-        assertThat(response).isNotNull();
-        assertThat(response.getRoleAdditionResponse()).isNotNull();
-        assertThat(response.getRoleAdditionResponse().getIdamMessage()).isEqualTo("Internal Server Error");
+        professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(feignExceptionMock, times(1)).status();
+
+        professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(feignExceptionMock, times(1)).status();
     }
 
     @Test
@@ -333,7 +338,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUsersByOrganisationEmptyResultExceptionTest() throws Exception {
+    public void test_findUsersByOrganisationEmptyResultException() throws Exception {
         List<String> ids = new ArrayList<>();
         ids.add(professionalUser.getUserIdentifier());
         List<ProfessionalUser> users = new ArrayList<>();
@@ -553,7 +558,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUserStatusByEmailForPending() throws Exception {
+    public void test_findUserStatusByEmailForPending() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -572,7 +577,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
+    public void test_findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
         organisation.setStatus(OrganisationStatus.PENDING);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -591,7 +596,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
+    public void test_findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -608,7 +613,7 @@ public class ProfessionalUserServiceImplTest {
 
     @SneakyThrows
     @Test(expected = Test.None.class)
-    public void checkUserStatusIsActiveByUserId() {
+    public void test_UserStatusIsActiveByUserId() {
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
 
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
@@ -622,6 +627,8 @@ public class ProfessionalUserServiceImplTest {
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -631,7 +638,7 @@ public class ProfessionalUserServiceImplTest {
 
     @SneakyThrows
     @Test(expected = AccessDeniedException.class)
-    public void checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
+    public void test_checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
         professionalUser.setIdamStatus(IdamStatus.PENDING);
 
         when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));
@@ -645,6 +652,8 @@ public class ProfessionalUserServiceImplTest {
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        verify(professionalUserRepository, times(1)).findById(any(UUID.class));
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     private RoleAdditionResponse createAddRoleResponse(HttpStatus status, String message) {
@@ -661,5 +670,34 @@ public class ProfessionalUserServiceImplTest {
         List<RoleDeletionResponse> deleteRoleResponses = new ArrayList<>();
         deleteRoleResponses.add(deleteRoleResponse);
         return deleteRoleResponses;
+    }
+
+    @Test
+    public void test_modify_user_roles_feign_error_with_no_status() throws Exception {
+
+        when(feignExceptionMock.status()).thenReturn(-1);
+        callModifyRolesForUser(HttpStatus.INTERNAL_SERVER_ERROR);
+        verify(feignExceptionMock, times(1)).status();
+
+    }
+
+    @Test
+    public void test_modify_user_roles_feign_error_with_no_400_status() throws Exception {
+
+        when(feignExceptionMock.status()).thenReturn(400);
+        callModifyRolesForUser(HttpStatus.BAD_REQUEST);
+        verify(feignExceptionMock, times(2)).status();
+
+    }
+
+    public void callModifyRolesForUser(HttpStatus status) {
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenThrow(feignExceptionMock);
+
+        Throwable thrown = catchThrowable(() ->  professionalUserService.modifyRolesForUser(new UserProfileUpdatedData(), UUID.randomUUID().toString(), Optional.of("")));
+        assertThat(thrown)
+                .isInstanceOf(ExternalApiException.class)
+                .hasMessageContaining(ERROR_MESSAGE_UP_FAILED);
+        assertThat(((ExternalApiException) thrown).getHttpStatus()).isEqualTo(status);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 }

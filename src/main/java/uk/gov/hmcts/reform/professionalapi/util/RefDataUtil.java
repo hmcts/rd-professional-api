@@ -4,6 +4,10 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 import feign.FeignException;
 import feign.Response;
@@ -42,7 +46,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -52,13 +55,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 @Slf4j
 public class RefDataUtil {
 
-    private RefDataUtil() {
-    }
+    private RefDataUtil() {}
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
-
-    private static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -122,7 +122,7 @@ public class RefDataUtil {
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
         return user;
@@ -146,7 +146,7 @@ public class RefDataUtil {
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
         } catch (FeignException ex) {
 
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
     }
@@ -307,20 +307,6 @@ public class RefDataUtil {
         return FALSE.equals(returnRoles) ? FALSE : TRUE;
     }
 
-    public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        boolean isFailureFromUp = response.status() > 300;
-        Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
-        if (isFailureFromUp) {
-            ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
-            modifyUserRolesResponse.setErrorResponse(errorResponse);
-        } else {
-            modifyUserRolesResponse = (ModifyUserRolesResponse) responseEntity.getBody();
-        }
-        return modifyUserRolesResponse;
-    }
-
     public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
 
         NewUserResponse newUserResponse;
@@ -340,7 +326,7 @@ public class RefDataUtil {
 
         } catch (FeignException ex) {
             log.error("Error while invoking UserProfileByEmail service call", ex);
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
         return newUserResponse;
@@ -352,16 +338,16 @@ public class RefDataUtil {
         DeleteOrganisationResponse deleteOrganisationResponse = null;
         try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
 
-            if (ProfessionalApiConstants.STATUS_CODE_204 == response.status()) {
-                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.STATUS_CODE_204, ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-            } else if (ProfessionalApiConstants.ERROR_CODE_500 <= response.status()) {
+            if (STATUS_CODE_204 == response.status()) {
+                deleteOrganisationResponse = new DeleteOrganisationResponse(STATUS_CODE_204, DELETION_SUCCESS_MSG);
+            } else if (ERROR_CODE_500 <= response.status()) {
                 log.error("DeleteUserProfiles service call failed in PRD::" + response.reason());
-                deleteOrganisationResponse = new DeleteOrganisationResponse(ProfessionalApiConstants.ERROR_CODE_500, UP_SERVICE_MSG);
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ERROR_CODE_500, ERROR_MESSAGE_UP_FAILED);
             }
 
         } catch (FeignException ex) {
             log.error("DeleteUserProfiles service call failed in PRD:: " + ex);
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
 
         }
         return deleteOrganisationResponse;

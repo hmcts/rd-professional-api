@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -213,19 +214,6 @@ public class SuperControllerTest {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
-    }
-
-    @Test
-    public void testModifyRolesForExistingUserOfOrganisation() {
-        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
-
-        String userId = UUID.randomUUID().toString();
-        ResponseEntity<ModifyUserRolesResponse> actualData = superController.modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of("EXUI"));
-
-        assertThat(actualData).isNotNull();
-        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 
     @Test(expected = HttpClientErrorException.class)
@@ -395,5 +383,29 @@ public class SuperControllerTest {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
+    }
+
+    @Test
+    public void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamMessage("some nessage");
+        roleAdditionResponse.setIdamStatusCode("200");
+        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(modifyUserRolesResponse);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
+
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
+        when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
+
+        String userId = UUID.randomUUID().toString();
+        ResponseEntity<Object> actualData = superController.modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of("EXUI"));
+
+        assertThat(actualData).isNotNull();
+        assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
+        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 }

@@ -56,7 +56,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
@@ -383,14 +382,11 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected ResponseEntity<ModifyUserRolesResponse> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
+    protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        ModifyUserRolesResponse rolesResponse = professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(rolesResponse);
+        return  professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public void checkUserAlreadyExist(String userEmail) {

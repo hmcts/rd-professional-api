@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.google.gson.Gson;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -65,7 +64,6 @@ public class ProfessionalApiClient {
 
     protected IdamOpenIdClient idamOpenIdClient;
     protected IdamClient idamClient;
-    private Gson gson = new Gson();
 
     public ProfessionalApiClient(
             String professionalApiUrl,
