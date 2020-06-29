@@ -73,7 +73,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
-import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class OrganisationServiceImplTest {
 
@@ -244,7 +243,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void test_setNewContactInformationFromRequest(){
+    public void test_setNewContactInformationFromRequest() {
         ContactInformation contactInformationMock = mock(ContactInformation.class);
         Organisation organisationMock = mock(Organisation.class);
 
@@ -349,7 +348,7 @@ public class OrganisationServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),null)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(), null)).body(body, Charset.defaultCharset()).status(200).build());
 
         OrganisationEntityResponse organisationEntityResponse = sut.retrieveOrganisation(organisationIdentifier);
 

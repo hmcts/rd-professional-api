@@ -13,7 +13,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.UP_SERVICE_MSG;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +28,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +41,6 @@ import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -532,8 +529,6 @@ public class RefDataUtilTest {
 
     @Test
     public void test_getMultipleUserProfilesFromUp() throws JsonProcessingException {
-
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = mock(RetrieveUserProfilesRequest.class);
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
         activeOrganisationDetails.put("someId", organisation);
 
@@ -552,7 +547,7 @@ public class RefDataUtilTest {
         when(response.status()).thenReturn(realResponse.status());
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest, "true", activeOrganisationDetails);
+        List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
         assertThat(orgResponse).isNotNull();
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
@@ -563,8 +558,6 @@ public class RefDataUtilTest {
 
     @Test
     public void test_getMultipleUserProfilesFromUp_ResponseStatusIs300() throws JsonProcessingException {
-
-        RetrieveUserProfilesRequest retrieveUserProfilesRequest = mock(RetrieveUserProfilesRequest.class);
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
         activeOrganisationDetails.put("someId", organisation);
 
@@ -580,7 +573,7 @@ public class RefDataUtilTest {
         Response response = Response.builder().status(300).reason("").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest, "true", activeOrganisationDetails);
+        List<Organisation> orgResponse = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, mock(RetrieveUserProfilesRequest.class), "true", activeOrganisationDetails);
         assertThat(orgResponse).isNotNull();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
@@ -661,7 +654,7 @@ public class RefDataUtilTest {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
-        String body = "{"+"}";
+        String body = "{" + "}";
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
         when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenReturn(response);
