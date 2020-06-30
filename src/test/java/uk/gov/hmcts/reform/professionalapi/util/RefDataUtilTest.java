@@ -292,6 +292,11 @@ public class RefDataUtilTest {
 
         assertThat(httpHeaders.containsKey("fakeHeader")).isTrue();
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+
+        verify(pageMock, times(1)).getTotalElements();
+        verify(pageMock, times(1)).getTotalPages();
+        verify(pageableMock, times(1)).getPageNumber();
+        verify(pageableMock, times(1)).getPageSize();
     }
 
     @Test
@@ -307,6 +312,11 @@ public class RefDataUtilTest {
         HttpHeaders httpHeaders = RefDataUtil.generateResponseEntityWithPaginationHeader(pageableMock, pageMock, null);
 
         assertThat(httpHeaders.containsKey("paginationInfo")).isTrue();
+
+        verify(pageMock, times(1)).getTotalElements();
+        verify(pageMock, times(1)).getTotalPages();
+        verify(pageableMock, times(1)).getPageNumber();
+        verify(pageableMock, times(1)).getPageSize();
     }
 
     @Test
@@ -471,10 +481,10 @@ public class RefDataUtilTest {
         ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
-        Organisation organisationRes = (Organisation) response.get("1");
+        Organisation organisationRes = response.get("1");
         assertEquals(organisation, organisationRes);
 
-        SuperUser item = ((SuperUser) users.get(0));
+        SuperUser item = users.get(0);
         assertNull(item.getId());
         assertEquals("fName", item.getFirstName());
         assertEquals("lName", item.getLastName());

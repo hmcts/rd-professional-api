@@ -137,14 +137,49 @@ public class JurisdictionServiceImplTest {
         verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
     }
 
+    @Test
+    public void should_throw_error_when_ccd_returns_300() {
+        response = response.toBuilder().status(300).build();
+        Response responseMock = mock(Response.class);
+
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(responseMock.status()).thenReturn(response.status());
+        when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(responseMock);
+
+        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+
+        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
+        verify(responseMock, times(1)).close();
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void should_throw_error_when_ccd_returns_500() {
+        FeignException feignException = mock(FeignException.class);
+        when(feignException.status()).thenReturn(500);
+
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenThrow(feignException);
+
+        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_error_when_ccd_returns_0() {
+        FeignException feignException = mock(FeignException.class);
+        when(feignException.status()).thenReturn(0);
+
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenThrow(feignException);
+
+        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
+    }
+
     @Test(expected = ExternalApiException.class)
     public void should_throw_error_when_ccd_returns_null_response() {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request)).thenReturn(null);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
-
-        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
     }
 
     @Test(expected = Test.None.class)

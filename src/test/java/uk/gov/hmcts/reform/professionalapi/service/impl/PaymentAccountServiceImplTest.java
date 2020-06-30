@@ -144,6 +144,7 @@ public class PaymentAccountServiceImplTest {
     @Test
     public void deletePaymentAccountsFromOrganisationTest() {
         Organisation organisationMock = mock(Organisation.class);
+
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
 
