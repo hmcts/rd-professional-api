@@ -566,18 +566,13 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
+    public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
-
-        assertThat(status).isNull();
-        assertThat(status.getStatusCode()).isEqualTo(500);
-        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
     }
 
     @SneakyThrows

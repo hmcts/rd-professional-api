@@ -12,7 +12,7 @@ public class UserAccountMapTest {
     public void creates_user_account_map_correctly() {
         UserAccountMap noOrgUserAccountMap = new UserAccountMap();
         assertThat(noOrgUserAccountMap).isNotNull();
-        assertThat(noOrgUserAccountMap.getDefaulted()).isEqualTo(false);
+        assertThat(noOrgUserAccountMap.getDefaulted()).isFalse();
 
         UserAccountMapId userAccountMapId = new UserAccountMapId();
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
@@ -20,6 +20,6 @@ public class UserAccountMapTest {
 
         UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
         when(userAccountMapMock.getDefaulted()).thenReturn(true);
-        assertThat(userAccountMapMock.getDefaulted()).isEqualTo(true);
+        assertThat(userAccountMapMock.getDefaulted()).isTrue();
     }
 }

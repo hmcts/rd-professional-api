@@ -217,7 +217,7 @@ public class RefDataUtil {
 
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
 
@@ -283,8 +283,8 @@ public class RefDataUtil {
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
-        Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+        Object clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
+        ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
         if (isFailureFromUp) {
             ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
             modifyUserRolesResponse.setErrorResponse(errorResponse);
@@ -299,8 +299,8 @@ public class RefDataUtil {
         NewUserResponse newUserResponse;
         try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() == 200) {
 

@@ -98,7 +98,7 @@ public class RefDataUtilTest {
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
         assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isGreaterThan(0);
+        assertThat(paymentAccounts.size()).isPositive();
     }
 
     @Test
@@ -120,7 +120,7 @@ public class RefDataUtilTest {
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
         assertThat(paymentAccounts).isNotNull();
-        assertThat(paymentAccounts.size()).isEqualTo(0);
+        assertThat(paymentAccounts.size()).isZero();
     }
 
     @Test
@@ -133,7 +133,7 @@ public class RefDataUtilTest {
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountFromUserMap(userMapPaymentAccount, paymentAccountsEntity);
 
-        assertThat(paymentAccounts.size()).isGreaterThan(0);
+        assertThat(paymentAccounts.size()).isPositive();
     }
 
     @Test
@@ -143,23 +143,21 @@ public class RefDataUtilTest {
 
         if (!paymentAccountsEntity.isEmpty()) {
             List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccount(paymentAccountsEntity);
-            assertThat(paymentAccounts.size()).isGreaterThan(0);
+            assertThat(paymentAccounts.size()).isPositive();
         }
     }
 
     @Test
     public void removeEmptyWhiteSpacesTest() {
         assertThat(RefDataUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
-        assertThat(RefDataUtil.removeEmptySpaces(null)).isEqualTo(null);
+        assertThat(RefDataUtil.removeEmptySpaces(null)).isNull();
         assertThat(RefDataUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
-
     }
 
     @Test
     public void removeAllWhiteSpacesTest() {
         assertThat(RefDataUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
-        assertThat(RefDataUtil.removeAllSpaces(null)).isEqualTo(null);
-
+        assertThat(RefDataUtil.removeAllSpaces(null)).isNull();
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -200,11 +198,11 @@ public class RefDataUtilTest {
         assertThat(responseUser.getEmailAddress()).isEqualTo(profile.getEmail());
         assertThat(responseUser.getFirstName()).isEqualTo(profile.getFirstName());
         assertThat(responseUser.getLastName()).isEqualTo(profile.getLastName());
-        assertThat(responseUser.getIdamStatus()).isEqualTo(null);
-        assertThat(responseUser.getUserIdentifier()).isEqualTo(null);
+        assertThat(responseUser.getIdamStatus()).isNull();
+        assertThat(responseUser.getUserIdentifier()).isNull();
         assertThat(responseUser.getRoles()).isNull();
-        assertThat(responseUser.getIdamStatusCode()).isEqualTo(null);
-        assertThat(responseUser.getIdamMessage()).isEqualTo(null);
+        assertThat(responseUser.getIdamStatusCode()).isNull();
+        assertThat(responseUser.getIdamMessage()).isNull();
     }
 
     @Test
@@ -224,7 +222,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
@@ -251,7 +249,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.BAD_REQUEST);
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
@@ -270,7 +268,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
 
         RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
     }
@@ -339,7 +337,7 @@ public class RefDataUtilTest {
         String showDeleted = "True";
         String response = RefDataUtil.getShowDeletedValue(showDeleted);
 
-        assertThat(response.equals("true")).isTrue();
+        assertThat(response).isEqualTo("true");
     }
 
     @Test
@@ -347,7 +345,7 @@ public class RefDataUtilTest {
         String showDeleted = "false";
         String response = RefDataUtil.getShowDeletedValue(showDeleted);
 
-        assertThat(response.equals("false")).isTrue();
+        assertThat(response).isEqualTo("false");
     }
 
     @Test
