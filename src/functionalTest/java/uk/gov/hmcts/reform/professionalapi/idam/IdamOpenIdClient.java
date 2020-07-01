@@ -70,6 +70,9 @@ public class IdamOpenIdClient {
                 .post("/testing-support/accounts")
                 .andReturn();
 
+
+        log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         return userEmail;
@@ -80,13 +83,6 @@ public class IdamOpenIdClient {
         return getOpenIdToken(userEmail);
     }
 
-    /*
-     This is customized method to generate the token based on passed role
-     */
-    public String getOpenIdTokenWithGivenRole(String role) {
-        String userEmail = createUser(role);
-        return getOpenIdToken(userEmail);
-    }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);
@@ -113,6 +109,8 @@ public class IdamOpenIdClient {
                 .post("/o/token")
                 .andReturn();
 
+        log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
+
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
         IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
@@ -121,7 +119,7 @@ public class IdamOpenIdClient {
     }
 
 
-    public String nextUserEmail() {
+    private String nextUserEmail() {
         return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
     }
 

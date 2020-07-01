@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -151,7 +150,6 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void returns_400_when_a_null_pba_number_is_received() {
-        cleanupTestData();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(null);
 

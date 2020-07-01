@@ -42,6 +42,7 @@ docker-compose up
 
 application will listen on 8090 when started using the above methods.
 
+
 Alternatively, you can start the application from the current source files using Gradle as follows:
 
 ```
@@ -153,6 +154,7 @@ To publish against remote broker:
 
 Turn on VPN and verify on url `https://pact-broker.platform.hmcts.net/`
 The pact contract(s) should be published
+
 
 To publish against local broker:
 Uncomment out the line found in the build.gradle:

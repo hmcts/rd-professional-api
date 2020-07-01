@@ -83,8 +83,15 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
 
         //validate overall response should be 200 always
         Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body")).isEqualTo("{\"errorMessage\":\"400\",\"errorDescription\":\"BAD REQUEST\",\"timeStamp\":\"23:10\"}");
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+
+        //internal response for update status should be 400
+        Map<String, Object> updateResponse = ((Map<String, Object>) response.get("errorResponse"));
+        assertThat(updateResponse.get("errorMessage")).isEqualTo("400");
+        assertThat(updateResponse.get("errorDescription")).isEqualTo("BAD REQUEST");
+        assertThat(updateResponse.get("timeStamp")).isEqualTo("23:10");
+
     }
 
     private UserProfileUpdatedData createModifyUserProfileData() {

@@ -22,6 +22,7 @@ plugins {
     id 'au.com.dius.pact' version '4.0.7'
 }
 
+
 apply plugin: 'java'
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'project-report'
@@ -49,7 +50,6 @@ group = 'uk.gov.hmcts.reform.refdata'
 version = '0.0.1'
 
 sourceCompatibility = 11
-targetCompatibility = 11
 
 jacocoTestCoverageVerification {
     violationRules {

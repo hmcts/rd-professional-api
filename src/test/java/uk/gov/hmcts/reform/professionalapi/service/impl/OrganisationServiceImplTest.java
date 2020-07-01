@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,10 +36,7 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -47,9 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -66,7 +61,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
@@ -121,7 +115,6 @@ public class OrganisationServiceImplTest {
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<UserAttribute> userAttributes;
     private List<String> jurisdictionIds;
-    private DeleteOrganisationResponse deleteOrganisationResponse;
 
     @InjectMocks
     private OrganisationServiceImpl sut;
@@ -176,8 +169,6 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", "sra-id", "false", "number01", "company-url", superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
-        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
-
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
         when(contactInformationRepositoryMock.save(any(ContactInformation.class))).thenReturn(contactInformation);
         when(professionalUserRepositoryMock.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
@@ -214,6 +205,7 @@ public class OrganisationServiceImplTest {
     @Test
     public void testSavesOrganisationWithInvalidRequest() {
         when(organisationRepository.save(any(Organisation.class))).thenThrow(ConstraintViolationException.class);
+
         Assertions.assertThatThrownBy(() -> sut.createOrganisationFrom(organisationCreationRequest))
                 .isExactlyInstanceOf(ConstraintViolationException.class);
 
@@ -233,8 +225,12 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+    public void retrieve_an_organisations_by_status() {
+        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+
+        assertThat(organisationDetailResponse).isEqualTo(404);
+
+        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
     }
 
 
@@ -460,6 +456,13 @@ public class OrganisationServiceImplTest {
         verify(userAttributeServiceMock, times(1)).addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes), eq(jurisdictionIds));
     }
 
+    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
+        final int orgIdLength = 7;
+        assertThat(organisationResponse).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
+    }
+
     @Test
     public void testAddContactInformationToOrganisation() throws NoSuchMethodException, IllegalAccessException {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
@@ -476,217 +479,4 @@ public class OrganisationServiceImplTest {
         assertEquals("country", contactInformationCreationRequests.get(0).getCountry());
         assertEquals("postCode", contactInformationCreationRequests.get(0).getPostCode());
     }
-
-    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
-        final int orgIdLength = 7;
-        assertThat(organisationResponse).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier()).hasSize(orgIdLength);
-    }
-
-    @Test
-    public void testDeletePendingOrganisation() {
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.PENDING);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-        verify(organisationRepository, times(1)).deleteById(any());
-    }
-
-    @Test
-    public void testDeleteActiveOrganisationWithOrgAdminPending() throws Exception {
-
-
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setIdamStatus("PENDING");
-        ObjectMapper mapper = new ObjectMapper();
-
-
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
-        deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-        ObjectMapper mapperOne = new ObjectMapper();
-        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
-        String body = mapper.writeValueAsString(newUserResponse);
-
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
-        verify(organisationRepository, times(1)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
-    }
-
-    @Test
-    public void testDeleteActiveOrganisationWithOrgAdminActiveGives400WithMessage() throws Exception {
-
-
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setIdamStatus("ACTIVE");
-        ObjectMapper mapper = new ObjectMapper();
-
-
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_400);
-        deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
-        ObjectMapper mapperOne = new ObjectMapper();
-        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
-        String body = mapper.writeValueAsString(newUserResponse);
-
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
-        verify(organisationRepository, times(0)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-    }
-
-    @Test
-    public void testDeleteActiveOrganisationWithMultiUsersGives400WithMessage() throws Exception {
-
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(2);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
-        verify(organisationRepository, times(0)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-    }
-
-    @Test
-    public void testDeleteActiveOrganisationGives500WithMessageWhenUpDown() throws Exception {
-
-
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setIdamStatus("PENDING");
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(newUserResponse);
-
-        ObjectMapper mapperOne = new ObjectMapper();
-        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
-
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(500).build());
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
-        verify(organisationRepository, times(0)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
-    }
-
-    @Test
-    public void testDeleteActiveOrganisationWithNoUserProfileinUpGives500WithMessage() throws Exception {
-
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setIdamStatus(" ");
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(newUserResponse);
-
-        ObjectMapper mapperOne = new ObjectMapper();
-        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
-
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(404).build());
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_500_ADMIN_NOT_FOUND_UP);
-        verify(organisationRepository, times(0)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
-    }
-
-    @Test(expected = ExternalApiException.class)
-    public void testDeleteActiveOrganisationThrowsExceptionWhenUpServiceDown() throws Exception {
-
-
-        NewUserResponse newUserResponse = new NewUserResponse();
-        newUserResponse.setIdamStatus("PENDING");
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(newUserResponse);
-
-        // DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        ObjectMapper mapperOne = new ObjectMapper();
-        String deleteBody = mapperOne.writeValueAsString(newUserResponse);
-
-        when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        when(userProfileFeignClient.deleteUserProfile(any())).thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "Error while invoking UP"));
-
-        Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
-
-        assertThat(deleteOrganisationResponse).isNotNull();
-        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
-        assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
-        verify(organisationRepository, times(0)).deleteById(any());
-        verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
-        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
-    }
-
-    private Organisation getDeleteOrganisation(OrganisationStatus status) {
-
-        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
-        superUser.setUserIdentifier(UUID.randomUUID().toString());
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
-
-        organisation.setStatus(status);
-        organisation.setUsers(users);
-
-        contactInformation.setAddressLine1("addressLine1");
-
-        List<DxAddress> dxAddresses = new ArrayList<>();
-        List<ContactInformation> contactInformations = new ArrayList<>();
-
-        dxAddresses.add(dxAddress);
-        contactInformation.setDxAddresses(dxAddresses);
-        contactInformations.add(contactInformation);
-        organisation.setContactInformations(contactInformations);
-
-        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE");
-        UserAttribute userAttribute = new UserAttribute(professionalUser,prdEnum);
-        userAttributes.add(userAttribute);
-        professionalUser.setUserAttributes(userAttributes);
-
-        UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
-        UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
-        userAccountMaps.add(userAccountMap);
-        paymentAccount.setUserAccountMap(userAccountMaps);
-        organisation.addPaymentAccount(paymentAccount);
-        return organisation;
-    }
-
 }

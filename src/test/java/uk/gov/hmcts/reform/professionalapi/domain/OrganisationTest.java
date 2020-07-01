@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class OrganisationTest {
         assertThat(organisation.getCreated()).isNotNull();
         assertThat(organisation.getContactInformations()).isNotNull();
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisation.getOrganisationIdentifier()).hasSize(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(organisation.getOrganisationIdentifier().length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
     }
 
     @Test

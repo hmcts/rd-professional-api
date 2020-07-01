@@ -4,6 +4,7 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
+
 def type = "java"
 def product = "rd"
 def component = "professional-api"
@@ -16,10 +17,10 @@ def secrets = [
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     [$class     : 'AzureKeyVaultSecret',
-        secretType : 'Secret',
-        name       : secretName,
-        version    : '',
-        envVariable: envVar
+     secretType : 'Secret',
+     name       : secretName,
+     version    : '',
+     envVariable: envVar
     ]
 }
 
@@ -29,7 +30,7 @@ def vaultOverrides = [
 ]
 
 withPipeline(type, product, component) {
-
+  
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
@@ -57,6 +58,7 @@ withPipeline(type, product, component) {
     }
 
     enablePactAs([
-        AppPipelineDsl.PactRoles.CONSUMER
+            AppPipelineDsl.PactRoles.CONSUMER
     ])
+
 }

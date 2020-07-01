@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -27,7 +28,7 @@ public interface ProfessionalUserService {
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
-    ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin);
+    ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin);
 
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 

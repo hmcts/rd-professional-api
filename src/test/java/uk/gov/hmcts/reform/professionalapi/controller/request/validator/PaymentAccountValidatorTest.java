@@ -37,34 +37,19 @@ public class PaymentAccountValidatorTest {
 
     @Test
     public void testPbaNumberIsInValid() {
-        Set<String> pbaNumber = new HashSet<>();
-        pbaNumber.add("abc1234567");
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(singleton("abc1234567")))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
-        pbaNumber.clear();
-        pbaNumber.add("pba123456");
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(singleton("pba123456")))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
-        pbaNumber.clear();
-        pbaNumber.add("1234");
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(singleton("1234")))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
-        pbaNumber.clear();
-        pbaNumber.add("wewdfd");
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(singleton("wewdfd")))
                 .isExactlyInstanceOf(InvalidRequest.class);
 
-        pbaNumber.clear();
-        pbaNumber.add(null);
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
+        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(singleton(null)))
                 .isExactlyInstanceOf(InvalidRequest.class);
     }
 

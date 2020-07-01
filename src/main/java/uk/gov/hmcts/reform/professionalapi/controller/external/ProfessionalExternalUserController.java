@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -30,8 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
-import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -52,7 +50,7 @@ public class ProfessionalExternalUserController extends SuperController {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if returnRoles is False",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -75,10 +73,6 @@ public class ProfessionalExternalUserController extends SuperController {
                     message = "An invalid Organisation Identifier was provided"
             ),
             @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
                     code = 403,
                     message = "Forbidden Error: Access denied"
             ),
@@ -95,28 +89,27 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "pui-caa", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
+    @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager", "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor", "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                   @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                   @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
-                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
                                                   @RequestParam(value = "page", required = false) Integer page,
-                                                  @RequestParam(value = "size", required = false) Integer size,
-                                                  @ApiParam(hidden = true) @UserId String userId) {
-
-        // verify the invited user status active or not?
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+                                                  @RequestParam(value = "size", required = false) Integer size) {
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
-
+        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        boolean isRolePuiUserManager  = organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), "pui-user-manager");
         ResponseEntity profUsersEntityResponse;
 
-        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles(), PUI_USER_MANAGER)) {
-            status = StringUtils.isEmpty(status) ? ACTIVE : status;
+        if (!isRolePuiUserManager) {
+            if (StringUtils.isEmpty(status)) {
+                status = "Active";
+            }
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
+
         return profUsersEntityResponse;
     }
 
@@ -216,14 +209,14 @@ public class ProfessionalExternalUserController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("pui-user-manager")
-    public ResponseEntity<Object> modifyRolesForExistingUserOfExternalOrganisation(
+    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfExternalOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @ApiParam(hidden = true) @OrgId String orgId,
             @PathVariable("userId") String userId,
             @RequestParam(name = "origin", required = false, defaultValue = "EXUI") Optional<String> origin
     ) {
 
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+        //Received request to update user roles of an organisation
         return modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, origin);
 
     }

@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -113,13 +108,17 @@ public class OrganisationCreationRequestValidator {
     private void requestPaymentAccount(Set<String> paymentAccounts) {
 
         if (paymentAccounts != null) {
-            paymentAccounts.stream()
-                    .forEach(paymentAccount -> {
-                        if (isEmptyValue(paymentAccount)) {
-                            throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
-                        }
-                    });
+
+            for (String paymentAccount : paymentAccounts) {
+
+                if (isEmptyValue(paymentAccount)) {
+
+                    throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
+                }
+
+            }
         }
+
     }
 
     public void requestValues(String... values) {
@@ -135,21 +134,20 @@ public class OrganisationCreationRequestValidator {
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
         if (null != contactInformations) {
 
-            contactInformations.stream()
-                    .forEach(contactInformation -> {
-                        if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
-                                || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
-                                || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
+            for (ContactInformationCreationRequest contactInformation : contactInformations) {
 
-                            throw new InvalidRequest("Empty contactInformation value");
-                        }
-                        if (null != contactInformation.getDxAddress()) {
-                            contactInformation.getDxAddress().stream().forEach(dxAddress -> {
-                                isDxAddressValid(dxAddress);
-                            });
-                        }
-                    });
+                if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
+                        || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
+                        || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
 
+                    throw new InvalidRequest("Empty contactInformation value");
+                }
+                if (null != contactInformation.getDxAddress()) {
+                    for (DxAddressCreationRequest dxAddress : contactInformation.getDxAddress()) {
+                        isDxAddressValid(dxAddress);
+                    }
+                }
+            }
         }
     }
 
@@ -163,21 +161,12 @@ public class OrganisationCreationRequestValidator {
     }
 
     private void isDxAddressValid(DxAddressCreationRequest dxAddress) {
-        if (StringUtils.isBlank(dxAddress.getDxNumber()) || StringUtils.isBlank(dxAddress.getDxExchange())) {
+        if (StringUtils.isEmpty(dxAddress.getDxNumber()) || StringUtils.isEmpty(dxAddress.getDxExchange())) {
             throw new InvalidRequest("DX Number or DX Exchange cannot be empty");
         } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
             throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
         } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
             throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
-        }
-    }
-
-    public static void isInputOrganisationStatusValid(String organisationStatus, String allowedStatus) {
-        List<String> validStatusList = asList(allowedStatus.split(","));
-        String orgStatus = removeAllSpaces(organisationStatus);
-        if (isBlank(orgStatus) ||  !validStatusList.contains(orgStatus.toUpperCase())) {
-            log.error(ERROR_MESSAGE_INVALID_STATUS_PASSED);
-            throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
         }
     }
 

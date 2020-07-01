@@ -34,8 +34,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -110,7 +108,7 @@ public class ProfessionalExternalUserControllerTest {
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", true, null, null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -146,63 +144,13 @@ public class ProfessionalExternalUserControllerTest {
         doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
         doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
 
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", true, null, null, null);
+        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", null, null);
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
         verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", true, "Active");
-    }
-
-    @Test
-    public void testFindUsersByOrganisationWithoutRoles() throws Exception {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
-
-        List<SuperUser> users = new ArrayList<>();
-        users.add(professionalUser.toSuperUser());
-        organisation.setUsers(users);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        List<String> authorities = new ArrayList<>();
-        authorities.add(TestConstants.PUI_CASE_MANAGER);
-
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
-        when(userInfoMock.getRoles()).thenReturn(authorities);
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
-        userProfiles.add(new ProfessionalUsersResponse(professionalUser));
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
-        professionalUsersEntityResponse.setUserProfiles(userProfiles);
-
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
-        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(responseEntity.getBody()).thenReturn(professionalUsersEntityResponse);
-
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class), any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class), any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any(String.class));
-
-        ResponseEntity<?> actual = professionalExternalUserController.findUsersByOrganisation(organisation.getOrganisationIdentifier(), "true", "", false, null, null, null);
-        assertThat(actual).isNotNull();
-        assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
-
-        List<ProfessionalUsersResponse> usersResponse = ((ProfessionalUsersEntityResponse) actual.getBody()).getUserProfiles();
-        assertThat(usersResponse.get(0).getRoles()).isNull();
-
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(organisation, "true", false, "Active");
-        verify(professionalUserServiceMock, times(1)).findProfessionalUsersByOrganisation(any(Organisation.class), any(String.class), any(Boolean.class), any(String.class));
-        verify(responseEntity, times(1)).getStatusCode();
-        verify(responseEntity, times(1)).getBody();
     }
 
     @Test
@@ -268,7 +216,7 @@ public class ProfessionalExternalUserControllerTest {
         Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
         assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
         verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
     }
 }

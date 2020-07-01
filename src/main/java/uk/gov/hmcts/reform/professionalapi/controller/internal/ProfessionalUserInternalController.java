@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,7 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if returnRoles is False",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -87,12 +86,10 @@ public class ProfessionalUserInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                      @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
                                                       @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size
-    ) {
+                                                      @RequestParam(value = "size", required = false) Integer size) {
 
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, EMPTY, page, size);
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, true, "", page, size);
     }
 
     @ApiOperation(
@@ -181,7 +178,7 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured("prd-admin")
-    public ResponseEntity<Object> modifyRolesForExistingUserOfOrganisation(
+    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,
             @PathVariable("userId") String userId,

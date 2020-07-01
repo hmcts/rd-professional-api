@@ -7,11 +7,12 @@ import java.lang.reflect.Modifier;
 
 import org.junit.Test;
 
+
 public class ProfessionalApiGeneratorConstantsTest {
 
     @Test
     public void privateConstructorTest() throws Exception {
-        Constructor<ProfessionalApiConstants> constructor = ProfessionalApiConstants.class.getDeclaredConstructor();
+        Constructor<ProfessionalApiGeneratorConstants> constructor = ProfessionalApiGeneratorConstants.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance((Object[]) null);

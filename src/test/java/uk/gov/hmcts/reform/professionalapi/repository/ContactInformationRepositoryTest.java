@@ -29,7 +29,7 @@ public class ContactInformationRepositoryTest extends BaseRepository {
     public void findByIdTest() {
         Optional<ContactInformation> contactInfo = contactInformationRepository.findById(contactInformation.getId());
 
-        assertThat(contactInfo).contains(contactInformation);
+        assertThat(contactInfo.get()).isEqualTo(contactInformation);
         assertThat(contactInfo.get().getAddressLine1()).isEqualTo(contactInformation.getAddressLine1());
     }
 }

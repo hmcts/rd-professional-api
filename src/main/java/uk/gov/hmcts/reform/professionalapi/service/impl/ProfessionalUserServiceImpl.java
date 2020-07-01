@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
-import static uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil.toResponseEntity;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.filterUsersByStatus;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
-
 import feign.FeignException;
 import feign.Response;
 
@@ -35,7 +30,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClie
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -49,7 +43,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-
 
 @Service
 @Slf4j
@@ -116,7 +109,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
-        ResponseEntity<Object> responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        ResponseEntity<Object>  responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status);
 
         HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers, responseEntity);
 
@@ -131,36 +124,27 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status);
     }
 
     @SuppressWarnings("unchecked")
-    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status, String organisationIdentifier) {
+    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status) {
         ResponseEntity<Object> responseEntity;
-        Object clazz;
 
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
 
-            if (response.status() > 300) {
-                clazz = ErrorResponse.class;
-            } else {
-                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class : ProfessionalUsersEntityResponseWithoutRoles.class;
-            }
-
+            Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                responseEntity = setOrgIdInGetUserResponse(responseEntity, organisationIdentifier);
-            }
 
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking UP");
         }
 
         if (!StringUtils.isBlank(status)) {
             //Filtering users by status
 
-            Object response = filterUsersByStatus(responseEntity, status);
-            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse = RefDataUtil.filterUsersByStatus(responseEntity, status);
+            responseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
 
         return responseEntity;
@@ -191,12 +175,15 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
+    public ModifyUserRolesResponse modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
+        ModifyUserRolesResponse modifyUserRolesResponse;
+
         try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
-            return toResponseEntity(response, response.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
+            modifyUserRolesResponse = RefDataUtil.decodeResponseFromUp(response);
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status() > 0 ? ex.status() : 500), ERROR_MESSAGE_UP_FAILED);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "Error while invoking modifyRoles API in UP");
         }
+        return modifyUserRolesResponse;
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
@@ -233,7 +220,7 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         }
 
         if (newUserResponse == null || !IdamStatus.ACTIVE.name().equalsIgnoreCase(newUserResponse.getIdamStatus())) {
-            throw new AccessDeniedException("User status must be Active to perform this operation");
+            throw new AccessDeniedException("403 Forbidden: User status must be Active to invite users");
         }
     }
 }
