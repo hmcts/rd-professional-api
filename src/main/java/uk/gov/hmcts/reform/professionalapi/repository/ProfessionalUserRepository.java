@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
-@Repository()
+@Repository
 public interface ProfessionalUserRepository extends JpaRepository<ProfessionalUser, UUID> {
 
     ProfessionalUser findByEmailAddress(String email);

@@ -19,7 +19,6 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void can_update_an_organisation() {
 
-        log.info("Inside can_update_an_organisation:");
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -55,5 +54,15 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
         professionalApiClient.updateOrganisationWithOldBearerToken(orgIdentifierResponse);
+    }
+
+
+    @Test
+    public void can_throw_Unauthorized_Error_code_without_bearertoken_to_update_an_organisation_401() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin,orgIdentifierResponse, HttpStatus.UNAUTHORIZED);
     }
 }

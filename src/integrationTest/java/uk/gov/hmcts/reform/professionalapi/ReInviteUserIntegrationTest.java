@@ -141,10 +141,10 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
             OrganisationCreationRequest organisationCreationRequest1 = someMinimalOrganisationRequest().build();
-            createAndActivateOrganisation(organisationCreationRequest1);
+            createAndActivateOrganisationWithGivenRequest(organisationCreationRequest1);
 
             OrganisationCreationRequest organisationCreationRequest2 = someMinimalOrganisationRequest().build();
-            String org2 = createAndActivateOrganisation(organisationCreationRequest2);
+            String org2 = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest2);
 
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(organisationCreationRequest1.getSuperUser().getEmail(), userRoles);
             Map<String, Object> reInviteUserResponse =

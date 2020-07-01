@@ -12,8 +12,6 @@ import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +32,12 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -79,11 +79,15 @@ public abstract class AuthorizationFunctionalTest {
 
     protected RequestSpecification bearerToken;
 
+    protected IdamOpenIdClient idamOpenIdClient;
+
     @Autowired
     protected TestConfigProperties configProperties;
 
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+
     @Before
-    public void setUp() throws MalformedURLException, UnknownHostException {
+    public void setUp() {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.defaultParser = Parser.JSON;
 
@@ -91,7 +95,7 @@ public abstract class AuthorizationFunctionalTest {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
@@ -118,6 +122,14 @@ public abstract class AuthorizationFunctionalTest {
 
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         return activateOrganisation(response, role);
+    }
+
+    protected String createAndctivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest, String role) {
+        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
+        assertThat(organisationIdentifier).isNotEmpty();
+        professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+        return organisationIdentifier;
     }
 
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
@@ -234,6 +246,24 @@ public abstract class AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         return bearerToken;
+    }
+
+    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
+        return superUser;
+    }
+
+    public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(status.name());
+        return data;
     }
 
 }

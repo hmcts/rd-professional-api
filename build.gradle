@@ -289,6 +289,12 @@ dependencies {
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
 
+    compile (group: 'io.rest-assured', name: 'rest-assured', version: '4.1.2') {
+        exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
+    }
+    compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.3'
+
+
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
