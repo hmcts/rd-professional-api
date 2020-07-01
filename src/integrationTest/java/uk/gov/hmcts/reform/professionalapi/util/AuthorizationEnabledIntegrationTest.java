@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -60,7 +59,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092","OPEN_ID_API_URI:http://0.0.0.0:7000/o"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
 @DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -107,23 +106,20 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
 
-    @Value("${prd.security.roles.hmcts-admin}")
+    @Value("${exui.role.hmcts-admin}")
     protected String hmctsAdmin;
 
-    @Value("${prd.security.roles.pui-user-manager}")
+    @Value("${exui.role.pui-user-manager}")
     protected String puiUserManager;
 
-    @Value("${prd.security.roles.pui-organisation-manager}")
+    @Value("${exui.role.pui-organisation-manager}")
     protected String puiOrgManager;
 
-    @Value("${prd.security.roles.pui-finance-manager}")
+    @Value("${exui.role.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${prd.security.roles.pui-case-manager}")
+    @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
-
-    @Value("${prd.security.roles.pui-caa}")
-    protected String puiCaa;
 
     @Value("${resendInterval}")
     protected String resendInterval;
@@ -138,8 +134,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     private long expiration;
 
     protected static final String ACTIVE = "ACTIVE";
-    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
     public void setUpClient() {
@@ -251,12 +245,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
-    }
-
-    public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
+    public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
@@ -279,9 +268,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public String createAndActivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
-        String orgIdentifier = createOrganisationWithGivenRequest(organisationCreationRequest);
-        updateOrganisationWithGivenRequest(organisationCreationRequest, orgIdentifier, hmctsAdmin, ACTIVE);
+    public String createAndActivateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
+        String orgIdentifier = createOrganisationRequest(organisationCreationRequest);
+        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE, organisationCreationRequest);
         return orgIdentifier;
     }
 
@@ -557,67 +546,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
-    public void deleteUserProfileMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStatus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-
-                    + "  \"statusCode\": \"204\","
-                    + "  \"message\": \"User Profile Deleted Successfully\""
-
-                    + "}";
-            returnHttpStatus = 204;
-        }  else if (status == HttpStatus.BAD_REQUEST) {
-            body = "{"
-
-                    + "  \"statusCode\": \"400\","
-                    + "  \"message\": \"User Profile Delete Request has some problem\""
-
-                + "}";
-        } else if (status == HttpStatus.NOT_FOUND) {
-            body = "{"
-
-                    + "  \"statusCode\": \"404\","
-                    + "  \"message\": \"User Profile Not Found To Delete\""
-
-                + "}";
-        }
-
-        userProfileService.stubFor(
-                delete(urlEqualTo("/v1/userprofile"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withBody(body)
-                                .withStatus(returnHttpStatus)
-                        )
-        );
-
-    }
-
-    public void getUserProfileByEmailWireMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStaus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                    + "  \"idamStatus\": \"PENDING\""
-                    + "}";
-            returnHttpStaus = 200;
-        } else {
-            body = "{"
-                    + "  \"idamStatus\": \" \""
-                    + "}";
-            returnHttpStaus = 500;
-        }
-
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(body)
-                        .withStatus(returnHttpStaus)
-                ));
-
-    }
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override
@@ -694,12 +622,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
-    }
-
-    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest, String organisationIdentifier, String role, String status) {
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
-        organisationUpdateRequest.setStatus(status);
-        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 }
 

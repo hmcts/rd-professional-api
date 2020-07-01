@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
 public class ModifyUserRolesResponseTest {
 
@@ -34,11 +36,15 @@ public class ModifyUserRolesResponseTest {
         List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
         deleteResponses.add(deleteRoleResponse);
 
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses, statusUpdateResponse);
+        ErrorResponse errorResponse = new ErrorResponse("failure", "500", "1200");
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(errorResponse, addRoleResponse, deleteResponses, statusUpdateResponse);
 
         assertThat(modifyUserRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getStatusUpdateResponse().getIdamMessage()).isEqualTo("updateMessage");
         assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
+        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorMessage()).isEqualTo("failure");
+        assertThat(modifyUserRolesResponse.getErrorResponse().getErrorDescription()).isEqualTo("500");
     }
 
     private RoleAdditionResponse addRolesForUser() {

@@ -2,13 +2,8 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -60,8 +54,8 @@ public class OrganisationCreationRequestValidatorTest {
         verify(validator1, times(1)).validate(organisationCreationRequest);
         verify(validator2, times(1)).validate(organisationCreationRequest);
 
-        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isTrue();
-        assertThat(OrganisationCreationRequestValidator.contains("pend")).isFalse();
+        assertThat(OrganisationCreationRequestValidator.contains(OrganisationStatus.PENDING.name())).isEqualTo(true);
+        assertThat(OrganisationCreationRequestValidator.contains("pend")).isEqualTo(false);
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
@@ -88,7 +82,7 @@ public class OrganisationCreationRequestValidatorTest {
             myException = e;
         }
 
-        assertThat(myException).isNull();
+        assertThat(myException).isEqualTo(null);
     }
 
     @Test
@@ -107,7 +101,7 @@ public class OrganisationCreationRequestValidatorTest {
     @Test //Active value should not throw empty exception
     public void isOrganisationActive_Active_Test() {
         Organisation organisation = new Organisation();
-        organisation.setStatus(ACTIVE);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         myException = null;
 
         try {
@@ -115,7 +109,7 @@ public class OrganisationCreationRequestValidatorTest {
         } catch (Exception e) {
             myException = e;
         }
-        assertThat(myException).isNull();
+        assertThat(myException).isEqualTo(null);
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
@@ -217,50 +211,6 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.requestContactInformation(contactList);
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void requestDxAddwithEmptySpaceDxNumberAndDxExchangeInvalidTest() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest(" ", "DxExchange1234567890");
-        List<DxAddressCreationRequest> dxList = new ArrayList<>();
-        dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
-        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
-        contactList.add(contactInfoCreateRequest);
-
-        organisationCreationRequestValidator.requestContactInformation(contactList);
-
-        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", " ");
-        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
-        dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
-        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
-        contactList1.add(contactInfoCreateRequest1);
-
-        organisationCreationRequestValidator.requestContactInformation(contactList);
-
-    }
-
-    @Test(expected = InvalidRequest.class)
-    public void requestDxAddwithNoValueDxExchangeInvalidTest() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("", "DxExchange1234567890");
-        List<DxAddressCreationRequest> dxList = new ArrayList<>();
-        dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
-        List<ContactInformationCreationRequest> contactList = new ArrayList<>();
-        contactList.add(contactInfoCreateRequest);
-
-        organisationCreationRequestValidator.requestContactInformation(contactList);
-
-        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", "");
-        List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
-        dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
-        List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
-        contactList1.add(contactInfoCreateRequest1);
-
-        organisationCreationRequestValidator.requestContactInformation(contactList);
-
-    }
-
     @Test(expected = Test.None.class)
     public void should_validate_valid_email_and_should_not_throw_exception() {
 
@@ -341,37 +291,5 @@ public class OrganisationCreationRequestValidatorTest {
     public void should_validate_company_no_length_and_not_throw_if_length_is_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","", "true", "12345678","",null, new HashSet<>(),null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
-    }
-
-    @Test(expected = Test.None.class)
-    public void test_isInputOrganisationStatusValid_with_valid_status() {
-        isInputOrganisationStatusValid(ACTIVE.name(), ACTIVE.name());
-    }
-
-    @Test(expected = Test.None.class)
-    public void test_isInputOrganisationStatusValid_with_lowercase_status() {
-        isInputOrganisationStatusValid(ACTIVE.name().toLowerCase(), ACTIVE.name() + "," + PENDING.name());
-    }
-
-    @Test
-    public void test_isInputOrganisationStatusValid_with_invalid_status() {
-        verifyResourceNotFoundExceptionThrown(catchThrowable(() -> isInputOrganisationStatusValid(OrganisationStatus.PENDING.name(), ACTIVE.name())));
-    }
-
-    @Test
-    public void test_isInputOrganisationStatusValid_with_invalid_status_from_multiple_list() {
-        verifyResourceNotFoundExceptionThrown(catchThrowable(() -> isInputOrganisationStatusValid(OrganisationStatus.BLOCKED.name(), ACTIVE.name() + "," + PENDING.name())));
-    }
-
-    @Test
-    public void test_isInputOrganisationStatusValid_with_blank_status() {
-        verifyResourceNotFoundExceptionThrown(catchThrowable(() -> isInputOrganisationStatusValid(null, ACTIVE.name())));
-        verifyResourceNotFoundExceptionThrown(catchThrowable(() -> isInputOrganisationStatusValid("", ACTIVE.name())));
-        verifyResourceNotFoundExceptionThrown(catchThrowable(() -> isInputOrganisationStatusValid(" ", ACTIVE.name())));
-    }
-
-    public void verifyResourceNotFoundExceptionThrown(Throwable raisedException) {
-        assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
-                .hasMessageStartingWith(ERROR_MESSAGE_INVALID_STATUS_PASSED);
     }
 }

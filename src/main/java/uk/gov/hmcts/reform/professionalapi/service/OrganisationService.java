@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
-import java.util.List;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -23,10 +21,6 @@ public interface OrganisationService {
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 
     OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status);
-
-    DeleteOrganisationResponse deleteOrganisation(Organisation organisation);
-
-    List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
 }
 

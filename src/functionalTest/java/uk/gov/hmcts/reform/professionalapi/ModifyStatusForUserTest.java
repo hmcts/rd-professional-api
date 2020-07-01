@@ -43,7 +43,11 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
-        UserProfileUpdatedData data = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
 
         Map<String,Object> modifyStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
 
@@ -51,7 +55,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
 
-        data = getUserStatusUpdateRequest(IdamStatus.ACTIVE);
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.ACTIVE.name());
 
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
 
@@ -80,7 +86,11 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserResponse).isNotNull();
 
-        UserProfileUpdatedData data = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(IdamStatus.SUSPENDED.name());
 
         String userId = (String) newUserResponse.get("userIdentifier");
 

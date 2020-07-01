@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -34,9 +32,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-
-    @Value(("${assignAccessRoleEnabled}"))
-    protected boolean assignAccessRoleEnabled;
 
     private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
     private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
@@ -58,7 +53,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
-        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK, "true");
+        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
@@ -66,37 +61,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
         assertThat(superUserRoles).contains("caseworker");
-
-    }
-
-    @Test
-    public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
-
-        if (assignAccessRoleEnabled) {
-            String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-            UserCreationRequest superUser = createSuperUser(email);
-
-            professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
-
-            OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                    .superUser(superUser)
-                    .build();
-
-            Map<String, Object> response = professionalApiClient.createOrganisation(request);
-            orgIdentifier = (String) response.get("organisationIdentifier");
-            request.setStatus("ACTIVE");
-            professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-
-            Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK, "true");
-            validateRetrievedUsers(searchUserResponse, "any");
-
-            List<Map> users = getNestedValue(searchUserResponse, "users");
-            Map superUserDetails = users.get(0);
-            List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
-
-            assertThat(superUserRoles).contains("pui-caa");
-            assertThat(superUserRoles).contains("caseworker-caa");
-        }
 
     }
 
@@ -120,6 +84,15 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         });
     }
 
+    public static <T> T getNestedValue(Map map, String... keys) {
+        Object value = map;
+
+        for (String key : keys) {
+            value = ((Map) value).get(key);
+        }
+
+        return (T) value;
+    }
 
     private UserCreationRequest createSuperUser(String email) {
         UserCreationRequest superUser = aUserCreationRequest()

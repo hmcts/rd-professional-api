@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
@@ -128,7 +126,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
         //Retrieve User Identifier to update status
-        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK, "true");
+        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK);
         assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
 
@@ -155,38 +153,4 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(newUserResponse).isNotNull();
     }
-
-    @Test
-    public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
-        List<String> userRoles = new ArrayList<>();
-        //userRoles.add("pui-caa");
-        //userRoles.add("caseworker-caa");
-        userRoles.add("pui-user-manager");
-        String firstName = "someName";
-        String lastName = "someLastName";
-        String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
-
-        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
-
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
-
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-
-        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, "false", HttpStatus.OK, "");
-
-        List<Map> users = getNestedValue(searchUserResponse, "users");
-        Map newUserDetails = users.get(1);
-        List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
-
-        //assertThat(superUserRoles).doesNotContain("pui-caa");
-        //assertThat(superUserRoles).doesNotContain("caseworker-caa");
-    }
-
 }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
@@ -132,8 +130,8 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity retrieveOrganisations(
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
-            @ApiParam(name = "status", required = false) @RequestParam(value = "status", required = false) String status) {
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);
     }
@@ -331,66 +329,5 @@ public class OrganisationInternalController extends SuperController {
         //Received request to add a internal new user to an organisation
 
         return inviteUserToOrganisation(newUserCreationRequest, organisationIdentifier, userId);
-    }
-
-    @ApiOperation(
-            value = "Delete an Organisation",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 204,
-                    message = "A representation of the Deleted organisation",
-                    response = DeleteOrganisationResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "The orgId provided for an organisation is not valid or organisation admin is not in Pending state "
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-
-    })
-    @DeleteMapping(
-            value = "/{orgId}",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @ResponseBody
-    @Secured("prd-admin")
-    public ResponseEntity<DeleteOrganisationResponse> deleteOrganisation(
-            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier) {
-
-        DeleteOrganisationResponse deleteOrganisationResponse;
-        //Received request to delete an organisation for internal user
-        Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));
-
-        if (!organisation.isPresent()) {
-
-            throw new EmptyResultDataAccessException(1);
-
-        }
-
-        deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get());
-        return ResponseEntity
-                .status(deleteOrganisationResponse.getStatusCode())
-                .body(deleteOrganisationResponse);
     }
 }

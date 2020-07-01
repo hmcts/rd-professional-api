@@ -13,8 +13,18 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProfessionalUsersResponse extends ProfessionalUsersResponseWithoutRoles {
+public class ProfessionalUsersResponse {
 
+    @JsonProperty
+    public String userIdentifier;
+    @JsonProperty
+    public String firstName;
+    @JsonProperty
+    public String lastName;
+    @JsonProperty
+    public String email;
+    @JsonProperty
+    public String idamStatus;
     @JsonProperty
     private List<String> roles;
     @JsonProperty

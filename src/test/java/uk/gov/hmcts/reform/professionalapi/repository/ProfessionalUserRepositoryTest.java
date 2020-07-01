@@ -29,7 +29,7 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
     public void test_findById() {
         Optional<ProfessionalUser> profUser = professionalUserRepository.findById(professionalUser.getId());
 
-        assertThat(profUser).contains(professionalUser);
+        assertThat(profUser.get()).isEqualTo(professionalUser);
         assertThat(profUser.get().getId()).isEqualTo(professionalUser.getId());
     }
 
@@ -55,11 +55,5 @@ public class ProfessionalUserRepositoryTest extends BaseRepository {
 
         assertThat(profUser).isEqualTo(professionalUser);
         assertThat(profUser.getId()).isEqualTo(professionalUser.getId());
-    }
-
-    @Test
-    public void test_findByUserCountByOrganisationId() {
-        int count = professionalUserRepository.findByUserCountByOrganisationId(organisation.getId());
-        assertThat(count).isEqualTo(1);
     }
 }

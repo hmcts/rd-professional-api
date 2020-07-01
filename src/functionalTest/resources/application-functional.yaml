@@ -1,4 +1,5 @@
 targetInstance: ${TEST_URL:http://localhost:8090}
+
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
 s2s-name: rd_professional_api
@@ -16,20 +17,14 @@ s2s-secret: ${S2S_SECRET:K6KA6PRLRFWQLSD6}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
-prd.security.roles.hmcts-admin: prd-admin
-prd.security.roles.pui-user-manager: pui-user-manager
-prd.security.roles.pui-organisation-manager: pui-organisation-manager
-prd.security.roles.pui-finance-manager: pui-finance-manager
-prd.security.roles.pui-case-manager: pui-case-manager
-prd.security.roles.pui-caa: pui-caa
+exui.role.hmcts-admin: prd-admin
+exui.role.pui-user-manager: pui-user-manager
+exui.role.pui-organisation-manager: pui-organisation-manager
+exui.role.pui-finance-manager: pui-finance-manager
+exui.role.pui-case-manager: pui-case-manager
 
 # resent user invite interval in minutes
 resendInterval: 60
 
 # toggle for resendInvite
 resendInviteEnabled : true
-# toggle for resendInvite
-deleteOrganisationEnabled : false
-
-# toggle for assign access roles
-assignAccessRoleEnabled : false

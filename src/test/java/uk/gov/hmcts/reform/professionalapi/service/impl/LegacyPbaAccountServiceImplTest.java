@@ -70,7 +70,7 @@ public class LegacyPbaAccountServiceImplTest {
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
 
         assertThat(paymentAccountPbaNumbers).isNotNull();
-        assertThat(paymentAccountPbaNumbers.size()).isNotNegative();
+        assertThat(paymentAccountPbaNumbers.size()).isGreaterThanOrEqualTo(0);
 
         verify(configurationMock, times(2)).getPbaFromUserAccountMap();
     }
