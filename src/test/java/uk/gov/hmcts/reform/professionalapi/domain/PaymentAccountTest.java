@@ -9,7 +9,7 @@ import org.junit.Test;
 public class PaymentAccountTest {
 
     @Test
-    public void can_set_organisation() {
+    public void test_can_set_organisation() {
         Organisation organisation = new Organisation();
         PaymentAccount paymentAccount = new PaymentAccount();
 

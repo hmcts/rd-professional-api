@@ -82,7 +82,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void retrievePaymentAccountsByPbaEmail() {
+    public void testRetrievePaymentAccountsByPbaEmail() {
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
@@ -109,7 +109,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void editPaymentAccountsByOrganisationIdentifier() {
+    public void testEditPaymentAccountsByOrganisationIdentifier() {
 
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -135,7 +135,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void deleteUserAndPaymentAccountsFromUserAccountMapTest() {
+    public void testDeleteUserAndPaymentAccountsFromUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.deleteUserAccountMaps(organisation);
 
@@ -143,7 +143,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void deletePaymentAccountsFromOrganisationTest() {
+    public void testDeletePaymentAccountsFromOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
 
         sut.deletePaymentAccountsFromOrganisation(organisation);
@@ -152,7 +152,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void addPaymentAccountsToOrganisationTest() {
+    public void testAddPaymentAccountsToOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
 
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
@@ -161,7 +161,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void addUserAndPaymentAccountsToUserAccountMapTest() {
+    public void testAddUserAndPaymentAccountsToUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
 
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
@@ -171,7 +171,7 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void generateListOfAccountsToDelete() {
+    public void testGenerateListOfAccountsToDelete() {
         ProfessionalUser prefU = new ProfessionalUser("Con", "Hal", "email@gmail.com", organisation);
         List<UserAccountMapId> listUserMap = new ArrayList<>();
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
