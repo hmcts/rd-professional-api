@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -211,12 +212,11 @@ public class ProfessionalExternalUserControllerTest {
         verify(professionalUserServiceMock, times(1)).findUserStatusByEmailAddress(professionalUser.getEmailAddress());
     }
 
-    @Test(expected = InvalidRequest.class)
+    @Test
     public void testFindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
-        Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
-        assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
-        verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
+        final Throwable raisedException = catchThrowable(() -> professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email"));
+
+        assertThat(raisedException).isExactlyInstanceOf(InvalidRequest.class);
     }
 }
