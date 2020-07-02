@@ -33,8 +33,6 @@ public class PaymentAccountValidator {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
             checkPbaNumberIsValid(paymentAccounts);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
-        } else {
-            throw new InvalidRequest("Empty Request for Edit Pbas request");
         }
     }
 
