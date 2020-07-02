@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -559,17 +560,17 @@ public class ProfessionalUserServiceImplTest {
         verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
     }
 
-    @Test(expected = ExternalApiException.class)
+    @Test
     public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        final Throwable raisedException = catchThrowable(() -> professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress()));
 
-        assertThat(status).isNull();
-        assertThat(status.getStatusCode()).isEqualTo(500);
+        assertThat(raisedException).isExactlyInstanceOf(ExternalApiException.class);
+
         verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
