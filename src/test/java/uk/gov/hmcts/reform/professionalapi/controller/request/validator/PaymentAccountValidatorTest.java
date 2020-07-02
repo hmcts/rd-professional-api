@@ -65,4 +65,10 @@ public class PaymentAccountValidatorTest {
         paymentAccounts.add(pba);
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
     }
+
+    @Test(expected = InvalidRequest.class)
+    public void pbaEditRequestEmptyThrowExceptionTest() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "O123456R");
+    }
 }
