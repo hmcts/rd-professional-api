@@ -68,10 +68,6 @@ public class ProfessionalUser implements Serializable {
     @Column(name = "CREATED")
     private LocalDateTime created;
 
-    @OneToMany
-    @JoinColumn(name = "PROFESSIONAL_USER_ID", referencedColumnName = "id")
-    private List<UserAccountMap> userAccountMap = new ArrayList<>();
-
     @Column(name = "USER_IDENTIFIER")
     private String userIdentifier;
 

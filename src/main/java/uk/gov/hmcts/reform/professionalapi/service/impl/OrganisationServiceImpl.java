@@ -117,12 +117,14 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         if (paymentAccounts != null) {
+            log.info("{}:: Inside  addPbaAccountToOrganisation ::{}::" + paymentAccounts);
             PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
+                log.info("{}:: paymentAccount saved in the DB ::{}::");
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }

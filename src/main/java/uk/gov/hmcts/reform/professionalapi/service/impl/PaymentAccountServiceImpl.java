@@ -46,37 +46,32 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public Organisation findPaymentAccountsByEmail(String email) {
 
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
         if (null != user
                 && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
 
-            if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
-
-                List<PaymentAccount> userMapPaymentAccount = RefDataUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
-                paymentAccountsEntity = RefDataUtil
-                        .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
-
-                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
-                organisation = user.getOrganisation();
-
-            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
-
-                paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
-                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
-                organisation = user.getOrganisation();
-            }
-
+            paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
+            user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+            user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
+            organisation = user.getOrganisation();
         }
         return organisation;
     }
 
+    @Override
     @Transactional
+    public PbaResponse editPbaAccounts(PbaEditRequest pbaEditRequest, Organisation organisation) {
+
+        log.info("Inside editPbaAccounts method");
+        deleteUserAccountMaps(organisation);
+        deletePaymentAccountsFromOrganisation(organisation);
+        addPaymentAccountsToOrganisation(pbaEditRequest,organisation);
+
+        return addUserAndPaymentAccountsToUserAccountMap(organisation);
+    }
+
     public void deleteUserAccountMaps(Organisation organisation) {
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
@@ -87,15 +82,17 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
 
         userAccountMapService.deleteByUserAccountMapIdIn(accountsToDelete);
+        log.info(" Number of UserAccountMaps deleted ::{}::" + accountsToDelete.size());
     }
 
-    @Transactional
+
     public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
         List<UUID> accountIds = new ArrayList<>();
 
         organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
 
         paymentAccountRepository.deleteByIdIn(accountIds);
+        log.info(" Number of PaymentAccounts deleted ::{}::" + accountIds.size());
 
         /** Please Note:
          * The below lines are required to set the Organisation's Payment Accounts List to be empty.
@@ -109,14 +106,16 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
+
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
         SuperUser superUser = organisation.getUsers().get(0);
+        log.info("addUserAndPaymentAccountsToUserAccountMap::Payment Accounts Size{}::" + paymentAccounts.size());
 
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
          * If this changes then the below logic will need to change accordingly */
         userAccountMapService.persistedUserAccountMap(superUser.toProfessionalUser(), paymentAccounts);
-
+        log.info("{}::After UserAccountMap persisted::{}::");
         return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 
