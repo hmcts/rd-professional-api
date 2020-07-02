@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,9 +104,11 @@ public class PaymentAccountServiceImplTest {
         verify(professionalUserRepositoryMock, times(1)).findByEmailAddress("some-email");
     }
 
-    @Test(expected = Exception.class)
-    public void testThrowsExceptionWhenEmailInvalid() {
-        when(sut.findPaymentAccountsByEmail("some-email")).thenReturn(organisation);
+    @Test
+    public void testReturnEmptyOrganisationWhenUnKnownEmail() {
+        Organisation  response = sut.findPaymentAccountsByEmail("some-email@gmail.com");
+        assertThat(response).isNull();
+        verify(professionalUserRepositoryMock, times(1)).findByEmailAddress(anyString());
     }
 
     @Test
@@ -154,18 +157,14 @@ public class PaymentAccountServiceImplTest {
     @Test
     public void testAddPaymentAccountsToOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
     }
 
     @Test
     public void testAddUserAndPaymentAccountsToUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
-
         assertThat(sut.addUserAndPaymentAccountsToUserAccountMap(organisation)).isNotNull();
         verify(userAccountMapServiceMock, times(2)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
     }
