@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -243,12 +244,12 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test
     public void retrieve_an_organisations_by_status() {
-        OrganisationsDetailResponse organisationDetailResponse
-                = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
 
-        assertThat(organisationDetailResponse).isEqualTo(404);
+        final Throwable raisedException = catchThrowable(() -> sut.findByOrganisationStatus(OrganisationStatus.ACTIVE));
+
+        assertThat(raisedException).isExactlyInstanceOf(EmptyResultDataAccessException.class);
 
         verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
     }
