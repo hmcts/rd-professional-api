@@ -29,8 +29,19 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
         List<String> pbaNumbers = null;
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
-            log.info("findLegacyPbaAccountByUserEmail :: inside {}:");
-            pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
+
+            if ("false".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
+
+                pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
+
+            } else if ("true".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
+
+                List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
+
+                pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation().getPaymentAccounts());
+
+            }
+
         }
 
         return pbaNumbers;

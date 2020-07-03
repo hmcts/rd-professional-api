@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ import org.junit.Test;
 public class PaymentAccountTest {
 
     @Test
-    public void test_can_set_organisation() {
+    public void can_set_organisation() {
         Organisation organisation = new Organisation();
         PaymentAccount paymentAccount = new PaymentAccount();
 
@@ -18,12 +19,13 @@ public class PaymentAccountTest {
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setId(UUID.randomUUID());
         paymentAccount.setPbaNumber("some-pba-number");
+        paymentAccount.setUserAccountMap(emptyList());
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
         assertThat(paymentAccount.getLastUpdated()).isNotNull();
         assertThat(paymentAccount.getCreated()).isNotNull();
         assertThat(paymentAccount.getId()).isNotNull();
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
-
+        assertThat(paymentAccount.getUserAccountMap()).isNotNull();
     }
 }
