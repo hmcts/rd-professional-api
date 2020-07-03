@@ -40,7 +40,8 @@ public class IdamOpenIdClient {
     }
 
     public String createUser(String userRole) {
-        return createUser(userRole, nextUserEmail(), "First", "Last");
+        return createUser(userRole, nextUserEmail(), "First",
+                "Last");
     }
 
     public String createUser(String userRole, String userEmail, String firstName, String lastName) {
@@ -113,7 +114,8 @@ public class IdamOpenIdClient {
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
-        IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
+        IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody()
+                .asString(), IdamOpenIdClient.BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
     }

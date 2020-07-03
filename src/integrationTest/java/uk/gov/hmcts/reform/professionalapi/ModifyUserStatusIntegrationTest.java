@@ -38,7 +38,9 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         updateUserProfileRolesMock(HttpStatus.OK);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
+                        hmctsAdmin);
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         //modify user details
@@ -46,7 +48,9 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         userProfileUpdatedData.setIdamStatus("SUSPENDED");
         updateUserProfileRolesMock(HttpStatus.OK);
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
 
         //validate overall response should be 200 always
         assertThat(response.get("http_status")).isNotNull();
@@ -73,7 +77,9 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         userRoles.add(puiCaseManager);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
+                                userRoles), hmctsAdmin);
 
         //modify user details
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
@@ -82,7 +88,9 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
         //validate overall response should be 200 always
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 

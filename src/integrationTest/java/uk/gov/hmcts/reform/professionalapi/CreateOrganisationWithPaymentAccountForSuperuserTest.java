@@ -38,7 +38,8 @@ public class CreateOrganisationWithPaymentAccountForSuperuserTest extends Author
                         .email(String.format("s@-somewhere.com", prefix))
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);

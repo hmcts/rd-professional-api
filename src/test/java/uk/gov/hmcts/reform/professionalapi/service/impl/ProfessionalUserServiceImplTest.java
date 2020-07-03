@@ -70,7 +70,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 
 public class ProfessionalUserServiceImplTest {
 
-    private final ProfessionalUserRepository professionalUserRepository = Mockito.mock(ProfessionalUserRepository.class);
+    private final ProfessionalUserRepository professionalUserRepository
+            = Mockito.mock(ProfessionalUserRepository.class);
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
     private final UserAttributeRepository userAttributeRepository = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepository = mock(PrdEnumRepository.class);
@@ -78,17 +79,22 @@ public class ProfessionalUserServiceImplTest {
     private final UserAttributeServiceImpl userAttributeService = mock(UserAttributeServiceImpl.class);
     private final FeignException feignExceptionMock = mock(FeignException.class);
 
-    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-    private final UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName", "lName", IdamStatus.PENDING);
-    private final GetUserProfileResponse getUserProfileResponseMock = new GetUserProfileResponse(userProfile, false);
+    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
+            null, null, null);
+    private final UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com",
+            "fName", "lName", IdamStatus.PENDING);
+    private final GetUserProfileResponse getUserProfileResponseMock = new GetUserProfileResponse(userProfile,
+            false);
 
     private final ProfessionalUserServiceImpl professionalUserService = new ProfessionalUserServiceImpl(
             organisationRepository, professionalUserRepository, userAttributeRepository,
             prdEnumRepository, userAttributeService, userProfileFeignClient);
 
-    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some-email", organisation);
+    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "some-email", organisation);
 
-    private final SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-super-email", organisation);
+    private final SuperUser superUser = new SuperUser("some-fname", "some-lname",
+            "some-super-email", organisation);
 
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private List<String> userRoles = new ArrayList<>();
@@ -122,14 +128,16 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(professionalUser);
 
         String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
+                "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
         getUserProfileResponseMock.setRoles(roles);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress(email);
         assertEquals(professionalUser.getFirstName(), user1.getFirstName());
@@ -155,14 +163,16 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(null);
 
         String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
+                "lastName", IdamStatus.ACTIVE);
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
         getUserProfileResponseMock.setRoles(roles);
 
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         professionalUserService.findProfessionalUserProfileByEmailAddress(email);
 
@@ -178,32 +188,43 @@ public class ProfessionalUserServiceImplTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
 
-        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName", "email@org.com", organisation);
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+                "email@org.com", organisation);
 
         ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
         userProfileResponse.setUserIdentifier(professionalUser.getUserIdentifier());
         userProfiles.add(userProfileResponse);
         professionalUsersEntityResponse.setUserProfiles(userProfiles);
-        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
-        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
+                "false", true, "");
 
         assertThat(responseEntity).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
-        verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
+        verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"),
+                eq("true"));
     }
 
     @Test
     public void findUsersByOrganisation_with_status_active() throws Exception {
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
-        ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse1
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1",
+                "some1@email.com", organisation));
+        ProfessionalUsersResponse professionalUsersResponse2
+                = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2",
+                "some2@email.com", organisation));
 
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
@@ -220,10 +241,12 @@ public class ProfessionalUserServiceImplTest {
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
 
-        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
 
-        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                .status(200).build();
 
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUser);
@@ -231,13 +254,16 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "Active");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
+                "false", true, "Active");
 
-        Mockito.verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
+        Mockito.verify(professionalUserRepository, Mockito.times(1))
+                .findByOrganisation(organisation);
         assertThat(responseEntity).isNotNull();
 
         verify(professionalUserRepository, Mockito.times(1)).findByOrganisation(organisation);
-        verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"), eq("true"));
+        verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"),
+                eq("true"));
     }
 
     //@Test
@@ -263,35 +289,14 @@ public class ProfessionalUserServiceImplTest {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
 
         UserProfileUpdatedData userProfileUpdatedData1 =
-                new UserProfileUpdatedData("test@test.com", "fname", "lname", IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
+                new UserProfileUpdatedData("test@test.com", "fname", "lname",
+                        IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
         assertThat(actualModifyProfileData).isNotNull();
         assertThat(actualModifyProfileData.getEmail()).isNull();
         assertThat(actualModifyProfileData.getIdamStatus()).isNull();
 
-        /*ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setAddRolesResponse(createAddRoleResponse(HttpStatus.OK, "Success"));
-        modifyUserRolesResponse.setDeleteRolesResponse(createDeleteRoleResponse(HttpStatus.OK, "Success"));
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        String body = mapper.writeValueAsString(modifyUserRolesResponse);
-
-        ObjectMapper mapper1 = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String body1 = mapper.writeValueAsString(modifyUserRolesResponse);
-
-
-
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        String id = UUID.randomUUID().toString();
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(modifyUserProfileData, id);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getAddRolesResponse()).isNotNull();
-        assertThat(response.getAddRolesResponse().getIdamMessage()).isEqualTo("Success");
-        assertThat(response.getDeleteRolesResponse()).isNotNull();
-        assertThat(response.getDeleteRolesResponse().get(0).getIdamMessage()).isEqualTo("Success");*/
     }
 
     @Test
@@ -306,14 +311,17 @@ public class ProfessionalUserServiceImplTest {
         userProfileUpdatedData.setRolesAdd(roles);
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST, "Request Not Valid"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.BAD_REQUEST,
+                "Request Not Valid"));
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(modifyUserRolesResponse);
 
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
+                UUID.randomUUID().toString(), Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getRoleAdditionResponse()).isNotNull();
@@ -325,7 +333,8 @@ public class ProfessionalUserServiceImplTest {
     @Test(expected = ExternalApiException.class)
     public void modify_user_roles_server_error() throws Exception {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
+        modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValueAsString(modifyUserRolesResponse);
 
@@ -340,7 +349,8 @@ public class ProfessionalUserServiceImplTest {
         roles.add(roleName2);
         userProfileUpdatedData.setRolesAdd(roles);
 
-        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData, UUID.randomUUID().toString(), Optional.of(""));
+        ModifyUserRolesResponse response = professionalUserService.modifyRolesForUser(userProfileUpdatedData,
+                UUID.randomUUID().toString(), Optional.of(""));
 
         assertThat(response).isNotNull();
         assertThat(response.getRoleAdditionResponse()).isNotNull();
@@ -353,11 +363,13 @@ public class ProfessionalUserServiceImplTest {
     public void addNewUserToAnOrganisation() {
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
-        NewUserResponse newUserResponse = professionalUserService.addNewUserToAnOrganisation(professionalUser, userRoles, prdEnums);
+        NewUserResponse newUserResponse = professionalUserService.addNewUserToAnOrganisation(professionalUser,
+                userRoles, prdEnums);
         assertThat(newUserResponse).isNotNull();
 
         verify(professionalUserRepository, times(1)).save(any(ProfessionalUser.class));
-        verify(userAttributeService, times(1)).addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()), (Mockito.anyList()));
+        verify(userAttributeService, times(1))
+                .addUserAttributesToUser(any(ProfessionalUser.class), (Mockito.anyList()), (Mockito.anyList()));
     }
 
     @Test(expected = ExternalApiException.class)
@@ -372,7 +384,8 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByOrganisation(organisation)).thenReturn(users);
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenThrow(exceptionMock);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", true, "");
+        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisation(organisation,
+                "false", true, "");
 
         verify(professionalUserRepository, times(1)).findByOrganisation(organisation);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
@@ -435,12 +448,15 @@ public class ProfessionalUserServiceImplTest {
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName", "some@email.com", organisation);
-        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName", "some1@email.com", organisation);
+        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation);
+        ProfessionalUser professionalUser1 = new ProfessionalUser("fName", "lName",
+                "some1@email.com", organisation);
         professionalUserList.add(professionalUser);
         professionalUserList.add(professionalUser1);
 
-        when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
+        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
+                .thenReturn(professionalUserPage);
         when(professionalUserPage.getContent()).thenReturn(professionalUserList);
 
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
@@ -455,17 +471,22 @@ public class ProfessionalUserServiceImplTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
         String body = mapper.writeValueAsString(professionalUsersEntityResponse);
-        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build();
+        Response response = Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                .status(200).build();
         when(userProfileFeignClient.getUserProfiles(any(), any(), any())).thenReturn(response);
 
-        ResponseEntity responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
+        ResponseEntity responseEntity = professionalUserService
+                .findProfessionalUsersByOrganisationWithPageable(organisation, "false", false,
+                        "Active", pageableMock);
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().get("paginationInfo")).isNotEmpty();
 
-        verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
+        verify(professionalUserRepository, times(1))
+                .findByOrganisation(organisation, pageableMock);
         verify(professionalUserPage, times(2)).getContent();
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
     }
@@ -476,11 +497,14 @@ public class ProfessionalUserServiceImplTest {
         Pageable pageableMock = mock(Pageable.class);
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
+        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
+                .thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false", false, "Active", pageableMock);
+        professionalUserService.findProfessionalUsersByOrganisationWithPageable(organisation, "false",
+                false, "Active", pageableMock);
 
-        verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
+        verify(professionalUserRepository, times(1))
+                .findByOrganisation(organisation, pageableMock);
     }
 
     @Test(expected = ResourceNotFoundException.class)
@@ -489,11 +513,14 @@ public class ProfessionalUserServiceImplTest {
         Pageable pageableMock = mock(Pageable.class);
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
-        when(professionalUserRepository.findByOrganisation(organisation, pageableMock)).thenReturn(professionalUserPage);
+        when(professionalUserRepository.findByOrganisation(organisation, pageableMock))
+                .thenReturn(professionalUserPage);
 
-        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false", false, "Active");
+        professionalUserService.findProfessionalUsersByOrganisation(organisation, "false",
+                false, "Active");
 
-        verify(professionalUserRepository, times(1)).findByOrganisation(organisation, pageableMock);
+        verify(professionalUserRepository, times(1))
+                .findByOrganisation(organisation, pageableMock);
     }
 
     @Test
@@ -501,7 +528,8 @@ public class ProfessionalUserServiceImplTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
-        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
+        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress()))
+                .thenReturn(professionalUser);
 
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setUserIdentifier("a123dfgr46");
@@ -509,15 +537,18 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<NewUserResponse> newResponse = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse = professionalUserService
+                .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(newResponse).isNotNull();
         assertThat(newResponse.getBody()).isNotNull();
         assertThat(newResponse.getBody().getUserIdentifier()).isEqualTo("a123dfgr46");
 
-        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
+        verify(professionalUserRepository, times(1))
+                .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
@@ -525,18 +556,22 @@ public class ProfessionalUserServiceImplTest {
     public void findUserStatusByEmailForPending() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
+        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress()))
+                .thenReturn(professionalUser);
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setIdamStatus("PENDING");
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<NewUserResponse> newResponse = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse = professionalUserService
+                .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
-        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
+        verify(professionalUserRepository, times(1))
+                .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
@@ -544,18 +579,22 @@ public class ProfessionalUserServiceImplTest {
     public void findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
         organisation.setStatus(OrganisationStatus.PENDING);
 
-        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
+        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress()))
+                .thenReturn(professionalUser);
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setIdamStatus("PENDING");
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<NewUserResponse> newResponse = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        ResponseEntity<NewUserResponse> newResponse
+                = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
         assertThat(newResponse).isNotNull();
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
-        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
+        verify(professionalUserRepository, times(1))
+                .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
     }
 
@@ -563,14 +602,18 @@ public class ProfessionalUserServiceImplTest {
     public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
-        when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
+        when(professionalUserRepository.findByEmailAddress(professionalUser
+                .getEmailAddress())).thenReturn(professionalUser);
+        when(userProfileFeignClient.getUserProfileByEmail(anyString()))
+                .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        ResponseEntity<NewUserResponse> status = professionalUserService
+                .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
 
         assertThat(status).isNull();
         assertThat(status.getStatusCode()).isEqualTo(500);
-        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
+        verify(professionalUserRepository, times(1))
+                .findByEmailAddress(professionalUser.getEmailAddress());
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
@@ -586,7 +629,8 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
@@ -609,7 +653,8 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);

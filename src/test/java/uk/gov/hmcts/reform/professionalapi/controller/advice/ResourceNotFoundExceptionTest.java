@@ -12,6 +12,7 @@ public class ResourceNotFoundExceptionTest {
     @Test
     public void getResourceNotFoundExceptionTest() {
         resourceNotFoundException = new ResourceNotFoundException(ErrorConstants.RESOURCE_NOT_FOUND.getErrorMessage());
-        assertThat(resourceNotFoundException.getMessage()).isEqualTo(ErrorConstants.RESOURCE_NOT_FOUND.getErrorMessage());
+        assertThat(resourceNotFoundException.getMessage())
+                .isEqualTo(ErrorConstants.RESOURCE_NOT_FOUND.getErrorMessage());
     }
 }

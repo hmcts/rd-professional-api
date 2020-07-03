@@ -17,7 +17,8 @@ public class UserCreationRequestTest {
 
     @Test
     public void hasMandatoryFieldsSpecifiedNotNull() {
-        UserCreationRequest userCreationRequest = new UserCreationRequest(null, null, "some@email.com", createJurisdictions());
+        UserCreationRequest userCreationRequest = new UserCreationRequest(null, null,
+                "some@email.com", createJurisdictions());
 
         Set<ConstraintViolation<UserCreationRequest>> violations = validator.validate(userCreationRequest);
         

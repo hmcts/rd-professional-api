@@ -160,7 +160,9 @@ public class OrganisationExternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
-    public ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email, @ApiParam(hidden = true) @OrgId String orgId) {
+    public ResponseEntity<OrganisationPbaResponse>
+        retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email,
+                                      @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
@@ -194,7 +196,8 @@ public class OrganisationExternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 409,
-                    message = "A User already exists with the given Email Address or is already active in SIDAM during resend invite"
+                    message = "A User already exists with the given Email Address or is already active in SIDAM "
+                            + "during resend invite"
             ),
             @ApiResponse(
                     code = 429,
@@ -225,13 +228,15 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
-    protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email, String extOrgIdentifier) {
+    protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,
+                                                                                        String extOrgIdentifier) {
         validateEmail(email);
         Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
 
-        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(), organisation,extOrgIdentifier);
+        organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
+                organisation,extOrgIdentifier);
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));

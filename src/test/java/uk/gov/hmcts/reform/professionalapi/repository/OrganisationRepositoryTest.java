@@ -22,12 +22,14 @@ public class OrganisationRepositoryTest extends BaseRepository {
 
         assertThat(organisations).hasSize(1);
         assertThat(organisations.get(0)).isEqualTo(organisation);
-        assertThat(organisations.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(organisations.get(0).getOrganisationIdentifier())
+                .isEqualTo(organisation.getOrganisationIdentifier());
     }
 
     @Test
     public void test_findByOrganisationIdentifier() {
-        Organisation org = organisationRepository.findByOrganisationIdentifier(organisation.getOrganisationIdentifier());
+        Organisation org = organisationRepository.findByOrganisationIdentifier(organisation
+                .getOrganisationIdentifier());
 
         assertThat(org).isEqualTo(organisation);
         assertThat(org.getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
@@ -39,7 +41,8 @@ public class OrganisationRepositoryTest extends BaseRepository {
 
         assertThat(activeOrganisations).hasSize(1);
         assertThat(activeOrganisations.get(0)).isEqualTo(organisation);
-        assertThat(activeOrganisations.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(activeOrganisations.get(0).getOrganisationIdentifier()).isEqualTo(organisation
+                .getOrganisationIdentifier());
     }
 
     @Test

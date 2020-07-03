@@ -21,7 +21,8 @@ public class ProfessionalApiGeneratorTest {
 
     @Test
     public void generateUniqueAlphanumericId() {
-        String uniqueAlphanumericString = ProfessionalApiGenerator.generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        String uniqueAlphanumericString = ProfessionalApiGenerator
+                .generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
         assertThat(uniqueAlphanumericString).isNotNull();
         assertThat(uniqueAlphanumericString.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);

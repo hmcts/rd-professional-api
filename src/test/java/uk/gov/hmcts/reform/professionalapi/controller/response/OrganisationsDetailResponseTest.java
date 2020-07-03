@@ -11,9 +11,11 @@ public class OrganisationsDetailResponseTest {
 
     @Test
     public void test_OrganisationsDetailResponse() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
 
-        OrganisationsDetailResponse organisationsDetailResponseResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
+        OrganisationsDetailResponse organisationsDetailResponseResponse
+                = new OrganisationsDetailResponse(singletonList(organisation), false);
 
         assertThat(organisationsDetailResponseResponse).isNotNull();
     }

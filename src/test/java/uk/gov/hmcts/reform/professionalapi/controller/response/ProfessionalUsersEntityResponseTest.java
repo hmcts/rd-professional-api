@@ -21,7 +21,8 @@ public class ProfessionalUsersEntityResponseTest {
         final String dummyLastName = "Bloggs";
         final String dummyEmail = "joe.bloggs@email.com";
 
-        ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail, new Organisation());
+        ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail,
+                new Organisation());
         List<ProfessionalUser> professionalUsers = new ArrayList<>();
         professionalUsers.add(professionalUser);
 

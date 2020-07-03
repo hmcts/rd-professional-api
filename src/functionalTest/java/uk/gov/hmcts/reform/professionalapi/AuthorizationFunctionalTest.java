@@ -114,7 +114,8 @@ public abstract class AuthorizationFunctionalTest {
         return activateOrganisation(response, role);
     }
 
-    protected String createAndUpdateOrganisationToActive(String role, OrganisationCreationRequest organisationCreationRequest) {
+    protected String createAndUpdateOrganisationToActive(String role,
+                                                         OrganisationCreationRequest organisationCreationRequest) {
 
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         return activateOrganisation(response, role);
@@ -149,7 +150,8 @@ public abstract class AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;
@@ -164,7 +166,8 @@ public abstract class AuthorizationFunctionalTest {
         String lastName = "someLastName";
         String firstName = "someName";
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
+                userEmail);
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
@@ -174,7 +177,8 @@ public abstract class AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;

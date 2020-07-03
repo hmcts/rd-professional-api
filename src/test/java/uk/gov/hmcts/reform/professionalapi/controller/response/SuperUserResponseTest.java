@@ -9,7 +9,8 @@ public class SuperUserResponseTest {
 
     @Test
     public void test_SuperUserResponse() {
-        SuperUserResponse superUserResponse = new SuperUserResponse(new SuperUser("some-fname", "some-lname", "some-email-address", null));
+        SuperUserResponse superUserResponse = new SuperUserResponse(new SuperUser("some-fname",
+                "some-lname", "some-email-address", null));
         assertThat(superUserResponse).isNotNull();
     }
 }

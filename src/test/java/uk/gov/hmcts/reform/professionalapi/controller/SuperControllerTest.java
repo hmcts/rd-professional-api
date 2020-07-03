@@ -102,10 +102,14 @@ public class SuperControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
 
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
-        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
-        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
-        userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName", "lastName", IdamStatus.ACTIVE.name(), null, null);
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
+                false);
+        userProfileUpdatedData = new UserProfileUpdatedData("test@email.com", "firstName",
+                "lastName", IdamStatus.ACTIVE.name(), null, null);
 
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
@@ -126,9 +130,13 @@ public class SuperControllerTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions, false);
-        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
+                "some@email.com", userRoles, jurisdictions, false);
+        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
+                "some@email.com", jurisdictions);
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id",
+                "false", "number02", "company-url", userCreationRequest,
+                null, null);
 
         MockitoAnnotations.initMocks(this);
     }
@@ -143,8 +151,10 @@ public class SuperControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
-        verify(organisationServiceMock, times(1)).createOrganisationFrom(organisationCreationRequest);
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(organisationCreationRequest);
     }
 
     @Test
@@ -188,7 +198,8 @@ public class SuperControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+                .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
@@ -200,8 +211,11 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
+                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
 
@@ -209,21 +223,25 @@ public class SuperControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 
     @Test
     public void testModifyRolesForExistingUserOfOrganisation() {
-        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
+        when(userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData))
+                .thenReturn(userProfileUpdatedData);
 
         String userId = UUID.randomUUID().toString();
-        ResponseEntity<ModifyUserRolesResponse> actualData = superController.modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of("EXUI"));
+        ResponseEntity<ModifyUserRolesResponse> actualData
+                = superController.modifyRolesForUserOfOrganisation(userProfileUpdatedData, userId, Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
+        verify(professionalUserServiceMock, times(1))
+                .modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
     }
 
     @Test(expected = HttpClientErrorException.class)
@@ -247,14 +265,16 @@ public class SuperControllerTest {
 
     @Test
     public void test_checkOrganisationIsActive() {
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
+                .thenReturn(organisation);
 
         Organisation existingOrg = superController.checkOrganisationIsActive(organisation.getOrganisationIdentifier());
 
         assertThat(existingOrg).isNotNull();
         assertThat(existingOrg).isEqualTo(organisation);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation
+                .getOrganisationIdentifier());
     }
 
     @Test
@@ -277,15 +297,20 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest,
+                professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 
@@ -301,22 +326,27 @@ public class SuperControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
-        ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription", "23:13");
+        ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription",
+                "23:13");
         String userId = UUID.randomUUID().toString();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorDetails);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response
+                .builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
 
-        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser.getOrganisation().getOrganisationIdentifier(), userId);
+        ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser
+                .getOrganisation().getOrganisationIdentifier(), userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getBody()).isExactlyInstanceOf(ErrorResponse.class);
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(professionalUser.getOrganisation().getOrganisationIdentifier());
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 
@@ -331,12 +361,14 @@ public class SuperControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(null);
 
-        final Throwable raisedException = catchThrowable(() -> superController.inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+        final Throwable raisedException = catchThrowable(() -> superController
+                .inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
 
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 
@@ -349,7 +381,8 @@ public class SuperControllerTest {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+                .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
@@ -361,8 +394,11 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
+                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
 
@@ -370,7 +406,8 @@ public class SuperControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(1)).findAllPrdEnums();
     }
 
@@ -385,12 +422,14 @@ public class SuperControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
 
-        final Throwable raisedException = catchThrowable(() -> superController.inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
+        final Throwable raisedException = catchThrowable(() -> superController
+                .inviteUserToOrganisation(newUserCreationRequest, orgId, UUID.randomUUID().toString()));
 
         assertThat(raisedException).isExactlyInstanceOf(AccessDeniedException.class);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
         verify(prdEnumServiceMock, times(0)).findAllPrdEnums();
     }
 }

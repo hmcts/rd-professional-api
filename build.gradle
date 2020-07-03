@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'checkstyle'
+    id 'uk.gov.hmcts.java' version '0.9.0'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.27.0'
@@ -139,12 +139,6 @@ configurations {
 
 check.dependsOn jacocoTestCoverageVerification
 
-checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.10.1'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
-}
 
 pmd {
     toolVersion = '6.12.0'
@@ -361,11 +355,7 @@ dependencies {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    // FIXME temp disabled with 42
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 0 : 11
-    suppressionFiles = ['config/owasp/suppressions.xml']
+    suppressionFile = 'config/owasp/suppressions.xml'
 }
 
 dependencyUpdates.resolutionStrategy = {

@@ -13,7 +13,9 @@ public class ProfessionalUsersResponseTest {
 
     @Test
     public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName, expectEmailAddress, null));
+        ProfessionalUsersResponse professionalUsersResponse
+                = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
+                expectEmailAddress, null));
 
         assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
         assertThat(professionalUsersResponse.getFirstName()).isEqualTo(expectFirstName);

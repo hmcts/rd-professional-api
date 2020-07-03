@@ -46,7 +46,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 @Slf4j
 public class RefDataUtil {
 
-    private RefDataUtil() {}
+    private RefDataUtil() {
+    }
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
@@ -57,13 +58,15 @@ public class RefDataUtil {
 
         List<PaymentAccount> userMapPaymentAccount;
 
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount()).collect(toList());
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
+                .getPaymentAccount()).collect(toList());
 
         return userMapPaymentAccount;
     }
 
 
-    public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+    public static List<PaymentAccount> getPaymentAccountFromUserMap(List<PaymentAccount> userMapPaymentAccount,
+                                                                    List<PaymentAccount> paymentAccountsEntity) {
 
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
@@ -90,19 +93,24 @@ public class RefDataUtil {
         return paymentAccounts;
     }
 
-    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static List<SuperUser> getUserIdFromUserProfile(List<SuperUser> users,
+                                                           UserProfileFeignClient userProfileFeignClient,
+                                                           Boolean isRequiredRoles) {
 
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
         for (SuperUser user: users) {
-            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient, isRequiredRoles);
+            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(),
+                    userProfileFeignClient, isRequiredRoles);
             userProfileDtls.add(professionalUser.toSuperUser());
         }
         return userProfileDtls;
     }
 
 
-    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user,
+                                                                  UserProfileFeignClient userProfileFeignClient,
+                                                                  Boolean isRequiredRoles) {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -110,7 +118,8 @@ public class RefDataUtil {
 
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                throw new ExternalApiException(responseResponseEntity.getStatusCode(), userProfileErrorResponse.getErrorMessage());
+                throw new ExternalApiException(responseResponseEntity.getStatusCode(),
+                        userProfileErrorResponse.getErrorMessage());
 
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
@@ -121,19 +130,23 @@ public class RefDataUtil {
         return user;
     }
 
-    public static List<Organisation> getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
-                                                                   RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                                                                   String showDeleted, Map<String, Organisation> activeOrganisationDetails) {
+    public static List<Organisation>
+        getMultipleUserProfilesFromUp(UserProfileFeignClient userProfileFeignClient,
+                                  RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                  String showDeleted, Map<String,
+            Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
+                "false")) {
 
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
             ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (response.status() < 300) {
 
-                modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDetails);
+                modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity,
+                        activeOrganisationDetails);
             }
 
             return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
@@ -144,10 +157,12 @@ public class RefDataUtil {
 
     }
 
-    public static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
-                                                                                   Map<String, Organisation> activeOrganisationDtls) {
+    public static Map<String, Organisation>
+        updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+                                           Map<String, Organisation> activeOrganisationDtls) {
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse
+                = (ProfessionalUsersEntityResponse)responseEntity.getBody();
         if (null != professionalUsersEntityResponse
                 && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
 
@@ -174,7 +189,8 @@ public class RefDataUtil {
 
 
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity,
+                                               Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -221,7 +237,8 @@ public class RefDataUtil {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
 
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse
+                    = (ProfessionalUsersEntityResponse) responseEntity.getBody();
 
             List<ProfessionalUsersResponse> filteredUsers =  professionalUsersEntityResponse.getUserProfiles().stream()
                     .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
@@ -239,7 +256,8 @@ public class RefDataUtil {
         }
     }
 
-    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page, ResponseEntity responseEntity) {
+    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page,
+                                                                         ResponseEntity responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -256,7 +274,8 @@ public class RefDataUtil {
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
-            // since Headers are read only , it can't be modified and hence copied all existing headers into new one and added new header for pagination
+            // since Headers are read only , it can't be modified and hence copied all existing headers into new
+            // one and added new header for pagination
             MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
             originalHeaders.forEach((key, value) -> headers.put(key, value));
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
@@ -294,7 +313,8 @@ public class RefDataUtil {
         return modifyUserRolesResponse;
     }
 
-    public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
+    public static NewUserResponse findUserProfileStatusByEmail(String emailAddress,
+                                                               UserProfileFeignClient userProfileFeignClient) {
 
         NewUserResponse newUserResponse;
         try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {

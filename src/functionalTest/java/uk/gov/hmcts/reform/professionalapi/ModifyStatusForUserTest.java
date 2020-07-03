@@ -36,7 +36,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
 
@@ -49,7 +50,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         data.setLastName("UpdatedLastName");
         data.setIdamStatus(IdamStatus.SUSPENDED.name());
 
-        Map<String,Object> modifyStatusResponse = professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        Map<String,Object> modifyStatusResponse = professionalApiClient
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
 
         String status = searchUserStatus(orgIdentifier, userId);
 
@@ -82,7 +84,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         assertThat(newUserCreationRequest).isNotNull();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
 
@@ -104,7 +107,8 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
     @SuppressWarnings("unchecked")
     private String searchUserStatus(String orgIdentifier, String userId) {
 
-        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
         return professionalUsersResponses.stream()

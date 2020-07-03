@@ -95,7 +95,8 @@ public class ExceptionMapper {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
-        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
+        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause()
+                .getMessage() != null) {
             String message = ex.getCause().getCause().getMessage().toUpperCase();
             if (message.contains("SRA_ID")) {
                 errorMessage = String.format(errorMessage, "SRA_ID");
@@ -163,7 +164,8 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
+        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
+                getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
     }

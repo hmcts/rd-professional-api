@@ -33,7 +33,8 @@ public class UserAttributeRequestTest {
 
     @Test
     public void userAttributeBuilderTest() {
-        UserAttributeRequest testUserAttributeRequest = UserAttributeRequest.aUserAttributeCreationRequest().userRoles(singletonList(puiUserManager)).build();
+        UserAttributeRequest testUserAttributeRequest = UserAttributeRequest.aUserAttributeCreationRequest()
+                .userRoles(singletonList(puiUserManager)).build();
 
         assertThat(testUserAttributeRequest.getUserRoles()).hasSize(1);
         assertThat(testUserAttributeRequest.getUserRoles().get(0)).isEqualTo(puiUserManager);

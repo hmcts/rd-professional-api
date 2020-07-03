@@ -54,9 +54,11 @@ public class BaseRepository {
 
     @Before
     public void setUp() {
-        organisation = new Organisation("some-name", OrganisationStatus.ACTIVE, "sra-id", "companyN", Boolean.FALSE, "company-url");
+        organisation = new Organisation("some-name", OrganisationStatus.ACTIVE, "sra-id",
+                "companyN", Boolean.FALSE, "company-url");
         organisation = organisationRepository.save(organisation);
-        professionalUser = new ProfessionalUser("fName", "lName", "user@test.com", organisation);
+        professionalUser = new ProfessionalUser("fName", "lName", "user@test.com",
+                organisation);
         professionalUser = professionalUserRepository.save(professionalUser);
         organisationRepository.save(organisation);
 

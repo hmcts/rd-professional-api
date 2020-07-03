@@ -19,7 +19,8 @@ public class UserProfileCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
         List<String> roles = asList("pui-user-manager", "pui-organisation-manager");
 
-        UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName, lastName, EN, PROFESSIONAL, EXTERNAL, roles, false);
+        UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName,
+                lastName, EN, PROFESSIONAL, EXTERNAL, roles, false);
 
         userProfileCreationRequest.setEmail("somebody@hmcts.net");
 
@@ -38,7 +39,8 @@ public class UserProfileCreationRequestTest {
     public void test_BuilderMethod() {
         List<String> roles = asList("aRole");
 
-        UserProfileCreationRequest userProfileCreationRequest = UserProfileCreationRequest.anUserProfileCreationRequest()
+        UserProfileCreationRequest userProfileCreationRequest
+                = UserProfileCreationRequest.anUserProfileCreationRequest()
                 .email(email)
                 .firstName(firstName)
                 .lastName(lastName)

@@ -89,7 +89,8 @@ public class OrganisationServiceImpl implements OrganisationService {
                 OrganisationStatus.PENDING,
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()),
                 RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()),
-                Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())),
+                Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated()
+                        .toLowerCase())),
                 RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl())
         );
 
@@ -141,11 +142,14 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId).collect(Collectors.toList());
+        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId)
+                .collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
-        List<UserAttribute> attributes = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser, newProfessionalUser.getUserAttributes(), jurisdictionIds);
+        List<UserAttribute> attributes
+                = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser,
+                newProfessionalUser.getUserAttributes(), jurisdictionIds);
         newProfessionalUser.setUserAttributes(attributes);
 
         userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());
@@ -178,7 +182,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest, ContactInformation contactInformation) {
+    private void addDxAddressToContactInformation(List<DxAddressCreationRequest> dxAddressCreationRequest,
+                                                  ContactInformation contactInformation) {
         if (dxAddressCreationRequest != null) {
             List<DxAddress> dxAddresses = new ArrayList<>();
             dxAddressCreationRequest.forEach(dxAdd -> {
@@ -207,8 +212,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
-            RetrieveUserProfilesRequest retrieveUserProfilesRequest = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
+            RetrieveUserProfilesRequest retrieveUserProfilesRequest
+                    = new RetrieveUserProfilesRequest(activeOrganisationDtls.keySet().stream().sorted()
+                    .collect(Collectors.toList()));
+            updatedOrganisationDetails = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
+                    retrieveUserProfilesRequest,
                     "false", activeOrganisationDtls);
 
         }
@@ -245,8 +253,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         if (!CollectionUtils.isEmpty(activeOrganisations)) {
 
             RetrieveUserProfilesRequest retrieveUserProfilesRequest
-                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted().collect(Collectors.toList()));
-            updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient, retrieveUserProfilesRequest,
+                    = new RetrieveUserProfilesRequest(activeOrganisationDetails.keySet().stream().sorted()
+                    .collect(Collectors.toList()));
+            updatedActiveOrganisations = RefDataUtil.getMultipleUserProfilesFromUp(userProfileFeignClient,
+                    retrieveUserProfilesRequest,
                     "false", activeOrganisationDetails);
         }
 
@@ -267,7 +277,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
         organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         organisation.setCompanyNumber(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
-        organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraRegulated().toLowerCase())));
+        organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
+                .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
         organisationRepository.save(organisation);
         //Update Organisation service done
@@ -289,7 +300,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
-            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
+            organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
+                    false));
         }
         return new OrganisationEntityResponse(organisation, true);
     }

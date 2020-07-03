@@ -21,27 +21,34 @@ public interface UserProfileFeignClient {
 
     @PostMapping(value = "/v1/userprofile")
     @RequestLine("POST /v1/userprofile")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
+            "Content-Type: application/json"})
     Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest);
 
     @GetMapping(value = "/v1/userprofile", params = "userId")
     @RequestLine("GET /v1/userprofile")
-    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}",
+            "Content-Type: application/json"})
     Response getUserProfileById(@RequestParam("userId") String userId);
 
     @GetMapping(value = "/v1/userprofile", params = "email")
     @RequestLine("GET /v1/userprofile")
-    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}",
+            "Content-Type: application/json"})
     Response getUserProfileByEmail(@RequestParam("email") String email);
 
     @PostMapping(value = "/v1/userprofile/users")
     @RequestLine("POST /v1/userprofile/users")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
+            "Content-Type: application/json"})
     Response getUserProfiles(@RequestBody RetrieveUserProfilesRequest retrieveUserProfilesRequest,
-                             @RequestParam(value = "showdeleted") String showDeleted,  @RequestParam(value = "rolesRequired")String rolesRequired);
+                             @RequestParam(value = "showdeleted") String showDeleted,
+                             @RequestParam(value = "rolesRequired")String rolesRequired);
 
     @PutMapping(value = "/v1/userprofile/{userId}")
     @RequestLine("PUT /v1/userprofile/{userId}")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}", "Content-Type: application/json"})
-    Response modifyUserRoles(@RequestBody UserProfileUpdatedData modifyRoles, @PathVariable("userId") String userId, @RequestParam(value = "origin") String origin);
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
+            "Content-Type: application/json"})
+    Response modifyUserRoles(@RequestBody UserProfileUpdatedData modifyRoles, @PathVariable("userId") String userId,
+                             @RequestParam(value = "origin") String origin);
 }

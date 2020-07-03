@@ -17,7 +17,8 @@ public class ProfessionalUserTest {
         roles.add("pui-user-manager");
 
         Organisation organisation = new Organisation();
-        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some-email-address", organisation);
+        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "some-email-address", organisation);
 
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setCreated(LocalDateTime.now());
@@ -43,7 +44,8 @@ public class ProfessionalUserTest {
     @Test
     public void test_toSuperUser() {
         Organisation organisation = new Organisation();
-        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some-email-address", organisation);
+        ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "some-email-address", organisation);
 
         UUID id = UUID.randomUUID();
         professionalUser.setUserIdentifier(id.toString());

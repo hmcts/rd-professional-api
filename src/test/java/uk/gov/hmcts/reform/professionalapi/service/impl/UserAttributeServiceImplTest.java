@@ -26,11 +26,14 @@ public class UserAttributeServiceImplTest {
     private final UserAttributeRepository userAttributeRepositoryMock = mock(UserAttributeRepository.class);
     private final PrdEnumRepository prdEnumRepositoryMock = mock(PrdEnumRepository.class);
     private final PrdEnumServiceImpl prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-    private final UserAttributeServiceImpl userAttributeServiceMock = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
+    private final UserAttributeServiceImpl userAttributeServiceMock
+            = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
 
     private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "JURISD_ID");
-    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname", "some-lname", "some@hmcts.net", organisation);
+    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
+            null, null, null);
+    private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
+            "some-lname", "some@hmcts.net", organisation);
     private List<String> userRoles = new ArrayList<>();
     private List<PrdEnum> prdEnums = new ArrayList<>();
     private PrdEnum anEnum;
@@ -58,7 +61,8 @@ public class UserAttributeServiceImplTest {
 
     @Test
     public void testAddAllAttributes() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
+        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE",
+                "PROBATE"));
 
         when(userAttributeRepositoryMock.saveAll(any())).thenReturn(userAttributes);
 
@@ -68,7 +72,8 @@ public class UserAttributeServiceImplTest {
         List<String> jurisdictionIds = new ArrayList<>();
         jurisdictionIds.add("PROBATE");
 
-        List<UserAttribute> result = userAttributeServiceMock.addUserAttributesToSuperUserWithJurisdictions(professionalUserMock, userAttributes, jurisdictionIds);
+        List<UserAttribute> result = userAttributeServiceMock
+                .addUserAttributesToSuperUserWithJurisdictions(professionalUserMock, userAttributes, jurisdictionIds);
 
         assertThat(result.size()).isEqualTo(expectSize);
 

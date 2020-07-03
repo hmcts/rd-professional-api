@@ -25,7 +25,8 @@ public class UserProfileCreationRequest  {
     private String email;
 
     @JsonIgnore
-    private static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+    private static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)"
+            + "*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
     
     @NotBlank
     private String firstName;

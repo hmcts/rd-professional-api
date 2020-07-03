@@ -10,9 +10,11 @@ public class OrganisationEntityResponseTest {
 
     @Test
     public void test_OrganisationEntityResponse() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
 
-        OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(organisation,
+                false);
 
         assertThat(organisationEntityResponse).isNotNull();
     }

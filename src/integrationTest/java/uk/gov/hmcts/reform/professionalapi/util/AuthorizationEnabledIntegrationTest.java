@@ -59,7 +59,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 
 @Configuration
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000", "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
+        "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
 @DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -101,7 +102,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public static WireMockRule ccdService = new WireMockRule(wireMockConfig().port(8092));
 
     @ClassRule
-    public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000).extensions(ExternalTransformer.class));
+    public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
+            .extensions(ExternalTransformer.class));
 
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
@@ -153,7 +155,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ.UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2AUgA")));
+                        .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ"
+                                + ".UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2"
+                                + "AUgA")));
 
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
                 .willReturn(aResponse()
@@ -232,7 +236,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin, userIdentifier);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
+                        hmctsAdmin, userIdentifier);
 
 
 
@@ -241,22 +247,26 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
     public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
     public void updateOrganisation(String organisationIdentifier, String role, String status) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+                .status(status).build();
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 
-    public void updateOrganisation(String organisationIdentifier, String role, String status, OrganisationCreationRequest organisationUpdateRequest) {
+    public void updateOrganisation(String organisationIdentifier, String role, String status,
+                                   OrganisationCreationRequest organisationUpdateRequest) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
@@ -494,14 +504,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}";
         } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
             body = "{"
-                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after some time\","
-                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval) + "\","
+                    + "  \"errorMessage\": \"10 : The request was last made less than 1 hour ago. Please try after"
+                    + " some time\","
+                    + "  \"errorDescription\": \"" + String.format("The request was last made less than %s minutes ago."
+                    + " Please try after some time", resendInterval) + "\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
         } else if (status == HttpStatus.CONFLICT) {
             body = "{"
-                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour for the system to refresh.\","
-                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval) + "\","
+                    + "  \"errorMessage\": \"7 : Resend invite failed as user is already active. Wait for one hour "
+                    + "for the system to refresh.\","
+                    + "  \"errorDescription\": \"" + String.format("Resend invite failed as user is already active. "
+                    + "Wait for %s minutes for the system to refresh.", syncInterval) + "\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
         }

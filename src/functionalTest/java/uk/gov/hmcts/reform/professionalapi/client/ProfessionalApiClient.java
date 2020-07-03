@@ -191,7 +191,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest organisationCreationRequest) {
+    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest
+                                                                         organisationCreationRequest) {
         Response response = withUnauthenticatedRequest()
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
@@ -224,7 +225,9 @@ public class ProfessionalApiClient {
         return createOrganisation(organisationCreationRequest);
     }
 
-    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
+    public void
+        receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest
+                                                                                  organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
@@ -274,7 +277,8 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10) + "@hotmail.com".toLowerCase() : email)
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10)
+                        + "@hotmail.com".toLowerCase() : email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .resendInvite(true)
@@ -283,7 +287,9 @@ public class ProfessionalApiClient {
         return userCreationRequest;
     }
 
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
+    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role,
+                                                          NewUserCreationRequest newUserCreationRequest,
+                                                          HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
                 .proxy("proxyout.reform.hmcts.net", 8080)
@@ -296,7 +302,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification, HttpStatus expectedStatus) {
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest,
+                                                                  RequestSpecification requestSpecification,
+                                                                  HttpStatus expectedStatus) {
 
         Response response = requestSpecification
                 .body(newUserCreationRequest)
@@ -391,7 +399,8 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,
+                                                         HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
@@ -402,10 +411,13 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, String pageNumber, String size) {
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role,
+                                                                       String showDeleted, HttpStatus status,
+                                                                       String pageNumber, String size) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&page=" + pageNumber + "&size=" + size)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -418,7 +430,10 @@ public class ProfessionalApiClient {
         }
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+    public Map<String, Object>
+        searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status,
+                                                                 RequestSpecification requestSpecification,
+                                                                 String userStatus, String pageNumber, String size) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
@@ -433,7 +448,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role, HttpStatus status) {
+    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId,
+                                                                       String role, HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
@@ -444,7 +460,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
+    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status,
+                                                                       RequestSpecification requestSpecification,
+                                                                       String userStatus) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
@@ -461,7 +479,8 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
+    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
+                                                                            RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations")
@@ -489,13 +508,15 @@ public class ProfessionalApiClient {
     }
 
     //with OPENID implementation
-    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
+                                   String organisationIdentifier) {
 
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
     }
 
 
-    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier, HttpStatus expectedStatus) {
+    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
+                                   String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(organisationCreationRequest)
@@ -509,7 +530,8 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
     }
 
-    public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier, HttpStatus expectedStatus) {
+    public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
+                                                     HttpStatus expectedStatus) {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
         Response response = getMultipleAuthHeadersWithEmptyBearerToken("")
                 .body(organisationCreationRequest)
@@ -599,7 +621,9 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status,
+                                                                  UserProfileUpdatedData userProfileUpdatedData,
+                                                                  String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(userProfileUpdatedData)
@@ -630,7 +654,10 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status,
+                                                                  UserProfileUpdatedData userProfileUpdatedData,
+                                                                  RequestSpecification requestSpecification,
+                                                                  String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
@@ -645,7 +672,10 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
+    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status,
+                                                                  UserProfileUpdatedData userProfileUpdatedData,
+                                                                  RequestSpecification requestSpecification,
+                                                                  String organisationId, String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
@@ -659,7 +689,8 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
+    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification,
+                                                     String email) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
@@ -693,7 +724,8 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
-    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
+    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,
+                                                               String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
