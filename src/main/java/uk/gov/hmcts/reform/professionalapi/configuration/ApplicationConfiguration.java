@@ -12,16 +12,13 @@ public class ApplicationConfiguration {
     private final String s2sSecret;
     private final String s2sMicroService;
     private final String s2sUrl;
-    private final String pbaFromUserAccountMap;
 
     public ApplicationConfiguration(@Value("${idam.s2s-auth.totp_secret}") String s2sSecret,
                                     @Value("${idam.s2s-auth.microservice}") String s2sMicroService,
-                                    @Value("${idam.s2s-auth.url}") String s2sUrl,
-                                    @Value("${idam.s2s-auth.pbaFromUserAccountMap}") String pbaFromUserAccountMap) {
+                                    @Value("${idam.s2s-auth.url}") String s2sUrl) {
         this.s2sSecret = s2sSecret;
         this.s2sMicroService = s2sMicroService;
         this.s2sUrl = s2sUrl;
-        this.pbaFromUserAccountMap = pbaFromUserAccountMap;
     }
 
     public String getS2sSecret() {
@@ -36,7 +33,4 @@ public class ApplicationConfiguration {
         return s2sUrl;
     }
 
-    public String getPbaFromUserAccountMap() {
-        return pbaFromUserAccountMap;
-    }
 }

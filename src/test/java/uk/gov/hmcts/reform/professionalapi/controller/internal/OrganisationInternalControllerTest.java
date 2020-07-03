@@ -263,10 +263,8 @@ public class OrganisationInternalControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(paymentAccountServiceMock, times(1)).deleteUserAccountMaps(organisation);
-        verify(paymentAccountServiceMock, times(1)).deletePaymentAccountsFromOrganisation(organisation);
-        verify(paymentAccountServiceMock, times(1)).addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        verify(paymentAccountServiceMock, times(1)).addUserAndPaymentAccountsToUserAccountMap(organisation);
+        verify(paymentAccountServiceMock, times(1)).editPbaAccounts(pbaEditRequest, organisation);
+
     }
 
     @Test
