@@ -22,6 +22,7 @@ public class ProfessionalUserTest {
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setRoles(roles);
+        professionalUser.setUserAccountMap(new ArrayList<>());
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
@@ -33,6 +34,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getRoles().get(0)).isEqualTo("pui-user-manager");
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
+        assertThat(professionalUser.getUserAccountMap()).isNotNull();
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();

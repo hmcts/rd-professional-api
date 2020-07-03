@@ -223,7 +223,10 @@ public class OrganisationInternalController extends SuperController {
             throw new EmptyResultDataAccessException(1);
         }
 
-        PbaResponse response = paymentAccountService.editPbaAccounts(pbaEditRequest, organisation.get());
+        paymentAccountService.deleteUserAccountMaps(organisation.get());
+        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
+        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
+        PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation.get());
 
         return ResponseEntity
                 .status(200)
