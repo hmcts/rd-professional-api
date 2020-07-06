@@ -34,7 +34,7 @@ public class PrdEnumServiceImplTest {
     }
 
     @Test
-    public void gets_user_roles_of_user_correctly_other_than_role_type() {
+    public void test_gets_user_roles_of_user_correctly_other_than_role_type() {
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
@@ -46,7 +46,7 @@ public class PrdEnumServiceImplTest {
     }
 
     @Test
-    public void gets_no_user_roles_of_user_by_admin_role_type() {
+    public void test_gets_no_user_roles_of_user_by_admin_role_type() {
 
         List<PrdEnum> prdEnums = new ArrayList<>();
         PrdEnum anEnum = new PrdEnum(prdEnumId3, "PRD-ADMIN", "ADMIN_ROLE");

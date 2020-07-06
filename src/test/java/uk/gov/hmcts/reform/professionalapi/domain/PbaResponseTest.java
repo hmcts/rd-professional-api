@@ -7,7 +7,7 @@ import org.junit.Test;
 public class PbaResponseTest {
 
     @Test
-    public void pbaResponseNoArgsConstructorTest() {
+    public void test_pbaResponseNoArgsConstructor() {
         PbaResponse pbaResponse = new PbaResponse();
 
         String success = "Success";
@@ -21,7 +21,7 @@ public class PbaResponseTest {
     }
 
     @Test
-    public void pbaResponseAllArgsConstructorTest() {
+    public void test_pbaResponseAllArgsConstructor() {
         String success = "Success";
         String statusCode = "200";
 

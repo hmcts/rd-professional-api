@@ -81,7 +81,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisation() {
+    public void test_FindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
@@ -118,7 +118,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisationWithPuiCaseManager() {
+    public void test_FindUsersByOrganisationWithPuiCaseManager() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
@@ -154,7 +154,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void testFindUserByEmailWithPuiUserManager() {
+    public void test_FindUserByEmailWithPuiUserManager() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
@@ -187,7 +187,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test
-    public void testFindUserStatusByEmail() throws JsonProcessingException {
+    public void test_FindUserStatusByEmail() throws JsonProcessingException {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
@@ -212,7 +212,7 @@ public class ProfessionalExternalUserControllerTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testFindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
+    public void test_FindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
         Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
         assertThat(actual).isNotNull();

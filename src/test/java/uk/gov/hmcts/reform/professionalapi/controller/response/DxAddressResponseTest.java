@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 public class DxAddressResponseTest {
 
     @Test
-    public void testDxAddress() {
+    public void test_DxAddress() {
         final String expectDxNumber = "01234567";
         final String expectDxExchange = "DX 1234";
         final DxAddress dxAddress = new DxAddress();

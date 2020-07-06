@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 public class ContactInformationResponseTest {
 
     @Test
-    public void testGetContactInformationResponse() throws Exception {
+    public void test_GetContactInformationResponse() throws Exception {
         final String expectAddress1 = "apt 1";
         final String expectAddress2 = "London Bridge Rd";
         final String expectAddress3 = "City Apartments";

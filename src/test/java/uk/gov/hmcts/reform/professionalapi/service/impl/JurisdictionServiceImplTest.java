@@ -79,7 +79,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test
-    public void should_create_jurisdictionUserProfileRequest_for_Super_User() {
+    public void test_should_create_jurisdictionUserProfileRequest_for_Super_User() {
         JurisdictionUserCreationRequest request = jurisdictionServiceImpl.createJurisdictionUserProfileRequestForSuperUser(user);
         assertThat(request).isNotNull();
         assertThat(request.getId()).isEqualTo("some@hmcts.net");
@@ -91,7 +91,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_call_ccd_without_exception() {
+    public void test_should_call_ccd_without_exception() {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
@@ -101,7 +101,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_error() {
+    public void test_should_throw_error_when_ccd_returns_error() {
         FeignException feignException = mock(FeignException.class);
         when(feignException.status()).thenReturn(400);
 
@@ -114,7 +114,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_error_less_than_zero() {
+    public void test_should_throw_error_when_ccd_returns_error_less_than_zero() {
         FeignException feignException = mock(FeignException.class);
         when(feignException.status()).thenReturn(-1);
 
@@ -127,7 +127,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_403() {
+    public void test_should_throw_error_when_ccd_returns_403() {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         response = response.toBuilder().status(403).build();
 
@@ -138,7 +138,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test
-    public void should_throw_error_when_ccd_returns_300() {
+    public void test_should_throw_error_when_ccd_returns_300() {
         response = response.toBuilder().status(300).build();
         Response responseMock = mock(Response.class);
 
@@ -153,7 +153,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_500() {
+    public void test_should_throw_error_when_ccd_returns_500() {
         FeignException feignException = mock(FeignException.class);
         when(feignException.status()).thenReturn(500);
 
@@ -164,7 +164,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_throw_error_when_ccd_returns_0() {
+    public void test_should_throw_error_when_ccd_returns_0() {
         FeignException feignException = mock(FeignException.class);
         when(feignException.status()).thenReturn(0);
 
@@ -175,7 +175,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_null_response() {
+    public void test_should_throw_error_when_ccd_returns_null_response() {
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
         when(jurisdictionFeignClient.createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request)).thenReturn(null);
 
@@ -183,7 +183,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_propagate_jurisdiction_ids_for_super_user_To_ccd_without_exception() {
+    public void test_should_propagate_jurisdiction_ids_for_super_user_To_ccd_without_exception() {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 
@@ -193,7 +193,7 @@ public class JurisdictionServiceImplTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_propagate_jurisdiction_ids_for_new_user_to_ccd_without_exception() {
+    public void test_should_propagate_jurisdiction_ids_for_new_user_to_ccd_without_exception() {
         when(jurisdictionFeignClient.createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
 

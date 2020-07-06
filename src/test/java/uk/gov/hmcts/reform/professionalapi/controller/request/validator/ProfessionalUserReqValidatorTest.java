@@ -25,13 +25,13 @@ public class ProfessionalUserReqValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testValidateRequestAllNull() {
+    public void test_ValidateRequestAllNull() {
         profUserReqValidator
                 .validateRequest(null, null, null);
     }
 
     @Test
-    public void testValidateRequestNoneNull() {
+    public void test_ValidateRequestNoneNull() {
         profUserReqValidator
                 .validateRequest("ordId", "true", "");
     }

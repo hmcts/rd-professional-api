@@ -10,7 +10,7 @@ public class PbaEditRequestTest {
     private String pbaNumber = "PBA0000001";
 
     @Test
-    public void pbaEditRequestBuilderTest() {
+    public void test_pbaEditRequestBuilder() {
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(singleton(pbaNumber));
         assertThat(pbaEditRequest.getPaymentAccounts()).isEqualTo(singleton(pbaNumber));

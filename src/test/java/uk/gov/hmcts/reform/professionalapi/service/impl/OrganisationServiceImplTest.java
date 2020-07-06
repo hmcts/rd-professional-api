@@ -185,7 +185,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testSavesAnOrganisation() {
+    public void test_SavesAnOrganisation() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(4, "ADMIN_ROLE"), "organisation-admin", "ADMIN_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
@@ -204,7 +204,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testSavesOrganisationWithInvalidRequest() {
+    public void test_SavesOrganisationWithInvalidRequest() {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.save(any(Organisation.class))).thenThrow(ConstraintViolationException.class);
 
@@ -214,63 +214,10 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(2)).save(any(Organisation.class));
 
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
-        verify(organisationMock, times(1)).setOrganisationIdentifier(any(String.class));
     }
 
     @Test
-    public void test_addPbaAccountToOrganisation() {
-        Organisation organisationMock = mock(Organisation.class);
-
-        sut.addPbaAccountToOrganisation(paymentAccountList, organisationMock);
-
-        verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
-    }
-
-    @Test
-    public void test_addSuperUserToOrganisation() {
-        Organisation organisationMock = mock(Organisation.class);
-
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId("PROBATE");
-        List<Jurisdiction> jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdiction);
-
-        UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some-email", jurisdictions);
-
-        sut.addSuperUserToOrganisation(userCreationRequest, organisationMock);
-
-        verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
-    }
-
-    @Test
-    public void test_setNewContactInformationFromRequest() {
-        ContactInformation contactInformationMock = mock(ContactInformation.class);
-        Organisation organisationMock = mock(Organisation.class);
-
-        sut.setNewContactInformationFromRequest(contactInformationMock, contactInformationCreationRequest, organisationMock);
-
-        verify(contactInformationMock, times(1)).setAddressLine1(any(String.class));
-        verify(contactInformationMock, times(1)).setAddressLine2(any(String.class));
-        verify(contactInformationMock, times(1)).setAddressLine3(any(String.class));
-        verify(contactInformationMock, times(1)).setTownCity(any(String.class));
-        verify(contactInformationMock, times(1)).setCounty(any(String.class));
-        verify(contactInformationMock, times(1)).setCountry(any(String.class));
-        verify(contactInformationMock, times(1)).setPostCode(any(String.class));
-        verify(contactInformationMock, times(1)).setOrganisation(any(Organisation.class));
-    }
-
-    @Test
-    public void testUpdatesAnOrganisation() {
-        OrganisationResponse organisationResponse = sut.updateOrganisation(organisationCreationRequest, organisationIdentifier);
-
-        assertThat(organisationResponse).isNotNull();
-
-        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
-        verify(organisationRepository, times(1)).save(any(Organisation.class));
-    }
-
-    @Test
-    public void testUpdatesAnOrganisationVerifySetMethodsAreCalled() {
+    public void test_UpdatesAnOrganisationVerifySetMethodsAreCalled() {
         Organisation organisationMock = mock(Organisation.class);
 
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
@@ -292,12 +239,16 @@ public class OrganisationServiceImplTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void retrieve_an_organisations_by_status() {
-        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
+
+        assertThat(organisationDetailResponse).isEqualTo(404);
+
+        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
     }
 
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void throwsEmptyResultDataAccessException() {
+    public void test_throwsEmptyResultDataAccessException() {
         Organisation testOrganisation = new Organisation();
         testOrganisation.setId(UUID.randomUUID());
         String testOrganisationId = testOrganisation.getOrganisationIdentifier();
@@ -307,7 +258,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void testRetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
+    public void test_RetrieveAllOrganisationsThrowExceptionWhenOrganisationEmpty() throws JsonProcessingException {
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com", "firstName", "lastName", IdamStatus.ACTIVE);
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
@@ -327,7 +278,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testRetrieveAnOrganisationsByOrgIdentifier() throws Exception {
+    public void test_RetrieveAnOrganisationsByOrgIdentifier() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -353,7 +304,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testRetrieveAnOrganisationsByWhenStatusActive() throws Exception {
+    public void test_RetrieveAnOrganisationsByWhenStatusActive() throws Exception {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
@@ -387,7 +338,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieveAnOrganisation() {
+    public void test_retrieveAnOrganisation() {
         Organisation organisationMock = mock(Organisation.class);
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisationMock);
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
@@ -402,19 +353,19 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieveAnOrganisationByUuidNotFound() {
+    public void test_retrieveAnOrganisationByUuidNotFound() {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
         sut.retrieveOrganisation(organisationIdentifier);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
+    public void test_retrieveAnPendingOrganisationThrowExceptionWhenOrgEmpty() {
         sut.findByOrganisationStatus(OrganisationStatus.PENDING);
     }
 
     @Test
-    public void retrieveAnPendingOrganisation() {
+    public void test_retrieveAnPendingOrganisation() {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
 
@@ -427,7 +378,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieveAllOrganisations() {
+    public void test_retrieveAllOrganisations() {
         List<Organisation> organisations = new ArrayList<>();
         organisations.add(organisation);
         organisations.add(organisation);
@@ -441,7 +392,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void retrieveAnOrganisationByOrgId() {
+    public void test_retrieveAnOrganisationByOrgId() {
         when(organisationRepository.findByOrganisationIdentifier(organisationIdentifier)).thenReturn(organisation);
 
         Organisation organisation = sut.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -452,7 +403,7 @@ public class OrganisationServiceImplTest {
 
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void testThrowsExceptionWhenOrganisationEmpty() {
+    public void test_ThrowsExceptionWhenOrganisationEmpty() {
         when(organisationRepository.findAll()).thenReturn(new ArrayList<>());
 
         sut.retrieveAllOrganisations();
@@ -460,7 +411,7 @@ public class OrganisationServiceImplTest {
 
 
     @Test(expected = InvalidRequest.class)
-    public void throwInvalidRequestWhenInvalidPbaIsPassed() {
+    public void test_throwInvalidRequestWhenInvalidPbaIsPassed() {
         Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "GBA1234567";
         paymentAccountList.add(pbaNumber);
@@ -471,7 +422,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
+    public void test_throwInvalidRequestWhenNullSuperUserEmailIsPassed() {
         Set<String> paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
@@ -489,7 +440,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testAllAttributesAddedToSuperUser() {
+    public void test_AllAttributesAddedToSuperUser() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(1, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(2, "SIDAM_ROLE"), "pui-user-manager", "SIDAM_ROLE"));
@@ -515,7 +466,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testFakeAttributesNotAdded() {
+    public void test_FakeAttributesNotAdded() {
         prdEnums.add(new PrdEnum(new PrdEnumId(0, "FAKE"), "pui-fake-manager", "FAKE_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(1, "FAKE_ROLE"), "pui-fake-manager", "FAKE_ROLE"));
         prdEnums.add(new PrdEnum(new PrdEnumId(2, "FAKE_FAKE"), "pui-fake-manager", "FAKE_ROLE"));
@@ -541,7 +492,7 @@ public class OrganisationServiceImplTest {
     }
 
     @Test
-    public void testAddContactInformationToOrganisation() {
+    public void test_AddContactInformationToOrganisation() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
         contactInformationCreationRequests.add(contactInformationCreationRequest);
         Organisation organisation = new Organisation("some-org-name", OrganisationStatus.ACTIVE, "PENDING", "Test", Boolean.TRUE, "Demo");

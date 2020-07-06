@@ -106,7 +106,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void retrieveUserByEmail() throws JsonProcessingException {
+    public void test_retrieveUserByEmail() throws JsonProcessingException {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
@@ -141,7 +141,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieveUserByEmail_EmptyData() throws JsonProcessingException {
+    public void test_retrieveUserByEmail_EmptyData() throws JsonProcessingException {
         List<SuperUser> users = new ArrayList<>();
         users.add(superUser);
         List<String> roles = new ArrayList<>();
@@ -171,7 +171,7 @@ public class ProfessionalUserServiceImplTest {
 
 
     @Test
-    public void findUsersByOrganisation_with_deleted_users() throws Exception {
+    public void test_findUsersByOrganisation_with_deleted_users() throws Exception {
         List<ProfessionalUser> users = new ArrayList<>();
         users.add(professionalUser);
 
@@ -200,7 +200,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUsersByOrganisation_with_status_active() throws Exception {
+    public void test_findUsersByOrganisation_with_status_active() throws Exception {
         ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse1 = new ProfessionalUsersResponse(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
         ProfessionalUsersResponse professionalUsersResponse2 = new ProfessionalUsersResponse(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
@@ -301,7 +301,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void modify_user_roles_bad_request() throws Exception {
+    public void test_modify_user_roles_bad_request() throws Exception {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
 
         Set<RoleName> roles = new HashSet<>();
@@ -329,7 +329,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void modify_user_roles_server_error() throws Exception {
+    public void test_modify_user_roles_server_error() throws Exception {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         modifyUserRolesResponse.setRoleAdditionResponse(createAddRoleResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
         ObjectMapper mapper = new ObjectMapper();
@@ -356,7 +356,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void addNewUserToAnOrganisation() {
+    public void test_addNewUserToAnOrganisation() {
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
         NewUserResponse newUserResponse = professionalUserService.addNewUserToAnOrganisation(professionalUser, userRoles, prdEnums);
@@ -367,7 +367,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUsersByOrganisationEmptyResultExceptionTest() throws Exception {
+    public void test_findUsersByOrganisationEmptyResultExceptionTest() throws Exception {
         List<String> ids = new ArrayList<>();
         ids.add(professionalUser.getUserIdentifier());
         List<ProfessionalUser> users = new ArrayList<>();
@@ -386,7 +386,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void shouldPersistUser() {
+    public void test_shouldPersistUser() {
         when(professionalUserRepository.save(any(ProfessionalUser.class))).thenReturn(professionalUser);
 
         ProfessionalUser actualProfessionalUser = professionalUserService.persistUser(professionalUser);
@@ -396,7 +396,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void shouldReturnProfessionalUserByEmail() {
+    public void test_shouldReturnProfessionalUserByEmail() {
         String email = "some@email.com";
         when(professionalUserRepository.findByEmailAddress(email)).thenReturn(professionalUser);
 
@@ -407,7 +407,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void shouldReturnProfessionalUserById() {
+    public void test_shouldReturnProfessionalUserById() {
         UUID id = UUID.randomUUID();
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
@@ -422,7 +422,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void shouldReturnProfessionalUserByIdShouldReturnNullIfUserNotFound() {
+    public void test_shouldReturnProfessionalUserByIdShouldReturnNullIfUserNotFound() {
         UUID id = UUID.randomUUID();
         Optional<ProfessionalUser> professionalUserOptional = Optional.empty();
 
@@ -436,7 +436,7 @@ public class ProfessionalUserServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
+    public void test_shouldReturnUsersInResponseEntityWithPageable() throws JsonProcessingException {
         Pageable pageableMock = mock(Pageable.class);
         List<ProfessionalUser> professionalUserList = new ArrayList<>();
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
@@ -491,7 +491,7 @@ public class ProfessionalUserServiceImplTest {
 
     @Test(expected = ResourceNotFoundException.class)
     @SuppressWarnings("unchecked")
-    public void shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
+    public void test_shouldThrowResourceNotFoundExceptionWhenNoUsersReturned() {
         Pageable pageableMock = mock(Pageable.class);
         Page<ProfessionalUser> professionalUserPage = (Page<ProfessionalUser>) mock(Page.class);
 
@@ -503,7 +503,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUserStatusByEmail() throws Exception {
+    public void test_findUserStatusByEmail() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
         professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
 
@@ -528,7 +528,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test
-    public void findUserStatusByEmailForPending() throws Exception {
+    public void test_findUserStatusByEmailForPending() throws Exception {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -547,7 +547,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
+    public void test_findUserStatusByEmailForPendingOrgThrowsException() throws Exception {
         organisation.setStatus(OrganisationStatus.PENDING);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
@@ -566,18 +566,23 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = ExternalApiException.class)
-    public void findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() {
+    public void test_findUserStatusByEmailForActiveThrowsExceptionWhenUpServiceDown() {
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(professionalUserRepository.findByEmailAddress(professionalUser.getEmailAddress())).thenReturn(professionalUser);
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
-        professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+        ResponseEntity<NewUserResponse> status = professionalUserService.findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+
+        assertThat(status).isNull();
+        assertThat(status.getStatusCode()).isEqualTo(500);
+        verify(professionalUserRepository, times(1)).findByEmailAddress(professionalUser.getEmailAddress());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
     @SneakyThrows
     @Test(expected = Test.None.class)
-    public void checkUserStatusIsActiveByUserId() {
+    public void test_checkUserStatusIsActiveByUserId() {
         professionalUser.setIdamStatus(IdamStatus.ACTIVE);
 
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(professionalUser);
@@ -594,7 +599,7 @@ public class ProfessionalUserServiceImplTest {
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void checkUserStatusIsActiveByUserId_Throws403_WhenNoUserFoundWithGivenId() {
+    public void test_checkUserStatusIsActiveByUserId_Throws403_WhenNoUserFoundWithGivenId() {
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(null);
 
         professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString());
@@ -602,7 +607,7 @@ public class ProfessionalUserServiceImplTest {
 
     @SneakyThrows
     @Test(expected = AccessDeniedException.class)
-    public void checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
+    public void test_checkUserStatusIsActiveByUserId_Throws403_WhenUserIsNotActive() {
         professionalUser.setIdamStatus(IdamStatus.PENDING);
 
         when(professionalUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(professionalUser));

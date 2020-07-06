@@ -9,13 +9,13 @@ import org.junit.Test;
 public class ProfessionalUserStatusTest {
 
     @Test
-    public void shouldReturnTrueWhenPendingisPassed() {
+    public void test_shouldReturnTrueWhenPendingisPassed() {
         ProfessionalUserStatus status = PENDING;
         assertThat(status).isEqualTo(PENDING);
     }
 
     @Test
-    public void shouldReturnTrueWhenActiveisPassed() {
+    public void test_shouldReturnTrueWhenActiveisPassed() {
         ProfessionalUserStatus status = ACTIVE;
         assertThat(status).isEqualTo(ACTIVE);;
     }

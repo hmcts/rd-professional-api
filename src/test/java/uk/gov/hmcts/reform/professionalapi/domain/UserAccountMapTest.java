@@ -9,7 +9,7 @@ import org.junit.Test;
 public class UserAccountMapTest {
 
     @Test
-    public void creates_user_account_map_correctly() {
+    public void test_creates_user_account_map_correctly() {
         UserAccountMap noOrgUserAccountMap = new UserAccountMap();
         assertThat(noOrgUserAccountMap).isNotNull();
         assertThat(noOrgUserAccountMap.getDefaulted()).isFalse();

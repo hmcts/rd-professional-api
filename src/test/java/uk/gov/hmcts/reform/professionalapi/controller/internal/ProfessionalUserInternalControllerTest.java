@@ -66,7 +66,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisation() {
+    public void test_FindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
@@ -92,7 +92,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUserByEmailWithPuiUserManager() {
+    public void test_FindUserByEmailWithPuiUserManager() {
         final String email = "testing@email.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
@@ -116,7 +116,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testModifyRolesForExistingUserOfOrganisation() {
+    public void test_ModifyRolesForExistingUserOfOrganisation() {
         when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
 
         String userId = UUID.randomUUID().toString();

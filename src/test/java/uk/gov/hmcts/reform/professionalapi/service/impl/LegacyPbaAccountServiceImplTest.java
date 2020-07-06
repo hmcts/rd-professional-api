@@ -49,7 +49,7 @@ public class LegacyPbaAccountServiceImplTest {
     }
 
     @Test
-    public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
+    public void test_FindLegacyAccountByUserEmailWhenPbaIsEmpty() {
         when(configurationMock.getPbaFromUserAccountMap()).thenReturn("false");
 
         paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
@@ -60,7 +60,7 @@ public class LegacyPbaAccountServiceImplTest {
     }
 
     @Test
-    public void testFindLegacyAccountByUserEmail() throws Exception {
+    public void test_FindLegacyAccountByUserEmail() throws Exception {
         when(configurationMock.getPbaFromUserAccountMap()).thenReturn("true");
         List<UserAccountMap> userAccountMapData = new ArrayList<>();
         UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);

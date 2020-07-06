@@ -12,7 +12,7 @@ import org.junit.Test;
 public class ProfessionalApiGeneratorTest {
 
     @Test
-    public void shouldReturnValidUuid() {
+    public void test_shouldReturnValidUuid() {
         UUID userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
 
         assertThat(userIdentifier).isNotNull();
@@ -20,7 +20,7 @@ public class ProfessionalApiGeneratorTest {
     }
 
     @Test
-    public void generateUniqueAlphanumericId() {
+    public void test_generateUniqueAlphanumericId() {
         String uniqueAlphanumericString = ProfessionalApiGenerator.generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
         assertThat(uniqueAlphanumericString).isNotNull();

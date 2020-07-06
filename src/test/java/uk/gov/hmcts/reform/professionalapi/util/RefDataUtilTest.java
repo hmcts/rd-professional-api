@@ -92,7 +92,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountsFromUserAccountMap() {
+    public void test_shouldReturnPaymentAccountsFromUserAccountMap() {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
         userAccountMaps.add(userAccountMap);
 
@@ -102,7 +102,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountsFromUserAccountMa_WhenUserAccountMapIdPaymentAccountIsEmpty() {
+    public void test_shouldReturnPaymentAccountsFromUserAccountMa_WhenUserAccountMapIdPaymentAccountIsEmpty() {
         UserAccountMapId userAccountMapId = new UserAccountMapId(null, null);
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
 
@@ -115,7 +115,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountsFromUserAccountMapWhenListIsEmpty() {
+    public void test_shouldReturnPaymentAccountsFromUserAccountMapWhenListIsEmpty() {
         List<UserAccountMap> userAccountMaps = new ArrayList<>();
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
@@ -124,7 +124,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountFromUserMap() {
+    public void test_shouldReturnPaymentAccountFromUserMap() {
         List<PaymentAccount> userMapPaymentAccount = new ArrayList<>();
         userMapPaymentAccount.add(paymentAccount);
 
@@ -137,7 +137,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void shouldReturnPaymentAccountFromOrganisationUser() {
+    public void test_shouldReturnPaymentAccountFromOrganisationUser() {
         List<PaymentAccount> paymentAccountsEntity = new ArrayList<>();
         paymentAccountsEntity.add(paymentAccount);
 
@@ -148,20 +148,20 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void removeEmptyWhiteSpacesTest() {
+    public void test_removeEmptyWhiteSpaces() {
         assertThat(RefDataUtil.removeEmptySpaces(" Test ")).isEqualTo("Test");
         assertThat(RefDataUtil.removeEmptySpaces(null)).isNull();
         assertThat(RefDataUtil.removeEmptySpaces(" Te  st ")).isEqualTo("Te st");
     }
 
     @Test
-    public void removeAllWhiteSpacesTest() {
+    public void test_removeAllWhiteSpaces() {
         assertThat(RefDataUtil.removeAllSpaces(" T e s t    1 ")).isEqualTo("Test1");
         assertThat(RefDataUtil.removeAllSpaces(null)).isNull();
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void shouldReturnTrueValidateOrgIdentifier() {
+    public void test_shouldReturnTrueValidateOrgIdentifier() {
         String uuid = UUID.randomUUID().toString();
         RefDataUtil.validateOrgIdentifier(uuid, UUID.randomUUID().toString());
     }
@@ -359,7 +359,7 @@ public class RefDataUtilTest {
     }
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    public void test_privateConstructor() throws Exception {
         Constructor<RefDataUtil> constructor = RefDataUtil.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
@@ -588,7 +588,7 @@ public class RefDataUtilTest {
 
 
     @Test(expected = ExternalApiException.class)
-    public void testGetSingleUserIdFromUserProfileForException() throws Exception {
+    public void test_GetSingleUserIdFromUserProfileForException() throws Exception {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);

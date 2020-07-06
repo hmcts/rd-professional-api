@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ProfessionalUserTest {
 
     @Test
-    public void creates_professional_user_correctly() {
+    public void test_creates_professional_user_correctly() {
         List<String> roles = new ArrayList<>();
         roles.add("pui-user-manager");
 

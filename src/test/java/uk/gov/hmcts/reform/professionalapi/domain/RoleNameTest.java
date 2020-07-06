@@ -10,7 +10,7 @@ public class RoleNameTest {
     private static final String PUI_CASE_MANAGER = "pui-case-manager";
 
     @Test
-    public void should_hold_values_after_creation() {
+    public void test_should_hold_values_after_creation() {
         RoleName roleName = new RoleName();
         roleName.setName(PUI_CASE_MANAGER);
         RoleName roleName1 = new RoleName(PUI_USER_MANAGER);
