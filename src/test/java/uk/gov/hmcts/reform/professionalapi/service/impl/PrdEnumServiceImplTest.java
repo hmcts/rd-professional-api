@@ -55,7 +55,7 @@ public class PrdEnumServiceImplTest {
         when(prdEnumRepository.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
         List roleList = prdEnumService.getPrdEnumByEnumType("ADMIN_ROLE");
-        assertThat(roleList.size()).isEqualTo(0);
+        assertThat(roleList.size()).isZero();
         verify(prdEnumRepository, times(1)).findByEnabled("YES");
     }
 }

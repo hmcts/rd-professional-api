@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -225,14 +224,9 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 
-    @Test
-    public void retrieve_an_organisations_by_status() {
-
-        final Throwable raisedException = catchThrowable(() -> sut.findByOrganisationStatus(OrganisationStatus.ACTIVE));
-
-        assertThat(raisedException).isExactlyInstanceOf(EmptyResultDataAccessException.class);
-
-        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void test_retrieve_an_organisations_by_status() {
+        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
 
@@ -458,13 +452,6 @@ public class OrganisationServiceImplTest {
         verify(userAttributeServiceMock, times(1)).addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes), eq(jurisdictionIds));
     }
 
-    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
-        final int orgIdLength = 7;
-        assertThat(organisationResponse).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
-    }
-
     @Test
     public void testAddContactInformationToOrganisation() throws NoSuchMethodException, IllegalAccessException {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
@@ -480,5 +467,12 @@ public class OrganisationServiceImplTest {
         assertEquals("county", contactInformationCreationRequests.get(0).getCounty());
         assertEquals("country", contactInformationCreationRequests.get(0).getCountry());
         assertEquals("postCode", contactInformationCreationRequests.get(0).getPostCode());
+    }
+
+    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
+        final int orgIdLength = 7;
+        assertThat(organisationResponse).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier()).hasSize(orgIdLength);
     }
 }

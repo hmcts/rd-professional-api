@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -76,8 +75,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    @Ignore
-    // Ignoring since invite user with caseworker-caa is failing
     public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_organisation_by_orgIdentifier_for_external() {
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser("caseworker-caa"));
         assertThat(response.get("errorMessage")).isNotNull();
@@ -92,7 +89,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
         orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
-        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "true", HttpStatus.OK);
+        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "true", HttpStatus.OK, "");
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName, email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 

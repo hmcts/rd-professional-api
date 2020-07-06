@@ -22,12 +22,16 @@ public class ProfessionalUsersEntityResponseTest {
         final String dummyEmail = "joe.bloggs@email.com";
 
         ProfessionalUser professionalUser = new ProfessionalUser(dummyFirstName, dummyLastName, dummyEmail, new Organisation());
+        ProfessionalUsersResponse professionalResponse = new ProfessionalUsersResponse(professionalUser);
         List<ProfessionalUsersResponse> professionalUsers = new ArrayList<>();
+        professionalUsers.add(professionalResponse);
 
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
-        professionalUsers.add(professionalUsersResponse);
         sut = new ProfessionalUsersEntityResponse();
         sut.setUserProfiles(professionalUsers);
+
+        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(professionalUser);
+        List<ProfessionalUsersResponse> usersExpected = new ArrayList<>();
+        usersExpected.add(professionalUsersResponse);
 
         assertThat(sut.getUserProfiles().get(0).getUserIdentifier()).isEqualTo(professionalUser.getUserIdentifier());
         assertThat(sut.getUserProfiles().get(0).getFirstName()).isEqualTo(professionalUser.getFirstName());
