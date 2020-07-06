@@ -354,6 +354,8 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any(String.class))).thenReturn(null);
 
         sut.retrieveOrganisation(organisationIdentifier);
+
+        verify(organisationRepository, times(1)).findByOrganisationIdentifier(any(String.class));
     }
 
     @Test(expected = EmptyResultDataAccessException.class)

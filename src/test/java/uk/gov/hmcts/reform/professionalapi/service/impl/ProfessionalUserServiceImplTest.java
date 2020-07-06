@@ -600,6 +600,8 @@ public class ProfessionalUserServiceImplTest {
         when(professionalUserRepository.findByUserIdentifier(any(String.class))).thenReturn(null);
 
         professionalUserService.checkUserStatusIsActiveByUserId(UUID.randomUUID().toString());
+
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
     }
 
     @SneakyThrows
