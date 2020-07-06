@@ -252,10 +252,9 @@ public class ProfessionalExternalUserControllerTest {
 
     @Test
     public void testFindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
-
         final Throwable raisedException = catchThrowable(() -> professionalExternalUserController
                 .findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email"));
-
         assertThat(raisedException).isExactlyInstanceOf(InvalidRequest.class);
+
     }
 }
