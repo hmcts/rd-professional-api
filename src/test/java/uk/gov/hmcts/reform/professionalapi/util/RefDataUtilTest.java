@@ -258,7 +258,7 @@ public class RefDataUtilTest {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.add("fakeHeader", "fakeValue");
 
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(null, responseHeader, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(null, responseHeader, HttpStatus.OK);
 
         Page pageMock = mock(Page.class);
         when(pageMock.getTotalElements()).thenReturn(1L);
