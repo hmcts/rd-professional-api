@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import feign.FeignException;
 import feign.Request;
 import feign.Response;
 
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -463,6 +465,25 @@ public class RefDataUtilTest {
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "emailAddress", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void test_findUserProfileStatusByEmail_Returns500_WhenExternalApiException() {
+        FeignException feignException = mock(FeignException.class);
+        Mockito.when(feignException.status()).thenReturn(500);
+
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        String body = "{"
+                + "  \"userIdentifier\": \"1cb88d5f-ef2c-4587-aca0-f77a7f6f3742\","
+                + "  \"idamStatus\": \"ACTIVE\""
+                + "}";
+
+        Mockito.when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
+
+        RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com", userProfileFeignClient);
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test

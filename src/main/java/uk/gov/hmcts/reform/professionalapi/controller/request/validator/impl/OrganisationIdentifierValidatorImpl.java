@@ -90,7 +90,6 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
             log.error(loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
-            log.error(loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }
