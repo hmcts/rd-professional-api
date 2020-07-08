@@ -22,8 +22,8 @@ import java.util.Date;
 import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -44,9 +44,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+@Slf4j
 public class ExceptionMapper {
 
-    private static final Logger LOG                         = LoggerFactory.getLogger(ExceptionMapper.class);
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
+
     private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
@@ -162,7 +165,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        log.error(loggingComponentName, HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);

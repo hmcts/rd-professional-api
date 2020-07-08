@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +79,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeService userAttributeService;
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
+
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
 
     @Override
     @Transactional
@@ -288,7 +292,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new EmptyResultDataAccessException(1);
 
         } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
-            log.debug("Retrieving organisation");
+            log.debug("{}:: Retrieving organisation", loggingComponentName);
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient, false));
         }
         return new OrganisationEntityResponse(organisation, true);

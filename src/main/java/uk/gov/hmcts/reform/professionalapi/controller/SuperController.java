@@ -240,7 +240,7 @@ public abstract class SuperController {
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
-                log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+                log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
@@ -266,7 +266,7 @@ public abstract class SuperController {
             Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
-            log.error("UserProfile api failed:: status code ::" + ex.status());
+            log.error("{}:: UserProfile api failed:: status code ::" + ex.status(), loggingComponentName);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
     }
@@ -280,7 +280,7 @@ public abstract class SuperController {
             organisationsDetailResponse =
                     organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
         } else {
-            log.error("Invalid Request param for status field");
+            log.error("{}:: Invalid Request param for status field", loggingComponentName);
             throw new InvalidRequest("400");
         }
         //Received response for status...
@@ -303,14 +303,14 @@ public abstract class SuperController {
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, false);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
-            log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+            log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
             responseBody = responseEntity.getBody();
         }
 
@@ -329,11 +329,11 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
-        ResponseEntity responseEntity = createUserProfileFor(professionalUser, roles, false, true);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error(String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+            log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
             responseBody = responseEntity.getBody();
         }
 

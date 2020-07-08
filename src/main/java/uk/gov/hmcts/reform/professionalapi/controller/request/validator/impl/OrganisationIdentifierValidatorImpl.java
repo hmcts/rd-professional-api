@@ -82,14 +82,15 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error(ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            log.error(loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
     }
 
     public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
-            log.error(NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error(loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }

@@ -51,6 +51,9 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
+
     private  static final String UP_SERVICE_MSG = "Error while invoking UP";
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
@@ -307,12 +310,12 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
+                log.error("{}:: Response from UserProfileByEmail service call " + errorResponse.getErrorDescription(), loggingComponentName);
                 newUserResponse = new NewUserResponse();
             }
 
         }  catch (FeignException ex) {
-            log.error("Error while invoking UserProfileByEmail service call", ex);
+            log.error("{}::", loggingComponentName + "Error while invoking UserProfileByEmail service call", ex);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
         }
 
@@ -321,7 +324,7 @@ public class RefDataUtil {
     }
 
     public static void throwException(int statusCode) {
-        log.info("Error status code: " + statusCode);
+        log.info("{}:: Error status code: " + statusCode, loggingComponentName);
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
