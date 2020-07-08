@@ -242,7 +242,7 @@ public class RefDataUtil {
         }
     }
 
-    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page, ResponseEntity responseEntity) {
+    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page, ResponseEntity<Object> responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -286,8 +286,8 @@ public class RefDataUtil {
     public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         boolean isFailureFromUp = response.status() > 300;
-        Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+        Object clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
+        ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
         if (isFailureFromUp) {
             ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
             modifyUserRolesResponse.setErrorResponse(errorResponse);
@@ -302,8 +302,8 @@ public class RefDataUtil {
         NewUserResponse newUserResponse;
         try (Response response =  userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() == 200) {
 

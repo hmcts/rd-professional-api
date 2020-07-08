@@ -310,7 +310,7 @@ public abstract class SuperController {
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
-            log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
+            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
@@ -333,7 +333,7 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
+            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
