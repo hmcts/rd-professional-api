@@ -251,8 +251,9 @@ public class SuperControllerTest {
 
         Organisation existingOrg = superController.checkOrganisationIsActive(organisation.getOrganisationIdentifier());
 
-        assertThat(existingOrg).isNotNull();
-        assertThat(existingOrg).isEqualTo(organisation);
+        assertThat(existingOrg)
+                .isNotNull()
+                .isEqualTo(organisation);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
