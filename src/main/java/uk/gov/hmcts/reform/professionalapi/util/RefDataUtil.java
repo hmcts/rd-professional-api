@@ -108,8 +108,8 @@ public class RefDataUtil {
     public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
         try (Response response =  userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
@@ -132,14 +132,14 @@ public class RefDataUtil {
         try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,"false")) {
 
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (response.status() < 300) {
 
                 modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity, activeOrganisationDetails);
             }
 
-            return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
+            return new ArrayList<>(modifiedOrgProfUserDetails.values());
         }  catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), UP_SERVICE_MSG);
@@ -147,7 +147,7 @@ public class RefDataUtil {
 
     }
 
-    public static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+    public static Map<String, Organisation> updateUserDetailsForActiveOrganisation(ResponseEntity<Object> responseEntity,
                                                                                    Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse)responseEntity.getBody();
@@ -155,7 +155,7 @@ public class RefDataUtil {
                 && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
 
             List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUserProfiles();
-            userProfiles.stream().forEach(userProfile -> {
+            userProfiles.forEach(userProfile -> {
 
                 if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
 
@@ -261,7 +261,7 @@ public class RefDataUtil {
         } else {
             // since Headers are read only , it can't be modified and hence copied all existing headers into new one and added new header for pagination
             MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
-            originalHeaders.forEach((key, value) -> headers.put(key, value));
+            originalHeaders.forEach(headers::put);
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
