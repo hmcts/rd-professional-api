@@ -330,7 +330,7 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("Response from UserProfileByEmail service call " + errorResponse);
+                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();
             }
 

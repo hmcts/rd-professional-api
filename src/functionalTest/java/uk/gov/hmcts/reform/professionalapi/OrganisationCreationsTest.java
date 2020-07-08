@@ -60,7 +60,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-        public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
+    public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&" + randomAlphabetic(9));
         professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
