@@ -214,9 +214,6 @@ public class ProfessionalExternalUserControllerTest {
     @Test(expected = InvalidRequest.class)
     public void testFindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
         Optional<ResponseEntity> actual = professionalExternalUserController.findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
-
-        assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode().value()).isEqualTo(HttpStatus.BAD_REQUEST);
         verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
     }
 }
