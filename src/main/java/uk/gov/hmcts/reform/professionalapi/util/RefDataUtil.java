@@ -177,7 +177,7 @@ public class RefDataUtil {
 
 
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity<Object> responseResponseEntity, Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -220,7 +220,7 @@ public class RefDataUtil {
 
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity responseEntity, String status) {
+    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() &&  null != responseEntity.getBody()) {
 
