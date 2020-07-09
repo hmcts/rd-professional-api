@@ -554,7 +554,29 @@ public class RefDataUtilTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileResponse);
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8).request(mock(Request.class)).build();
-        when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
+        Response responseMock = mock(Response.class);
+        when(responseMock.body()).thenReturn(response.body());
+        when(responseMock.status()).thenReturn(response.status());
+
+        when(userProfileFeignClient.getUserProfileById(any())).thenReturn(responseMock);
+
+        ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "some@email.com", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
+        assertThat(result).isNotNull();
+        assertThat(result.getFirstName()).isEqualTo("firstName");
+        assertThat(result.getLastName()).isEqualTo("lastName");
+        assertThat(result.getEmailAddress()).isEqualTo("some@email.com");
+        verify(userProfileFeignClient, times(1)).getUserProfileById(any());
+        verify(responseMock, times(1)).body();
+        verify(responseMock, times(3)).status();
+        verify(responseMock, times(1)).close();
+    }
+
+    @Test(expected = ExternalApiException.class)
+    public void test_GetSingleUserIdFromUserProfile_WithFeignException() throws Exception {
+        FeignException feignExceptionMock = mock(FeignException.class);
+        when(feignExceptionMock.status()).thenReturn(500);
+
+        when(userProfileFeignClient.getUserProfileById(any())).thenThrow(feignExceptionMock);
 
         ProfessionalUser result = RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName", "lastName", "some@email.com", new Organisation("name", OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE, "companyUrl")), userProfileFeignClient, Boolean.TRUE);
         assertThat(result).isNotNull();
@@ -740,7 +762,8 @@ public class RefDataUtilTest {
 
         when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
 
-        RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com", userProfileFeignClient);
+        NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com", userProfileFeignClient);
+        assertThat(newUserResponse).isNotNull();
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
@@ -779,7 +802,7 @@ public class RefDataUtilTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
         ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
-        ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse)responseEntityOutput.getBody();
+        ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
     }
 
@@ -793,7 +816,7 @@ public class RefDataUtilTest {
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
         ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
-        ProfessionalUsersEntityResponseWithoutRoles output = (ProfessionalUsersEntityResponseWithoutRoles)responseEntityOutput.getBody();
+        ProfessionalUsersEntityResponseWithoutRoles output = (ProfessionalUsersEntityResponseWithoutRoles) responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
     }
 }

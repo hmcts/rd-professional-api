@@ -214,6 +214,45 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(2)).save(any(Organisation.class));
 
         assertThat(organisation.getOrganisationIdentifier()).isNotNull();
+        verify(organisationMock, times(1)).setOrganisationIdentifier(any(String.class));
+    }
+
+    @Test
+    public void test_addPbaAccountToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+        Set<String> paymentAccounts = new HashSet<>();
+        String pbaNumber = "PBA1234567";
+        paymentAccounts.add(pbaNumber);
+
+        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock);
+
+        verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void test_addSuperUserToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        sut.addSuperUserToOrganisation(superUserCreationRequest, organisationMock);
+
+        verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
+    }
+
+    @Test
+    public void test_setNewContactInformationFromRequest() {
+        ContactInformation contactInformationMock = mock(ContactInformation.class);
+        Organisation organisationMock = mock(Organisation.class);
+
+        sut.setNewContactInformationFromRequest(contactInformationMock, contactInformationCreationRequest, organisationMock);
+
+        verify(contactInformationMock, times(1)).setAddressLine1(any(String.class));
+        verify(contactInformationMock, times(1)).setAddressLine2(any(String.class));
+        verify(contactInformationMock, times(1)).setAddressLine3(any(String.class));
+        verify(contactInformationMock, times(1)).setTownCity(any(String.class));
+        verify(contactInformationMock, times(1)).setCounty(any(String.class));
+        verify(contactInformationMock, times(1)).setCountry(any(String.class));
+        verify(contactInformationMock, times(1)).setPostCode(any(String.class));
+        verify(contactInformationMock, times(1)).setOrganisation(any(Organisation.class));
     }
 
     @Test
