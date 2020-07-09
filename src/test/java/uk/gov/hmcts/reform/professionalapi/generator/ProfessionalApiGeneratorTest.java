@@ -16,7 +16,7 @@ public class ProfessionalApiGeneratorTest {
         UUID userIdentifier = ProfessionalApiGenerator.generateUniqueUuid();
 
         assertThat(userIdentifier).isNotNull();
-        assertThat(userIdentifier.toString().length()).isEqualTo(LENGTH_OF_UUID);
+        assertThat(userIdentifier.toString()).hasSize(LENGTH_OF_UUID);
     }
 
     @Test
@@ -25,7 +25,7 @@ public class ProfessionalApiGeneratorTest {
                 .generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
 
         assertThat(uniqueAlphanumericString).isNotNull();
-        assertThat(uniqueAlphanumericString.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
-        assertThat(uniqueAlphanumericString.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
+        assertThat(uniqueAlphanumericString).hasSize(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(uniqueAlphanumericString).matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX);
     }
 }

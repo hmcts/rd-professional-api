@@ -35,7 +35,7 @@ public class UserAccountMapRepositoryTest extends BaseRepository {
         Optional<UserAccountMap> user = userAccountMapRepository.findByUserAccountMapId(userAccountMap
                 .getUserAccountMapId());
 
-        assertThat(user.isPresent()).isTrue();
+        assertThat(user).isPresent();
         assertThat(user.get().getUserAccountMapId().getProfessionalUser()).isEqualTo(professionalUser);
         assertThat(user.get().getUserAccountMapId().getProfessionalUser().getId()).isEqualTo(professionalUser.getId());
         assertThat(user.get().getUserAccountMapId().getPaymentAccount()).isEqualTo(paymentAccount);

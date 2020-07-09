@@ -20,7 +20,7 @@ public class UserAttributeRequestTest {
 
         Set<ConstraintViolation<UserAttributeRequest>> violations = validator.validate(userAttributeRequest);
 
-        assertThat(violations.size()).isEqualTo(0);
+        assertThat(violations.size()).isZero();
     }
 
     @Test

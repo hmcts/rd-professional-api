@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ONE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import java.util.ArrayList;
@@ -19,7 +22,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -202,11 +204,11 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(OrganisationStatus.ACTIVE);
+        List<Organisation> activeOrganisations = organisationRepository.findByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
-            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                activeOrganisationDtls.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX).getUserIdentifier()) {
+                activeOrganisationDtls.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
             }
         });
 
@@ -240,8 +242,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
                 activeOrganisations.add(organisation);
-                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(0).getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(0).getUserIdentifier(), organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX).getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
                 }
             } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);
@@ -296,9 +298,9 @@ public class OrganisationServiceImpl implements OrganisationService {
     public OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier) {
         Organisation organisation = organisationRepository.findByOrganisationIdentifier(organisationIdentifier);
         if (organisation == null) {
-            throw new EmptyResultDataAccessException(1);
+            throw new EmptyResultDataAccessException(ONE);
 
-        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
+        } else if (ACTIVE.name().equalsIgnoreCase(organisation.getStatus().name())) {
             log.debug("Retrieving organisation");
             organisation.setUsers(RefDataUtil.getUserIdFromUserProfile(organisation.getUsers(), userProfileFeignClient,
                     false));
@@ -309,20 +311,18 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public OrganisationsDetailResponse findByOrganisationStatus(OrganisationStatus status) {
 
-
         List<Organisation> organisations = null;
-
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
             organisations = organisationRepository.findByStatus(status);
 
-        } else if (OrganisationStatus.ACTIVE.name().equalsIgnoreCase(status.name())) {
+        } else if (ACTIVE.name().equalsIgnoreCase(status.name())) {
 
             organisations = retrieveActiveOrganisationDetails();
         }
 
         if (CollectionUtils.isEmpty(organisations)) {
-            throw new EmptyResultDataAccessException(1);
+            throw new EmptyResultDataAccessException(ONE);
 
         }
         return new OrganisationsDetailResponse(organisations, true);

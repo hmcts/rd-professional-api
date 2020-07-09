@@ -42,10 +42,10 @@ public class ProfessionalReferenceDataClient {
     private String issuer;
     private long expiration;
 
-    public ProfessionalReferenceDataClient(int port, String issuer,  Long tokenExpirationInterval) {
+    public ProfessionalReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {
         this.prdApiPort = port;
         this.baseUrl = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH;
-        this.baseIntUrl =  "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
+        this.baseIntUrl = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH;
         this.issuer = issuer;
         this.expiration = tokenExpirationInterval;
     }
@@ -55,30 +55,30 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> findUserByEmail(String email, String role) {
-        return getRequest(APP_INT_BASE_PATH + "/user?email={email}", role,email);
+        return getRequest(APP_INT_BASE_PATH + "/user?email={email}", role, email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
-        return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role,email);
+        return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role, email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmailForExternalUsers(String email, String role) {
-        return getRequest("/refdata/external/v1/organisations" + "/pbas?email={email}", role,email);
+        return getRequest("/refdata/external/v1/organisations" + "/pbas?email={email}", role, email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
-        return getRequest("/search/pba/{email}","pui-case-manager", email);
+        return getRequest("/search/pba/{email}", "pui-case-manager", email);
     }
 
-    public Map<String,Object> retrieveSingleOrganisation(String id, String role) {
+    public Map<String, Object> retrieveSingleOrganisation(String id, String role) {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
 
-    public Map<String,Object> retrieveExternalOrganisation(String id, String role) {
+    public Map<String, Object> retrieveExternalOrganisation(String id, String role) {
         return getRequestForExternal(APP_EXT_BASE_PATH, role, id);
     }
 
-    public Map<String,Object> retrieveAllOrganisations(String role) {
+    public Map<String, Object> retrieveAllOrganisations(String role) {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
 
@@ -102,19 +102,24 @@ public class ProfessionalReferenceDataClient {
                 role, showDeleted);
     }
 
-    public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier,
-                                                                                String showDeleted, String role) {
-        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
-                + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
+    // Override the method to support return roles param
+    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role, String returnRoles) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
     }
 
-    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role,
-                                                                   String id) {
-        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",
-                role, id, showDeleted, status);
+    public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier, String showDeleted, String role) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, String id) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}", role, id, showDeleted, status);
+    }
+
+    public Map<String, Object> findUsersByOrganisationWithReturnRoles(String returnRoles, String role, String id) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?returnRoles={returnRoles}", role, id, returnRoles);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
         HttpEntity<T> request = null;
@@ -146,8 +151,8 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private Map<String, Object> getRequest(String uriPath,String role, Object... params) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequest(String uriPath, String role, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -169,7 +174,7 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    private Map<String, Object> getRequestForExternal(String uriPath,String role, String userId, Object... params) {
+    private Map<String, Object> getRequestForExternal(String uriPath, String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -191,8 +196,7 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    private Map<String, Object> getRequestForExternalRoles(String uriPath,String role, String userId,
-                                                           Object... params) {
+    private Map<String, Object> getRequestForExternalRoles(String uriPath, String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -213,17 +217,15 @@ public class ProfessionalReferenceDataClient {
 
         return getResponse(responseEntity);
     }
-
 
 
     public Map<String, Object> updateOrganisation(
-            OrganisationCreationRequest organisationCreationRequest,String role, String organisationIdentifier) {
+            OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
 
         ResponseEntity<OrganisationResponse> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
         try {
-            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
-                    getMultipleAuthHeaders(role));
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest, getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -283,15 +285,14 @@ public class ProfessionalReferenceDataClient {
         return response;
     }
 
-    public  Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
-                                                              String orgId, String userIdentifier, String hmctsAdmin) {
+
+    public Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/users/"
                 + userIdentifier;
 
         try {
-            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
-                    getMultipleAuthHeaders(hmctsAdmin));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData, getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -304,14 +305,12 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public  Map<String, Object> modifyUserRolesOfOrganisationExternal(UserProfileUpdatedData userProfileUpdatedData,
-                                                                      String userIdentifier, String externalRole) {
+    public Map<String, Object> modifyUserRolesOfOrganisationExternal(UserProfileUpdatedData userProfileUpdatedData, String userIdentifier, String externalRole) {
         ResponseEntity<Map> responseEntity = null;
-        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH  + "/users/" + userIdentifier;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/users/" + userIdentifier;
 
         try {
-            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
-                    getMultipleAuthHeaders(externalRole,userIdentifier));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData, getMultipleAuthHeaders(externalRole, userIdentifier));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -324,8 +323,7 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public  Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId,
-                                                            String hmctsAdmin) {
+    public Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 
@@ -345,7 +343,7 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public  Map<String, Object> findUserStatusByEmail(String email, String role) {
+    public Map<String, Object> findUserStatusByEmail(String email, String role) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + "users/accountId?email=" + email;
 
@@ -360,6 +358,6 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
-        return  getResponse(responseEntity);
+        return getResponse(responseEntity);
     }
 }

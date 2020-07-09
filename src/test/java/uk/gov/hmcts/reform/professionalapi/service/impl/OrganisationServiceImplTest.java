@@ -244,14 +244,9 @@ public class OrganisationServiceImplTest {
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
 
-    @Test
-    public void retrieve_an_organisations_by_status() {
-
-        final Throwable raisedException = catchThrowable(() -> sut.findByOrganisationStatus(OrganisationStatus.ACTIVE));
-
-        assertThat(raisedException).isExactlyInstanceOf(EmptyResultDataAccessException.class);
-
-        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void test_retrieve_an_organisations_by_status() {
+        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
 

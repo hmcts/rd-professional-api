@@ -53,8 +53,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
-        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
-                hmctsAdmin, "false", HttpStatus.OK);
+        Map<String, Object> searchUserResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK, "true");
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
