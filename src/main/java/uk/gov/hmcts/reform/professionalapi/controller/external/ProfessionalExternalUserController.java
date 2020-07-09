@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PUI_USER_MANAGER;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 
 import io.swagger.annotations.ApiOperation;
@@ -28,8 +30,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
+import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -50,7 +52,7 @@ public class ProfessionalExternalUserController extends SuperController {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if returnRoles is False",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -73,6 +75,10 @@ public class ProfessionalExternalUserController extends SuperController {
                     message = "An invalid Organisation Identifier was provided"
             ),
             @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
                     code = 403,
                     message = "Forbidden Error: Access denied"
             ),
@@ -93,23 +99,23 @@ public class ProfessionalExternalUserController extends SuperController {
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
                                                   @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
                                                   @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
+                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
                                                   @RequestParam(value = "page", required = false) Integer page,
-                                                  @RequestParam(value = "size", required = false) Integer size) {
+                                                  @RequestParam(value = "size", required = false) Integer size,
+                                                  @ApiParam(hidden = true) @UserId String userId) {
+
+
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-        boolean isRolePuiUserManager  = organisationIdentifierValidatorImpl.ifUserRoleExists(userInfo.getRoles(), "pui-user-manager");
+
         ResponseEntity profUsersEntityResponse;
 
-        if (!isRolePuiUserManager) {
-            if (StringUtils.isEmpty(status)) {
-                status = "Active";
-            }
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles(), PUI_USER_MANAGER)) {
+            status = StringUtils.isEmpty(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, true, status, page, size);
-
+        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
         return profUsersEntityResponse;
     }
 

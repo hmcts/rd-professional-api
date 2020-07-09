@@ -238,9 +238,8 @@ public class OrganisationServiceImplTest {
 
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void retrieve_an_organisations_by_status() {
-        OrganisationsDetailResponse organisationDetailResponse = sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
-        verify(organisationRepository, times(1)).findByStatus(any(OrganisationStatus.class));
+    public void test_retrieve_an_organisations_by_status() {
+        sut.findByOrganisationStatus(OrganisationStatus.ACTIVE);
     }
 
 

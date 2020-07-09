@@ -83,6 +83,13 @@ public class IdamOpenIdClient {
         return getOpenIdToken(userEmail);
     }
 
+    /*
+     This is customized method to generate the token based on passed role
+     */
+    public String getOpenIdTokenWithGivenRole(String role) {
+        String userEmail = createUser(role);
+        return getOpenIdToken(userEmail);
+    }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         String userEmail = createUser(role, email, firstName, lastName);
@@ -119,7 +126,7 @@ public class IdamOpenIdClient {
     }
 
 
-    private String nextUserEmail() {
+    public String nextUserEmail() {
         return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
     }
 

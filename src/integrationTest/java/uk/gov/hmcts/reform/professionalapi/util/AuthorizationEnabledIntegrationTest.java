@@ -245,7 +245,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public String createOrganisationRequest(OrganisationCreationRequest organisationCreationRequest) {
+    public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+    }
+
+    public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
@@ -268,9 +273,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public String createAndActivateOrganisation(OrganisationCreationRequest organisationCreationRequest) {
-        String orgIdentifier = createOrganisationRequest(organisationCreationRequest);
-        updateOrganisation(orgIdentifier, hmctsAdmin, ACTIVE, organisationCreationRequest);
+    public String createAndActivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
+        String orgIdentifier = createOrganisationWithGivenRequest(organisationCreationRequest);
+        updateOrganisationWithGivenRequest(organisationCreationRequest, orgIdentifier, hmctsAdmin, ACTIVE);
         return orgIdentifier;
     }
 
@@ -622,6 +627,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         public boolean applyGlobally() {
             return false;
         }
+    }
+
+    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest, String organisationIdentifier, String role, String status) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        organisationUpdateRequest.setStatus(status);
+        professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);
     }
 }
 

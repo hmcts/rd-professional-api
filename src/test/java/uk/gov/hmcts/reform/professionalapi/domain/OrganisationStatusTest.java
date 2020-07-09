@@ -11,15 +11,15 @@ public class OrganisationStatusTest {
     public void test_shouldReturnTrueWhenPendingisPassed() {
         OrganisationStatus organisationStatus = OrganisationStatus.ACTIVE;
 
-        assertThat(organisationStatus.isActive()).isEqualTo(true);
-        assertThat(organisationStatus.isPending()).isEqualTo(false);
+        assertThat(organisationStatus.isActive()).isTrue();
+        assertThat(organisationStatus.isPending()).isFalse();
     }
 
     @Test
     public void test_shouldReturnTrueWhenActiveisPassed() {
         OrganisationStatus organisationStatus = OrganisationStatus.PENDING;
         
-        assertThat(organisationStatus.isActive()).isEqualTo(false);
-        assertThat(organisationStatus.isPending()).isEqualTo(true);
+        assertThat(organisationStatus.isActive()).isFalse();
+        assertThat(organisationStatus.isPending()).isTrue();
     }
 }
