@@ -103,20 +103,27 @@ public class ProfessionalReferenceDataClient {
     }
 
     // Override the method to support return roles param
-    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role, String returnRoles) {
-        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
+    public Map<String, Object> findUsersByOrganisation(String organisationIdentifier, String showDeleted, String role,
+                                                       String returnRoles) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
     }
 
-    public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier, String showDeleted, String role) {
-        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
+    public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier,
+                                                                                String showDeleted, String role) {
+        return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                + "/users?showDeleted={showDeleted}&page=1&size=3", role, showDeleted);
     }
 
-    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role, String id) {
-        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}", role, id, showDeleted, status);
+    public Map<String, Object> findAllUsersForOrganisationByStatus(String showDeleted, String status, String role,
+                                                                   String id) {
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?showDeleted={showDeleted}&status={status}",
+                role, id, showDeleted, status);
     }
 
     public Map<String, Object> findUsersByOrganisationWithReturnRoles(String returnRoles, String role, String id) {
-        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?returnRoles={returnRoles}", role, id, returnRoles);
+        return getRequestForExternal(APP_EXT_BASE_PATH + "/users?returnRoles={returnRoles}", role, id,
+                returnRoles);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -196,7 +203,8 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    private Map<String, Object> getRequestForExternalRoles(String uriPath, String role, String userId, Object... params) {
+    private Map<String, Object> getRequestForExternalRoles(String uriPath, String role, String userId,
+                                                           Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -225,7 +233,8 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<OrganisationResponse> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
         try {
-            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest, getMultipleAuthHeaders(role));
+            HttpEntity<OrganisationCreationRequest> requestEntity = new HttpEntity<>(organisationCreationRequest,
+                    getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, OrganisationResponse.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -286,13 +295,15 @@ public class ProfessionalReferenceDataClient {
     }
 
 
-    public Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData, String orgId, String userIdentifier, String hmctsAdmin) {
+    public Map<String, Object> modifyUserRolesOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
+                                                             String orgId, String userIdentifier, String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/users/"
                 + userIdentifier;
 
         try {
-            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData, getMultipleAuthHeaders(hmctsAdmin));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
+                    getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -305,12 +316,14 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> modifyUserRolesOfOrganisationExternal(UserProfileUpdatedData userProfileUpdatedData, String userIdentifier, String externalRole) {
+    public Map<String, Object> modifyUserRolesOfOrganisationExternal(UserProfileUpdatedData userProfileUpdatedData,
+                                                                     String userIdentifier, String externalRole) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/users/" + userIdentifier;
 
         try {
-            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData, getMultipleAuthHeaders(externalRole, userIdentifier));
+            HttpEntity<UserProfileUpdatedData> requestEntity = new HttpEntity<>(userProfileUpdatedData,
+                    getMultipleAuthHeaders(externalRole, userIdentifier));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -323,7 +336,8 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId, String hmctsAdmin) {
+    public Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId,
+                                                           String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 

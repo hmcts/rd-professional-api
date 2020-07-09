@@ -123,8 +123,10 @@ public abstract class AuthorizationFunctionalTest {
         return activateOrganisation(response, role);
     }
 
-    protected String createAndctivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest, String role) {
-        Map<String, Object> organisationCreationResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
+    protected String createAndctivateOrganisationWithGivenRequest(
+            OrganisationCreationRequest organisationCreationRequest, String role) {
+        Map<String, Object> organisationCreationResponse = professionalApiClient
+                .createOrganisation(organisationCreationRequest);
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);

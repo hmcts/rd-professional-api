@@ -52,7 +52,8 @@ public class ProfessionalExternalUserController extends SuperController {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
-            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if returnRoles is False",
+            value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
+                    + " returnRoles is False",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -99,9 +100,12 @@ public class ProfessionalExternalUserController extends SuperController {
             "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor",
             "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker"})
     public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
-                                                  @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted", required = false) String showDeleted,
-                                                  @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status,
-                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
+                                                  @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted",
+                                                          required = false) String showDeleted,
+                                                  @ApiParam(name = "status") @RequestParam(value = "status",
+                                                          required = false) String status,
+                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles",
+                                                          required = false, defaultValue = "true") Boolean returnRoles,
                                                   @RequestParam(value = "page", required = false) Integer page,
                                                   @RequestParam(value = "size", required = false) Integer size,
                                                   @ApiParam(hidden = true) @UserId String userId) {
@@ -112,12 +116,14 @@ public class ProfessionalExternalUserController extends SuperController {
 
         ResponseEntity profUsersEntityResponse;
 
-        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles(), PUI_USER_MANAGER)) {
+        if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
+                .getRoles(), PUI_USER_MANAGER)) {
             status = StringUtils.isEmpty(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
-        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
+        profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
+                page, size);
         return profUsersEntityResponse;
     }
 

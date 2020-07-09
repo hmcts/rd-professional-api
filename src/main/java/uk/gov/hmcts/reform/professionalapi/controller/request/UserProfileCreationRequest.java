@@ -21,10 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 @Builder(builderMethodName = "anUserProfileCreationRequest")
 public class UserProfileCreationRequest  {
 
-
     @Pattern(regexp = EMAILREGEX)
     private String email;
-    
+
     @NotBlank
     private String firstName;
 

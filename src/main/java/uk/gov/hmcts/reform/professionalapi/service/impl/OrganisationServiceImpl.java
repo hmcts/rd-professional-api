@@ -207,7 +207,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> activeOrganisations = organisationRepository.findByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
-            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX).getUserIdentifier()) {
+            if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
+                    .getUserIdentifier()) {
                 activeOrganisationDtls.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
             }
         });
@@ -242,8 +243,10 @@ public class OrganisationServiceImpl implements OrganisationService {
         retrievedOrganisations.forEach(organisation -> {
             if (organisation.isOrganisationStatusActive()) {
                 activeOrganisations.add(organisation);
-                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX).getUserIdentifier()) {
-                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(), organisation);
+                if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX)
+                        .getUserIdentifier()) {
+                    activeOrganisationDetails.put(organisation.getUsers().get(ZERO_INDEX).getUserIdentifier(),
+                            organisation);
                 }
             } else if (organisation.getStatus() == OrganisationStatus.PENDING) {
                 pendingOrganisations.add(organisation);

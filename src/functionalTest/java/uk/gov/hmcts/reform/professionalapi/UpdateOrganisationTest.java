@@ -64,6 +64,7 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin,orgIdentifierResponse, HttpStatus.UNAUTHORIZED);
+        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin,orgIdentifierResponse,
+                HttpStatus.UNAUTHORIZED);
     }
 }

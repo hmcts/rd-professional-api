@@ -215,9 +215,12 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
+                HttpStatus.OK);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = (ProfessionalUsersEntityResponse) RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse1
+                = (ProfessionalUsersEntityResponse) RefDataUtil.filterUsersByStatus(realResponseEntity,
+                "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
         assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(2);
@@ -227,29 +230,42 @@ public class RefDataUtilTest {
 
     @Test
     public void test_filterUsersByStatusWithoutRoles() {
-        ProfessionalUsersResponseWithoutRoles professionalUsersResponse = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName", "lName", "some@email.com", organisation));
-        ProfessionalUsersResponseWithoutRoles professionalUsersResponse1 = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName1", "lName1", "some1@email.com", organisation));
-        ProfessionalUsersResponseWithoutRoles professionalUsersResponse2 = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName2", "lName2", "some2@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName", "lName",
+                "some@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse1
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName1", "lName1",
+                "some1@email.com", organisation));
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponse2
+                = new ProfessionalUsersResponseWithoutRoles(new ProfessionalUser("fName2", "lName2",
+                "some2@email.com", organisation));
 
         professionalUsersResponse.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse1.setIdamStatus(IdamStatus.ACTIVE.toString());
         professionalUsersResponse2.setIdamStatus(IdamStatus.PENDING.toString());
 
-        List<ProfessionalUsersResponseWithoutRoles> userProfiles = asList(professionalUsersResponse, professionalUsersResponse1, professionalUsersResponse2);
+        List<ProfessionalUsersResponseWithoutRoles> userProfiles = asList(professionalUsersResponse,
+                professionalUsersResponse1, professionalUsersResponse2);
 
-        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = new ProfessionalUsersEntityResponseWithoutRoles();
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = new ProfessionalUsersEntityResponseWithoutRoles();
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+                header, HttpStatus.OK);
 
-        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles11 = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles11
+                = (ProfessionalUsersEntityResponseWithoutRoles) RefDataUtil.filterUsersByStatus(realResponseEntity,
+                "Active");
         assertThat(professionalUsersEntityResponseWithoutRoles11).isNotNull();
 
         assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().size()).isEqualTo(2);
-        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(0)).isEqualTo(professionalUsersResponse);
-        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(1)).isEqualTo(professionalUsersResponse1);
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(0))
+                .isEqualTo(professionalUsersResponse);
+        assertThat(professionalUsersEntityResponseWithoutRoles11.getUserProfiles().get(1))
+                .isEqualTo(professionalUsersResponse1);
     }
 
     @Test(expected = ExternalApiException.class)
@@ -276,9 +292,12 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
+                HttpStatus.BAD_REQUEST);
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse1 = (ProfessionalUsersEntityResponse) RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse1
+                = (ProfessionalUsersEntityResponse) RefDataUtil.filterUsersByStatus(realResponseEntity,
+                "Active");
         assertThat(professionalUsersEntityResponse1).isNotNull();
 
         assertThat(professionalUsersEntityResponse1.getUserProfiles().size()).isEqualTo(3);
@@ -295,20 +314,23 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header,
+                HttpStatus.OK);
 
         RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
     }
 
     @Test(expected = ResourceNotFoundException.class)
     public void test_filterUsersByStatusWhereNoUsersFoundWithoutRolesThrowsResourceNotFoundException() {
-        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = new ProfessionalUsersEntityResponseWithoutRoles();
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = new ProfessionalUsersEntityResponseWithoutRoles();
         List<ProfessionalUsersResponseWithoutRoles> userProfiles = new ArrayList<>();
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(userProfiles);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+                header, HttpStatus.OK);
 
         RefDataUtil.filterUsersByStatus(realResponseEntity, "Active");
     }
@@ -592,7 +614,8 @@ public class RefDataUtilTest {
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         professionalUsersEntityResponse.setUserProfiles(professionalUsersResponses);
         ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponse);
-        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
+        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity,
+                "ABCD123");
         assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponse.class);
         ProfessionalUsersEntityResponse output = (ProfessionalUsersEntityResponse)responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
@@ -601,14 +624,20 @@ public class RefDataUtilTest {
     @Test
     public void test_setOrgIdInGetUserResponse_without_roles_response() {
         List<ProfessionalUsersResponseWithoutRoles> professionalUsersEntityResponsesWithoutRoles = new ArrayList<>();
-        ProfessionalUsersResponseWithoutRoles professionalUsersResponseWithoutRoles = new ProfessionalUsersResponseWithoutRoles(professionalUser);
+        ProfessionalUsersResponseWithoutRoles professionalUsersResponseWithoutRoles
+                = new ProfessionalUsersResponseWithoutRoles(professionalUser);
         professionalUsersEntityResponsesWithoutRoles.add(professionalUsersResponseWithoutRoles);
-        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = new ProfessionalUsersEntityResponseWithoutRoles();
+        ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                = new ProfessionalUsersEntityResponseWithoutRoles();
         professionalUsersEntityResponseWithoutRoles.setUserProfiles(professionalUsersEntityResponsesWithoutRoles);
-        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(professionalUsersEntityResponseWithoutRoles);
-        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity, "ABCD123");
-        assertThat(responseEntityOutput.getBody()).isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
-        ProfessionalUsersEntityResponseWithoutRoles output = (ProfessionalUsersEntityResponseWithoutRoles)responseEntityOutput.getBody();
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200)
+                .body(professionalUsersEntityResponseWithoutRoles);
+        ResponseEntity<Object> responseEntityOutput = setOrgIdInGetUserResponse(responseEntity,
+                "ABCD123");
+        assertThat(responseEntityOutput.getBody())
+                .isExactlyInstanceOf(ProfessionalUsersEntityResponseWithoutRoles.class);
+        ProfessionalUsersEntityResponseWithoutRoles output
+                = (ProfessionalUsersEntityResponseWithoutRoles)responseEntityOutput.getBody();
         assertThat(output.getOrganisationIdentifier()).hasToString("ABCD123");
     }
 }

@@ -403,7 +403,8 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status, String returnRoles) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,
+                                                         HttpStatus status, String returnRoles) {
 
         // Use the role supplied to generate tokens appropritely
         RequestSpecification requestSpecification;
@@ -413,7 +414,8 @@ public class ProfessionalApiClient {
             requestSpecification = getMultipleAuthHeadersInternal();
         }
         Response response = requestSpecification
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&returnRoles=" + returnRoles)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&returnRoles=" + returnRoles)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -502,7 +504,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status, RequestSpecification requestSpecification, String returnRoles) {
+    public Map<String, Object>
+        searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status, RequestSpecification requestSpecification,
+                                                          String returnRoles) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
@@ -699,7 +703,8 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
+    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification,
+                                                     String email) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users/accountId?email=" + email)

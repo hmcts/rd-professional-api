@@ -253,12 +253,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
     public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
     public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
@@ -282,9 +284,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         return orgIdentifier;
     }
 
-    public String createAndActivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
-        String orgIdentifier = createOrganisationWithGivenRequest(organisationCreationRequest);
-        updateOrganisationWithGivenRequest(organisationCreationRequest, orgIdentifier, hmctsAdmin, ACTIVE);
+    public String createAndActivateOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRst) {
+        String orgIdentifier = createOrganisationWithGivenRequest(organisationCreationRst);
+        updateOrganisationWithGivenRequest(organisationCreationRst, orgIdentifier, hmctsAdmin, ACTIVE);
         return orgIdentifier;
     }
 
@@ -642,7 +644,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         }
     }
 
-    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest, String organisationIdentifier, String role, String status) {
+    public void updateOrganisationWithGivenRequest(OrganisationCreationRequest organisationUpdateRequest,
+                                                   String organisationIdentifier, String role, String status) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         organisationUpdateRequest.setStatus(status);
         professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, role, organisationIdentifier);

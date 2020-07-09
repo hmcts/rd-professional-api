@@ -103,14 +103,17 @@ public class RefDataUtil {
         List<SuperUser> userProfileDtls = new ArrayList<>();
         ProfessionalUser professionalUser = null;
         for (SuperUser user : users) {
-            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient, isRequiredRoles);
+            professionalUser = getSingleUserIdFromUserProfile(user.toProfessionalUser(), userProfileFeignClient,
+                    isRequiredRoles);
             userProfileDtls.add(professionalUser.toSuperUser());
         }
         return userProfileDtls;
     }
 
 
-    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user, UserProfileFeignClient userProfileFeignClient, Boolean isRequiredRoles) {
+    public static ProfessionalUser getSingleUserIdFromUserProfile(ProfessionalUser user,
+                                                                  UserProfileFeignClient userProfileFeignClient,
+                                                                  Boolean isRequiredRoles) {
         try (Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
@@ -137,7 +140,8 @@ public class RefDataUtil {
             Organisation> activeOrganisationDetails) {
         Map<String, Organisation> modifiedOrgProfUserDetails = new HashMap<>();
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, "false")) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
+                "false")) {
 
 
             Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
@@ -160,7 +164,8 @@ public class RefDataUtil {
         updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
                                            Map<String, Organisation> activeOrganisationDtls) {
 
-        ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse
+                = (ProfessionalUsersEntityResponse) responseEntity.getBody();
         if (null != professionalUsersEntityResponse
                 && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
 
@@ -185,7 +190,8 @@ public class RefDataUtil {
         return activeOrganisationDtls;
     }
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity, Boolean isRequiredRoles) {
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity,
+                                               Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
         if (!StringUtils.isEmpty(userProfileResponse)) {
@@ -233,11 +239,13 @@ public class RefDataUtil {
 
             if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
 
-                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(), status);
+                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(),
+                        status);
 
             } else {
 
-                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody(), status);
+                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity
+                        .getBody(), status);
             }
 
         } else {
@@ -245,10 +253,12 @@ public class RefDataUtil {
         }
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatusWithRoles(ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
-        List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse.getUserProfiles().stream()
-                .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
-                .collect(Collectors.toList());
+    public static ProfessionalUsersEntityResponse
+        filterUsersByStatusWithRoles(ProfessionalUsersEntityResponse professionalUsersEntityResponse, String status) {
+        List<ProfessionalUsersResponse> filteredUsers = professionalUsersEntityResponse
+                .getUserProfiles().stream()
+                    .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
+                        .collect(Collectors.toList());
 
         checkListIsEmpty(filteredUsers, status);
 
@@ -256,8 +266,12 @@ public class RefDataUtil {
         return professionalUsersEntityResponse;
     }
 
-    public static ProfessionalUsersEntityResponseWithoutRoles filterUsersByStatusWithoutRoles(ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles, String status) {
-        List<ProfessionalUsersResponseWithoutRoles> filteredUsers = professionalUsersEntityResponseWithoutRoles.getUserProfiles().stream()
+    public static ProfessionalUsersEntityResponseWithoutRoles
+        filterUsersByStatusWithoutRoles(
+                ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles,
+                String status) {
+        List<ProfessionalUsersResponseWithoutRoles> filteredUsers
+                = professionalUsersEntityResponseWithoutRoles.getUserProfiles().stream()
                 .filter(user -> status.equalsIgnoreCase(user.getIdamStatus()))
                 .collect(Collectors.toList());
 
@@ -267,7 +281,8 @@ public class RefDataUtil {
         return professionalUsersEntityResponseWithoutRoles;
     }
 
-    public static void checkListIsEmpty(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers, String status) {
+    public static void checkListIsEmpty(List<? extends ProfessionalUsersResponseWithoutRoles> filteredUsers,
+                                        String status) {
         if (CollectionUtils.isEmpty(filteredUsers)) {
             throw new ResourceNotFoundException("No users found with status :" + status);
         }
@@ -308,7 +323,8 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        return ProfessionalApiGeneratorConstants.TRUE.equalsIgnoreCase(showDeleted) ? ProfessionalApiGeneratorConstants.TRUE : ProfessionalApiGeneratorConstants.FALSE;
+        return ProfessionalApiGeneratorConstants.TRUE.equalsIgnoreCase(showDeleted)
+                ? ProfessionalApiGeneratorConstants.TRUE : ProfessionalApiGeneratorConstants.FALSE;
     }
 
     public static Boolean getReturnRolesValue(Boolean returnRoles) {
@@ -363,16 +379,21 @@ public class RefDataUtil {
         throw new ExternalApiException(httpStatus, errorMessage);
     }
 
-    public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity, String organisationIdentifier) {
+    public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,
+                                                                   String organisationIdentifier) {
         ResponseEntity<Object> newResponseEntity;
         if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+            ProfessionalUsersEntityResponse professionalUsersEntityResponse
+                    = (ProfessionalUsersEntityResponse) responseEntity.getBody();
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
-            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
+                    responseEntity.getStatusCode());
         } else {
-            ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
+            ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
+                    = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
-            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
+                    responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
     }

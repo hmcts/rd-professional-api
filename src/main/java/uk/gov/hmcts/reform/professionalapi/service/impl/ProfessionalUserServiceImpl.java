@@ -119,7 +119,9 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
                                                                                   String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
-        ResponseEntity<Object> responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        ResponseEntity<Object> responseEntity
+                = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
 
         HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
                 responseEntity);
@@ -136,11 +138,14 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired,
+                status, organisation.getOrganisationIdentifier());
     }
 
     @SuppressWarnings("unchecked")
-    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status, String organisationIdentifier) {
+    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                        String showDeleted, boolean rolesRequired, String status,
+                                                        String organisationIdentifier) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
@@ -150,7 +155,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             if (response.status() > 300) {
                 clazz = ErrorResponse.class;
             } else {
-                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class : ProfessionalUsersEntityResponseWithoutRoles.class;
+                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class
+                        : ProfessionalUsersEntityResponseWithoutRoles.class;
             }
 
             responseEntity = toResponseEntity(response, clazz);
@@ -166,7 +172,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             //Filtering users by status
 
             Object response = filterUsersByStatus(responseEntity, status);
-            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(),
+                    responseEntity.getStatusCode());
         }
 
         return responseEntity;

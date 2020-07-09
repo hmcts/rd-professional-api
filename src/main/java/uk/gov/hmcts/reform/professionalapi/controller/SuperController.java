@@ -230,7 +230,8 @@ public abstract class SuperController {
         organisationCreationRequestValidator.validate(organisationCreationRequest);
         organisationCreationRequestValidator.validateOrganisationIdentifier(orgId);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
-        updateOrganisationRequestValidator.validateStatus(existingOrganisation, valueOf(organisationCreationRequest.getStatus()), orgId);
+        updateOrganisationRequestValidator.validateStatus(existingOrganisation, valueOf(organisationCreationRequest
+                .getStatus()), orgId);
 
         SuperUser superUser = existingOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
@@ -257,7 +258,8 @@ public abstract class SuperController {
         return ResponseEntity.status(200).build();
     }
 
-    private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles, boolean isAdminUser, boolean isResendInvite) {
+    private ResponseEntity<Object> createUserProfileFor(ProfessionalUser professionalUser, List<String> roles,
+                                                        boolean isAdminUser, boolean isResendInvite) {
         //Creating user...
         List<String> userRoles = isAdminUser ? prdEnumService.getPrdEnumByEnumType(prdEnumRoleType) : roles;
         UserProfileCreationRequest userCreationRequest = new UserProfileCreationRequest(
@@ -314,8 +316,10 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, false);
+        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId,
+                newUserCreationRequest.getEmail());
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
+                false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) responseEntity.getBody();
@@ -347,7 +351,8 @@ public abstract class SuperController {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
-        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, true);
+        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
+                true);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
@@ -375,7 +380,9 @@ public abstract class SuperController {
 
     }
 
-    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted, Boolean returnRoles, String status, Integer page, Integer size) {
+    protected ResponseEntity<Object> searchUsersByOrganisation(String organisationIdentifier, String showDeleted,
+                                                               Boolean returnRoles, String status, Integer page,
+                                                               Integer size) {
 
         organisationCreationRequestValidator.validateOrganisationIdentifier(organisationIdentifier);
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
@@ -388,9 +395,12 @@ public abstract class SuperController {
 
         if (page != null) {
             Pageable pageable = createPageableObject(page, size, Sort.by(Sort.DEFAULT_DIRECTION, FIRST_NAME));
-            responseEntity = professionalUserService.findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles, status, pageable);
+            responseEntity = professionalUserService
+                    .findProfessionalUsersByOrganisationWithPageable(existingOrganisation, showDeleted, returnRoles,
+                            status, pageable);
         } else {
-            responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation, showDeleted, returnRoles, status);
+            responseEntity = professionalUserService.findProfessionalUsersByOrganisation(existingOrganisation,
+                    showDeleted, returnRoles, status);
         }
         return responseEntity;
     }
