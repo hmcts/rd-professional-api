@@ -31,8 +31,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-case-manager");
         // creating new user request
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
-        // creating user in idam with the same email used in the invite user so that status automatically will update
-        // in the up
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
@@ -51,8 +51,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-case-manager");
         // creating new user request
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
-        // creating user in idam with the same email used in the invite user so that status automatically will be
-        // update in the up
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will be update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
         // inviting user
@@ -113,8 +113,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-organisation-manager");
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
 
-        // creating user in idam with the same email used in the invite user so that status automatically will update
-        // in the up
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
@@ -142,8 +142,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         userRoles.add("pui-organisation-manager");
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
 
-        // creating user in idam with the same email used in the invite user so that status automatically will update
-        // in the up
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will update in the up
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 

@@ -22,8 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -41,12 +40,11 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-
+@Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 public class ExceptionMapper {
 
-    private static final Logger LOG                         = LoggerFactory.getLogger(ExceptionMapper.class);
     private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
@@ -163,7 +161,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        log.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
                 getTimeStamp());
 

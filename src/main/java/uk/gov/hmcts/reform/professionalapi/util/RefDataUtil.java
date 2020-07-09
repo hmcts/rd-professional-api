@@ -274,8 +274,8 @@ public class RefDataUtil {
         if (responseEntity == null) {
             headers.add("paginationInfo", pageInformation.toString());
         } else {
-            // since Headers are read only , it can't be modified and hence copied all existing headers into new
-            // one and added new header for pagination
+            // since Headers are read only , it can't be modified.
+            // Hence copied all existing headers into new one and added new header for pagination
             MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
             originalHeaders.forEach((key, value) -> headers.put(key, value));
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));

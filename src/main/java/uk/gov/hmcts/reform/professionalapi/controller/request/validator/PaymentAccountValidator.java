@@ -52,7 +52,7 @@ public class PaymentAccountValidator {
 
         if (!StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
-                    + "characters. The following PBAs entered are invalid: " + invalidPbas);
+                    .concat("characters. The following PBAs entered are invalid: " + invalidPbas));
         }
     }
 
@@ -72,7 +72,7 @@ public class PaymentAccountValidator {
 
         if (!uniquePBas.isEmpty()) {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas)
-                    + " belongs to another Organisation");
+                    .concat(" belongs to another Organisation"));
         }
     }
 

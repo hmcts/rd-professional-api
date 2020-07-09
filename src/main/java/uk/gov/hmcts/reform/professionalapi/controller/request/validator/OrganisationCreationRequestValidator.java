@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
@@ -26,9 +27,6 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
-            .concat("[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
-
     public static final String CHARACTERS = " characters";
 
     public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
@@ -38,7 +36,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     public static void validateEmail(String email) {
-        if (email != null && !email.matches(emailRegex)) {
+        if (email != null && !email.matches(EMAIL_REGEX)) {
             throw new InvalidRequest("Email format invalid for email: " + email);
         }
     }

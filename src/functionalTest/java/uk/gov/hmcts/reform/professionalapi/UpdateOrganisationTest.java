@@ -45,11 +45,10 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
     }
 
 
-    // This test is for validating if old implementation i.e. Bearer token still works along with OPENID token
-    // as well since PRD needs to
-    // support both. Clients like EXUI is still using Bearer token and yet to migrate on OPENID. Currently all
-    // functional test cases are running
-    // via OPENID tokens.
+    // This test is for validating if old implementation i.e.
+    // Bearer token still works along with OPENID token as well since PRD needs to support both.
+    // Clients like EXUI is still using Bearer token and yet to migrate on OPENID.
+    // Currently all functional test cases are running via OPENID tokens.
     @Test
     public void can_update_an_organisation_with_old_bearer_token() {
 
