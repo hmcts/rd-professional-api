@@ -31,6 +31,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
@@ -292,7 +293,6 @@ public class ProfessionalApiClient {
                                                           HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
-                .proxy("proxyout.reform.hmcts.net", 8080)
                 .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
@@ -333,7 +333,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+    public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
@@ -345,9 +345,13 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
 
     }
 
@@ -400,10 +404,18 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,
-                                                         HttpStatus status) {
+                                                         HttpStatus status, String returnRoles) {
 
-        Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+        // Use the role supplied to generate tokens appropritely
+        RequestSpecification requestSpecification;
+        if (!StringUtils.isBlank(role)) {
+            requestSpecification = getMultipleAuthHeadersWithGivenRole(role);
+        } else {
+            requestSpecification = getMultipleAuthHeadersInternal();
+        }
+        Response response = requestSpecification
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&returnRoles=" + returnRoles)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -448,8 +460,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId,
-                                                                       String role, HttpStatus status) {
+    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role,
+                                                                       HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
@@ -479,8 +491,8 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
-                                                                            RequestSpecification requestSpecification) {
+    public Map<String, Object>
+        retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations")
@@ -490,6 +502,26 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
         return response.body().as(Map.class);
+    }
+
+    public Map<String, Object>
+        searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status,
+                                                          RequestSpecification requestSpecification,
+                                                          String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
     }
 
 
@@ -672,23 +704,6 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status,
-                                                                  UserProfileUpdatedData userProfileUpdatedData,
-                                                                  RequestSpecification requestSpecification,
-                                                                  String organisationId, String userId) {
-
-        Response response = requestSpecification
-                .body(userProfileUpdatedData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-        return response.body().as(Map.class);
-
-    }
-
     public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification,
                                                      String email) {
 
@@ -700,6 +715,7 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(status.value());
         return response.body().as(Map.class);
+
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
@@ -717,6 +733,10 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeadersInternal() {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
+    }
+
+    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
     }
 
     private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {

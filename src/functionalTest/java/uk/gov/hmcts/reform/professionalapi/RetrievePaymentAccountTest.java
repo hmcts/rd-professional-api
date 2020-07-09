@@ -100,9 +100,9 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
-                puiOrgManager, "true", HttpStatus.OK);
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName,
-                email);
+                hmctsAdmin, "true", HttpStatus.OK, "");
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName,
+                lastName, email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 
         Map<String, Object> response = professionalApiClient
