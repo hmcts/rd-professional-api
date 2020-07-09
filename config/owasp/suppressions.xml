@@ -31,4 +31,47 @@
 <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
 <cve>CVE-2020-9488</cve>
 </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: dom4j-2.1.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.dom4j/dom4j@.*$</packageUrl>
+        <cpe>cpe:/a:dom4j_project:dom4j</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: postgresql-42.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
+        <cpe>cpe:/a:postgresql:postgresql</cpe>
+        <cpe>cpe:/a:postgresql:postgresql_jdbc_driver</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security*.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org*@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+        <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
+        <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+        <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:java-websocket_project:java-websocket</cpe>
+    </suppress>
 </suppressions>
