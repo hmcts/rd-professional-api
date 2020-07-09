@@ -134,7 +134,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         //Retrieve User Identifier to update status
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
-                hmctsAdmin, "false", HttpStatus.OK, "true");
+                hmctsAdmin, "false", HttpStatus.OK);
         assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
 

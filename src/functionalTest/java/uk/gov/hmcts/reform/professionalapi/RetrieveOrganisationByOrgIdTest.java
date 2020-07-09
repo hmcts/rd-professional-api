@@ -97,7 +97,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
-                hmctsAdmin, "true", HttpStatus.OK, "");
+                hmctsAdmin, "true", HttpStatus.OK);
         bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName,
                 email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
