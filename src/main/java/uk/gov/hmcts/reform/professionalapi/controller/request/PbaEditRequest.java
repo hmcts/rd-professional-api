@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 public class PbaEditRequest {
 
-    @JsonProperty(value = "payment_accounts")
+    @JsonProperty(value = "paymentAccounts")
     private Set<String> paymentAccounts;
 }

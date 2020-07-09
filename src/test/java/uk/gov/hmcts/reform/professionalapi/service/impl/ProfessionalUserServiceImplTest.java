@@ -615,6 +615,7 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
+
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
     }
 
