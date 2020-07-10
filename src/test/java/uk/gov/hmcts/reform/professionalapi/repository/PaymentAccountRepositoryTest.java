@@ -31,7 +31,7 @@ public class PaymentAccountRepositoryTest extends BaseRepository {
     public void findByIdTest() {
         Optional<PaymentAccount> paymentAcc = paymentAccountRepository.findById(paymentAccount.getId());
 
-        assertThat(paymentAcc.get()).isEqualTo(paymentAccount);
+        assertThat(paymentAcc).contains(paymentAccount);
         assertThat(paymentAcc.get().getId()).isEqualTo(paymentAccount.getId());
     }
 

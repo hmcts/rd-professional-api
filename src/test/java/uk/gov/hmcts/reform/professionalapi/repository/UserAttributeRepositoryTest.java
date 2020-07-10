@@ -33,7 +33,7 @@ public class UserAttributeRepositoryTest extends BaseRepository {
     public void test_findById() {
         Optional<UserAttribute> profUser = userAttributeRepository.findById(userAttribute.getId());
 
-        assertThat(profUser.get()).isEqualTo(userAttribute);
+        assertThat(profUser).contains(userAttribute);
         assertThat(profUser.get().getPrdEnum()).isEqualTo(userAttribute.getPrdEnum());
         assertThat(profUser.get().getPrdEnum().getPrdEnumId()).isEqualTo(userAttribute.getPrdEnum().getPrdEnumId());
         assertThat(profUser.get().getProfessionalUser().getId()).isEqualTo(userAttribute.getProfessionalUser().getId());
