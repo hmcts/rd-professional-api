@@ -452,13 +452,6 @@ public class OrganisationServiceImplTest {
         verify(userAttributeServiceMock, times(1)).addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes), eq(jurisdictionIds));
     }
 
-    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
-        final int orgIdLength = 7;
-        assertThat(organisationResponse).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
-        assertThat(organisationResponse.getOrganisationIdentifier().length()).isEqualTo(orgIdLength);
-    }
-
     @Test
     public void testAddContactInformationToOrganisation() throws NoSuchMethodException, IllegalAccessException {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest("addressLine-1", "addressLine-2", "addressLine-3", "townCity", "county", "country", "postCode", dxAddressRequests);
@@ -474,5 +467,12 @@ public class OrganisationServiceImplTest {
         assertEquals("county", contactInformationCreationRequests.get(0).getCounty());
         assertEquals("country", contactInformationCreationRequests.get(0).getCountry());
         assertEquals("postCode", contactInformationCreationRequests.get(0).getPostCode());
+    }
+
+    private void assertExpectedOrganisationResponse(OrganisationResponse organisationResponse) {
+        final int orgIdLength = 7;
+        assertThat(organisationResponse).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier()).isNotNull();
+        assertThat(organisationResponse.getOrganisationIdentifier()).hasSize(orgIdLength);
     }
 }
