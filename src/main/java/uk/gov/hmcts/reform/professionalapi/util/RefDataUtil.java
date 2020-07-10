@@ -222,7 +222,7 @@ public class RefDataUtil {
         }
     }
 
-    public static ProfessionalUsersEntityResponse filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
+    public static Object filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
 
         if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
 
