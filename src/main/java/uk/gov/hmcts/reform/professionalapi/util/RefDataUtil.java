@@ -59,8 +59,6 @@ public class RefDataUtil {
     @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
-    private  static final String UP_SERVICE_MSG = "Error while invoking UP";
-
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
         List<PaymentAccount> userMapPaymentAccount;
