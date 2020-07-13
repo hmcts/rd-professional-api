@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -22,11 +23,14 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
 
     private UserAccountMapRepository userAccountMapRepository;
 
+    @Value("${logging-component-name}")
+    protected static String loggingComponentName;
+
     public void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
         if (!paymentAccounts.isEmpty()) {
             List<UserAccountMap> userAccountMaps = new ArrayList<>();
-            log.debug("PaymentAccount is not empty");
+            log.debug("{}:: PaymentAccount is not empty", loggingComponentName);
             paymentAccounts.forEach(paymentAccount ->
                 userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount))));
             if (!CollectionUtils.isEmpty(userAccountMaps)) {

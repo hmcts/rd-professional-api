@@ -18,6 +18,7 @@ import javax.validation.constraints.Pattern;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 @Slf4j
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
+
+    @Value("${logging-component-name}")
+    protected  String loggingComponentName;
 
     @ApiOperation(
             value = "Creates an Organisation",
@@ -214,7 +218,7 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
                                                      @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier) {
-        log.info("Received request to edit payment accounts by organisation Id...");
+        log.info("{}:: Received request to edit payment accounts by organisation Id...",loggingComponentName);
 
         paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService.getOrganisationByOrgIdentifier(organisationIdentifier));

@@ -89,7 +89,7 @@ public class RefDataUtilTest {
         userAccountMaps.add(userAccountMap);
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountsFromUserAccountMap(userAccountMaps);
-        assertThat(paymentAccounts.size()).isGreaterThan(0);
+        assertThat(paymentAccounts.size()).isPositive();
     }
 
     @Test
@@ -110,7 +110,7 @@ public class RefDataUtilTest {
 
         List<PaymentAccount> paymentAccounts = RefDataUtil.getPaymentAccountFromUserMap(userMapPaymentAccount, paymentAccountsEntity);
 
-        assertThat(paymentAccounts.size()).isNotNegative();
+        assertThat(paymentAccounts.size()).isPositive();
     }
 
     @Test
@@ -150,7 +150,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
 
         ProfessionalUser responseUser = RefDataUtil.mapUserInfo(professionalUser, realResponseEntity, true);
         assertThat(responseUser).isNotNull();
@@ -169,7 +169,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
 
         ProfessionalUser responseUser = RefDataUtil.mapUserInfo(new ProfessionalUser(), realResponseEntity, false);
 
@@ -297,7 +297,7 @@ public class RefDataUtilTest {
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.add("fakeHeader", "fakeValue");
 
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(null, responseHeader, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(null, responseHeader, HttpStatus.OK);
 
         Page pageMock = mock(Page.class);
         when(pageMock.getTotalElements()).thenReturn(1L);
@@ -388,7 +388,7 @@ public class RefDataUtilTest {
         header.setContentType(APPLICATION_JSON);
 
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(null, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(null, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
         assertThat(response).isEmpty();
 
@@ -411,7 +411,7 @@ public class RefDataUtilTest {
         header.setContentType(APPLICATION_JSON);
 
         Map<String, Organisation> activeOrganisationDtls = new HashMap<>();
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
         assertThat(response).isEmpty();
 
@@ -442,7 +442,7 @@ public class RefDataUtilTest {
         activeOrganisationDtls.put("1",organisation);
         activeOrganisationDtls.put("2",organisation);
         activeOrganisationDtls.put("3",organisation);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
         Organisation organisationRes = (Organisation)response.get("1");
@@ -480,7 +480,7 @@ public class RefDataUtilTest {
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(APPLICATION_JSON);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(getUserProfileResponse, header, HttpStatus.OK);
         ProfessionalUser responseUser = RefDataUtil.mapUserInfo(new ProfessionalUser(), realResponseEntity, true);
         assertNull(responseUser.getId());
         assertEquals("firstName", responseUser.getFirstName());
