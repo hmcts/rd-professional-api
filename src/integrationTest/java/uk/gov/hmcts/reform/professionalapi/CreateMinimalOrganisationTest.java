@@ -12,11 +12,15 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.commons.lang.RandomStringUtils;
+
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -315,8 +319,26 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                     professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
             assertThat(response.get("http_status")).isEqualTo("201 CREATED");
         });
+    }
 
+    @Test
+    public void return_400_invalid_organisation_with_invalid_email() {
+        String prefix = UUID.randomUUID().toString();
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email(String.format("s@-somewhere.com", prefix))
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .build();
 
-
+        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).asString().contains("400");
     }
 }

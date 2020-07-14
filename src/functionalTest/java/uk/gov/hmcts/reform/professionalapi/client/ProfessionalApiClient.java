@@ -627,7 +627,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(userProfileUpdatedData)
@@ -658,7 +658,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
