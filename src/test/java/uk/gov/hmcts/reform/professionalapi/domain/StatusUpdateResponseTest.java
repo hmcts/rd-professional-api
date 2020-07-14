@@ -10,7 +10,7 @@ public class StatusUpdateResponseTest {
     private String idamMessage = "Message";
 
     @Test
-    public void updateStatusResponseTest() {
+    public void test_updateStatusResponse() {
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse(idamStatusCode, idamMessage);
 
         assertThat(statusUpdateResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);

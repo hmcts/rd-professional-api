@@ -9,7 +9,7 @@ import org.junit.Test;
 public class DxAddressTest {
 
     @Test
-    public void creates_dx_address_correctly() {
+    public void test_creates_dx_address_correctly() {
         ContactInformation contactInformation = new ContactInformation();
         DxAddress dxAddress = new DxAddress("DX 1234567890", "some-exchange", contactInformation);
         dxAddress.setLastUpdated(LocalDateTime.now());

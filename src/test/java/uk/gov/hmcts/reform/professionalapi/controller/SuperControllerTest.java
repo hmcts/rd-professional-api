@@ -164,7 +164,7 @@ public class SuperControllerTest {
 
 
     @Test
-    public void testRetrievePaymentAccountByEmail() {
+    public void test_retrievePaymentAccountByEmail() {
         String email = "some-email@test.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -182,7 +182,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testInviteUserToOrganisation() throws JsonProcessingException {
+    public void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -247,7 +247,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testReInviteUserToOrganisation() throws JsonProcessingException {
+    public void test_ReInviteUserToOrganisation() throws JsonProcessingException {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -280,7 +280,7 @@ public class SuperControllerTest {
 
 
     @Test
-    public void testReInviteUserToOrganisation_when_up_fails() throws JsonProcessingException {
+    public void test_ReInviteUserToOrganisation_when_up_fails() throws JsonProcessingException {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -310,7 +310,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testReInviteUserToOrganisation_when_user_does_not_exists() {
+    public void test_ReInviteUserToOrganisation_when_user_does_not_exists() {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -330,7 +330,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
+    public void test_ReinviteDoesntHappenwhenToggleOff() throws JsonProcessingException {
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", false);
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
@@ -364,7 +364,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testReInviteUserToOrganisation_when_user_does_not_exists_in_organisation() {
+    public void test_ReInviteUserToOrganisation_when_user_does_not_exists_in_organisation() {
 
         ReflectionTestUtils.setField(superController, "resendInviteEnabled", true);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));

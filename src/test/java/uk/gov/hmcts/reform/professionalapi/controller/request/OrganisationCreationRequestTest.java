@@ -25,7 +25,7 @@ public class OrganisationCreationRequestTest {
     }
 
     @Test
-    public void testOrganisationCreationRequest() {
+    public void test_OrganisationCreationRequest() {
 
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", null, null, null);
