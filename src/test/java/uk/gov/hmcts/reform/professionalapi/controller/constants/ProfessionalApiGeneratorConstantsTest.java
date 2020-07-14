@@ -11,7 +11,7 @@ import org.junit.Test;
 public class ProfessionalApiGeneratorConstantsTest {
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    public void test_privateConstructor() throws Exception {
         Constructor<ProfessionalApiGeneratorConstants> constructor = ProfessionalApiGeneratorConstants.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

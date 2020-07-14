@@ -68,7 +68,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUsersByOrganisation() {
+    public void test_FindUsersByOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "emailAddress", organisation);
 
@@ -147,7 +147,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testFindUserByEmailWithPuiUserManager() {
+    public void test_FindUserByEmailWithPuiUserManager() {
         final String email = "testing@email.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName", "test@email.com", organisation);
@@ -171,7 +171,7 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void testModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+    public void test_ModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();

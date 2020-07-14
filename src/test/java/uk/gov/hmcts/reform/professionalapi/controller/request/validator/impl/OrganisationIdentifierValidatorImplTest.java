@@ -33,7 +33,7 @@ public class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test
-    public void testValidate() {
+    public void test_Validate() {
         Organisation dummyOrganisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId", "12345678", Boolean.FALSE, "dummySite.com");
 
         organisationIdentifierValidatorImpl.validate(dummyOrganisation, dummyOrganisation.getStatus(), dummyOrganisation.getOrganisationIdentifier());
@@ -41,26 +41,26 @@ public class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void shouldCheckOrganisationDoesNotExist() {
+    public void test_shouldCheckOrganisationDoesNotExist() {
         organisationIdentifierValidatorImpl.validate(null, null, null);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+    public void test_shouldThrowAEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(new ArrayList<>());
 
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
+    public void test_shouldThrowAAccessDeniedExceptionWhenPaymentAccountsIsEmpty() {
         organisation.setPaymentAccounts(singletonList(paymentAccount));
 
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
+    public void test_shouldThrowEmptyResultDataAccessExceptionWhenPaymentAccountsIsEmpty() {
         organisationIdentifierValidatorImpl.verifyExtUserOrgIdentifier(organisation, UUID.randomUUID().toString());
     }
 
@@ -70,7 +70,7 @@ public class OrganisationIdentifierValidatorImplTest {
     }
 
     @Test(expected = Test.None.class)
-    public void shouldTNothrowExceptionWhenOrganisationIsNotNull() {
+    public void test_shouldTNothrowExceptionWhenOrganisationIsNotNull() {
         PaymentAccount pba = new PaymentAccount("PBA1234567");
         List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(pba);

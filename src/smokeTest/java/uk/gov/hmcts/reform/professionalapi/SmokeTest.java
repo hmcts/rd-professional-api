@@ -23,7 +23,7 @@ public class SmokeTest {
         );
 
     @Test
-    public void should_prove_app_is_running_and_healthy() {
+    public void test_should_prove_app_is_running_and_healthy() {
         // local test
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/

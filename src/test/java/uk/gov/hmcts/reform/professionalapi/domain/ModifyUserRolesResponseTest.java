@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ModifyUserRolesResponseTest {
 
     @Test
-    public void should_Return_User_profile_Response() {
+    public void test_should_Return_User_profile_Response() {
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
         userProfileRolesResponse.setRoleAdditionResponse(addRolesForUser());
         userProfileRolesResponse.setRoleDeletionResponse(deleteRolesForUser());
@@ -21,7 +21,7 @@ public class ModifyUserRolesResponseTest {
     }
 
     @Test
-    public void modifyUserRolesResponseTest() {
+    public void test_modifyUserRolesResponse() {
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse();
         statusUpdateResponse.setIdamMessage("updateMessage");
 

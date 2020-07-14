@@ -307,8 +307,8 @@ public class RefDataUtil {
         NewUserResponse newUserResponse;
         try (Response response = userProfileFeignClient.getUserProfileByEmail(emailAddress)) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() == 200) {
 

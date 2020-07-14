@@ -18,13 +18,13 @@ public class PbaAccountCreationRequestTest {
     }
 
     @Test
-    public void testPbaAccountCreation() {
+    public void test_PbaAccountCreation() {
         String expectedPbaNumber = pbaAccountCreationRequest.getPbaNumber();
         assertThat(expectedPbaNumber).isEqualTo(pbaNumber);
     }
 
     @Test
-    public void testThatPbaAccountCreationIsChangedByBuilder() {
+    public void test_ThatPbaAccountCreationIsChangedByBuilder() {
         System.out.println(pbaNumber);
         PbaAccountCreationRequest testPbaAccountCreationRequest = aPbaPaymentAccount().pbaNumber(pbaNumber1).build();
         assertThat(testPbaAccountCreationRequest.getPbaNumber()).isEqualTo(pbaNumber1);

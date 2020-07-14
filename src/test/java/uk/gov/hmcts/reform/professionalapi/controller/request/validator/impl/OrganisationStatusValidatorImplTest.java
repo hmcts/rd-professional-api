@@ -23,7 +23,7 @@ public class OrganisationStatusValidatorImplTest {
     }
 
     @Test
-    public void testValidate() {
+    public void test_Validate() {
         try {
             organisationStatusValidatorImpl.validate(organisation, OrganisationStatus.ACTIVE, orgId);
         } catch (Exception e) {
@@ -32,12 +32,12 @@ public class OrganisationStatusValidatorImplTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testThrowsExceptionWhenCurrentStatusActiveAndInputStatusPending() {
+    public void test_ThrowsExceptionWhenCurrentStatusActiveAndInputStatusPending() {
         organisationStatusValidatorImpl.validate(organisation, OrganisationStatus.PENDING, orgId);
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testThrowsExceptionWhenCurrentStatusDeleted() {
+    public void test_ThrowsExceptionWhenCurrentStatusDeleted() {
         organisation.setStatus(OrganisationStatus.DELETED);
         organisationStatusValidatorImpl.validate(organisation, OrganisationStatus.ACTIVE, orgId);
     }

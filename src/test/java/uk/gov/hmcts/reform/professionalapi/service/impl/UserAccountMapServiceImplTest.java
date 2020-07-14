@@ -22,7 +22,7 @@ public class UserAccountMapServiceImplTest {
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
     @Test
-    public void persistedUserAccountMap() {
+    public void test_persistedUserAccountMap() {
         PaymentAccount pba = new PaymentAccount("PBA1234567");
         paymentAccounts.add(0, pba);
 
@@ -32,7 +32,7 @@ public class UserAccountMapServiceImplTest {
     }
 
     @Test
-    public void deleteByUserAccountMapIdIn() {
+    public void test_deleteByUserAccountMapIdIn() {
         sut.deleteByUserAccountMapIdIn(anyList());
         verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
     }
