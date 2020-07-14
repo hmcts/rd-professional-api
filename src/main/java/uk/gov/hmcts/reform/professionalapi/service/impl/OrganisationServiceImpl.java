@@ -199,7 +199,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> updatedOrganisationDetails = new ArrayList<>();
         Map<String, Organisation> activeOrganisationDtls = new ConcurrentHashMap<>();
 
-        List<Organisation> activeOrganisations = organisationRepository.findByStatus(ACTIVE);
+        List<Organisation> activeOrganisations = getOrganisationByStatus(ACTIVE);
 
         activeOrganisations.forEach(organisation -> {
             if (!organisation.getUsers().isEmpty() && null != organisation.getUsers().get(ZERO_INDEX).getUserIdentifier()) {
@@ -302,7 +302,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         List<Organisation> organisations = null;
         if (OrganisationStatus.PENDING.name().equalsIgnoreCase(status.name())) {
 
-            organisations = organisationRepository.findByStatus(status);
+            organisations = getOrganisationByStatus(status);
 
         } else if (ACTIVE.name().equalsIgnoreCase(status.name())) {
 
@@ -316,6 +316,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationsDetailResponse(organisations, true);
     }
 
+    public List<Organisation> getOrganisationByStatus(OrganisationStatus status) {
+        return organisationRepository.findByStatus(status);
+    }
 
 }
 
