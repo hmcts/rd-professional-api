@@ -8,6 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -168,15 +171,27 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void test_ModifyRolesForExistingUserOfOrganisation() {
+    public void test_ModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
+
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamMessage("some nessage");
+        roleAdditionResponse.setIdamStatusCode("200");
+        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(modifyUserRolesResponse);
+        ResponseEntity<Object> responseEntity = ResponseEntity.status(200).body(body);
+        when(professionalUserServiceMock.modifyRolesForUser(any(), any(), any())).thenReturn(responseEntity);
+
         when(userProfileUpdateRequestValidatorMock.validateRequest(userProfileUpdatedData)).thenReturn(userProfileUpdatedData);
 
         String userId = UUID.randomUUID().toString();
-        ResponseEntity<ModifyUserRolesResponse> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, Optional.of("EXUI"));
+        ResponseEntity<Object> actualData = professionalUserInternalController.modifyRolesForExistingUserOfOrganisation(userProfileUpdatedData, "123456A", userId, Optional.of("EXUI"));
 
         assertThat(actualData).isNotNull();
         assertThat(actualData.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData, userId, Optional.of("EXUI"));
+        verify(userProfileUpdateRequestValidatorMock, times(1)).validateRequest(userProfileUpdatedData);
     }
 }
