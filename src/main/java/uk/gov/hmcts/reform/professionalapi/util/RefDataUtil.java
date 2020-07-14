@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponseWithoutRoles;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponseWithoutRoles;
-import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -301,20 +300,6 @@ public class RefDataUtil {
 
     public static Boolean getReturnRolesValue(Boolean returnRoles) {
         return FALSE.equals(returnRoles) ? FALSE : TRUE;
-    }
-
-    public static ModifyUserRolesResponse decodeResponseFromUp(Response response) {
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
-        boolean isFailureFromUp = response.status() > 300;
-        Class clazz = isFailureFromUp ? ErrorResponse.class : ModifyUserRolesResponse.class;
-        ResponseEntity responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
-        if (isFailureFromUp) {
-            ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
-            modifyUserRolesResponse.setErrorResponse(errorResponse);
-        } else {
-            modifyUserRolesResponse = (ModifyUserRolesResponse) responseEntity.getBody();
-        }
-        return modifyUserRolesResponse;
     }
 
     public static NewUserResponse findUserProfileStatusByEmail(String emailAddress, UserProfileFeignClient userProfileFeignClient) {
