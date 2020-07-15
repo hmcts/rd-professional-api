@@ -23,7 +23,6 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
 
     private UserAccountMapRepository userAccountMapRepository;
 
-    @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
     public void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
@@ -44,4 +43,8 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
     }
 
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        UserAccountMapServiceImpl.loggingComponentName = loggingComponentName;
+    }
 }

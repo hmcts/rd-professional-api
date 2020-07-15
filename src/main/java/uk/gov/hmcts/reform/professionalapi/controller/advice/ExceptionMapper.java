@@ -49,7 +49,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 public class ExceptionMapper {
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    protected String loggingComponentName;
 
     private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
 

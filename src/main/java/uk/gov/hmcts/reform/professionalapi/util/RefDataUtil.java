@@ -55,7 +55,6 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
@@ -350,5 +349,10 @@ public class RefDataUtil {
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        RefDataUtil.loggingComponentName = loggingComponentName;
     }
 }

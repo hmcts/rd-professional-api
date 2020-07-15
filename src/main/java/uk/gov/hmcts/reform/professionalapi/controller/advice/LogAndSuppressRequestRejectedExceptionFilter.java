@@ -32,7 +32,7 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
     private Gson gson = new Gson();
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    protected String loggingComponentName;
 
 
     @Override
