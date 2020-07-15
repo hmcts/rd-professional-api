@@ -84,6 +84,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Value("${logging-component-name}")
     private String loggingComponentName;
+    
 
     @Override
     @Transactional
