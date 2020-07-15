@@ -627,6 +627,7 @@
         <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
         <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
         <cve>CVE-2020-11996</cve>
+        <vulnerabilityName>CVE-2020-9484</vulnerabilityName>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -644,5 +645,13 @@
         <packageUrl regex="true">^pkg:maven/org\.hibernate/hibernate\-core@.*$</packageUrl>
         <cpe>cpe:/a:hibernate:hibernate_orm</cpe>
         <cve>CVE-2019-14900</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.2.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+        <vulnerabilityName>CVE-2020-5407</vulnerabilityName>
+        <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
     </suppress>
 </suppressions>
