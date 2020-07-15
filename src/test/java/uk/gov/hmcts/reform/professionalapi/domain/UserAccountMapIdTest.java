@@ -7,7 +7,7 @@ import org.junit.Test;
 public class UserAccountMapIdTest {
 
     @Test
-    public void creates_user_account_map_id_correctly() {
+    public void test_creates_user_account_map_id_correctly() {
         ProfessionalUser professionalUser = new ProfessionalUser();
         PaymentAccount paymentAccount = new PaymentAccount();
 

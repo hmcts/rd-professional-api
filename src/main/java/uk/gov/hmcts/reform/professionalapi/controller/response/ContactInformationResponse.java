@@ -27,7 +27,7 @@ public class ContactInformationResponse {
     @JsonProperty
     private final String postCode;
     @JsonProperty
-    private final List<DxAddressResponse> dxAddress;
+    private  List<DxAddressResponse> dxAddress;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
         this.addressLine1 = contactInfo.getAddressLine1();
@@ -38,9 +38,9 @@ public class ContactInformationResponse {
         this.country = contactInfo.getCountry();
         this.postCode = contactInfo.getPostCode();
         this.dxAddress = contactInfo.getDxAddresses()
-                .stream()
-                .map(dxAddres ->  new DxAddressResponse(dxAddres))
-                .collect(toList());
+                    .stream()
+                    .map(dxAddres -> new DxAddressResponse(dxAddres))
+                    .collect(toList());
     }
 
 }

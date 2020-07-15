@@ -9,7 +9,7 @@ import org.junit.Test;
 public class UserProfileUpdatedDataTest {
 
     @Test
-    public void should_add_roles_add_when_modified() {
+    public void test_should_add_roles_add_when_modified() {
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         Set<RoleName> rolesAdd = new HashSet<>();

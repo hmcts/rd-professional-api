@@ -62,26 +62,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    public void rdcc117_ac1_pui_finance_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiFinanceManager));
-        assertThat(response.get("paymentAccount")).asList().hasSize(3);
-        responseValidate(response);
-    }
-
-    @Test
-    public void rdcc117_ac2_pui_organisation_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiOrgManager));
-        assertThat(response.get("paymentAccount")).asList().hasSize(3);
-    }
-
-    @Test
-    public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_organisation_by_orgIdentifier_for_external() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser("caseworker-caa"));
-        assertThat(response.get("errorMessage")).isNotNull();
-        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
-    }
-
-    @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_organisation_by_orgIdentifier() {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(createUserForTest()).build();

@@ -34,9 +34,11 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -116,8 +118,8 @@ public abstract class AuthorizationFunctionalTest {
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
         professionalApiClient = new ProfessionalApiClient(
-            professionalApiUrl,
-            s2sToken, idamOpenIdClient, idamClient);
+                professionalApiUrl,
+                s2sToken, idamOpenIdClient, idamClient);
     }
 
     @After
@@ -183,12 +185,12 @@ public abstract class AuthorizationFunctionalTest {
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .jurisdictions(createJurisdictions())
-            .build();
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         log.info("::executing generateBearerTokenFor method called by :: {} execution time {} ",
@@ -210,12 +212,12 @@ public abstract class AuthorizationFunctionalTest {
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .jurisdictions(createJurisdictions())
-            .build();
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         log.info("::executing generateBearerTokenForExternalUserRolesSpecified method called by :: {} execution time {} ",
@@ -242,16 +244,17 @@ public abstract class AuthorizationFunctionalTest {
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
+
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
         String lastName = "someLastName";
         String firstName = "someFirstName";
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .jurisdictions(createJurisdictions())
-            .build();
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .build();
         return userCreationRequest;
     }
 
@@ -261,16 +264,16 @@ public abstract class AuthorizationFunctionalTest {
         String lastName = "some-lname";
         String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         UserCreationRequest superUser = aUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(email)
-            .jurisdictions(createJurisdictions())
-            .build();
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
-            .superUser(superUser)
-            .build();
+                .superUser(superUser)
+                .build();
 
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
@@ -296,4 +299,23 @@ public abstract class AuthorizationFunctionalTest {
     private void setTestName() {
         testNameStatic = testName;
     }
+
+    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .jurisdictions(createJurisdictions())
+                .build();
+        return superUser;
+    }
+
+    public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
+        UserProfileUpdatedData data = new UserProfileUpdatedData();
+        data.setFirstName("UpdatedFirstName");
+        data.setLastName("UpdatedLastName");
+        data.setIdamStatus(status.name());
+        return data;
+    }
+
 }
