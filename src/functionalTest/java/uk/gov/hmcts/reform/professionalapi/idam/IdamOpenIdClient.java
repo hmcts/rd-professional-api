@@ -7,10 +7,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 
@@ -62,13 +61,13 @@ public class IdamOpenIdClient {
         String serializedUser = gson.toJson(user);
 
         Response createdUserResponse = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .body(serializedUser)
-                .post("/testing-support/accounts")
-                .andReturn();
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .body(serializedUser)
+            .post("/testing-support/accounts")
+            .andReturn();
 
 
         log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
@@ -97,7 +96,7 @@ public class IdamOpenIdClient {
     }
 
     public String getOpenIdToken(String userEmail) {
-
+        final long startTime = System.currentTimeMillis();
         Map<String, String> tokenParams = new HashMap<>();
         tokenParams.put("grant_type", "password");
         tokenParams.put("username", userEmail);
@@ -108,19 +107,21 @@ public class IdamOpenIdClient {
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         Response openIdTokenResponse = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-                .params(tokenParams)
-                .post("/o/token")
-                .andReturn();
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+            .params(tokenParams)
+            .post("/o/token")
+            .andReturn();
 
         log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
         IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
+        log.info("::executing getOpenIdToken method called by :: {} execution time {} ",
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
         return accessTokenResponse.getAccessToken();
 
     }

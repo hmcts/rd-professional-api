@@ -7,10 +7,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 
@@ -87,7 +86,7 @@ public class IdamClient {
     }
 
     public String getBearerToken(String userEmail) {
-
+        final long startTime = System.currentTimeMillis();
         String codeAuthorization = Base64.getEncoder().encodeToString((userEmail + ":" + password).getBytes());
 
         Map<String, String> authorizeParams = new HashMap<>();
@@ -131,6 +130,9 @@ public class IdamClient {
         assertThat(bearerTokenResponse.getStatusCode()).isEqualTo(200);
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
+
+        log.info("::executing getBearerToken method called by :: {} execution time {} ",
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
 
         return accessTokenResponse.getAccessToken();
     }
