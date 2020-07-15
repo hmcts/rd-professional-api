@@ -15,7 +15,7 @@ public class UserAttributeRequestTest {
     private String puiUserManager = "pui-user-manager";
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void test_has_mandatory_fields_specified_not_null() {
         UserAttributeRequest userAttributeRequest = new UserAttributeRequest(null);
 
         Set<ConstraintViolation<UserAttributeRequest>> violations = validator.validate(userAttributeRequest);
@@ -24,7 +24,7 @@ public class UserAttributeRequestTest {
     }
 
     @Test
-    public void creates_new_user_creation_request_correctly() {
+    public void test_creates_new_user_creation_request_correctly() {
         UserAttributeRequest userAttributeRequest = new UserAttributeRequest(singletonList(puiUserManager));
 
         assertThat(userAttributeRequest.getUserRoles()).hasSize(1);
@@ -32,7 +32,7 @@ public class UserAttributeRequestTest {
     }
 
     @Test
-    public void userAttributeBuilderTest() {
+    public void test_userAttributeBuilder() {
         UserAttributeRequest testUserAttributeRequest = UserAttributeRequest.aUserAttributeCreationRequest()
                 .userRoles(singletonList(puiUserManager)).build();
 

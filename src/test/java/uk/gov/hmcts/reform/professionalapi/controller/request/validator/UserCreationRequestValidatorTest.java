@@ -30,7 +30,7 @@ public class UserCreationRequestValidatorTest {
     }
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    public void test_privateConstructor() throws Exception {
         Constructor<UserCreationRequestValidator> constructor
                 = UserCreationRequestValidator.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));

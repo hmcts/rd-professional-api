@@ -15,7 +15,7 @@ public class WelcomeControllerTest {
     private final WelcomeController welcomeController = new WelcomeController();
 
     @Test
-    public void should_return_welcome_response() {
+    public void test_should_return_welcome_response() {
 
         ResponseEntity<String> responseEntity = welcomeController.welcome();
         String expectedMessage = "Welcome to the System Reference Data API";

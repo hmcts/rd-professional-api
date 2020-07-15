@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import org.junit.Test;
 public class ProfessionalUserTest {
 
     @Test
-    public void creates_professional_user_correctly() {
+    public void test_creates_professional_user_correctly() {
         List<String> roles = new ArrayList<>();
         roles.add("pui-user-manager");
 
@@ -23,7 +24,7 @@ public class ProfessionalUserTest {
         professionalUser.setLastUpdated(LocalDateTime.now());
         professionalUser.setCreated(LocalDateTime.now());
         professionalUser.setRoles(roles);
-        professionalUser.setUserAccountMap(new ArrayList<>());
+        professionalUser.setUserAccountMap(Arrays.asList(new UserAccountMap()));
 
         assertThat(professionalUser.getFirstName()).isEqualTo("some-fname");
         assertThat(professionalUser.getLastName()).isEqualTo("some-lname");
@@ -36,6 +37,7 @@ public class ProfessionalUserTest {
         assertThat(professionalUser.getLastUpdated()).isNotNull();
         assertThat(professionalUser.getCreated()).isNotNull();
         assertThat(professionalUser.getUserAccountMap()).isNotNull();
+        assertThat(professionalUser.getUserAccountMap()).isNotEmpty();
 
         ProfessionalUser user = new ProfessionalUser();
         assertThat(user).isNotNull();

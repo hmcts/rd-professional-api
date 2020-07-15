@@ -20,7 +20,7 @@ public class ContactInformationCreationRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void test_has_mandatory_fields_specified_not_null() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 null, null, null, null, null, null,
                 null, null);
@@ -31,7 +31,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void creates_contact_information_creation_request_correctly() {
+    public void test_creates_contact_information_creation_request_correctly() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
                 "some-exchange");
 
@@ -53,7 +53,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void creates_contact_information_creation_request_correctly_when_optional_values_are_null() {
+    public void test_creates_contact_information_creation_request_correctly_when_optional_values_are_null() {
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
                 "some-exchange");
 
@@ -74,7 +74,7 @@ public class ContactInformationCreationRequestTest {
     }
 
     @Test
-    public void creates_contact_information_creation_request_correctly_without_dx_address() {
+    public void test_creates_contact_information_creation_request_correctly_without_dx_address() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
                 "some-address1", "some-address2", "some-address3",
                 "some-town-city", "some-county", "some-country",

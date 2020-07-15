@@ -7,7 +7,7 @@ import org.junit.Test;
 public class ErrorResponseTest {
 
     @Test
-    public void testErrorResponse() {
+    public void test_ErrorResponse() {
         String expectMsg = "msg";
         String expectDesc = "desc";
         String expectTs = "time";

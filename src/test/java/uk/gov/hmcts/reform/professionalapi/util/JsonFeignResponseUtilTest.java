@@ -44,7 +44,7 @@ public class JsonFeignResponseUtilTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testDecode_fails_with_ioException() {
+    public void test_Decode_fails_with_ioException() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
@@ -99,7 +99,7 @@ public class JsonFeignResponseUtilTest {
     }
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    public void test_privateConstructor() throws Exception {
         Constructor<JsonFeignResponseUtil> constructor = JsonFeignResponseUtil.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

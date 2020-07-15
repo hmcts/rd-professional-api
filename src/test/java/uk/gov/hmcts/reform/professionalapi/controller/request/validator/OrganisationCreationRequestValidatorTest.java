@@ -45,13 +45,13 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
         userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
                 .email("test@email.com").build();
-        organisationCreationRequest = new OrganisationCreationRequest("Company","PENDING","SraId",
-                "true", "12345678","www.company.com",userCreationRequest,
-                new HashSet<>(),null);
+        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
+                "true", "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null);
     }
 
     @Test
-    public void testCallsAllValidators() {
+    public void test_CallsAllValidators() {
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
         verify(validator1, times(1)).validate(organisationCreationRequest);
@@ -62,22 +62,23 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
-    public void validateOrganisationIdentifierNullTest() {
+    public void test_validateOrganisationIdentifierNull() {
         organisationCreationRequestValidator.validateOrganisationIdentifier(null);
     }
 
-    @Test(expected = EmptyResultDataAccessException.class) //value < 7 char in length should throw empty exception
-    public void validateOrganisationIdentifierTooShortTest() {
+    @Test(expected = EmptyResultDataAccessException.class)
+    //value less than 7 char in length should throw empty exception
+    public void test_validateOrganisationIdentifierTooShort() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("AB");
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //incorrect format should throw empty exception
-    public void validateOrganisationIdentifierWrongFormatTest() {
+    public void test_validateOrganisationIdentifierWrongFormat() {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");
     }
 
     @Test //valid value should not throw exception
-    public void validateOrganisationIdentifierNoExcepTest() {
+    public void test_validateOrganisationIdentifierNoException() {
         myException = null;
         try {
             organisationCreationRequestValidator.validateOrganisationIdentifier("Q90SB9S");
@@ -89,20 +90,20 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test
-    public void containsTest() {
+    public void test_contains() {
         assertThat(OrganisationCreationRequestValidator.contains("quhajdsajsh")).isFalse();
         assertThat(OrganisationCreationRequestValidator.contains("PENDING")).isTrue();
     }
 
-    @Test (expected = InvalidRequest.class) //Pending value should not throw empty exception
-    public void isOrganisationActive_Pending_Test() {
+    @Test(expected = InvalidRequest.class) //Pending value should not throw empty exception
+    public void test_isOrganisationActive_Pending() {
         Organisation myOrgg = new Organisation();
         myOrgg.setStatus(OrganisationStatus.PENDING);
         organisationCreationRequestValidator.isOrganisationActive(myOrgg);
     }
 
     @Test //Active value should not throw empty exception
-    public void isOrganisationActive_Active_Test() {
+    public void test_isOrganisationActive_Active() {
         Organisation organisation = new Organisation();
         organisation.setStatus(OrganisationStatus.ACTIVE);
         myException = null;
@@ -116,36 +117,36 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
-    public void isOrganisationActive_Null_Test() {
+    public void test_isOrganisationActive_Null() {
         organisationCreationRequestValidator.isOrganisationActive(null);
     }
 
     @Test(expected = InvalidRequest.class) //empty value should throw empty exception
-    public void isOrganisationActive_Empty_Test() {
+    public void test_isOrganisationActive_Empty() {
         organisationCreationRequestValidator.isOrganisationActive(new Organisation());
     }
 
     @Test(expected = InvalidRequest.class)
-    public void validateOrganisationRequestTest() {
+    public void test_validateOrganisationRequest() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","",
-                "true", "","",null, paymentAccounts,
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "", "", null, paymentAccounts,
                 null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 
     @Test //empty value should throw invalid request
-    public void requestValuesTest() {
+    public void test_requestValues() {
         Assertions.assertThatThrownBy(() -> organisationCreationRequestValidator.requestValues(""))
                 .isExactlyInstanceOf(InvalidRequest.class);
     }
 
     @Test(expected = InvalidRequest.class) // if the fields are null or empty it should throw invalid request
-    public void requestContactInformationTest() {
+    public void test_requestContactInformation() {
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("",null,null,null,
-                null,null,null,null);
+                = new ContactInformationCreationRequest("", null, null,
+                null, null, null, null, null);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -153,14 +154,14 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void requestContactInformationDxAddwithDxNumerHasSpecialCharsTest() {
+    public void test_requestContactInformationDxAddwithDxNumerHasSpecialChars() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1*2$3&4@",
                 "DxExchange");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList);
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -168,13 +169,13 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void requestContactInformationDxAddwithEmptyTest() {
+    public void test_requestContactInformationDxAddwithEmpty() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", null);
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList);
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -184,8 +185,8 @@ public class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
         ContactInformationCreationRequest contactInfoCreateRequest1
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList1);
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
 
@@ -193,14 +194,14 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void requestContactInformationDxAddwithInvalidLengthTest() {
+    public void test_requestContactInformationDxAddwithInvalidLength() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 12345678900000",
                 "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList);
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -211,8 +212,8 @@ public class OrganisationCreationRequestValidatorTest {
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
         ContactInformationCreationRequest contactInfoCreateRequest1
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList1);
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
 
@@ -220,14 +221,14 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = Test.None.class)
-    public void requestContactInformationDxAddwithvalidTest() {
+    public void test_requestContactInformationDxAddwithvalid() {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890",
                 "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
         ContactInformationCreationRequest contactInfoCreateRequest
-                = new ContactInformationCreationRequest("A","A","A","A",
-                "A","A","A", dxList);
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -235,9 +236,9 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_validate_valid_email_and_should_not_throw_exception() {
+    public void test_should_validate_valid_email_and_should_not_throw_exception() {
 
-        String[] validEmails = new String[] {
+        String[] validEmails = new String[]{
             "shreedhar.lomte@hmcts.net",
             "shreedhar@yahoo.com",
             "Email.100@yahoo.com",
@@ -259,10 +260,8 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void should_validate_valid_email_and_should_throw_exception() {
-
-        String[] validEmails = new String[] {
-            "あいうえお@example.com",
+    public void test_should_validate_valid_email_and_should_throw_exception() {
+        String[] validEmails = new String[]{"あいうえお@example.com",
             "emAil@1.com",
             "email@111",
             "email@.com.my",
@@ -291,7 +290,7 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = Test.None.class)
-    public void should_validate_mandatory_user_fields_and_not_throw_exception() {
+    public void test_should_validate_mandatory_user_fields_and_not_throw_exception() {
 
         NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname",
                 "sl@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
@@ -300,24 +299,24 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void should_validate_mandatory_user_fields_and_throw_exception() {
+    public void test_should_validate_mandatory_user_fields_and_throw_exception() {
         NewUserCreationRequest request = new NewUserCreationRequest(null, null,
                 "al@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 
     @Test(expected = InvalidRequest.class)
-    public void should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","",
-                "true", "123456789","",null, new HashSet<>(),
+    public void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "123456789", "", null, new HashSet<>(),
                 null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 
     @Test
-    public void should_validate_company_no_length_and_not_throw_if_length_is_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("","","",
-                "true", "12345678","",null, new HashSet<>(),
+    public void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "12345678", "", null, new HashSet<>(),
                 null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }

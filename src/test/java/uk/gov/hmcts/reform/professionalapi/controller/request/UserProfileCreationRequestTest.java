@@ -16,7 +16,7 @@ public class UserProfileCreationRequestTest {
     private String lastName = "lName";
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void test_has_mandatory_fields_specified_not_null() {
         List<String> roles = asList("pui-user-manager", "pui-organisation-manager");
 
         UserProfileCreationRequest userProfileCreationRequest = new UserProfileCreationRequest(email, firstName,

@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationStatusTest {
 
     @Test
-    public void shouldReturnTrueWhenPendingisPassed() {
+    public void test_shouldReturnTrueWhenPendingisPassed() {
         OrganisationStatus organisationStatus = OrganisationStatus.ACTIVE;
 
         assertThat(organisationStatus.isActive()).isTrue();
@@ -16,7 +16,7 @@ public class OrganisationStatusTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenActiveisPassed() {
+    public void test_shouldReturnTrueWhenActiveisPassed() {
         OrganisationStatus organisationStatus = OrganisationStatus.PENDING;
         
         assertThat(organisationStatus.isActive()).isFalse();

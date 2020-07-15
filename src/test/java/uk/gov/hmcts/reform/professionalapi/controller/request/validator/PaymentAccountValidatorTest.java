@@ -69,12 +69,12 @@ public class PaymentAccountValidatorTest {
     }
 
     @Test(expected = Test.None.class)
-    public void testCheckPbasAreUniqueWithOrgId() {
+    public void test_CheckPbasAreUniqueWithOrgId() {
         paymentAccountValidator.checkPbasAreUniqueWithOrgId(singleton("PBA1234567"), "");
     }
 
     @Test
-    public void testValidatePaymentAccounts() {
+    public void test_ValidatePaymentAccounts() {
         String pba = "PBA1234567";
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);

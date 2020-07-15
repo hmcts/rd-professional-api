@@ -6,13 +6,13 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -273,6 +273,80 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         List<String> rolesInfo = searchUserInfo(orgIdentifierResponse);
         assertThat(rolesInfo.size()).isEqualTo(1);
         //assertThat(!rolesInfo.contains("pui-organisation-manager"));
+    }
+
+    @Test
+    public void should_get_400_when_modify_roles_for_pending_user_internal() {
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        Map<String, Object> createUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+                hmctsAdmin, professionalApiClient.createNewUserRequest(), HttpStatus.CREATED);
+        Map<String, Object> modifiedUserResponse = professionalApiClient
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.BAD_REQUEST, getUserProfileAddRoleRequest(),
+                orgIdentifier, (String)createUserResponse.get("userIdentifier"));
+        assertThat(modifiedUserResponse.get("errorDescription")).isEqualTo("UserId status is not active");
+        assertThat(modifiedUserResponse.get("errorMessage"))
+                .isEqualTo("3 : There is a problem with your request. Please check and try again");
+    }
+
+    @Test
+    public void should_get_404_when_modify_roles_for_unknown_user_internal() {
+        String unknownUserId = UUID.randomUUID().toString();
+        Map<String, Object> modifiedUserResponse = professionalApiClient
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.NOT_FOUND, getUserProfileAddRoleRequest(),
+                createAndUpdateOrganisationToActive(hmctsAdmin), unknownUserId);
+        assertThat(modifiedUserResponse.get("errorDescription"))
+                .isEqualTo("could not find user profile for userId: or status is not active " + unknownUserId);
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("4 : Resource not found");
+    }
+
+    @Test
+    public void should_get_403_when_non_active_external_user_modify_roles() {
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        //create test sidam user and add same user in org
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String externalUserEmail = idamOpenIdClient.createUser(puiUserManager);
+        String userId = (String)professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
+                professionalApiClient.createNewUserRequest(externalUserEmail),
+                HttpStatus.CREATED).get("userIdentifier");
+        RequestSpecification bearerToken = professionalApiClient
+                .getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail));
+        //update status to suspended so that while adding roles by ext user will be non active
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK,
+                getUserStatusUpdateRequest(IdamStatus.SUSPENDED), orgIdentifier, userId);
+        //use external suspended user to add roles should give 403 back
+        professionalApiClient.modifyUserToExistingUserForExternal(HttpStatus.INTERNAL_SERVER_ERROR,
+                getUserProfileAddRoleRequest(),
+                bearerToken, userId);
+    }
+
+    @Test
+    public void should_get_403_when_external_user_modify_roles_of_non_active_user() {
+
+        String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String externalUserEmail = idamOpenIdClient.createUser(puiUserManager);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
+                professionalApiClient.createNewUserRequest(externalUserEmail), HttpStatus.CREATED);
+
+        String pendingUserId = (String)professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
+                professionalApiClient.createNewUserRequest(idamOpenIdClient.nextUserEmail()),
+                HttpStatus.CREATED).get("userIdentifier");
+
+        Map<String, Object> modifiedUserResponse = professionalApiClient
+                .modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
+                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail)),
+                        pendingUserId);
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
+        assertThat(modifiedUserResponse.get("errorDescription"))
+                .isEqualTo("User status must be Active to perform this operation");
+    }
+
+    public UserProfileUpdatedData getUserProfileAddRoleRequest() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        userProfileUpdatedData.setRolesAdd(createAddRoleName());
+        return userProfileUpdatedData;
     }
 
     private Set<RoleName> createOrDeleteRoleName() {

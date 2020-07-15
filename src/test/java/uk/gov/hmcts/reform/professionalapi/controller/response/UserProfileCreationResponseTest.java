@@ -14,7 +14,7 @@ public class UserProfileCreationResponseTest {
     private String testUuid = UUID.randomUUID().toString();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void test_has_mandatory_fields_specified_not_null() {
         userProfileCreationResponse.setIdamId(testUuid);
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 

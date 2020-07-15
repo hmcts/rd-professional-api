@@ -12,7 +12,7 @@ public class ProfessionalUsersResponseTest {
     private final String expectLastName = "Smith";
 
     @Test
-    public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
+    public void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
         ProfessionalUsersResponse professionalUsersResponse
                 = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
                 expectEmailAddress, null));

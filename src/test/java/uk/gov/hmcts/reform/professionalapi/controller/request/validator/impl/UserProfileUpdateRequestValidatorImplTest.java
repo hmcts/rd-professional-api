@@ -40,7 +40,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestIfBothStatusAndRoleArePresent() {
+    public void test_ValidateRequestIfBothStatusAndRoleArePresent() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
@@ -55,7 +55,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestForStatus() {
+    public void test_ValidateRequestForStatus() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 IdamStatus.ACTIVE.name(), null, null);
 
@@ -69,7 +69,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestForRoles() {
+    public void test_ValidateRequestForRoles() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 null, rolesData, rolesToDeleteData);
 
@@ -83,7 +83,7 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testThrowErrorIfValidateRequestIsEmpty() {
+    public void test_ThrowErrorIfValidateRequestIsEmpty() {
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
                 null, null, null);
 

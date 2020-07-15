@@ -53,8 +53,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
 
     }
 
-    //TODO review validation with biz requirements
-    //@Test
+    @Test
     public void ac3_modify_roles_of_active_users_for_an_with_prd_admin_role_should_return_400() {
 
         String organisationIdentifier = createOrganisationRequest();
@@ -84,6 +83,8 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response.get("response_body"))
+                .isEqualTo("{\"errorMessage\":\"400\",\"errorDescription\":\"BAD REQUEST\",\"timeStamp\":\"23:10\"}");
 
     }
 
