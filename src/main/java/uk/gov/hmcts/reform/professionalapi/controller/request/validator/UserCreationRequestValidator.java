@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 @Slf4j
 public class UserCreationRequestValidator {
 
-    protected static String loggingComponentName;
+    private static String loggingComponentName;
 
     private UserCreationRequestValidator() {
     }

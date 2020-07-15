@@ -120,7 +120,7 @@ public abstract class SuperController {
     private boolean resendInviteEnabled;
 
     @Value("${logging-component-name}")
-    protected String loggingComponentName;
+    private String loggingComponentName;
 
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";

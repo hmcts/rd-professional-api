@@ -55,7 +55,7 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    protected static String loggingComponentName;
+    private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 

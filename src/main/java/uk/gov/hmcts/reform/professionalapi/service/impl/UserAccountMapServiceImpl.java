@@ -23,7 +23,7 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
 
     private UserAccountMapRepository userAccountMapRepository;
 
-    protected static String loggingComponentName;
+    private static String loggingComponentName;
 
     public void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
