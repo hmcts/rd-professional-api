@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 @AllArgsConstructor
 public class UserAccountMapServiceImpl implements UserAccountMapService {
 
-    @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
     private UserAccountMapRepository userAccountMapRepository;
@@ -44,4 +43,8 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
     }
 
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        UserAccountMapServiceImpl.loggingComponentName = loggingComponentName;
+    }
 }

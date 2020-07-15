@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 @Slf4j
 public class UserCreationRequestValidator {
 
-    @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
     private UserCreationRequestValidator() {
@@ -25,5 +24,10 @@ public class UserCreationRequestValidator {
         }
 
         return roles;
+    }
+
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        UserCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 }

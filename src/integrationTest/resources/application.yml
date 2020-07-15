@@ -61,3 +61,5 @@ resendInterval: 60
 
 # sync time interval in minutes
 syncInterval: 60
+
+logging-component-name: RD_Professional_API

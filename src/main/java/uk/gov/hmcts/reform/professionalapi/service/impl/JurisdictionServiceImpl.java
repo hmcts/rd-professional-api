@@ -28,7 +28,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     AuthTokenGenerator authTokenGenerator;
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    protected String loggingComponentName;
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {

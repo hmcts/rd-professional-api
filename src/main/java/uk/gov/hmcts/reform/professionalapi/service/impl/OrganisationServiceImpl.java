@@ -83,7 +83,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     PaymentAccountValidator paymentAccountValidator;
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    protected String loggingComponentName;
 
     @Override
     @Transactional

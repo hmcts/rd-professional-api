@@ -51,12 +51,12 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 @Slf4j
 public class RefDataUtil {
 
-    private RefDataUtil() {}
+    private RefDataUtil() {
+    }
 
     @Value("${defaultPageSize}")
     public static final int DEFAULTPAGESIZE = 10;
 
-    @Value("${logging-component-name}")
     protected static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
@@ -143,7 +143,7 @@ public class RefDataUtil {
             }
 
             return new ArrayList<>(modifiedOrgProfUserDetails.values());
-        }  catch (FeignException ex) {
+        } catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
@@ -365,5 +365,10 @@ public class RefDataUtil {
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        RefDataUtil.loggingComponentName = loggingComponentName;
     }
 }

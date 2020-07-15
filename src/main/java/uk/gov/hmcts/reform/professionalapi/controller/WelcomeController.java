@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WelcomeController {
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    protected String loggingComponentName;
 
     private static final String INSTANCE_ID = UUID.randomUUID().toString();
     private static final String MESSAGE = "Welcome to the System Reference Data API";
