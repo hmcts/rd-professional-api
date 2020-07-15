@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -47,12 +48,13 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
+@Component
 @Slf4j
 public class RefDataUtil {
 
     private RefDataUtil() {}
 
-    public static int DEFAULTPAGESIZE;
+    public static int defaultPageSize;
 
     private static String loggingComponentName;
 
@@ -290,7 +292,7 @@ public class RefDataUtil {
 
     public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
         if (size == null) {
-            size = DEFAULTPAGESIZE;
+            size = defaultPageSize;
         }
         return PageRequest.of(page, size, sort);
     }
@@ -356,7 +358,7 @@ public class RefDataUtil {
     }
 
     @Value("${defaultPageSize}")
-    public void setDefaultpagesize(int DEFAULTPAGESIZE) {
-        RefDataUtil.DEFAULTPAGESIZE = DEFAULTPAGESIZE;
+    public void setDefaultPageSize(int defaultPageSize) {
+        RefDataUtil.defaultPageSize = defaultPageSize;
     }
 }
