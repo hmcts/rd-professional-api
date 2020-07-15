@@ -16,7 +16,7 @@ public class ProfessionalUsersEntityResponseTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testProfessionalUsersEntityResponse() throws Exception {
+    public void test_ProfessionalUsersEntityResponse() throws Exception {
         final String dummyFirstName = "Joe";
         final String dummyLastName = "Bloggs";
         final String dummyEmail = "joe.bloggs@email.com";

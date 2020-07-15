@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 public class CcdErrorMessageResolverTest {
 
     @Test
-    public void should_return_error_message_by_HttpStatus_provided() {
+    public void test_return_error_message_by_HttpStatus_provided() {
         String httpStatusString;
 
         httpStatusString = resolveStatusAndReturnMessage(HttpStatus.BAD_REQUEST);
@@ -42,7 +42,7 @@ public class CcdErrorMessageResolverTest {
     }
 
     @Test
-    public void privateConstructorTest() throws Exception {
+    public void test_privateConstructor() throws Exception {
         Constructor<CcdErrorMessageResolver> constructor = CcdErrorMessageResolver.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

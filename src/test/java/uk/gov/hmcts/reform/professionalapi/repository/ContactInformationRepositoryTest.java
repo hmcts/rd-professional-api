@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.helper.BaseRepository;
 public class ContactInformationRepositoryTest extends BaseRepository {
 
     @Test
-    public void findAllTest() {
+    public void test_findAll() {
         List<ContactInformation> contactInformationList = contactInformationRepository.findAll();
 
         assertThat(contactInformationList).hasSize(1);
@@ -26,7 +26,7 @@ public class ContactInformationRepositoryTest extends BaseRepository {
     }
 
     @Test
-    public void findByIdTest() {
+    public void test_findById() {
         Optional<ContactInformation> contactInfo = contactInformationRepository.findById(contactInformation.getId());
 
         assertThat(contactInfo).contains(contactInformation);

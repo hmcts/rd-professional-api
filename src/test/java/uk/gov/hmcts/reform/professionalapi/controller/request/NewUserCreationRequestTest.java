@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 public class NewUserCreationRequestTest {
 
     @Test
-    public void testCreatesNewUser() {
+    public void test_CreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -30,7 +30,7 @@ public class NewUserCreationRequestTest {
 
 
     @Test
-    public void newUserCreationBuilderTest() {
+    public void test_newUserCreationBuilder() {
         String testFirstName = "Jane";
         String testLastName = "Doe";
         String testEmail = "jane.doe@email.com";

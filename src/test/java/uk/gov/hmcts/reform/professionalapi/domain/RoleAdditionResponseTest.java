@@ -10,7 +10,7 @@ public class RoleAdditionResponseTest {
     private String idamMessage = "Message";
 
     @Test
-    public void addRoleResponseTest() {
+    public void test_addRoleResponse() {
         RoleAdditionResponse addRoleResponse = new RoleAdditionResponse(idamStatusCode, idamMessage);
 
         assertThat(addRoleResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);

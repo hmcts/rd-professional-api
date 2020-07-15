@@ -47,7 +47,7 @@ public class UserAttributeServiceImplTest {
     }
 
     @Test
-    public void adds_user_attributes_to_user_correctly() {
+    public void test_adds_user_attributes_to_user_correctly() {
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnums);
 
         userAttributeServiceMock.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
@@ -57,7 +57,7 @@ public class UserAttributeServiceImplTest {
     }
 
     @Test
-    public void testAddAllAttributes() {
+    public void test_AddAllAttributes() {
         prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
 
         when(userAttributeRepositoryMock.saveAll(any())).thenReturn(userAttributes);

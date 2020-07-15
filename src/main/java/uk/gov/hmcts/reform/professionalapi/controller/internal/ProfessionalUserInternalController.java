@@ -181,7 +181,7 @@ public class ProfessionalUserInternalController extends SuperController {
     )
     @ResponseStatus(value = HttpStatus.CREATED)
     @Secured("prd-admin")
-    public ResponseEntity<ModifyUserRolesResponse> modifyRolesForExistingUserOfOrganisation(
+    public ResponseEntity<Object> modifyRolesForExistingUserOfOrganisation(
             @RequestBody UserProfileUpdatedData userProfileUpdatedData,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") String orgId,
             @PathVariable("userId") String userId,

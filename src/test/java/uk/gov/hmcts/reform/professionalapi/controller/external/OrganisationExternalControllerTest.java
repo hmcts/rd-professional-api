@@ -148,7 +148,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testCreateOrganisation() {
+    public void test_CreateOrganisation() {
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest)).thenReturn(organisationResponse);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
@@ -163,7 +163,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testRetrieveOrganisationByIdentifier() {
+    public void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
@@ -178,7 +178,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testRetrievePaymentAccountByUserEmail() {
+    public void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         List<String> authorities = new ArrayList<>();
@@ -196,7 +196,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testInviteUserToOrganisation() throws JsonProcessingException {
+    public void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
