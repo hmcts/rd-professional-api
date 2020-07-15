@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -471,7 +470,7 @@ public class RefDataUtilTest {
         activeOrganisationDtls.put("1", organisation);
         activeOrganisationDtls.put("2", organisation);
         activeOrganisationDtls.put("3", organisation);
-        ResponseEntity<?> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
+        ResponseEntity<Object> realResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, header, HttpStatus.OK);
         Map<String, Organisation> response = RefDataUtil.updateUserDetailsForActiveOrganisation(realResponseEntity, activeOrganisationDtls);
 
         Organisation organisationRes = response.get("1");
@@ -625,25 +624,6 @@ public class RefDataUtilTest {
         verify(response, times(1)).body();
         verify(response, times(2)).status();
         verify(response, times(1)).close();
-    }
-
-    @Test(expected = ExternalApiException.class)
-    public void test_findUserProfileStatusByEmail_Returns500_WhenExternalApiException() {
-        FeignException feignException = mock(FeignException.class);
-        Mockito.when(feignException.status()).thenReturn(500);
-
-        Map<String, Collection<String>> header = new HashMap<>();
-        Collection<String> list = new ArrayList<>();
-        header.put("content-encoding", list);
-        String body = "{"
-                + "  \"userIdentifier\": \"1cb88d5f-ef2c-4587-aca0-f77a7f6f3742\","
-                + "  \"idamStatus\": \"ACTIVE\""
-                + "}";
-
-        Mockito.when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
-
-        RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com", userProfileFeignClient);
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test
