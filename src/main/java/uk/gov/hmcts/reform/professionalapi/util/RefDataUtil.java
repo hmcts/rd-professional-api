@@ -52,8 +52,7 @@ public class RefDataUtil {
 
     private RefDataUtil() {}
 
-    @Value("${defaultPageSize}")
-    public static final int DEFAULTPAGESIZE = 10;
+    public static int DEFAULTPAGESIZE;
 
     private static String loggingComponentName;
 
@@ -354,5 +353,10 @@ public class RefDataUtil {
     @Value("${logging-component-name}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
+    }
+
+    @Value("${defaultPageSize}")
+    public void setDefaultpagesize(int DEFAULTPAGESIZE) {
+        RefDataUtil.DEFAULTPAGESIZE = DEFAULTPAGESIZE;
     }
 }
