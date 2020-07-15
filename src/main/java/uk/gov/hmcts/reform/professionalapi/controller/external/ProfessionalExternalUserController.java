@@ -180,7 +180,7 @@ public class ProfessionalExternalUserController extends SuperController {
             return optionalResponseEntity;
         } else {
             throw new ResourceNotFoundException("No user was found with the email provided, please ensure you are "
-                    + "using a valid email address");
+                    .concat("using a valid email address"));
         }
     }
 
