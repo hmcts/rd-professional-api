@@ -286,9 +286,9 @@ public abstract class AuthorizationFunctionalTest {
 
     @AfterClass
     public static void log() {
-        log.info("::::exiting from functional suite:::");
+        log.warn("::::exiting from functional suite:::");
         logFunctionalTime.forEach((method, time) -> {
-            log.info("::method:: {} execution time {} in seconds ", method, time);
+            log.warn("::method:: {} execution time {} in seconds ", method, time);
         });
     }
 
