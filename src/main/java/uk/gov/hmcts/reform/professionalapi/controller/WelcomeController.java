@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WelcomeController {
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    private String loggingComponentName;
 
     private static final Logger LOG = getLogger(WelcomeController.class);
     private static final String INSTANCE_ID = UUID.randomUUID().toString();

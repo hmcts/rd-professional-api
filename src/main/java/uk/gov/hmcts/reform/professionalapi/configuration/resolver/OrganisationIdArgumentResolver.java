@@ -34,7 +34,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    private String loggingComponentName;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {

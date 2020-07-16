@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -47,16 +48,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
+@Component
 @Slf4j
 public class RefDataUtil {
 
     private RefDataUtil() {}
 
-    @Value("${defaultPageSize}")
-    public static final int DEFAULTPAGESIZE = 10;
+    private static int defaultPageSize;
 
-    @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -292,7 +292,7 @@ public class RefDataUtil {
 
     public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
         if (size == null) {
-            size = DEFAULTPAGESIZE;
+            size = defaultPageSize;
         }
         return PageRequest.of(page, size, sort);
     }
@@ -318,7 +318,7 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("{}:: Response from UserProfileByEmail service call " + errorResponse.getErrorDescription(), loggingComponentName);
+                log.error("{}:: Response from UserProfileByEmail service call {}", loggingComponentName, errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();
             }
 
@@ -350,5 +350,15 @@ public class RefDataUtil {
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    @Value("${logging-component-name}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        RefDataUtil.loggingComponentName = loggingComponentName;
+    }
+
+    @Value("${defaultPageSize}")
+    public void setDefaultPageSize(int defaultPageSize) {
+        RefDataUtil.defaultPageSize = defaultPageSize;
     }
 }

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
 
     @Value("${logging-component-name}")
-    protected String loggingComponentName;
+    private String loggingComponentName;
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {

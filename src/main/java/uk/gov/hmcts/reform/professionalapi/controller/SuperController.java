@@ -120,7 +120,7 @@ public abstract class SuperController {
     private boolean resendInviteEnabled;
 
     @Value("${logging-component-name}")
-    protected static String loggingComponentName;
+    private String loggingComponentName;
 
     private static final String SRA_REGULATED_FALSE = "false";
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
@@ -270,7 +270,7 @@ public abstract class SuperController {
             Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
-            log.error("{}:: UserProfile api failed:: status code ::" + ex.status(), loggingComponentName);
+            log.error("{}:: UserProfile api failed:: status code {}", loggingComponentName, ex.status());
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), "UserProfile api failed!!");
         }
     }
@@ -383,7 +383,7 @@ public abstract class SuperController {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        return  professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public void checkUserAlreadyExist(String userEmail) {
