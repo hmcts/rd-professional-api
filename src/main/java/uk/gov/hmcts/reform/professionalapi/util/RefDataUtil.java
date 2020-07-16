@@ -54,7 +54,7 @@ public class RefDataUtil {
 
     private RefDataUtil() {}
 
-    public static int defaultPageSize;
+    private static int defaultPageSize;
 
     private static String loggingComponentName;
 
