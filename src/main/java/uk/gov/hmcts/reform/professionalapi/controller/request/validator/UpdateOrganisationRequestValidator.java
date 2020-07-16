@@ -17,7 +17,8 @@ public class UpdateOrganisationRequestValidator {
         this.validators = validators;
     }
 
-    public void validateStatus(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
+    public void validateStatus(Organisation existingOrganisation, OrganisationStatus inputStatus,
+                               String inputOrganisationIdentifier) {
         validators.forEach(v -> v.validate(existingOrganisation, inputStatus, inputOrganisationIdentifier));
     }
 }

@@ -16,13 +16,17 @@ public class UserProfileUpdateRequestValidatorImpl implements UserProfileUpdateR
         UserProfileUpdatedData validatedData = new UserProfileUpdatedData();
 
         //if required fields are empty
-        if (null == userProfileUpdatedData.getRolesAdd() && null == userProfileUpdatedData.getRolesDelete() && StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
+        if (null == userProfileUpdatedData.getRolesAdd() && null == userProfileUpdatedData
+                .getRolesDelete() && StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
             throw new InvalidRequest(ErrorConstants.INVALID_REQUEST.getErrorMessage());
         }
 
         //if all are present
-        if (null != userProfileUpdatedData.getRolesAdd() && null != userProfileUpdatedData.getRolesDelete() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())
-                && !StringUtils.isEmpty(userProfileUpdatedData.getFirstName()) && !StringUtils.isEmpty(userProfileUpdatedData.getLastName()) && !StringUtils.isEmpty(userProfileUpdatedData.getEmail())) {
+        if (null != userProfileUpdatedData.getRolesAdd() && null != userProfileUpdatedData
+                .getRolesDelete() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())
+                && !StringUtils.isEmpty(userProfileUpdatedData
+                .getFirstName()) && !StringUtils.isEmpty(userProfileUpdatedData.getLastName()) && !StringUtils
+                .isEmpty(userProfileUpdatedData.getEmail())) {
 
             validatedData.setRolesAdd(userProfileUpdatedData.getRolesAdd());
             validatedData.setRolesDelete(userProfileUpdatedData.getRolesDelete());
@@ -30,21 +34,24 @@ public class UserProfileUpdateRequestValidatorImpl implements UserProfileUpdateR
         }
 
         //if both roles and status are present
-        if (null != userProfileUpdatedData.getRolesAdd() && null != userProfileUpdatedData.getRolesDelete() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
+        if (null != userProfileUpdatedData.getRolesAdd() && null != userProfileUpdatedData
+                .getRolesDelete() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
             validatedData.setRolesAdd(userProfileUpdatedData.getRolesAdd());
             validatedData.setRolesDelete(userProfileUpdatedData.getRolesDelete());
             return validatedData;
         }
 
         //if one role and status are present
-        if (null != userProfileUpdatedData.getRolesDelete() || null != userProfileUpdatedData.getRolesAdd() && StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
+        if (null != userProfileUpdatedData.getRolesDelete() || null != userProfileUpdatedData
+                .getRolesAdd() && StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
             validatedData.setRolesAdd(userProfileUpdatedData.getRolesAdd());
             validatedData.setRolesDelete(userProfileUpdatedData.getRolesDelete());
             return validatedData;
         }
 
         //if no roles and status is present
-        if (null == userProfileUpdatedData.getRolesDelete() && null == userProfileUpdatedData.getRolesAdd() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
+        if (null == userProfileUpdatedData.getRolesDelete() && null == userProfileUpdatedData
+                .getRolesAdd() && !StringUtils.isEmpty(userProfileUpdatedData.getIdamStatus())) {
             validatedData.setIdamStatus(userProfileUpdatedData.getIdamStatus());
             return validatedData;
         }

@@ -16,7 +16,8 @@ public class UpdateOrganisationRequestValidatorTest {
         List<OrganisationIdentifierValidator> updateOrganisationRequestValidatorList = new ArrayList<>();
         updateOrganisationRequestValidatorList.add(mock(OrganisationIdentifierValidator.class));
 
-        UpdateOrganisationRequestValidator updateOrganisationRequestValidator = new UpdateOrganisationRequestValidator(updateOrganisationRequestValidatorList);
+        UpdateOrganisationRequestValidator updateOrganisationRequestValidator
+                = new UpdateOrganisationRequestValidator(updateOrganisationRequestValidatorList);
 
         assertThat(updateOrganisationRequestValidator).isNotNull();
     }

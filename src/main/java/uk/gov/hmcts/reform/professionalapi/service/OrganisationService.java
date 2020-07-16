@@ -16,7 +16,8 @@ public interface OrganisationService {
 
     OrganisationEntityResponse retrieveOrganisation(String organisationIdentifier);
 
-    OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String organisationIdentifier);
+    OrganisationResponse updateOrganisation(OrganisationCreationRequest organisationCreationRequest,
+                                            String organisationIdentifier);
 
     Organisation getOrganisationByOrgIdentifier(String organisationIdentifier);
 

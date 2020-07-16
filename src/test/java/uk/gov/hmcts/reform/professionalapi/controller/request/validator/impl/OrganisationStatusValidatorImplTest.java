@@ -18,7 +18,8 @@ public class OrganisationStatusValidatorImplTest {
     @Before
     public void setUp() {
         organisationStatusValidatorImpl = new OrganisationStatusValidatorImpl();
-        organisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId", "12345678", Boolean.FALSE, "dummySite.com");
+        organisation = new Organisation("dummyName", OrganisationStatus.ACTIVE, "sraId",
+                "12345678", Boolean.FALSE, "dummySite.com");
         orgId = organisation.getOrganisationIdentifier();
     }
 

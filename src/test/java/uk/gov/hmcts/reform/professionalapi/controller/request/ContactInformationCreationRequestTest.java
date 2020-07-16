@@ -22,7 +22,8 @@ public class ContactInformationCreationRequestTest {
     @Test
     public void test_has_mandatory_fields_specified_not_null() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null,
+                null, null);
 
         Set<ConstraintViolation<ContactInformationCreationRequest>> violations = validator
                 .validate(contactInformationCreationRequest);
@@ -31,12 +32,14 @@ public class ContactInformationCreationRequestTest {
 
     @Test
     public void test_creates_contact_information_creation_request_correctly() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address", "some-exchange");
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
+                "some-exchange");
 
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", "some-address2", "some-address3", "some-town-city", "some-county", "some-country",
+                "some-address1", "some-address2", "some-address3",
+                "some-town-city", "some-county", "some-country",
                 "some-post-code", dxAddresses);
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
@@ -51,12 +54,14 @@ public class ContactInformationCreationRequestTest {
 
     @Test
     public void test_creates_contact_information_creation_request_correctly_when_optional_values_are_null() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address", "some-exchange");
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-address",
+                "some-exchange");
 
         dxAddresses.add(dxAddressCreationRequest);
 
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", null, null, null, null, null, null, null);
+                "some-address1", null, null, null, null,
+                null, null, null);
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
         assertThat(contactInformationCreationRequest.getAddressLine2()).isNull();
@@ -71,7 +76,8 @@ public class ContactInformationCreationRequestTest {
     @Test
     public void test_creates_contact_information_creation_request_correctly_without_dx_address() {
         ContactInformationCreationRequest contactInformationCreationRequest = new ContactInformationCreationRequest(
-                "some-address1", "some-address2", "some-address3", "some-town-city", "some-county", "some-country",
+                "some-address1", "some-address2", "some-address3",
+                "some-town-city", "some-county", "some-country",
                 "some-post-code", null);
 
         assertThat(contactInformationCreationRequest.getAddressLine1()).isEqualTo("some-address1");
@@ -96,7 +102,8 @@ public class ContactInformationCreationRequestTest {
         String country = "country";
         String postCode = "postC";
 
-        ContactInformationCreationRequest contactInformationCreationRequest = ContactInformationCreationRequest.aContactInformationCreationRequest()
+        ContactInformationCreationRequest contactInformationCreationRequest = ContactInformationCreationRequest
+                .aContactInformationCreationRequest()
                 .addressLine1(addressLine1)
                 .addressLine2(addressLine2)
                 .addressLine3(addressLine3)

@@ -21,13 +21,17 @@ public interface ProfessionalUserService {
 
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
-    ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status);
+    ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted,
+                                                               boolean rolesRequired, String status);
 
-    ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable);
+    ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation existingOrganisation,
+                                                                           String showDeleted, boolean rolesRequired,
+                                                                           String status, Pageable pageable);
 
     ProfessionalUser persistUser(ProfessionalUser professionalUser);
 
-    ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin);
+    ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId,
+                                              Optional<String> origin);
 
     ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String email);
 

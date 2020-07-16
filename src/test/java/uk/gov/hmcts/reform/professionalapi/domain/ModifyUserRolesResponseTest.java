@@ -34,11 +34,13 @@ public class ModifyUserRolesResponseTest {
         List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
         deleteResponses.add(deleteRoleResponse);
 
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses, statusUpdateResponse);
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse,
+                deleteResponses, statusUpdateResponse);
 
         assertThat(modifyUserRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getStatusUpdateResponse().getIdamMessage()).isEqualTo("updateMessage");
-        assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
+        assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage())
+                .isEqualTo("deleteMessage");
     }
 
     private RoleAdditionResponse addRolesForUser() {

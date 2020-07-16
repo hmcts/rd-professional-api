@@ -34,8 +34,10 @@ public class JsonFeignResponseUtilTest {
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
 
-        Response response = Response.builder().status(200).reason("OK").headers(header).body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
-        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
+        Response response = Response.builder().status(200).reason("OK").headers(header)
+                .body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
+        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
+                ProfessionalUsersResponse.class);
 
         assertThat(createUserProfileResponseOptional).isNotEmpty();
     }
@@ -48,7 +50,8 @@ public class JsonFeignResponseUtilTest {
         header.put("content-encoding", list);
 
         Response.Body bodyMock = mock(Response.Body.class);
-        Response response = Response.builder().status(200).reason("OK").headers(header).body(bodyMock).request(mock(Request.class)).build();
+        Response response = Response.builder().status(200).reason("OK").headers(header).body(bodyMock)
+                .request(mock(Request.class)).build();
 
         try {
             when(bodyMock.asInputStream()).thenThrow(new IOException());
@@ -57,14 +60,16 @@ public class JsonFeignResponseUtilTest {
             e.printStackTrace();
         }
 
-        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response, ProfessionalUsersResponse.class);
+        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
+                ProfessionalUsersResponse.class);
         assertThat(createUserProfileResponseOptional).isEmpty();
     }
 
     @Test
     public void test_convertHeaders() {
         Map<String, Collection<String>> header = new HashMap<>();
-        Collection<String> list = new ArrayList<>(Arrays.asList("gzip", "request-context", "x-powered-by", "content-length"));
+        Collection<String> list = new ArrayList<>(Arrays.asList("gzip", "request-context", "x-powered-by",
+                "content-length"));
         header.put("content-encoding", list);
 
         MultiValueMap<String, String> responseHeader = JsonFeignResponseUtil.convertHeaders(header);
@@ -83,7 +88,8 @@ public class JsonFeignResponseUtilTest {
         Collection<String> list = new ArrayList<>(Arrays.asList("a", "b"));
         header.put("content-encoding", list);
 
-        Response response = Response.builder().status(200).reason("OK").headers(header).body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
+        Response response = Response.builder().status(200).reason("OK").headers(header)
+                .body("{\"userIdentifier\": 1}", UTF_8).request(mock(Request.class)).build();
         ResponseEntity entity = JsonFeignResponseUtil.toResponseEntity(response, ProfessionalUsersResponse.class);
 
         assertThat(entity).isNotNull();

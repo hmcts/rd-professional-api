@@ -31,14 +31,16 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
     private Gson gson = new Gson();
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+            ServletException {
         try {
             chain.doFilter(req, res);
         } catch (RequestRejectedException exception) {
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) res;
 
-            log.warn("request_rejected: remote={}, user_agent={}, request_url={}", request.getRemoteHost(), request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
+            log.warn("request_rejected: remote={}, user_agent={}, request_url={}", request.getRemoteHost(),
+                    request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

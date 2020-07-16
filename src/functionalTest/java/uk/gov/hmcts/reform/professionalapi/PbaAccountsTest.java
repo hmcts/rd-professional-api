@@ -46,7 +46,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(), hmctsAdmin);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(),
+                hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
 
@@ -57,7 +58,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
 
-        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest, orgIdentifierResponse, hmctsAdmin);
+        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest,
+                orgIdentifierResponse, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
     }
 

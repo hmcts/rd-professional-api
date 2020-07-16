@@ -44,13 +44,16 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
             Map<String, Object> newUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
+                            hmctsAdmin);
             String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
             assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
+                    userRoles);
             Map<String, Object> reInviteUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
+                            hmctsAdmin);
             assertNotNull(reInviteUserResponse.get("userIdentifier"));
         }
     }
@@ -60,9 +63,11 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
     public void should_return_404_when_user_doesnt_exists() throws Exception {
 
         if (resendInviteEnabled) {
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
+                    userRoles);
             Map<String, Object> reInviteUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
+                            hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("404");
             assertThat((String) reInviteUserResponse.get("response_body")).contains("User does not exist");
         }
@@ -76,14 +81,17 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
             Map<String, Object> newUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
+                            hmctsAdmin);
             String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
             assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.BAD_REQUEST);
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
+                    userRoles);
             Map<String, Object> reInviteUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
+                            hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("400");
             assertThat((String) reInviteUserResponse.get("response_body")).contains("User is not in PENDING state");
         }
@@ -98,16 +106,21 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
             Map<String, Object> newUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
+                            hmctsAdmin);
             String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
             assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.TOO_MANY_REQUESTS);
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
+                    userRoles);
             Map<String, Object> reInviteUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
+                            hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("429");
-            assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("The request was last made less than %s minutes ago. Please try after some time", resendInterval));
+            assertThat((String) reInviteUserResponse.get("response_body"))
+                    .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
+                            + " time", resendInterval));
         }
 
     }
@@ -120,16 +133,21 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             userProfileCreateUserWireMock(HttpStatus.CREATED);
 
             Map<String, Object> newUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
+                            hmctsAdmin);
             String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
             assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.CONFLICT);
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
+                    userRoles);
             Map<String, Object> reInviteUserResponse =
-                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest, hmctsAdmin);
+                    professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
+                            hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("409");
-            assertThat((String) reInviteUserResponse.get("response_body")).contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for the system to refresh.", syncInterval));
+            assertThat((String) reInviteUserResponse.get("response_body"))
+                    .contains(String.format("Resend invite failed as user is already active. Wait for %s minutes for "
+                            + "the system to refresh.", syncInterval));
         }
     }
 
@@ -146,11 +164,13 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             OrganisationCreationRequest organisationCreationRequest2 = someMinimalOrganisationRequest().build();
             String org2 = createAndActivateOrganisationWithGivenRequest(organisationCreationRequest2);
 
-            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(organisationCreationRequest1.getSuperUser().getEmail(), userRoles);
+            NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(organisationCreationRequest1
+                    .getSuperUser().getEmail(), userRoles);
             Map<String, Object> reInviteUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(org2, reinviteRequest, hmctsAdmin);
             assertThat(reInviteUserResponse.get("http_status")).isEqualTo("403");
-            assertThat((String) reInviteUserResponse.get("response_body")).contains("User does not belong to same organisation");
+            assertThat((String) reInviteUserResponse.get("response_body")).contains("User does not belong to same "
+                    + "organisation");
         }
     }
 }
