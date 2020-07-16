@@ -60,7 +60,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
         assertThat(persistedOrganisation.getUsers().size()).isEqualTo(1);
 
-        assertThat(persistedSuperUser.getEmailAddress()).isEqualTo(organisationCreationRequest.getSuperUser().getEmail());
+        assertThat(persistedSuperUser.getEmailAddress()).isEqualTo(organisationCreationRequest.getSuperUser()
+                .getEmail());
         assertThat(persistedSuperUser.getFirstName()).isEqualTo("some-fname");
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some-lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some-org-name");
@@ -74,7 +75,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         UserAttribute jurisAttribute1 = new UserAttribute(persistedSuperUser, prdEnum1);
         UserAttribute jurisAttribute2 = new UserAttribute(persistedSuperUser, prdEnum1);
         List<ProfessionalUser> professionalUser = professionalUserRepository.findByOrganisation(persistedOrganisation);
-        assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.get(0).getUserAttributes().get(4).getPrdEnum().getEnumName())
+                .isEqualTo("organisation-admin");
         assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute1));
         assertThat(professionalUser.get(0).getUserAttributes().contains(jurisAttribute2));
 
@@ -191,7 +193,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                 .findByOrganisationIdentifier(orgIdentifierResponse);
 
         SuperUser persistedSuperUser = persistedOrganisation.getUsers().get(0);
-        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(persistedSuperUser.getUserIdentifier());
+        ProfessionalUser professionalUser = professionalUserRepository.findByUserIdentifier(persistedSuperUser
+                .getUserIdentifier());
 
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isNotNull();
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -202,7 +205,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         assertThat(persistedSuperUser.getLastName()).isEqualTo("some- lname");
         assertThat(persistedSuperUser.getOrganisation().getName()).isEqualTo("some- org -name");
         assertThat(persistedSuperUser.getOrganisation().getId()).isEqualTo(persistedOrganisation.getId());
-        assertThat(professionalUser.getUserAttributes().get(4).getPrdEnum().getEnumName()).isEqualTo("organisation-admin");
+        assertThat(professionalUser.getUserAttributes().get(4).getPrdEnum().getEnumName())
+                .isEqualTo("organisation-admin");
         assertThat(persistedOrganisation.getName()).isEqualTo("some- org -name");
 
     }
@@ -228,7 +232,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         assertThat(response1.get("http_status")).isEqualTo("400");
-        assertThat(response1.get("response_body").toString().contains("attempt to insert or update data resulted in violation of an integrity constraint for field SRA_ID"));
+        assertThat(response1.get("response_body").toString().contains("attempt to insert or update data resulted in "
+                + "violation of an integrity constraint for field SRA_ID"));
     }
 
     @Test
@@ -261,7 +266,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         assertThat(response2.get("http_status")).isEqualTo("400");
-        assertThat(response2.get("response_body").toString().contains("attempt to insert or update data resulted in violation of an integrity constraint for field COMPANY_NUMBER"));
+        assertThat(response2.get("response_body").toString().contains("attempt to insert or update data resulted in "
+                + "violation of an integrity constraint for field COMPANY_NUMBER"));
     }
 
     @Test
@@ -310,11 +316,13 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         String[] emails = new String[] {"v.greeny@ashfords.co.uk", "j.johnson@timms-law.com"};
 
 
-        OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationCreationRequest = someMinimalOrganisationRequest();
+        OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationCreationRequest
+                = someMinimalOrganisationRequest();
 
         Arrays.stream(emails).forEach(email -> {
 
-            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname").lastName("lname").jurisdictions(createJurisdictions()).build());
+            organisationCreationRequest.superUser(aUserCreationRequest().email(email).firstName("fname")
+                    .lastName("lname").jurisdictions(createJurisdictions()).build());
             Map<String, Object> response =
                     professionalReferenceDataClient.createOrganisation(organisationCreationRequest.build());
             assertThat(response.get("http_status")).isEqualTo("201 CREATED");
@@ -335,7 +343,8 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
                         .email(String.format("s@-somewhere.com", prefix))
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
                 .build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);

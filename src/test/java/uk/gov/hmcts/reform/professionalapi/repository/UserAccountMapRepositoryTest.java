@@ -23,19 +23,23 @@ public class UserAccountMapRepositoryTest extends BaseRepository {
 
         assertThat(professionalUsers).hasSize(1);
         assertThat(professionalUsers.get(0).getUserAccountMapId().getProfessionalUser()).isEqualTo(professionalUser);
-        assertThat(professionalUsers.get(0).getUserAccountMapId().getProfessionalUser().getId()).isEqualTo(professionalUser.getId());
+        assertThat(professionalUsers.get(0).getUserAccountMapId().getProfessionalUser().getId())
+                .isEqualTo(professionalUser.getId());
         assertThat(professionalUsers.get(0).getUserAccountMapId().getPaymentAccount()).isEqualTo(paymentAccount);
-        assertThat(professionalUsers.get(0).getUserAccountMapId().getPaymentAccount().getPbaNumber()).isEqualTo(paymentAccount.getPbaNumber());
+        assertThat(professionalUsers.get(0).getUserAccountMapId().getPaymentAccount().getPbaNumber())
+                .isEqualTo(paymentAccount.getPbaNumber());
     }
 
     @Test
     public void test_findByUserAccountMapId() {
-        Optional<UserAccountMap> user = userAccountMapRepository.findByUserAccountMapId(userAccountMap.getUserAccountMapId());
+        Optional<UserAccountMap> user = userAccountMapRepository.findByUserAccountMapId(userAccountMap
+                .getUserAccountMapId());
 
         assertThat(user).isPresent();
         assertThat(user.get().getUserAccountMapId().getProfessionalUser()).isEqualTo(professionalUser);
         assertThat(user.get().getUserAccountMapId().getProfessionalUser().getId()).isEqualTo(professionalUser.getId());
         assertThat(user.get().getUserAccountMapId().getPaymentAccount()).isEqualTo(paymentAccount);
-        assertThat(user.get().getUserAccountMapId().getPaymentAccount().getPbaNumber()).isEqualTo(paymentAccount.getPbaNumber());
+        assertThat(user.get().getUserAccountMapId().getPaymentAccount().getPbaNumber()).isEqualTo(paymentAccount
+                .getPbaNumber());
     }
 }

@@ -15,7 +15,8 @@ public class ModifyUserRolesResponse {
     private List<RoleDeletionResponse> roleDeletionResponse;
     private StatusUpdateResponse statusUpdateResponse;
 
-    public ModifyUserRolesResponse(RoleAdditionResponse addRolesResponse, List<RoleDeletionResponse> deleteResponses, StatusUpdateResponse statusUpdateResponse) {
+    public ModifyUserRolesResponse(RoleAdditionResponse addRolesResponse, List<RoleDeletionResponse> deleteResponses,
+                                   StatusUpdateResponse statusUpdateResponse) {
         this.roleAdditionResponse = addRolesResponse;
         this.roleDeletionResponse = deleteResponses;
         this.statusUpdateResponse = statusUpdateResponse;

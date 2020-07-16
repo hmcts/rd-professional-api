@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 
@@ -26,8 +27,6 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    private  static String emailRegex = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-
     public static final String CHARACTERS = " characters";
 
     public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
@@ -37,13 +36,14 @@ public class OrganisationCreationRequestValidator {
     }
 
     public static void validateEmail(String email) {
-        if (email != null && !email.matches(emailRegex)) {
+        if (email != null && !email.matches(EMAIL_REGEX)) {
             throw new InvalidRequest("Email format invalid for email: " + email);
         }
     }
 
     public static void validateNewUserCreationRequestForMandatoryFields(NewUserCreationRequest request) {
-        if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName()) || StringUtils.isBlank(request.getEmail())) {
+        if (StringUtils.isBlank(request.getFirstName()) || StringUtils.isBlank(request.getLastName())
+                || StringUtils.isBlank(request.getEmail())) {
             throw new InvalidRequest("Mandatory fields are blank or null");
         }
         validateEmail(request.getEmail());
@@ -66,7 +66,8 @@ public class OrganisationCreationRequestValidator {
     }
 
     public void validateOrganisationIdentifier(String inputOrganisationIdentifier) {
-        if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier.length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
+        if (null == inputOrganisationIdentifier || LENGTH_OF_ORGANISATION_IDENTIFIER != inputOrganisationIdentifier
+                .length() || !inputOrganisationIdentifier.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)) {
             throw new EmptyResultDataAccessException(1);
         }
     }
@@ -132,9 +133,12 @@ public class OrganisationCreationRequestValidator {
 
             contactInformations.stream()
                     .forEach(contactInformation -> {
-                        if (isEmptyValue(contactInformation.getAddressLine1()) || isEmptyValue(contactInformation.getAddressLine2())
-                                || isEmptyValue(contactInformation.getAddressLine3()) || isEmptyValue(contactInformation.getCountry())
-                                || isEmptyValue(contactInformation.getPostCode()) || isEmptyValue(contactInformation.getTownCity())) {
+                        if (isEmptyValue(contactInformation.getAddressLine1())
+                                || isEmptyValue(contactInformation.getAddressLine2())
+                                || isEmptyValue(contactInformation.getAddressLine3())
+                                || isEmptyValue(contactInformation.getCountry())
+                                || isEmptyValue(contactInformation.getPostCode())
+                                || isEmptyValue(contactInformation.getTownCity())) {
 
                             throw new InvalidRequest("Empty contactInformation value");
                         }
@@ -163,7 +167,8 @@ public class OrganisationCreationRequestValidator {
         } else if (dxAddress.getDxNumber().length() >= 14 || dxAddress.getDxExchange().length() >= 21) {
             throw new InvalidRequest("DX Number (max=13) or DX Exchange (max=20) has invalid length");
         } else if (!dxAddress.getDxNumber().matches("^[a-zA-Z0-9 ]*$")) {
-            throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain numbers, letters and spaces");
+            throw new InvalidRequest("Invalid Dx Number entered: " + dxAddress.getDxNumber() + ", it can only contain "
+                    .concat("numbers, letters and spaces"));
         }
     }
 

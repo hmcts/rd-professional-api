@@ -19,5 +19,6 @@ public interface JurisdictionFeignClient {
     @Headers("Content-Type: application/json")
     Response createJurisdictionUserProfile(@RequestHeader("actionedBy") String email,
                                            @RequestHeader("ServiceAuthorization") String auth,
-                                           @RequestBody JurisdictionUserCreationRequest jurisdictionUserCreationRequest);
+                                           @RequestBody JurisdictionUserCreationRequest
+                                                   jurisdictionUserCreationRequest);
 }

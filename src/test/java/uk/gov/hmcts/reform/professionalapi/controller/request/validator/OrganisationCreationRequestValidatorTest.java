@@ -43,8 +43,11 @@ public class OrganisationCreationRequestValidatorTest {
     @Before
     public void setup() {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
-        userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName").email("test@email.com").build();
-        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId", "true", "12345678", "www.company.com", userCreationRequest, new HashSet<>(), null);
+        userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
+                .email("test@email.com").build();
+        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
+                "true", "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null);
     }
 
     @Test
@@ -127,7 +130,9 @@ public class OrganisationCreationRequestValidatorTest {
     public void test_validateOrganisationRequest() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("");
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "", "true", "", "", null, paymentAccounts, null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "", "", null, paymentAccounts,
+                null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 
@@ -139,7 +144,9 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class) // if the fields are null or empty it should throw invalid request
     public void test_requestContactInformation() {
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("", null, null, null, null, null, null, null);
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("", null, null,
+                null, null, null, null, null);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -148,10 +155,13 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_requestContactInformationDxAddwithDxNumerHasSpecialChars() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1*2$3&4@", "DxExchange");
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1*2$3&4@",
+                "DxExchange");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -163,7 +173,9 @@ public class OrganisationCreationRequestValidatorTest {
         DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", null);
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -172,7 +184,9 @@ public class OrganisationCreationRequestValidatorTest {
         DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest(null, "DxExchange");
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
-        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
+        ContactInformationCreationRequest contactInfoCreateRequest1
+                = new ContactInformationCreationRequest("A", "A", "A", "A",
+                "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
 
@@ -181,19 +195,25 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_requestContactInformationDxAddwithInvalidLength() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 12345678900000", "DxExchange1234567890");
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 12345678900000",
+                "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
         organisationCreationRequestValidator.requestContactInformation(contactList);
 
-        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890", "DxExchangeDxExchange123");
+        DxAddressCreationRequest dxRequest1 = new DxAddressCreationRequest("DX 1234567890",
+                "DxExchangeDxExchange123");
         List<DxAddressCreationRequest> dxList1 = new ArrayList<>();
         dxList1.add(dxRequest1);
-        ContactInformationCreationRequest contactInfoCreateRequest1 = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList1);
+        ContactInformationCreationRequest contactInfoCreateRequest1
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList1);
         List<ContactInformationCreationRequest> contactList1 = new ArrayList<>();
         contactList1.add(contactInfoCreateRequest1);
 
@@ -202,10 +222,13 @@ public class OrganisationCreationRequestValidatorTest {
 
     @Test(expected = Test.None.class)
     public void test_requestContactInformationDxAddwithvalid() {
-        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890", "DxExchange1234567890");
+        DxAddressCreationRequest dxRequest = new DxAddressCreationRequest("DX 1234567890",
+                "DxExchange1234567890");
         List<DxAddressCreationRequest> dxList = new ArrayList<>();
         dxList.add(dxRequest);
-        ContactInformationCreationRequest contactInfoCreateRequest = new ContactInformationCreationRequest("A", "A", "A", "A", "A", "A", "A", dxList);
+        ContactInformationCreationRequest contactInfoCreateRequest
+                = new ContactInformationCreationRequest("A", "A", "A",
+                "A", "A", "A", "A", dxList);
         List<ContactInformationCreationRequest> contactList = new ArrayList<>();
         contactList.add(contactInfoCreateRequest);
 
@@ -269,26 +292,32 @@ public class OrganisationCreationRequestValidatorTest {
     @Test(expected = Test.None.class)
     public void test_should_validate_mandatory_user_fields_and_not_throw_exception() {
 
-        NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname", "sl@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
+        NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname",
+                "sl@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
 
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_should_validate_mandatory_user_fields_and_throw_exception() {
-        NewUserCreationRequest request = new NewUserCreationRequest(null, null, "al@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
+        NewUserCreationRequest request = new NewUserCreationRequest(null, null,
+                "al@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "", "true", "123456789", "", null, new HashSet<>(), null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "123456789", "", null, new HashSet<>(),
+                null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 
     @Test
     public void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
-        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "", "true", "12345678", "", null, new HashSet<>(), null);
+        OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
+                "true", "12345678", "", null, new HashSet<>(),
+                null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 }

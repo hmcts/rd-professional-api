@@ -24,9 +24,11 @@ public class UserAttributeRepositoryTest extends BaseRepository {
         assertThat(professionalUsers).hasSize(1);
         assertThat(professionalUsers.get(0)).isEqualTo(userAttribute);
         assertThat(professionalUsers.get(0).getPrdEnum()).isEqualTo(userAttribute.getPrdEnum());
-        assertThat(professionalUsers.get(0).getPrdEnum().getPrdEnumId()).isEqualTo(userAttribute.getPrdEnum().getPrdEnumId());
+        assertThat(professionalUsers.get(0).getPrdEnum().getPrdEnumId()).isEqualTo(userAttribute.getPrdEnum()
+                .getPrdEnumId());
         assertThat(professionalUsers.get(0).getProfessionalUser()).isEqualTo(userAttribute.getProfessionalUser());
-        assertThat(professionalUsers.get(0).getProfessionalUser().getId()).isEqualTo(userAttribute.getProfessionalUser().getId());
+        assertThat(professionalUsers.get(0).getProfessionalUser().getId()).isEqualTo(userAttribute
+                .getProfessionalUser().getId());
     }
 
     @Test

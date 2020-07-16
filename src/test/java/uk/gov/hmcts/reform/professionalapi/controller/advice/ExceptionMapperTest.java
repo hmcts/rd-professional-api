@@ -33,17 +33,20 @@ public class ExceptionMapperTest {
     public void test_handle_empty_result_exception() {
         EmptyResultDataAccessException emptyResultDataAccessException = new EmptyResultDataAccessException(1);
 
-        ResponseEntity<Object> responseEntity = exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
+        ResponseEntity<Object> responseEntity
+                = exceptionMapper.handleEmptyResultDataAccessException(emptyResultDataAccessException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertEquals(emptyResultDataAccessException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(emptyResultDataAccessException.getMessage(),
+                ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
     }
 
     @Test
     public void test_handle_resource_not_found_exception() {
         ResourceNotFoundException resourceNotFoundException = new ResourceNotFoundException("Resource not found");
 
-        ResponseEntity<Object> responseEntity = exceptionMapper.handleResourceNotFoundException(resourceNotFoundException);
+        ResponseEntity<Object> responseEntity
+                = exceptionMapper.handleResourceNotFoundException(resourceNotFoundException);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("Resource not found", ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
@@ -122,10 +125,12 @@ public class ExceptionMapperTest {
     public void test_handle_method_not_valid_exception() {
         MethodArgumentNotValidException methodArgumentNotValidException = mock(MethodArgumentNotValidException.class);
 
-        ResponseEntity<Object> responseEntity = exceptionMapper.annotationDrivenValidationError(methodArgumentNotValidException);
+        ResponseEntity<Object> responseEntity
+                = exceptionMapper.annotationDrivenValidationError(methodArgumentNotValidException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(methodArgumentNotValidException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(methodArgumentNotValidException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
 
     }
 
@@ -136,7 +141,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
 
     }
 
@@ -148,7 +154,8 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.getUserProfileExceptionError(externalApiException);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals(externalApiException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(externalApiException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
 
     }
 
@@ -159,36 +166,43 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.duplicateKeyException(duplicateKeyException);
 
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
-        assertEquals(duplicateKeyException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(duplicateKeyException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
 
     }
 
     @Test
     public void test_handle_constraint_violation_exception() {
-        ConstraintViolationException constraintViolationException = new ConstraintViolationException("Constraint Violation", null);
+        ConstraintViolationException constraintViolationException
+                = new ConstraintViolationException("Constraint Violation", null);
 
         ResponseEntity<Object> responseEntity = exceptionMapper.constraintViolationError(constraintViolationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(constraintViolationException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(constraintViolationException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
 
     }
 
     @Test
     public void test_handle_data_integrity_violation_exception() {
-        DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException("Data Integrity Violation");
+        DataIntegrityViolationException dataIntegrityViolationException
+                = new DataIntegrityViolationException("Data Integrity Violation");
 
-        ResponseEntity<Object> responseEntity = exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
+        ResponseEntity<Object> responseEntity
+                = exceptionMapper.dataIntegrityViolationError(dataIntegrityViolationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(dataIntegrityViolationException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(dataIntegrityViolationException.getMessage(),
+                ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
 
     }
 
     @Test
     public void test_handle_data_integrity_violation_exception_with_custom_message_for_sra_id() {
         String errorCause = "SRA_ID";
-        ResponseEntity<Object> responseEntity = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        ResponseEntity<Object> responseEntity
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
@@ -197,7 +211,8 @@ public class ExceptionMapperTest {
     @Test
     public void test_handle_data_integrity_violation_exception_with_custom_message_for_company_number() {
         String errorCause = "COMPANY_NUMBER";
-        ResponseEntity<Object> responseEntity = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        ResponseEntity<Object> responseEntity
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
@@ -206,7 +221,8 @@ public class ExceptionMapperTest {
     @Test
     public void test_handle_data_integrity_violation_exception_with_custom_message_for_email_address() {
         String errorCause = "EMAIL_ADDRESS";
-        ResponseEntity<Object> responseEntity = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        ResponseEntity<Object> responseEntity
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains("EMAIL"));
@@ -215,7 +231,8 @@ public class ExceptionMapperTest {
     @Test
     public void test_handle_data_integrity_violation_exception_with_custom_message_for_pba_number() {
         String errorCause = "PBA_NUMBER";
-        ResponseEntity<Object> responseEntity = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        ResponseEntity<Object> responseEntity
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
@@ -228,11 +245,13 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleDuplicateUserException(httpClientErrorException);
 
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
-        assertEquals(httpClientErrorException.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+        assertEquals(httpClientErrorException.getMessage(),
+                ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
 
     }
 
-    private ResponseEntity<Object> generateCustomDataIntegrityViolationResponseMessageForSpecificCause(String errorCause) {
+    private ResponseEntity<Object>
+        generateCustomDataIntegrityViolationResponseMessageForSpecificCause(String errorCause) {
         DataIntegrityViolationException dataIntegrityViolationException = mock(DataIntegrityViolationException.class);
 
         Throwable throwable = mock(Throwable.class);

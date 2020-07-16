@@ -81,7 +81,8 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
 
     @Transactional
     @Override
-    public NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles, List<PrdEnum> prdEnumList) {
+    public NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles,
+                                                      List<PrdEnum> prdEnumList) {
 
         ProfessionalUser persistedNewUser = persistUser(newUser);
 
@@ -112,38 +113,50 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation, String showDeleted, boolean rolesRequired, String status, Pageable pageable) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisationWithPageable(Organisation organisation,
+                                                                                  String showDeleted,
+                                                                                  boolean rolesRequired,
+                                                                                  String status, Pageable pageable) {
         Page<ProfessionalUser> pagedProfessionalUsers = getPagedListOfUsers(organisation, pageable);
 
-        ResponseEntity<Object> responseEntity = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        ResponseEntity<Object> responseEntity
+                = retrieveUserProfiles(generateRetrieveUserProfilesRequest(pagedProfessionalUsers.getContent()),
+                showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
 
-        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers, responseEntity);
+        HttpHeaders headers = RefDataUtil.generateResponseEntityWithPaginationHeader(pageable, pagedProfessionalUsers,
+                responseEntity);
 
         return ResponseEntity.status(responseEntity.getStatusCode()).headers(headers).body(responseEntity.getBody());
     }
 
     @Override
-    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted, boolean rolesRequired, String status) {
+    public ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation organisation, String showDeleted,
+                                                                      boolean rolesRequired, String status) {
         List<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation);
 
         if (professionalUsers.isEmpty()) {
             throw new ResourceNotFoundException("No Users were found for the given organisation");
         }
 
-        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired, status, organisation.getOrganisationIdentifier());
+        return retrieveUserProfiles(generateRetrieveUserProfilesRequest(professionalUsers), showDeleted, rolesRequired,
+                status, organisation.getOrganisationIdentifier());
     }
 
     @SuppressWarnings("unchecked")
-    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest, String showDeleted, boolean rolesRequired, String status, String organisationIdentifier) {
+    private ResponseEntity<Object> retrieveUserProfiles(RetrieveUserProfilesRequest retrieveUserProfilesRequest,
+                                                        String showDeleted, boolean rolesRequired, String status,
+                                                        String organisationIdentifier) {
         ResponseEntity<Object> responseEntity;
         Object clazz;
 
-        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted, Boolean.toString(rolesRequired))) {
+        try (Response response = userProfileFeignClient.getUserProfiles(retrieveUserProfilesRequest, showDeleted,
+                Boolean.toString(rolesRequired))) {
 
             if (response.status() > 300) {
                 clazz = ErrorResponse.class;
             } else {
-                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class : ProfessionalUsersEntityResponseWithoutRoles.class;
+                clazz = rolesRequired ? ProfessionalUsersEntityResponse.class
+                        : ProfessionalUsersEntityResponseWithoutRoles.class;
             }
 
             responseEntity = toResponseEntity(response, clazz);
@@ -159,14 +172,16 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
             //Filtering users by status
 
             Object response = filterUsersByStatus(responseEntity, status);
-            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(), responseEntity.getStatusCode());
+            responseEntity = new ResponseEntity<>(response, responseEntity.getHeaders(),
+                    responseEntity.getStatusCode());
         }
 
         return responseEntity;
     }
 
     private Page<ProfessionalUser> getPagedListOfUsers(Organisation organisation, Pageable pageable) {
-        Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation, pageable);
+        Page<ProfessionalUser> professionalUsers = professionalUserRepository.findByOrganisation(organisation,
+                pageable);
 
         if (professionalUsers.getContent().isEmpty()) {
             throw new ResourceNotFoundException("No Users found for page number " + pageable.getPageNumber());
@@ -190,17 +205,22 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
     }
 
     @Override
-    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData, String userId, Optional<String> origin) {
-        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin.orElse(""))) {
-            return toResponseEntity(response, response.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
+    public ResponseEntity<Object> modifyRolesForUser(UserProfileUpdatedData userProfileUpdatedData,
+                                                     String userId, Optional<String> origin) {
+        try (Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId,
+                origin.orElse(""))) {
+            return toResponseEntity(
+                    response, response.status() > 300 ? ErrorResponse.class : ModifyUserRolesResponse.class);
         } catch (FeignException ex) {
-            throw new ExternalApiException(HttpStatus.valueOf(ex.status() > 0 ? ex.status() : 500), ERROR_MESSAGE_UP_FAILED);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status() > 0 ? ex.status() : 500),
+                    ERROR_MESSAGE_UP_FAILED);
         }
     }
 
     public ResponseEntity<NewUserResponse> findUserStatusByEmailAddress(String emailAddress) {
 
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(emailAddress));
+        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil
+                .removeAllSpaces(emailAddress));
         int statusCode = 200;
         NewUserResponse newUserResponse = null;
         if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {

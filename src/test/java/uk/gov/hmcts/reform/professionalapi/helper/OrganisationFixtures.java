@@ -85,7 +85,8 @@ public class OrganisationFixtures {
                 .build()));
     }
 
-    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
+    public static OrganisationCreationRequest
+            .OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 

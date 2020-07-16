@@ -59,11 +59,14 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     }
 
     @Override
-    public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user, List<UserAttribute> attributes, List<String> jurisdictionIds) {
+    public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user,
+                                                                             List<UserAttribute> attributes,
+                                                                             List<String> jurisdictionIds) {
         prdEnumService.findAllPrdEnums().stream()
                 .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
                 .map(prdEnum -> {
-                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(),
+                            prdEnum.getEnumDescription());
                     return new UserAttribute(user, e);
                 }).forEach(attributes::add);
 
@@ -78,7 +81,8 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     private boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
-                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
+                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds
+                .contains(prdEnum.getEnumName()));
     }
 
 

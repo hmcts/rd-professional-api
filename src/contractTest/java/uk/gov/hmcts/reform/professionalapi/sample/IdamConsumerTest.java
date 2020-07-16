@@ -157,7 +157,8 @@ public class IdamConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "executeGetIdamAuthCodeAndGet200Response")
-    public void should_post_to_oauth2_authorize_and_receive_code_with_200_response(MockServer mockServer) throws JSONException {
+    public void should_post_to_oauth2_authorize_and_receive_code_with_200_response(MockServer mockServer)
+            throws JSONException {
 
         Map<String, String> headers = Maps.newHashMap();
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
@@ -189,7 +190,8 @@ public class IdamConsumerTest {
 
     @Test
     @PactTestFor(pactMethod = "executeGetIdamAuthTokenAndGet200")
-    public void should_post_to_oauth2_token_and_receive_code_with_200_response(MockServer mockServer) throws JSONException {
+    public void should_post_to_oauth2_token_and_receive_code_with_200_response(MockServer mockServer)
+            throws JSONException {
 
         Map<String, String> headers = Maps.newHashMap();
 

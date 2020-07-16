@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 public interface OrganisationIdentifierValidator {
 
-    void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier);
+    void validate(Organisation existingOrganisation, OrganisationStatus inputStatus,
+                  String inputOrganisationIdentifier);
 
 }

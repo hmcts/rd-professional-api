@@ -17,7 +17,8 @@ import org.springframework.util.MultiValueMap;
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
-    private static final ObjectMapper json = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final ObjectMapper json = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private JsonFeignResponseUtil() {
 
@@ -25,7 +26,8 @@ public class JsonFeignResponseUtil {
 
     public static Optional<Object> decode(Response response, Object clazz) {
         try {
-            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()), (Class<Object>) clazz));
+            return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()),
+                    (Class<Object>) clazz));
         } catch (IOException e) {
             return Optional.empty();
         }
@@ -43,7 +45,9 @@ public class JsonFeignResponseUtil {
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
         MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
         responseHeaders.entrySet().stream().forEach(e -> {
-            if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey().equalsIgnoreCase("x-powered-by") || e.getKey().equalsIgnoreCase("content-length"))) {
+            if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey()
+                    .equalsIgnoreCase("x-powered-by") || e.getKey()
+                    .equalsIgnoreCase("content-length"))) {
                 responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
             }
         });

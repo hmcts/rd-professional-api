@@ -13,7 +13,8 @@ public class LegacyPbaResponseTest {
     public void test_LegacyPbaResponse() {
         PaymentAccount paymentAccount = new PaymentAccount("pba1234567");
 
-        LegacyPbaResponse legacyPbaResponse = new LegacyPbaResponse(Collections.singletonList(paymentAccount.getPbaNumber()));
+        LegacyPbaResponse legacyPbaResponse = new LegacyPbaResponse(Collections.singletonList(paymentAccount
+                .getPbaNumber()));
 
         assertThat(legacyPbaResponse.getPayment_accounts().size()).isEqualTo(1);
         assertThat(legacyPbaResponse.getPayment_accounts().get(0)).isEqualTo(paymentAccount.getPbaNumber());

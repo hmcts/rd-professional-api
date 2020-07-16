@@ -55,20 +55,24 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
             if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
-                List<PaymentAccount> userMapPaymentAccount = RefDataUtil.getPaymentAccountsFromUserAccountMap(user.getUserAccountMap());
+                List<PaymentAccount> userMapPaymentAccount = RefDataUtil.getPaymentAccountsFromUserAccountMap(user
+                        .getUserAccountMap());
                 paymentAccountsEntity = RefDataUtil
-                        .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation().getPaymentAccounts());
+                        .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation()
+                                .getPaymentAccounts());
 
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
 
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
+                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
+                        userProfileFeignClient, false));
                 organisation = user.getOrganisation();
 
             } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
 
                 paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
                 user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(), userProfileFeignClient, false));
+                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
+                        userProfileFeignClient, false));
                 organisation = user.getOrganisation();
             }
 

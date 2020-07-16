@@ -17,9 +17,12 @@ public class OrganisationCreationRequestTest {
     public void has_mandatory_fields_specified_not_null() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest(null, null, null, "false", null, null, null, null, null);
+                new OrganisationCreationRequest(null, null, null, "false",
+                        null, null, null, null,
+                        null);
 
-        Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator.validate(organisationCreationRequest);
+        Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator
+                .validate(organisationCreationRequest);
 
         assertThat(violations.size()).isEqualTo(3);
     }
@@ -28,7 +31,9 @@ public class OrganisationCreationRequestTest {
     public void test_OrganisationCreationRequest() {
 
         OrganisationCreationRequest organisationCreationRequest =
-                new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", null, null, null);
+                new OrganisationCreationRequest("test", "PENDING", "sra-id", "false",
+                        "number02", "company-url", null, null,
+                        null);
 
         organisationCreationRequest.setStatus("ACTIVE");
 
@@ -47,7 +52,8 @@ public class OrganisationCreationRequestTest {
         String companyNumber = "companyNumber";
         String companyUrl = "companyUrl";
 
-        OrganisationCreationRequest organisationCreationRequest = OrganisationCreationRequest.anOrganisationCreationRequest()
+        OrganisationCreationRequest organisationCreationRequest = OrganisationCreationRequest
+                .anOrganisationCreationRequest()
                 .name(name)
                 .status(status)
                 .sraId(sraId)

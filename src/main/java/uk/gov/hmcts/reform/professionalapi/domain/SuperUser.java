@@ -76,7 +76,8 @@ public class SuperUser implements Serializable {
 
     public ProfessionalUser toProfessionalUser() {
         ProfessionalUser professionalUser =
-                new ProfessionalUser(this.getFirstName(), this.getLastName(), this.getEmailAddress(), this.getOrganisation());
+                new ProfessionalUser(this.getFirstName(), this.getLastName(), this.getEmailAddress(),
+                        this.getOrganisation());
 
         professionalUser.setCreated(this.getCreated());
         professionalUser.setDeleted(this.getDeleted());

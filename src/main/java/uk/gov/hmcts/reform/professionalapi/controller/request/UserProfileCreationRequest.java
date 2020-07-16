@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.EMAILREGEX;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -20,13 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 @Builder(builderMethodName = "anUserProfileCreationRequest")
 public class UserProfileCreationRequest  {
 
-
     @Pattern(regexp = EMAILREGEX)
     private String email;
 
-    @JsonIgnore
-    private static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
-    
     @NotBlank
     private String firstName;
 
