@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.swagger.annotations.Api;
@@ -10,7 +9,6 @@ import io.swagger.annotations.ApiResponses;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,6 @@ public class WelcomeController {
     @Value("${logging-component-name}")
     private String loggingComponentName;
 
-    private static final Logger LOG = getLogger(WelcomeController.class);
     private static final String INSTANCE_ID = UUID.randomUUID().toString();
     private static final String MESSAGE = "Welcome to the System Reference Data API";
 

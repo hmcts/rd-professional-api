@@ -51,7 +51,7 @@ public class ExceptionMapper {
     @Value("${logging-component-name}")
     private String loggingComponentName;
 
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
@@ -171,7 +171,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        log.error(loggingComponentName, HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        log.error(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
