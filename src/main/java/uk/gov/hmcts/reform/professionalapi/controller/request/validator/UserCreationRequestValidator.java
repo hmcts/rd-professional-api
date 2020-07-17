@@ -12,14 +12,10 @@ public class UserCreationRequestValidator {
     private UserCreationRequestValidator() {
     }
 
-
     public static List<String> validateRoles(List<String> roles) {
-
         if (CollectionUtils.isEmpty(roles)) {
-            log.error("No user role(s) provided");
             throw new InvalidRequest("No role(s) provided");
         }
-
         return roles;
     }
 }

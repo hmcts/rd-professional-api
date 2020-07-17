@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
@@ -10,6 +11,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Component
 @Slf4j
 public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
+
+    @Value("${logging-component-name}")
+    private String loggingComponentName;
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
@@ -22,12 +26,12 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
 
     private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus, OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
         if (existingStatus == OrganisationStatus.DELETED) {
-            String errorMessage = "Cannot amend status since existing organisation status is DELETED for organisationIdentifier: " + inputOrganisationIdentifier;
-            log.error(errorMessage);
+            String errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for organisationIdentifier: " + inputOrganisationIdentifier;
+            log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         } else if (inputRequestOrganisationStatus == OrganisationStatus.PENDING && existingStatus == OrganisationStatus.ACTIVE) {
-            String errorMessage = "Cannot amend status to PENDING since existing organisation status is ACTIVE for organisationIdentifier: " + inputOrganisationIdentifier;
-            log.error(errorMessage);
+            String errorMessage = "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for organisationIdentifier: " + inputOrganisationIdentifier;
+            log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         }
     }

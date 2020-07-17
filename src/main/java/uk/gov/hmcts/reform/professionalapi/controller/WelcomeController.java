@@ -8,7 +8,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 )
 
 @RestController
+@Slf4j
 public class WelcomeController {
+
+    @Value("${logging-component-name}")
+    private String loggingComponentName;
 
     private static final Logger LOG = getLogger(WelcomeController.class);
     private static final String INSTANCE_ID = UUID.randomUUID().toString();
@@ -51,7 +58,7 @@ public class WelcomeController {
     @ResponseBody
     public ResponseEntity<String> welcome() {
 
-        LOG.info("Welcome message '{}' from running instance: {}", MESSAGE, INSTANCE_ID);
+        log.info("{}:: Welcome message '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
 
         return ResponseEntity
             .ok()

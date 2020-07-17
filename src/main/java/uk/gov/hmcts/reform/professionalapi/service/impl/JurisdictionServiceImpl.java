@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
@@ -25,6 +26,9 @@ public class JurisdictionServiceImpl implements JurisdictionService {
 
     @Autowired
     AuthTokenGenerator authTokenGenerator;
+
+    @Value("${logging-component-name}")
+    private String loggingComponentName;
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {
@@ -56,14 +60,14 @@ public class JurisdictionServiceImpl implements JurisdictionService {
         String s2sToken = authTokenGenerator.generate();
         try (Response response = jurisdictionFeignClient.createJurisdictionUserProfile(userId, s2sToken, request)) {
             if (response == null) {
-                log.warn("Response returned null while CCD call");
+                log.warn("{}:: Response returned null while CCD call", loggingComponentName);
                 throwException(responseCode);
             } else if (response.status() > 300) {
                 responseCode = response.status();
                 throwException(responseCode);
             }
         } catch (FeignException ex) {
-            log.warn("Feign exception while CCD call");
+            log.warn("{}:: Feign exception while CCD call", loggingComponentName);
             throwException(ex.status() < 0 ? responseCode : ex.status());
         }
     }
