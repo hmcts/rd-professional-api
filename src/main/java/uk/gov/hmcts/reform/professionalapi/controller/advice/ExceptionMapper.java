@@ -48,7 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 @Slf4j
 public class ExceptionMapper {
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";

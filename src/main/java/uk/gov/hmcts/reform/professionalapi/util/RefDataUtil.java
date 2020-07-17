@@ -352,7 +352,7 @@ public class RefDataUtil {
         return newResponseEntity;
     }
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
     }

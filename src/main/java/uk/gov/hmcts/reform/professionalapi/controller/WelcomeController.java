@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class WelcomeController {
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     private static final String INSTANCE_ID = UUID.randomUUID().toString();

@@ -119,7 +119,7 @@ public abstract class SuperController {
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     private static final String SRA_REGULATED_FALSE = "false";
