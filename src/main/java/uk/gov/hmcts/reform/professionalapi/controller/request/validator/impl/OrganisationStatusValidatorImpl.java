@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Slf4j
 public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     @Override
