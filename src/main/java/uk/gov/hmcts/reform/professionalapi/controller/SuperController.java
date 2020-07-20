@@ -126,7 +126,7 @@ public abstract class SuperController {
     @Value("${allowedStatus}")
     private String allowedOrganisationStatus;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     private static final String SRA_REGULATED_FALSE = "false";

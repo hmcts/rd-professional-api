@@ -117,4 +117,4 @@ defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 resendInviteEnabled : true
 
-logging-component-name: RD_Professional_API
+loggingComponentName: RD_Professional_API

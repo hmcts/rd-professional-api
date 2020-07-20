@@ -353,11 +353,12 @@ public class RefDataUtil {
         return newResponseEntity;
     }
 
+
     public static boolean isSystemRoleUser(List<String> roles) {
         return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
     }
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         RefDataUtil.loggingComponentName = loggingComponentName;
     }

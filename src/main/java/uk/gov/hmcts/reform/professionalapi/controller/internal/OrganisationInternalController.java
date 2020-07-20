@@ -55,7 +55,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 @NoArgsConstructor
 public class OrganisationInternalController extends SuperController {
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     protected  String loggingComponentName;
 
     @ApiOperation(
