@@ -103,6 +103,22 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
     }
 
     @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_user_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiUserManager);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void return_organisation_payload_with_200_status_code_for_pui_caa_manager_user_organisation_id() {
+        String userId = settingUpOrganisation(puiCaa);
+        Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiCaa);
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+    }
+
+    @Test
     public void persists_and_returns_all_organisations() {
 
         Set<String> paymentAccounts2ndOrg = new HashSet<>();

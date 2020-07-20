@@ -75,6 +75,12 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${exui.roles.pui-caa}")
+    protected String puiCaa;
+
+    @Value("${prd.roles.prd-aac-system}")
+    protected String systemUser;
+
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;

@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_AAC_SYSTEM;
 
 import feign.FeignException;
 import feign.Response;
@@ -350,6 +351,10 @@ public class RefDataUtil {
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles, responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    public static boolean isSystemRoleUser(List<String> roles) {
+        return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
     }
 
     @Value("${logging-component-name}")

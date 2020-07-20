@@ -121,6 +121,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${exui.role.pui-caa}")
+    protected String puiCaa;
+
+    @Value("${prd.roles.prd-aac-system}")
+    protected String systemUser;
+
     @Value("${resendInterval}")
     protected String resendInterval;
 
@@ -134,6 +140,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     private long expiration;
 
     protected static final String ACTIVE = "ACTIVE";
+    protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE = "User status must be Active to perform this operation";
+    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @Before
     public void setUpClient() {
@@ -551,6 +559,29 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
+    public void getUserProfileByEmailWireMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStaus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamStatus\": \"PENDING\""
+                    + "}";
+            returnHttpStaus = 200;
+        } else {
+            body = "{"
+                    + "  \"idamStatus\": \" \""
+                    + "}";
+            returnHttpStaus = 500;
+        }
+
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(returnHttpStaus)
+                ));
+
+    }
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override

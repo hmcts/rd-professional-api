@@ -97,6 +97,10 @@ public class OrganisationInternalControllerTest {
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
+        organisationResponse = new OrganisationResponse(organisation);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);

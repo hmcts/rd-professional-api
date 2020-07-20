@@ -22,5 +22,6 @@ public class ProfessionalApiGeneratorConstants {
     public static final String FIRST_NAME = "firstName";
     public static final String EMPTY = "";
     public static final String ERROR_MESSAGE_UP_FAILED = "Error while invoking UP";
+    public static final String PRD_AAC_SYSTEM = "prd-aac-system";
 
 }

@@ -8,12 +8,8 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-public class OrganisationEntityResponse  {
+public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
-    @JsonProperty
-    private String organisationIdentifier;
-    @JsonProperty
-    private String name;
     @JsonProperty
     private OrganisationStatus status;
     @JsonProperty
