@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: http://rd-professional-api-aat.service.core-compute-aat.internal/
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 

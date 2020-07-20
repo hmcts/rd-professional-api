@@ -194,7 +194,7 @@ public class ProfessionalApiClient {
                 .statusCode(CREATED.value());
 
         log.info("::executing createOrganisation method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
 
         return response.body().as(Map.class);
     }
@@ -211,7 +211,7 @@ public class ProfessionalApiClient {
                 .statusCode(UNAUTHORIZED.value());
 
         log.info("::executing createOrganisationWithoutS2SToken method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -247,7 +247,7 @@ public class ProfessionalApiClient {
         log.info("Create organisation response: " + response.asString());
 
         log.info("::executing receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
@@ -267,6 +267,8 @@ public class ProfessionalApiClient {
 
         return userCreationRequest;
     }
+
+
 
     public NewUserCreationRequest createNewUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
@@ -309,7 +311,7 @@ public class ProfessionalApiClient {
                 .assertThat()
                 .statusCode(expectedStatus.value());
         log.info("::executing addNewUserToAnOrganisation method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -323,7 +325,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(expectedStatus.value());
         log.info("::executing addNewUserToAnOrganisationExternal method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
 
         return response.body().as(Map.class);
     }
@@ -341,7 +343,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
         log.info("::executing searchForUserByEmailAddress method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -362,7 +364,7 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
 
         log.info("::executing retrieveOrganisationDetails method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -385,7 +387,7 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
 
         log.info("::executing retrieveAllOrganisations method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -403,7 +405,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
         log.info("::executing retrievePaymentAccountsByEmail method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -417,7 +419,7 @@ public class ProfessionalApiClient {
 
         log.info("Retrieve organisation response: " + response.asString());
         log.info("::executing retrieveBadRequestForPendingOrganisationWithPbaEmail method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(NOT_FOUND.value());
@@ -441,7 +443,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing searchUsersByOrganisation method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -455,7 +457,7 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
         assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
         log.info("::executing searchUsersByOrganisationWithPagination method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -475,7 +477,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing searchAllActiveUsersByOrganisationExternalWithPagination method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -488,7 +490,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing searchOrganisationUsersByStatusInternal method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -531,7 +533,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing searchOrganisationUsersByReturnRolesParamExternal method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -571,7 +573,7 @@ public class ProfessionalApiClient {
 
         log.info("Update organisation response: " + response.getStatusCode());
         log.info("::executing updateOrganisation method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
@@ -587,7 +589,7 @@ public class ProfessionalApiClient {
 
         log.info("Update organisation response: " + response.getStatusCode());
         log.info("::executing updateOrganisationWithoutBearerToken method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
@@ -602,7 +604,7 @@ public class ProfessionalApiClient {
 
         log.info("Update user response: " + response.getStatusCode());
         log.info("::executing updateUser method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -620,7 +622,7 @@ public class ProfessionalApiClient {
 
         log.info("Update organisation response: " + response.getStatusCode());
         log.info("::executing updateOrganisationWithOldBearerToken method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -634,7 +636,7 @@ public class ProfessionalApiClient {
                 .andReturn();
         log.debug("Retrieve organisation response by status: " + response.getStatusCode());
         log.info("::executing retrieveOrganisationDetailsByStatus method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(OK.value());
@@ -651,7 +653,7 @@ public class ProfessionalApiClient {
 
         log.debug("Retrieve organisation response for unknown status: " + response.asString());
         log.info("::executing retrieveOrganisationDetailsByUnknownStatus method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value());
@@ -671,7 +673,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
         log.info("::executing retrieveLegacyPbaNumbersByUserEmail method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -687,7 +689,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing modifyUserToExistingUserForPrdAdmin method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
 
     }
@@ -705,7 +707,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
         log.info("::executing editPbaAccountsByOrgId method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
     }
 
@@ -720,7 +722,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing modifyUserToExistingUserForExternal method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
 
     }
@@ -735,7 +737,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         log.info("::executing findUserStatusByEmail method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return response.body().as(Map.class);
 
     }

@@ -55,7 +55,7 @@ public class S2sClient {
         String jwtToken = response.getBody().asString();
         log.debug("Got JWT from S2S service");
         log.info("::executing signIntoS2S method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return jwtToken;
     }
 }

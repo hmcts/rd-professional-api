@@ -43,6 +43,7 @@ public class IdamOpenIdClient {
     }
 
     public String createUser(String userRole, String userEmail, String firstName, String lastName) {
+        final long startTime = System.currentTimeMillis();
         //Generating a random user
         String userGroup = "";
         String password = "Hmcts1234";
@@ -71,6 +72,8 @@ public class IdamOpenIdClient {
 
 
         log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+        log.info("::executing createUser method called by :: {} execution time {} ",
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
 
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
@@ -121,7 +124,7 @@ public class IdamOpenIdClient {
 
         IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody().asString(), IdamOpenIdClient.BearerTokenResponse.class);
         log.info("::executing getOpenIdToken method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return accessTokenResponse.getAccessToken();
 
     }

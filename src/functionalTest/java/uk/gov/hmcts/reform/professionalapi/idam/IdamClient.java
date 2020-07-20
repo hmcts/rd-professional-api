@@ -132,7 +132,7 @@ public class IdamClient {
         BearerTokenResponse accessTokenResponse = gson.fromJson(bearerTokenResponse.getBody().asString(), BearerTokenResponse.class);
 
         log.info("::executing getBearerToken method called by :: {} execution time {} ",
-            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            AuthorizationFunctionalTest.getCallerName(), (System.currentTimeMillis() - startTime) / 1000) ;
 
         return accessTokenResponse.getAccessToken();
     }

@@ -18,6 +18,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -112,8 +113,8 @@ public abstract class AuthorizationFunctionalTest {
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
@@ -125,9 +126,9 @@ public abstract class AuthorizationFunctionalTest {
     @After
     public void tearDown() {
         final long startTime = logFunctionalTime.get(testName.getMethodName());
-        long endTime = (System.currentTimeMillis() - startTime / 1000) % 60;
-        logFunctionalTime.put(testName.getMethodName(), endTime);
-        log.info("::method:: {} execution time {} ", testName.getMethodName(), endTime);
+        long timeDiff = (System.currentTimeMillis() - startTime) / 1000 ;
+        logFunctionalTime.put(testName.getMethodName(), timeDiff);
+        log.info("::method:: {} execution time {} ", testName.getMethodName(), timeDiff);
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -135,7 +136,7 @@ public abstract class AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         logFunctionalTime.put(testName.getMethodName(), System.currentTimeMillis());
         log.info("::executing createAndUpdateOrganisationToActive(role) method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return activateOrganisation(response, role);
     }
 
@@ -143,7 +144,7 @@ public abstract class AuthorizationFunctionalTest {
         final long startTime = System.currentTimeMillis();
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         log.info("::executing createAndUpdateOrganisationToActive(role,organisationCreationRequest) method called by ::"
-            + "{} execution time {}", testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            + "{} execution time {}", testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return activateOrganisation(response, role);
     }
 
@@ -154,7 +155,7 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
         log.info("::executing createAndctivateOrganisationWithGivenRequest method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return organisationIdentifier;
     }
 
@@ -164,7 +165,7 @@ public abstract class AuthorizationFunctionalTest {
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationIdentifier, role);
         log.info("::executing activateOrganisation method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return organisationIdentifier;
     }
 
@@ -194,7 +195,7 @@ public abstract class AuthorizationFunctionalTest {
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         log.info("::executing generateBearerTokenFor method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return bearerToken;
     }
 
@@ -221,7 +222,7 @@ public abstract class AuthorizationFunctionalTest {
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         log.info("::executing generateBearerTokenForExternalUserRolesSpecified method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return bearerToken;
     }
 
@@ -280,7 +281,7 @@ public abstract class AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         log.info("::executing generateSuperUserBearerToken method called by :: {} execution time {} ",
-            testName.getMethodName(), (System.currentTimeMillis() - startTime / 1000) % 60);
+            testName.getMethodName(), (System.currentTimeMillis() - startTime) / 1000) ;
         return bearerToken;
     }
 
