@@ -23,6 +23,7 @@ import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -46,7 +47,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 public class ExceptionMapper {
 
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
@@ -167,7 +171,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        log.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
                 getTimeStamp());
 
