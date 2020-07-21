@@ -164,7 +164,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
     def totalForks = Runtime.runtime.availableProcessors()
-    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) > 3)  ? 3 : 1
+    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
     print "Total forsks aviable ${totalForks} & Forksused::: ${maxParallelForks}"
 }
 
