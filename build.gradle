@@ -47,7 +47,7 @@ mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
 group = 'uk.gov.hmcts.reform.refdata'
-version = '0.0.1'
+version = '0.1.0'
 
 sourceCompatibility = 11
 targetCompatibility = 11
