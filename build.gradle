@@ -69,6 +69,7 @@ compileJava {
 }
 
 compileTestJava {
+    options.compilerArgs.addAll(arrayOf("--release", "11"))
     options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
