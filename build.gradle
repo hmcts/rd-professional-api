@@ -65,12 +65,12 @@ jacocoTestCoverageVerification {
 }
 
 compileJava {
-    options.compilerArgs.addAll(['--release', '11'])
+
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
 compileTestJava {
-    options.compilerArgs.addAll(['--release', '11'])
+
     options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
@@ -166,9 +166,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    def totalForks = Runtime.runtime.availableProcessors()
     maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
-    print "Total forsks aviable ${totalForks} & Forksused::: ${maxParallelForks}"
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
