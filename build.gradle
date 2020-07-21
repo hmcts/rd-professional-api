@@ -65,6 +65,7 @@ jacocoTestCoverageVerification {
 }
 
 compileJava {
+    options.compilerArgs.addAll(['--release', '11'])
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
