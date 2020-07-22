@@ -33,6 +33,7 @@ public class PrdEnumServiceImpl implements PrdEnumService {
         if (CollectionUtils.isEmpty(enumList)) {
             enumList = prdEnumRepository.findByEnabled("YES");
         }
+        enumList.forEach(enumList -> log.info(":::: " + enumList.getEnumName() + " ::::"));
         return enumList;
     }
 
