@@ -66,4 +66,4 @@ syncInterval: 60
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
-logging-component-name: RD_Professional_API
+loggingComponentName: RD_Professional_API
