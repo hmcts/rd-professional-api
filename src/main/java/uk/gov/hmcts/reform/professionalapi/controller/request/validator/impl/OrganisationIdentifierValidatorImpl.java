@@ -26,7 +26,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     private OrganisationService organisationService;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     @Autowired

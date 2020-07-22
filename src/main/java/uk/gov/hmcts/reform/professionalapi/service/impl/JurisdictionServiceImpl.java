@@ -27,7 +27,7 @@ public class JurisdictionServiceImpl implements JurisdictionService {
     @Autowired
     AuthTokenGenerator authTokenGenerator;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     @Override

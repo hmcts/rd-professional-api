@@ -33,7 +33,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
 
     @Override

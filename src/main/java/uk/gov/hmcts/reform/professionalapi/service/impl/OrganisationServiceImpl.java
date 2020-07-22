@@ -82,7 +82,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     private String loggingComponentName;
     
 

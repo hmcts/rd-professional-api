@@ -43,7 +43,7 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
     }
 
-    @Value("${logging-component-name}")
+    @Value("${loggingComponentName}")
     public void setLoggingComponentName(String loggingComponentName) {
         UserAccountMapServiceImpl.loggingComponentName = loggingComponentName;
     }
