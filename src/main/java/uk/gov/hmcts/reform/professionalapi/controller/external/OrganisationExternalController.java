@@ -263,7 +263,7 @@ public class OrganisationExternalController extends SuperController {
             path = "/status/{status}",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-user-manager", "pui-caa"})
+    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
     public ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveOrganisationsByStatusWithMinimalInfo(
             @ApiParam(hidden = true) @UserId String userId,
             @PathVariable("status") String status) {
