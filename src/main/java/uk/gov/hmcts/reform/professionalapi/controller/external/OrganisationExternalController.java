@@ -269,6 +269,7 @@ public class OrganisationExternalController extends SuperController {
             @PathVariable("status") String status) {
 
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
         return retrieveAllOrganisationsByStatus(status);
     }
 
