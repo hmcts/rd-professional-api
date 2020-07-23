@@ -169,7 +169,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    maxParallelForks = 3
+    maxParallelForks = 2
 
 }
 
