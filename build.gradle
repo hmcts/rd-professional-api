@@ -166,7 +166,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    maxParallelForks = (Runtime.runtime.availableProcessors() > 3)  ? 3 : 1
+    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
