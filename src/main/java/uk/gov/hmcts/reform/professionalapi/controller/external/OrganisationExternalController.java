@@ -157,7 +157,7 @@ public class OrganisationExternalController extends SuperController {
     })
     @GetMapping(
             path = "/pbas",
-            produces = APPLICATION_JSON_VALUE
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>

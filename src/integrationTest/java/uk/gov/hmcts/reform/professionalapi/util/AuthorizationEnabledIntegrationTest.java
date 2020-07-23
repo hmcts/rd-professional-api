@@ -1,22 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static java.lang.String.format;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
-import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
-import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;

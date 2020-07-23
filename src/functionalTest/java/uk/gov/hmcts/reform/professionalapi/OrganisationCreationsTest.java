@@ -118,6 +118,14 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void ac7_can_throw_Unauthorized_Error_code_without_service_token_create_an_organisation_401() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+    }
+
+    @Test
     public void ac7_create_an_organisation_with_Dx_Exchange_not_provided_throws_400() {
         OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
                 .name("some-org-name")

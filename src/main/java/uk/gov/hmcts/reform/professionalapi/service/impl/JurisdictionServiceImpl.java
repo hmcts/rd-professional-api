@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.JurisdictionFeignClient;
@@ -25,6 +26,9 @@ public class JurisdictionServiceImpl implements JurisdictionService {
 
     @Autowired
     AuthTokenGenerator authTokenGenerator;
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     @Override
     public void propagateJurisdictionIdsForSuperUserToCcd(ProfessionalUser user, String userId) {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;

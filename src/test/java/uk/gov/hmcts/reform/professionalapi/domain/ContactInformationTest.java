@@ -27,13 +27,13 @@ public class ContactInformationTest {
     }
 
     @Test
-    public void test_creates_contact_information_correctly() {
+    public void creates_contact_information_correctly() {
         assertThat(contactInformation.getId()).isNull();
         assertThat(contactInformation.getOrganisation()).isEqualTo(organisation);
     }
 
     @Test
-    public void test_adds_dx_address_into_ContactInformation_Correctly() {
+    public void adds_dx_address_into_ContactInformation_Correctly() {
         DxAddress dxAddress = new DxAddress();
 
         contactInformation.addDxAddress(dxAddress);

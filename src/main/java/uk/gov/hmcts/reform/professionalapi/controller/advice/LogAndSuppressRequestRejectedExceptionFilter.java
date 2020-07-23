@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,10 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
 
     private Gson gson = new Gson();
 
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
             ServletException {
@@ -39,8 +44,8 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) res;
 
-            log.warn("request_rejected: remote={}, user_agent={}, request_url={}", request.getRemoteHost(),
-                    request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
+            log.warn("{}:: request_rejected: remote={}, user_agent={}, request_url={}", loggingComponentName,
+                    request.getRemoteHost(), request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

@@ -49,11 +49,13 @@ public class OrganisationEntityResponse  {
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
+
         this.paymentAccount = organisation.getPaymentAccounts()
-                .stream()
-                .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
-                .collect(toList());
-        if (Boolean.TRUE.equals(isRequiredAllEntities)) {
+                    .stream()
+                    .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
+                    .collect(toList());
+
+        if (isRequiredAllEntities) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
                     .map(contactInfo -> new ContactInformationResponse(contactInfo))

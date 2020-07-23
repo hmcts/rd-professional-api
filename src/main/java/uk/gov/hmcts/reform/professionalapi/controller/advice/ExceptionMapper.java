@@ -23,6 +23,7 @@ import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -41,12 +42,15 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-@Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+@Slf4j
 public class ExceptionMapper {
 
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(

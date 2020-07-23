@@ -120,6 +120,8 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
 
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
+
         userProfileCreateUserWireMock(HttpStatus.BAD_REQUEST);
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(orgIdentifierResponse,
