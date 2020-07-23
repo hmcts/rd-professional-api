@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -47,14 +48,16 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 
+@Component
 @Slf4j
 public class RefDataUtil {
 
     private RefDataUtil() {
     }
 
-    @Value("${defaultPageSize}")
-    public static final int DEFAULTPAGESIZE = 10;
+    private static int defaultPageSize;
+
+    private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
 
@@ -115,8 +118,8 @@ public class RefDataUtil {
                                                                   Boolean isRequiredRoles) {
         try (Response response = userProfileFeignClient.getUserProfileById(user.getUserIdentifier())) {
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
@@ -143,15 +146,15 @@ public class RefDataUtil {
                 "false")) {
 
 
-            Class clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
-            ResponseEntity responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : ProfessionalUsersEntityResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (response.status() < 300) {
 
                 modifiedOrgProfUserDetails = updateUserDetailsForActiveOrganisation(responseResponseEntity,
                         activeOrganisationDetails);
             }
 
-            return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
+            return new ArrayList<>(modifiedOrgProfUserDetails.values());
         } catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
@@ -160,7 +163,7 @@ public class RefDataUtil {
     }
 
     public static Map<String, Organisation>
-        updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+        updateUserDetailsForActiveOrganisation(ResponseEntity<Object> responseEntity,
                                            Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse
@@ -169,7 +172,7 @@ public class RefDataUtil {
                 && !CollectionUtils.isEmpty(professionalUsersEntityResponse.getUserProfiles())) {
 
             List<ProfessionalUsersResponse> userProfiles = professionalUsersEntityResponse.getUserProfiles();
-            userProfiles.stream().forEach(userProfile -> {
+            userProfiles.forEach(userProfile -> {
 
                 if (null != activeOrganisationDtls.get(userProfile.getUserIdentifier())) {
 
@@ -189,7 +192,7 @@ public class RefDataUtil {
         return activeOrganisationDtls;
     }
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity,
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity<Object> responseResponseEntity,
                                                Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
@@ -287,8 +290,8 @@ public class RefDataUtil {
         }
     }
 
-    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page,
-                                                                         ResponseEntity responseEntity) {
+    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page<?> page,
+                                                                         ResponseEntity<Object> responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -308,7 +311,7 @@ public class RefDataUtil {
             // since Headers are read only , it can't be modified.
             // Hence copied all existing headers into new one and added new header for pagination
             MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
-            originalHeaders.forEach((key, value) -> headers.put(key, value));
+            originalHeaders.forEach(headers::put);
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
@@ -316,7 +319,7 @@ public class RefDataUtil {
 
     public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
         if (size == null) {
-            size = DEFAULTPAGESIZE;
+            size = defaultPageSize;
         }
         return PageRequest.of(page, size, sort);
     }
@@ -344,12 +347,13 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("Response from UserProfileByEmail service call " + errorResponse.getErrorDescription());
+                log.error("{}:: Response from UserProfileByEmail service call {}",
+                        loggingComponentName, errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();
             }
 
         } catch (FeignException ex) {
-            log.error("Error while invoking UserProfileByEmail service call", ex);
+            log.error("{}::", loggingComponentName + "Error while invoking UserProfileByEmail service call", ex);
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
         }
 
@@ -358,7 +362,7 @@ public class RefDataUtil {
     }
 
     public static void throwException(int statusCode) {
-        log.info("Error status code: " + statusCode);
+        log.info("{}:: Error status code: " + statusCode, loggingComponentName);
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
         String errorMessage = resolveStatusAndReturnMessage(httpStatus);
         throw new ExternalApiException(httpStatus, errorMessage);
@@ -381,5 +385,15 @@ public class RefDataUtil {
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
         return newResponseEntity;
+    }
+
+    @Value("${loggingComponentName}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        RefDataUtil.loggingComponentName = loggingComponentName;
+    }
+
+    @Value("${defaultPageSize}")
+    public void setDefaultPageSize(int defaultPageSize) {
+        RefDataUtil.defaultPageSize = defaultPageSize;
     }
 }
