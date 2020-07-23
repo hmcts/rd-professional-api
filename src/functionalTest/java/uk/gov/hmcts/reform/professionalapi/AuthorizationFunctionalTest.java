@@ -75,7 +75,8 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-    @Value("${exui.roles.pui-caa}")
+    @Value("${exui.role.pui-caa}")
+
     protected String puiCaa;
 
     @Value("${prd.roles.prd-aac-system}")

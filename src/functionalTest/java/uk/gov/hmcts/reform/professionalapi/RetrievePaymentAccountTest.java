@@ -65,26 +65,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void rdcc117_ac1_pui_finance_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        log.info("Inside RetrievePaymentAccountTest:");
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiFinanceManager));
-        assertThat(response.get("paymentAccount")).asList().hasSize(3);
-    }
-
-    @Test
-    public void rdcc117_ac2_pui_organisation_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK, generateBearerTokenForUser(puiOrgManager));
-        assertThat(response.get("paymentAccount")).asList().hasSize(3);
-    }
-
-    @Test
-    public void rdcc117_ac3_user_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, generateBearerTokenForUser(puiUserManager));
-        assertThat(response.get("errorMessage")).isNotNull();
-        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
-    }
-
-    @Test
     public void rdcc117_ac4_pui_organisation_or_finance_manager_without_active_status_cannot_retrieve_a_list_of_pbas() {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(createUserForTest()).build();
