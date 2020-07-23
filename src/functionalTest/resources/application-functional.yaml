@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://rd-professional-api-pr-665.service.core-compute-preview.internal/}
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
@@ -23,8 +23,7 @@ exui.role.pui-organisation-manager: pui-organisation-manager
 exui.role.pui-finance-manager: pui-finance-manager
 exui.role.pui-case-manager: pui-case-manager
 exui.role.pui-caa: pui-caa
-prd.roles:
-  prd-aac-system: prd-aac-system
+prd.roles.prd-aac-system: prd-aac-system
 
 # resent user invite interval in minutes
 resendInterval: 60
