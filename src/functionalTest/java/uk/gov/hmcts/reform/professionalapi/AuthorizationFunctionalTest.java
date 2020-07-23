@@ -116,7 +116,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient, idamClient);
-        System.out.println(professionalApiUrl);
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
