@@ -27,7 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.AbstractTestExecutionListener;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
@@ -46,7 +49,9 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-public abstract class AuthorizationFunctionalTest {
+@TestExecutionListeners(listeners = {
+        DependencyInjectionTestExecutionListener.class})
+public abstract class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${s2s-url}")
     protected String s2sUrl;

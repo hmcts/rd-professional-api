@@ -35,6 +35,8 @@ public class IdamOpenIdClient {
 
     private Gson gson = new Gson();
 
+    private static String internalOpenIdTokenPrdAdmin;
+
     public IdamOpenIdClient(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
     }
@@ -80,8 +82,11 @@ public class IdamOpenIdClient {
     }
 
     public String getInternalOpenIdToken() {
-        String userEmail = createUser("prd-admin");
-        return getOpenIdToken(userEmail);
+        if (internalOpenIdTokenPrdAdmin == null) {
+            String userEmail = createUser("prd-admin");
+            internalOpenIdTokenPrdAdmin = getOpenIdToken(userEmail);
+        }
+        return internalOpenIdTokenPrdAdmin;
     }
 
     /*

@@ -330,8 +330,8 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        return ProfessionalApiGeneratorConstants.TRUE.equalsIgnoreCase(showDeleted)
-                ? ProfessionalApiGeneratorConstants.TRUE : ProfessionalApiGeneratorConstants.FALSE;
+        return ProfessionalApiConstants.TRUE.equalsIgnoreCase(showDeleted)
+                ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
     public static Boolean getReturnRolesValue(Boolean returnRoles) {
