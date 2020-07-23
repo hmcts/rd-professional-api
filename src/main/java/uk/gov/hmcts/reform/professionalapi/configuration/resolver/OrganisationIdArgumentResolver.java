@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,6 +32,9 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -62,7 +66,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
                 organisation = professionalUser.getOrganisation();
                 orgId = organisation.getOrganisationIdentifier();
             } else {
-                log.error("ProfessionalUserUser info null::");
+                log.error("{}:: ProfessionalUserUser info null::", loggingComponentName);
                 throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
             }
 
@@ -70,7 +74,7 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
         if (null == userInfo || StringUtils.isEmpty(orgId)) {
 
-            log.error(" userInfo or OrganisationIdentifier is Null::");
+            log.error("{}:: userInfo or OrganisationIdentifier is Null::", loggingComponentName);
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
         return orgId;

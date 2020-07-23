@@ -12,3 +12,5 @@ spring:
     url: jdbc:h2:mem:dbrefdata
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
+
+defaultPageSize: ${DEFAULTPAGESIZE:10}

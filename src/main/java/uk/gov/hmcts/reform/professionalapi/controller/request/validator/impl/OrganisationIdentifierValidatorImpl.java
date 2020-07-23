@@ -8,6 +8,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     private OrganisationService organisationService;
 
+    @Value("${loggingComponentName}")
+    protected String loggingComponentName;
+
     @Autowired
     public OrganisationIdentifierValidatorImpl(OrganisationService organisationService) {
         this.organisationService = organisationService;
@@ -41,7 +45,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = NO_ORG_FOUND_FOR_GIVEN_ID + inputOrganisationIdentifier;
-            log.error(errorMessage);
+            log.error(loggingComponentName,errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }
@@ -81,14 +85,14 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error(ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
     }
 
     public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
-            log.error(NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }
