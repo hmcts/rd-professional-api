@@ -127,7 +127,7 @@ public abstract class SuperController {
 
 
     protected ResponseEntity<OrganisationResponse>
-    createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+        createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
@@ -252,7 +252,8 @@ public abstract class SuperController {
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 professionalUserService.persistUser(professionalUser);
             } else {
-                log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
+                log.error("{}:: " + String.format(
+                        IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()), loggingComponentName);
                 return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
             }
         }
@@ -318,13 +319,17 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
-        ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false, false);
+        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(
+                newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+        ResponseEntity<Object> responseEntity = createUserProfileFor(
+                professionalUser, roles, false, false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            UserProfileCreationResponse userProfileCreationResponse = (UserProfileCreationResponse) responseEntity.getBody();
+            UserProfileCreationResponse userProfileCreationResponse =
+                    (UserProfileCreationResponse) responseEntity.getBody();
             //Idam registration success
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
-            responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles, prdEnumService.findAllPrdEnums());
+            responseBody = professionalUserService.addNewUserToAnOrganisation(
+                    professionalUser, roles, prdEnumService.findAllPrdEnums());
         } else {
             log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
@@ -335,13 +340,17 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    private ResponseEntity<Object> reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest, ProfessionalUser professionalUser, List<String> roles, String organisationIdentifier) {
+    private ResponseEntity<Object> reInviteExpiredUser(NewUserCreationRequest newUserCreationRequest,
+                                                       ProfessionalUser professionalUser, List<String> roles,
+                                                       String organisationIdentifier) {
 
         Object responseBody = null;
-        ProfessionalUser existingUser = professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
+        ProfessionalUser existingUser =
+                professionalUserService.findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
         if (existingUser == null) {
             throw new ResourceNotFoundException("User does not exist");
-        } else if (!existingUser.getOrganisation().getOrganisationIdentifier().equalsIgnoreCase(organisationIdentifier)) {
+        } else if (!existingUser.getOrganisation().getOrganisationIdentifier()
+                .equalsIgnoreCase(organisationIdentifier)) {
             throw new AccessDeniedException("User does not belong to same organisation");
         }
 
@@ -349,7 +358,8 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+            log.error(loggingComponentName + String.format(
+                    IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
@@ -360,7 +370,7 @@ public abstract class SuperController {
 
     private ProfessionalUser
         validateInviteUserRequestAndCreateNewUserObject(NewUserCreationRequest newUserCreationRequest,
-                                                        String organisationIdentifier, List<String> roles) {
+                                                    String organisationIdentifier, List<String> roles) {
 
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         final Organisation existingOrganisation = checkOrganisationIsActive(removeEmptySpaces(organisationIdentifier));
@@ -403,7 +413,7 @@ public abstract class SuperController {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        return  professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public void checkUserAlreadyExist(String userEmail) {

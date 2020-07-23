@@ -52,15 +52,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 @Slf4j
 public class RefDataUtil {
 
-    private RefDataUtil() {}
+    private RefDataUtil() {
+    }
 
     private static int defaultPageSize;
 
     private static String loggingComponentName;
 
     public static List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
-
-        List<PaymentAccount> userMapPaymentAccount;
 
         List<PaymentAccount> userMapPaymentAccount;
 
@@ -320,7 +319,7 @@ public class RefDataUtil {
 
     public static Pageable createPageableObject(Integer page, Integer size, Sort sort) {
         if (size == null) {
-            size = DEFAULTPAGESIZE;
+            size = defaultPageSize;
         }
         return PageRequest.of(page, size, sort);
     }
@@ -348,7 +347,8 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("{}:: Response from UserProfileByEmail service call {}", loggingComponentName, errorResponse.getErrorDescription());
+                log.error("{}:: Response from UserProfileByEmail service call {}",
+                        loggingComponentName, errorResponse.getErrorDescription());
                 newUserResponse = new NewUserResponse();
             }
 

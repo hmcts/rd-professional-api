@@ -34,7 +34,8 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
             throw new InvalidRequest(errorMessage);
         } else if (inputRequestOrganisationStatus == OrganisationStatus.PENDING
                 && existingStatus == OrganisationStatus.ACTIVE) {
-            String errorMessage = "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for "
+            String errorMessage =
+                    "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for "
                     .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);

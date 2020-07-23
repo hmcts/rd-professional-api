@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -176,14 +172,4 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
-    public static void isInputOrganisationStatusValid(String organisationStatus, String allowedStatus) {
-        List<String> validStatusList = asList(allowedStatus.split(","));
-        String orgStatus = removeAllSpaces(organisationStatus);
-        if (isBlank(orgStatus) ||  !validStatusList.contains(orgStatus.toUpperCase())) {
-            log.error(ERROR_MESSAGE_INVALID_STATUS_PASSED);
-            throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
-        }
-    }
-
 }
-

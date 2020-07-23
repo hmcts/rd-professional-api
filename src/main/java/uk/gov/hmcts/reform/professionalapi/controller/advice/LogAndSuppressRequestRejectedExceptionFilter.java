@@ -45,7 +45,8 @@ public class LogAndSuppressRequestRejectedExceptionFilter extends GenericFilterB
             HttpServletResponse response = (HttpServletResponse) res;
 
             log.warn("{}:: request_rejected: remote={}, user_agent={}, request_url={}", loggingComponentName,
-                    request.getRemoteHost(), request.getHeader(HttpHeaders.USER_AGENT), request.getRequestURL(), exception);
+                    request.getRemoteHost(), request.getHeader(HttpHeaders.USER_AGENT),
+                    request.getRequestURL(), exception);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
