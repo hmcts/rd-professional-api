@@ -110,14 +110,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    public void can_retrieve_organisation_by_orgIdentifier_for_pui_caa_External() {
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
-                generateBearerTokenForUser(puiCaa));
-        assertThat(response).isNotEmpty();
-        responseValidate(response);
-    }
-
-    @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
                 generateBearerTokenFor(puiCaseManager));
