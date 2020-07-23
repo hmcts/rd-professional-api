@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
@@ -95,19 +95,19 @@ public abstract class SuperController {
     @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
-    @Value("${exui.role.hmcts-admin:}")
+    @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
 
-    @Value("${exui.role.pui-user-manager:}")
+    @Value("${prd.security.roles.pui-user-manager:}")
     protected String puiUserManager;
 
-    @Value("${exui.role.pui-organisation-manager:}")
+    @Value("${prd.security.roles.pui-organisation-manager:}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.pui-finance-manager}")
+    @Value("${prd.security.roles.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.pui-case-manager:}")
+    @Value("${prd.security.roles.pui-case-manager:}")
     protected String puiCaseManager;
 
     @Value("${prdEnumRoleType}")

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -108,19 +109,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
 
-    @Value("${exui.role.hmcts-admin}")
+    @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
 
-    @Value("${exui.role.pui-user-manager}")
+    @Value("${prd.security.roles.pui-user-manager}")
     protected String puiUserManager;
 
-    @Value("${exui.role.pui-organisation-manager}")
+    @Value("${prd.security.roles.pui-organisation-manager}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.pui-finance-manager}")
+    @Value("${prd.security.roles.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.pui-case-manager}")
+    @Value("${prd.security.roles.pui-case-manager}")
     protected String puiCaseManager;
 
     @Value("${resendInterval}")
@@ -566,6 +567,67 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
+    public void deleteUserProfileMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStatus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+
+                    + "  \"statusCode\": \"204\","
+                    + "  \"message\": \"User Profile Deleted Successfully\""
+
+                    + "}";
+            returnHttpStatus = 204;
+        }  else if (status == HttpStatus.BAD_REQUEST) {
+            body = "{"
+
+                    + "  \"statusCode\": \"400\","
+                    + "  \"message\": \"User Profile Delete Request has some problem\""
+
+                + "}";
+        } else if (status == HttpStatus.NOT_FOUND) {
+            body = "{"
+
+                    + "  \"statusCode\": \"404\","
+                    + "  \"message\": \"User Profile Not Found To Delete\""
+
+                + "}";
+        }
+
+        userProfileService.stubFor(
+                delete(urlEqualTo("/v1/userprofile"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        )
+        );
+
+    }
+
+    public void getUserProfileByEmailWireMock(HttpStatus status) {
+        String body = null;
+        int returnHttpStaus = status.value();
+        if (status.is2xxSuccessful()) {
+            body = "{"
+                    + "  \"idamStatus\": \"PENDING\""
+                    + "}";
+            returnHttpStaus = 200;
+        } else {
+            body = "{"
+                    + "  \"idamStatus\": \" \""
+                    + "}";
+            returnHttpStaus = 500;
+        }
+
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(returnHttpStaus)
+                ));
+
+    }
 
     public static class MultipleUsersResponseTransformer extends ResponseTransformer {
         @Override

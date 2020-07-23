@@ -38,13 +38,15 @@ idam:
 
 ## IDAM feign connection
 auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
-
-exui.role:
-  hmcts-admin: prd-admin
-  pui-user-manager: pui-user-manager
-  pui-organisation-manager: pui-organisation-manager
-  pui-finance-manager: pui-finance-manager
-  pui-case-manager: pui-case-manager
+prd:
+  security:
+    roles:
+      hmcts-admin: prd-admin
+      pui-user-manager: pui-user-manager
+      pui-organisation-manager: pui-organisation-manager
+      pui-finance-manager: pui-finance-manager
+      pui-case-manager: pui-case-manager
+      pui-caa: pui-caa
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
