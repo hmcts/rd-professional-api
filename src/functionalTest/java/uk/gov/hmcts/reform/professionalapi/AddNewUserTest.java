@@ -166,6 +166,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
+
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
         if (assignAccessRoleEnabled) {
