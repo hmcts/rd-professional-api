@@ -168,38 +168,39 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
-        List<String> userRoles = new ArrayList<>();
-        //userRoles.add("pui-caa");
-        //userRoles.add("caseworker-caa");
-        userRoles.add("pui-user-manager");
-        String firstName = "someName";
-        String lastName = "someLastName";
-        String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
+        if (assignAccessRoleEnabled) {
+            List<String> userRoles = new ArrayList<>();
+            userRoles.add("pui-caa");
+            userRoles.add("caseworker-caa");
+            userRoles.add("pui-user-manager");
+            String firstName = "someName";
+            String lastName = "someLastName";
+            String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
 
-        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+            NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .roles(userRoles)
+                    .jurisdictions(createJurisdictions())
+                    .build();
 
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+            professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
 
-        Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                        HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
+            Map<String, Object> newUserResponse = professionalApiClient
+                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
+                            HttpStatus.CREATED);
+            assertThat(newUserResponse).isNotNull();
 
-        Map<String, Object> searchUserResponse = professionalApiClient
-                .searchUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, "false", HttpStatus.OK,
-                        "true");
+            Map<String, Object> searchUserResponse = professionalApiClient
+                    .searchUsersByOrganisation(orgIdentifierResponse, hmctsAdmin, "false", HttpStatus.OK,
+                            "true");
 
-        List<Map> users = getNestedValue(searchUserResponse, "users");
-        Map newUserDetails = users.get(1);
-        List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
+            List<Map> users = getNestedValue(searchUserResponse, "users");
+            Map newUserDetails = getActiveUser(users);
+            List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
 
-        //assertThat(superUserRoles).doesNotContain("pui-caa");
-        //assertThat(superUserRoles).doesNotContain("caseworker-caa");
+            assertThat(superUserRoles).contains("pui-caa", "caseworker-caa");
+        }
     }
 }

@@ -81,6 +81,9 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${prd.roles.prd-aac-system}")
     protected String systemUser;
 
+    @Value(("${assignAccessRoleEnabled}"))
+    protected boolean assignAccessRoleEnabled;
+
     protected ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -276,6 +279,18 @@ public abstract class AuthorizationFunctionalTest {
         data.setLastName("UpdatedLastName");
         data.setIdamStatus(status.name());
         return data;
+    }
+
+    public Map getActiveUser(List<Map> professionalUsersResponses) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
     }
 
 }
