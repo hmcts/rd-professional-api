@@ -33,4 +33,5 @@ public class ProfessionalApiGeneratorConstants {
     public static final String ERROR_MESSAGE_UP_FAILED = "Error while invoking UP";
     public static final String ERROR_MESSAGE_USER_MUST_BE_ACTIVE = "User status must be Active to perform this "
             .concat("operation");
+    public static final String PRD_AAC_SYSTEM = "prd-aac-system";
 }
