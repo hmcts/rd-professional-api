@@ -56,7 +56,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 public class OrganisationInternalController extends SuperController {
 
     @Value("${loggingComponentName}")
-    protected  String loggingComponentName;
+    protected String loggingComponentName;
+
 
     @ApiOperation(
             value = "Creates an Organisation",
@@ -221,7 +222,7 @@ public class OrganisationInternalController extends SuperController {
                                                      @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
                                                              message = ORG_ID_VALIDATION_ERROR_MESSAGE)
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
-        log.info("{}:: Received request to edit payment accounts by organisation Id...",loggingComponentName);
+        log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
         paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService

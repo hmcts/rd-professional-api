@@ -7,7 +7,7 @@ import org.junit.Test;
 public class UserAttributeTest {
 
     @Test
-    public void creates_user_attribute_correctly() {
+    public void test_creates_user_attribute_correctly() {
         PrdEnum prdEnum = new PrdEnum();
         ProfessionalUser professionalUser = new ProfessionalUser();
 

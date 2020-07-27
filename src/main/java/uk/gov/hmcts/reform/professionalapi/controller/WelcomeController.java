@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
     produces = APPLICATION_JSON_VALUE
 )
 
-@RestController
 @Slf4j
+@RestController
 public class WelcomeController {
 
     @Value("${loggingComponentName}")
@@ -55,7 +55,7 @@ public class WelcomeController {
     @ResponseBody
     public ResponseEntity<String> welcome() {
 
-        log.info("{} :: Welcome message '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
+        log.info("{}:: Welcome message '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
 
         return ResponseEntity
             .ok()

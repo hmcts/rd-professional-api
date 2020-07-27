@@ -27,7 +27,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private OrganisationService organisationService;
 
     @Value("${loggingComponentName}")
-    private String loggingComponentName;
+    protected String loggingComponentName;
 
     @Autowired
     public OrganisationIdentifierValidatorImpl(OrganisationService organisationService) {
@@ -45,7 +45,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = NO_ORG_FOUND_FOR_GIVEN_ID + inputOrganisationIdentifier;
-            log.error(errorMessage);
+            log.error(loggingComponentName,errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }
@@ -85,14 +85,14 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
 
     public void validateOrganisationIsActive(Organisation existingOrganisation) {
         if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
-            log.error(loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
             throw new EmptyResultDataAccessException(1);
         }
     }
 
     public void validateOrganisationExistsWithGivenOrgId(String orgId) {
         if (null == organisationService.getOrganisationByOrgIdentifier(orgId)) {
-            log.error(loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }

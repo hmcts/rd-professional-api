@@ -200,33 +200,6 @@ public class JurisdictionServiceImplTest {
                 .thenReturn(null);
 
         jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
-
-        verify(jurisdictionFeignClient, times(1)).createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
-    }
-
-    @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_403() {
-        when(authTokenGenerator.generate()).thenReturn("s2sToken");
-        response = response.toBuilder().status(403).build();
-
-        when(jurisdictionFeignClient.createJurisdictionUserProfile(
-                any(), any(), any(JurisdictionUserCreationRequest.class))).thenReturn(response);
-        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
-
-        verify(jurisdictionFeignClient, times(1))
-                .createJurisdictionUserProfile(any(), any(), any(JurisdictionUserCreationRequest.class));
-    }
-
-    @Test(expected = ExternalApiException.class)
-    public void should_throw_error_when_ccd_returns_null_response() {
-        when(authTokenGenerator.generate()).thenReturn("s2sToken");
-        when(jurisdictionFeignClient.createJurisdictionUserProfile(
-                "some@hmcts.net", "s2sToken", request)).thenReturn(null);
-
-        jurisdictionServiceImpl.callCcd(request, "some@hmcts.net");
-
-        verify(jurisdictionFeignClient, times(1))
-                .createJurisdictionUserProfile("some@hmcts.net", "s2sToken", request);
     }
 
     @Test(expected = Test.None.class)

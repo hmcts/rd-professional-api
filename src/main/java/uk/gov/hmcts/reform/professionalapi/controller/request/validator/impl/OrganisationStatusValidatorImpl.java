@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 public class OrganisationStatusValidatorImpl implements OrganisationIdentifierValidator {
 
     @Value("${loggingComponentName}")
-    private String loggingComponentName;
+    protected String loggingComponentName;
 
     @Override
     public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus,
@@ -34,9 +34,8 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
             throw new InvalidRequest(errorMessage);
         } else if (inputRequestOrganisationStatus == OrganisationStatus.PENDING
                 && existingStatus == OrganisationStatus.ACTIVE) {
-            String errorMessage =
-                    "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for "
-                    .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
+            String errorMessage = "{}:: Cannot amend status to PENDING since existing organisation"
+                    .concat(" status is ACTIVE for organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         }

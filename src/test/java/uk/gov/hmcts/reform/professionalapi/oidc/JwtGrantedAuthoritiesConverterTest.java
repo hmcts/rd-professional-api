@@ -40,6 +40,7 @@ public class JwtGrantedAuthoritiesConverterTest {
     @Test
     public void test_shouldReturnEmptyAuthorities() {
         Collection<GrantedAuthority> authorities = converter.convert(jwtMock);
+
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
         verify(idamRepositoryMock, times(0)).getUserInfo(anyString());

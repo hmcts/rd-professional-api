@@ -83,7 +83,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void buildMethodtest() {
+    public void test_buildMethod() {
         String dxExchange = "dxExchange";
         String dxNumber = "dxExchange";
 
