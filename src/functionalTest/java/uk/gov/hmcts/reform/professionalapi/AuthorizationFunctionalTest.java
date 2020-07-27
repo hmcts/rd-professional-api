@@ -84,7 +84,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${prd.roles.prd-aac-system}")
     protected String systemUser;
-
+  
     protected static ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
