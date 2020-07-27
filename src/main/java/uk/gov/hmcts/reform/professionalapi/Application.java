@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @EnableJpaAuditing
 @EnableJpaRepositories
-@SpringBootApplication(exclude = HealthAutoConfiguration.class)
+@SpringBootApplication
 @EnableCaching
 @EnableFeignClients(basePackages = {
         "uk.gov.hmcts.reform.professionalapi" },
