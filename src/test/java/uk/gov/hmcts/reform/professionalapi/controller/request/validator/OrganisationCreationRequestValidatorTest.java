@@ -43,11 +43,11 @@ public class OrganisationCreationRequestValidatorTest {
     @Before
     public void setup() {
         organisationCreationRequestValidator = new OrganisationCreationRequestValidator(asList(validator1, validator2));
-        userCreationRequest = UserCreationRequest
-                .aUserCreationRequest().firstName("fName").lastName("lName").email("test@email.com").build();
-        organisationCreationRequest =
-                new OrganisationCreationRequest("Company","PENDING","SraId", "true",
-                        "12345678","www.company.com",userCreationRequest, new HashSet<>(),null);
+        userCreationRequest = UserCreationRequest.aUserCreationRequest().firstName("fName").lastName("lName")
+                .email("test@email.com").build();
+        organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
+                "true", "12345678", "www.company.com", userCreationRequest,
+                new HashSet<>(), null);
     }
 
     @Test
@@ -238,7 +238,7 @@ public class OrganisationCreationRequestValidatorTest {
     @Test(expected = Test.None.class)
     public void test_should_validate_valid_email_and_should_not_throw_exception() {
 
-        String[] validEmails = new String[] {
+        String[] validEmails = new String[]{
             "shreedhar.lomte@hmcts.net",
             "shreedhar@yahoo.com",
             "Email.100@yahoo.com",
@@ -260,10 +260,8 @@ public class OrganisationCreationRequestValidatorTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void should_validate_valid_email_and_should_throw_exception() {
-
-        String[] validEmails = new String[] {
-            "あいうえお@example.com",
+    public void test_should_validate_valid_email_and_should_throw_exception() {
+        String[] validEmails = new String[]{"あいうえお@example.com",
             "emAil@1.com",
             "email@111",
             "email@.com.my",
