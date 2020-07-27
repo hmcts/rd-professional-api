@@ -16,7 +16,8 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
     private String loggingComponentName;
 
     @Override
-    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
+    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus,
+                         String inputOrganisationIdentifier) {
         //Into Organisation status validator
 
         validateOrganisationStatus(inputStatus, existingOrganisation.getStatus(), inputOrganisationIdentifier);
@@ -24,13 +25,18 @@ public class OrganisationStatusValidatorImpl implements OrganisationIdentifierVa
         //Validation completed for Update Organisation
     }
 
-    private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus, OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
+    private void validateOrganisationStatus(OrganisationStatus inputRequestOrganisationStatus,
+                                            OrganisationStatus existingStatus, String inputOrganisationIdentifier) {
         if (existingStatus == OrganisationStatus.DELETED) {
-            String errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for organisationIdentifier: " + inputOrganisationIdentifier;
+            String errorMessage = "{}:: Cannot amend status since existing organisation status is DELETED for "
+                    .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
-        } else if (inputRequestOrganisationStatus == OrganisationStatus.PENDING && existingStatus == OrganisationStatus.ACTIVE) {
-            String errorMessage = "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for organisationIdentifier: " + inputOrganisationIdentifier;
+        } else if (inputRequestOrganisationStatus == OrganisationStatus.PENDING
+                && existingStatus == OrganisationStatus.ACTIVE) {
+            String errorMessage =
+                    "{}:: Cannot amend status to PENDING since existing organisation status is ACTIVE for "
+                    .concat("organisationIdentifier: ") + inputOrganisationIdentifier;
             log.error(errorMessage, loggingComponentName);
             throw new InvalidRequest(errorMessage);
         }

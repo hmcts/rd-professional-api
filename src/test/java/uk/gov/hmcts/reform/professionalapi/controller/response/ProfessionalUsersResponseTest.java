@@ -12,8 +12,10 @@ public class ProfessionalUsersResponseTest {
     private final String expectLastName = "Smith";
 
     @Test
-    public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName, expectEmailAddress, null));
+    public void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
+        ProfessionalUsersResponse professionalUsersResponse
+                = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
+                expectEmailAddress, null));
 
         assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
         assertThat(professionalUsersResponse.getFirstName()).isEqualTo(expectFirstName);

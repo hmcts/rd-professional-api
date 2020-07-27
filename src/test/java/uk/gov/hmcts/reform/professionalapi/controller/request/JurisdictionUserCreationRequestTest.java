@@ -19,7 +19,8 @@ public class JurisdictionUserCreationRequestTest {
 
         String id = UUID.randomUUID().toString();
 
-        JurisdictionUserCreationRequest jurisdictionUserCreationRequest = new JurisdictionUserCreationRequest(null, null);
+        JurisdictionUserCreationRequest jurisdictionUserCreationRequest
+                = new JurisdictionUserCreationRequest(null, null);
 
         jurisdictionUserCreationRequest.setId(id);
         jurisdictionUserCreationRequest.setJurisdictions(jurisdictions);

@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
 
-
 @Service
 @Slf4j
 public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
@@ -36,9 +35,11 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
             } else if ("true".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
 
-                List<PaymentAccount>  userMapPaymentAccount = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
+                List<PaymentAccount> userMapPaymentAccount
+                        = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
 
-                pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation().getPaymentAccounts());
+                pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation()
+                        .getPaymentAccounts());
 
             }
 
@@ -47,36 +48,32 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
         return pbaNumbers;
     }
 
-    private  List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> paymentAccountsEntity) {
+    private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> paymentAccountsEntity) {
 
         List<String> paymentAccountPbaNumbers = new ArrayList<>();
 
-        if (!paymentAccountsEntity.isEmpty()) {
-
-            paymentAccountsEntity.forEach(paymentAccount ->
-
+        paymentAccountsEntity.forEach(paymentAccount ->
                 paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber().trim())
+        );
 
-            );
-        }
         return paymentAccountPbaNumbers;
     }
 
-    private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> userMapPaymentAccount, List<PaymentAccount> paymentAccountsEntity) {
+    private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> userMapPaymentAccount,
+                                                         List<PaymentAccount> paymentAccountsEntity) {
 
         List<String> paymentAccountPbaNumbers = new ArrayList<>();
 
-        if (!paymentAccountsEntity.isEmpty()) {
+        paymentAccountsEntity.forEach(paymentAccount -> {
+            for (PaymentAccount usrMapAccount : userMapPaymentAccount) {
 
-            paymentAccountsEntity.forEach(paymentAccount -> {
-                for (PaymentAccount usrMapAccount : userMapPaymentAccount) {
-                    if (usrMapAccount.getId().equals(paymentAccount.getId())) {
+                if (usrMapAccount.getId().equals(paymentAccount.getId())) {
 
-                        paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber());
-                    }
+                    paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber());
                 }
-            });
-        }
+            }
+        });
+
         return paymentAccountPbaNumbers;
     }
 
@@ -84,7 +81,8 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
 
         List<PaymentAccount> userMapPaymentAccount;
 
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId().getPaymentAccount())
+        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
+                .getPaymentAccount())
                 .collect(toList());
 
         return userMapPaymentAccount;

@@ -41,7 +41,8 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email.toLowerCase(), hmctsAdmin);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(email.toLowerCase(),
+                hmctsAdmin);
 
         assertThat(searchResponse.get("firstName")).isEqualTo("some-fname");
     }
@@ -64,7 +65,8 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
 
-        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(emailIgnoreCase, hmctsAdmin);
+        Map<String, Object> searchResponse = professionalApiClient.searchForUserByEmailAddress(emailIgnoreCase,
+                hmctsAdmin);
         assertThat(searchResponse.get("email")).isEqualTo(emailIgnoreCase.toLowerCase());
     }
 }

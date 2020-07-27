@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void ac1_modify_roles_of_active_users_and_delete_for_an_active_organisation_with_prd_admin_role_should_return_200() {
+    public void ac1_modify_roles_of_active_usr_and_delete_for_an_active_org_with_prd_admin_role_should_return_200() {
 
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, ACTIVE);
@@ -38,18 +38,24 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.OK);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
+                                userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
 
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 
         UserProfileUpdatedData deleteUserProfileData = createDeleteRolesUserProfileData();
-        Map<String, Object> responseForDelete = professionalReferenceDataClient.modifyUserRolesOfOrganisation(deleteUserProfileData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> responseForDelete = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(deleteUserProfileData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
 
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
@@ -71,7 +77,9 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
+                                userRoles), hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
@@ -81,7 +89,9 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         rolesDelete.add(roleName1);
         userProfileUpdatedData.setRolesDelete(rolesDelete);
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isNotNull();
@@ -93,26 +103,29 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.OK);
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiCaseManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("403");
         assertThat(response.get("response_body")).isNotNull();
     }
 
     @Test
-    public void ac5_add_and_delete_roles_of_active_users_for_an_active_organisation_with_pui_user_manager_role_should_return_200() {
+    public void ac5_add_and_delete_roles_of_active_usr_for_an_active_org_with_pui_usr_mgr_role_should_return_200() {
 
         updateUserProfileRolesMock(HttpStatus.OK);
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
         String userIdentifier = settingUpOrganisation(puiUserManager);
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 
         UserProfileUpdatedData deleteUserProfileData = createDeleteRolesUserProfileData();
-        Map<String, Object> responseForDelete = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(deleteUserProfileData, userIdentifier, puiUserManager);
+        Map<String, Object> responseForDelete = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(deleteUserProfileData, userIdentifier, puiUserManager);
 
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
@@ -130,19 +143,21 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         deleteRoles.add(roleName1);
         userProfileUpdatedData.setRolesDelete(deleteRoles);
         String userIdentifier = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body")).isNotNull();
 
     }
 
     @Test
-    public void ac8_delete_roles_of_active_users_for_with_pui_user_manager_role_should_return_500_for_Internal_server() {
+    public void ac8_delete_roles_of_active_users_for_with_pui_user_manager_role_sld_rtn_500_for_Internal_server() {
 
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
         UserProfileUpdatedData userProfileUpdatedData = createDeleteRolesUserProfileData();
         String userIdentifier = settingUpOrganisation("pui-user-manager");
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
 
         verifyDeleteRolesResponse(response);
 
@@ -162,13 +177,17 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
         updateUserProfileRolesMock(HttpStatus.INTERNAL_SERVER_ERROR);
 
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
+                        hmctsAdmin);
 
         String userIdentifier = (String) newUserResponse.get("userIdentifier");
 
         UserProfileUpdatedData userProfileUpdatedData = createDeleteRolesUserProfileData();
 
-        Map<String, Object> response = professionalReferenceDataClient.modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisation(userProfileUpdatedData, organisationIdentifier, userIdentifier,
+                        hmctsAdmin);
 
         verifyDeleteRolesResponse(response);
 
@@ -200,7 +219,8 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
     private void verifyDeleteRolesResponse(Map<String, Object> response) {
 
         assertThat(response.get("roleDeletionResponse")).isNotNull();
-        List<Map<String, Object>> deleteRolesResponse = (List<Map<String, Object>>) response.get("roleDeletionResponse");
+        List<Map<String, Object>> deleteRolesResponse
+                = (List<Map<String, Object>>) response.get("roleDeletionResponse");
         Map<String, Object>  deleteRoleResponse = deleteRolesResponse.get(0);
         assertThat(deleteRoleResponse.get("idamStatusCode")).isEqualTo("500");
         assertThat(deleteRoleResponse.get("idamMessage")).isEqualTo("Internal Server Error");

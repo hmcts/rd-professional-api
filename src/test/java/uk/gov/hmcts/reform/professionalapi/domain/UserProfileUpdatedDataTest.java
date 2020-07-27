@@ -9,7 +9,7 @@ import org.junit.Test;
 public class UserProfileUpdatedDataTest {
 
     @Test
-    public void should_add_roles_add_when_modified() {
+    public void test_should_add_roles_add_when_modified() {
         RoleName roleName1 = new RoleName("pui-case-manager");
         RoleName roleName2 = new RoleName("pui-case-organisation");
         Set<RoleName> rolesAdd = new HashSet<>();
@@ -20,7 +20,8 @@ public class UserProfileUpdatedDataTest {
         rolesDelete.add(roleName1);
         rolesDelete.add(roleName2);
 
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("a@hmcts.net", "fname", "lname", "ACTIVE", rolesAdd, rolesDelete);
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("a@hmcts.net",
+                "fname", "lname", "ACTIVE", rolesAdd, rolesDelete);
         userProfileUpdatedData.setRolesAdd(rolesAdd);
         userProfileUpdatedData.setRolesDelete(rolesDelete);
 

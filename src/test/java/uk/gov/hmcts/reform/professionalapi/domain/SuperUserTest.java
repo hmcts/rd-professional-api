@@ -12,7 +12,7 @@ import org.junit.Test;
 public class SuperUserTest {
 
     @Test
-    public void creates_super_user() {
+    public void test_creates_super_user() {
         List<String> roles = new ArrayList<>();
         roles.add("role");
 

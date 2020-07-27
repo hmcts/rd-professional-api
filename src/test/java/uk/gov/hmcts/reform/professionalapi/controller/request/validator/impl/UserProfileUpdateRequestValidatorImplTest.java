@@ -40,8 +40,9 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestIfBothStatusAndRoleArePresent() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName, IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
+    public void test_ValidateRequestIfBothStatusAndRoleArePresent() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                IdamStatus.ACTIVE.name(), rolesData, rolesToDeleteData);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -54,8 +55,9 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestForStatus() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName, IdamStatus.ACTIVE.name(), null, null);
+    public void test_ValidateRequestForStatus() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                IdamStatus.ACTIVE.name(), null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -67,8 +69,9 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test
-    public void testValidateRequestForRoles() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName, null, rolesData, rolesToDeleteData);
+    public void test_ValidateRequestForRoles() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                null, rolesData, rolesToDeleteData);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         UserProfileUpdatedData actualModifyProfileData = sut.validateRequest(userProfileUpdatedData);
@@ -80,8 +83,9 @@ public class UserProfileUpdateRequestValidatorImplTest {
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testThrowErrorIfValidateRequestIsEmpty() {
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName, null, null, null);
+    public void test_ThrowErrorIfValidateRequestIsEmpty() {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData(email, firstName, lastName,
+                null, null, null);
 
         UserProfileUpdateRequestValidator sut = new UserProfileUpdateRequestValidatorImpl();
         sut.validateRequest(userProfileUpdatedData);

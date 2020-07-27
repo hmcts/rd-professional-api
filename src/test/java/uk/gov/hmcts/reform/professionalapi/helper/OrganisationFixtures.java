@@ -27,7 +27,7 @@ public class OrganisationFixtures {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphanumeric(7) + "@hmcts.net")
+                        .email(randomAlphanumeric(7).concat("@hmcts.net"))
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
@@ -85,7 +85,8 @@ public class OrganisationFixtures {
                 .build()));
     }
 
-    public static OrganisationCreationRequest.OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
+    public static OrganisationCreationRequest
+            .OrganisationCreationRequestBuilder organisationRequestWithAllFieldsAreUpdated() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA1234567");
 

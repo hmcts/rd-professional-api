@@ -40,7 +40,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -96,7 +97,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .paymentAccount(paymentAccounts)
-                        .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                                .addressLine1("addressLine1").build()))
                         .build();
 
         Map<String, Object> createOrganisationResponse =
@@ -189,7 +191,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
@@ -201,7 +204,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone1@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         Map<String, Object> response =

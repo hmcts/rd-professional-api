@@ -53,7 +53,8 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
     public void returns_201_when_authorised_service_attempts_create_organisation() {
         s2sAuthorisedCallMock();
 
-        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
         String httpStatus = (String) response.get("http_status");
         assertThat(httpStatus).isEqualTo("201 CREATED");
@@ -68,7 +69,8 @@ public class AuthorisedServicesIntegrationTest extends SpringBootIntegrationTest
     public void returns_401_when_unauthorised_service_attempts_create_organisation() {
         s2sUnauthorisedCallMock();
 
-        Map<String, Object> response = professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
 
         String httpStatus = (String) response.get("http_status");
         assertThat(httpStatus).isEqualTo("401");

@@ -20,22 +20,26 @@ public class MultipleUserProfilesResponseTest {
 
     @Before
     public void setUp() {
-        userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName", "lName", IdamStatus.PENDING);
+        userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName",
+                "lName", IdamStatus.PENDING);
         getUserProfileResponse = new GetUserProfileResponse();
         userProfiles.add(userProfile);
         getUserProfileResponses.add(getUserProfileResponse);
     }
 
     @Test
-    public void multipleUserProfileResponseTest() {
-        MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles, true);
+    public void test_multipleUserProfileResponse() {
+        MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles,
+                true);
         assertThat(multipleUserProfilesResponse.getUserProfiles().size()).isEqualTo(1);
-        assertThat(multipleUserProfilesResponse.getUserProfiles().get(0).getIdamId()).isEqualTo(userProfile.getIdamId());
+        assertThat(multipleUserProfilesResponse.getUserProfiles().get(0).getIdamId()).isEqualTo(userProfile
+                .getIdamId());
     }
 
     @Test
     public void test_MultipleUserProfilesResponseSetter() {
-        MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles, true);
+        MultipleUserProfilesResponse multipleUserProfilesResponse = new MultipleUserProfilesResponse(userProfiles,
+                true);
 
         multipleUserProfilesResponse.setUserProfiles(getUserProfileResponses);
 

@@ -79,7 +79,8 @@ public class LegacyPbaController {
     @ResponseBody
     public ResponseEntity<LegacyPbaResponse> retrievePbaAccountsByEmail(@PathVariable("email") @NotBlank String email) {
         List<String> pbaNumbers;
-        ProfessionalUser professionalUser = professionalUserService.findProfessionalUserByEmailAddress(RefDataUtil.removeEmptySpaces(email));
+        ProfessionalUser professionalUser = professionalUserService
+                .findProfessionalUserByEmailAddress(RefDataUtil.removeEmptySpaces(email));
 
         if (professionalUser == null) {
             throw new EmptyResultDataAccessException(1);

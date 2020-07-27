@@ -22,7 +22,8 @@ public class RetrieveUserProfilesRequestTest {
 
     @Test
     public void test_test_RetrieveUserProfilesRequestBuilder() {
-        retrieveUserProfilesRequest = RetrieveUserProfilesRequest.aRetrieveUserProfilesRequest().userIds(singletonList(userId)).build();
+        retrieveUserProfilesRequest = RetrieveUserProfilesRequest.aRetrieveUserProfilesRequest()
+                .userIds(singletonList(userId)).build();
 
         assertThat(retrieveUserProfilesRequest.getUserIds().size()).isEqualTo(1);
         assertThat(retrieveUserProfilesRequest.getUserIds().get(0)).isEqualTo(userId);

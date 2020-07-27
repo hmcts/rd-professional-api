@@ -35,12 +35,14 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                orgId, hmctsAdmin);
 
         assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
 
         Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
@@ -54,7 +56,8 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
         pbaEditRequest.setPaymentAccounts(newPaymentAccounts);
-        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, "A7BNM89", hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                "A7BNM89", hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
@@ -68,7 +71,8 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                orgId, hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
@@ -82,25 +86,29 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                orgId, hmctsAdmin);
 
         assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient.retrieveSingleOrganisation(orgId, hmctsAdmin);
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .retrieveSingleOrganisation(orgId, hmctsAdmin);
 
         List paymentAccounts = (List) retrievePaymentAccountsByEmailResponse.get("paymentAccount");
         assertThat(paymentAccounts).hasSize(0);
     }
 
     @Test
-    public void test_editPaymentAccountsShouldReturn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
+    public void test_editPaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
         Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000003");
         existingPaymentAccounts.add("PBA0000004");
 
-        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFieldsAreUpdated().status("PENDING").paymentAccount(existingPaymentAccounts).sraId("someSra").build();
-        java.util.Map<String, Object> responseForFirstOrganisationCreation = professionalReferenceDataClient.createOrganisation(firstOrganisationCreationRequest);
+        OrganisationCreationRequest firstOrganisationCreationRequest = organisationRequestWithAllFieldsAreUpdated()
+                .status("PENDING").paymentAccount(existingPaymentAccounts).sraId("someSra").build();
+        java.util.Map<String, Object> responseForFirstOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(firstOrganisationCreationRequest);
         String firstOrgId = (String) responseForFirstOrganisationCreation.get("organisationIdentifier");
         updateOrganisation(firstOrgId, hmctsAdmin, ACTIVE);
 
@@ -113,10 +121,12 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                orgId, hmctsAdmin);
 
         assertThat(pbaResponse.get("http_status")).isEqualTo("400");
-        assertThat(pbaResponse.get("response_body").toString()).contains("The PBA numbers you have entered: PBA0000003 belongs to another Organisation");
+        assertThat(pbaResponse.get("response_body").toString()).contains("The PBA numbers you have entered: PBA0000003 "
+                + "belongs to another Organisation");
     }
 
     @Test
@@ -129,9 +139,11 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
+                orgId, hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString()).contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: this-is-invalid");
+        assertThat(response.get("response_body").toString()).contains("PBA numbers must start with PBA/pba and be "
+                + "followed by 7 alphanumeric characters. The following PBAs entered are invalid: this-is-invalid");
     }
 
     private String createActiveOrganisationAndPbaEditRequest() {
@@ -139,8 +151,10 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         existingPaymentAccounts.add("PBA0000001");
         existingPaymentAccounts.add("PBA0000002");
 
-        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().paymentAccount(existingPaymentAccounts).build();
-        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .paymentAccount(existingPaymentAccounts).build();
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         String orgId = (String) responseForOrganisationCreation.get("organisationIdentifier");
         updateOrganisation(orgId, hmctsAdmin, ACTIVE);
 

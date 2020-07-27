@@ -35,7 +35,8 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     }
 
     @Override
-    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus, String inputOrganisationIdentifier) {
+    public void validate(Organisation existingOrganisation, OrganisationStatus inputStatus,
+                         String inputOrganisationIdentifier) {
         //Into Organisation identifier validator
         checkOrganisationDoesNotExist(existingOrganisation, inputOrganisationIdentifier);
         //Validation completed for identifier Organisation
@@ -44,7 +45,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
     private void checkOrganisationDoesNotExist(Organisation organisation, String inputOrganisationIdentifier) {
         if (null == organisation) {
             String errorMessage = NO_ORG_FOUND_FOR_GIVEN_ID + inputOrganisationIdentifier;
-            log.error(loggingComponentName,errorMessage);
+            log.error(errorMessage);
             throw new EmptyResultDataAccessException(errorMessage, 1);
         }
     }
@@ -59,12 +60,14 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         }
     }
 
-    public void verifyNonPuiFinanceManagerOrgIdentifier(List<String> authorities, Organisation organisation, String extOrgIdentifier) {
+    public void verifyNonPuiFinanceManagerOrgIdentifier(List<String> authorities, Organisation organisation,
+                                                        String extOrgIdentifier) {
 
         boolean isPuiFinanceManExist = ifUserRoleExists(authorities, "pui-finance-manager");
 
         if (!isPuiFinanceManExist) {
-            authorities.forEach(role -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier, organisation.getOrganisationIdentifier()));
+            authorities.forEach(role -> RefDataUtil.validateOrgIdentifier(extOrgIdentifier,
+                    organisation.getOrganisationIdentifier()));
         }
     }
 

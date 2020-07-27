@@ -41,7 +41,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     public void add_new_user_to_organisation() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -50,7 +51,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setJurisdictions(new ArrayList<>());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -62,7 +64,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setRoles(roles);
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND);
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -79,7 +82,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         // now invite same user/email used in above pending org should give CONFLICT
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(pendingOrganisationCreationRequest.getSuperUser().getEmail());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(organisationIdentifier,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
     }
 
@@ -95,11 +99,14 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .jurisdictions(createJurisdictions())
                 .build();
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, generateSuperUserBearerToken(), HttpStatus.CREATED);
+        Map<String, Object> newUserResponse = professionalApiClient
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest, generateSuperUserBearerToken(),
+                        HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 
-    //currently returning 500 response status code which is coming 500 from SIDAM - but comes 403 when testing in Swagger
+    //currently returning 500 response status code which is coming 500 from SIDAM - but comes 403 when testing in
+    // Swagger
     @Test
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
@@ -126,7 +133,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
         //Retrieve User Identifier to update status
-        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK, "true");
+        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
+                hmctsAdmin, "false", HttpStatus.OK, "true");
         assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
         List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
 
@@ -150,7 +158,9 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .build();
 
         //adding new user with Suspended Super User Bearer Token
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, Object> newUserResponse = professionalApiClient
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(newUserResponse).isNotNull();
     }
 }

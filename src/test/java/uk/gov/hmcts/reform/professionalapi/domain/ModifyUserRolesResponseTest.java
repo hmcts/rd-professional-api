@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ModifyUserRolesResponseTest {
 
     @Test
-    public void should_Return_User_profile_Response() {
+    public void test_should_Return_User_profile_Response() {
         ModifyUserRolesResponse userProfileRolesResponse = new ModifyUserRolesResponse();
         userProfileRolesResponse.setRoleAdditionResponse(addRolesForUser());
         userProfileRolesResponse.setRoleDeletionResponse(deleteRolesForUser());
@@ -21,7 +21,7 @@ public class ModifyUserRolesResponseTest {
     }
 
     @Test
-    public void modifyUserRolesResponseTest() {
+    public void test_modifyUserRolesResponse() {
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse();
         statusUpdateResponse.setIdamMessage("updateMessage");
 
@@ -34,11 +34,13 @@ public class ModifyUserRolesResponseTest {
         List<RoleDeletionResponse> deleteResponses = new ArrayList<>();
         deleteResponses.add(deleteRoleResponse);
 
-        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse, deleteResponses, statusUpdateResponse);
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse(addRoleResponse,
+                deleteResponses, statusUpdateResponse);
 
         assertThat(modifyUserRolesResponse.getRoleAdditionResponse().getIdamMessage()).isEqualTo("addMessage");
         assertThat(modifyUserRolesResponse.getStatusUpdateResponse().getIdamMessage()).isEqualTo("updateMessage");
-        assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage()).isEqualTo("deleteMessage");
+        assertThat(modifyUserRolesResponse.getRoleDeletionResponse().get(0).getIdamMessage())
+                .isEqualTo("deleteMessage");
     }
 
     private RoleAdditionResponse addRolesForUser() {

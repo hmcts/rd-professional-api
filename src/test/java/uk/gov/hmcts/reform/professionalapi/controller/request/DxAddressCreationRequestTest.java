@@ -17,9 +17,10 @@ public class DxAddressCreationRequestTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
+    public void test_has_mandatory_fields_specified_not_null() {
 
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest(null, null);
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest(null,
+                null);
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator.validate(dxAddressCreationRequest);
 
@@ -27,7 +28,7 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void creates_dx_address_creation_request_correctly() {
+    public void test_creates_dx_address_creation_request_correctly() {
 
         DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("some-number",
                 "some-exchange");
@@ -37,8 +38,9 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_dx_address_creation_request_when_number_does_not_have_a_space() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX12345678901", "some-exchange");
+    public void test_does_not_create_dx_address_creation_request_when_number_does_not_have_a_space() {
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX12345678901",
+                "some-exchange");
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
@@ -48,8 +50,9 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_dx_address_creation_request_when_number_does_not_start_with_dx_or_ni() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("AB 1345678901", "some-exchange");
+    public void test_does_not_create_dx_address_creation_request_when_number_does_not_start_with_dx_or_ni() {
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("AB 1345678901",
+                "some-exchange");
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
@@ -58,8 +61,9 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_dx_address_creation_request_when_number_contains_non_numerical_digits() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789Z", "some-exchange");
+    public void test_does_not_create_dx_address_creation_request_when_number_contains_non_numerical_digits() {
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789Z",
+                "some-exchange");
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);
@@ -68,8 +72,9 @@ public class DxAddressCreationRequestTest {
     }
 
     @Test
-    public void does_not_create_dx_address_creation_request_when_number_does_not_have_10_digits() {
-        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789", "some-exchange");
+    public void test_does_not_create_dx_address_creation_request_when_number_does_not_have_10_digits() {
+        DxAddressCreationRequest dxAddressCreationRequest = new DxAddressCreationRequest("DX 123456789",
+                "some-exchange");
 
         Set<ConstraintViolation<DxAddressCreationRequest>> violations = validator
                 .validate(dxAddressCreationRequest);

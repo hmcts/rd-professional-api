@@ -53,7 +53,8 @@ public class LegacyPbaControllerTest {
         legacyPbaAccountServiceImpl = new LegacyPbaAccountServiceImpl();
 
         legacyPbaController = new LegacyPbaController(legacyPbaAccountServiceImpl, professionalUserServiceImpl);
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
         professionalUser = new ProfessionalUser("some-fname", "some-lname", email, organisation);
 
         organisationRepository.save(organisation);

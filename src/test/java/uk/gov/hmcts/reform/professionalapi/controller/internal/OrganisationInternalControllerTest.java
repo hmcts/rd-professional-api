@@ -92,9 +92,11 @@ public class OrganisationInternalControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
-        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
+                false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
         organisationServiceMock = mock(OrganisationService.class);
@@ -123,41 +125,49 @@ public class OrganisationInternalControllerTest {
         jurisdictions.add(jurisdiction1);
         jurisdictions.add(jurisdiction2);
 
-        userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
+        userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
+                "some@email.com", jurisdictions);
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
+                "sra-id", "false", "number02", "company-url",
+                userCreationRequest, null, null);
 
         organisation.setOrganisationIdentifier("AK57L4T");
 
         organisationResponse = new OrganisationResponse(organisation);
-        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions, false);
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
+                "some@email.com", userRoles, jurisdictions, false);
 
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testCreateOrganisation() {
+    public void test_CreateOrganisation() {
         final HttpStatus expectedHttpStatus = HttpStatus.CREATED;
 
-        when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest)).thenReturn(organisationResponse);
+        when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
+                .thenReturn(organisationResponse);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationInternalController.createOrganisation(organisationCreationRequest);
 
-        verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
-        verify(organisationServiceMock, times(1)).createOrganisationFrom(any(OrganisationCreationRequest.class));
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(any(OrganisationCreationRequest.class));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
     }
 
     @Test
-    public void testRetrieveOrganisations() {
+    public void test_RetrieveOrganisations() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.retrieveAllOrganisations()).thenReturn(organisationsDetailResponse);
@@ -171,56 +181,64 @@ public class OrganisationInternalControllerTest {
     }
 
     @Test
-    public void testRetrieveOrganisationByIdWithStatusNull() {
+    public void test_RetrieveOrganisationByIdWithStatusNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponse);
+        when(organisationServiceMock.retrieveOrganisation(any(String.class)))
+                .thenReturn(organisationEntityResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation.getOrganisationIdentifier(), null);
+        ResponseEntity<?> actual = organisationInternalController
+                .retrieveOrganisations(organisation.getOrganisationIdentifier(), null);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveOrganisation(organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(1))
+                .retrieveOrganisation(organisation.getOrganisationIdentifier());
     }
 
     @Test
-    public void testRetrieveOrganisationByIdWithStatusNotNull() {
+    public void test_RetrieveOrganisationByIdWithStatusNotNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         when(organisationServiceMock.retrieveOrganisation(any(String.class))).thenReturn(organisationEntityResponse);
 
-        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation.getOrganisationIdentifier(), "PENDING");
+        ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(organisation
+                .getOrganisationIdentifier(), "PENDING");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).retrieveOrganisation(organisation.getOrganisationIdentifier());
+        verify(organisationServiceMock, times(1))
+                .retrieveOrganisation(organisation.getOrganisationIdentifier());
     }
 
     @Test
-    public void testRetrieveOrganisationByStatusWithIdNull() {
+    public void test_RetrieveOrganisationByStatusWithIdNull() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponse);
+        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
+                .thenReturn(organisationsDetailResponse);
 
         ResponseEntity<?> actual = organisationInternalController.retrieveOrganisations(null, "PENDING");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).findByOrganisationStatus(OrganisationStatus.PENDING);
+        verify(organisationServiceMock, times(1))
+                .findByOrganisationStatus(OrganisationStatus.PENDING);
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testRetrieveOrganisationThrows400WhenStatusInvalid() {
-        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class))).thenReturn(organisationsDetailResponse);
+    public void test_RetrieveOrganisationThrows400WhenStatusInvalid() {
+        when(organisationServiceMock.findByOrganisationStatus(any(OrganisationStatus.class)))
+                .thenReturn(organisationsDetailResponse);
 
         organisationInternalController.retrieveOrganisations(null, "this is not a status");
     }
 
     @Test
-    public void testRetrievePaymentAccountByEmail() {
+    public void test_RetrievePaymentAccountByEmail() {
         String email = "some-email@test.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
@@ -238,17 +256,17 @@ public class OrganisationInternalControllerTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
-    public void testRetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
+    public void test_RetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
     }
 
     @Test(expected = InvalidRequest.class)
-    public void testRetrievePaymentAccountByEmailThrows400WhenEmailIsInvalid() {
+    public void test_RetrievePaymentAccountByEmailThrows400WhenEmailIsInvalid() {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
     }
 
     @Test
-    public void testEditPaymentAccountsByOrgId() {
+    public void test_EditPaymentAccountsByOrgId() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         Set<String> pbas = new HashSet<>();
@@ -256,28 +274,34 @@ public class OrganisationInternalControllerTest {
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(pbas);
 
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier())).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
+                .thenReturn(organisation);
 
-        ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest, organisation.getOrganisationIdentifier());
+        ResponseEntity response = organisationInternalController.editPaymentAccountsByOrgId(pbaEditRequest,
+                organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(paymentAccountServiceMock, times(1)).deleteUserAccountMaps(organisation);
-        verify(paymentAccountServiceMock, times(1)).deletePaymentAccountsFromOrganisation(organisation);
-        verify(paymentAccountServiceMock, times(1)).addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        verify(paymentAccountServiceMock, times(1)).addUserAndPaymentAccountsToUserAccountMap(organisation);
+        verify(paymentAccountServiceMock, times(1))
+                .deletePaymentAccountsFromOrganisation(organisation);
+        verify(paymentAccountServiceMock, times(1))
+                .addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
+        verify(paymentAccountServiceMock, times(1))
+                .addUserAndPaymentAccountsToUserAccountMap(organisation);
     }
 
     @Test
-    public void testInviteUserToOrganisation() throws JsonProcessingException {
+    public void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+                .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
@@ -289,15 +313,20 @@ public class OrganisationInternalControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
+                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
-        ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest,
+                orgId, userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
     }
 }

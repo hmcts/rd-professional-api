@@ -51,7 +51,8 @@ public class PaymentAccountValidator {
                 .collect(Collectors.joining(", "));
 
         if (!StringUtils.isEmpty(invalidPbas)) {
-            throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters. The following PBAs entered are invalid: " + invalidPbas);
+            throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
+                    .concat("characters. The following PBAs entered are invalid: " + invalidPbas));
         }
     }
 
@@ -63,13 +64,15 @@ public class PaymentAccountValidator {
         List<String> uniquePBas = new ArrayList<>();
 
         paymentAccountsInDatabase.forEach(pbaInDb -> upperCasePbas.forEach(pba -> {
-            if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
+            if (pbaInDb.getPbaNumber().equals(pba) && !pbaInDb.getOrganisation().getOrganisationIdentifier()
+                    .equals(orgId)) {
                 uniquePBas.add(pba);
             }
         }));
 
         if (!uniquePBas.isEmpty()) {
-            throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas) + " belongs to another Organisation");
+            throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas)
+                    .concat(" belongs to another Organisation"));
         }
     }
 

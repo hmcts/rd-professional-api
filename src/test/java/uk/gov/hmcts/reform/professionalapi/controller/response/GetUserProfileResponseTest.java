@@ -12,7 +12,8 @@ public class GetUserProfileResponseTest {
 
     @Test
     public void test_GetUserProfileResponseTest() {
-        UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com", "fName", "lName", IdamStatus.PENDING);
+        UserProfile userProfile = new UserProfile(UUID.randomUUID().toString(), "test@email.com",
+                "fName", "lName", IdamStatus.PENDING);
 
         GetUserProfileResponse getUserProfileResponse = new GetUserProfileResponse(userProfile, false);
 

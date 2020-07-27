@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 public class NewUserCreationRequestTest {
 
     @Test
-    public void testCreatesNewUser() {
+    public void test_CreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -19,7 +19,8 @@ public class NewUserCreationRequestTest {
         jurisdictions.add(jurisdiction);
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, jurisdictions, false);
+                new NewUserCreationRequest("some-name", "some-last-name",
+                        "some@email.com",  userRoles, jurisdictions, false);
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
@@ -30,7 +31,7 @@ public class NewUserCreationRequestTest {
 
 
     @Test
-    public void newUserCreationBuilderTest() {
+    public void test_newUserCreationBuilder() {
         String testFirstName = "Jane";
         String testLastName = "Doe";
         String testEmail = "jane.doe@email.com";

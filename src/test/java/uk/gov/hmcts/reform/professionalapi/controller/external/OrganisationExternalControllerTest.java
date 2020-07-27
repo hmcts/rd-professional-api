@@ -111,10 +111,13 @@ public class OrganisationExternalControllerTest {
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         userInfoMock = mock(UserInfo.class);
 
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
-        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
-        SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
+        SuperUser superUser = new SuperUser("some-fname", "some-lname",
+                "some-email-address", organisation);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
 
@@ -138,32 +141,43 @@ public class OrganisationExternalControllerTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name", "some@email.com", userRoles, jurisdictions,false);
-        userCreationRequest = new UserCreationRequest("some-fname", "some-lname", "some@email.com", jurisdictions);
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id", "false", "number02", "company-url", userCreationRequest, null, null);
-        userProfileCreationRequest = new UserProfileCreationRequest("some@email.com", "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles, false);
-        response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class)).request(mock(Request.class)).build();
+        newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
+                "some@email.com", userRoles, jurisdictions,false);
+        userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
+                "some@email.com", jurisdictions);
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
+                "sra-id", "false", "number02", "company-url",
+                userCreationRequest, null, null);
+        userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
+                "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
+                false);
+        response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class))
+                .request(mock(Request.class)).build();
 
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testCreateOrganisation() {
-        when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest)).thenReturn(organisationResponse);
+    public void test_CreateOrganisation() {
+        when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
+                .thenReturn(organisationResponse);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
-        ResponseEntity<?> actual = organisationExternalController.createOrganisationUsingExternalController(organisationCreationRequest);
+        ResponseEntity<?> actual = organisationExternalController
+                .createOrganisationUsingExternalController(organisationCreationRequest);
 
-        verify(organisationCreationRequestValidatorMock, times(1)).validate(any(OrganisationCreationRequest.class));
-        verify(organisationServiceMock, times(1)).createOrganisationFrom(organisationCreationRequest);
+        verify(organisationCreationRequestValidatorMock, times(1))
+                .validate(any(OrganisationCreationRequest.class));
+        verify(organisationServiceMock, times(1))
+                .createOrganisationFrom(organisationCreationRequest);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @Test
-    public void testRetrieveOrganisationByIdentifier() {
+    public void test_RetrieveOrganisationByIdentifier() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         String id = UUID.randomUUID().toString().substring(0, 7);
@@ -178,7 +192,7 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testRetrievePaymentAccountByUserEmail() {
+    public void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
 
         List<String> authorities = new ArrayList<>();
@@ -188,7 +202,8 @@ public class OrganisationExternalControllerTest {
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
 
-        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email, UUID.randomUUID().toString().substring(0, 7));
+        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email,
+                UUID.randomUUID().toString().substring(0, 7));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -196,14 +211,15 @@ public class OrganisationExternalControllerTest {
     }
 
     @Test
-    public void testInviteUserToOrganisation() throws JsonProcessingException {
+    public void test_InviteUserToOrganisation() throws JsonProcessingException {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         newUserCreationRequest.setRoles(singletonList("pui-case-manager"));
         organisation.setStatus(OrganisationStatus.ACTIVE);
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
+                .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
@@ -215,15 +231,21 @@ public class OrganisationExternalControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId, newUserCreationRequest.getEmail());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(200).build());
+        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
+                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
-        ResponseEntity<?> actual = organisationExternalController.addUserToOrganisationUsingExternalController(newUserCreationRequest, orgId, userId);
+        ResponseEntity<?> actual = organisationExternalController
+                .addUserToOrganisationUsingExternalController(newUserCreationRequest, orgId, userId);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(professionalUserServiceMock, times(1)).findProfessionalUserByEmailAddress("some@email.com");
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(orgId);
+        verify(professionalUserServiceMock, times(1))
+                .findProfessionalUserByEmailAddress("some@email.com");
     }
 }

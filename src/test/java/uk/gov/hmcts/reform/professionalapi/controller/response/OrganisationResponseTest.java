@@ -10,10 +10,12 @@ public class OrganisationResponseTest {
 
     @Test
     public void test_OrganisationResponse() {
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
 
         OrganisationResponse organisationResponse = new OrganisationResponse(organisation);
 
-        assertThat(organisationResponse.getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
+        assertThat(organisationResponse.getOrganisationIdentifier()).isEqualTo(organisation
+                .getOrganisationIdentifier());
     }
 }

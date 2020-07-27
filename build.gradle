@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'checkstyle'
+    id 'uk.gov.hmcts.java' version '0.9.0'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.27.0'
@@ -139,12 +139,6 @@ configurations {
 
 check.dependsOn jacocoTestCoverageVerification
 
-checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.10.1'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
-}
 
 pmd {
     toolVersion = '6.12.0'
@@ -261,7 +255,10 @@ dependencies {
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
+    compile (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
+        exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
+    }
+    compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.3'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -284,7 +281,7 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.8'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
@@ -361,11 +358,7 @@ dependencies {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    // FIXME temp disabled with 42
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 0 : 11
-    suppressionFiles = ['config/owasp/suppressions.xml']
+    suppressionFile = 'config/owasp/suppressions.xml'
 }
 
 dependencyUpdates.resolutionStrategy = {

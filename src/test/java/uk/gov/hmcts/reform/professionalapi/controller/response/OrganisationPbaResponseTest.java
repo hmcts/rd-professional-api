@@ -19,15 +19,17 @@ public class OrganisationPbaResponseTest {
 
     @Before
     public void setUp() {
-        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id", "companyN", false, "www.org.com");
-        professionalUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
 
         users.add(professionalUser.toSuperUser());
         organisation.setUsers(users);
     }
 
     @Test
-    public void testGetOrganisationPbaResponse() throws Exception {
+    public void test_GetOrganisationPbaResponse() throws Exception {
         OrganisationPbaResponse sut = new OrganisationPbaResponse(organisation, true);
         assertThat(sut.getOrganisationEntityResponse()).isNotNull();
     }
