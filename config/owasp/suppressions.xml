@@ -5,9 +5,6 @@
         ]]></notes>
 <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
 <cve>CVE-2018-1258</cve>
-<cve>CVE-2018-1258</cve>
-<cve>CVE-2018-1258</cve>
-<cve>CVE-2018-1258</cve>
 </suppress>
 <suppress>
 <notes><![CDATA[
@@ -38,7 +35,7 @@
 <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
 <vulnerabilityName>CVE-2020-9484</vulnerabilityName>
 </suppress>
-<suppress>
+<!--<suppress>
 <notes><![CDATA[
    file name: spring-security-core-5.2.2.RELEASE.jar
    ]]></notes>
@@ -51,7 +48,7 @@
    ]]></notes>
 <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
 <vulnerabilityName>CVE-2020-5408</vulnerabilityName>
-</suppress>
+</suppress>-->
 <suppress>
 <notes><![CDATA[
    file name: dom4j-2.1.1.jar
@@ -66,117 +63,122 @@
         <packageUrl regex="true">^pkg:maven/org\.hibernate/hibernate\-core@.*$</packageUrl>
         <cpe>cpe:/a:hibernate:hibernate_orm</cpe>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-config-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-config@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-crypto-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-web-5.2.2.RELEASE.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
-        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    </suppress>
-    <suppress>
+    <!--<suppress>
+       <notes><![CDATA[
+  file name: spring-security-config-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-config@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-crypto-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-client-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-client@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-core-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-core@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-jose-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-jose@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-oauth2-resource-server-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security_oauth</cpe>
+   </suppress>
+   <suppress>
+       <notes><![CDATA[
+  file name: spring-security-web-5.2.2.RELEASE.jar
+  ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
+       <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+   </suppress>-->
+   <!-- <suppress>
         <notes><![CDATA[
    file name: tomcat-embed-core-9.0.31.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
         <cpe>cpe:/a:apache:tomcat</cpe>
+        <cpe>cpe:/a:apache_software_foundation:tomcat</cpe>
+        <cpe>cpe:/a:apache_tomcat:apache_tomcat</cpe>
+        <cpe>cpe:/a:java-websocket_project:java-websocket</cpe>
+
+
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -219,8 +221,8 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
         <cpe>cpe:/a:java-websocket_project:java-websocket</cpe>
-    </suppress>
-    <suppress>
+    </suppress>-->
+   <!-- <suppress>
         <notes><![CDATA[
    file name: postgresql-42.2.8.jar
    ]]></notes>
@@ -233,12 +235,12 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
         <cpe>cpe:/a:postgresql:postgresql_jdbc_driver</cpe>
-    </suppress>
-    <suppress>
+    </suppress>-->
+    <!--<suppress>
         <notes><![CDATA[
    file name: tomcat-embed-core-9.0.31.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
         <vulnerabilityName>CVE-2020-11996</vulnerabilityName>
-    </suppress>
+    </suppress>-->
 </suppressions>
