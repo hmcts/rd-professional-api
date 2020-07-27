@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_AAC_SYSTEM;
 
 import feign.FeignException;
 import feign.Response;
@@ -154,7 +155,7 @@ public class RefDataUtil {
                         activeOrganisationDetails);
             }
 
-            return modifiedOrgProfUserDetails.values().stream().collect(Collectors.toList());
+            return new ArrayList<>(modifiedOrgProfUserDetails.values());
         } catch (FeignException ex) {
 
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
@@ -163,7 +164,7 @@ public class RefDataUtil {
     }
 
     public static Map<String, Organisation>
-        updateUserDetailsForActiveOrganisation(ResponseEntity responseEntity,
+        updateUserDetailsForActiveOrganisation(ResponseEntity<Object> responseEntity,
                                            Map<String, Organisation> activeOrganisationDtls) {
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse
@@ -192,7 +193,7 @@ public class RefDataUtil {
         return activeOrganisationDtls;
     }
 
-    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity responseResponseEntity,
+    public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity<Object> responseResponseEntity,
                                                Boolean isRequiredRoles) {
 
         GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
@@ -290,8 +291,8 @@ public class RefDataUtil {
         }
     }
 
-    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page page,
-                                                                         ResponseEntity responseEntity) {
+    public static HttpHeaders generateResponseEntityWithPaginationHeader(Pageable pageable, Page<?> page,
+                                                                         ResponseEntity<Object> responseEntity) {
         HttpHeaders headers = new HttpHeaders();
 
         final StringBuilder pageInformation = new StringBuilder();
@@ -311,7 +312,7 @@ public class RefDataUtil {
             // since Headers are read only , it can't be modified.
             // Hence copied all existing headers into new one and added new header for pagination
             MultiValueMap<String, String> originalHeaders = responseEntity.getHeaders();
-            originalHeaders.forEach((key, value) -> headers.put(key, value));
+            originalHeaders.forEach(headers::put);
             headers.put("paginationInfo", Collections.singletonList(pageInformation.toString()));
         }
         return headers;
@@ -395,5 +396,9 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public void setDefaultPageSize(int defaultPageSize) {
         RefDataUtil.defaultPageSize = defaultPageSize;
+    }
+
+    public static boolean isSystemRoleUser(List<String> roles) {
+        return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
     }
 }

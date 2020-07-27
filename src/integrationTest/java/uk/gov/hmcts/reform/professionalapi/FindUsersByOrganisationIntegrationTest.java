@@ -274,4 +274,37 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
                 createAndActivateOrganisation(), "True", hmctsAdmin,"thisisinvalid");
         assertThat(response.get("http_status")).isEqualTo("400");
     }
+
+    @Test
+    public void retrieve_active_users_only_for_an_organisation_with_pui_caa_role_should_return_200() {
+        String id = settingUpOrganisation("pui-caa");
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationByStatus("false", "Active", puiCaa, id);
+        validateUsers(response, 2, true);
+    }
+
+    @Test
+    public void retrieve_pending_users_only_for_an_organisation_with_pui_caa_role_should_return_400() {
+        String id = createOrganisationRequest();
+        Map<String, Object> response = professionalReferenceDataClient
+                .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
+
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_system_role_role_should_return_200() {
+        Map<String, Object> response = professionalReferenceDataClient
+                .findUsersByOrganisation(createAndActivateOrganisation(),"false", systemUser);
+        validateUsers(response, 2, false);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_invalid_role_role_should_return_403() {
+        Map<String, Object> response = professionalReferenceDataClient
+                .findUsersByOrganisation(createAndActivateOrganisation(),"false", "invalidRole");
+        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat((String)response.get("response_body"))
+                .contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
+    }
 }

@@ -11,23 +11,23 @@ import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.R
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContext;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.AbstractTestExecutionListener;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
@@ -35,18 +35,19 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-public abstract class AuthorizationFunctionalTest {
+@TestExecutionListeners(listeners = {
+    AuthorizationFunctionalTest.class,
+    DependencyInjectionTestExecutionListener.class})
+public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -75,7 +76,16 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
-    protected ProfessionalApiClient professionalApiClient;
+    @Value("${exui.role.pui-caa}")
+    protected String puiCaa;
+
+    @Value("${exui.role.caseworker-caa}")
+    protected String caseworkerCaa;
+
+    @Value("${prd.roles.prd-aac-system}")
+    protected String systemUser;
+  
+    protected static ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
 
@@ -86,8 +96,17 @@ public abstract class AuthorizationFunctionalTest {
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
-    @Before
-    public void setUp() {
+    @After
+    public void tearDown() {
+    }
+
+    @Override
+    public void beforeTestClass(TestContext testContext) {
+        testContext.getApplicationContext()
+            .getAutowireCapableBeanFactory()
+            .autowireBean(this);
+
+
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.defaultParser = Parser.JSON;
 
@@ -104,12 +123,8 @@ public abstract class AuthorizationFunctionalTest {
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
         professionalApiClient = new ProfessionalApiClient(
-                professionalApiUrl,
-                s2sToken, idamOpenIdClient, idamClient);
-    }
-
-    @After
-    public void tearDown() {
+            professionalApiUrl,
+            s2sToken, idamOpenIdClient, idamClient);
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -270,6 +285,18 @@ public abstract class AuthorizationFunctionalTest {
         data.setLastName("UpdatedLastName");
         data.setIdamStatus(status.name());
         return data;
+    }
+
+    public Map getActiveUser(List<Map> professionalUsersResponses) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
     }
 
 }

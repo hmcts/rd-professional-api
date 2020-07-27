@@ -42,9 +42,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
+@Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-@Slf4j
 public class ExceptionMapper {
 
     @Value("${loggingComponentName}")
@@ -171,7 +171,7 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        log.info(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
+        log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
                 getTimeStamp());
 

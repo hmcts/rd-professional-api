@@ -8,7 +8,7 @@ import org.junit.Test;
 public class ExternalApiExceptionTest {
 
     @Test
-    public void getExternalApiExceptionTest() {
+    public void test_getExternalApiException() {
         ExternalApiException externalApiException = new ExternalApiException(BAD_REQUEST, "BAD REQUEST");
 
         assertThat(externalApiException.getHttpStatus()).hasToString("400 BAD_REQUEST");

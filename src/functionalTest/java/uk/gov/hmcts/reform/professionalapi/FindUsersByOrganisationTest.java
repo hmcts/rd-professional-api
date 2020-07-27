@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.FALSE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
@@ -21,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -309,6 +313,52 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient
                 .searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.BAD_REQUEST,
                         generateBearerTokenForNonPuiManager(), "infealfnk");
+    }
+
+    @Test
+    //RDCC-1531-AC1
+    public void find_users_by_active_organisation_with_system_user_role_should_return_active_users() {
+
+        // create active user in sidam
+        List<String> roles = new ArrayList<>();
+        roles.add(puiUserManager);
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        String email = idamOpenIdClient.nextUserEmail();
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        newUserCreationRequest.setEmail(email);
+        newUserCreationRequest.setRoles(roles);
+        idamOpenIdClient
+                .createUser(hmctsAdmin, email,
+                        newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName());
+
+        // create and update org
+        String organisationIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
+        // invite new user who is active
+        professionalApiClient
+                .addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest,
+                        HttpStatus.CREATED);
+        // search
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchUsersByOrganisation(organisationIdentifier, systemUser, FALSE, HttpStatus.OK, TRUE);
+        List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
+        assertThat(professionalUsers.size()).isEqualTo(1);
+        validateRetrievedUsers(searchResponse, ACTIVE, false);
+    }
+
+    @Test
+    //RDCC-1531-AC2
+    public void find_users_by_active_org_with_system_user_role_should_return_404_when_users_are_not_active_under_org() {
+        professionalApiClient
+                .searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, FALSE,
+                        HttpStatus.NOT_FOUND, TRUE);
+    }
+
+    @Test
+    //RDCC-1531-AC3
+    public void find_users_by_active_organisation_with_non_permitted_role_should_return_403() {
+        professionalApiClient
+                .searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), puiCaseManager, FALSE,
+                        HttpStatus.FORBIDDEN, TRUE);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
