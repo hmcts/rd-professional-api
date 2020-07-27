@@ -166,17 +166,16 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
-
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
         if (assignAccessRoleEnabled) {
             List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-caa");
+            userRoles.add(puiCaa);
             userRoles.add("caseworker-caa");
             userRoles.add("pui-user-manager");
             String firstName = "someName";
             String lastName = "someLastName";
-            String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
+            String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
 
             NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                     .firstName(firstName)
@@ -201,7 +200,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
             Map newUserDetails = getActiveUser(users);
             List<String> superUserRoles = getNestedValue(newUserDetails, "roles");
 
-            assertThat(superUserRoles).contains("pui-caa", "caseworker-caa");
+            assertThat(superUserRoles).contains(puiCaa, "caseworker-caa");
         }
     }
 }
