@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.9.0'
+    id 'uk.gov.hmcts.java' version '0.11.0'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.27.0'
@@ -47,9 +47,10 @@ mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
 
 group = 'uk.gov.hmcts.reform.refdata'
-version = '0.0.1'
+version = '0.1.0'
 
 sourceCompatibility = 11
+targetCompatibility = 11
 
 jacocoTestCoverageVerification {
     violationRules {
@@ -64,10 +65,12 @@ jacocoTestCoverageVerification {
 }
 
 compileJava {
+
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
 compileTestJava {
+
     options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
@@ -163,6 +166,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
+    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
