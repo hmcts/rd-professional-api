@@ -20,23 +20,23 @@ public class PrdEnumRepositoryTest extends BaseRepository {
     public void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(37);
+        assertThat(prdEnums).hasSize(39);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
     }
 
     @Test
     public void test_findByEnabledYes() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("NO");
 
-        assertThat(prdEnums).hasSize(31);
-        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
+        assertThat(prdEnums).hasSize(8);
+        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(31);
     }
 
     @Test
-    public void test_findByEnabledNo() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("YES");
+    public void test_findAll_containsCaaRoles() {
+        List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(31);
-        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(0);
+        assertThat(prdEnums.get(37).getEnumName()).isEqualTo("pui-caa");
+        assertThat(prdEnums.get(38).getEnumName()).isEqualTo("caseworker-caa");
     }
 }

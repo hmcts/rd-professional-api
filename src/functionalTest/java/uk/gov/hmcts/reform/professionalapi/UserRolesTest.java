@@ -65,6 +65,34 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     }
 
+    @Test
+    public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
+        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
+        UserCreationRequest superUser = createSuperUser(email);
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .superUser(superUser)
+                .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+        orgIdentifier = (String) response.get("organisationIdentifier");
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+
+        Map<String, Object> searchUserResponse = professionalApiClient
+                .searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK,
+                        "true");
+        validateRetrievedUsers(searchUserResponse, "any");
+
+        List<Map> users = getNestedValue(searchUserResponse, "users");
+        Map superUserDetails = users.get(0);
+        List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
+
+        assertThat(superUserRoles).doesNotContain(puiCaa, caseworkerCaa);
+    }
+
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
 
