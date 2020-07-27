@@ -82,15 +82,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void rdcc117_ac3_usr_without_appropriate_permission_cannot_retrieve_a_list_of_pbas_of_a_given_org() {
-        Map<String, Object> response = professionalApiClient
-                .retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN,
-                        generateBearerTokenForUser(puiUserManager));
-        assertThat(response.get("errorMessage")).isNotNull();
-        assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
-    }
-
-    @Test
     public void rdcc117_ac4_pui_organisation_or_finance_mgr_without_active_status_cannot_retrieve_a_list_of_pbas() {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()

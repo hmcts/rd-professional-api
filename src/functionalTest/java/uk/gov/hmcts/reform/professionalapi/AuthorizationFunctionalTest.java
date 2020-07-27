@@ -76,6 +76,15 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Value("${exui.role.pui-case-manager}")
     protected String puiCaseManager;
 
+    @Value("${exui.role.pui-caa}")
+    protected String puiCaa;
+
+    @Value("${exui.role.caseworker-caa}")
+    protected String caseworkerCaa;
+
+    @Value("${prd.roles.prd-aac-system}")
+    protected String systemUser;
+  
     protected static ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -276,6 +285,18 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         data.setLastName("UpdatedLastName");
         data.setIdamStatus(status.name());
         return data;
+    }
+
+    public Map getActiveUser(List<Map> professionalUsersResponses) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
     }
 
 }

@@ -380,17 +380,4 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         });
         return rolesToBeReturned;
     }
-
-    private Map getActiveUser(List<Map> professionalUsersResponses) {
-
-        Map activeUserMap = null;
-
-        for (Map userMap : professionalUsersResponses) {
-            if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
-                activeUserMap = userMap;
-            }
-        }
-        return activeUserMap;
-    }
-
 }
