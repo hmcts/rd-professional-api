@@ -78,11 +78,11 @@ public abstract class AuthorizationFunctionalTest {
     @Value("${exui.role.pui-caa}")
     protected String puiCaa;
 
+    @Value("${exui.role.caseworker-caa}")
+    protected String caseworkerCaa;
+
     @Value("${prd.roles.prd-aac-system}")
     protected String systemUser;
-
-    @Value(("${assignAccessRoleEnabled}"))
-    protected boolean assignAccessRoleEnabled;
 
     protected ProfessionalApiClient professionalApiClient;
 
