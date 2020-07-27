@@ -172,7 +172,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
             List<String> userRoles = new ArrayList<>();
             userRoles.add(puiCaa);
             userRoles.add("caseworker-caa");
-            userRoles.add("pui-user-manager");
+            userRoles.add(puiUserManager);
             String firstName = "someName";
             String lastName = "someLastName";
             String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
