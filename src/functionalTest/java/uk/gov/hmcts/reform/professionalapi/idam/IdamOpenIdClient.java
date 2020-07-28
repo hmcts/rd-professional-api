@@ -43,7 +43,7 @@ public class IdamOpenIdClient {
 
     public String createUser(String userRole) {
         return createUser(userRole, nextUserEmail(), "First",
-                "Last");
+            "Last");
     }
 
     public String createUser(String userRole, String userEmail, String firstName, String lastName) {
@@ -65,13 +65,13 @@ public class IdamOpenIdClient {
         String serializedUser = gson.toJson(user);
 
         Response createdUserResponse = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .body(serializedUser)
-                .post("/testing-support/accounts")
-                .andReturn();
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .body(serializedUser)
+            .post("/testing-support/accounts")
+            .andReturn();
 
 
         log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
@@ -114,20 +114,20 @@ public class IdamOpenIdClient {
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         Response openIdTokenResponse = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-                .params(tokenParams)
-                .post("/o/token")
-                .andReturn();
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+            .params(tokenParams)
+            .post("/o/token")
+            .andReturn();
 
         log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
         IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody()
-                .asString(), IdamOpenIdClient.BearerTokenResponse.class);
+            .asString(), IdamOpenIdClient.BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
     }

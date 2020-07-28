@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
@@ -84,7 +84,7 @@ public class ProfessionalUserInternalController extends SuperController {
             value = "/{orgId}/users",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("prd-admin")
+    @Secured({"prd-admin", "prd-aac-system"})
     public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message
             = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
                                                       @RequestParam(value = "showDeleted", required = false)
@@ -95,8 +95,11 @@ public class ProfessionalUserInternalController extends SuperController {
                                                       @RequestParam(value = "page", required = false) Integer page,
                                                       @RequestParam(value = "size", required = false) Integer size
     ) {
-
-        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, EMPTY, page, size);
+        String status = EMPTY;
+        if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
+            status = ACTIVE;
+        }
+        return searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status, page, size);
     }
 
     @ApiOperation(

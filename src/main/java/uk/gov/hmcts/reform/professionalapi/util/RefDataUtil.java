@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMess
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 import feign.FeignException;
@@ -421,5 +422,9 @@ public class RefDataUtil {
     @Value("${defaultPageSize}")
     public void setDefaultPageSize(int defaultPageSize) {
         RefDataUtil.defaultPageSize = defaultPageSize;
+    }
+
+    public static boolean isSystemRoleUser(List<String> roles) {
+        return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
     }
 }
