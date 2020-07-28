@@ -45,5 +45,6 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MESSAGE_INTERNAL_SERVER = "Internal Server Error";
     public static final String ERR_MESG_500_ADMIN_NOTFOUNDUP = "The Organisation admin details could not be retrieved";
     public static final String DELETION_SUCCESS_MSG = "The organisation has deleted successfully";
+    public static final String PRD_AAC_SYSTEM = "prd-aac-system";
 
 }
