@@ -259,7 +259,7 @@ dependencies {
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-    compile (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
+    compile (group: 'io.rest-assured', name: 'rest-assured', version: '4.3.1') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
     }
@@ -308,7 +308,7 @@ dependencies {
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.1'
     testCompile group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
 
     testCompile group: 'com.h2database', name: 'h2'
