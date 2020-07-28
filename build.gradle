@@ -261,6 +261,7 @@ dependencies {
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
     compile (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
+        exclude group: "org.apache.sling"
     }
     compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.3'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
@@ -284,6 +285,9 @@ dependencies {
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'

@@ -6,19 +6,4 @@
 <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
 <cve>CVE-2018-1258</cve>
 </suppress>
- <suppress>
- <notes><![CDATA[
-   file name: org.apache.sling.javax.activation-0.1.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.sling/org\.apache\.sling\.javax\.activation@.*$</packageUrl>
-        <cve>CVE-2016-6798</cve>
-     <cve>CVE-2016-5394</cve>
-  </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: log4j-**.jar
-    ]]></notes>
-        <filePath regex="true">.*\**</filePath>
-        <cve>CVE-2020-9488</cve>
-    </suppress>
 </suppressions>
