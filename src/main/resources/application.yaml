@@ -40,7 +40,7 @@ spring:
   flyway.locations: classpath:db/migration,classpath:db/postgres
   flyway:
     ignore-missing-migrations: true
-
+    validateOnMigrate: false
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
