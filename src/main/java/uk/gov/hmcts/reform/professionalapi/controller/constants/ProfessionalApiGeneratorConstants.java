@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
+import java.time.LocalTime;
+
 public class ProfessionalApiGeneratorConstants {
 
     private ProfessionalApiGeneratorConstants() {
@@ -34,4 +36,9 @@ public class ProfessionalApiGeneratorConstants {
     public static final String ERROR_MESSAGE_USER_MUST_BE_ACTIVE = "User status must be Active to perform this "
             .concat("operation");
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
+    public static final String UNAUTHORISED_BODY = "{"
+            + "  \"errorMessage\": \"Unauthorised\","
+            + "  \"errorDescription\": \"Unsuccessful service authentication\","
+            + "  \"timeStamp\": \"" + LocalTime.now() + "\""
+            + "}";
 }

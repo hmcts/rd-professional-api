@@ -280,7 +280,7 @@ public class ProfessionalUserServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), eq("false"),
                 eq("true"));
         verify(response, times(1)).body();
-        verify(response, times(2)).status();
+        verify(response, times(3)).status();
         verify(response, times(1)).close();
     }
 

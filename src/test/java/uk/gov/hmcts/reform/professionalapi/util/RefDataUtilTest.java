@@ -585,7 +585,7 @@ public class RefDataUtilTest {
         assertThat(result.getEmailAddress()).isEqualTo("some@email.com");
         verify(userProfileFeignClient, times(1)).getUserProfileById(any());
         verify(responseMock, times(1)).body();
-        verify(responseMock, times(3)).status();
+        verify(responseMock, times(4)).status();
         verify(responseMock, times(1)).close();
     }
 
@@ -661,7 +661,7 @@ public class RefDataUtilTest {
         assertThat(orgResponse.get(0).getOrganisationIdentifier()).isEqualTo(organisation.getOrganisationIdentifier());
         verify(userProfileFeignClient, times(1)).getUserProfiles(any(), any(), any());
         verify(response, times(1)).body();
-        verify(response, times(3)).status();
+        verify(response, times(4)).status();
         verify(response, times(1)).close();
     }
 

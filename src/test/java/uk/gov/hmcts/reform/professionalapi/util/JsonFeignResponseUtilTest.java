@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 
 public class JsonFeignResponseUtilTest {
@@ -96,6 +97,24 @@ public class JsonFeignResponseUtilTest {
         assertThat(entity.getStatusCode().value()).isEqualTo(200);
         assertThat(entity.getHeaders()).isNotEmpty();
         assertThat(((ProfessionalUsersResponse) entity.getBody()).getUserIdentifier()).isEqualTo("1");
+    }
+
+    @Test
+    public void test_toResponseEntity_with_401_status_code() {
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>(Arrays.asList("a", "b"));
+        header.put("content-encoding", list);
+
+        Response response = Response.builder().status(401).reason("Unauthorised").headers(header)
+                .body("", UTF_8).request(mock(Request.class)).build();
+        ResponseEntity entity = JsonFeignResponseUtil.toResponseEntity(response, ErrorResponse.class);
+
+        assertThat(entity).isNotNull();
+        assertThat(entity.getStatusCode().value()).isEqualTo(401);
+        assertThat(entity.getHeaders()).isNotEmpty();
+        assertThat(((ErrorResponse) entity.getBody()).getErrorDescription())
+                .isEqualTo("Unsuccessful service authentication");
+        assertThat(((ErrorResponse) entity.getBody()).getErrorMessage()).isEqualTo("Unauthorised");
     }
 
     @Test

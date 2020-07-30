@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.UNAUTHORISED_BODY;
+
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
@@ -34,6 +37,11 @@ public class JsonFeignResponseUtil {
     }
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
+        if (response.status() == 401) {
+            response = Response.builder().status(401).reason(response.reason())
+                    .headers(response.headers()).body(UNAUTHORISED_BODY, UTF_8).request(response.request()).build();
+        }
+
         Optional<Object>  payload = decode(response, clazz);
 
         return new ResponseEntity<>(
