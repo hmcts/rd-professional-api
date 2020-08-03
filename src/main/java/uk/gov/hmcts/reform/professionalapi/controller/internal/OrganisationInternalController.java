@@ -395,7 +395,7 @@ public class OrganisationInternalController extends SuperController {
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-        DeleteOrganisationResponse deleteOrganisationResponse = null;
+        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         if (deleteOrganisationEnabled.equals("true")) {
             //Received request to delete an organisation for internal user
             Optional<Organisation> organisation = Optional.ofNullable(organisationService
