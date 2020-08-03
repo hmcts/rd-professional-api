@@ -13,10 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.UNAUTHORISED_BODY;
-
+import static java.time.LocalDateTime.now;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.UNAUTHORISED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.UNSUCCESSFUL_AUTHENTICATION;
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
@@ -38,16 +39,16 @@ public class JsonFeignResponseUtil {
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
         if (response.status() == 401) {
-            response = Response.builder().status(401).reason(response.reason())
-                    .headers(response.headers()).body(UNAUTHORISED_BODY, UTF_8).request(response.request()).build();
+            return new ResponseEntity<>(
+                    new ErrorResponse(UNAUTHORISED, UNSUCCESSFUL_AUTHENTICATION, now().toString()),
+                    convertHeaders(response.headers()),
+                    HttpStatus.valueOf(response.status()));
+        } else {
+            return new ResponseEntity<>(
+                    decode(response, clazz).orElse(null),
+                    convertHeaders(response.headers()),
+                    HttpStatus.valueOf(response.status()));
         }
-
-        Optional<Object>  payload = decode(response, clazz);
-
-        return new ResponseEntity<>(
-                payload.orElse(null),
-                convertHeaders(response.headers()),
-                HttpStatus.valueOf(response.status()));
     }
 
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
