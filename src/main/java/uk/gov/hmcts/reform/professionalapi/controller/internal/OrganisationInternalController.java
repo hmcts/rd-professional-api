@@ -60,9 +60,6 @@ public class OrganisationInternalController extends SuperController {
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
 
-    @Value("${deleteOrganisationEnabled}")
-    private String deleteOrganisationEnabled;
-
 
     @ApiOperation(
             value = "Creates an Organisation",
