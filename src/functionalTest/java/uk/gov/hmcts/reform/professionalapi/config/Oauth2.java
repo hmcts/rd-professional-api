@@ -24,4 +24,6 @@ public class Oauth2 {
         this.redirectUrl = redirectUrl;
         this.clientSecret = clientSecret;
     }
+
+
 }

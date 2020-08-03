@@ -9,9 +9,21 @@ def type = "java"
 def product = "rd"
 def component = "professional-api"
 
-def secrets = [
+def prSecrets = [
+  's2s-${env}': [
+   secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+  ]
+]
+
+def nonPrSecrets = [
   's2s-${env}': [
     secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+  ],
+  'rd-${env}': [
+   secret('professional-api-POSTGRES-HOST', 'FUNC_DATABASE_HOST'),
+   secret('professional-api-POSTGRES-PASS', 'FUNC_DATABASE_PASS'),
+   secret('professional-api-POSTGRES-USER', 'FUNC_DATABASE_NAME'),
+   secret('professional-api-POSTGRES-DATABASE', 'FUNC_DATABASE_USER')
   ]
 ]
 
@@ -32,7 +44,13 @@ def vaultOverrides = [
 withPipeline(type, product, component) {
   
     overrideVaultEnvironments(vaultOverrides)
-    loadVaultSecrets(secrets)
+
+    onPR() {
+        loadVaultSecrets(prSecrets)
+    }
+    onNonPR() {
+        loadVaultSecrets(nonPrSecrets)
+    }
 
     enableDbMigration('rd')
     disableLegacyDeployment()
@@ -55,6 +73,15 @@ withPipeline(type, product, component) {
 
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    }
+
+    before('functionalTest:preview') {
+        withAksClient('nonprod') {
+            def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT)
+            env.FUNC_DATABASE_HOST = dockerImage.getAksServiceName().toLowerCase()"-postgresql"
+            println ${env.FUNC_DATABASE_HOST}
+        }
+
     }
 
     enablePactAs([

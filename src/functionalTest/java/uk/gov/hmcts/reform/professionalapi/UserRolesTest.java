@@ -7,6 +7,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +69,8 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
+    public void rdcc_1387_ac1_super_user_can_have_caa_roles() throws SQLException {
+
         String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
@@ -89,8 +93,18 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<Map> users = getNestedValue(searchUserResponse, "users");
         Map superUserDetails = users.get(0);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
-
-        assertThat(superUserRoles).doesNotContain(puiCaa, caseworkerCaa);
+        ArrayList<String> enabledRoles = new ArrayList();
+        try {
+            ResultSet resultSet = dataSource.getConnection().createStatement()
+                    .executeQuery("select * from prd_enum where enabled= 'YES'");
+            enabledRoles = new ArrayList();
+            while (resultSet.next()) {
+                enabledRoles.add(resultSet.getString("enum_name"));
+            }
+        } catch (Exception e) {
+            log.error("Exception while roles test case : ", e.getMessage());
+        }
+        assertThat(enabledRoles).containsAll(superUserRoles);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus) {

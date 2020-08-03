@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://rd-professional-api-pr-678.service.core-compute-preview.internal}
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
@@ -25,6 +25,14 @@ exui.role.pui-case-manager: pui-case-manager
 exui.role.pui-caa: pui-caa
 exui.role.caseworker-caa: caseworker-caa
 prd.roles.prd-aac-system: prd-aac-system
+
+#######
+postgres.host_name: ${FUNC_DATABASE_HOST:rd-professional-api-pr-678-postgresql}
+postgres.name: ${FUNC_DATABASE_NAME:dbrefdata}
+postgres.user: ${FUNC_DATABASE_USER:dbrefdata}
+postgres.password: ${FUNC_DATABASE_PASS:dbrefdata}
+postgres.port: 5432
+#######
 
 # resent user invite interval in minutes
 resendInterval: 60

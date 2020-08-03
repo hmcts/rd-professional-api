@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import java.util.Arrays;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
+@Ignore
 public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test

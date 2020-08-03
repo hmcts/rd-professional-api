@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import javax.sql.DataSource;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -40,7 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -94,6 +97,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected TestConfigProperties configProperties;
 
+    @Autowired
+    protected DataSource dataSource;
+
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @After
@@ -113,12 +119,11 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
-
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
         IdamClient idamClient = new IdamClient(configProperties);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
 
         String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
 
