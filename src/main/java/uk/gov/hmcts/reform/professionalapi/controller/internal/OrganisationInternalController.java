@@ -390,26 +390,23 @@ public class OrganisationInternalController extends SuperController {
     )
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
-    @Secured("prd-admin")
+    @Secured("prd-admin1")
     public ResponseEntity<DeleteOrganisationResponse> deleteOrganisation(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if (deleteOrganisationEnabled.equals("true")) {
-            //Received request to delete an organisation for internal user
-            Optional<Organisation> organisation = Optional.ofNullable(organisationService
+        //Received request to delete an organisation for internal user
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService
                     .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-            if (!organisation.isPresent()) {
+        if (!organisation.isPresent()) {
 
-                throw new EmptyResultDataAccessException(1);
-
-            }
-
-            deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get());
+            throw new EmptyResultDataAccessException(1);
 
         }
+
+        deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get());
         return ResponseEntity
                 .status(deleteOrganisationResponse.getStatusCode())
                 .body(deleteOrganisationResponse);
