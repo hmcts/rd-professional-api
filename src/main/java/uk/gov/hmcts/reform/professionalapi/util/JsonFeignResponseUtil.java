@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -43,12 +45,13 @@ public class JsonFeignResponseUtil {
                     new ErrorResponse(UNAUTHORISED, UNSUCCESSFUL_AUTHENTICATION, now().toString()),
                     convertHeaders(response.headers()),
                     HttpStatus.valueOf(response.status()));
-        } else {
-            return new ResponseEntity<>(
-                    decode(response, clazz).orElse(null),
-                    convertHeaders(response.headers()),
-                    HttpStatus.valueOf(response.status()));
         }
+        
+        return new ResponseEntity<>(
+                decode(response, clazz).orElse(null),
+                convertHeaders(response.headers()),
+                HttpStatus.valueOf(response.status()));
+
     }
 
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
