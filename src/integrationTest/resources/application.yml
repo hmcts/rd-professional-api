@@ -68,3 +68,6 @@ syncInterval: 60
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
+
+# delete organisation enabled
+deleteOrganisationEnabled : false

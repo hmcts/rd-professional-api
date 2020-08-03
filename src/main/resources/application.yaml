@@ -118,4 +118,7 @@ defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 resendInviteEnabled : true
 
+# delete organisation enabled
+deleteOrganisationEnabled : false
+
 loggingComponentName: RD_Professional_API

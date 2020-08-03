@@ -29,6 +29,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -338,10 +339,11 @@ public class OrganisationInternalControllerTest {
     @Test
     public void testDeleteOrganisation() {
 
+        // Inject mock into the private field
+        ReflectionTestUtils.setField(organisationInternalController, "deleteOrganisationEnabled","true");
         final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         organisation.setStatus(OrganisationStatus.PENDING);
-
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(organisationServiceMock.deleteOrganisation(organisation)).thenReturn(deleteOrganisationResponse);
         ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId);
@@ -355,6 +357,8 @@ public class OrganisationInternalControllerTest {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void testDeleteOrganisationThrows404WhenNoOrgFound() {
+        // Inject mock into the private field
+        ReflectionTestUtils.setField(organisationInternalController, "deleteOrganisationEnabled","true");
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
         organisationInternalController.deleteOrganisation(orgId);

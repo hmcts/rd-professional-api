@@ -6,7 +6,6 @@ java:
     POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-    USER_PROFILE_URL: http://rd-user-profile-api-pr-404.service.core-compute-preview.internal
   postgresql:
     enabled: true
     postgresqlUsername: dbrefdata

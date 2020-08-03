@@ -14,3 +14,6 @@ spring:
     password: ${POSTGRES_PASSWORD:dbrefdata}
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
+
+# delete organisation enabled
+deleteOrganisationEnabled : true
