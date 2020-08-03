@@ -40,15 +40,15 @@ public class JsonFeignResponseUtil {
     }
 
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
+
+        Optional<Object> payload = decode(response, clazz);
+
         if (response.status() == 401) {
-            return new ResponseEntity<>(
-                    new ErrorResponse(UNAUTHORISED, UNSUCCESSFUL_AUTHENTICATION, now().toString()),
-                    convertHeaders(response.headers()),
-                    HttpStatus.valueOf(response.status()));
+            payload = Optional.of(new ErrorResponse(UNAUTHORISED, UNSUCCESSFUL_AUTHENTICATION, now().toString()));
         }
-        
+
         return new ResponseEntity<>(
-                decode(response, clazz).orElse(null),
+                payload.orElse(null),
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
 
