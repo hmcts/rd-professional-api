@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,7 +52,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class OrganisationInternalControllerTest {
@@ -62,7 +60,6 @@ public class OrganisationInternalControllerTest {
     private OrganisationEntityResponse organisationEntityResponse;
     private OrganisationService organisationServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
-    private JurisdictionServiceImpl jurisdictionService;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
@@ -102,7 +99,6 @@ public class OrganisationInternalControllerTest {
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
-        jurisdictionService = mock(JurisdictionServiceImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
@@ -316,8 +312,6 @@ public class OrganisationInternalControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest,
                 orgId, userId);

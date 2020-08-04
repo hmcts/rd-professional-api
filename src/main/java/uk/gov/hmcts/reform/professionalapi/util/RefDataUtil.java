@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_UP_FAILED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_AAC_SYSTEM;
 
@@ -360,13 +359,6 @@ public class RefDataUtil {
 
         return newUserResponse;
 
-    }
-
-    public static void throwException(int statusCode) {
-        log.info("{}:: Error status code: " + statusCode, loggingComponentName);
-        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
-        String errorMessage = resolveStatusAndReturnMessage(httpStatus);
-        throw new ExternalApiException(httpStatus, errorMessage);
     }
 
     public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,

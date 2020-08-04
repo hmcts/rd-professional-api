@@ -64,7 +64,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 @RestController
@@ -92,10 +91,7 @@ public abstract class SuperController {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
-    private JurisdictionServiceImpl jurisdictionService;
-    @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
-
     @Value("${exui.role.hmcts-admin:}")
     protected String prdAdmin;
 
@@ -241,7 +237,6 @@ public abstract class SuperController {
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 
-            jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -319,8 +314,6 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId,
-                newUserCreationRequest.getEmail());
         ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {

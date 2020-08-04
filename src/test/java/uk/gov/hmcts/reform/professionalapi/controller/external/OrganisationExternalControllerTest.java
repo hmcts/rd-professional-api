@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,7 +54,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class OrganisationExternalControllerTest {
@@ -69,7 +67,6 @@ public class OrganisationExternalControllerTest {
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
     private PrdEnumServiceImpl prdEnumServiceMock;
-    private JurisdictionServiceImpl jurisdictionService;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PrdEnumRepository prdEnumRepository;
@@ -105,7 +102,6 @@ public class OrganisationExternalControllerTest {
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-        jurisdictionService = mock(JurisdictionServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
@@ -234,8 +230,6 @@ public class OrganisationExternalControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = organisationExternalController
                 .addUserToOrganisationUsingExternalController(newUserCreationRequest, orgId, userId);
