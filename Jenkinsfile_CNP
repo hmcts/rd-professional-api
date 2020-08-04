@@ -83,7 +83,8 @@ withPipeline(type, product, component) {
         def dbHost = "${serviceName}" + "-postgresql"
         println "hostName:::: $dbHost"
         env.FUNC_DATABASE_HOST = "${dbHost}"
-        println ${env.FUNC_DATABASE_HOST}
+        println "env.host:::: ${env.FUNC_DATABASE_HOST}"
+        println "env.host1:::: $env.FUNC_DATABASE_HOST"
     }
 
     enablePactAs([
