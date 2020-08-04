@@ -80,9 +80,9 @@ withPipeline(type, product, component) {
         def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT)
         def serviceName = dockerImage.getAksServiceName().toLowerCase()
         println "serviceName:::: $serviceName"
-        def dbHost = "${-> serviceName}" + "-postgresql"
+        def dbHost = "${serviceName}" + "-postgresql"
         println "hostName:::: $dbHost"
-        env.FUNC_DATABASE_HOST = "${-> dbHost}"
+        env.FUNC_DATABASE_HOST = "${dbHost}"
         println ${env.FUNC_DATABASE_HOST}
     }
 
