@@ -77,12 +77,9 @@ withPipeline(type, product, component) {
     }
 
     before('functionalTest:preview') {
-        withAksClient('nonprod') {
-            def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT)
-            env.FUNC_DATABASE_HOST = dockerImage.getAksServiceName().toLowerCase()"-postgresql"
-            println ${env.FUNC_DATABASE_HOST}
-        }
-
+        def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT)
+        env.FUNC_DATABASE_HOST = dockerImage.getAksServiceName().toLowerCase()"-postgresql"
+        println ${env.FUNC_DATABASE_HOST}
     }
 
     enablePactAs([
