@@ -49,12 +49,13 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_400() {
+    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+
         newUserCreationRequest.setJurisdictions(new ArrayList<>());
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 
