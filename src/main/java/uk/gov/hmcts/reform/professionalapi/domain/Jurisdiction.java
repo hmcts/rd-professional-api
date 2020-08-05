@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import lombok.Getter;
@@ -11,3 +12,4 @@ public class Jurisdiction {
 
     private String id;
 }
+*/

@@ -293,7 +293,7 @@ public class OrganisationCreationRequestValidatorTest {
     public void test_should_validate_mandatory_user_fields_and_not_throw_exception() {
 
         NewUserCreationRequest request = new NewUserCreationRequest("fanme", "lastname",
-                "sl@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
+                "sl@hmcts.net", new ArrayList<String>(), false);
 
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
@@ -301,7 +301,7 @@ public class OrganisationCreationRequestValidatorTest {
     @Test(expected = InvalidRequest.class)
     public void test_should_validate_mandatory_user_fields_and_throw_exception() {
         NewUserCreationRequest request = new NewUserCreationRequest(null, null,
-                "al@hmcts.net", new ArrayList<String>(), new ArrayList<>(), false);
+                "al@hmcts.net", new ArrayList<String>(), false);
         OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields(request);
     }
 

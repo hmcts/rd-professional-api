@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.Arrays;
@@ -46,7 +45,6 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1").build()))
@@ -86,7 +84,6 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -120,7 +117,6 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -157,7 +153,6 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))

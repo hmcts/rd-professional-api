@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
@@ -48,7 +47,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createReInviteUserRequest(RANDOM_EMAIL);
-            newUserCreationRequest.setJurisdictions(new ArrayList<>());
             Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.NOT_FOUND);
@@ -199,7 +197,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createReInviteUserRequest(organisationCreationRequest1.getSuperUser().getEmail());
-            newUserCreationRequest.setJurisdictions(new ArrayList<>());
             Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.FORBIDDEN);

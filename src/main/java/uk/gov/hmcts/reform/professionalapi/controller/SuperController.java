@@ -110,9 +110,6 @@ public abstract class SuperController {
     @Value("${prdEnumRoleType}")
     protected String prdEnumRoleType;
 
-    @Value("${jurisdictionIdType}")
-    private String jurisdictionIds;
-
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
 

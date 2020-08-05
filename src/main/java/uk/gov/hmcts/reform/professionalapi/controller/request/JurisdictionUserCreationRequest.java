@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,3 +24,4 @@ public class JurisdictionUserCreationRequest {
     }
 
 }
+*/
