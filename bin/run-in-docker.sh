@@ -44,9 +44,9 @@ execute_script() {
 
   clean_old_docker_artifacts
 
-    build_s2s_image
+#    build_s2s_image
 
-    build_service_auth_app
+#    build_service_auth_app
 
     ./gradlew clean assemble
 
