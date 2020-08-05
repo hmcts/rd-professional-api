@@ -574,26 +574,28 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     public void getUserProfileByEmailWireMock(HttpStatus status) {
         String body = null;
-        int returnHttpStaus = status.value();
+        int returnHttpStatus;
         if (status.is2xxSuccessful()) {
             body = "{"
                     + "  \"idamStatus\": \"PENDING\""
                     + "}";
-            returnHttpStaus = 200;
+            returnHttpStatus = 200;
+        } else if (status == HttpStatus.UNAUTHORIZED) {
+            returnHttpStatus = 401;
         } else {
             body = "{"
                     + "  \"idamStatus\": \" \""
                     + "}";
-            returnHttpStaus = 500;
+            returnHttpStatus = 500;
         }
 
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(body)
-                        .withStatus(returnHttpStaus)
-                ));
-
+        userProfileService.stubFor(
+                get(urlPathMatching("/v1/userprofile"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody(body)
+                                .withStatus(returnHttpStatus)
+                        ));
     }
 
 

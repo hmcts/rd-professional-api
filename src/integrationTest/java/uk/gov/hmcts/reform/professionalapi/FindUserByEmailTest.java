@@ -99,6 +99,38 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     }
 
+    @Test
+    public void find_user_status_by_user_email_address_for_organisation_status_as_active_401() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+
+        getUserProfileByEmailWireMock(HttpStatus.UNAUTHORIZED);
+
+        Map<String, Object> response = professionalReferenceDataClient.findUserByEmail(userEmail, hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("401");
+        assertThat(response.get("response_body").toString()).contains("{"
+                + "\"errorMessage\":\"Unauthorised\","
+                + "\"errorDescription\":\"Unauthorised\","
+                + "\"timeStamp\":");
+
+    }
+
 
     @Test
     public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_org_status_as_active() {
