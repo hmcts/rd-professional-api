@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference.EN;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserCategory.PROFESSIONAL;
 import static uk.gov.hmcts.reform.professionalapi.domain.UserType.EXTERNAL;
 
@@ -31,7 +33,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -41,6 +45,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
@@ -75,6 +80,7 @@ public class OrganisationExternalControllerTest {
     private PrdEnumRepository prdEnumRepository;
     private UserCreationRequest userCreationRequest;
     private Organisation organisation;
+    private Organisation organisation1;
     private ProfessionalUser professionalUser;
     private OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock;
     private UserProfileCreationRequest userProfileCreationRequest;
@@ -113,6 +119,8 @@ public class OrganisationExternalControllerTest {
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
+        organisation1 = new Organisation("Org-Name2", OrganisationStatus.ACTIVE, "sra-id2",
+                "companyN2", false, "www2.org.com");
         organisationResponse = new OrganisationResponse(organisation);
         professionalUser = new ProfessionalUser("some-fname", "some-lname",
                 "soMeone@somewhere.com", organisation);
@@ -247,5 +255,36 @@ public class OrganisationExternalControllerTest {
                 .getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUserByEmailAddress("some@email.com");
+    }
+
+    @Test
+    public void test_retrieveOrganisationsByStatusWithMinimalInfo_should_return_200_with_response() {
+        ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
+        List<Organisation> organisations = new ArrayList<>();
+        organisations.add(organisation1);
+        OrganisationMinimalInfoResponse organisationMinimalInfoResponse = new OrganisationMinimalInfoResponse(
+                organisation1.getName(), organisation1.getOrganisationIdentifier());
+        when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(organisations);
+
+        ResponseEntity<List<OrganisationMinimalInfoResponse>> responseEntity =
+                organisationExternalController.retrieveOrganisationsByStatusWithMinimalInfo(
+                        UUID.randomUUID().toString(), ACTIVE.name());
+        List<OrganisationMinimalInfoResponse> minimalInfoResponseList = responseEntity.getBody();
+        assertThat(minimalInfoResponseList).usingFieldByFieldElementComparator()
+                .contains(organisationMinimalInfoResponse);
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
+
+    }
+
+    @Test
+    public void test_retrieveAllOrganisationsByStatus_should_return_404_when_no_active_orgs_found() {
+        ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
+        when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(new ArrayList<>());
+        Throwable raisedException = catchThrowable(() -> organisationExternalController
+                .retrieveOrganisationsByStatusWithMinimalInfo(UUID.randomUUID().toString(), ACTIVE.name()));
+        assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
+                .hasMessageStartingWith("No Organisations found");
+        verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
     }
 }
