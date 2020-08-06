@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -32,15 +33,20 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
     private Map<String, OrganisationMinimalInfoResponse> activeOrgs;
     private Map<String, OrganisationMinimalInfoResponse> pendingOrgs;
+    private Map<String, OrganisationMinimalInfoResponse> noAddressOrgs;
 
     private OrganisationMinimalInfoResponse organisationEntityResponse1;
     private OrganisationMinimalInfoResponse organisationEntityResponse2;
     private OrganisationMinimalInfoResponse organisationEntityResponse3;
     private OrganisationMinimalInfoResponse organisationEntityResponse4;
+    private OrganisationMinimalInfoResponse organisationEntityResponse5;
+    private OrganisationMinimalInfoResponse organisationEntityResponse6;
     private String orgIdentifier1;
     private String orgIdentifier2;
     private String orgIdentifier3;
     private String orgIdentifier4;
+    private String orgIdentifier5;
+    private String orgIdentifier6;
     private List<String> validRoles;
 
     @Test
@@ -56,7 +62,10 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
                 .contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
         assertThat(responseList).usingFieldByFieldElementComparator()
                 .doesNotContain(pendingOrgs.get(orgIdentifier3), pendingOrgs.get(orgIdentifier4));
-
+        assertThat(responseList).usingFieldByFieldElementComparator()
+                .contains(noAddressOrgs.get(orgIdentifier5), noAddressOrgs.get(orgIdentifier6));
+        assertThat(responseList.get(4).getContactInformation()).isNullOrEmpty();
+        assertThat(responseList.get(5).getContactInformation()).isNullOrEmpty();
     }
 
     @Test
@@ -112,6 +121,14 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         pendingOrgs.put(orgIdentifier3, organisationEntityResponse3);
         pendingOrgs.put(orgIdentifier4, organisationEntityResponse4);
 
+
+        //create 2 active orgs for validating response doesnt have 2 contact address present for 2 orgs
+        createActiveOrganisation3WithAddressRequiredFalse();
+        createActiveOrganisation4WithAddressRequiredFalse();
+
+        noAddressOrgs = new HashMap<>();
+        noAddressOrgs.put(orgIdentifier5, organisationEntityResponse5);
+        noAddressOrgs.put(orgIdentifier6, organisationEntityResponse6);
         //invite user under org1 with valid roles and who is active
         inviteNewUser(getValidRoleList());
 
@@ -150,7 +167,11 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         String orgName1 = randomAlphabetic(7);
         orgIdentifier1 = createAndctivateOrganisationWithGivenRequest(
                 createMinimalOrganisationRequest(orgName1), hmctsAdmin);
-        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(orgName1, orgIdentifier1);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier1,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse1 = new OrganisationMinimalInfoResponse((Organisation) org, true);
         return orgIdentifier1;
     }
 
@@ -158,20 +179,56 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         String orgName2 = randomAlphabetic(7);
         orgIdentifier2 = createAndctivateOrganisationWithGivenRequest(
                 createMinimalOrganisationRequest(orgName2), hmctsAdmin);
-        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(orgName2, orgIdentifier2);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier2,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse2 = new OrganisationMinimalInfoResponse((Organisation) org, true);
         return orgIdentifier2;
     }
 
     public void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
         orgIdentifier3 = createOrganisation(orgName3);
-        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(orgName3, orgIdentifier3);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier3,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse3 = new OrganisationMinimalInfoResponse((Organisation) org, true);
     }
 
     public void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
         orgIdentifier4 = createOrganisation(orgName4);
-        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(orgName4, orgIdentifier4);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier2,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse4 = new OrganisationMinimalInfoResponse((Organisation) org, true);
+    }
+
+    public String createActiveOrganisation3WithAddressRequiredFalse() {
+        String orgName5 = randomAlphabetic(7);
+        orgIdentifier5 = createAndctivateOrganisationWithGivenRequest(
+                createMinimalOrganisationRequest(orgName5), hmctsAdmin);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier5,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse5 = new OrganisationMinimalInfoResponse((Organisation) org, false);
+        return orgIdentifier1;
+    }
+
+    public String createActiveOrganisation4WithAddressRequiredFalse() {
+        String orgName6 = randomAlphabetic(7);
+        orgIdentifier6 = createAndctivateOrganisationWithGivenRequest(
+                createMinimalOrganisationRequest(orgName6), hmctsAdmin);
+
+        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier6,
+                puiCaseManager,HttpStatus.OK);
+
+        organisationEntityResponse6 = new OrganisationMinimalInfoResponse((Organisation) org, false);
+        return orgIdentifier2;
     }
 
     public String createOrganisation(String orgName) {
@@ -190,6 +247,4 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         assertThat(errorResponse.getErrorDescription()).isEqualTo(expectedErrorDescription);
         assertThat(errorResponse.getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
-
-
 }

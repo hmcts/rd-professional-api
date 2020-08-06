@@ -39,7 +39,7 @@ public class ContactInformationResponse {
         this.postCode = contactInfo.getPostCode();
         this.dxAddress = contactInfo.getDxAddresses()
                     .stream()
-                    .map(dxAddres -> new DxAddressResponse(dxAddres))
+                    .map(dxAddress -> new DxAddressResponse(dxAddress))
                     .collect(toList());
     }
 

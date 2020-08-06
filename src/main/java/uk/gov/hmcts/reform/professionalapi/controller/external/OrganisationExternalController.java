@@ -271,11 +271,13 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
     public ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveOrganisationsByStatusWithMinimalInfo(
             @ApiParam(hidden = true) @UserId String userId,
-            @PathVariable("status") String status) {
+            @PathVariable("status") String status,
+            @ApiParam(name = "address")
+            @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
 
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        return retrieveAllOrganisationsByStatus(status);
+        return retrieveAllOrganisationsByStatus(status, address);
     }
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,

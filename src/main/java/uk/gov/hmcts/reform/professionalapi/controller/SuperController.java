@@ -290,7 +290,8 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveAllOrganisationsByStatus(String status) {
+    protected ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveAllOrganisationsByStatus(
+            String status, boolean address) {
 
         isInputOrganisationStatusValid(status, allowedOrganisationStatus);
 
@@ -301,9 +302,9 @@ public abstract class SuperController {
         }
 
         List<OrganisationMinimalInfoResponse> organisationMinimalInfoResponses =
-                organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation.getName(),
-                        organisation.getOrganisationIdentifier()))
+                organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
                         .collect(Collectors.toList());
+
         return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
 

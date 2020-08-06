@@ -24,8 +24,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
     private SuperUserResponse superUser;
     @JsonProperty
     private List<String> paymentAccount;
-    @JsonProperty
-    private List<ContactInformationResponse> contactInformation;
+
 
     public OrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
@@ -53,7 +52,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
-                    .map(contactInfo -> new ContactInformationResponse(contactInfo))
+                    .map(ContactInformationResponse::new)
                     .collect(toList());
         }
     }

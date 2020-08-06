@@ -87,10 +87,10 @@ public class ProfessionalReferenceDataClient {
         return getRequest(APP_INT_BASE_PATH + "/", role);
     }
 
-    public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus, Class expectedClass)
+    public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus, boolean address, Class expectedClass)
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
-                APP_EXT_BASE_PATH + "/status/" + orgStatus, role, id, expectedClass);
+                APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);
         HttpStatus status = responseEntity.getStatusCode();
         if (status.is2xxSuccessful()) {
             return Arrays.asList((OrganisationMinimalInfoResponse[]) objectMapper.convertValue(
