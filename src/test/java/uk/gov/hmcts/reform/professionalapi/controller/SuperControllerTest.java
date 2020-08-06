@@ -139,7 +139,7 @@ public class SuperControllerTest {
                 "false", "number02", "company-url", userCreationRequest,
                 null, null);
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

@@ -129,7 +129,7 @@ public class OrganisationServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         sut.setOrganisationRepository(organisationRepository);
         sut.setProfessionalUserRepository(professionalUserRepositoryMock);

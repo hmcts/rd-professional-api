@@ -143,7 +143,7 @@ public class OrganisationInternalControllerTest {
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
                 "some@email.com", userRoles, jurisdictions, false);
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
