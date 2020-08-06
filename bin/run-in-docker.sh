@@ -9,7 +9,7 @@ export S2S_MICROSERVICE=rd_professional_api
 
 build_s2s_image() {
     git clone https://github.com/hmcts/s2s-test-tool.git
-    cd s2s-test-too
+    cd s2s-test-tool
     git checkout allow-all-microservices
     ./gradlew build
     docker build -t hmcts/service-token-provider .
