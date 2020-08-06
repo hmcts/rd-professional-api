@@ -8,10 +8,12 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.cr
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import javax.sql.DataSource;
+
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
@@ -100,6 +103,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected DataSource dataSource;
 
+    public static ArrayList<String> enabledRoles;
+
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     @After
@@ -130,6 +135,27 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient, idamClient);
+
+        getRolesFromDb();
+    }
+
+    public List<String> getRolesFromDb() {
+        if (CollectionUtils.isEmpty(enabledRoles)) {
+            enabledRoles = new ArrayList();
+            try {
+                ResultSet resultSet = dataSource.getConnection().createStatement()
+                        .executeQuery("select * from prd_enum where enabled = 'YES'");
+                enabledRoles = new ArrayList();
+                while (resultSet.next()) {
+                    enabledRoles.add(resultSet.getString("enum_name"));
+                }
+            } catch (Exception e) {
+                log.error("Database exception while roles test case : ", e.getMessage());
+            }
+            return enabledRoles;
+        } else {
+            return enabledRoles;
+        }
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {

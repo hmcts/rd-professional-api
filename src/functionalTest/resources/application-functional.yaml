@@ -27,11 +27,12 @@ exui.role.caseworker-caa: caseworker-caa
 prd.roles.prd-aac-system: prd-aac-system
 
 #######
-postgres.host_name: ${FUNC_DATABASE_HOST:rd-professional-api-pr-678-postgresql}
+#postgres.host_name: ${FUNC_DATABASE_HOST:rd-professional-api-pr-678-postgresql}
+postgres.host_name: ${FUNC_DATABASE_HOST:localhost}
 postgres.name: ${FUNC_DATABASE_NAME:dbrefdata}
 postgres.user: ${FUNC_DATABASE_USER:dbrefdata}
 postgres.password: ${FUNC_DATABASE_PASS:dbrefdata}
-postgres.port: 5432
+postgres.port: ${FUNC_DATABASE_PORT:7000}
 #######
 
 # resent user invite interval in minutes
