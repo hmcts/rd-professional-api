@@ -620,7 +620,7 @@ public class OrganisationServiceImplTest {
     @Test
     public void testDeletePendingOrganisation() {
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.PENDING);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
@@ -651,7 +651,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
 
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.STATUS_CODE_204);
@@ -685,7 +685,7 @@ public class OrganisationServiceImplTest {
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
 
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
@@ -702,7 +702,7 @@ public class OrganisationServiceImplTest {
 
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(2);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_400);
@@ -732,7 +732,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(500).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -758,7 +758,7 @@ public class OrganisationServiceImplTest {
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(404).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);
@@ -789,7 +789,7 @@ public class OrganisationServiceImplTest {
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "Error while invoking UP"));
 
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
-        deleteOrganisationResponse = sut.deleteOrganisation(organisation);
+        deleteOrganisationResponse = sut.deleteOrganisation(organisation, "123456789");
 
         assertThat(deleteOrganisationResponse).isNotNull();
         assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(ProfessionalApiConstants.ERROR_CODE_500);

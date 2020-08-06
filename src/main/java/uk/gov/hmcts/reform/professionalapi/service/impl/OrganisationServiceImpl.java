@@ -353,15 +353,15 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public DeleteOrganisationResponse deleteOrganisation(Organisation organisation) {
+    public DeleteOrganisationResponse deleteOrganisation(Organisation organisation, String prdAdminUserId) {
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
         switch (organisation.getStatus()) {
             case PENDING:
-                return deleteOrganisationEntity(organisation, deleteOrganisationResponse);
+                return deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId);
             case ACTIVE:
                 deleteOrganisationResponse = deleteUserProfile(organisation, deleteOrganisationResponse);
                 return deleteOrganisationResponse.getStatusCode() == ProfessionalApiConstants.STATUS_CODE_204
-                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse)
+                        ? deleteOrganisationEntity(organisation, deleteOrganisationResponse, prdAdminUserId)
                         : deleteOrganisationResponse;
             default:
                 throw new EmptyResultDataAccessException(ProfessionalApiConstants.ONE);
@@ -370,10 +370,13 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
-                                                                DeleteOrganisationResponse deleteOrganisationResponse) {
+                                                                DeleteOrganisationResponse deleteOrganisationResponse,
+            String prdAdminUserId) {
         organisationRepository.deleteById(organisation.getId());
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
+        log.info(loggingComponentName, organisation.getOrganisationIdentifier()
+                + "::organisation deleted by::prdadmin::" + prdAdminUserId);
         return deleteOrganisationResponse;
     }
 

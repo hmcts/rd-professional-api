@@ -60,10 +60,6 @@ public class OrganisationInternalController extends SuperController {
     @Value("${loggingComponentName}")
     protected String loggingComponentName;
 
-    @Value("${deleteOrganisationEnabled}")
-    private String deleteOrganisationEnabled;
-
-
 
 
     @ApiOperation(
@@ -395,23 +391,21 @@ public class OrganisationInternalController extends SuperController {
     @Secured("prd-admin")
     public ResponseEntity<DeleteOrganisationResponse> deleteOrganisation(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-            @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
 
         DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        if (deleteOrganisationEnabled.equals("true")) {
-            //Received request to delete an organisation for internal user
-            Optional<Organisation> organisation = Optional.ofNullable(organisationService
+        //Received request to delete an organisation for internal user
+        Optional<Organisation> organisation = Optional.ofNullable(organisationService
                     .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-            if (!organisation.isPresent()) {
+        if (!organisation.isPresent()) {
 
-                throw new EmptyResultDataAccessException(1);
-
-            }
-
-            deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get());
+            throw new EmptyResultDataAccessException(1);
 
         }
+
+        deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get(), userId);
         return ResponseEntity
                 .status(deleteOrganisationResponse.getStatusCode())
                 .body(deleteOrganisationResponse);
