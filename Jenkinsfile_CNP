@@ -76,15 +76,28 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
+    before('functionalTest:aat') {
+        env.FUNC_DATABASE_PORT = "5432"
+    }
+
     before('functionalTest:preview') {
         def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT)
         def serviceName = dockerImage.getAksServiceName().toLowerCase()
+        def subscription = env.SUBSCRIPTION_NAME
+        def namespace = new TeamConfig(this).getNameSpace(product)
+
         println "serviceName:::: $serviceName"
-        def dbHost = "${serviceName}" + "-postgresql"
-        println "hostName:::: $dbHost"
-        env.FUNC_DATABASE_HOST = "${dbHost}"
-        println "env.host:::: ${env.FUNC_DATABASE_HOST}"
-        println "env.host1:::: $env.FUNC_DATABASE_HOST"
+        def dbPodName = "${serviceName}" + "-postgresql-0"
+        println "dbPodName:::: $dbPodName"
+
+        def kubectl = new Kubectl(this, subscription, namespace)
+        kubectl.login()
+        def kubeCommand = "port-forward pods/${dbPodName} 7000:5432"
+        println "kube command:::: $kubeCommand"
+        def commandOutput = kubectl.execute("${kubeCommand}", true)
+        println "port forwarding output:::: $commandOutput"
+
+
     }
 
     enablePactAs([
