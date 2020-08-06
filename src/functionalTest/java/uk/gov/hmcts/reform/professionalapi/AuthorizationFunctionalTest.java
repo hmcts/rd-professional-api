@@ -96,6 +96,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
+    protected static  String  s2sToken;
+
     @After
     public void tearDown() {
     }
@@ -120,11 +122,15 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
-        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+        if (s2sToken == null) {
+
+            s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+        }
 
         professionalApiClient = new ProfessionalApiClient(
-            professionalApiUrl,
-            s2sToken, idamOpenIdClient, idamClient);
+                professionalApiUrl,
+                s2sToken, idamOpenIdClient, idamClient);
+
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
