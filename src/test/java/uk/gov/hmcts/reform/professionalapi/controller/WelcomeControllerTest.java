@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.professionalapi.controller.WelcomeController;
 
 public class WelcomeControllerTest {
 
@@ -22,6 +20,6 @@ public class WelcomeControllerTest {
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertThat(responseEntity.getBody(), containsString(expectedMessage));
+        assertThat(responseEntity.getBody()).contains(expectedMessage);
     }
 }
