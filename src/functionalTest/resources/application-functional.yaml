@@ -1,6 +1,6 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://rd-professional-api-pr-682.service.core-compute-preview.internal}
 
-s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-demo.service.core-compute-demo.internal}
+s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
 s2s-name: rd_professional_api
 
@@ -13,7 +13,7 @@ idam.auth.clientId: rd-professional-api
 
 idam.auth.tokenAuth: ${IDAM_TOKEN_ATUH:cmQtcHJvZmVzc2lvbmFsLWFwaTpjYzVmMmE2LTk2OTAtMTFlOS1iYzQyLTUyNmFmNzc2NGY2NA==}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
-s2s-secret: 4QKOKOOTZN7KOHYG
+s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
