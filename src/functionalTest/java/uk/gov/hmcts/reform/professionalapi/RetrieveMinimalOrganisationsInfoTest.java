@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +24,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -57,7 +61,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
                 professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
+                        bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
         assertThat(responseList).usingFieldByFieldElementComparator()
                 .contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
         assertThat(responseList).usingFieldByFieldElementComparator()
@@ -71,7 +75,6 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @Test
     //AC:3
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
-
         // invite new user having invalid roles
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
@@ -85,7 +88,6 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @Test
     //AC:5
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending() {
-
         // invite new user having valid roles and also make it active
         inviteNewUser(getValidRoleList());
         validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
@@ -96,7 +98,6 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @Test
     //AC:6
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed() {
-
         // invite new user having valid roles and also make it active
         inviteNewUser(getValidRoleList());
         validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
@@ -113,7 +114,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         activeOrgs.put(orgIdentifier1, organisationEntityResponse1);
         activeOrgs.put(orgIdentifier2, organisationEntityResponse2);
 
-        //create 2 pending orgs for validating response doesnt have 2 orgs present
+        //create 2 pending orgs for validating response doesn't have 2 orgs present
         createPendingOrganisation1();
         createPendingOrganisation2();
 
@@ -122,13 +123,14 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         pendingOrgs.put(orgIdentifier4, organisationEntityResponse4);
 
 
-        //create 2 active orgs for validating response doesnt have 2 contact address present for 2 orgs
+        //create 2 active orgs for validating response doesn't have 2 contact address present for 2 orgs
         createActiveOrganisation3WithAddressRequiredFalse();
         createActiveOrganisation4WithAddressRequiredFalse();
 
         noAddressOrgs = new HashMap<>();
         noAddressOrgs.put(orgIdentifier5, organisationEntityResponse5);
         noAddressOrgs.put(orgIdentifier6, organisationEntityResponse6);
+
         //invite user under org1 with valid roles and who is active
         inviteNewUser(getValidRoleList());
 
@@ -165,81 +167,86 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
     public String createActiveOrganisation1() {
         String orgName1 = randomAlphabetic(7);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName1);
         orgIdentifier1 = createAndctivateOrganisationWithGivenRequest(
-                createMinimalOrganisationRequest(orgName1), hmctsAdmin);
+                organisationCreationRequest, hmctsAdmin);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier1,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse1 = new OrganisationMinimalInfoResponse((Organisation) org, true);
+        organisationEntityResponse1 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier1), true);
         return orgIdentifier1;
     }
 
-    public String createActiveOrganisation2() {
+    public void createActiveOrganisation2() {
         String orgName2 = randomAlphabetic(7);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName2);
         orgIdentifier2 = createAndctivateOrganisationWithGivenRequest(
-                createMinimalOrganisationRequest(orgName2), hmctsAdmin);
+                organisationCreationRequest, hmctsAdmin);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier2,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse2 = new OrganisationMinimalInfoResponse((Organisation) org, true);
-        return orgIdentifier2;
+        organisationEntityResponse2 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier1), true);
     }
 
     public void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
-        orgIdentifier3 = createOrganisation(orgName3);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName3);
+        orgIdentifier3 = createOrganisation(organisationCreationRequest);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier3,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse3 = new OrganisationMinimalInfoResponse((Organisation) org, true);
+        organisationEntityResponse3 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier3), true);
     }
 
     public void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
-        orgIdentifier4 = createOrganisation(orgName4);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName4);
+        orgIdentifier4 = createOrganisation(organisationCreationRequest);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier2,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse4 = new OrganisationMinimalInfoResponse((Organisation) org, true);
+        organisationEntityResponse4 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier4), true);
     }
 
-    public String createActiveOrganisation3WithAddressRequiredFalse() {
+    public void createActiveOrganisation3WithAddressRequiredFalse() {
         String orgName5 = randomAlphabetic(7);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName5);
         orgIdentifier5 = createAndctivateOrganisationWithGivenRequest(
-                createMinimalOrganisationRequest(orgName5), hmctsAdmin);
+                organisationCreationRequest, hmctsAdmin);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier5,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse5 = new OrganisationMinimalInfoResponse((Organisation) org, false);
-        return orgIdentifier1;
+        organisationEntityResponse5 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier5), false);
     }
 
-    public String createActiveOrganisation4WithAddressRequiredFalse() {
+    public void createActiveOrganisation4WithAddressRequiredFalse() {
         String orgName6 = randomAlphabetic(7);
+        OrganisationCreationRequest organisationCreationRequest = createMinimalOrganisationRequest(orgName6);
         orgIdentifier6 = createAndctivateOrganisationWithGivenRequest(
-                createMinimalOrganisationRequest(orgName6), hmctsAdmin);
+                organisationCreationRequest, hmctsAdmin);
 
-        Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(orgIdentifier6,
-                puiCaseManager,HttpStatus.OK);
-
-        organisationEntityResponse6 = new OrganisationMinimalInfoResponse((Organisation) org, false);
-        return orgIdentifier2;
+        organisationEntityResponse6 = new OrganisationMinimalInfoResponse(
+                generateOrganisation(organisationCreationRequest, orgIdentifier6), false);
     }
 
-    public String createOrganisation(String orgName) {
-        return (String)professionalApiClient.createOrganisation(
-                createMinimalOrganisationRequest(orgName)).get("organisationIdentifier");
+    public String createOrganisation(OrganisationCreationRequest organisationCreationRequest) {
+        return (String) professionalApiClient.createOrganisation(
+                organisationCreationRequest).get("organisationIdentifier");
     }
 
     public OrganisationCreationRequest createMinimalOrganisationRequest(String organisationName) {
         return someMinimalOrganisationRequest()
                 .name(organisationName).status(ACTIVE.name())
                 .sraId(randomAlphabetic(10)).build();
+    }
+
+    public Organisation generateOrganisation(OrganisationCreationRequest creationRequest, String orgId) {
+        Organisation organisation = new Organisation(creationRequest.getName(),
+                OrganisationStatus.valueOf(creationRequest.getStatus()),
+                creationRequest.getSraId(), creationRequest.getCompanyNumber(),
+                Boolean.valueOf(creationRequest.getSraRegulated()), creationRequest.getCompanyUrl());
+
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1(creationRequest.getContactInformation().get(0).getAddressLine1());
+
+        organisation.setContactInformations(singletonList(contactInformation));
+
+        return organisation;
     }
 
     public void validateErrorResponse(ErrorResponse errorResponse, String expectedErrorMessage,
