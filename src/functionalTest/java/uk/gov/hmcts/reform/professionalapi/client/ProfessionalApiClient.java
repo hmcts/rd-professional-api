@@ -81,6 +81,7 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value())
                 .and()
                 .extract()
+                .response()
                 .body()
                 .asString();
     }
@@ -92,6 +93,7 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value())
                 .and()
                 .extract()
+                .response()
                 .body()
                 .asString();
     }
