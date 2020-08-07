@@ -7,25 +7,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
 @Getter
+@NoArgsConstructor
 public class ContactInformationResponse {
 
     @JsonProperty
-    private final String addressLine1;
+    private String addressLine1;
     @JsonProperty
-    private final String addressLine2;
+    private String addressLine2;
     @JsonProperty
-    private final String addressLine3;
+    private String addressLine3;
     @JsonProperty
-    private final String townCity;
+    private String townCity;
     @JsonProperty
-    private final String county;
+    private String county;
     @JsonProperty
-    private final String country;
+    private String country;
     @JsonProperty
-    private final String postCode;
+    private String postCode;
     @JsonProperty
     private  List<DxAddressResponse> dxAddress;
 
