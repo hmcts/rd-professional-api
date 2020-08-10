@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,9 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PEND
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -35,9 +34,9 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     private static final String STATUS_PARAM_INVALID_MESSAGE =
             "Please check status param passed as this is invalid status.";
 
-    private Map<String, OrganisationMinimalInfoResponse> activeOrgs;
-    private Map<String, OrganisationMinimalInfoResponse> pendingOrgs;
-    private Map<String, OrganisationMinimalInfoResponse> noAddressOrgs;
+    private List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
+    private List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
+    private List<OrganisationMinimalInfoResponse> noAddressOrgs = new ArrayList<>();
 
     private OrganisationMinimalInfoResponse organisationEntityResponse1;
     private OrganisationMinimalInfoResponse organisationEntityResponse2;
@@ -51,25 +50,39 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     private String orgIdentifier4;
     private String orgIdentifier5;
     private String orgIdentifier6;
-    private List<String> validRoles;
+    private List<String> validRoles = new ArrayList<>();
+    private List<String> orgResponseInfo = new ArrayList<>();
+
 
     @Test
     @SuppressWarnings("unchecked")
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
-
         setUpTestData();
+
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
                 professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
                         bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
-        assertThat(responseList).usingFieldByFieldElementComparator()
-                .contains(activeOrgs.get(orgIdentifier1), activeOrgs.get(orgIdentifier2));
-        assertThat(responseList).usingFieldByFieldElementComparator()
-                .doesNotContain(pendingOrgs.get(orgIdentifier3), pendingOrgs.get(orgIdentifier4));
-        assertThat(responseList).usingFieldByFieldElementComparator()
-                .contains(noAddressOrgs.get(orgIdentifier5), noAddressOrgs.get(orgIdentifier6));
-        assertThat(responseList.get(4).getContactInformation()).isNullOrEmpty();
-        assertThat(responseList.get(5).getContactInformation()).isNullOrEmpty();
+
+        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
+                org.getContactInformation().get(0).getAddressLine1())));
+
+        assertThat(orgResponseInfo).contains(
+                activeOrgs.get(0).getOrganisationIdentifier(),
+                activeOrgs.get(0).getName(),
+                activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                activeOrgs.get(1).getOrganisationIdentifier(),
+                activeOrgs.get(1).getName(),
+                activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
+                noAddressOrgs.get(0).getOrganisationIdentifier(),
+                noAddressOrgs.get(0).getName(),
+                noAddressOrgs.get(1).getOrganisationIdentifier(),
+                noAddressOrgs.get(1).getName())
+                .doesNotContain(
+                        pendingOrgs.get(0).getOrganisationIdentifier(),
+                        pendingOrgs.get(0).getName(),
+                        pendingOrgs.get(1).getOrganisationIdentifier(),
+                        pendingOrgs.get(1).getName());
     }
 
     @Test
@@ -110,26 +123,23 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         createActiveOrganisation1();
         createActiveOrganisation2();
 
-        activeOrgs = new HashMap<>();
-        activeOrgs.put(orgIdentifier1, organisationEntityResponse1);
-        activeOrgs.put(orgIdentifier2, organisationEntityResponse2);
+        activeOrgs.add(organisationEntityResponse1);
+        activeOrgs.add(organisationEntityResponse2);
 
         //create 2 pending orgs for validating response doesn't have 2 orgs present
         createPendingOrganisation1();
         createPendingOrganisation2();
 
-        pendingOrgs = new HashMap<>();
-        pendingOrgs.put(orgIdentifier3, organisationEntityResponse3);
-        pendingOrgs.put(orgIdentifier4, organisationEntityResponse4);
+        pendingOrgs.add(organisationEntityResponse3);
+        pendingOrgs.add(organisationEntityResponse4);
 
 
         //create 2 active orgs for validating response doesn't have 2 contact address present for 2 orgs
         createActiveOrganisation3WithAddressRequiredFalse();
         createActiveOrganisation4WithAddressRequiredFalse();
 
-        noAddressOrgs = new HashMap<>();
-        noAddressOrgs.put(orgIdentifier5, organisationEntityResponse5);
-        noAddressOrgs.put(orgIdentifier6, organisationEntityResponse6);
+        noAddressOrgs.add(organisationEntityResponse5);
+        noAddressOrgs.add(organisationEntityResponse6);
 
         //invite user under org1 with valid roles and who is active
         inviteNewUser(getValidRoleList());
@@ -183,7 +193,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
                 organisationCreationRequest, hmctsAdmin);
 
         organisationEntityResponse2 = new OrganisationMinimalInfoResponse(
-                generateOrganisation(organisationCreationRequest, orgIdentifier1), true);
+                generateOrganisation(organisationCreationRequest, orgIdentifier2), true);
     }
 
     public void createPendingOrganisation1() {
