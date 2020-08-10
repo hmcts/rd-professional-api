@@ -254,6 +254,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         contactInformation.setAddressLine1(creationRequest.getContactInformation().get(0).getAddressLine1());
 
         organisation.setContactInformations(singletonList(contactInformation));
+        organisation.setOrganisationIdentifier(orgId);
 
         return organisation;
     }
