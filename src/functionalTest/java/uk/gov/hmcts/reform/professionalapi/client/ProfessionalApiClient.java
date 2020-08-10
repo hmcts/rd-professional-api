@@ -787,9 +787,10 @@ public class ProfessionalApiClient {
     }
 
     public Object retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification,
-                                                                HttpStatus expectedStatus, String status) {
+                                                                HttpStatus expectedStatus, String status,
+                                                                boolean address) {
         Response response = requestSpecification
-                .get("/refdata/external/v1/organisations/status/" + status)
+                .get("/refdata/external/v1/organisations/status/" + status + "?address=" + address)
                 .andReturn();
 
         response.then()

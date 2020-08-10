@@ -25,7 +25,7 @@ public class OrganisationMinimalInfoResponse {
         getOrganisationMinimalInfoResponse(organisation, isAddressRequired);
     }
 
-    private void getOrganisationMinimalInfoResponse(Organisation organisation, Boolean isAddressRequired) {
+    public void getOrganisationMinimalInfoResponse(Organisation organisation, Boolean isAddressRequired) {
         this.name = organisation.getName();
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
 

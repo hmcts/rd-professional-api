@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,22 +61,22 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
                 professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                        bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString());
+                        bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString(), true);
 
-        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
-                org.getContactInformation().get(0).getAddressLine1())));
+        responseList.forEach(org -> orgResponseInfo.addAll(getOrganisationInfo(org)));
 
-        assertThat(orgResponseInfo).contains(
-                activeOrgs.get(0).getOrganisationIdentifier(),
-                activeOrgs.get(0).getName(),
-                activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
-                activeOrgs.get(1).getOrganisationIdentifier(),
-                activeOrgs.get(1).getName(),
-                activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
-                noAddressOrgs.get(0).getOrganisationIdentifier(),
-                noAddressOrgs.get(0).getName(),
-                noAddressOrgs.get(1).getOrganisationIdentifier(),
-                noAddressOrgs.get(1).getName())
+        assertThat(orgResponseInfo)
+                .contains(
+                        activeOrgs.get(0).getOrganisationIdentifier(),
+                        activeOrgs.get(0).getName(),
+                        activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                        activeOrgs.get(1).getOrganisationIdentifier(),
+                        activeOrgs.get(1).getName(),
+                        activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
+                        noAddressOrgs.get(0).getOrganisationIdentifier(),
+                        noAddressOrgs.get(0).getName(),
+                        noAddressOrgs.get(1).getOrganisationIdentifier(),
+                        noAddressOrgs.get(1).getName())
                 .doesNotContain(
                         pendingOrgs.get(0).getOrganisationIdentifier(),
                         pendingOrgs.get(0).getName(),
@@ -94,7 +93,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         inviteNewUser(userRoles);
         validateErrorResponse((ErrorResponse) professionalApiClient
                         .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
-                                HttpStatus.FORBIDDEN, ACTIVE.toString()),
+                                HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
                 ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);
     }
 
@@ -104,7 +103,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         // invite new user having valid roles and also make it active
         inviteNewUser(getValidRoleList());
         validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                bearerToken, HttpStatus.NOT_FOUND, PENDING.toString()),
+                bearerToken, HttpStatus.NOT_FOUND, PENDING.toString(), true),
                 EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
     }
 
@@ -114,7 +113,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         // invite new user having valid roles and also make it active
         inviteNewUser(getValidRoleList());
         validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                bearerToken, HttpStatus.NOT_FOUND, null),
+                bearerToken, HttpStatus.NOT_FOUND, null, true),
                 EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
     }
 
@@ -257,6 +256,16 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         organisation.setContactInformations(singletonList(contactInformation));
 
         return organisation;
+    }
+
+    public List<String> getOrganisationInfo(OrganisationMinimalInfoResponse org) {
+        List<String> details = new ArrayList<>();
+        if (null != org.getContactInformation().get(0).getAddressLine1()) {
+            details.add(org.getContactInformation().get(0).getAddressLine1());
+        }
+        details.add(org.getName());
+        details.add(org.getOrganisationIdentifier());
+        return details;
     }
 
     public void validateErrorResponse(ErrorResponse errorResponse, String expectedErrorMessage,
