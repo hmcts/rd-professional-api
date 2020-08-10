@@ -20,7 +20,7 @@ public class FeatureConditionEvaluation  implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object arg2) throws Exception {
 
-        if (!deleteOrganisationEnabled && request.getMethod().equals("DELETE")) {
+        if (!deleteOrganisationEnabled) {
 
             response.sendError(403, ERROR_MESSAGE_403_FORBIDDEN);
         }

@@ -15,5 +15,3 @@ spring:
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
-# delete organisation enabled
-deleteOrganisationEnabled : true
