@@ -32,7 +32,7 @@ public class OrganisationMinimalInfoResponse {
         if (Boolean.TRUE.equals(isAddressRequired)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
-                    .map(ContactInformationResponse::new)
+                    .map(contactInfo -> new ContactInformationResponse(contactInfo, false))
                     .collect(toList());
         }
     }

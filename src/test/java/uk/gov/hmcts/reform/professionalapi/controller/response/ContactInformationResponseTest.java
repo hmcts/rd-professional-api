@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,10 +20,8 @@ public class ContactInformationResponseTest {
     final String expectTownCity = "London";
 
     @Test
-    public void testGetContactInformationResponse() throws Exception {
-
-        List<DxAddress> dxAddressList = new ArrayList<>();
-        dxAddressList.add(new DxAddress());
+    public void testGetContactInformationResponse() {
+        List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
@@ -35,7 +33,7 @@ public class ContactInformationResponseTest {
         contactInformation.setTownCity(expectTownCity);
         contactInformation.setDxAddresses(dxAddressList);
 
-        ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
+        ContactInformationResponse sut = new ContactInformationResponse(contactInformation, true);
 
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
         assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
@@ -48,8 +46,7 @@ public class ContactInformationResponseTest {
     }
 
     @Test
-    public void testGetContactInformationResponseWithDxAddress() throws Exception {
-
+    public void testGetContactInformationResponseWithDxAddress() {
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
         contactInformation.setAddressLine2(expectAddress2);
@@ -58,7 +55,8 @@ public class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
-        ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
+
+        ContactInformationResponse sut = new ContactInformationResponse(contactInformation, true);
 
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
         assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
@@ -68,7 +66,5 @@ public class ContactInformationResponseTest {
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
         assertThat(sut.getDxAddress()).isEmpty();
-
     }
-
 }
