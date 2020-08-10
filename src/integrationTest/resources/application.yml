@@ -33,6 +33,7 @@ idam:
   client:
     redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
     id: rd-professional-api
+    secret: cc5f2a6-9690-11e9-bc42-526af7764f64
 
 
 ## IDAM feign connection
