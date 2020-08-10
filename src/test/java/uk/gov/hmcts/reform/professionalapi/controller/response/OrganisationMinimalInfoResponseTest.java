@@ -43,6 +43,6 @@ public class OrganisationMinimalInfoResponseTest {
         OrganisationMinimalInfoResponse response = new OrganisationMinimalInfoResponse(organisationMock, false);
         assertThat(response.getName()).isEqualTo(name);
         assertThat(response.getOrganisationIdentifier()).isEqualTo(organisationIdentifier);
-        assertThat(response.getContactInformation()).isEqualTo(null);
+        assertThat(response.getContactInformation()).isNull();
     }
 }
