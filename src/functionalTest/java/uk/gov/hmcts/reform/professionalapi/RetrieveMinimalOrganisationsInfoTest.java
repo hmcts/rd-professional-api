@@ -4,9 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
@@ -95,26 +93,6 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
                         .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
                                 HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
                 ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);
-    }
-
-    @Test
-    //AC:5
-    public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending() {
-        // invite new user having valid roles and also make it active
-        inviteNewUser(getValidRoleList());
-        validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                bearerToken, HttpStatus.NOT_FOUND, PENDING.toString(), true),
-                EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
-    }
-
-    @Test
-    //AC:6
-    public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed() {
-        // invite new user having valid roles and also make it active
-        inviteNewUser(getValidRoleList());
-        validateErrorResponse((ErrorResponse) professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                bearerToken, HttpStatus.NOT_FOUND, null, true),
-                EMPTY_RESULT_DATA_ACCESS.getErrorMessage(), STATUS_PARAM_INVALID_MESSAGE);
     }
 
     public void setUpTestData() {
