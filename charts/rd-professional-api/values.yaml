@@ -13,7 +13,6 @@ java:
     IDAM_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     CCD_URL: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
-    OPEN_ID_API_BASE_URI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
 
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
   keyVaults:
