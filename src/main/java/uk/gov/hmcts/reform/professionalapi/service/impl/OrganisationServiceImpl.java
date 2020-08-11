@@ -151,7 +151,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes
-                = userAttributeService.addUserAttributesToSuperUserWithoutJurisdictions(persistedSuperUser,
+                = userAttributeService.addUserAttributesToSuperUser(persistedSuperUser,
                 newProfessionalUser.getUserAttributes());
         newProfessionalUser.setUserAttributes(attributes);
 

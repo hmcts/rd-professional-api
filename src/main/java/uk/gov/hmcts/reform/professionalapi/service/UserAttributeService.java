@@ -9,6 +9,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 public interface UserAttributeService {
     void addUserAttributesToUser(ProfessionalUser newUser, List<String> userRoles, List<PrdEnum> prdEnums);
 
-    List<UserAttribute> addUserAttributesToSuperUserWithoutJurisdictions(ProfessionalUser user,
+    List<UserAttribute> addUserAttributesToSuperUser(ProfessionalUser user,
                                                                       List<UserAttribute> attributes);
 }

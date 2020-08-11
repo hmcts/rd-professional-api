@@ -59,7 +59,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     }
 
     @Override
-    public List<UserAttribute> addUserAttributesToSuperUserWithoutJurisdictions(ProfessionalUser user,
+    public List<UserAttribute> addUserAttributesToSuperUser(ProfessionalUser user,
                                                                              List<UserAttribute> attributes) {
         prdEnumService.findAllPrdEnums().stream()
                 .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),prdEnum))

@@ -535,7 +535,7 @@ public class OrganisationServiceImplTest {
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUserWithoutJurisdictions(eq(professionalUser), eq(userAttributes));
+                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
         verify(professionalUserRepositoryMock, times(1)).save(any(ProfessionalUser.class));
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
@@ -557,13 +557,13 @@ public class OrganisationServiceImplTest {
         attributes.add(userAttribute);
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
-        when(userAttributeServiceMock.addUserAttributesToSuperUserWithoutJurisdictions(professionalUser, userAttributes
+        when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser, userAttributes
                 )).thenReturn(attributes);
 
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUserWithoutJurisdictions(eq(professionalUser), eq(userAttributes));
+                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
     }
 
     @Test
