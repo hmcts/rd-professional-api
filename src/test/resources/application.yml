@@ -14,3 +14,4 @@ spring:
     password: ${POSTGRES_PASSWORD:dbrefdata}
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
+
