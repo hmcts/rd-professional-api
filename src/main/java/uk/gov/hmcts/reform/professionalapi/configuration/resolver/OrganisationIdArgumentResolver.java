@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.configuration.resolver;
 
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_403_FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 
 import javax.servlet.http.HttpServletRequest;
 
