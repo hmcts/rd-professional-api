@@ -68,7 +68,3 @@ syncInterval: 60
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
-
-azure:
-  application-insights:
-    instrumentation-key: d8574bc8-c6b0-42fb-8572-6eafd7558cc0
