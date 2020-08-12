@@ -60,30 +60,30 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Value("${targetInstance}")
     protected String professionalApiUrl;
 
-    @Value("${exui.role.hmcts-admin}")
+    @Value("${prd.security.roles.hmcts-admin}")
     protected String hmctsAdmin;
 
-    @Value("${exui.role.pui-user-manager}")
+    @Value("${prd.security.roles.pui-user-manager}")
     protected String puiUserManager;
 
-    @Value("${exui.role.pui-organisation-manager}")
+    @Value("${prd.security.roles.pui-organisation-manager}")
     protected String puiOrgManager;
 
-    @Value("${exui.role.pui-finance-manager}")
+    @Value("${prd.security.roles.pui-finance-manager}")
     protected String puiFinanceManager;
 
-    @Value("${exui.role.pui-case-manager}")
+    @Value("${prd.security.roles.pui-case-manager}")
     protected String puiCaseManager;
 
-    @Value("${exui.role.pui-caa}")
+    @Value("${prd.security.roles.pui-caa}")
     protected String puiCaa;
 
-    @Value("${exui.role.caseworker-caa}")
+    @Value("${prd.security.roles.caseworker-caa}")
     protected String caseworkerCaa;
 
-    @Value("${prd.roles.prd-aac-system}")
+    @Value("${prd.security.roles.prd-aac-system}")
     protected String systemUser;
-  
+
     protected static ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -94,6 +94,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     protected TestConfigProperties configProperties;
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+
+    protected static  String  s2sToken;
 
     @After
     public void tearDown() {
@@ -119,11 +121,15 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
-        String s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+        if (s2sToken == null) {
+
+            s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
+        }
 
         professionalApiClient = new ProfessionalApiClient(
-            professionalApiUrl,
-            s2sToken, idamOpenIdClient, idamClient);
+                professionalApiUrl,
+                s2sToken, idamOpenIdClient, idamClient);
+
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {

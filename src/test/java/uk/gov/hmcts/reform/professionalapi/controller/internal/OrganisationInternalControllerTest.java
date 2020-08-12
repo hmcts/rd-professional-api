@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -81,6 +82,7 @@ public class OrganisationInternalControllerTest {
     private ProfessionalUser professionalUser;
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
+    private DeleteOrganisationResponse deleteOrganisationResponse;
 
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
@@ -90,8 +92,11 @@ public class OrganisationInternalControllerTest {
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
         organisationResponse = new OrganisationResponse(organisation);
-        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation),
-                false);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
+        organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+        organisationResponse = new OrganisationResponse(organisation);
+        organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
 
         organisationServiceMock = mock(OrganisationService.class);
@@ -309,5 +314,31 @@ public class OrganisationInternalControllerTest {
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
         verify(professionalUserServiceMock, times(1))
                 .findProfessionalUserByEmailAddress("some@email.com");
+    }
+
+    @Test
+    public void testDeleteOrganisation() {
+
+        final HttpStatus expectedHttpStatus = HttpStatus.NO_CONTENT;
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        organisation.setStatus(OrganisationStatus.PENDING);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+        when(organisationServiceMock.deleteOrganisation(organisation,"123456789"))
+                .thenReturn(deleteOrganisationResponse);
+        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId,"123456789");
+
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+        verify(organisationServiceMock, times(1)).deleteOrganisation(organisation,"123456789");
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void testDeleteOrganisationThrows404WhenNoOrgFound() {
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
+        organisationInternalController.deleteOrganisation(orgId,"123456789");
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
 }

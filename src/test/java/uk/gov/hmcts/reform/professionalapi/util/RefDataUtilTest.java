@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
 
@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -884,4 +885,50 @@ public class RefDataUtilTest {
         roles.add("prd-admin");
         assertFalse(isSystemRoleUser(roles));
     }
+
+    @Test
+    public void delete_UserProfile_204() throws JsonProcessingException {
+
+
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = "{" + "}";
+
+        Response response = Response.builder().status(204).reason("OK").headers(header).body(body, UTF_8)
+                .request(mock(Request.class)).build();
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(response);
+
+        DeleteOrganisationResponse deleteOrganisationResponse = RefDataUtil
+                .deleteUserProfilesFromUp(any(), userProfileFeignClient);
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(204);
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+
+    }
+
+    @Test
+    public void delete_UserProfile_500() throws JsonProcessingException {
+
+
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = "{" + "}";
+        Response response = Response.builder().status(500).reason("service failed").headers(header).body(body, UTF_8)
+                .request(mock(Request.class)).build();
+        when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(response);
+
+        DeleteOrganisationResponse deleteOrganisationResponse = RefDataUtil
+                .deleteUserProfilesFromUp(any(), userProfileFeignClient);
+
+        assertThat(deleteOrganisationResponse).isNotNull();
+        assertThat(deleteOrganisationResponse.getStatusCode()).isEqualTo(500);
+        verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
+
+    }
+
 }

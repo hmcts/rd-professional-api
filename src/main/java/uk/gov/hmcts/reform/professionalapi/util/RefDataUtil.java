@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.ERROR_MESSAGE_UP_FAILED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
 import feign.FeignException;
 import feign.Response;
@@ -33,9 +36,11 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiGeneratorConstants;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RetrieveUserProfilesRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
@@ -325,8 +330,8 @@ public class RefDataUtil {
     }
 
     public static String getShowDeletedValue(String showDeleted) {
-        return ProfessionalApiGeneratorConstants.TRUE.equalsIgnoreCase(showDeleted)
-                ? ProfessionalApiGeneratorConstants.TRUE : ProfessionalApiGeneratorConstants.FALSE;
+        return ProfessionalApiConstants.TRUE.equalsIgnoreCase(showDeleted)
+                ? ProfessionalApiConstants.TRUE : ProfessionalApiConstants.FALSE;
     }
 
     public static Boolean getReturnRolesValue(Boolean returnRoles) {
@@ -359,6 +364,27 @@ public class RefDataUtil {
 
         return newUserResponse;
 
+    }
+
+    public static DeleteOrganisationResponse deleteUserProfilesFromUp(DeleteUserProfilesRequest deleteUserRequest,
+            UserProfileFeignClient userProfileFeignClient) {
+
+        DeleteOrganisationResponse deleteOrganisationResponse = null;
+        try (Response response = userProfileFeignClient.deleteUserProfile(deleteUserRequest)) {
+
+            if (STATUS_CODE_204 == response.status()) {
+                deleteOrganisationResponse = new DeleteOrganisationResponse(STATUS_CODE_204, DELETION_SUCCESS_MSG);
+            } else if (ERROR_CODE_500 <= response.status()) {
+                log.error("DeleteUserProfiles service call failed in PRD::" + response.reason());
+                deleteOrganisationResponse = new DeleteOrganisationResponse(ERROR_CODE_500, ERROR_MESSAGE_UP_FAILED);
+            }
+
+        } catch (FeignException ex) {
+            log.error("DeleteUserProfiles service call failed in PRD:: " + ex);
+            throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ERROR_MESSAGE_UP_FAILED);
+
+        }
+        return deleteOrganisationResponse;
     }
 
     public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,
