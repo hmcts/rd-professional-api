@@ -70,3 +70,6 @@ loggingComponentName: RD_Professional_API
 
 # delete organisation enabled
 deleteOrganisationEnabled : false
+
+# get Active Orgs External enabled
+getActiveOrgsExternalEnabled : false

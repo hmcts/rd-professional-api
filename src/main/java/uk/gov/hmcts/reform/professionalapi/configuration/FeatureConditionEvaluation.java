@@ -12,10 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @Component
-public class FeatureConditionEvaluation  implements HandlerInterceptor {
+public class FeatureConditionEvaluation implements HandlerInterceptor {
 
     @Value("${deleteOrganisationEnabled}")
     private boolean deleteOrganisationEnabled;
+
+    @Value("${getActiveOrgsExternalEnabled}")
+    private boolean getActiveOrgsExternalEnabled;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -25,8 +28,11 @@ public class FeatureConditionEvaluation  implements HandlerInterceptor {
 
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
+
+        if (!getActiveOrgsExternalEnabled && request.getRequestURI().contains("refdata/external/v1/organisations/status/")) {
+            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
+        }
+
         return true;
     }
-
-
 }

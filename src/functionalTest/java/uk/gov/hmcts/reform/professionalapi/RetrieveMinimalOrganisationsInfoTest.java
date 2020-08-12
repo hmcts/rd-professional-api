@@ -13,6 +13,7 @@ import java.util.List;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -27,6 +28,9 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
+
+    @Value("${getActiveOrgsExternalEnabled}")
+    private boolean getActiveOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
             "Please check status param passed as this is invalid status.";
@@ -55,44 +59,49 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @SuppressWarnings("unchecked")
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
-        setUpTestData();
+        if (getActiveOrgsExternalEnabled) {
+            setUpTestData();
 
-        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
-                professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-                        bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString(), true);
+            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+                    professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
+                            bearerToken, HttpStatus.OK, IdamStatus.ACTIVE.toString(), true);
 
-        responseList.forEach(org -> orgResponseInfo.addAll(getOrganisationInfo(org)));
+            responseList.forEach(org -> orgResponseInfo.addAll(getOrganisationInfo(org)));
 
-        assertThat(orgResponseInfo)
-                .contains(
-                        activeOrgs.get(0).getOrganisationIdentifier(),
-                        activeOrgs.get(0).getName(),
-                        activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
-                        activeOrgs.get(1).getOrganisationIdentifier(),
-                        activeOrgs.get(1).getName(),
-                        activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
-                        noAddressOrgs.get(0).getOrganisationIdentifier(),
-                        noAddressOrgs.get(0).getName(),
-                        noAddressOrgs.get(1).getOrganisationIdentifier(),
-                        noAddressOrgs.get(1).getName())
-                .doesNotContain(
-                        pendingOrgs.get(0).getOrganisationIdentifier(),
-                        pendingOrgs.get(0).getName(),
-                        pendingOrgs.get(1).getOrganisationIdentifier(),
-                        pendingOrgs.get(1).getName());
+            assertThat(orgResponseInfo)
+                    .contains(
+                            activeOrgs.get(0).getOrganisationIdentifier(),
+                            activeOrgs.get(0).getName(),
+                            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                            activeOrgs.get(1).getOrganisationIdentifier(),
+                            activeOrgs.get(1).getName(),
+                            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
+                            noAddressOrgs.get(0).getOrganisationIdentifier(),
+                            noAddressOrgs.get(0).getName(),
+                            noAddressOrgs.get(1).getOrganisationIdentifier(),
+                            noAddressOrgs.get(1).getName())
+                    .doesNotContain(
+                            pendingOrgs.get(0).getOrganisationIdentifier(),
+                            pendingOrgs.get(0).getName(),
+                            pendingOrgs.get(1).getOrganisationIdentifier(),
+                            pendingOrgs.get(1).getName());
+        }
     }
 
     @Test
     //AC:3
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
-        // invite new user having invalid roles
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("caseworker");
-        inviteNewUser(userRoles);
-        validateErrorResponse((ErrorResponse) professionalApiClient
-                        .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
-                                HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
-                ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);
+        if (getActiveOrgsExternalEnabled) {
+
+            // invite new user having invalid roles
+            List<String> userRoles = new ArrayList<>();
+            userRoles.add("caseworker");
+            inviteNewUser(userRoles);
+            validateErrorResponse((ErrorResponse) professionalApiClient
+                            .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
+                                    HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
+                    ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);
+        }
     }
 
     public void setUpTestData() {
