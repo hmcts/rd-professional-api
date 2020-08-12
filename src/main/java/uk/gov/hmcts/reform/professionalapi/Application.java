@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @SpringBootApplication
 @EnableCaching
 @EnableFeignClients(basePackages = {
-        "uk.gov.hmcts.reform.professionalapi" }, basePackageClasses = { IdamApi.class, ServiceAuthorisationApi.class })
+        "uk.gov.hmcts.reform.professionalapi" },
+        basePackageClasses = { IdamApi.class, ServiceAuthorisationApi.class }
+        )
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application  {
 
