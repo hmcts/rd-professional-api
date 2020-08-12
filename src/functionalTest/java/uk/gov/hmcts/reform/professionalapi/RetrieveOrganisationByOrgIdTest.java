@@ -64,22 +64,38 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
-    public void rdcc117_ac4_pui_org_or_finance_mgr_without_active_status_cannot_retrieve_org_by_orgIdentifier() {
+    public void rdcc117_ac1_pui_finance_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+                generateBearerTokenForUser(puiFinanceManager));
+        assertThat(response.get("paymentAccount")).asList().hasSize(3);
+        responseValidate(response);
+    }
 
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(createUserForTest()).build();
+    @Test
+    public void rdcc117_ac2_pui_organisation_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+                generateBearerTokenForUser(puiOrgManager));
+        assertThat(response.get("paymentAccount")).asList().hasSize(3);
+    }
+
+
+    @Test
+    public void rdcc117_ac4_puiOrganisationOrFinanceManagerWithoutActiveStatusCannotRetrieveOrganisationbyOrgId() {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(
+                createUserForTest()).build();
         Map<String, Object> createOrgResponse = professionalApiClient.createOrganisation(organisationCreationRequest);
         orgIdentifier = (String) createOrgResponse.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
                 hmctsAdmin, "true", HttpStatus.OK, "");
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, firstName, lastName,
-                email);
+        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager,
+                firstName, lastName, email);
         assertThat(searchUsersResponse.containsValue("PENDING"));
 
-        Map<String, Object> response = professionalApiClient
-                .retrievePbaAccountsForAnOrganisationExternal(HttpStatus.FORBIDDEN, bearerTokenForUser);
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN,
+                bearerTokenForUser);
 
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
@@ -87,27 +103,20 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
 
     @Test
     public void can_retrieve_organisation_by_orgIdentifier_for_pui_user_manager_External() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
                 generateBearerTokenForUser(puiUserManager));
         assertThat(response).isNotEmpty();
         responseValidate(response);
     }
 
     @Test
-    public void can_retrieve_organisation_by_orgIdentifier_for_pui_caa_External() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
-                generateBearerTokenForUser(puiCaa));
-        assertThat(response).isNotEmpty();
-        responseValidate(response);
-    }
-
-    @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
-        Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
                 generateBearerTokenFor(puiCaseManager));
         assertThat(response).isNotEmpty();
         responseValidate(response);
     }
+
 
     private void responseValidate(Map<String, Object> orgResponse) {
 
