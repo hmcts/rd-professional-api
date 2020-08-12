@@ -134,11 +134,6 @@ public class ProfessionalExternalUserController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The Email Address of the User to be retrieved"
-    )
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -168,8 +163,7 @@ public class ProfessionalExternalUserController extends SuperController {
     )
     @Secured({"pui-user-manager"})
     public Optional<ResponseEntity> findUserByEmail(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
-                                                    @ApiParam(name = "email") @RequestParam(value = "email",
-                                                            required = false) String email) {
+                                                     @RequestParam(value = "email",  required = false) String email) {
 
         Optional<ResponseEntity> optionalResponseEntity;
         validateEmail(email);

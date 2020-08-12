@@ -291,6 +291,7 @@ dependencies {
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
