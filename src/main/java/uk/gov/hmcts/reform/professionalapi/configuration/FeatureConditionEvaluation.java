@@ -29,7 +29,8 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
 
-        if (!getActiveOrgsExternalEnabled && request.getRequestURI().contains("refdata/external/v1/organisations/status/")) {
+        if (!getActiveOrgsExternalEnabled && request.getRequestURI()
+                .contains("refdata/external/v1/organisations/status/")) {
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
 

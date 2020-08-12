@@ -88,7 +88,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Object retrieveOrganisationsWithMinimalInfo(String id, String role, String orgStatus,
-                                                       boolean address, Class expectedClass)
+                                                       Boolean address, Class expectedClass)
             throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequestForExternalWithGivenResponseType(
                 APP_EXT_BASE_PATH + "/status/" + orgStatus + "?address=" + address, role, id, expectedClass);

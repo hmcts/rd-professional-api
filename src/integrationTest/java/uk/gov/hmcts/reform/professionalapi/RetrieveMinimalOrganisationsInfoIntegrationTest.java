@@ -85,6 +85,70 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     }
 
     @Test
+    public void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
+            throws JsonProcessingException {
+        if (getActiveOrgsExternalEnabled) {
+
+            setUpTestData();
+            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+                    professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                            userIdentifier, puiCaa, ACTIVE, null, OrganisationMinimalInfoResponse[].class);
+
+            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
+                    org.getContactInformation().get(0).getAddressLine1())));
+
+            assertThat(orgResponseInfo).contains(
+                    activeOrgs.get(0).getOrganisationIdentifier(),
+                    activeOrgs.get(0).getName(),
+                    activeOrgs.get(1).getOrganisationIdentifier(),
+                    activeOrgs.get(1).getName(),
+                    noAddressOrgs.get(0).getOrganisationIdentifier(),
+                    noAddressOrgs.get(0).getName(),
+                    noAddressOrgs.get(1).getOrganisationIdentifier(),
+                    noAddressOrgs.get(1).getName())
+                    .doesNotContain(
+                            pendingOrgs.get(0).getOrganisationIdentifier(),
+                            pendingOrgs.get(0).getName(),
+                            pendingOrgs.get(1).getOrganisationIdentifier(),
+                            pendingOrgs.get(1).getName(),
+                            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
+        }
+    }
+
+    @Test
+    public void should_retrieve_organisations_info_without_address_with_200_for_status_active_false_address_param()
+            throws JsonProcessingException {
+        if (getActiveOrgsExternalEnabled) {
+
+            setUpTestData();
+            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+                    professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                            userIdentifier, puiCaa, ACTIVE, null, OrganisationMinimalInfoResponse[].class);
+
+            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
+                    org.getContactInformation().get(0).getAddressLine1())));
+
+            assertThat(orgResponseInfo).contains(
+                    activeOrgs.get(0).getOrganisationIdentifier(),
+                    activeOrgs.get(0).getName(),
+                    activeOrgs.get(1).getOrganisationIdentifier(),
+                    activeOrgs.get(1).getName(),
+                    noAddressOrgs.get(0).getOrganisationIdentifier(),
+                    noAddressOrgs.get(0).getName(),
+                    noAddressOrgs.get(1).getOrganisationIdentifier(),
+                    noAddressOrgs.get(1).getName())
+                    .doesNotContain(
+                            pendingOrgs.get(0).getOrganisationIdentifier(),
+                            pendingOrgs.get(0).getName(),
+                            pendingOrgs.get(1).getOrganisationIdentifier(),
+                            pendingOrgs.get(1).getName(),
+                            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
+        }
+    }
+
+    @Test
     //AC:2
     public void shouldFailTo_retrieve_orgInfo_with403_withCorrectRoles_andStatusActive_andPendingCallerUser()
             throws JsonProcessingException {

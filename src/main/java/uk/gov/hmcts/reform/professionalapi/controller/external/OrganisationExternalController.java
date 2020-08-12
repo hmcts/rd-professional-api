@@ -165,7 +165,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
         retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email,
-                                      @ApiParam(hidden = true) @OrgId String orgId) {
+                                  @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
@@ -269,7 +269,8 @@ public class OrganisationExternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
-    public ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveOrganisationsByStatusWithMinimalInfo(
+    public ResponseEntity<List<OrganisationMinimalInfoResponse>>
+        retrieveOrganisationsByStatusWithAddressDetailsOptional(
             @ApiParam(hidden = true) @UserId String userId,
             @PathVariable("status") String status,
             @ApiParam(name = "address")
@@ -288,7 +289,7 @@ public class OrganisationExternalController extends SuperController {
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
-                organisation,extOrgIdentifier);
+                organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));

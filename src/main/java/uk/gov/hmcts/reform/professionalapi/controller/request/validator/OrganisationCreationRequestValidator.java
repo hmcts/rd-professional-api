@@ -13,6 +13,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -35,6 +36,8 @@ public class OrganisationCreationRequestValidator {
     public static final String CHARACTERS = " characters";
 
     public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
+
+    private static String loggingComponentName;
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -181,9 +184,14 @@ public class OrganisationCreationRequestValidator {
         List<String> validStatusList = asList(allowedStatus.split(","));
         String orgStatus = removeAllSpaces(organisationStatus);
         if (isBlank(orgStatus) || !validStatusList.contains(orgStatus.toUpperCase())) {
-            log.error(ERROR_MESSAGE_INVALID_STATUS_PASSED);
+            log.error(loggingComponentName + ERROR_MESSAGE_INVALID_STATUS_PASSED);
             throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
         }
+    }
+
+    @Value("${loggingComponentName}")
+    public void setLoggingComponentName(String loggingComponentName) {
+        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 
 }
