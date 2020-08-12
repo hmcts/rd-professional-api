@@ -59,7 +59,6 @@ public class TelemetryRequestProcessor implements TelemetryProcessor {
                     String encodeVal = val.replace((val.substring(2, val.indexOf("."))), "****");
                     requestTelemetry.setUrl(requestTelemetry.getUrlString().replace(val, encodeVal));
                 }
-
             }
         } catch (Exception exception) {
             log.error("{}::RequestTelemetry error malformed uri", loggingComponentName);
