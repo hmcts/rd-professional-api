@@ -134,11 +134,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The Email Address of the User to be retrieved"
-    )
+
     @ApiResponses({
             @ApiResponse(
                     code = 200,
