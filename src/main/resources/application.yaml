@@ -38,8 +38,10 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
-
-### database configuration
+  flyway:
+    ignore-missing-migrations: true
+    validateOnMigrate: false
+  ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
@@ -119,6 +121,6 @@ defaultPageSize: ${DEFAULTPAGESIZE:10}
 resendInviteEnabled : true
 
 # delete organisation enabled
-deleteOrganisationEnabled : ${DELETE_ORG:false}
+deleteOrganisationEnabled : true
 
 loggingComponentName: RD_Professional_API
