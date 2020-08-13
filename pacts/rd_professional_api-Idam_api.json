@@ -1,0 +1,165 @@
+{
+    "provider": {
+        "name": "Idam_api"
+    },
+    "consumer": {
+        "name": "rd_professional_api"
+    },
+    "interactions": [
+        {
+            "description": "Provider returns user info to RD-PROFESSIONAL-API",
+            "request": {
+                "method": "GET",
+                "path": "/o/userinfo",
+                "headers": {
+                    "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJraWQiOiJiL082T3ZWdeRre"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "uid": "1111-2222-3333-4567",
+                    "roles": [
+                        "citizen"
+                    ],
+                    "given_name": "puiCaseManager",
+                    "family_name": "Jar"
+                },
+                "matchingRules": {
+                    "body": {
+                        "$.uid": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.given_name": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.family_name": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.roles[0]": {
+                            "matchers": [
+                                {
+                                    "match": "type",
+                                     "min" : 0
+                                }
+                            ],
+                            "combine": "AND"
+                        }
+                    }
+                }
+            },
+            "providerStates": [
+                {
+                    "name": "I have obtained an access_token as a user",
+                    "params": {
+                        "client_id": "pact",
+                        "client_secret": "pactsecret",
+                        "password": "Password123",
+                        "redirect_uri": "http://www.dummy-pact-service.com/callback",
+                        "scope": "openid profile roles",
+                        "username": "prdadmin@email.net"
+                    }
+                }
+            ]
+        },
+        {
+            "description": "Provider receives a GET /details request from the RD - REF DATA API",
+            "request": {
+                "method": "GET",
+                "path": "/details",
+                "headers": {
+                    "Authorization": "111"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "forename": "rao",
+                    "surname": "kotla",
+                    "roles": "[\"prd-admin\"]",
+                    "id": "123",
+                    "email": "prdadmin@fake.hmcts.net"
+                },
+                "matchingRules": {
+                    "body": {
+                        "$.id": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.email": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.forename": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.surname": {
+                            "matchers": [
+                                {
+                                    "match": "type"
+                                }
+                            ],
+                            "combine": "AND"
+                        },
+                        "$.roles": {
+                            "matchers": [
+                                {
+                                    "match": "type",
+                                    "min" : 0
+                                }
+                            ],
+                            "combine": "AND"
+                        }
+                    }
+                }
+            },
+            "providerStates": [
+                {
+                    "name": "Idam successfully returns user details"
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "pactSpecification": {
+            "version": "3.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.5.24"
+        }
+    }
+}
