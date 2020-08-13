@@ -35,4 +35,4 @@ resendInterval: 60
 resendInviteEnabled : true
 
 # delete organisation enabled
-deleteOrganisationEnabled : true
+deleteOrganisationEnabled : ${DELETE_ORG:true}
