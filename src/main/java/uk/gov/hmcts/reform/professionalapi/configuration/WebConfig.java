@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.configuration;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -14,10 +13,7 @@ import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrganisationId
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserIdArgumentResolver;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-
-    @Value("${activeOrgsExternalEnabled}")
-    private boolean activeOrgsExternalEnabled;
+public class WebConfig  implements WebMvcConfigurer {
 
     @Bean
     public UserIdArgumentResolver getUserIdArgumentResolver() {
@@ -41,12 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
         registry.addInterceptor(featureConditionEvaluation);
-        if (!activeOrgsExternalEnabled) {
-            registry.addInterceptor(featureConditionEvaluation)
-                    .excludePathPatterns("refdata/external/v1/organisations/status/**");
-        }
     }
 
 }
