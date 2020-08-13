@@ -89,6 +89,17 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void should_retrieve_403_when_API_toggled_off() {
+        if (!activeOrgsExternalEnabled) {
+            setUpTestData();
+
+            professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
+                            bearerToken, HttpStatus.FORBIDDEN, IdamStatus.ACTIVE.toString(), true);
+        }
+    }
+
+    @Test
     //AC:3
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
         if (activeOrgsExternalEnabled) {
