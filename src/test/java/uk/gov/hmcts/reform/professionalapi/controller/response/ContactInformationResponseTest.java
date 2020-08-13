@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContactInformationResponseTest {
 
@@ -21,7 +17,6 @@ public class ContactInformationResponseTest {
 
     @Test
     public void testGetContactInformationResponse() {
-        List<DxAddress> dxAddressList = Arrays.asList(new DxAddress());
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
@@ -31,32 +26,8 @@ public class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
-        contactInformation.setDxAddresses(dxAddressList);
 
-        ContactInformationResponse sut = new ContactInformationResponse(contactInformation, true);
-
-        assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
-        assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
-        assertThat(sut.getAddressLine3()).isEqualTo(expectAddress3);
-        assertThat(sut.getPostCode()).isEqualTo(expectPostCode);
-        assertThat(sut.getCounty()).isEqualTo(expectCounty);
-        assertThat(sut.getCountry()).isEqualTo(expectCountry);
-        assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
-        assertThat(sut.getDxAddress()).isNotEmpty();
-    }
-
-    @Test
-    public void testGetContactInformationResponseWithDxAddress() {
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setAddressLine1(expectAddress1);
-        contactInformation.setAddressLine2(expectAddress2);
-        contactInformation.setAddressLine3(expectAddress3);
-        contactInformation.setPostCode(expectPostCode);
-        contactInformation.setCounty(expectCounty);
-        contactInformation.setCountry(expectCountry);
-        contactInformation.setTownCity(expectTownCity);
-
-        ContactInformationResponse sut = new ContactInformationResponse(contactInformation, true);
+        ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
 
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);
         assertThat(sut.getAddressLine2()).isEqualTo(expectAddress2);
@@ -65,6 +36,5 @@ public class ContactInformationResponseTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
-        assertThat(sut.getDxAddress()).isEmpty();
     }
 }
