@@ -120,7 +120,7 @@ defaultPageSize: ${DEFAULTPAGESIZE:10}
 resendInviteEnabled : true
 
 # delete organisation enabled
-deleteOrganisationEnabled : false
+deleteOrganisationEnabled : ${DELETE_ORG:false}
 
 # get Active Orgs External enabled
 getActiveOrgsExternalEnabled : false
