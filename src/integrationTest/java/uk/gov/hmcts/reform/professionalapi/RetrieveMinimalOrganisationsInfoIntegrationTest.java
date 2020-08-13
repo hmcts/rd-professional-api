@@ -27,8 +27,8 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 @SuppressWarnings("unchecked")
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    @Value("${getActiveOrgsExternalEnabled}")
-    private boolean getActiveOrgsExternalEnabled;
+    @Value("${activeOrgsExternalEnabled}")
+    private boolean activeOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
             "Please check status param passed as this is invalid status.";
@@ -55,7 +55,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active()
             throws JsonProcessingException {
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             setUpTestData();
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -87,7 +87,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     @Test
     public void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
             throws JsonProcessingException {
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             setUpTestData();
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -119,7 +119,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     @Test
     public void should_retrieve_organisations_info_without_address_with_200_for_status_active_false_address_param()
             throws JsonProcessingException {
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             setUpTestData();
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -153,7 +153,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void shouldFailTo_retrieve_orgInfo_with403_withCorrectRoles_andStatusActive_andPendingCallerUser()
             throws JsonProcessingException {
 
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             inviteUser(false);
             getUserProfileByEmailWireMock(HttpStatus.OK);
@@ -169,7 +169,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void shouldFailTo_retrieve_orgInfo_with403_withIncorrect_roles_and_status_active()
             throws JsonProcessingException {
 
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             inviteUser(false);
             Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
@@ -185,7 +185,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending()
             throws JsonProcessingException {
 
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             inviteUser(false);
             Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
@@ -201,7 +201,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed()
             throws JsonProcessingException {
 
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             inviteUser(false);
             Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient

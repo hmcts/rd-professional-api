@@ -29,8 +29,8 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
-    @Value("${getActiveOrgsExternalEnabled}")
-    private boolean getActiveOrgsExternalEnabled;
+    @Value("${activeOrgsExternalEnabled}")
+    private boolean activeOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
             "Please check status param passed as this is invalid status.";
@@ -59,7 +59,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @SuppressWarnings("unchecked")
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
             setUpTestData();
 
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -91,7 +91,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     @Test
     //AC:3
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
-        if (getActiveOrgsExternalEnabled) {
+        if (activeOrgsExternalEnabled) {
 
             // invite new user having invalid roles
             List<String> userRoles = new ArrayList<>();

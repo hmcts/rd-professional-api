@@ -123,6 +123,6 @@ resendInviteEnabled : true
 deleteOrganisationEnabled : ${DELETE_ORG:false}
 
 # get Active Orgs External enabled
-getActiveOrgsExternalEnabled : false
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
 
 loggingComponentName: RD_Professional_API
