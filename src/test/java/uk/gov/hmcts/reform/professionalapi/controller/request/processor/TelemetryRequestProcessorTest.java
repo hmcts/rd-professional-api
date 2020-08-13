@@ -21,23 +21,23 @@ public class TelemetryRequestProcessorTest {
 
     @Test
     public void testProcess() throws Exception {
-        requestTelemetry.setUrl(new URL("http://test.com?email=abc@test.com"));
+        requestTelemetry.setUrl(new URL("http://test.com?email=abcdef.xyz@test.com"));
         telemetryRequestProcessor.process(requestTelemetry);
-        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com?email=ab****.com");
+        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com?email=ab******yz@test.com");
     }
 
     @Test
     public void testProcessPathParams() throws Exception {
         requestTelemetry.setUrl(new URL("http://test.com/abc@test.com"));
         telemetryRequestProcessor.process(requestTelemetry);
-        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/ab****.com");
+        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/a**@test.com");
     }
 
     @Test
     public void testProcessPathParamsAndQueryParams() throws Exception {
         requestTelemetry.setUrl(new URL("http://test.com/abc@test.com?email=abc%40test.com"));
         telemetryRequestProcessor.process(requestTelemetry);
-        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/ab****.com?email=ab****.com");
+        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/a**@test.com?email=a**@test.com");
     }
 
     @Test
