@@ -28,9 +28,9 @@ public class TelemetryRequestProcessorTest {
 
     @Test
     public void testProcessPathParams() throws Exception {
-        requestTelemetry.setUrl(new URL("http://test.com/abc@test.com"));
+        requestTelemetry.setUrl(new URL("http://test.com/abcde@test.com"));
         telemetryRequestProcessor.process(requestTelemetry);
-        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/a**@test.com");
+        Assertions.assertThat(requestTelemetry.getUrlString()).isEqualTo("http://test.com/ab**e@test.com");
     }
 
     @Test

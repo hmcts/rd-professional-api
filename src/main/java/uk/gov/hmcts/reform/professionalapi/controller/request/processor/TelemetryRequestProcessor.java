@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.processor;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FilenameUtils.getName;
+import static org.apache.commons.lang.StringUtils.overlay;
 import static org.apache.commons.lang.StringUtils.repeat;
 import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.http.client.utils.URLEncodedUtils.parse;
@@ -64,8 +65,10 @@ public class TelemetryRequestProcessor implements TelemetryProcessor {
                         encodeVal = val.replace(id, repeat("*", id.length()));
                     } else {
                         String id = val.substring(0, (val.indexOf("@")));
-                        String anonymizedId = id.length() > 3 ? rightPad(id.substring(0, 2), id.length(), "*") :
+                        String anonymizedId = id.length() > 3 ? overlay(val,
+                            repeat("*", val.length() - val.substring(2).length()), 2, val.length()) :
                             rightPad(id.substring(0, 1), id.length(), "*");
+                        anonymizedId = id.replace(id.substring(0, anonymizedId.length()), anonymizedId);
                         encodeVal = val.replace(id, anonymizedId);
                     }
                     requestTelemetry.setUrl(requestTelemetry.getUrlString().replace(val, encodeVal));
