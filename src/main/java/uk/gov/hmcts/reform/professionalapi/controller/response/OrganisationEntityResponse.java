@@ -52,7 +52,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
         if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
-                    .map(contactInfo -> new ContactInformationResponseWithDxAddress(contactInfo))
+                    .map(ContactInformationResponseWithDxAddress::new)
                     .collect(toList());
         }
     }

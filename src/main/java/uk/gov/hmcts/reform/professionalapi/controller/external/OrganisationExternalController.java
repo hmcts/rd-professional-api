@@ -273,7 +273,6 @@ public class OrganisationExternalController extends SuperController {
         retrieveOrganisationsByStatusWithAddressDetailsOptional(
             @ApiParam(hidden = true) @UserId String userId,
             @PathVariable("status") String status,
-            @ApiParam(name = "address")
             @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
 
         professionalUserService.checkUserStatusIsActiveByUserId(userId);

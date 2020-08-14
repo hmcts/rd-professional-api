@@ -29,10 +29,10 @@ public class OrganisationMinimalInfoResponse {
         this.name = organisation.getName();
         this.organisationIdentifier = organisation.getOrganisationIdentifier();
 
-        if (Boolean.TRUE.equals(isAddressRequired)) {
+        if (isAddressRequired) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
-                    .map(contactInfo -> new ContactInformationResponse(contactInfo))
+                    .map(ContactInformationResponse::new)
                     .collect(toList());
         }
     }

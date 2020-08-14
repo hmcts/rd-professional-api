@@ -33,10 +33,6 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    public static final String CHARACTERS = " characters";
-
-    public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
-
     private static String loggingComponentName;
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
@@ -117,7 +113,7 @@ public class OrganisationCreationRequestValidator {
     private void requestPaymentAccount(Set<String> paymentAccounts) {
 
         if (paymentAccounts != null) {
-            paymentAccounts.stream()
+            paymentAccounts
                     .forEach(paymentAccount -> {
                         if (isEmptyValue(paymentAccount)) {
                             throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
@@ -139,7 +135,7 @@ public class OrganisationCreationRequestValidator {
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
         if (null != contactInformations) {
 
-            contactInformations.stream()
+            contactInformations
                     .forEach(contactInformation -> {
                         if (isEmptyValue(contactInformation.getAddressLine1())
                                 || isEmptyValue(contactInformation.getAddressLine2())
@@ -151,9 +147,7 @@ public class OrganisationCreationRequestValidator {
                             throw new InvalidRequest("Empty contactInformation value");
                         }
                         if (null != contactInformation.getDxAddress()) {
-                            contactInformation.getDxAddress().stream().forEach(dxAddress -> {
-                                isDxAddressValid(dxAddress);
-                            });
+                            contactInformation.getDxAddress().forEach(this::isDxAddressValid);
                         }
                     });
 
@@ -190,7 +184,7 @@ public class OrganisationCreationRequestValidator {
     }
 
     @Value("${loggingComponentName}")
-    public void setLoggingComponentName(String loggingComponentName) {
+    public static void setLoggingComponentName(String loggingComponentName) {
         OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
     }
 
