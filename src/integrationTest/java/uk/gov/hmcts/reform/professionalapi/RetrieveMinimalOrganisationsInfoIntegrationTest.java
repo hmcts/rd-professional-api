@@ -124,7 +124,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
             setUpTestData();
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
                     professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                            userIdentifier, puiCaa, ACTIVE, null, OrganisationMinimalInfoResponse[].class);
+                            userIdentifier, puiCaa, ACTIVE, false, OrganisationMinimalInfoResponse[].class);
 
             responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
                     org.getContactInformation().get(0).getAddressLine1())));
