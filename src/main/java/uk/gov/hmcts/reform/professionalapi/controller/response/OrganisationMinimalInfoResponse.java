@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 @NoArgsConstructor
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganisationMinimalInfoResponse {
 
     @JsonProperty

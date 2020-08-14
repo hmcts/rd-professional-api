@@ -92,10 +92,10 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
             setUpTestData();
             List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
                     professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                            userIdentifier, puiCaa, ACTIVE, null, OrganisationMinimalInfoResponse[].class);
+                            userIdentifier, puiCaa, ACTIVE, Boolean.valueOf(null),
+                            OrganisationMinimalInfoResponse[].class);
 
-            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
-                    org.getContactInformation().get(0).getAddressLine1())));
+            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
 
             assertThat(orgResponseInfo).contains(
                     activeOrgs.get(0).getOrganisationIdentifier(),
@@ -126,8 +126,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
                     professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
                             userIdentifier, puiCaa, ACTIVE, false, OrganisationMinimalInfoResponse[].class);
 
-            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
-                    org.getContactInformation().get(0).getAddressLine1())));
+            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
 
             assertThat(orgResponseInfo).contains(
                     activeOrgs.get(0).getOrganisationIdentifier(),

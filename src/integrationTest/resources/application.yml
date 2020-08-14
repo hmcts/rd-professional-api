@@ -72,4 +72,4 @@ loggingComponentName: RD_Professional_API
 deleteOrganisationEnabled : false
 
 # get Active Orgs External enabled
-activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:true}
