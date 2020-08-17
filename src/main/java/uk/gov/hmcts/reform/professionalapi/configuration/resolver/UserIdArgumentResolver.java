@@ -35,6 +35,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
         HttpServletRequest request
                 = (HttpServletRequest) nativeWebRequest.getNativeRequest();
+
         String userId = null;
         //Inside UserIdArgumentResolver
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();

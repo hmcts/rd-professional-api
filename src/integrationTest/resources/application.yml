@@ -37,16 +37,16 @@ idam:
 
 ## IDAM feign connection
 auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
-
-exui.role:
-  hmcts-admin: prd-admin
-  pui-user-manager: pui-user-manager
-  pui-organisation-manager: pui-organisation-manager
-  pui-finance-manager: pui-finance-manager
-  pui-case-manager: pui-case-manager
-  pui-caa: pui-caa
-prd.roles:
-  prd-aac-system: prd-aac-system
+prd:
+  security:
+    roles:
+      hmcts-admin: prd-admin
+      pui-user-manager: pui-user-manager
+      pui-organisation-manager: pui-organisation-manager
+      pui-finance-manager: pui-finance-manager
+      pui-case-manager: pui-case-manager
+      pui-caa: pui-caa
+      prd-aac-system: prd-aac-system
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
@@ -67,3 +67,6 @@ syncInterval: 60
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
+
+# delete organisation enabled
+deleteOrganisationEnabled : false

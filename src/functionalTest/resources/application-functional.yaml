@@ -1,4 +1,4 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://rd-professional-api-pr-682.service.core-compute-preview.internal}
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
@@ -16,17 +16,20 @@ s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
-exui.role.hmcts-admin: prd-admin
-exui.role.pui-user-manager: pui-user-manager
-exui.role.pui-organisation-manager: pui-organisation-manager
-exui.role.pui-finance-manager: pui-finance-manager
-exui.role.pui-case-manager: pui-case-manager
-exui.role.pui-caa: pui-caa
-exui.role.caseworker-caa: caseworker-caa
-prd.roles.prd-aac-system: prd-aac-system
+prd.security.roles.hmcts-admin: prd-admin
+prd.security.roles.pui-user-manager: pui-user-manager
+prd.security.roles.pui-organisation-manager: pui-organisation-manager
+prd.security.roles.pui-finance-manager: pui-finance-manager
+prd.security.roles.pui-case-manager: pui-case-manager
+prd.security.roles.pui-caa: pui-caa
+prd.security.roles.caseworker-caa: caseworker-caa
+prd.security.roles.prd-aac-system: prd-aac-system
 
 # resent user invite interval in minutes
 resendInterval: 60
 
 # toggle for resendInvite
 resendInviteEnabled : true
+
+# delete organisation enabled
+deleteOrganisationEnabled : false
