@@ -291,6 +291,8 @@ dependencies {
 
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+    compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
+
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
