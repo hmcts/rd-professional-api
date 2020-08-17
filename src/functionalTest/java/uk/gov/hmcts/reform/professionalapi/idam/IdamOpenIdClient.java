@@ -113,6 +113,8 @@ public class IdamOpenIdClient {
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
+        log.info("getClientSecret: " + testConfig.getClientSecret());
+
         Response openIdTokenResponse = RestAssured
             .given()
             .relaxedHTTPSValidation()
