@@ -175,7 +175,7 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     baselineOnMigrate = true
-    ignoreMissingMigrations = true
+    locations = ["filesystem:src/main/resources/db/migration","filesystem:src/main/resources/db/postgres"]
     if (project.hasProperty("dburl")) {
         url = "jdbc:postgresql://${dburl}"
     }
@@ -283,7 +283,7 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
+//    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
