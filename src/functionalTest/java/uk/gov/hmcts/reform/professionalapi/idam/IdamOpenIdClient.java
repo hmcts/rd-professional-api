@@ -114,6 +114,7 @@ public class IdamOpenIdClient {
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         log.info("getClientSecret: " + testConfig.getClientSecret());
+        System.out.println("getClientSecret from sysout: " + testConfig.getClientSecret());
 
         Response openIdTokenResponse = RestAssured
             .given()
