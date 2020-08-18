@@ -8,7 +8,7 @@ idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 generated.user.email.pattern: ${GENERATED_USER_EMAIL_PATTERN:freg-test-user-%s@feemail.com}
 test.user.password: ${TEST_USER_PASSWORD:Hmcts123}
 oauth2.client.id: ${OAUTH2_CLIENT_ID:rd-professional-api}
-oauth2.client.secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64}
+oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64}
 idam.auth.clientId: rd-professional-api
 idam.auth.tokenAuth: ${IDAM_TOKEN_ATUH:cmQtcHJvZmVzc2lvbmFsLWFwaTpjYzVmMmE2LTk2OTAtMTFlOS1iYzQyLTUyNmFmNzc2NGY2NA==}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
