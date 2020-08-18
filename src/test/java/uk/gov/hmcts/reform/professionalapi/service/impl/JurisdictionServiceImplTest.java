@@ -61,7 +61,7 @@ public class JurisdictionServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         attributeList.add(userAttribute1);
         attributeList.add(userAttribute2);
