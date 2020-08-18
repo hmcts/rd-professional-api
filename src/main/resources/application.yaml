@@ -86,7 +86,6 @@ idam:
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
     pbaFromUserAccountMap: false
-    oauth2_secret: ${OAUTH2_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac,aac_manage_case_assignment}
   api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
