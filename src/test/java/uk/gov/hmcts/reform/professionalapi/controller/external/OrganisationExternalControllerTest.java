@@ -154,7 +154,7 @@ public class OrganisationExternalControllerTest {
         response = Response.builder().status(200).reason("OK").body(mock(Response.Body.class))
                 .request(mock(Request.class)).build();
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
