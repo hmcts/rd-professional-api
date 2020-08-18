@@ -21,4 +21,4 @@ java:
         - professional-api-POSTGRES-PASS
         - s2s-secret
         - AppInsightsInstrumentationKey
-        - oauth2-client-secret
+        - OAUTH2-CLIENT-SECRET

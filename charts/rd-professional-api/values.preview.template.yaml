@@ -15,6 +15,4 @@ java:
     rd:
       secrets:
         - s2s-secret
-        - oauth2-client-secret
-
-
+        - OAUTH2-CLIENT-SECRET
