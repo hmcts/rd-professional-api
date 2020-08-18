@@ -60,7 +60,7 @@ public class LegacyPbaControllerTest {
         organisationRepository.save(organisation);
         professionalUserRepository.save(professionalUser);
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

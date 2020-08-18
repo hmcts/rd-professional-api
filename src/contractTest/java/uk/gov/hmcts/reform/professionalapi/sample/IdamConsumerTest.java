@@ -136,6 +136,7 @@ public class IdamConsumerTest {
                         .statusCode(200)
                         .and()
                         .extract()
+                        .response()
                         .body()
                         .asString();
 
@@ -180,6 +181,8 @@ public class IdamConsumerTest {
                         .statusCode(200)
                         .and()
                         .extract()
+                        .response()
+                        .body()
                         .asString();
 
         assertThat(actualResponseBody).isNotNull();
@@ -217,7 +220,9 @@ public class IdamConsumerTest {
                         .then()
                         .statusCode(200)
                         .and()
-                        .extract().response().body()
+                        .extract()
+                        .response()
+                        .body()
                         .asString();
 
         JSONObject response = new JSONObject(actualResponseBody);
