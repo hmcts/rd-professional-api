@@ -828,7 +828,6 @@ public class OrganisationServiceImplTest {
         UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
         userAccountMaps.add(userAccountMap);
-        paymentAccount.setUserAccountMap(userAccountMaps);
         organisation.addPaymentAccount(paymentAccount);
         return organisation;
     }

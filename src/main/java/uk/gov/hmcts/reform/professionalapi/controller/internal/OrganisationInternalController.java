@@ -225,20 +225,19 @@ public class OrganisationInternalController extends SuperController {
                                                      @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
                                                              message = ORG_ID_VALIDATION_ERROR_MESSAGE)
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
         log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
         paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
                 .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-        if (!organisation.isPresent()) {
+        if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
 
-        paymentAccountService.deleteUserAccountMaps(organisation.get());
-        paymentAccountService.deletePaymentAccountsFromOrganisation(organisation.get());
-        paymentAccountService.addPaymentAccountsToOrganisation(pbaEditRequest, organisation.get());
-        PbaResponse response = paymentAccountService.addUserAndPaymentAccountsToUserAccountMap(organisation.get());
+        PbaResponse response = paymentAccountService
+                .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
 
         return ResponseEntity
                 .status(200)

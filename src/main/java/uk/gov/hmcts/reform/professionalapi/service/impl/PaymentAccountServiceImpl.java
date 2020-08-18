@@ -46,41 +46,30 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public Organisation findPaymentAccountsByEmail(String email) {
 
         ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-
         Organisation organisation = null;
         List<PaymentAccount> paymentAccountsEntity;
 
-        if (null != user
-                && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
+        if (null != user && OrganisationStatus.ACTIVE.equals(user.getOrganisation().getStatus())) {
 
-            if ("true".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
-
-                List<PaymentAccount> userMapPaymentAccount = RefDataUtil.getPaymentAccountsFromUserAccountMap(user
-                        .getUserAccountMap());
-                paymentAccountsEntity = RefDataUtil
-                        .getPaymentAccountFromUserMap(userMapPaymentAccount, user.getOrganisation()
-                                .getPaymentAccounts());
-
-                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
-                        userProfileFeignClient, false));
-                organisation = user.getOrganisation();
-
-            } else if ("false".equalsIgnoreCase(configuration.getPbaFromUserAccountMap())) {
-
-                paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
-                user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
-                user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
-                        userProfileFeignClient, false));
-                organisation = user.getOrganisation();
-            }
-
+            paymentAccountsEntity = RefDataUtil.getPaymentAccount(user.getOrganisation().getPaymentAccounts());
+            user.getOrganisation().setPaymentAccounts(paymentAccountsEntity);
+            user.getOrganisation().setUsers(RefDataUtil.getUserIdFromUserProfile(user.getOrganisation().getUsers(),
+                    userProfileFeignClient, false));
+            organisation = user.getOrganisation();
         }
         return organisation;
     }
 
+    @Override
     @Transactional
+    public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
+        deleteUserAccountMaps(organisation);
+        deletePaymentAccountsFromOrganisation(organisation);
+        paymentAccountRepository.flush();
+        addPaymentAccountsToOrganisation(pbaEditRequest,organisation);
+        return addUserAndPaymentAccountsToUserAccountMap(organisation);
+    }
+
     public void deleteUserAccountMaps(Organisation organisation) {
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
@@ -93,7 +82,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         userAccountMapService.deleteByUserAccountMapIdIn(accountsToDelete);
     }
 
-    @Transactional
+
     public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
         List<UUID> accountIds = new ArrayList<>();
 
@@ -113,6 +102,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
+
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
         SuperUser superUser = organisation.getUsers().get(0);
 
@@ -120,7 +110,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
          * If this changes then the below logic will need to change accordingly */
         userAccountMapService.persistedUserAccountMap(superUser.toProfessionalUser(), paymentAccounts);
-
         return new PbaResponse(HttpStatus.OK.toString(), HttpStatus.OK.getReasonPhrase());
     }
 

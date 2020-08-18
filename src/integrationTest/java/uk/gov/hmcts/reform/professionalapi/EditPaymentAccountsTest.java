@@ -23,6 +23,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
     @Test
     public void test_editPaymentAccountsShouldReturn200() {
         Set<String> newPaymentAccounts = new HashSet<>();
+        newPaymentAccounts.add("PBA0000001");
         newPaymentAccounts.add("PBA0000003");
         newPaymentAccounts.add("PBA0000004");
         newPaymentAccounts.add("PBA0000005");
@@ -35,18 +36,19 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
 
         String orgId = createActiveOrganisationAndPbaEditRequest();
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest,
-                orgId, hmctsAdmin);
+        Map<String, Object> pbaResponse =
+                professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest, orgId, hmctsAdmin);
 
         assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
-                .findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse =
+                professionalReferenceDataClient.findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
 
         Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
-        assertThat(paymentAccount).hasSize(6);
+        assertThat(paymentAccount).hasSize(7);
+        assertThat(paymentAccount).containsExactlyInAnyOrderElementsOf(newPaymentAccounts);
     }
 
     @Test
