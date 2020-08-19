@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @Slf4j
@@ -64,15 +63,13 @@ public class ProfessionalApiClient {
 
 
     protected IdamOpenIdClient idamOpenIdClient;
-    protected IdamClient idamClient;
 
     public ProfessionalApiClient(
             String professionalApiUrl,
-            String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) {
+            String s2sToken, IdamOpenIdClient idamOpenIdClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
-        this.idamClient = idamClient;
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {
@@ -606,23 +603,6 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
     }
 
-    //with Bearer token
-    public void updateOrganisationWithOldBearerToken(String organisationIdentifier) {
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
-        Response response = getMultipleAuthHeadersInternalWithOldBearerToken()
-                .body(organisationCreationRequest)
-                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
-                .andReturn();
-
-        log.info("Update organisation response: " + response.getStatusCode());
-
-        response.then()
-                .assertThat()
-                .statusCode(OK.value());
-    }
-
     public Map<String, Object> retrieveOrganisationDetailsByStatus(String status, String role) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -810,10 +790,6 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
-    }
-
-    private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {
-        return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,

@@ -13,17 +13,12 @@ public class TestConfigProperties {
 
     @Value("${oauth2.client.secret}")
     public String clientSecret;
-    @Value("${generated.user.email.pattern}")
-    public String generatedUserEmailPattern;
 
     @Value("${test.user.password}")
     public String testUserPassword;
 
     @Value("${idam.api.url}")
     public String idamApiUrl;
-
-    @Value("${idam.auth.tokenAuth}")
-    public String tokenAuthorization;
 
     @Value("${idam.auth.redirectUrl}")
     public String oauthRedirectUrl;

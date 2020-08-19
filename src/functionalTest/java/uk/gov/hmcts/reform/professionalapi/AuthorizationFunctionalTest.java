@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
@@ -121,8 +119,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         if (s2sToken == null) {
 
@@ -130,10 +128,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         }
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        IdamClient idamClient = new IdamClient(configProperties);
         professionalApiClient = new ProfessionalApiClient(
                 professionalApiUrl,
-                s2sToken, idamOpenIdClient, idamClient);
+                s2sToken, idamOpenIdClient);
 
     }
 
