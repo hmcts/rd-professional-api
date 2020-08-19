@@ -16,3 +16,4 @@ java:
       secrets:
         - s2s-secret
         - OAUTH2-CLIENT-SECRET
+        - AppInsightsInstrumentationKey
