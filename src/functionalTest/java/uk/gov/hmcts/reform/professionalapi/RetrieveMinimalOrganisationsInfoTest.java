@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
@@ -145,14 +146,16 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
     public void inviteNewUser(List<String> roles) {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.nextUserEmail();
+        String email = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);
 
-        idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
+        Map<String, String> userCreds =
+                idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName());
-        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(email));
+        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
+                .getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD)));
 
         professionalApiClient.addNewUserToAnOrganisation(
                 orgIdentifier1 == null ? createActiveOrganisation1() :
