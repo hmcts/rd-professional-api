@@ -35,7 +35,7 @@ resendInterval: 60
 resendInviteEnabled : true
 
 # delete organisation enabled
-deleteOrganisationEnabled : false
+deleteOrganisationEnabled : ${DELETE_ORG:true}
 
 # get Active Orgs External enabled
 activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:true}
