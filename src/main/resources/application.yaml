@@ -106,6 +106,7 @@ prd:
 
 prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
+allowedStatus: ACTIVE
 
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 ccdUrl: ${CCD_URL:http://ccd-user-profile-api-aat.service.core-compute-aat.internal}
@@ -122,5 +123,8 @@ resendInviteEnabled : true
 
 # delete organisation enabled
 deleteOrganisationEnabled : ${DELETE_ORG:true}
+
+# get Active Orgs External enabled
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:true}
 
 loggingComponentName: RD_Professional_API
