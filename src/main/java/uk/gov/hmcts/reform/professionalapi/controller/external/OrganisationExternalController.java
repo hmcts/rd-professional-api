@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
+import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
@@ -162,7 +165,7 @@ public class OrganisationExternalController extends SuperController {
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
         retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email,
-                                      @ApiParam(hidden = true) @OrgId String orgId) {
+                                  @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
 
         return retrievePaymentAccountByUserEmail(email, orgId);
@@ -228,6 +231,55 @@ public class OrganisationExternalController extends SuperController {
 
     }
 
+    @ApiOperation(
+            value = "Retrieves all Organisations of requested status for user"
+                    + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Successfully retrieved list of all Organisations of"
+                            + " requested status with minimal information",
+                    response = OrganisationMinimalInfoResponse.class,
+                    responseContainer = "list"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No Organisation found"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @GetMapping(
+            path = "/status/{status}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
+    public ResponseEntity<List<OrganisationMinimalInfoResponse>>
+        retrieveOrganisationsByStatusWithAddressDetailsOptional(
+            @ApiParam(hidden = true) @UserId String userId,
+            @PathVariable("status") String status,
+            @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
+
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        return retrieveAllOrganisationsByStatus(status, address);
+    }
+
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,
                                                                                         String extOrgIdentifier) {
         validateEmail(email);
@@ -236,7 +288,7 @@ public class OrganisationExternalController extends SuperController {
         UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
 
         organisationIdentifierValidatorImpl.verifyNonPuiFinanceManagerOrgIdentifier(userInfo.getRoles(),
-                organisation,extOrgIdentifier);
+                organisation, extOrgIdentifier);
         return ResponseEntity
                 .status(200)
                 .body(new OrganisationPbaResponse(organisation, false));
