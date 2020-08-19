@@ -36,3 +36,6 @@ resendInviteEnabled : true
 
 # delete organisation enabled
 deleteOrganisationEnabled : ${DELETE_ORG:true}
+
+# get Active Orgs External enabled
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:true}

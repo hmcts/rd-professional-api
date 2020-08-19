@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.professionalapi.controller;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
@@ -18,6 +21,7 @@ import feign.Response;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -46,14 +50,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UpdateOr
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
@@ -119,6 +122,9 @@ public abstract class SuperController {
 
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
+
+    @Value("${allowedStatus}")
+    private String allowedOrganisationStatus;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -284,20 +290,22 @@ public abstract class SuperController {
         }
     }
 
-    protected ResponseEntity<Object> retrieveAllOrganisationsByStatus(String status) {
-        String orgStatus = removeEmptySpaces(status);
+    protected ResponseEntity<List<OrganisationMinimalInfoResponse>> retrieveAllOrganisationsByStatus(
+            String status, boolean address) {
 
-        OrganisationsDetailResponse organisationsDetailResponse;
-        if (OrganisationCreationRequestValidator.contains(orgStatus.toUpperCase())) {
+        isInputOrganisationStatusValid(status, allowedOrganisationStatus);
 
-            organisationsDetailResponse =
-                    organisationService.findByOrganisationStatus(OrganisationStatus.valueOf(orgStatus.toUpperCase()));
-        } else {
-            log.error("{}:: Invalid Request param for status field", loggingComponentName);
-            throw new InvalidRequest("400");
+        List<Organisation> organisations = organisationService.getOrganisationByStatus(ACTIVE);
+
+        if (isEmpty(organisations)) {
+            throw new ResourceNotFoundException("No Organisations found");
         }
-        //Received response for status...
-        return ResponseEntity.status(200).body(organisationsDetailResponse);
+
+        List<OrganisationMinimalInfoResponse> organisationMinimalInfoResponses =
+                organisations.stream().map(organisation -> new OrganisationMinimalInfoResponse(organisation, address))
+                        .collect(Collectors.toList());
+
+        return ResponseEntity.status(200).body(organisationMinimalInfoResponses);
     }
 
     protected ResponseEntity<Object> inviteUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
@@ -331,7 +339,8 @@ public abstract class SuperController {
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,
                     prdEnumService.findAllPrdEnums());
         } else {
-            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
+                    responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 
@@ -359,7 +368,8 @@ public abstract class SuperController {
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             responseBody = new NewUserResponse((UserProfileCreationResponse) responseEntity.getBody());
         } else {
-            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()));
+            log.error(loggingComponentName + String.format(IDAM_ERROR_MESSAGE,
+                    responseEntity.getStatusCode().value()));
             responseBody = responseEntity.getBody();
         }
 

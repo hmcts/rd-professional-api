@@ -10,12 +10,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 @Component
-public class FeatureConditionEvaluation  implements HandlerInterceptor {
+public class FeatureConditionEvaluation implements HandlerInterceptor {
 
     @Value("${deleteOrganisationEnabled}")
     private boolean deleteOrganisationEnabled;
+
+    @Value("${activeOrgsExternalEnabled}")
+    private boolean activeOrgsExternalEnabled;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -25,8 +27,12 @@ public class FeatureConditionEvaluation  implements HandlerInterceptor {
 
             throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
         }
+
+        if (!activeOrgsExternalEnabled && request.getRequestURI()
+                .contains("refdata/external/v1/organisations/status/")) {
+            throw new AccessDeniedException(ERROR_MESSAGE_403_FORBIDDEN);
+        }
+
         return true;
     }
-
-
 }
