@@ -31,8 +31,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
 
@@ -73,8 +74,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
 

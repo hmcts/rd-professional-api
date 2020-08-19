@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.specification.RequestSpecification;
@@ -120,7 +119,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient
                 .getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname",
                         "externalLname", email);
@@ -146,7 +145,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient
                 .getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname",
                         "externalLname", email);

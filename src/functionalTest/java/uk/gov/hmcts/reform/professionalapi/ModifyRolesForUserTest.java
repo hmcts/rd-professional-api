@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
@@ -43,7 +42,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
 
@@ -75,7 +74,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
             List<String> userRoles = new ArrayList<>();
             userRoles.add("pui-case-manager");
-            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+            String userEmail = generateRandomEmail();
             String lastName = "someLastName";
             String firstName = "someName";
 
@@ -109,8 +108,9 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
 
@@ -191,8 +191,9 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String, String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
         // inviting the user
@@ -306,12 +307,13 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
         //create test sidam user and add same user in org
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String externalUserEmail = idamOpenIdClient.createUser(puiUserManager);
+        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(puiUserManager);
         String userId = (String)professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
-                professionalApiClient.createNewUserRequest(externalUserEmail),
+                professionalApiClient.createNewUserRequest(pumUserCreds.get(EMAIL)),
                 HttpStatus.CREATED).get("userIdentifier");
         RequestSpecification bearerToken = professionalApiClient
-                .getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail));
+                .getMultipleAuthHeaders(idamOpenIdClient
+                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD)));
         //update status to suspended so that while adding roles by ext user will be non active
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK,
                 getUserStatusUpdateRequest(IdamStatus.SUSPENDED), orgIdentifier, userId);
@@ -326,17 +328,19 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         String orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String externalUserEmail = idamOpenIdClient.createUser(puiUserManager);
+        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(puiUserManager);
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
-                professionalApiClient.createNewUserRequest(externalUserEmail), HttpStatus.CREATED);
+                professionalApiClient.createNewUserRequest(pumUserCreds.get(EMAIL)), HttpStatus.CREATED);
 
         String pendingUserId = (String)professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin,
-                professionalApiClient.createNewUserRequest(idamOpenIdClient.nextUserEmail()),
+                professionalApiClient.createNewUserRequest(generateRandomEmail()),
                 HttpStatus.CREATED).get("userIdentifier");
 
         Map<String, Object> modifiedUserResponse = professionalApiClient
                 .modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
-                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(externalUserEmail)),
+                professionalApiClient
+                        .getMultipleAuthHeaders(idamOpenIdClient
+                                .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD))),
                         pendingUserId);
         assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
         assertThat(modifiedUserResponse.get("errorDescription"))

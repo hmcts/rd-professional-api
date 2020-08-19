@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -155,7 +156,7 @@ public class ProfessionalApiClient {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
+                        .email(generateRandomEmail().toLowerCase())
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(contactInfoList);
@@ -251,7 +252,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
@@ -281,8 +282,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10)
-                        + "@hotmail.com".toLowerCase() : email)
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? generateRandomEmail() : email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .resendInvite(true)

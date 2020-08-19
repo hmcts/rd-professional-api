@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.PASSWORD;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -27,11 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 @Slf4j
 public class IdamOpenIdClient {
 
-    private final TestConfigProperties testConfig;
-
-    public static final String BASIC = "Basic ";
-
-    private final String password = "Hmcts1234";
+    private static TestConfigProperties testConfig = null;
 
     private Gson gson = new Gson();
 
@@ -41,15 +40,14 @@ public class IdamOpenIdClient {
         this.testConfig = testConfig;
     }
 
-    public String createUser(String userRole) {
-        return createUser(userRole, nextUserEmail(), "First",
-            "Last");
+    public Map<String,String> createUser(String userRole) {
+        return createUser(userRole, generateRandomEmail(), "First", "Last");
     }
 
-    public String createUser(String userRole, String userEmail, String firstName, String lastName) {
+    public Map<String,String> createUser(String userRole, String userEmail, String firstName, String lastName) {
         //Generating a random user
         String userGroup = "";
-        String password = "Hmcts1234";
+        String password = generateSidamPassword();
 
         String id = UUID.randomUUID().toString();
 
@@ -78,13 +76,16 @@ public class IdamOpenIdClient {
 
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
-        return userEmail;
+        Map<String,String> userCreds = new HashMap<>();
+        userCreds.put("email", userEmail);
+        userCreds.put("password", password);
+        return userCreds;
     }
 
     public String getInternalOpenIdToken() {
         if (internalOpenIdTokenPrdAdmin == null) {
-            String userEmail = createUser("prd-admin");
-            internalOpenIdTokenPrdAdmin = getOpenIdToken(userEmail);
+            Map<String,String> userCreds = createUser("prd-admin");
+            internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
         }
         return internalOpenIdTokenPrdAdmin;
     }
@@ -93,16 +94,16 @@ public class IdamOpenIdClient {
      This is customized method to generate the token based on passed role
      */
     public String getOpenIdTokenWithGivenRole(String role) {
-        String userEmail = createUser(role);
-        return getOpenIdToken(userEmail);
+        Map<String,String> userCreds = createUser(role);
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
     }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
-        String userEmail = createUser(role, email, firstName, lastName);
-        return getOpenIdToken(userEmail);
+        Map<String,String> userCreds = createUser(role, email, firstName, lastName);
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
     }
 
-    public String getOpenIdToken(String userEmail) {
+    public String getOpenIdToken(String userEmail, String password) {
 
         Map<String, String> tokenParams = new HashMap<>();
         tokenParams.put("grant_type", "password");
@@ -130,11 +131,6 @@ public class IdamOpenIdClient {
             .asString(), IdamOpenIdClient.BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
-    }
-
-
-    public String nextUserEmail() {
-        return String.format(testConfig.getGeneratedUserEmailPattern(), RandomStringUtils.randomAlphanumeric(10));
     }
 
     @AllArgsConstructor
@@ -169,5 +165,15 @@ public class IdamOpenIdClient {
     class BearerTokenResponse {
         @SerializedName("access_token")
         private String accessToken;
+    }
+
+
+    public static String generateSidamPassword() {
+        String regex = "^(?=.{10,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$";
+        String password = RandomStringUtils.randomAlphanumeric(10);
+        if (!password.matches(regex)) {
+            password = generateSidamPassword();
+        }
+        return password;
     }
 }

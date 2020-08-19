@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
 import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,6 +98,12 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected static  String  s2sToken;
 
+    public static final String EMAIL = "email";
+
+    public static final String PASSWORD = "password";
+
+    public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
+
     @After
     public void tearDown() {
     }
@@ -108,7 +114,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             .getAutowireCapableBeanFactory()
             .autowireBean(this);
 
-
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.defaultParser = Parser.JSON;
 
@@ -116,17 +121,16 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        IdamClient idamClient = new IdamClient(configProperties);
-
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
 
         if (s2sToken == null) {
 
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
 
+        idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        IdamClient idamClient = new IdamClient(configProperties);
         professionalApiClient = new ProfessionalApiClient(
                 professionalApiUrl,
                 s2sToken, idamOpenIdClient, idamClient);
@@ -171,7 +175,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
 
@@ -197,7 +201,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
 
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
 
@@ -239,7 +243,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
 
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someFirstName";
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
@@ -255,7 +259,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public RequestSpecification generateSuperUserBearerToken() {
         String firstName = "some-fname";
         String lastName = "some-lname";
-        String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail();
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -303,6 +307,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             }
         }
         return activeUserMap;
+    }
+
+    public static String generateRandomEmail() {
+        return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 
 }
