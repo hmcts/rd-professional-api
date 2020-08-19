@@ -23,7 +23,7 @@ public class PaymentAccountValidatorTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test(expected = Test.None.class)
