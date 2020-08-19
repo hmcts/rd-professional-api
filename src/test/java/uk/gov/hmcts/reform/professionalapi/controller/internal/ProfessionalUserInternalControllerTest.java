@@ -76,7 +76,7 @@ public class ProfessionalUserInternalControllerTest {
         systemUserRoles = new ArrayList<>();
         systemUserRoles.add("prd-aac-system");
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
