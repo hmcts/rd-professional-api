@@ -33,7 +33,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     private boolean activeOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
-            "Please check status param passed as this is invalid status.";
+            "Invalid status param provided, only Active status is allowed";
 
     private List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
