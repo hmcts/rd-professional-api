@@ -232,7 +232,7 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves all Organisations of requested status for user"
+            value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
