@@ -78,4 +78,24 @@ public class UserAttributeServiceImplTest {
 
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
+
+    @Test
+    public void test_validEnumType() {
+        List<String> jurisdictionIds = new ArrayList<>();
+        jurisdictionIds.add("PROBATE");
+        PrdEnum prdEnum = new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE",
+                "PROBATE");
+        boolean flag = userAttributeServiceMock.isValidEnumType("SIDAM_ROLE", jurisdictionIds,  prdEnum);
+
+        assertThat(flag).isEqualTo(true);
+
+        boolean flag1 = userAttributeServiceMock.isValidEnumType("ADMIN_ROLE", jurisdictionIds,  prdEnum);
+
+        assertThat(flag1).isEqualTo(true);
+
+        boolean flag2 = userAttributeServiceMock.isValidEnumType("JURISD_ID_1", jurisdictionIds,  prdEnum);
+
+        assertThat(flag2).isEqualTo(false);
+
+    }
 }
