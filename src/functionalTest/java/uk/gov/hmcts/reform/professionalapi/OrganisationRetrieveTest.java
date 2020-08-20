@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {

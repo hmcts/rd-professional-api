@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
