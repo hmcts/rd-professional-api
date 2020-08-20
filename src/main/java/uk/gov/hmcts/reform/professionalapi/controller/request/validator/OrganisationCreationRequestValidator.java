@@ -1,16 +1,22 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_INVALID_STATUS_PASSED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAIL_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
 
 import java.util.List;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -27,9 +33,7 @@ public class OrganisationCreationRequestValidator {
 
     private final List<RequestValidator> validators;
 
-    public static final String CHARACTERS = " characters";
-
-    public static final String THIRTEEN_OR_LESS = "must be 13 characters or less, you have entered ";
+    private static String loggingComponentName;
 
     public OrganisationCreationRequestValidator(List<RequestValidator> validators) {
         this.validators = validators;
@@ -109,7 +113,7 @@ public class OrganisationCreationRequestValidator {
     private void requestPaymentAccount(Set<String> paymentAccounts) {
 
         if (paymentAccounts != null) {
-            paymentAccounts.stream()
+            paymentAccounts
                     .forEach(paymentAccount -> {
                         if (isEmptyValue(paymentAccount)) {
                             throw new InvalidRequest("Empty paymentAccount value" + paymentAccount);
@@ -131,7 +135,7 @@ public class OrganisationCreationRequestValidator {
     public void requestContactInformation(List<ContactInformationCreationRequest> contactInformations) {
         if (null != contactInformations) {
 
-            contactInformations.stream()
+            contactInformations
                     .forEach(contactInformation -> {
                         if (isEmptyValue(contactInformation.getAddressLine1())
                                 || isEmptyValue(contactInformation.getAddressLine2())
@@ -143,9 +147,7 @@ public class OrganisationCreationRequestValidator {
                             throw new InvalidRequest("Empty contactInformation value");
                         }
                         if (null != contactInformation.getDxAddress()) {
-                            contactInformation.getDxAddress().stream().forEach(dxAddress -> {
-                                isDxAddressValid(dxAddress);
-                            });
+                            contactInformation.getDxAddress().forEach(this::isDxAddressValid);
                         }
                     });
 
@@ -172,4 +174,19 @@ public class OrganisationCreationRequestValidator {
         }
     }
 
+    public static void isInputOrganisationStatusValid(String organisationStatus, String allowedStatus) {
+        List<String> validStatusList = asList(allowedStatus.split(","));
+        String orgStatus = removeAllSpaces(organisationStatus);
+        if (isBlank(orgStatus) || !validStatusList.contains(orgStatus.toUpperCase())) {
+            log.error(loggingComponentName + ERROR_MESSAGE_INVALID_STATUS_PASSED);
+            throw new ResourceNotFoundException(ERROR_MESSAGE_INVALID_STATUS_PASSED);
+        }
+    }
+
+    @Value("${loggingComponentName}")
+    public static void setLoggingComponentName(String loggingComponentName) {
+        OrganisationCreationRequestValidator.loggingComponentName = loggingComponentName;
+    }
+
 }
+

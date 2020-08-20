@@ -81,7 +81,7 @@ public class ProfessionalExternalUserControllerTest {
 
         organisation.setOrganisationIdentifier(UUID.randomUUID().toString());
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

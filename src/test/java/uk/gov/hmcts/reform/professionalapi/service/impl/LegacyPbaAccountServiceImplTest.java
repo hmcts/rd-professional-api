@@ -38,7 +38,7 @@ public class LegacyPbaAccountServiceImplTest {
         organisation.setPaymentAccounts(paymentAccounts);
         professionalUser = new ProfessionalUser("some-fname", "some-lname", "some@hmcts.net", organisation);
         organisation.setPaymentAccounts(paymentAccounts);
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
