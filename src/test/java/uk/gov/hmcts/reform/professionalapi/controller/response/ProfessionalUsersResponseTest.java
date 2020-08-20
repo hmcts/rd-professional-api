@@ -7,19 +7,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 public class ProfessionalUsersResponseTest {
 
+    private final String expectEmailAddress = "dummy@email.com";
+    private final String expectFirstName = "Bob";
+    private final String expectLastName = "Smith";
 
     @Test
-    public void professionalUsersTest() throws NoSuchFieldException, IllegalAccessException {
-
-        final String expectEmailAddress = "dummy@email.com";
-        final String expectFirstName = "Bob";
-        final String expectLastName = "Smith";
-
-        ProfessionalUser user = new ProfessionalUser();
-        user.setEmailAddress(expectEmailAddress);
-        user.setFirstName(expectFirstName);
-        user.setLastName(expectLastName);
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
+    public void test_professionalUsers() throws NoSuchFieldException, IllegalAccessException {
+        ProfessionalUsersResponse professionalUsersResponse
+                = new ProfessionalUsersResponse(new ProfessionalUser(expectFirstName, expectLastName,
+                expectEmailAddress, null));
 
         assertThat(professionalUsersResponse.getEmail()).isEqualTo(expectEmailAddress);
         assertThat(professionalUsersResponse.getFirstName()).isEqualTo(expectFirstName);

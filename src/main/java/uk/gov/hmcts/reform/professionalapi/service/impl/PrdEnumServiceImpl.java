@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 
 @Service
@@ -31,16 +31,14 @@ public class PrdEnumServiceImpl implements PrdEnumService {
     @Override
     public List<PrdEnum> findAllPrdEnums() {
         if (CollectionUtils.isEmpty(enumList)) {
-            enumList = prdEnumRepository.findAll();
-            return enumList;
-        } else {
-            return enumList;
+            enumList = prdEnumRepository.findByEnabled("YES");
         }
+        return enumList;
     }
 
     public List<String> getPrdEnumByEnumType(String enumType) {
         List<String> ignoreEnumList = Arrays.asList(enumType.split(","));
-        List<String> enumNameList = new ArrayList<String>();
+        List<String> enumNameList = new ArrayList<>();
         List<PrdEnum> prdEnumList = findAllPrdEnums();
         prdEnumList.forEach(prdEnum -> {
             if (!ignoreEnumList.contains(prdEnum.getPrdEnumId().getEnumType())) {

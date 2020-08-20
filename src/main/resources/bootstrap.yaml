@@ -7,7 +7,6 @@ spring:
         s2s.microservicekey-rd-professional-api: S2S_SECRET
         rd.s2s-url: S2S_URL
         s2s-secret: idam.s2s-auth.totp_secret
-        idam-url:   auth.idam.client.baseUrl
         professional-api-POSTGRES-PASS: spring.datasource.password
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
 

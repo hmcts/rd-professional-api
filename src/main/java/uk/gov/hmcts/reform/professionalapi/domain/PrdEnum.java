@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Entity
-public class PrdEnum {
+public class PrdEnum implements Serializable {
 
     @EmbeddedId
     private PrdEnumId prdEnumId;
@@ -27,6 +28,9 @@ public class PrdEnum {
 
     @OneToMany(mappedBy = "prdEnum")
     private List<UserAttribute> userAttributes;
+
+    @Column
+    private String enabled;
 
     public PrdEnum(PrdEnumId prdEnumId, String enumName, String enumDescription) {
         this.prdEnumId = prdEnumId;

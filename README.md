@@ -30,7 +30,6 @@ If running locally for development or testing you will need to set the following
 
 To run the API quickly use the docker helper script as follows:
 
-
 ```
 ./bin/run-in-docker.sh
 ```
@@ -60,7 +59,6 @@ If required, to run with a low memory consumption, the following can be used:
 
 To understand if the application is working, you can call it's health endpoint:
 
-
 ```
 curl http://localhost:8090/health
 ```
@@ -75,7 +73,7 @@ If the API is running, you should see this response:
 
 The application uses a Postgres database which can be run through a docker container on its own if required.
 
-this
+
 
 The application should automatically apply any database migrations using flyway.
 
@@ -172,4 +170,4 @@ Publish via the gradle command
 Once Verify on url `http://localhost:9292/`
 The pact contract(s) should be published
 
-Remember to return the localhost back to the remote broker.
+Remember to return the localhost back to the remote broker

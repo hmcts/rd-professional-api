@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,59 +24,54 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 
 public class LegacyPbaAccountServiceImplTest {
 
-    List<String> paymentAccountPbaNumbers = new ArrayList<>();
-    ProfessionalUser professionalUserMock;
     ApplicationConfiguration configurationMock;
-    Organisation organisationMock;
-    List<PaymentAccount> paymentAccounts;
-    List<UserAccountMap> userAccountMap;
-    PaymentAccount paymentAccountMock;
+
+    private Organisation organisation;
+    private ProfessionalUser professionalUser;
+    private PaymentAccount paymentAccount;
+
+    List<String> paymentAccountPbaNumbers = new ArrayList<>();
+    List<PaymentAccount> paymentAccounts = new ArrayList<>();
+    List<UserAccountMap> userAccountMap = new ArrayList<>();
 
     @InjectMocks
     LegacyPbaAccountServiceImpl sut;
 
     @Before
     public void setup() {
-        professionalUserMock = mock(ProfessionalUser.class);
         configurationMock = mock(ApplicationConfiguration.class);
-        organisationMock = mock(Organisation.class);
-        paymentAccountMock = mock(PaymentAccount.class);
-        userAccountMap = new ArrayList<>();
-        paymentAccounts = new ArrayList<>();
+        organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
         paymentAccounts.add(new PaymentAccount("PBA123"));
-        final UUID paymentAccountUuid = UUID.randomUUID();
-        when(paymentAccountMock.getId()).thenReturn(paymentAccountUuid);
-        MockitoAnnotations.initMocks(this);
+        organisation.setPaymentAccounts(paymentAccounts);
+        professionalUser = new ProfessionalUser("some-fname", "some-lname", "some@hmcts.net", organisation);
+        organisation.setPaymentAccounts(paymentAccounts);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testFindLegacyAccountByUserEmailWhenPbaIsEmpty() {
+    public void test_FindLegacyAccountByUserEmailWhenPbaIsEmpty() {
         when(configurationMock.getPbaFromUserAccountMap()).thenReturn("false");
-        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-        paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUserMock);
+
+        paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
         assertThat(paymentAccountPbaNumbers).isNotNull();
         assertThat(paymentAccountPbaNumbers.size()).isEqualTo(1);
+        assertThat(paymentAccountPbaNumbers.get(0)).isEqualTo("PBA123");
+        verify(configurationMock, times(1)).getPbaFromUserAccountMap();
     }
 
     @Test
-    public void testFindLegacyAccountByUserEmail() throws Exception {
+    public void test_FindLegacyAccountByUserEmail() throws Exception {
+        when(configurationMock.getPbaFromUserAccountMap()).thenReturn("true");
         List<UserAccountMap> userAccountMapData = new ArrayList<>();
-        UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUserMock, paymentAccountMock);
+        UserAccountMapId newUserAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         UserAccountMap userAccountMap = new UserAccountMap(newUserAccountMapId);
-
         userAccountMapData.add(userAccountMap);
 
-        organisationMock.setPaymentAccounts(paymentAccounts);
-
-        when(configurationMock.getPbaFromUserAccountMap()).thenReturn("true");
-        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-        when(professionalUserMock.getUserAccountMap()).thenReturn(userAccountMapData);
-
-        paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUserMock);
+        paymentAccountPbaNumbers = sut.findLegacyPbaAccountByUserEmail(professionalUser);
 
         assertThat(paymentAccountPbaNumbers).isNotNull();
-        assertThat(paymentAccountPbaNumbers.size()).isGreaterThanOrEqualTo(0);
+        assertThat(paymentAccountPbaNumbers.size()).isNotNegative();
+
+        verify(configurationMock, times(2)).getPbaFromUserAccountMap();
     }
 }

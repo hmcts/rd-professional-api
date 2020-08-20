@@ -7,12 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.PrdEnumType;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.persistence.PrdEnumRepository;
-import uk.gov.hmcts.reform.professionalapi.persistence.UserAttributeRepository;
-import uk.gov.hmcts.reform.professionalapi.service.PrdEnumType;
+import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
@@ -59,11 +59,14 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     }
 
     @Override
-    public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user, List<UserAttribute> attributes, List<String> jurisdictionIds) {
+    public List<UserAttribute> addUserAttributesToSuperUserWithJurisdictions(ProfessionalUser user,
+                                                                             List<UserAttribute> attributes,
+                                                                             List<String> jurisdictionIds) {
         prdEnumService.findAllPrdEnums().stream()
                 .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),jurisdictionIds,prdEnum))
                 .map(prdEnum -> {
-                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(), prdEnum.getEnumDescription());
+                    PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(),
+                            prdEnum.getEnumDescription());
                     return new UserAttribute(user, e);
                 }).forEach(attributes::add);
 
@@ -78,7 +81,8 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     private boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
-                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds.contains(prdEnum.getEnumName()));
+                || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds
+                .contains(prdEnum.getEnumName()));
     }
 
 

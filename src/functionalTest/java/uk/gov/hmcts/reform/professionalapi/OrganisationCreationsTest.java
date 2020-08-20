@@ -28,17 +28,23 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
+
     @Test
     public void ac1_can_create_an_organisation_with_valid_Dx_Number_and_valid_Dx_Exchange() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10)
+                + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
+
     @Test
     public void ac2_5_can_create_an_organisation_with_Dx_Number_less_than_13() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(6), randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(6), randomAlphabetic(10)
+                + "&" + randomAlphabetic(9));
         Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
         assertThat(orgIdentifierResponse).isNotEmpty();
@@ -46,27 +52,38 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac2_create_an_organisation_with_Dx_Number_longer_than_13_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10) + "&" + randomAlphabetic(9));
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10)
+                + "&" + randomAlphabetic(9));
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
 
     @Test
     public void ac3_create_an_organisation_with_Dx_Exchange_longer_than_20_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10) + "&" + randomAlphabetic(10));
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10)
+                + "&" + randomAlphabetic(10));
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
     public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&" + randomAlphabetic(9));
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&"
+                + randomAlphabetic(9));
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
     public void ac5_create_an_organisation_with_Dx_Exchange_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationWithDxEntity(randomAlphabetic(13), "");
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(13), "");
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     @Test
@@ -86,7 +103,18 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                         .build()))
                 .build();
 
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+    }
+
+    @Test
+    public void ac7_can_throw_Unauthorized_Error_code_without_service_token_create_an_organisation_401() {
+        OrganisationCreationRequest organisationCreationRequest
+                = createOrganisationWithDxEntity(randomAlphabetic(13),
+                randomAlphabetic(10) + "&" + randomAlphabetic(9));
+        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
     @Test
@@ -107,7 +135,8 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                         .build()))
                 .build();
 
-        professionalApiClient.receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
+        professionalApiClient
+                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
     }
 
     private OrganisationCreationRequest createOrganisationWithDxEntity(String dxNumber, String dxExchange) {

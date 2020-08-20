@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMAILREGEX;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -20,13 +21,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 @Builder(builderMethodName = "anUserProfileCreationRequest")
 public class UserProfileCreationRequest  {
 
-
-    @Pattern(regexp = emailRegex)
+    @Pattern(regexp = EMAILREGEX)
     private String email;
 
-    @JsonIgnore
-    private final String emailRegex = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
-    
     @NotBlank
     private String firstName;
 
@@ -45,6 +42,8 @@ public class UserProfileCreationRequest  {
     @NotEmpty
     private List<String> roles;
 
+    private boolean resendInvite;
+
     @JsonCreator
     public UserProfileCreationRequest(@JsonProperty(value = "email") String email,
                                       @JsonProperty(value = "firstName") String firstName,
@@ -52,7 +51,8 @@ public class UserProfileCreationRequest  {
                                       @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
                                       @JsonProperty(value = "userCategory") UserCategory userCategory,
                                       @JsonProperty(value = "userType") UserType userType,
-                                      @JsonProperty(value = "roles") List<String> roles) {
+                                      @JsonProperty(value = "roles") List<String> roles,
+                                      @JsonProperty(value = "resendInvite") boolean resendInvite) {
 
         this.email = email;
         this.firstName = firstName;
@@ -61,5 +61,6 @@ public class UserProfileCreationRequest  {
         this.userCategory = userCategory;
         this.userType = userType;
         this.roles = roles;
+        this.resendInvite = resendInvite;
     }
 }

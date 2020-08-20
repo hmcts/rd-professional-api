@@ -6,20 +6,15 @@ import org.junit.Test;
 
 public class StatusUpdateResponseTest {
 
+    private String idamStatusCode = "Coded";
+    private String idamMessage = "Message";
+
     @Test
-    public void updateStatusResponseTest() {
-
-        StatusUpdateResponse statusUpdateResponse1 = new StatusUpdateResponse() {};
-
-        String idamStatusCode = "Coded";
-        String idamMessage = "Message";
-
+    public void test_updateStatusResponse() {
         StatusUpdateResponse statusUpdateResponse = new StatusUpdateResponse(idamStatusCode, idamMessage);
 
-        assertThat(statusUpdateResponse.getIdamStatusCode()).isEqualTo("Coded");
-        assertThat(statusUpdateResponse.getIdamMessage()).isEqualTo("Message");
-
+        assertThat(statusUpdateResponse.getIdamStatusCode()).isEqualTo(idamStatusCode);
+        assertThat(statusUpdateResponse.getIdamMessage()).isEqualTo(idamMessage);
     }
-
 }
 

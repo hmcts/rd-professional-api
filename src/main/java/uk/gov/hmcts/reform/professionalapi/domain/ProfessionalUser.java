@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +26,14 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import uk.gov.hmcts.reform.professionalapi.controller.response.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 
 @Entity(name = "professional_user")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class ProfessionalUser {
+public class ProfessionalUser implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

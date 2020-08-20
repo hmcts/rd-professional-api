@@ -6,23 +6,24 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.ACCESS_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.CONFLICT_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.DATA_INTEGRITY_VIOLATION;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.INVALID_REQUEST;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.MALFORMED_JSON;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.METHOD_ARG_NOT_VALID;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.UNKNOWN_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.CONFLICT_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.DATA_INTEGRITY_VIOLATION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.DUPLICATE_USER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -35,17 +36,21 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 
-
+@Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
 @RequestMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 public class ExceptionMapper {
 
-    private static final Logger LOG                         = LoggerFactory.getLogger(ExceptionMapper.class);
-    private static final String HANDLING_EXCEPTION_TEMPLATE = "handling exception: {}";
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
+    private static final String HANDLING_EXCEPTION_TEMPLATE = "{}:: handling exception: {}";
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
@@ -83,10 +88,18 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, CONFLICT, CONFLICT_EXCEPTION.getErrorMessage());
     }
 
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<Object> handleDuplicateUserException(
+            HttpClientErrorException ex) {
+        return errorDetailsResponseEntity(ex, CONFLICT, DUPLICATE_USER.getErrorMessage());
+    }
+
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
         String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
-        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause().getMessage() != null) {
+        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause()
+                .getMessage() != null) {
             String message = ex.getCause().getCause().getMessage().toUpperCase();
             if (message.contains("SRA_ID")) {
                 errorMessage = String.format(errorMessage, "SRA_ID");
@@ -109,6 +122,11 @@ public class ExceptionMapper {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST.getErrorMessage());
     }
 
@@ -153,8 +171,9 @@ public class ExceptionMapper {
 
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
-        LOG.error(HANDLING_EXCEPTION_TEMPLATE, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(), getTimeStamp());
+        log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
+        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
+                getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
     }
