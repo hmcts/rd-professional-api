@@ -203,7 +203,6 @@ pitest {
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
-            'uk.gov.hmcts.reform.professionalapi.service.PrdEnumType',
             'uk.gov.hmcts.reform.professionalapi.Application'
     ]
     threads = 10

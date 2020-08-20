@@ -78,7 +78,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     }
 
-    private boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
+    public boolean isValidEnumType(String enumType,List<String> jurisdictionIds, PrdEnum prdEnum) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name())
                 || (enumType.equalsIgnoreCase(PrdEnumType.JURISD_ID.name()) && jurisdictionIds
