@@ -87,15 +87,15 @@ public class UserAttributeServiceImplTest {
                 "PROBATE");
         boolean flag = userAttributeServiceMock.isValidEnumType("SIDAM_ROLE", jurisdictionIds,  prdEnum);
 
-        assertThat(flag).isEqualTo(true);
+        assertThat(flag).isTrue();
 
         boolean flag1 = userAttributeServiceMock.isValidEnumType("ADMIN_ROLE", jurisdictionIds,  prdEnum);
 
-        assertThat(flag1).isEqualTo(true);
+        assertThat(flag1).isTrue();
 
         boolean flag2 = userAttributeServiceMock.isValidEnumType("JURISD_ID_1", jurisdictionIds,  prdEnum);
 
-        assertThat(flag2).isEqualTo(false);
+        assertThat(flag2).isFalse();
 
     }
 }
