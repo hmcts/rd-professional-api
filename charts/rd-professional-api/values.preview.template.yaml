@@ -18,3 +18,4 @@ java:
         - OAUTH2-CLIENT-SECRET
         - AppInsightsInstrumentationKey
         - professional-api-S2S-SECRET
+        - s2s-url

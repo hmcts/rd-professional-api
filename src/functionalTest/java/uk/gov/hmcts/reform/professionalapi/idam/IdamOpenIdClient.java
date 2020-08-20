@@ -113,8 +113,9 @@ public class IdamOpenIdClient {
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
-        log.info("getClientSecret: " + testConfig.getClientSecret());
-        System.out.println("getClientSecret from sysout: " + testConfig.getClientSecret());
+        clientSecret = testConfig.getClientSecret();
+        log.info("getClientSecret: " + clientSecret.substring(0, 2) + "************" + clientSecret.substring(clientSecret.length() - 2));
+        System.out.println("getClientSecret from sysout: " + clientSecret);
 
         Response openIdTokenResponse = RestAssured
             .given()
