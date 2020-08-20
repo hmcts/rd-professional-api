@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
 @Getter
 @Setter

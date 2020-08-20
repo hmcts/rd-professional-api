@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,14 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -37,7 +40,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         Map<String, Object> response =
@@ -93,7 +97,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         OrganisationCreationRequest organisationCreationRequest =
                 someMinimalOrganisationRequest()
                         .paymentAccount(paymentAccounts)
-                        .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                        .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                                .addressLine1("addressLine1").build()))
                         .build();
 
         Map<String, Object> createOrganisationResponse =
@@ -147,6 +152,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
 
     @Test
     public void returns_400_when_a_null_pba_number_is_received() {
+        cleanupTestData();
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(null);
 
@@ -185,7 +191,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         OrganisationCreationRequest organisationCreationRequest2 = anOrganisationCreationRequest()
@@ -197,7 +204,8 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .email("someone1@somewhere.com")
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1").build()))
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .build()))
                 .build();
 
         Map<String, Object> response =

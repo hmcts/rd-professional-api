@@ -5,13 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,23 +26,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
-
-import uk.gov.hmcts.reform.professionalapi.controller.request.Jurisdiction;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -49,6 +56,7 @@ public class ProfessionalApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     private final String professionalApiUrl;
     private final String s2sToken;
@@ -56,7 +64,6 @@ public class ProfessionalApiClient {
 
     protected IdamOpenIdClient idamOpenIdClient;
     protected IdamClient idamClient;
-
 
     public ProfessionalApiClient(
             String professionalApiUrl,
@@ -78,6 +85,7 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value())
                 .and()
                 .extract()
+                .response()
                 .body()
                 .asString();
     }
@@ -89,6 +97,7 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value())
                 .and()
                 .extract()
+                .response()
                 .body()
                 .asString();
     }
@@ -96,6 +105,47 @@ public class ProfessionalApiClient {
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder createOrganisationRequest() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        List<DxAddressCreationRequest> dx1 = new LinkedList<>();
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 1234567890")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456777")
+                .dxExchange("dxExchange").build());
+        dx1.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456788")
+                .dxExchange("dxExchange").build());
+        List<DxAddressCreationRequest> dx2 = new LinkedList<>();
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123452222")
+                .dxExchange("dxExchange").build());
+        dx2.add(dxAddressCreationRequest()
+                .dxNumber("DX 123456333")
+                .dxExchange("dxExchange").build());
+        List<ContactInformationCreationRequest> contactInfoList = new LinkedList<>();
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addressLine1")
+                .addressLine2("addressLine2")
+                .addressLine3("addressLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx1)
+                .build());
+        contactInfoList.add(aContactInformationCreationRequest()
+                .addressLine1("addLine1")
+                .addressLine2("addLine2")
+                .addressLine3("addLine3")
+                .country("some-country")
+                .county("some-county")
+                .townCity("some-town-city")
+                .postCode("some-post-code")
+                .dxAddress(dx2)
+                .build());
 
         return someMinimalOrganisationRequest()
                 .name(randomAlphabetic(10))
@@ -111,18 +161,7 @@ public class ProfessionalApiClient {
                         .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
                         .jurisdictions(createJurisdictions())
                         .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1")
-                        .addressLine2("addressLine2")
-                        .addressLine3("addressLine3")
-                        .country("some-country")
-                        .county("some-county")
-                        .townCity("some-town-city")
-                        .postCode("some-post-code")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber("DX 1234567890")
-                                .dxExchange("dxExchange").build()))
-                        .build()));
+                .contactInformation(contactInfoList);
     }
 
     public static List<Jurisdiction> createJurisdictions() {
@@ -159,7 +198,43 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest organisationCreationRequest) {
+    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest
+                                                                         organisationCreationRequest) {
+        Response response = withUnauthenticatedRequest()
+                .body(organisationCreationRequest)
+                .post("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(UNAUTHORIZED.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> createOrganisationWithUnknownJurisdictionId() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
+        organisationCreationRequest.getSuperUser().setJurisdictions(createUnknownJurisdiction());
+        return createOrganisation(organisationCreationRequest);
+    }
+
+    public List<Jurisdiction> createUnknownJurisdiction() {
+        List<Jurisdiction> jurisdictionIds = new ArrayList<>();
+        Jurisdiction jurisdiction = new Jurisdiction();
+        jurisdiction.setId("UNKNOWN");
+        jurisdictionIds.add(jurisdiction);
+        return jurisdictionIds;
+    }
+
+    public Map<String, Object> createOrganisationWithNoJurisdictionId() {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
+        organisationCreationRequest.getSuperUser().setJurisdictions(new ArrayList<>());
+        return createOrganisation(organisationCreationRequest);
+    }
+
+    public void
+        receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest
+                                                                                  organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
                 .body(organisationCreationRequest)
                 .post("/refdata/external/v1/organisations")
@@ -172,7 +247,7 @@ public class ProfessionalApiClient {
                 .statusCode(BAD_REQUEST.value());
     }
 
-    public  NewUserCreationRequest createNewUserRequest() {
+    public NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
@@ -181,13 +256,13 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
     }
 
-    public  NewUserCreationRequest createNewUserRequest(String email) {
+    public NewUserCreationRequest createNewUserRequest(String email) {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
 
@@ -196,16 +271,43 @@ public class ProfessionalApiClient {
                 .lastName("someLastName")
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(OrganisationFixtures.createJurisdictions())
+                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
     }
 
-    public Map<String, Object> addNewUserToAnOrganisation(String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
+    public NewUserCreationRequest createReInviteUserRequest(String email) {
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName("someName")
+                .lastName("someLastName")
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10)
+                        + "@hotmail.com".toLowerCase() : email)
+                .roles(userRoles)
+                .jurisdictions(createJurisdictions())
+                .resendInvite(true)
+                .build();
+
+        return userCreationRequest;
+    }
+
+    public static <T> T getNestedValue(Map map, String... keys) {
+        Object value = map;
+
+        for (String key : keys) {
+            value = ((Map) value).get(key);
+        }
+
+        return (T) value;
+    }
+
+    public Map<String, Object> addNewUserToAnOrganisation(
+            String orgId, String role, NewUserCreationRequest newUserCreationRequest, HttpStatus expectedStatus) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(newUserCreationRequest)
-                .proxy("proxyout.reform.hmcts.net", 8080)
                 .post("/refdata/internal/v1/organisations/" + orgId + "/users/")
                 .andReturn();
         response.then()
@@ -215,7 +317,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest, RequestSpecification requestSpecification, HttpStatus expectedStatus) {
+    public Map<String, Object> addNewUserToAnOrganisationExternal(NewUserCreationRequest newUserCreationRequest,
+                                                                  RequestSpecification requestSpecification,
+                                                                  HttpStatus expectedStatus) {
 
         Response response = requestSpecification
                 .body(newUserCreationRequest)
@@ -244,7 +348,7 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveOrganisationDetails(String id, String role) {
+    public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
                 .get("/refdata/internal/v1/organisations?id=" + id)
@@ -256,9 +360,13 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
 
     }
 
@@ -310,10 +418,19 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted, HttpStatus status) {
+    public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,
+                                                         HttpStatus status, String returnRoles) {
 
-        Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted)
+        // Use the role supplied to generate tokens appropritely
+        RequestSpecification requestSpecification;
+        if (!StringUtils.isBlank(role)) {
+            requestSpecification = getMultipleAuthHeadersWithGivenRole(role);
+        } else {
+            requestSpecification = getMultipleAuthHeadersInternal();
+        }
+        Response response = requestSpecification
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&returnRoles=" + returnRoles)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -321,10 +438,13 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role, String showDeleted, HttpStatus status, String pageNumber, String size) {
+    public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role,
+                                                                       String showDeleted, HttpStatus status,
+                                                                       String pageNumber, String size) {
 
         Response response = getMultipleAuthHeadersInternal()
-                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted=" + showDeleted + "&page=" + pageNumber + "&size=" + size)
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&page=" + pageNumber + "&size=" + size)
                 .andReturn();
         response.then()
                 .assertThat()
@@ -337,7 +457,10 @@ public class ProfessionalApiClient {
         }
     }
 
-    public Map<String, Object> searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status, RequestSpecification requestSpecification, String userStatus, String pageNumber, String size) {
+    public Map<String, Object>
+        searchAllActiveUsersByOrganisationExternalWithPagination(HttpStatus status,
+                                                                 RequestSpecification requestSpecification,
+                                                                 String userStatus, String pageNumber, String size) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?page=" + pageNumber + "&size=" + size)
@@ -352,7 +475,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role, HttpStatus status) {
+    public Map<String, Object> searchOrganisationUsersByStatusInternal(String organisationId, String role,
+                                                                       HttpStatus status) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/" + organisationId + "/users")
@@ -363,7 +487,9 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status, RequestSpecification requestSpecification, String userStatus) {
+    public Map<String, Object> searchOrganisationUsersByStatusExternal(HttpStatus status,
+                                                                       RequestSpecification requestSpecification,
+                                                                       String userStatus) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users?status=" + userStatus)
@@ -372,10 +498,16 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        return response.body().as(Map.class);
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
     }
 
-    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status, RequestSpecification requestSpecification) {
+    public Map<String, Object> retrieveOrganisationByOrgIdExternal(HttpStatus status,
+                                                                   RequestSpecification requestSpecification) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations")
@@ -387,6 +519,27 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object>
+        searchOrganisationUsersByReturnRolesParamExternal(HttpStatus status,
+                                                          RequestSpecification requestSpecification,
+                                                          String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        if (HttpStatus.OK == status) {
+            return response.as(Map.class);
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
+
     public void updateOrganisation(String organisationIdentifier, String role) {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
@@ -394,8 +547,23 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
+    public void updateOrganisation(String organisationIdentifier, String role, HttpStatus expectedStatus) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, expectedStatus);
+    }
+
     //with OPENID implementation
-    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role, String organisationIdentifier) {
+    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
+                                   String organisationIdentifier) {
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier, OK);
+    }
+
+
+    public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
+                                   String organisationIdentifier, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(organisationCreationRequest)
@@ -406,7 +574,22 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(expectedStatus.value());
+    }
+
+    public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
+                                                     HttpStatus expectedStatus) {
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
+        Response response = getMultipleAuthHeadersWithEmptyBearerToken("")
+                .body(organisationCreationRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
+                .andReturn();
+
+        log.info("Update organisation response: " + response.getStatusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
     }
 
     public void updateUser(UserCreationRequest userCreationRequest, String role, String userIdentifier) {
@@ -485,7 +668,9 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, String organisationId, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status,
+                                                                   UserProfileUpdatedData userProfileUpdatedData,
+                                                                   String organisationId, String userId) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(userProfileUpdatedData)
@@ -516,7 +701,10 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String,Object> modifyUserToExistingUserForExternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String userId) {
+    public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status,
+                                                                   UserProfileUpdatedData userProfileUpdatedData,
+                                                                   RequestSpecification requestSpecification,
+                                                                   String userId) {
 
         Response response = requestSpecification
                 .body(userProfileUpdatedData)
@@ -531,21 +719,8 @@ public class ProfessionalApiClient {
 
     }
 
-    public Map<String,Object> modifyUserToExistingUserForInternal(HttpStatus status, UserProfileUpdatedData userProfileUpdatedData, RequestSpecification requestSpecification, String organisationId, String userId) {
-
-        Response response = requestSpecification
-                .body(userProfileUpdatedData)
-                .put("/refdata/internal/v1/organisations/" + organisationId + "/users/" + userId)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-        return response.body().as(Map.class);
-
-    }
-
-    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification, String email) {
+    public Map<String, Object> findUserStatusByEmail(HttpStatus status, RequestSpecification requestSpecification,
+                                                     String email) {
 
         Response response = requestSpecification
                 .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
@@ -554,20 +729,77 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-
         return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
+            RequestSpecification requestSpecification) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
+    public void deleteOrganisation(String organisationId, String role, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .delete("/refdata/internal/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+    }
+
+    public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body("")
+                .delete("/refdata/external/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+
+    }
+
+    public void deleteOrganisationByExternalUsersBearerToken(String organisationId,
+                                   RequestSpecification requestSpecification, HttpStatus status) {
+        Response response = requestSpecification
+                .body("")
+                .delete("/refdata/internal/v1/organisations/" + organisationId)
+                .andReturn();
+
+        if (response.statusCode() != NO_CONTENT.value()) {
+            log.info("Delete organisation response: " + response.asString());
+        }
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
-                .header("Accepts", APPLICATION_JSON_UTF8_VALUE);
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
     private RequestSpecification getS2sTokenHeaders() {
-
         return withUnauthenticatedRequest()
                 .header(SERVICE_HEADER, "Bearer " + s2sToken);
     }
@@ -576,12 +808,16 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
     }
 
+    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
+    }
+
     private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {
         return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
-
-    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName, String email) {
+    public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,
+                                                               String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
@@ -590,14 +826,41 @@ public class ProfessionalApiClient {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(professionalApiUrl)
-                .header("Content-Type", APPLICATION_JSON_UTF8_VALUE)
-                .header("Accepts", APPLICATION_JSON_UTF8_VALUE)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
+    public RequestSpecification getMultipleAuthHeadersWithEmptyBearerToken(String userToken) {
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer ");
     }
 
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
+    }
+
+    public Object retrieveAllActiveOrganisationsWithMinimalInfo(RequestSpecification requestSpecification,
+                                                                HttpStatus expectedStatus, String status,
+                                                                boolean address) {
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/status/" + status + "?address=" + address)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationMinimalInfoResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
     }
 }

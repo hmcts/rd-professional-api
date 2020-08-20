@@ -1,37 +1,36 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 
 
 public class OrganisationPbaResponseTest {
 
-    private Organisation organisationMock = Mockito.mock(Organisation.class);
+    private ProfessionalUser professionalUser;
+    private Organisation organisation;
+    private ArrayList<SuperUser> users = new ArrayList<>();
 
-    private final SuperUser professionalUserMock = Mockito.mock(SuperUser.class);
+    @Before
+    public void setUp() {
+        organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+                "companyN", false, "www.org.com");
+        professionalUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
 
-    @Test
-    public void testGetOrganisationPbaResponse() throws Exception {
-
-        ArrayList<SuperUser> users = new ArrayList<>();
-        users.add(professionalUserMock);
-
-        when(organisationMock.getUsers())
-                .thenReturn(users);
-
-        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisationMock, true);
-
-        OrganisationEntityResponse name;
-
-        assertThat(sut.getOrganisationEntityResponse()).isNotNull();
-
+        users.add(professionalUser.toSuperUser());
+        organisation.setUsers(users);
     }
 
+    @Test
+    public void test_GetOrganisationPbaResponse() throws Exception {
+        OrganisationPbaResponse sut = new OrganisationPbaResponse(organisation, true);
+        assertThat(sut.getOrganisationEntityResponse()).isNotNull();
+    }
 }

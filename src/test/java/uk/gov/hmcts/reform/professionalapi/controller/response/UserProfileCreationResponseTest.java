@@ -10,13 +10,12 @@ import org.springframework.http.HttpStatus;
 
 public class UserProfileCreationResponseTest {
 
+    private UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+    private String testUuid = UUID.randomUUID().toString();
 
     @Test
-    public void has_mandatory_fields_specified_not_null() {
-
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        String testUuid = UUID.randomUUID().toString();
-        userProfileCreationResponse.setIdamId(testUuid.toString());
+    public void test_has_mandatory_fields_specified_not_null() {
+        userProfileCreationResponse.setIdamId(testUuid);
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 
         assertThat(userProfileCreationResponse.getIdamId()).isEqualTo(testUuid);
@@ -25,10 +24,8 @@ public class UserProfileCreationResponseTest {
 
     @Test
     public void test_isUserCreated() {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamRegistrationResponse(HttpStatus.CREATED.value());
 
-        Boolean result = userProfileCreationResponse.isUserCreated();
-        assertTrue(result);
+        assertTrue(userProfileCreationResponse.isUserCreated());
     }
 }

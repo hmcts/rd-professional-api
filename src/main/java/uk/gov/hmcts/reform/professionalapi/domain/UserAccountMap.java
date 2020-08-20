@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-public class UserAccountMap {
+public class UserAccountMap implements Serializable {
 
     @EmbeddedId
     private UserAccountMapId  userAccountMapId;

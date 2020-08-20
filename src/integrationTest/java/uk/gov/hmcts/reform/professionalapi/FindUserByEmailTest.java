@@ -8,21 +8,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
-
 
     @Before
     public void setUp() {
-        Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
-        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname", "soMeone@somewhere.com", organisation);
+        Organisation organisation = new Organisation("some-org-name", null, "PENDING",
+                null, null, null);
+        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", organisation);
         organisationRepository.save(organisation);
         professionalUserRepository.save(superUser);
     }
@@ -36,7 +40,8 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,"True", hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
+                "True", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isGreaterThan(0);
@@ -77,10 +82,13 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
         String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
-        inviteUserCreationRequest(userEmail, userRoles);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
         assertThat(userIdentifierResponse).isNotNull();
@@ -93,7 +101,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
 
     @Test
-    public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+    public void should_throw_403_for_prd_admin_find_user_status_by_user_email_address_for_org_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -104,7 +112,8 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
 
@@ -115,7 +124,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void should_give_bad_request_for_invalid_email_to_find_user_status_by_user_email_address_for_organisation_status_as_active() {
+    public void shld_give_bad_request_4_invalid_email_to_find_usr_status_by_usr_email_id_for_org_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -126,10 +135,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
-                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
+                professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
         String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail, puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail,
+                puiUserManager);
 
         assertThat(response.get("http_status")).isEqualTo("400");
 

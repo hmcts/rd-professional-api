@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
-import uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures;
+
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
@@ -36,7 +37,7 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
-                        .jurisdictions(OrganisationFixtures.createJurisdictions())
+                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
 
@@ -45,7 +46,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(), hmctsAdmin);
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(),
+                hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
 
@@ -53,9 +55,11 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
-        PbaEditRequest pbaEditRequest = new PbaEditRequest(paymentAccountsEdit);
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
 
-        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest, orgIdentifierResponse, hmctsAdmin);
+        Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest,
+                orgIdentifierResponse, hmctsAdmin);
         assertThat(pbaResponse).isNotEmpty();
     }
 

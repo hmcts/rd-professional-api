@@ -9,31 +9,24 @@ import org.junit.Test;
 public class PbaAccountCreationRequestTest {
 
     private PbaAccountCreationRequest pbaAccountCreationRequest;
-
     private String pbaNumber = "123456";
+    private String pbaNumber1 = "987654";
 
     @Before
     public void setUp() {
-
         pbaAccountCreationRequest = new PbaAccountCreationRequest(pbaNumber);
     }
 
     @Test
-    public void testPbaAccountCreation() {
+    public void test_PbaAccountCreation() {
         String expectedPbaNumber = pbaAccountCreationRequest.getPbaNumber();
         assertThat(expectedPbaNumber).isEqualTo(pbaNumber);
-
     }
-
-
 
     @Test
-    public void testThatPbaAccountCreationIsChangedByBuilder() {
+    public void test_ThatPbaAccountCreationIsChangedByBuilder() {
         System.out.println(pbaNumber);
-        String pbaNumber2 = "987654";
-        PbaAccountCreationRequest testPbaAccountCreationRequest = aPbaPaymentAccount().pbaNumber(pbaNumber2).build();
-        assertThat(testPbaAccountCreationRequest.getPbaNumber()).isEqualTo(pbaNumber2);
+        PbaAccountCreationRequest testPbaAccountCreationRequest = aPbaPaymentAccount().pbaNumber(pbaNumber1).build();
+        assertThat(testPbaAccountCreationRequest.getPbaNumber()).isEqualTo(pbaNumber1);
     }
-
-
 }

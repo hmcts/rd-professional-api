@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -24,7 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class SuperUser {
+public class SuperUser implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,7 +76,8 @@ public class SuperUser {
 
     public ProfessionalUser toProfessionalUser() {
         ProfessionalUser professionalUser =
-                new ProfessionalUser(this.getFirstName(), this.getLastName(), this.getEmailAddress(), this.getOrganisation());
+                new ProfessionalUser(this.getFirstName(), this.getLastName(), this.getEmailAddress(),
+                        this.getOrganisation());
 
         professionalUser.setCreated(this.getCreated());
         professionalUser.setDeleted(this.getDeleted());

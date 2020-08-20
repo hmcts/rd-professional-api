@@ -1,33 +1,28 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 
+@NoArgsConstructor
 @Getter
 public class ContactInformationResponse {
 
     @JsonProperty
-    private final String addressLine1;
+    protected String addressLine1;
     @JsonProperty
-    private final String addressLine2;
+    protected String addressLine2;
     @JsonProperty
-    private final String addressLine3;
+    protected String addressLine3;
     @JsonProperty
-    private final String townCity;
+    protected String townCity;
     @JsonProperty
-    private final String county;
+    protected String county;
     @JsonProperty
-    private final String country;
+    protected String country;
     @JsonProperty
-    private final String postCode;
-    @JsonProperty
-    private final List<DxAddressResponse> dxAddress;
+    protected String postCode;
 
     public ContactInformationResponse(ContactInformation contactInfo) {
         this.addressLine1 = contactInfo.getAddressLine1();
@@ -37,10 +32,5 @@ public class ContactInformationResponse {
         this.county = contactInfo.getCounty();
         this.country = contactInfo.getCountry();
         this.postCode = contactInfo.getPostCode();
-        this.dxAddress = contactInfo.getDxAddresses()
-                .stream()
-                .map(dxAddres ->  new DxAddressResponse(dxAddres))
-                .collect(toList());
     }
-
 }

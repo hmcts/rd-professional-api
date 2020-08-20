@@ -2,14 +2,16 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFields;
-import static uk.gov.hmcts.reform.professionalapi.utils.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.List;
 import java.util.Map;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -19,8 +21,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+@RunWith(SpringIntegrationSerenityRunner.class)
 public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest {
-
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
@@ -29,12 +31,12 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-        updateAndValidateOrganisation(null, "ACTIVE",404);
+        updateAndValidateOrganisation(null, "ACTIVE",400);
     }
 
     @Test
     public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-        updateAndValidateOrganisation("1234ab12", "ACTIVE",404);
+        updateAndValidateOrganisation("1234ab12", "ACTIVE",400);
     }
 
     @Test
@@ -119,7 +121,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     @Test
     public void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",200);
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
+                200);
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
         PaymentAccount paymentAccount = pbaAccounts.get(0);
@@ -145,7 +148,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     @Test
     public void fields_other_than_organisation_should_override_if_same_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", 200);
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
+                200);
     }
 
     @Test
@@ -161,7 +165,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 .companyNumber(randomAlphabetic(8))
                 .build();
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin,
+                        organisationIdentifier);
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
@@ -174,19 +179,79 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         assertThat(persistedOrganisation.getCompanyNumber()).isNotNull();
     }
 
+    @Test
+    public void should_abort_flow_when_ccd_fails() {
+
+        Map<String, Object> responseForOrganisationUpdate;
+        String organisationIdentifier = createOrganisationRequest();
+        OrganisationCreationRequest organisationUpdateRequest
+                = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
+
+        ccdUserProfileErrorWireMock(HttpStatus.BAD_REQUEST);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.BAD_REQUEST.value()));
+        String responseBody = (String)responseForOrganisationUpdate.get("response_body");
+        assertThat(responseBody).contains("21 : There is a problem with your request. Please check and try again");
+
+        ccdUserProfileErrorWireMock(HttpStatus.NOT_FOUND);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.NOT_FOUND.value()));
+        responseBody = (String)responseForOrganisationUpdate.get("response_body");
+        assertThat(responseBody).contains("22 : Resource not found");
+
+        ccdUserProfileErrorWireMock(HttpStatus.UNAUTHORIZED);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.UNAUTHORIZED.value()));
+
+        ccdUserProfileErrorWireMock(HttpStatus.FORBIDDEN);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.FORBIDDEN.value()));
+        responseBody = (String)responseForOrganisationUpdate.get("response_body");
+        assertThat(responseBody).contains("24 : Access Denied");
+
+        ccdUserProfileErrorWireMock(HttpStatus.CONFLICT);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.CONFLICT.value()));
+        responseBody = (String)responseForOrganisationUpdate.get("response_body");
+        assertThat(responseBody).contains("25 : User already exists");
+
+        ccdUserProfileErrorWireMock(HttpStatus.INTERNAL_SERVER_ERROR);
+        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
+                hmctsAdmin, organisationIdentifier);
+        assertThat(responseForOrganisationUpdate.get("http_status"))
+                .isEqualTo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        responseBody = (String)responseForOrganisationUpdate.get("response_body");
+        assertThat(responseBody).contains("26 : error was caused by an unknown exception");
+        ccdUserProfileErrorWireMock(HttpStatus.OK);
+    }
+
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
-        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get("organisationIdentifier");
     }
 
-    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status, Integer httpStatus) {
+    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status,
+                                                      Integer httpStatus) {
         userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
         Organisation persistedOrganisation = null;
-        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated().status(status).build();
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+                .status(status).build();
 
         Map<String, Object> responseForOrganisationUpdate =
-                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, organisationIdentifier);
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin,
+                        organisationIdentifier);
 
         persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
@@ -205,7 +270,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
             }
         } else {
             if (responseForOrganisationUpdate.get("http_status") instanceof String) {
-                assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(String.valueOf(httpStatus.intValue()));
+                assertThat(responseForOrganisationUpdate.get("http_status"))
+                        .isEqualTo(String.valueOf(httpStatus.intValue()));
             } else {
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
             }

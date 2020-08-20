@@ -1,31 +1,26 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
-
 import org.junit.Test;
+import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 
 public class NewUserCreationRequestTest {
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
     @Test
-    public void testCreatesNewUser() {
+    public void test_CreatesNewUser() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
-        Jurisdiction jurisdictionMock = mock(Jurisdiction.class);
+        Jurisdiction jurisdiction = new Jurisdiction();
         List<Jurisdiction> jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdictionMock);
+        jurisdictions.add(jurisdiction);
 
         NewUserCreationRequest newUserCreationRequest =
-                new NewUserCreationRequest("some-name", "some-last-name", "some@email.com",  userRoles, jurisdictions);
+                new NewUserCreationRequest("some-name", "some-last-name",
+                        "some@email.com",  userRoles, jurisdictions, false);
 
         assertThat(newUserCreationRequest.getFirstName()).isEqualTo("some-name");
         assertThat(newUserCreationRequest.getLastName()).isEqualTo("some-last-name");
@@ -36,16 +31,16 @@ public class NewUserCreationRequestTest {
 
 
     @Test
-    public void newUserCreationBuilderTest() {
+    public void test_newUserCreationBuilder() {
         String testFirstName = "Jane";
         String testLastName = "Doe";
         String testEmail = "jane.doe@email.com";
         List<String> testRoles = new ArrayList<>();
         testRoles.add("a role");
 
-        Jurisdiction jurisdictionMock = mock(Jurisdiction.class);
+        Jurisdiction jurisdiction = new Jurisdiction();
         List<Jurisdiction> jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdictionMock);
+        jurisdictions.add(jurisdiction);
 
         NewUserCreationRequest testNewUserCreationRequest = NewUserCreationRequest.aNewUserCreationRequest()
                 .firstName(testFirstName)

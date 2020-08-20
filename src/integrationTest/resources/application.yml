@@ -6,29 +6,70 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
-
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:dbrefdata
     username: ${POSTGRES_USERNAME:dbrefdata}
     password: ${POSTGRES_PASSWORD:dbrefdata}
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-professional-api
+            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
 
-security:
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
 
-  authorisedServices:
-    - "it"
+idam:
+  s2s-authorised:
+    services: rd_professional_api
+  api.url: ${IDAM_URL:http://127.0.0.1:5000}
+  client:
+    redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
+    id: rd-professional-api
+
+
 ## IDAM feign connection
-auth.idam.client.baseUrl: ${IDAM_URL:http://127.0.0.1:5000}
-
-exui.role:
-  hmcts-admin: prd-admin
-  pui-user-manager: pui-user-manager
-  pui-organisation-manager: pui-organisation-manager
-  pui-finance-manager: pui-finance-manager
-  pui-case-manager: pui-case-manager
+auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
+prd:
+  security:
+    roles:
+      hmcts-admin: prd-admin
+      pui-user-manager: pui-user-manager
+      pui-organisation-manager: pui-organisation-manager
+      pui-finance-manager: pui-finance-manager
+      pui-case-manager: pui-case-manager
+      pui-caa: pui-caa
+      prd-aac-system: prd-aac-system
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
+oidc:
+  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+  expiration: 14400000 # milliseconds 4 hours
+
 ## ccd jurisdiction feign connection
 ccdUrl: ${CCD_URL:http://127.0.0.1:8092}
+
+# resent user invite interval in minutes
+resendInterval: 60
+
+# sync time interval in minutes
+syncInterval: 60
+
+defaultPageSize: ${DEFAULTPAGESIZE:10}
+
+loggingComponentName: RD_Professional_API
+
+# delete organisation enabled
+deleteOrganisationEnabled : false
+
+# get Active Orgs External enabled
+activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}

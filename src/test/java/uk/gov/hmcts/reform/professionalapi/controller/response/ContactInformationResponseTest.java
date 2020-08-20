@@ -1,29 +1,22 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContactInformationResponseTest {
 
+    final String expectAddress1 = "apt 1";
+    final String expectAddress2 = "London Bridge Rd";
+    final String expectAddress3 = "City Apartments";
+    final String expectPostCode = "N1 PD2";
+    final String expectCounty = "City of London";
+    final String expectCountry = "England";
+    final String expectTownCity = "London";
+
     @Test
-    public void testGetContactInformationResponse() throws Exception {
-        final String expectAddress1 = "apt 1";
-        final String expectAddress2 = "London Bridge Rd";
-        final String expectAddress3 = "City Apartments";
-        final String expectPostCode = "N1 PD2";
-        final String expectCounty = "City of London";
-        final String expectCountry = "England";
-        final String expectTownCity = "London";
-        List<DxAddress> dxAddressList = new ArrayList<>();
-        dxAddressList.add(mock(DxAddress.class));
+    public void testGetContactInformationResponse() {
 
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setAddressLine1(expectAddress1);
@@ -33,7 +26,6 @@ public class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
-        contactInformation.setDxAddresses(dxAddressList);
 
         ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
 
@@ -44,7 +36,5 @@ public class ContactInformationResponseTest {
         assertThat(sut.getCounty()).isEqualTo(expectCounty);
         assertThat(sut.getCountry()).isEqualTo(expectCountry);
         assertThat(sut.getTownCity()).isEqualTo(expectTownCity);
-        assertThat(sut.getDxAddress()).isNotEmpty();
     }
-
 }
