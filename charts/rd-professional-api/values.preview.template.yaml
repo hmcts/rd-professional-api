@@ -17,3 +17,4 @@ java:
         - s2s-secret
         - OAUTH2-CLIENT-SECRET
         - AppInsightsInstrumentationKey
+        - professional-api-S2S-SECRET

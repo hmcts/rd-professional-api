@@ -86,6 +86,12 @@ data "azurerm_key_vault_secret" "oauth2_client_secret" {
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
+resource "azurerm_key_vault_secret" "professional-api-s2s-secret" {
+  name          = "${var.component}-S2S-SECRET"
+  value         = "${data.azurerm_key_vault_secret.s2s_secret.value}"
+  key_vault_id  = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name      = "${var.component}-POSTGRES-USER"
   value     = "${module.db-professional-ref-data.user_name}"
