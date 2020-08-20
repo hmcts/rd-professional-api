@@ -55,13 +55,8 @@ public class PbaAccountsTest extends AuthorizationFunctionalTest {
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
         paymentAccountsEdit.add("PBA" + randomAlphabetic(7));
 
-<<<<<<<< HEAD:src/functionalTest/java/uk/gov/hmcts/reform/professionalapi/PbaAccountsTest.java
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
-========
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + randomAlphabetic(7));
->>>>>>>> remotes/origin/master:src/functionalTest/java/uk/gov/hmcts/reform/professionalapi/PaymentAccountRetrieveByEmailTest.java
 
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(pbaEditRequest,
                 orgIdentifierResponse, hmctsAdmin);
