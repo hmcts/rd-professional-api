@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 @Slf4j
 public class IdamOpenIdClient {
 
-    private static TestConfigProperties testConfig = null;
+    private TestConfigProperties testConfig;
 
     private Gson gson = new Gson();
 
