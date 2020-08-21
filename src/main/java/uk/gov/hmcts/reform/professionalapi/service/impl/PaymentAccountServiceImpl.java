@@ -65,8 +65,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
         deleteUserAccountMaps(organisation);
         deletePaymentAccountsFromOrganisation(organisation);
-        paymentAccountRepository.flush();
-        addPaymentAccountsToOrganisation(pbaEditRequest,organisation);
+        addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         return addUserAndPaymentAccountsToUserAccountMap(organisation);
     }
 
@@ -83,12 +82,13 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
 
+    @Transactional
     public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
         List<UUID> accountIds = new ArrayList<>();
 
         organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
 
-        paymentAccountRepository.deleteByIdIn(accountIds);
+        paymentAccountRepository.deletePaymentAccountsWithIds(accountIds);
 
         /** Please Note:
          * The below lines are required to set the Organisation's Payment Accounts List to be empty.

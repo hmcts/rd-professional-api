@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -38,7 +39,7 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteByUserAccountMapIdIn(List<UserAccountMapId> accountsToDelete) {
         userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
     }

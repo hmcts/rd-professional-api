@@ -133,7 +133,7 @@ public class PaymentAccountServiceImplTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo("200 OK");
 
-        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+        verify(paymentAccountRepositoryMock, times(1)).deletePaymentAccountsWithIds(anyList());
         verify(userAccountMapServiceMock, times(1)).deleteByUserAccountMapIdIn(anyList());
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
         verify(userAccountMapServiceMock, times(1))
@@ -154,7 +154,7 @@ public class PaymentAccountServiceImplTest {
 
         sut.deletePaymentAccountsFromOrganisation(organisation);
 
-        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
+        verify(paymentAccountRepositoryMock, times(1)).deletePaymentAccountsWithIds(anyList());
     }
 
     @Test
