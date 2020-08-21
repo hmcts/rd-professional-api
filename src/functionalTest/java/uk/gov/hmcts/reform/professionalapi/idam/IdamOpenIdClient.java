@@ -5,7 +5,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.EMAIL;
-import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.PASSWORD;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.CREDS;
 import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 
 import com.google.gson.Gson;
@@ -77,15 +77,15 @@ public class IdamOpenIdClient {
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
         Map<String,String> userCreds = new HashMap<>();
-        userCreds.put("email", userEmail);
-        userCreds.put("password", password);
+        userCreds.put(EMAIL, userEmail);
+        userCreds.put(CREDS, password);
         return userCreds;
     }
 
     public String getInternalOpenIdToken() {
         if (internalOpenIdTokenPrdAdmin == null) {
             Map<String,String> userCreds = createUser("prd-admin");
-            internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
+            internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
     }
@@ -95,12 +95,12 @@ public class IdamOpenIdClient {
      */
     public String getOpenIdTokenWithGivenRole(String role) {
         Map<String,String> userCreds = createUser(role);
-        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         Map<String,String> userCreds = createUser(role, email, firstName, lastName);
-        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD));
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getOpenIdToken(String userEmail, String password) {

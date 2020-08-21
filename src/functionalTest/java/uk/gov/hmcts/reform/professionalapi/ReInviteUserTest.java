@@ -125,7 +125,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
             // get PUM bearer token and reinvite
             String pumBearerToken = idamOpenIdClient
-                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD));
+                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
             newUserCreationRequest.setResendInvite(true);
             Map<String, Object> reinviteUserResponse = professionalApiClient
                     .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
@@ -156,7 +156,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
             // get PUM bearer token and reinvite
             String pumBearerToken = idamOpenIdClient
-                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD));
+                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
             newUserCreationRequest.setResendInvite(true);
             Map<String, Object> reinviteUserResponse = professionalApiClient
                     .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
@@ -230,7 +230,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
                 organisationCreationRequest = someMinimalOrganisationRequest().build();
                 orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
                 String pumBearerToken = idamOpenIdClient
-                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD));
+                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
                 newUserCreationRequest.setResendInvite(true);
                 newUserCreationRequest.setEmail(organisationCreationRequest.getSuperUser().getEmail());
                 Map<String, Object> reinviteUserResponse = professionalApiClient

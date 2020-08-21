@@ -155,7 +155,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
                 idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName());
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
-                .getOpenIdToken(userCreds.get(EMAIL), userCreds.get(PASSWORD)));
+                .getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS)));
 
         professionalApiClient.addNewUserToAnOrganisation(
                 orgIdentifier1 == null ? createActiveOrganisation1() :

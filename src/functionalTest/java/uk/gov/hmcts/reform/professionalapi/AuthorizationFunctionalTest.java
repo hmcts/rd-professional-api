@@ -98,7 +98,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static final String EMAIL = "email";
 
-    public static final String PASSWORD = "password";
+    public static final String CREDS = "CREDS";
 
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
 

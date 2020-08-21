@@ -313,7 +313,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 HttpStatus.CREATED).get("userIdentifier");
         RequestSpecification bearerToken = professionalApiClient
                 .getMultipleAuthHeaders(idamOpenIdClient
-                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD)));
+                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS)));
         //update status to suspended so that while adding roles by ext user will be non active
         professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK,
                 getUserStatusUpdateRequest(IdamStatus.SUSPENDED), orgIdentifier, userId);
@@ -340,7 +340,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .modifyUserToExistingUserForExternal(HttpStatus.FORBIDDEN, getUserProfileAddRoleRequest(),
                 professionalApiClient
                         .getMultipleAuthHeaders(idamOpenIdClient
-                                .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(PASSWORD))),
+                                .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS))),
                         pendingUserId);
         assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
         assertThat(modifiedUserResponse.get("errorDescription"))
