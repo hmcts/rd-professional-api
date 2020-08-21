@@ -10,9 +10,11 @@ def product = "rd"
 def component = "professional-api"
 
 def secrets = [
-    'rd-prof-api-${env}': [
-        secret('microservicekey-rd-professional-api', 'S2S_SECRET'),
-        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+    's2s-${env}': [
+        secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+    ],
+    'rd-${env}': [
+        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET')
     ]
 ]
 
