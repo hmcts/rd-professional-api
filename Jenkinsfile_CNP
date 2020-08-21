@@ -10,9 +10,10 @@ def product = "rd"
 def component = "professional-api"
 
 def secrets = [
-  's2s-${env}': [
-    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
-  ]
+    'rd-prof-api-${env}': [
+        secret('microservicekey-rd-professional-api', 'S2S_SECRET'),
+        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
