@@ -109,12 +109,7 @@ public class ProfessionalUserInternalController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The Email Address of the User to be retrieved",
-            required = true
-    )
+
     @ApiResponses({
             @ApiResponse(
                     code = 200,
