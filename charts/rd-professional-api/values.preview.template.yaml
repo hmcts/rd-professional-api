@@ -16,3 +16,5 @@ java:
       secrets:
         - s2s-secret
         - OAUTH2-CLIENT-SECRET
+        - OAUTH2-CLIENT-ID
+        - OAUTH2-CLIENT-AUTH

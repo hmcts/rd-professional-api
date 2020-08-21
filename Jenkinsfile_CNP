@@ -14,8 +14,12 @@ def secrets = [
         secret('microservicekey-rd-professional-api', 'S2S_SECRET')
     ],
     'rd-${env}': [
-        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET')
+        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+        secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
+        secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID')
+
     ]
+
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {

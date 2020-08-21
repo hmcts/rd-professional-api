@@ -10,3 +10,5 @@ spring:
         rd.professional-api-POSTGRES-PASS: spring.datasource.password
         rd.AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         rd.OAUTH2-CLIENT-SECRET: OAUTH2_CLIENT_SECRET
+        rd.OAUTH2-CLIENT-AUTH: OAUTH2_CLIENT_AUTH
+        rd.OAUTH2-CLIENT-ID: OAUTH2_CLIENT_ID
