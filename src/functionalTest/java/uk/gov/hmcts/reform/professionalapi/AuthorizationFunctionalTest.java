@@ -96,7 +96,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected static  String  s2sToken;
 
-    public static final String EMAIL = "email";
+    public static final String EMAIL = "EMAIL";
 
     public static final String CREDS = "CREDS";
 
