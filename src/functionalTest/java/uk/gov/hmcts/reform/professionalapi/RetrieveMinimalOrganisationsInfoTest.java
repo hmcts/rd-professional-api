@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-@Ignore
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
