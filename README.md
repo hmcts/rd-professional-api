@@ -10,7 +10,7 @@ Provides professional reference data to client applications.  Implemented as a J
 
 To run the project you will need to have the following installed:
 
-* Java 8
+* Java 11
 * Docker (optional)
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
@@ -149,25 +149,18 @@ ServiceAuthorization: Bearer {{token}}
 
 ### Contract testing with pact
 
-To publish against remote broker:
-`./gradlew pactPublish`
+To generate contract in pacts folder run the below command
 
+`./gradlew clean`
+
+`./gradlew contract
+
+To publish against remote broker:
 Turn on VPN and verify on url `https://pact-broker.platform.hmcts.net/`
 The pact contract(s) should be published
 
-
-To publish against local broker:
-Uncomment out the line found in the build.gradle:
-`pactBrokerUrl = 'http://localhost:9292'`
-comment out the real broker
-
-Start the docker container from the root dir run
-`docker-compose -f broker-compose.yml up`
-
 Publish via the gradle command
-`./gradlew pactPublish`
+ ./gradlew --no-daemon  -Dpact.broker.url=https://pact-broker.platform.hmcts.net -Dpact.consumer.version=test runAndPublishConsumerPactTests
 
-Once Verify on url `http://localhost:9292/`
+Once Verify on url 'https://pact-broker.platform.hmcts.net/'
 The pact contract(s) should be published
-
-Remember to return the localhost back to the remote broker
