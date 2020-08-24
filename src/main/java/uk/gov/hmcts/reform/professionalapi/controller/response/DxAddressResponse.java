@@ -2,15 +2,17 @@ package uk.gov.hmcts.reform.professionalapi.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 
 @Getter
+@NoArgsConstructor
 public class DxAddressResponse {
 
     @JsonProperty
-    private final String dxNumber;
+    private String dxNumber;
     @JsonProperty
-    private final String dxExchange;
+    private String dxExchange;
 
     public DxAddressResponse(DxAddress dxAddress) {
         this.dxNumber = dxAddress.getDxNumber();
