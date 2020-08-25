@@ -156,7 +156,7 @@ To generate contract in pacts folder run the below command
 `./gradlew contract
 
 To publish against remote broker:
-Turn on VPN and verify on url `https://pact-broker.platform.hmcts.net/`
+Turn on VPN and verify on urlgit pul `https://pact-broker.platform.hmcts.net/`
 The pact contract(s) should be published
 
 Publish via the gradle command
