@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -21,12 +20,16 @@ import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
+import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
-import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 
 @Service
 @Slf4j
@@ -37,9 +40,10 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     ApplicationConfiguration configuration;
     @Autowired
     UserProfileFeignClient userProfileFeignClient;
+    @Autowired
+    EntityManagerFactory emf;
 
     private ProfessionalUserRepository professionalUserRepository;
-    private PaymentAccountRepository paymentAccountRepository;
     private OrganisationServiceImpl organisationServiceImpl;
     private UserAccountMapService userAccountMapService;
 
@@ -63,38 +67,24 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     @Override
     @Transactional
     public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
-        deleteUserAccountMaps(organisation);
-        deletePaymentAccountsFromOrganisation(organisation);
+        deleteUserAccountMapsAndPaymentAccounts(organisation);
         addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         return addUserAndPaymentAccountsToUserAccountMap(organisation);
     }
 
-    public void deleteUserAccountMaps(Organisation organisation) {
+    public void deleteUserAccountMapsAndPaymentAccounts(Organisation organisation) {
+        List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
+
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
-         * If this changes then the below logic will need to change accordingly */
-        ProfessionalUser user = organisation.getUsers().get(0).toProfessionalUser();
-
-        List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
-        List<UserAccountMapId> accountsToDelete = generateListOfAccountsToDelete(user, paymentAccount);
-
-        userAccountMapService.deleteByUserAccountMapIdIn(accountsToDelete);
-    }
-
-
-    @Transactional
-    public void deletePaymentAccountsFromOrganisation(Organisation organisation) {
-        List<UUID> accountIds = new ArrayList<>();
-
-        organisation.getPaymentAccounts().forEach(account -> accountIds.add(account.getId()));
-
-        paymentAccountRepository.deletePaymentAccountsWithIds(accountIds);
+         * If this changes then the below method will need to change accordingly */
+        removePaymentAccountAndUserAccountMaps(
+                generateListOfAccountsToDelete(organisation.getUsers().get(0).toProfessionalUser(), paymentAccount));
 
         /** Please Note:
          * The below lines are required to set the Organisation's Payment Accounts List to be empty.
          * If this is not done, the Organisation's list will still contain the previous Accounts */
-        List<PaymentAccount> resetOrganisationPaymentAccounts = new ArrayList<>();
-        organisation.setPaymentAccounts(resetOrganisationPaymentAccounts);
+        organisation.setPaymentAccounts(new ArrayList<>());
     }
 
     public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
@@ -102,7 +92,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
-
         List<PaymentAccount> paymentAccounts = organisation.getPaymentAccounts();
         SuperUser superUser = organisation.getUsers().get(0);
 
@@ -114,9 +103,21 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public List<UserAccountMapId> generateListOfAccountsToDelete(ProfessionalUser user, List<PaymentAccount> accounts) {
-
         return accounts.stream().filter(account -> null != user && null != account)
                 .map(account -> new UserAccountMapId(user, account))
                 .collect(Collectors.toList());
+    }
+
+    public void removePaymentAccountAndUserAccountMaps(List<UserAccountMapId> userAccountMaps) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+
+        userAccountMaps.forEach(userAccountMap -> {
+            em.remove(em.find(UserAccountMap.class, userAccountMap));
+            em.remove(em.find(PaymentAccount.class, userAccountMap.getPaymentAccount().getId()));
+        });
+
+        transaction.commit();
     }
 }
