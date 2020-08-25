@@ -17,7 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.After;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,6 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
+@RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @TestExecutionListeners(listeners = {
     AuthorizationFunctionalTest.class,

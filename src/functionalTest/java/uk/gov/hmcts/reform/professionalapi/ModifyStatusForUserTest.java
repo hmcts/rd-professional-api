@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -16,8 +14,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-
-@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {

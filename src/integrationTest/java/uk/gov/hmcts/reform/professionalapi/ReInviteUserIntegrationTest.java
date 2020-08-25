@@ -8,17 +8,14 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     private NewUserCreationRequest userCreationRequest;

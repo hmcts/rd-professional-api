@@ -10,14 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {

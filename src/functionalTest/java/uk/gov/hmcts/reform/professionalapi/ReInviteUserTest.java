@@ -7,10 +7,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 
 import java.util.ArrayList;
 import java.util.Map;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,7 +16,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class ReInviteUserTest extends AuthorizationFunctionalTest {
 

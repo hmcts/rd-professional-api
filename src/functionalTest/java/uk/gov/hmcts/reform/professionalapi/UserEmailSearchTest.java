@@ -7,17 +7,11 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.cr
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Map;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
-
-@RunWith(SpringIntegrationSerenityRunner.class)
 @ActiveProfiles("functional")
 public class UserEmailSearchTest extends AuthorizationFunctionalTest {
 
