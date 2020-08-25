@@ -174,7 +174,8 @@ public class IdamConsumerTest {
                 .stringType("given_name", "puiCaseManager")
                 .stringType("family_name", "Jar")
                 .array("roles")
-                .stringType("citizen")
+                .stringType("prd-admin")
+                .stringType("IDAM_ADMIN_USER")
                 .closeArray();
 
     }
