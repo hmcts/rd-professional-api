@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class SmokeTest {
         RestAssured.baseURI = targetInstance;
         RestAssured.useRelaxedHTTPSValidation();
 
-        Response response = RestAssured
+        Response response = SerenityRest
                 .given()
                 .relaxedHTTPSValidation()
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
