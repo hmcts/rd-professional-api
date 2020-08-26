@@ -23,6 +23,8 @@ public enum ErrorConstants {
 
     CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception"),
 
+    FORBIDDEN_EXCEPTION_LD("11 : Error was caused by not accessible LaunchDarkly flag"),
+
     //error codes for CCD
     INVALID_REQUEST_CCD("21 : There is a problem with your request. Please check and try again"),
 

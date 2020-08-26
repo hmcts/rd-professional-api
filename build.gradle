@@ -39,7 +39,8 @@ def versions = [
         springBoot         : '2.3.3.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
-        pact_version       : '3.5.24'
+        pact_version       : '3.5.24',
+        launchDarklySdk    : "5.+"
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
@@ -293,6 +294,7 @@ dependencies {
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -318,6 +320,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
+
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
     testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest

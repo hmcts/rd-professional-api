@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.DATA_INTEGRITY_VIOLATION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.DUPLICATE_USER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.FORBIDDEN_EXCEPTION_LD;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.INVALID_REQUEST;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
@@ -41,6 +42,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 @Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
@@ -150,6 +152,11 @@ public class ExceptionMapper {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleForbiddenException(Exception ex) {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Object> handleLaunchDarklyException(Exception ex) {
+        return errorDetailsResponseEntity(ex, FORBIDDEN, FORBIDDEN_EXCEPTION_LD.getErrorMessage());
     }
 
     @ExceptionHandler(Exception.class)

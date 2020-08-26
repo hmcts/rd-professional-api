@@ -6,6 +6,7 @@ java:
     POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    LAUNCH_DARKLY_ENV: "preview"
   postgresql:
     enabled: true
     postgresqlUsername: dbrefdata
@@ -16,5 +17,6 @@ java:
       secrets:
         - s2s-secret
         - AppInsightsInstrumentationKey
+        - LD-SDK-KEY
 
 
