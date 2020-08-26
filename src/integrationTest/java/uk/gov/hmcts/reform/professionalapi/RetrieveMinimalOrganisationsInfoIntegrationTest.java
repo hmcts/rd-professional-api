@@ -31,7 +31,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
-        "Please check status param passed as this is invalid status.";
+        "Invalid status param provided, only Active status is allowed";
+
     List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
     List<OrganisationMinimalInfoResponse> noAddressOrgs = new ArrayList<>();

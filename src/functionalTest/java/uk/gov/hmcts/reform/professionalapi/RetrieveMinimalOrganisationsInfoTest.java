@@ -9,8 +9,9 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
     @Value("${activeOrgsExternalEnabled}")
     private boolean activeOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
-            "Please check status param passed as this is invalid status.";
+            "Invalid status param provided, only Active status is allowed";
 
     private List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
