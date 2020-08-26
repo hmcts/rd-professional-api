@@ -66,25 +66,6 @@ data "azurerm_key_vault_secret" "CCD_URL" {
  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "s2s_secret" {
-  name = "microservicekey-rd-professional-api"
-  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_redirect_uri" {
-  name = "OAUTH2-REDIRECT-URI"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_client_id" {
-  name = "OAUTH2-CLIENT-ID"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_client_secret" {
-  name = "OAUTH2-CLIENT-SECRET"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name      = "${var.component}-POSTGRES-USER"
