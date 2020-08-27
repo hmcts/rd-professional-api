@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import java.util.ArrayList;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
