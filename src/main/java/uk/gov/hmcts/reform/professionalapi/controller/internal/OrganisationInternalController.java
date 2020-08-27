@@ -228,13 +228,13 @@ public class OrganisationInternalController extends SuperController {
 
         log.info("{}:: Received request to edit payment accounts by organisation Id...", loggingComponentName);
 
-        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
                 .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
             throw new EmptyResultDataAccessException(1);
         }
+        paymentAccountValidator.validatePaymentAccounts(pbaEditRequest.getPaymentAccounts(), organisationIdentifier);
 
         PbaResponse response = paymentAccountService
                 .editPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
