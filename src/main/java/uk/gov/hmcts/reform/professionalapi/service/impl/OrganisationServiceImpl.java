@@ -110,7 +110,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = saveOrganisation(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -130,9 +130,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
+    public void addPbaAccountToOrganisation(Set<String> paymentAccounts,
+                                            Organisation organisation, boolean pbasValidated) {
         if (paymentAccounts != null) {
-            PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            if (!pbasValidated) {
+                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            }
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
@@ -371,7 +374,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
-            String prdAdminUserId) {
+                                                                String prdAdminUserId) {
         organisationRepository.deleteById(organisation.getId());
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
@@ -388,7 +391,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .findByUserCountByOrganisationId(organisation.getId())) {
             ProfessionalUser user = organisation.getUsers()
                     .get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
-            NewUserResponse newUserResponse  =  RefDataUtil
+            NewUserResponse newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
             if (StringUtils.isEmpty(newUserResponse.getIdamStatus())) {

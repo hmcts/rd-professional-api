@@ -249,7 +249,7 @@ public class OrganisationServiceImplTest {
         String pbaNumber = "PBA1234567";
         paymentAccounts.add(pbaNumber);
 
-        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock);
+        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false);
 
         verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
     }
