@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
@@ -44,7 +45,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     EntityManagerFactory emf;
 
     private ProfessionalUserRepository professionalUserRepository;
-    private OrganisationServiceImpl organisationServiceImpl;
+    private OrganisationService organisationService;
     private UserAccountMapService userAccountMapService;
 
     public Organisation findPaymentAccountsByEmail(String email) {
@@ -88,7 +89,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
-        organisationServiceImpl.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation, true);
+        organisationService.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation, true);
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
