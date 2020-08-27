@@ -160,6 +160,7 @@ pmd {
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
+    finalizedBy aggregate
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
@@ -175,6 +176,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
     testClassesDirs = sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
+    finalizedBy aggregate
 }
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
@@ -208,7 +210,7 @@ pact {
         //pactBrokerUrl = 'http://localhost:9292'
         pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
         tags = ['Dev']
-        version = "2.1"
+        version = "2.3"
     }
 }
 
@@ -238,7 +240,7 @@ pitest {
     historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
     outputFormats = ['XML', 'HTML']
     timestampedReports = true
-    mutationThreshold = 90   
+    mutationThreshold = 90
 
 }
 

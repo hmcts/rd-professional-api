@@ -181,7 +181,7 @@ public class IdamConsumerTest {
     }
 
     private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("prd-admin");
+        PactDslJsonArray array = new PactDslJsonArray().stringValue("prd-admin").stringValue("IDAM_ADMIN_USER");
 
         return new PactDslJsonBody()
                 .stringType("id", "123")
