@@ -157,11 +157,9 @@ public class PaymentAccountServiceImplTest {
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
         when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
 
-        sut.deleteUserAccountMapsAndPaymentAccounts(organisation);
+        sut.deleteUserAccountMapsAndPaymentAccounts(entityManagerMock, organisation);
 
         assertThat(organisation.getPaymentAccounts()).isEmpty();
-        verify(entityManagerFactoryMock, times(1)).createEntityManager();
-        verify(entityManagerMock, times(1)).getTransaction();
         verify(entityManagerMock, times(2)).find(any(), any());
         verify(entityManagerMock, times(2)).remove(any());
     }

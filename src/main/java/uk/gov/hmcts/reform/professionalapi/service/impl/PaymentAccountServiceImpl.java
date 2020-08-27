@@ -68,18 +68,25 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     @Override
     @Transactional
     public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
-        deleteUserAccountMapsAndPaymentAccounts(organisation);
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+
+        deleteUserAccountMapsAndPaymentAccounts(em, organisation);
         addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        return addUserAndPaymentAccountsToUserAccountMap(organisation);
+        PbaResponse pbaResponse = addUserAndPaymentAccountsToUserAccountMap(organisation);
+
+        transaction.commit();
+        return pbaResponse;
     }
 
-    public void deleteUserAccountMapsAndPaymentAccounts(Organisation organisation) {
+    public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {
         List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
 
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
          * If this changes then the below method will need to change accordingly */
-        removePaymentAccountAndUserAccountMaps(
+        removePaymentAccountAndUserAccountMaps(em,
                 generateListOfAccountsToDelete(organisation.getUsers().get(0).toProfessionalUser(), paymentAccount));
 
         /** Please Note:
@@ -109,16 +116,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 .collect(Collectors.toList());
     }
 
-    public void removePaymentAccountAndUserAccountMaps(List<UserAccountMapId> userAccountMaps) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-        transaction.begin();
-
+    public void removePaymentAccountAndUserAccountMaps(EntityManager em, List<UserAccountMapId> userAccountMaps) {
         userAccountMaps.forEach(userAccountMap -> {
             em.remove(em.find(UserAccountMap.class, userAccountMap));
             em.remove(em.find(PaymentAccount.class, userAccountMap.getPaymentAccount().getId()));
         });
 
-        transaction.commit();
     }
 }
