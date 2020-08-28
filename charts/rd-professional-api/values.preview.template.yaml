@@ -11,9 +11,6 @@ java:
     postgresqlUsername: dbrefdata
     postgresqlPassword: dbrefdata
     postgresqlDatabase: dbrefdata
-  keyVaults:
-    rd:
-      secrets:
-        - s2s-secret
+
 
 
