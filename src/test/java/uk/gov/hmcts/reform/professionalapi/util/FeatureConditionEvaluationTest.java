@@ -73,6 +73,16 @@ public class FeatureConditionEvaluationTest {
             .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
 
+    @Test(expected = ForbiddenException.class)
+    public void testPreHandleInvalidServletRequestAttributes() throws Exception {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("WelcomeController.test", "test-flag");
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod);
+        verify(featureConditionEvaluation, times(1))
+            .preHandle(httpRequest, httpServletResponse, handlerMethod);
+    }
+
     @Test
     public void testPreHandleNoFlag() throws Exception {
         assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));

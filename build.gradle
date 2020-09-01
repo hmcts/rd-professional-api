@@ -330,8 +330,6 @@ dependencies {
     compile "commons-codec:commons-codec:1.10"
     compile "com.google.code.gson:gson:2.7"
     compile "com.launchdarkly:okhttp-eventsource:2.3.1"
-
-
     compile group:"org.yaml", name: "snakeyaml", version:"1.26"
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

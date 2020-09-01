@@ -16,6 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
+import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
 
 @Component
@@ -50,11 +51,18 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
     }
 
     public String getServiceName() {
-        HttpServletRequest request =
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-                .getRequest();
 
-        return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
+        ServletRequestAttributes servletRequestAttributes =
+            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+
+        if (nonNull(servletRequestAttributes)) {
+            HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                    .getRequest();
+            return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
+        }
+
+        throw new ForbiddenException("Forbidden with Launch Darkly");
     }
 
     private String removeBearerFromToken(String token) {
