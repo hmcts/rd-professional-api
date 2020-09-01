@@ -40,8 +40,9 @@ def versions = [
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '3.5.24',
-        launchDarklySdk    : "5.+"
+        launchDarklySdk    : "5.0.3"
 ]
+
 
 mainClassName = 'uk.gov.hmcts.reform.professionalapi.Application'
 def jarName = 'rd-professional-api.jar'
@@ -323,7 +324,15 @@ dependencies {
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
+    compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.0.3:thin'
+    //needs to be removed :thin of LD SDK jar and following 4 jars of LD dependency once  CVE-2017-18640 fixed LD
+    compile "com.launchdarkly:launchdarkly-java-sdk-common:1.0.0"
+    compile "commons-codec:commons-codec:1.10"
+    compile "com.google.code.gson:gson:2.7"
+    compile "com.launchdarkly:okhttp-eventsource:2.3.1"
+
+
+    compile group:"org.yaml", name: "snakeyaml", version:"1.26"
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -364,15 +373,15 @@ dependencies {
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
-    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
+    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
         force = true
     }
 
-    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
         force = true
     }
 
-    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
         force = true
     }
 
