@@ -40,7 +40,7 @@ public class PaymentAccountValidator {
     public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
         String invalidPbas = paymentAccounts.stream()
                 .filter(pbaAccount -> {
-                    if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
+                    if (pbaAccount.length() == 10) {
                         Pattern pattern = Pattern.compile("(?i)pba.[a-zA-Z0-9]*$");
                         Matcher matcher = pattern.matcher(pbaAccount);
                         if (matcher.matches()) {
