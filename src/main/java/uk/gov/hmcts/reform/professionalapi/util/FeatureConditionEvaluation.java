@@ -56,9 +56,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
             ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         if (nonNull(servletRequestAttributes)) {
-            HttpServletRequest request =
-                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-                    .getRequest();
+            HttpServletRequest request = servletRequestAttributes.getRequest();
             return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
         }
 
