@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation;
 
 @Configuration
@@ -21,9 +20,6 @@ public class LaunchDarklyConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private FeatureConditionEvaluation featureConditionEvaluation;
-
-    @Autowired
-    private FeatureToggleServiceImpl featureToggleService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

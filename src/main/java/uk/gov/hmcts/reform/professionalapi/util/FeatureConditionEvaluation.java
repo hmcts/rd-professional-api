@@ -14,7 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
-import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
 
@@ -26,7 +26,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
     public static final String BEARER = "Bearer ";
 
     @Autowired
-    private final FeatureToggleServiceImpl featureToggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public boolean preHandle(HttpServletRequest request,

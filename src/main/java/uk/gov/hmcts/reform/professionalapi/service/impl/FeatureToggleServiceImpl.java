@@ -9,9 +9,10 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 @Service
-public class FeatureToggleServiceImpl {
+public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     @Autowired
     private final LDClient ldClient;
@@ -38,6 +39,7 @@ public class FeatureToggleServiceImpl {
             "test-flag-1");
     }
 
+    @Override
     public boolean isFlagEnabled(String serviceName, String flagName) {
         LDUser user = new LDUser.Builder(userName)
             .firstName(userName)
@@ -48,6 +50,7 @@ public class FeatureToggleServiceImpl {
         return ldClient.boolVariation(flagName, user, false);
     }
 
+    @Override
     public Map<String, String> getLaunchDarklyMap() {
         return launchDarklyMap;
     }
