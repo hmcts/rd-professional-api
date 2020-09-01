@@ -31,6 +31,7 @@ public class PaymentAccountValidator {
 
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
+            paymentAccounts.removeIf(String::isBlank);
             checkPbaNumberIsValid(paymentAccounts);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
