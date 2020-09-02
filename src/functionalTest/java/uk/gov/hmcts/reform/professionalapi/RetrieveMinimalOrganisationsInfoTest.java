@@ -156,7 +156,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         
       
       
-      <String, String> userCreds =
+        Map<String, String> userCreds =
                 idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName());
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
