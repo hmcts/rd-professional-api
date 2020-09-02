@@ -275,7 +275,7 @@ public class ProfessionalExternalUserControllerTest {
                 any(OrganisationStatus.class), any(String.class));
         doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
 
-        Optional<ResponseEntity<Object>> actual = professionalExternalUserController
+        Optional<ResponseEntity> actual = professionalExternalUserController
                 .findUserByEmail(organisation.getOrganisationIdentifier(), "testing@email.com");
         assertThat(actual).isNotNull();
         assertThat(actual.get().getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
@@ -316,7 +316,7 @@ public class ProfessionalExternalUserControllerTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_FindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
-        Optional<ResponseEntity<Object>> actual = professionalExternalUserController
+        Optional<ResponseEntity> actual = professionalExternalUserController
                 .findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
         assertThat(actual).isNotNull();
