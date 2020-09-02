@@ -32,8 +32,3 @@ resendInterval: 60
 # toggle for resendInvite
 resendInviteEnabled : true
 
-# delete organisation enabled
-deleteOrganisationEnabled : true
-
-# get Active Orgs External enabled
-activeOrgsExternalEnabled : true

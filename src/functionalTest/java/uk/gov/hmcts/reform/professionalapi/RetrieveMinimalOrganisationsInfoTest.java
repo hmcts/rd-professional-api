@@ -1,21 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
 import java.util.ArrayList;
 import java.util.List;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestContext;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -27,11 +21,17 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
-    @Value("${activeOrgsExternalEnabled}")
     private boolean activeOrgsExternalEnabled;
 
     private static final String STATUS_PARAM_INVALID_MESSAGE =
@@ -56,6 +56,14 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     private List<String> validRoles = new ArrayList<>();
     private List<String> orgResponseInfo = new ArrayList<>();
 
+
+    @Override
+    public void beforeTestClass(TestContext testContext) {
+        super.beforeTestClass(testContext);
+        String flag = featureToggleService.getLaunchDarklyMap()
+            .get("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional");
+        activeOrgsExternalEnabled = featureToggleService.isFlagEnabled("rd_professional_api", flag);
+    }
 
     @Test
     @SuppressWarnings("unchecked")

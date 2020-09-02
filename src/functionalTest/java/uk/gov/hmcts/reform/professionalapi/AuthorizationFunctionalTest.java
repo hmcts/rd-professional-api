@@ -1,12 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
+import com.launchdarkly.sdk.server.LDClient;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -30,6 +24,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.LaunchDarklyTestConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -39,8 +34,16 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, LaunchDarklyTestConfig.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -96,7 +99,12 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
-    protected static  String  s2sToken;
+    protected static String s2sToken;
+
+    protected FeatureToggleServiceImpl featureToggleService;
+
+    @Autowired
+    LDClient ldClient;
 
     @After
     public void tearDown() {
@@ -128,9 +136,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         }
 
         professionalApiClient = new ProfessionalApiClient(
-                professionalApiUrl,
-                s2sToken, idamOpenIdClient, idamClient);
+            professionalApiUrl,
+            s2sToken, idamOpenIdClient, idamClient);
 
+        featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -147,9 +156,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     }
 
     protected String createAndctivateOrganisationWithGivenRequest(
-            OrganisationCreationRequest organisationCreationRequest, String role) {
+        OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
-                .createOrganisation(organisationCreationRequest);
+            .createOrganisation(organisationCreationRequest);
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
@@ -159,7 +168,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier,role);
+        professionalApiClient.updateOrganisation(organisationIdentifier, role);
         return organisationIdentifier;
     }
 
@@ -179,14 +188,14 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(userEmail)
+            .roles(userRoles)
+            .jurisdictions(createJurisdictions())
+            .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+            hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;
@@ -202,18 +211,18 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String firstName = "someName";
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
-                userEmail);
+            userEmail);
 
 
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(userEmail)
+            .roles(userRoles)
+            .jurisdictions(createJurisdictions())
+            .build();
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+            hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;
@@ -243,12 +252,12 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String lastName = "someLastName";
         String firstName = "someFirstName";
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .jurisdictions(createJurisdictions())
-                .build();
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(userEmail)
+            .roles(userRoles)
+            .jurisdictions(createJurisdictions())
+            .build();
         return userCreationRequest;
     }
 
@@ -257,16 +266,16 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String lastName = "some-lname";
         String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .jurisdictions(createJurisdictions())
-                .build();
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .jurisdictions(createJurisdictions())
+            .build();
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(superUser)
-                .build();
+            .superUser(superUser)
+            .build();
 
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
@@ -277,11 +286,11 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
         UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .jurisdictions(createJurisdictions())
-                .build();
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .jurisdictions(createJurisdictions())
+            .build();
         return superUser;
     }
 
