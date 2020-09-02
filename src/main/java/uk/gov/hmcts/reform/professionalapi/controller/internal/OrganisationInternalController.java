@@ -137,9 +137,9 @@ public class OrganisationInternalController extends SuperController {
 
     @Secured("prd-admin")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity retrieveOrganisations(
+    public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
-            @ApiParam(name = "id", required = false) @RequestParam(value = "id", required = false) String id,
+            @ApiParam(name = "id") @RequestParam(value = "id", required = false) String id,
             @ApiParam(name = "status") @RequestParam(value = "status", required = false) String status) {
 
         return retrieveAllOrganisationOrById(id, status);
@@ -181,7 +181,7 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
+    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
         //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmail(email);
     }
@@ -221,7 +221,7 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
+    public ResponseEntity<Object> editPaymentAccountsByOrgId(@Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
                                                      @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
                                                              message = ORG_ID_VALIDATION_ERROR_MESSAGE)
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
@@ -279,7 +279,7 @@ public class OrganisationInternalController extends SuperController {
     )
     @ResponseBody
     @Secured("prd-admin")
-    public ResponseEntity updatesOrganisation(
+    public ResponseEntity<Object> updatesOrganisation(
             @Valid @NotNull @RequestBody OrganisationCreationRequest organisationCreationRequest,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
@@ -334,7 +334,7 @@ public class OrganisationInternalController extends SuperController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     @Secured("prd-admin")
-    public ResponseEntity addUserToOrganisation(
+    public ResponseEntity<Object> addUserToOrganisation(
             @Valid @NotNull @RequestBody NewUserCreationRequest newUserCreationRequest,
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
@@ -393,12 +393,12 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
+        DeleteOrganisationResponse deleteOrganisationResponse;
         //Received request to delete an organisation for internal user
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
                     .getOrganisationByOrgIdentifier(organisationIdentifier));
 
-        if (!organisation.isPresent()) {
+        if (organisation.isEmpty()) {
 
             throw new EmptyResultDataAccessException(1);
 
