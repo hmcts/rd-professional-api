@@ -77,6 +77,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         PbaResponse pbaResponse = addUserAndPaymentAccountsToUserAccountMap(organisation);
 
         transaction.commit();
+        em.close();
         return pbaResponse;
     }
 
