@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
@@ -246,13 +247,13 @@ public class RefDataUtil {
 
             if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
 
-                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(),
-                        status);
+                return filterUsersByStatusWithRoles(
+                        (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody()), status);
 
             } else {
 
-                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity
-                        .getBody(), status);
+                return filterUsersByStatusWithoutRoles(
+                        (ProfessionalUsersEntityResponseWithoutRoles) requireNonNull(responseEntity.getBody()), status);
             }
 
         } else {
