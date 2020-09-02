@@ -5,15 +5,11 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
 import java.util.Map;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegrationTest {
 
     @Test

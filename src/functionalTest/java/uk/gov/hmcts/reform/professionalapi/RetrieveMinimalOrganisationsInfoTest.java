@@ -10,8 +10,9 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
     @Value("${activeOrgsExternalEnabled}")
@@ -151,7 +153,10 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);
 
-        Map<String, String> userCreds =
+        
+      
+      
+      <String, String> userCreds =
                 idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName());
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
