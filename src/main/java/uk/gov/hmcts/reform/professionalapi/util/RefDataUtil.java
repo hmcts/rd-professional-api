@@ -127,7 +127,7 @@ public class RefDataUtil {
             Object clazz = response.status() > 300 ? ErrorResponse.class : GetUserProfileResponse.class;
             ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
-            if (response.status() > 300) {
+            if (null != responseResponseEntity.getBody() && response.status() > 300) {
                 ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(),
                         userProfileErrorResponse.getErrorMessage());
@@ -201,17 +201,19 @@ public class RefDataUtil {
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity<Object> responseResponseEntity,
                                                Boolean isRequiredRoles) {
 
-        GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
-        if (!StringUtils.isEmpty(userProfileResponse)) {
-            user.setFirstName(userProfileResponse.getFirstName());
-            user.setLastName(userProfileResponse.getLastName());
-            user.setEmailAddress(userProfileResponse.getEmail());
-            if (TRUE.equals(isRequiredRoles)) {
-                user.setUserIdentifier(userProfileResponse.getIdamId());
-                user.setIdamStatus(userProfileResponse.getIdamStatus());
-                user.setRoles(userProfileResponse.getRoles());
-                user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
-                user.setIdamMessage(userProfileResponse.getIdamMessage());
+        if (null != responseResponseEntity.getBody()) {
+            GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
+            if (!StringUtils.isEmpty(userProfileResponse)) {
+                user.setFirstName(userProfileResponse.getFirstName());
+                user.setLastName(userProfileResponse.getLastName());
+                user.setEmailAddress(userProfileResponse.getEmail());
+                if (TRUE.equals(isRequiredRoles)) {
+                    user.setUserIdentifier(userProfileResponse.getIdamId());
+                    user.setIdamStatus(userProfileResponse.getIdamStatus());
+                    user.setRoles(userProfileResponse.getRoles());
+                    user.setIdamStatusCode(userProfileResponse.getIdamStatusCode());
+                    user.setIdamMessage(userProfileResponse.getIdamMessage());
+                }
             }
         }
         return user;
@@ -242,23 +244,28 @@ public class RefDataUtil {
     }
 
     public static Object filterUsersByStatus(ResponseEntity<Object> responseEntity, String status) {
+        Object response = null;
 
-        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
 
-            if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
+            if (null != responseEntity.getBody()) {
+                if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
 
-                return filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(),
-                        status);
+                    response = filterUsersByStatusWithRoles((ProfessionalUsersEntityResponse) responseEntity.getBody(),
+                            status);
 
-            } else {
+                } else {
 
-                return filterUsersByStatusWithoutRoles((ProfessionalUsersEntityResponseWithoutRoles) responseEntity
-                        .getBody(), status);
+                    response = filterUsersByStatusWithoutRoles(
+                            (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody(), status);
+                }
             }
 
         } else {
             throw new ExternalApiException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MESSAGE_UP_FAILED);
         }
+
+        return response;
     }
 
     public static ProfessionalUsersEntityResponse
@@ -353,8 +360,10 @@ public class RefDataUtil {
                 newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
-                log.error("{}:: Response from UserProfileByEmail service call {}",
-                        loggingComponentName, errorResponse.getErrorDescription());
+                if (null != errorResponse) {
+                    log.error("{}:: Response from UserProfileByEmail service call {}",
+                            loggingComponentName, errorResponse.getErrorDescription());
+                }
                 newUserResponse = new NewUserResponse();
             }
 
@@ -407,7 +416,9 @@ public class RefDataUtil {
         } else {
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
                     = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
-            professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
+            if (null != professionalUsersEntityResponseWithoutRoles) {
+                professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
+            }
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
         }
