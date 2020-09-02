@@ -4,16 +4,25 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
+properties([
+        parameters([
+                string(defaultValue: 'preview', description: 'Environment', name: 'environment'),
+        ])
+])
+
 
 def type = "java"
 def product = "rd"
 def component = "professional-api"
+def secretId = "rd-" + params.ENVIRONMENT
 
 def secrets = [
   's2s-${env}': [
-    secret('microservicekey-rd-professional-api', 'S2S_SECRET'),
-    secret('LD-SDK-KEY', 'LD_SDK_KEY')
-  ]
+            secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+  ],
+  (secretId): [
+            secret('LD-SDK-KEY', 'LD_SDK_KEY')
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
