@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -38,7 +37,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations",
@@ -47,9 +45,6 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 @RestController
 @Slf4j
 public class ProfessionalExternalUserController extends SuperController {
-
-    @Autowired
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
@@ -99,22 +94,22 @@ public class ProfessionalExternalUserController extends SuperController {
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager",
             "caseworker-divorce-financialremedy", "caseworker-divorce-financialremedy-solicitor",
             "caseworker-divorce-solicitor", "caseworker-divorce", "caseworker", "pui-caa"})
-    public ResponseEntity findUsersByOrganisation(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
-                                                  @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted",
-                                                          required = false) String showDeleted,
-                                                  @ApiParam(name = "status") @RequestParam(value = "status",
-                                                          required = false) String status,
-                                                  @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles",
-                                                          required = false, defaultValue = "true") Boolean returnRoles,
-                                                  @RequestParam(value = "page", required = false) Integer page,
-                                                  @RequestParam(value = "size", required = false) Integer size,
-                                                  @ApiParam(hidden = true) @UserId String userId) {
-
+    public ResponseEntity<Object> findUsersByOrganisation(
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(name = "showDeleted") @RequestParam(value = "showDeleted",
+                    required = false) String showDeleted,
+            @ApiParam(name = "status") @RequestParam(value = "status",
+                    required = false) String status,
+            @ApiParam(name = "returnRoles") @RequestParam(value = "returnRoles",
+                    required = false, defaultValue = "true") Boolean returnRoles,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(hidden = true) @UserId String userId) {
 
 
         profExtUsrReqValidator.validateRequest(organisationIdentifier, showDeleted, status);
 
-        ResponseEntity profUsersEntityResponse;
+        ResponseEntity<Object> profUsersEntityResponse;
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
@@ -163,11 +158,12 @@ public class ProfessionalExternalUserController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"pui-user-manager"})
-    public Optional<ResponseEntity> findUserByEmail(@ApiParam(hidden = true) @OrgId String organisationIdentifier,
-                                                    @ApiParam(name = "email") @RequestParam(value = "email",
-                                                            required = false) String email) {
+    public Optional<ResponseEntity<Object>> findUserByEmail(
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(name = "email") @RequestParam(value = "email",
+                    required = false) String email) {
 
-        Optional<ResponseEntity> optionalResponseEntity;
+        Optional<ResponseEntity<Object>> optionalResponseEntity;
         validateEmail(email);
         //email is valid
         optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email.toLowerCase()));
