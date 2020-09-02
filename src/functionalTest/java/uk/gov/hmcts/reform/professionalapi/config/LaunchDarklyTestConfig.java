@@ -12,6 +12,6 @@ public class LaunchDarklyTestConfig {
 
     @Bean
     public LDClient ldClient() {
-        return new LDClient(getenv("LD-SDK-KEY"));
+        return new LDClient(getenv("LD_SDK_KEY"));
     }
 }
