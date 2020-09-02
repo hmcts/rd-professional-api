@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.idam;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.ge
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import com.mifmif.common.regex.Generex;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
@@ -23,7 +25,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 
 
@@ -35,6 +36,8 @@ public class IdamOpenIdClient {
     private Gson gson = new Gson();
 
     private static String internalOpenIdTokenPrdAdmin;
+
+    private static String sidamPassword;
 
     public IdamOpenIdClient(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
@@ -167,13 +170,11 @@ public class IdamOpenIdClient {
         private String accessToken;
     }
 
-
     public static String generateSidamPassword() {
-        String regex = "^(?=.{10,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$";
-        String password = RandomStringUtils.randomAlphanumeric(10);
-        if (!password.matches(regex)) {
-            password = generateSidamPassword();
+        if (isBlank(sidamPassword)) {
+            sidamPassword = new Generex("([A-Z])([a-z]{4})([0-9]{4})").random();
         }
-        return password;
+        return sidamPassword;
     }
+
 }
