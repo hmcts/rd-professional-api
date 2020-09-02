@@ -6,7 +6,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 
 properties([
         parameters([
-                string(defaultValue: 'preview', description: 'Environment', name: 'environment'),
+                string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test')
         ])
 ])
 
