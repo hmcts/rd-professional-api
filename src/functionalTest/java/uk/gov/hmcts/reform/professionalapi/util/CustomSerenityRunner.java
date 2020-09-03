@@ -5,26 +5,16 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.professionalapi.config.LaunchDarklyTestConfig;
-import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
-import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
+import static java.lang.System.getenv;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, LaunchDarklyTestConfig.class})
-@ComponentScan("uk.gov.hmcts.reform.professionalapi")
-@TestPropertySource("classpath:application-functional.yaml")
 public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
 
-    @Autowired
-    LDClient ldClient;
+    private LDClient ldClient =  new LDClient(getenv("LD_SDK_KEY"));
 
-    protected FeatureToggleServiceImpl featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
+    private FeatureToggleServiceImpl featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
 
     public CustomSerenityRunner(Class<?> klass) throws InitializationError {
         super(klass);
