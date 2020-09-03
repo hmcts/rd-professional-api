@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import com.launchdarkly.sdk.server.LDClient;
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,11 +99,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected static String s2sToken;
 
-    protected FeatureToggleServiceImpl featureToggleService;
-
-    @Autowired
-    LDClient ldClient;
-
     @After
     public void tearDown() {
     }
@@ -138,8 +131,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient, idamClient);
-
-        featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {

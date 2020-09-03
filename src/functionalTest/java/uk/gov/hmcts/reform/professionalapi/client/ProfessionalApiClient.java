@@ -758,6 +758,7 @@ public class ProfessionalApiClient {
                 .statusCode(status.value());
     }
 
+
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body("")
