@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.service.LegacyPbaAccountService;
 
 @Service
@@ -24,27 +21,11 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
     ApplicationConfiguration config;
 
     public List<String> findLegacyPbaAccountByUserEmail(ProfessionalUser professionalUser) {
-
         List<String> pbaNumbers = null;
 
         if (!professionalUser.getOrganisation().getPaymentAccounts().isEmpty()) {
-
-            if ("false".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
-
-                pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
-
-            } else if ("true".equalsIgnoreCase(config.getPbaFromUserAccountMap())) {
-
-                List<PaymentAccount> userMapPaymentAccount
-                        = getPaymentAccountsFromUserAccountMap(professionalUser.getUserAccountMap());
-
-                pbaNumbers = getPbaNumbersFromPaymentAccount(userMapPaymentAccount, professionalUser.getOrganisation()
-                        .getPaymentAccounts());
-
-            }
-
+            pbaNumbers = getPbaNumbersFromPaymentAccount(professionalUser.getOrganisation().getPaymentAccounts());
         }
-
         return pbaNumbers;
     }
 
@@ -57,34 +38,5 @@ public class LegacyPbaAccountServiceImpl implements LegacyPbaAccountService {
         );
 
         return paymentAccountPbaNumbers;
-    }
-
-    private List<String> getPbaNumbersFromPaymentAccount(List<PaymentAccount> userMapPaymentAccount,
-                                                         List<PaymentAccount> paymentAccountsEntity) {
-
-        List<String> paymentAccountPbaNumbers = new ArrayList<>();
-
-        paymentAccountsEntity.forEach(paymentAccount -> {
-            for (PaymentAccount usrMapAccount : userMapPaymentAccount) {
-
-                if (usrMapAccount.getId().equals(paymentAccount.getId())) {
-
-                    paymentAccountPbaNumbers.add(paymentAccount.getPbaNumber());
-                }
-            }
-        });
-
-        return paymentAccountPbaNumbers;
-    }
-
-    private List<PaymentAccount> getPaymentAccountsFromUserAccountMap(List<UserAccountMap> userAccountMaps) {
-
-        List<PaymentAccount> userMapPaymentAccount;
-
-        userMapPaymentAccount = userAccountMaps.stream().map(userAccountMap -> userAccountMap.getUserAccountMapId()
-                .getPaymentAccount())
-                .collect(toList());
-
-        return userMapPaymentAccount;
     }
 }
