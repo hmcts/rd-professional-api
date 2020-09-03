@@ -251,7 +251,7 @@ public abstract class SuperController {
             jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
                 UserProfileCreationResponse userProfileCreationResponse
                         = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
@@ -332,7 +332,7 @@ public abstract class SuperController {
                 newUserCreationRequest.getEmail());
         ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
