@@ -371,18 +371,6 @@ dependencies {
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
-    testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
-        force = true
-    }
-
-    integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
-        force = true
-    }
-
-    functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
-        force = true
-    }
-
     contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
         force = true
     }
