@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,16 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class UserAccountMapServiceImpl implements UserAccountMapService {
 
     private UserAccountMapRepository userAccountMapRepository;
 
-    private static String loggingComponentName;
+    public UserAccountMapServiceImpl(UserAccountMapRepository userAccountMapRepository) {
+        this.userAccountMapRepository = userAccountMapRepository;
+    }
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     public void persistedUserAccountMap(ProfessionalUser persistedSuperUser, List<PaymentAccount> paymentAccounts) {
 
@@ -31,7 +34,7 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
             List<UserAccountMap> userAccountMaps = new ArrayList<>();
             log.debug("{}:: PaymentAccount is not empty", loggingComponentName);
             paymentAccounts.forEach(paymentAccount ->
-                userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount))));
+                    userAccountMaps.add(new UserAccountMap(new UserAccountMapId(persistedSuperUser, paymentAccount))));
             if (!CollectionUtils.isEmpty(userAccountMaps)) {
                 userAccountMapRepository.saveAll(userAccountMaps);
             }
@@ -41,10 +44,5 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
     @Transactional
     public void deleteByUserAccountMapIdIn(List<UserAccountMapId> accountsToDelete) {
         userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
-    }
-
-    @Value("${loggingComponentName}")
-    public void setLoggingComponentName(String loggingComponentName) {
-        UserAccountMapServiceImpl.loggingComponentName = loggingComponentName;
     }
 }
