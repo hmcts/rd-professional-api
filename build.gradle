@@ -258,7 +258,8 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java," +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/RefDataUtil.java"
     }
 }
 
