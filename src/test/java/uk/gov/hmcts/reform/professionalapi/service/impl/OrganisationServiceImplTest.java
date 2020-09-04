@@ -249,7 +249,7 @@ public class OrganisationServiceImplTest {
         String pbaNumber = "PBA1234567";
         paymentAccounts.add(pbaNumber);
 
-        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock);
+        sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false);
 
         verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
     }
@@ -828,7 +828,6 @@ public class OrganisationServiceImplTest {
         UserAccountMapId userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
         UserAccountMap userAccountMap = new UserAccountMap(userAccountMapId);
         userAccountMaps.add(userAccountMap);
-        paymentAccount.setUserAccountMap(userAccountMaps);
         organisation.addPaymentAccount(paymentAccount);
         return organisation;
     }

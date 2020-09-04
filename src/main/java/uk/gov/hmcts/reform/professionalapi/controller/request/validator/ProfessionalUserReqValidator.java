@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +18,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Component
 @Slf4j
 public class ProfessionalUserReqValidator {
-
-
-    public static boolean isValidEmail(String email) {
-        return StringUtils.isNotEmpty(email) && isEmailValid(email);
-    }
 
     public void validateRequest(String orgId, String showDeleted, String status) {
         if (StringUtils.isEmpty(orgId) && StringUtils.isEmpty(showDeleted)) {
@@ -70,17 +63,4 @@ public class ProfessionalUserReqValidator {
         }
         return !emptyRoles.isEmpty();
     }
-
-    private static boolean isEmailValid(String email) {
-        Pattern p = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:"
-               + "[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c"
-               + "\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|"
-               + "\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|"
-               + "[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09"
-               + "\\x0b\\x0c\\x0e-\\x7f])+)\\])");
-        Matcher m = p.matcher(email);
-        return m.find();
-    }
-
-
 }

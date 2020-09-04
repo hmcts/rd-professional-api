@@ -256,7 +256,8 @@ sonarqube {
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/professionalapi/configuration/**," +
                 "src/main/java/uk/gov/hmcts/reform/professionalapi/SystemDateProvider.java," +
-                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java"
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/Application.java," +
+                "src/main/java/uk/gov/hmcts/reform/professionalapi/util/RefDataUtil.java"
     }
 }
 
@@ -320,8 +321,6 @@ dependencies {
 
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
-
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok

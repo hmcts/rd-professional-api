@@ -22,14 +22,11 @@ public class PaymentAccountTest {
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setId(UUID.randomUUID());
         paymentAccount.setPbaNumber("some-pba-number");
-        paymentAccount.setUserAccountMap(userAccountMap);
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
         assertThat(paymentAccount.getLastUpdated()).isNotNull();
         assertThat(paymentAccount.getCreated()).isNotNull();
         assertThat(paymentAccount.getId()).isNotNull();
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
-        assertThat(paymentAccount.getUserAccountMap()).isNotNull();
-        assertThat(paymentAccount.getUserAccountMap()).isNotEmpty();
     }
 }
