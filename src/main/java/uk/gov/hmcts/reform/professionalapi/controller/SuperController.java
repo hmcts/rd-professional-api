@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -252,7 +253,7 @@ public abstract class SuperController {
                     false);
             if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
                 UserProfileCreationResponse userProfileCreationResponse
-                        = (UserProfileCreationResponse) responseEntity.getBody();
+                        = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
@@ -333,7 +334,7 @@ public abstract class SuperController {
                 false);
         if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
             UserProfileCreationResponse userProfileCreationResponse
-                    = (UserProfileCreationResponse) responseEntity.getBody();
+                    = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,

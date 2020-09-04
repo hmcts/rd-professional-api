@@ -129,7 +129,8 @@ public class RefDataUtil {
             ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
-                ErrorResponse userProfileErrorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                ErrorResponse userProfileErrorResponse =
+                        (ErrorResponse) requireNonNull(responseResponseEntity.getBody());
                 throw new ExternalApiException(responseResponseEntity.getStatusCode(),
                         userProfileErrorResponse.getErrorMessage());
 
@@ -201,7 +202,8 @@ public class RefDataUtil {
     public static ProfessionalUser mapUserInfo(ProfessionalUser user, ResponseEntity<Object> responseResponseEntity,
                                                Boolean isRequiredRoles) {
 
-        GetUserProfileResponse userProfileResponse = (GetUserProfileResponse) responseResponseEntity.getBody();
+        GetUserProfileResponse userProfileResponse =
+                (GetUserProfileResponse) requireNonNull(responseResponseEntity.getBody());
         if (!StringUtils.isEmpty(userProfileResponse)) {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
@@ -349,7 +351,7 @@ public class RefDataUtil {
 
             if (response.status() == 200) {
 
-                newUserResponse = (NewUserResponse) responseResponseEntity.getBody();
+                newUserResponse = (NewUserResponse) requireNonNull(responseResponseEntity.getBody());
             } else {
                 ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
                 log.error("{}:: Response from UserProfileByEmail service call {}",
@@ -399,13 +401,13 @@ public class RefDataUtil {
         ResponseEntity<Object> newResponseEntity;
         if (responseEntity.getBody() instanceof ProfessionalUsersEntityResponse) {
             ProfessionalUsersEntityResponse professionalUsersEntityResponse
-                    = (ProfessionalUsersEntityResponse) responseEntity.getBody();
+                    = (ProfessionalUsersEntityResponse) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponse.setOrganisationIdentifier(organisationIdentifier);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponse, responseEntity.getHeaders(),
                     responseEntity.getStatusCode());
         } else {
             ProfessionalUsersEntityResponseWithoutRoles professionalUsersEntityResponseWithoutRoles
-                    = (ProfessionalUsersEntityResponseWithoutRoles) responseEntity.getBody();
+                    = (ProfessionalUsersEntityResponseWithoutRoles) requireNonNull(responseEntity.getBody());
             professionalUsersEntityResponseWithoutRoles.setOrganisationIdentifier(organisationIdentifier);
             newResponseEntity = new ResponseEntity<>(professionalUsersEntityResponseWithoutRoles,
                     responseEntity.getHeaders(), responseEntity.getStatusCode());
