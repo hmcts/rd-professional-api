@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentA
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
@@ -34,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
+
 public class PaymentAccountServiceImplTest {
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
@@ -43,13 +49,18 @@ public class PaymentAccountServiceImplTest {
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
+    private final EntityManagerFactory entityManagerFactoryMock =  mock(EntityManagerFactory.class);
+    private final EntityManager entityManagerMock = mock(EntityManager.class);
+    private final EntityTransaction entityTransactionMock = mock(EntityTransaction.class);
 
     private OrganisationServiceImpl organisationService;
     private PaymentAccountServiceImpl sut;
 
-    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING", null, null, null);
+    private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
+            null, null, null);
     private final PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
-    private final SuperUser superUser = new SuperUser("some-fname", "some-lname", "some-email-address", organisation);
+    private final SuperUser superUser = new SuperUser("some-fname", "some-lname",
+            "some-email-address", organisation);
 
     private final List<UserAccountMap> userAccountMaps = new ArrayList<>();
     private List<SuperUser> superUsers = new ArrayList<>();
@@ -64,8 +75,8 @@ public class PaymentAccountServiceImplTest {
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
 
         sut = new PaymentAccountServiceImpl(
-                applicationConfigurationMock, userProfileFeignClientMock, professionalUserRepositoryMock,
-                paymentAccountRepositoryMock, organisationService, userAccountMapServiceMock);
+                applicationConfigurationMock, userProfileFeignClientMock, entityManagerFactoryMock,
+                professionalUserRepositoryMock, organisationService, userAccountMapServiceMock);
 
         superUsers.add(superUser);
         paymentAccounts.add(paymentAccount);
@@ -81,14 +92,13 @@ public class PaymentAccountServiceImplTest {
     }
 
     @Test
-    public void test_retrievePaymentAccountsByPbaEmailWhenConfigTrue() {
+    public void testRetrievePaymentAccountsByPbaEmail() {
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("true");
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
         when(professionalUserRepositoryMock.findByEmailAddress("some-email")).thenReturn(professionalUserMock);
@@ -100,83 +110,80 @@ public class PaymentAccountServiceImplTest {
 
         verify(organisationMock, times(1)).setPaymentAccounts(any());
         verify(organisationMock, times(1)).setUsers(any());
-        verify(organisationMock, times(1)).setPaymentAccounts(any());
         verify(professionalUserRepositoryMock, times(1)).findByEmailAddress("some-email");
     }
 
     @Test
-    public void test_retrievePaymentAccountsByPbaEmailWhenConfigFalse() {
+    public void testReturnEmptyOrganisationWhenUnKnownEmail() {
+        Organisation  response = sut.findPaymentAccountsByEmail("some-email@gmail.com");
+        assertThat(response).isNull();
+        verify(professionalUserRepositoryMock, times(1)).findByEmailAddress(anyString());
+    }
+
+    @Test
+    public void testEditPaymentAccountsByOrganisationIdentifier() {
+
         Organisation organisationMock = mock(Organisation.class);
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
         ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
 
         when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(applicationConfigurationMock.getPbaFromUserAccountMap()).thenReturn("false");
         when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
         when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-        when(professionalUserRepositoryMock.findByEmailAddress("some-email")).thenReturn(professionalUserMock);
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
 
         RefDataUtil.getPaymentAccount(paymentAccounts);
 
-        Organisation organisation = sut.findPaymentAccountsByEmail("some-email");
-        assertThat(organisation).isNotNull();
+        PbaResponse response = sut.editPaymentAccountsByOrganisation(organisation, pbaEditRequest);
 
-        verify(organisationMock, times(1)).setPaymentAccounts(any());
-        verify(organisationMock, times(1)).setUsers(any());
-        verify(organisationMock, times(1)).setPaymentAccounts(any());
-        verify(professionalUserRepositoryMock, times(1)).findByEmailAddress("some-email");
-    }
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo("200 OK");
 
-    @Test(expected = Exception.class)
-    public void test_ThrowsExceptionWhenEmailInvalid() {
-        when(sut.findPaymentAccountsByEmail("some-email")).thenReturn(organisation);
+        verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
+        verify(userAccountMapServiceMock, times(1))
+                .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
+        verify(entityManagerFactoryMock, times(1)).createEntityManager();
+        verify(entityManagerMock, times(1)).getTransaction();
+        verify(entityManagerMock, times(2)).find(any(), any());
+        verify(entityManagerMock, times(2)).remove(any());
     }
 
     @Test
-    public void test_deleteUserAndPaymentAccountsFromUserAccountMap() {
+    public void testDeleteUserAccountMapsAndPaymentAccounts() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-        sut.deleteUserAccountMaps(organisation);
+        when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
 
-        verify(userAccountMapServiceMock, times(1)).deleteByUserAccountMapIdIn(anyList());
+        sut.deleteUserAccountMapsAndPaymentAccounts(entityManagerMock, organisation);
+
+        assertThat(organisation.getPaymentAccounts()).isEmpty();
+        verify(entityManagerMock, times(2)).find(any(), any());
+        verify(entityManagerMock, times(2)).remove(any());
     }
 
     @Test
-    public void test_deletePaymentAccountsFromOrganisation() {
-        Organisation organisationMock = mock(Organisation.class);
-
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisationMock);
-
-        sut.deletePaymentAccountsFromOrganisation(organisationMock);
-
-        verify(paymentAccountRepositoryMock, times(1)).deleteByIdIn(anyList());
-        verify(organisationMock, times(1)).getPaymentAccounts();
-        verify(organisationMock, times(1)).setPaymentAccounts(anyList());
-    }
-
-    @Test
-    public void test_addPaymentAccountsToOrganisation() {
+    public void testAddPaymentAccountsToOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
     }
 
     @Test
-    public void test_addUserAndPaymentAccountsToUserAccountMap() {
+    public void testAddUserAndPaymentAccountsToUserAccountMapTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-
         sut.addUserAndPaymentAccountsToUserAccountMap(organisation);
-
         assertThat(sut.addUserAndPaymentAccountsToUserAccountMap(organisation)).isNotNull();
-        verify(userAccountMapServiceMock, times(2)).persistedUserAccountMap(any(ProfessionalUser.class), anyList());
+        verify(userAccountMapServiceMock, times(2))
+                .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
     }
 
     @Test
-    public void test_generateListOfAccountsToDelete() {
-        ProfessionalUser prefU = new ProfessionalUser("Con", "Hal", "email@gmail.com", organisation);
+    public void testGenerateListOfAccountsToDelete() {
+        ProfessionalUser prefU = new ProfessionalUser("Con", "Hal",
+                "email@gmail.com", organisation);
         List<UserAccountMapId> listUserMap = new ArrayList<>();
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);

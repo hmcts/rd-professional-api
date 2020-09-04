@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,6 +12,4 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 public interface UserAccountMapRepository extends JpaRepository<UserAccountMap,UUID> {
 
     Optional<UserAccountMap> findByUserAccountMapId(UserAccountMapId userAccountMapId);
-
-    Long deleteByUserAccountMapIdIn(List<UserAccountMapId> userAccountMapIdList);
 }
