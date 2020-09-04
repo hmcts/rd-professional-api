@@ -34,9 +34,9 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
-            "test-flag");
+            "prd-aac-get-org-by-status");
         launchDarklyMap.put("OrganisationInternalController.deleteOrganisation",
-            "test-flag-1");
+            "prd-delete-org");
     }
 
     @Override

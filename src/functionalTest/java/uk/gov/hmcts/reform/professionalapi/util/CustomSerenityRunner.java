@@ -7,8 +7,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
@@ -21,21 +21,23 @@ import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils
 @TestPropertySource("classpath:application-functional.yaml")
 public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
 
-    LDClient ldClient;
+    private static LDClient ldClient;
 
-    protected TestContextManager testContextManager;
+    private static FeatureToggleServiceImpl featureToggleService;
 
-    private FeatureToggleServiceImpl featureToggleService;
+    static boolean isInitialized = false;
 
     public CustomSerenityRunner(Class<?> klass) throws InitializationError {
         super(klass);
-        this.testContextManager =  new TestContextManager(klass);;
     }
 
     @Override
     protected boolean isIgnored(FrameworkMethod child) {
-        ldClient =  new LDClient(getenv("LD_SDK_KEY"));
-        featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
+
+        if (negate(isInitialized)) {
+            initialize();
+        }
+
         ToggleEnable o1 = child.getAnnotation(ToggleEnable.class);
         if (o1 != null) {
             featureToggleService.mapServiceToFlag();
@@ -55,5 +57,14 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
             }
         }
         return super.isIgnored(child);
+    }
+
+    public void initialize() {
+        ldClient = new LDClient(getenv("LD_SDK_KEY"));
+        featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
+        String executionEnvironment = getenv("execution_environment") == null ? "aat"
+            : getenv("execution_environment");
+        ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);
+        isInitialized = true;
     }
 }
