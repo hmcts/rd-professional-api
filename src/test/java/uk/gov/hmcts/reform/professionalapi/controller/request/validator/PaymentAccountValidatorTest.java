@@ -60,12 +60,6 @@ public class PaymentAccountValidatorTest {
 
         Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
                 .isExactlyInstanceOf(InvalidRequest.class);
-
-        pbaNumber.clear();
-        pbaNumber.add(null);
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
-                .isExactlyInstanceOf(InvalidRequest.class);
     }
 
     @Test(expected = Test.None.class)
