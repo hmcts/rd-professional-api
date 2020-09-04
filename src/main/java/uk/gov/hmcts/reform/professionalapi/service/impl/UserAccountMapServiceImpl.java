@@ -39,9 +39,4 @@ public class UserAccountMapServiceImpl implements UserAccountMapService {
             }
         }
     }
-
-    @Transactional
-    public void deleteByUserAccountMapIdIn(List<UserAccountMapId> accountsToDelete) {
-        userAccountMapRepository.deleteByUserAccountMapIdIn(accountsToDelete);
-    }
 }
