@@ -40,7 +40,7 @@ def versions = [
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '3.5.24',
-        launchDarklySdk    : "5.0.3"
+        launchDarklySdk    : "5.0.5"
 ]
 
 
@@ -323,13 +323,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
-    compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.1'
-    compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.0.3:thin'
-    //needs to be removed :thin of LD SDK jar and following 4 jars of LD dependency once  CVE-2017-18640 fixed LD
-    compile "com.launchdarkly:launchdarkly-java-sdk-common:1.0.0"
-    compile "commons-codec:commons-codec:1.10"
-    compile "com.google.code.gson:gson:2.7"
-    compile "com.launchdarkly:okhttp-eventsource:2.3.1"
+    compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     compile group:"org.yaml", name: "snakeyaml", version:"1.26"
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

@@ -38,20 +38,20 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
             initialize();
         }
 
-        ToggleEnable o1 = child.getAnnotation(ToggleEnable.class);
-        if (o1 != null) {
+        ToggleEnable toggleEnable = child.getAnnotation(ToggleEnable.class);
+        if (toggleEnable != null) {
             featureToggleService.mapServiceToFlag();
             String flag = featureToggleService.getLaunchDarklyMap()
-                .get(o1.mapKey());
+                .get(toggleEnable.mapKey());
 
             boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_professional_api", flag);
 
             if (isEnabledLD) {
-                if (negate(o1.withFeature())) {
+                if (negate(toggleEnable.withFeature())) {
                     return true;
                 }
             } else {
-                if (o1.withFeature()) {
+                if (toggleEnable.withFeature()) {
                     return true;
                 }
             }
