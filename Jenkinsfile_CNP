@@ -55,6 +55,10 @@ withPipeline(type, product, component) {
         env.execution_environment = "preview"
     }
 
+    before('functionalTest:aat') {
+        env.execution_environment = "aat"
+    }
+
     after('integrationTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
