@@ -30,83 +30,9 @@ data "azurerm_key_vault" "s2s_key_vault" {
   resource_group_name = "rpe-service-auth-provider-${local.local_env}"
 }
 
-data "azurerm_key_vault_secret" "s2s_microservice" {
-  name = "s2s-microservice"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "s2s_url" {
-  name = "s2s-url"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "idam_url" {
-  name = "idam-url"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "OIDC_ISSUER_URL" {
-  name = "OIDC-ISSUER-URL"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "OPEN_ID_API_BASE_URI" {
-  name = "OPEN-ID-API-BASE-URI"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-
-data "azurerm_key_vault_secret" "USER_PROFILE_URL" {
- name = "USER-PROFILE-URL"
- key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "CCD_URL" {
- name = "CCD-URL"
- key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "s2s_secret" {
-  name = "microservicekey-rd-professional-api"
-  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_redirect_uri" {
-  name = "OAUTH2-REDIRECT-URI"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_client_id" {
-  name = "OAUTH2-CLIENT-ID"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-data "azurerm_key_vault_secret" "oauth2_client_secret" {
-  name = "OAUTH2-CLIENT-SECRET"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES-USER" {
-  name      = "${var.component}-POSTGRES-USER"
-  value     = "${module.db-professional-ref-data.user_name}"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name      = "${var.component}-POSTGRES-PASS"
   value     = "${module.db-professional-ref-data.postgresql_password}"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
-  name      = "${var.component}-POSTGRES-HOST"
-  value     = "${module.db-professional-ref-data.host_name}"
-  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
-}
-
-resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
-  name      = "${var.component}-POSTGRES-PORT"
-  value     = "5432"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
