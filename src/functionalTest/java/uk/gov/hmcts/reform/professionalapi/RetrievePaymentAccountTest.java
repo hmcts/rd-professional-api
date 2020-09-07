@@ -67,7 +67,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc117_ac1_pui_finance_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        log.info("Inside RetrievePaymentAccountTest:");
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
                 generateBearerTokenForUser(puiFinanceManager));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
