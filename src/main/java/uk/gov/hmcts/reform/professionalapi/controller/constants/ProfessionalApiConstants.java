@@ -29,6 +29,8 @@ public class ProfessionalApiConstants {
     public static final String FALSE = "false";
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String ACTIVE = "Active";
+    public static final String ERROR_MESSAGE_INVALID_STATUS_PASSED =
+            "Invalid status param provided, only Active status is allowed";
     public static final String FIRST_NAME = "firstName";
     public static final String EMPTY = "";
     public static final String ERROR_MESSAGE_UP_FAILED = "Error while invoking UP";

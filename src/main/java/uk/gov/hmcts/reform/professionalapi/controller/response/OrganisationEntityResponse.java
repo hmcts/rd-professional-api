@@ -8,12 +8,8 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
-public class OrganisationEntityResponse  {
+public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse {
 
-    @JsonProperty
-    private String organisationIdentifier;
-    @JsonProperty
-    private String name;
     @JsonProperty
     private OrganisationStatus status;
     @JsonProperty
@@ -28,8 +24,7 @@ public class OrganisationEntityResponse  {
     private SuperUserResponse superUser;
     @JsonProperty
     private List<String> paymentAccount;
-    @JsonProperty
-    private List<ContactInformationResponse> contactInformation;
+
 
     public OrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
@@ -49,6 +44,7 @@ public class OrganisationEntityResponse  {
         if (!organisation.getUsers().isEmpty()) {
             this.superUser = new SuperUserResponse(organisation.getUsers().get(0));
         }
+
         this.paymentAccount = organisation.getPaymentAccounts()
                 .stream()
                 .map(pbaAccount -> new PbaAccountResponse(pbaAccount).getPbaNumber())
@@ -56,7 +52,7 @@ public class OrganisationEntityResponse  {
         if (Boolean.TRUE.equals(isRequiredAllEntities)) {
             this.contactInformation = organisation.getContactInformation()
                     .stream()
-                    .map(contactInfo -> new ContactInformationResponse(contactInfo))
+                    .map(ContactInformationResponseWithDxAddress::new)
                     .collect(toList());
         }
     }
