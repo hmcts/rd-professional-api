@@ -24,10 +24,13 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -95,8 +98,11 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     public void should_retrieve_403_when_API_toggled_off() {
         setUpTestData();
 
-        professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
-            bearerToken, HttpStatus.FORBIDDEN, IdamStatus.ACTIVE.toString(), true);
+        validateErrorResponse((ErrorResponse) professionalApiClient
+                .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
+                    HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
+            getFeatureFlagName().concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD),
+            getFeatureFlagName().concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     @Test

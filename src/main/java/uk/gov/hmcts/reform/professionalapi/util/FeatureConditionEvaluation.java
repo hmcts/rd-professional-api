@@ -18,13 +18,17 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
 @AllArgsConstructor
 public class FeatureConditionEvaluation implements HandlerInterceptor {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     public static final String BEARER = "Bearer ";
+
+    public static final String FORBIDDEN_EXCEPTION_LD = "feature is not released in LD";
 
     @Autowired
     private final FeatureToggleService featureToggleService;
@@ -39,18 +43,21 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         String clazz = ((HandlerMethod) handler).getMethod().getDeclaringClass().getSimpleName();
         boolean flagStatus = Boolean.TRUE;
 
-        if (negate(launchDarklyUrlMap.isEmpty()) && launchDarklyUrlMap.get(clazz + "." + restMethod) != null) {
+        String flagName = launchDarklyUrlMap.get(clazz + "." + restMethod);
+
+        if (negate(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
+
             flagStatus = featureToggleService
-                .isFlagEnabled(getServiceName(), launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(getServiceName(flagName), launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
-                throw new ForbiddenException("Forbidden with Launch Darkly");
+                throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
             }
         }
         return flagStatus;
     }
 
-    public String getServiceName() {
+    public String getServiceName(String flagName) {
 
         ServletRequestAttributes servletRequestAttributes =
             ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
@@ -60,7 +67,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
             return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
         }
 
-        throw new ForbiddenException("Forbidden with Launch Darkly");
+        throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     private String removeBearerFromToken(String token) {

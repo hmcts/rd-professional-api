@@ -25,11 +25,14 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
 
     private static FeatureToggleServiceImpl featureToggleService;
 
-    static boolean isInitialized = false;
+    private static boolean isInitialized = false;
+
+    private static String flagName;
 
     public CustomSerenityRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }
+
 
     @Override
     protected boolean isIgnored(FrameworkMethod child) {
@@ -41,10 +44,10 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
         ToggleEnable toggleEnable = child.getAnnotation(ToggleEnable.class);
         if (toggleEnable != null) {
             featureToggleService.mapServiceToFlag();
-            String flag = featureToggleService.getLaunchDarklyMap()
+            flagName = featureToggleService.getLaunchDarklyMap()
                 .get(toggleEnable.mapKey());
 
-            boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_professional_api", flag);
+            boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_professional_api", flagName);
 
             if (isEnabledLD) {
                 if (negate(toggleEnable.withFeature())) {
@@ -59,11 +62,16 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
         return super.isIgnored(child);
     }
 
-    public void initialize() {
+    private void initialize() {
         ldClient = new LDClient(getenv("LD_SDK_KEY"));
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
         String executionEnvironment = getenv("execution_environment");
         ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);
+
         isInitialized = true;
+    }
+
+    public static String getFeatureFlagName() {
+        return  flagName;
     }
 }

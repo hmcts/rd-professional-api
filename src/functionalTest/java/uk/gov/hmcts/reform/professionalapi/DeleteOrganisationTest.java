@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -33,6 +34,49 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     @Override
     public void beforeTestClass(TestContext testContext) {
         super.beforeTestClass(testContext);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    public void ac1_can_delete_an_organisation_with_valid_org_identifier_by_prd_admin() {
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifier).isNotEmpty();
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    public void ac2_could_throw_not_found_error_when_delete_an_organisation_with_external_endpoint_404() {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifier).isNotEmpty();
+        professionalApiClient.deleteOrganisationByExternalUser(orgIdentifier, HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    public void ac3_error_when_delete_an_organisation_with_unknown_org_identifier_should_return_404() {
+        String orgIdentifier = "C345EDF";
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    public void ac4_error_when_delete_an_organisation_with_invalid_org_id_should_return_400() {
+        String orgIdentifier = "C345DF";
+        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    public void ac5_delete_an_active_organisation_with_pending_user_profile_by_prd_admin_successfully() {
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
 
@@ -80,8 +124,9 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = mapKey, withFeature = false)
     public void should_retrieve_403_when_API_toggled_off() {
         String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisation(
-            orgIdentifierResp, hmctsAdmin, HttpStatus.FORBIDDEN);
+        professionalApiClient.deleteOrganisationErrorResponse(
+            orgIdentifierResp, hmctsAdmin, HttpStatus.FORBIDDEN, getFeatureFlagName()
+        );
     }
 
     @Test
@@ -102,6 +147,5 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier,
             requestSpecification, HttpStatus.FORBIDDEN);
-
     }
 }

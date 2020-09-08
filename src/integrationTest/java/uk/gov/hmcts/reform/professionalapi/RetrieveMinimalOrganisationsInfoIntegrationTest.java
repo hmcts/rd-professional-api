@@ -23,9 +23,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.FORBIDDEN_EXCEPTION_LD;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @SuppressWarnings("unchecked")
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -100,7 +100,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         setUpTestData();
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
             .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, FORBIDDEN, FORBIDDEN_EXCEPTION_LD.getErrorMessage(),
+        validateErrorResponse(errorResponseMap, FORBIDDEN, FORBIDDEN_EXCEPTION_LD,
             FORBIDDEN_LD);
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.client;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -745,7 +747,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public void deleteOrganisation(String organisationId, String role, HttpStatus status) {
+    public Response deleteOrganisation(String organisationId, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .delete("/refdata/internal/v1/organisations/" + organisationId)
                 .andReturn();
@@ -756,8 +758,13 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
+        return response;
     }
 
+    public void deleteOrganisationErrorResponse(String organisationId, String role, HttpStatus status, String flag) {
+        ErrorResponse response = (ErrorResponse) deleteOrganisation(organisationId, role, status);
+        assertThat(response.getErrorDescription().equalsIgnoreCase(flag.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD)));
+    }
 
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
