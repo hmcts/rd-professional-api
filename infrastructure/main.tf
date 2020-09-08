@@ -30,6 +30,24 @@ data "azurerm_key_vault" "s2s_key_vault" {
   resource_group_name = "rpe-service-auth-provider-${local.local_env}"
 }
 
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name      = "${var.component}-POSTGRES-HOST"
+  value     = "${module.db-professional-ref-data.host_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name      = "${var.component}-POSTGRES-PORT"
+  value     = "5432"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name      = "${var.component}-POSTGRES-USER"
+  value     = "${module.db-professional-ref-data.user_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name      = "${var.component}-POSTGRES-PASS"
   value     = "${module.db-professional-ref-data.postgresql_password}"
