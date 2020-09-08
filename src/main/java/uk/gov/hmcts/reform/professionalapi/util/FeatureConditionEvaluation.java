@@ -28,7 +28,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
     public static final String BEARER = "Bearer ";
 
-    public static final String FORBIDDEN_EXCEPTION_LD = "feature is not released in LD";
+    public static final String FORBIDDEN_EXCEPTION_LD = "feature flag is not released";
 
     @Autowired
     private final FeatureToggleService featureToggleService;
