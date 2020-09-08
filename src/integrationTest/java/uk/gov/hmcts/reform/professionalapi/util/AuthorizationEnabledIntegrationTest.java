@@ -158,8 +158,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             "User status must be Active to perform this operation";
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
-    protected static final String FORBIDDEN_LD = "Forbidden with Launch Darkly";
-
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
 

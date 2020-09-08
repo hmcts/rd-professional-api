@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
@@ -46,7 +47,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> errorResponseMap = deleteOrganization();
         assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
         assertThat((String) errorResponseMap.get("response_body"))
-            .contains(FORBIDDEN_LD);
+            .contains(FORBIDDEN_EXCEPTION_LD);
     }
 
     @Test
