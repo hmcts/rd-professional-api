@@ -17,7 +17,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 public class UserAccountMapServiceImplTest {
 
     private final UserAccountMapRepository userAccountMapRepositoryMock = mock(UserAccountMapRepository.class);
-    private UserAccountMapServiceImpl sut = new UserAccountMapServiceImpl(userAccountMapRepositoryMock);
+    private UserAccountMapServiceImpl sut =
+            new UserAccountMapServiceImpl(userAccountMapRepositoryMock);
     private ProfessionalUser persistedSuperUser = new ProfessionalUser();
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
 
@@ -29,11 +30,5 @@ public class UserAccountMapServiceImplTest {
         sut.persistedUserAccountMap(persistedSuperUser, paymentAccounts);
 
         verify(userAccountMapRepositoryMock, times(1)).saveAll(anyList());
-    }
-
-    @Test
-    public void test_deleteByUserAccountMapIdIn() {
-        sut.deleteByUserAccountMapIdIn(anyList());
-        verify(userAccountMapRepositoryMock, times(1)).deleteByUserAccountMapIdIn(anyList());
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class TestConfigProperties {
 
 
-    @Value("${oauth2.client.secret}")
+    @Value("${oauth2-client-secret}")
     public String clientSecret;
 
     @Value("${test.user.password}")

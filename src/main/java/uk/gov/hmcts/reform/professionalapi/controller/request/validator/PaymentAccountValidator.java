@@ -31,6 +31,7 @@ public class PaymentAccountValidator {
 
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
+            paymentAccounts.removeIf(String::isBlank);
             checkPbaNumberIsValid(paymentAccounts);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
@@ -40,7 +41,7 @@ public class PaymentAccountValidator {
         String invalidPbas = paymentAccounts.stream()
                 .filter(pbaAccount -> {
                     if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
-                        Pattern pattern = Pattern.compile("(?i)pba.[a-zA-Z0-9]*$");
+                        Pattern pattern = Pattern.compile("(?i)pba.[[\\\\w[^_]]{7}]*$");
                         Matcher matcher = pattern.matcher(pbaAccount);
                         if (matcher.matches()) {
                             return false;
