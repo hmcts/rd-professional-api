@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -149,14 +150,19 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
     public void inviteNewUser(List<String> roles) {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.nextUserEmail();
+        String email = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);
 
-        idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
-            newUserCreationRequest.getLastName());
-        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getOpenIdToken(email));
+
+
+
+        Map<String, String> userCreds =
+            idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
+                newUserCreationRequest.getLastName());
+        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
+            .getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS)));
 
         professionalApiClient.addNewUserToAnOrganisation(
             orgIdentifier1 == null ? createActiveOrganisation1() :
