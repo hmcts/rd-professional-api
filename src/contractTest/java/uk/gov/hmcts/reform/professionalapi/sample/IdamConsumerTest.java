@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.dsl.DslPart;
-import au.com.dius.pact.consumer.dsl.PactDslJsonArray;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
@@ -16,7 +15,6 @@ import groovy.util.logging.Slf4j;
 import java.util.Map;
 import java.util.TreeMap;
 
-import io.restassured.http.ContentType;
 import net.serenitybdd.rest.SerenityRest;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,73 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class IdamConsumerTest {
 
-    private static final String IDAM_DETAILS_URL = "/details";
     private static final String IDAM_USERINFO_URL = "/o/userinfo";
-    private static final String ACCESS_TOKEN = "111";
-
-
-    @Test
-    @Pact(provider = "Idam_api", consumer = "rd_professional_api")
-    public RequestResponsePact executeGetUserDetailsAndGet200(PactDslWithProvider builder) {
-
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-
-        Map<String, String> responseHeaders = Maps.newHashMap();
-        responseHeaders.put("Content-Type", "application/json");
-
-        return builder
-                .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /details request from the RD - REF DATA API")
-                .path(IDAM_DETAILS_URL)
-                .method(HttpMethod.GET.toString())
-                .headers(headers)
-                .willRespondWith()
-                .status(HttpStatus.OK.value())
-                .headers(responseHeaders)
-                .body(createUserDetailsResponse())
-                .toPact();
-
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "executeGetUserDetailsAndGet200")
-    public void should_get_user_details_with_access_token(MockServer mockServer) throws JSONException {
-
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-
-
-
-        String actualResponseBody =
-                SerenityRest
-                        .given()
-                        .headers(headers)
-                        .contentType(ContentType.URLENC)
-                        .when()
-                        .get(mockServer.getUrl() + IDAM_DETAILS_URL)
-                        .then()
-                        .statusCode(200)
-                        .and()
-                        .extract()
-                        .response()
-                        .body()
-                        .asString();
-
-        JSONObject response = new JSONObject(actualResponseBody);
-
-        assertThat(actualResponseBody).isNotNull();
-        assertThat(response.getString("id")).isNotBlank();
-        assertThat(response.getString("forename")).isNotBlank();
-        assertThat(response.getString("surname")).isNotBlank();
-
-        JSONArray rolesArr = new JSONArray(response.getString("roles"));
-
-        assertThat(rolesArr).isNotNull();
-        assertThat(rolesArr.length()).isNotZero();
-        assertThat(rolesArr.get(0).toString()).isNotBlank();
-
-    }
 
     @Pact(provider = "Idam_api", consumer = "rd_professional_api")
     public RequestResponsePact executeGetUserInfoDetailsAndGet200(PactDslWithProvider builder) {
@@ -177,18 +109,6 @@ public class IdamConsumerTest {
                 .stringType("prd-admin")
                 .stringType("IDAM_ADMIN_USER")
                 .closeArray();
-
-    }
-
-    private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("prd-admin").stringValue("IDAM_ADMIN_USER");
-
-        return new PactDslJsonBody()
-                .stringType("id", "123")
-                .stringType("email", "prdadmin@fake.hmcts.net")
-                .stringType("forename", "rao")
-                .stringType("surname", "kotla")
-                .stringType("roles", array.toString());
 
     }
 
