@@ -83,16 +83,9 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.validateOrganisationIdentifier("@@@@@@@");
     }
 
-    @Test //valid value should not throw exception
+    @Test(expected = Test.None.class) //valid value should not throw exception
     public void test_validateOrganisationIdentifierNoException() {
-        myException = null;
-        try {
-            organisationCreationRequestValidator.validateOrganisationIdentifier("Q90SB9S");
-        } catch (Exception e) {
-            myException = e;
-        }
-
-        assertThat(myException).isEqualTo(null);
+        organisationCreationRequestValidator.validateOrganisationIdentifier("Q90SB9S");
     }
 
     @Test
@@ -108,18 +101,11 @@ public class OrganisationCreationRequestValidatorTest {
         organisationCreationRequestValidator.isOrganisationActive(myOrgg);
     }
 
-    @Test //Active value should not throw empty exception
+    @Test(expected = Test.None.class) //Active value should not throw empty exception
     public void test_isOrganisationActive_Active() {
         Organisation organisation = new Organisation();
         organisation.setStatus(OrganisationStatus.ACTIVE);
-        myException = null;
-
-        try {
-            organisationCreationRequestValidator.isOrganisationActive(organisation);
-        } catch (Exception e) {
-            myException = e;
-        }
-        assertThat(myException).isEqualTo(null);
+        organisationCreationRequestValidator.isOrganisationActive(organisation);
     }
 
     @Test(expected = EmptyResultDataAccessException.class) //null value should throw empty exception
