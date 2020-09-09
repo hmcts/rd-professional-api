@@ -762,8 +762,9 @@ public class ProfessionalApiClient {
     }
 
     public void deleteOrganisationErrorResponse(String organisationId, String role, HttpStatus status, String flag) {
-        ErrorResponse response = (ErrorResponse) deleteOrganisation(organisationId, role, status);
-        assertThat(response.getErrorDescription().equalsIgnoreCase(flag.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD)));
+        Response response =  deleteOrganisation(organisationId, role, status);
+        ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+        assertThat(errorResponse.getErrorDescription().equalsIgnoreCase(flag.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD)));
     }
 
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
