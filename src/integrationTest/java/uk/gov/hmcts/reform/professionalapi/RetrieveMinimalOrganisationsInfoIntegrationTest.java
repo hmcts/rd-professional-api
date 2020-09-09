@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -101,7 +102,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
             .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
         validateErrorResponse(errorResponseMap, FORBIDDEN, FORBIDDEN_EXCEPTION_LD,
-            FORBIDDEN_EXCEPTION_LD);
+            "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     @Test
