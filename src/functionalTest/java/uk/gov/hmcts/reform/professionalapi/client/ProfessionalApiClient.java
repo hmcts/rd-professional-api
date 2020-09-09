@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -46,7 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
-import uk.gov.hmcts.reform.professionalapi.idam.IdamClient;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 @Slf4j
@@ -63,15 +63,13 @@ public class ProfessionalApiClient {
 
 
     protected IdamOpenIdClient idamOpenIdClient;
-    protected IdamClient idamClient;
 
     public ProfessionalApiClient(
             String professionalApiUrl,
-            String s2sToken, IdamOpenIdClient idamOpenIdClient, IdamClient idamClient) {
+            String s2sToken, IdamOpenIdClient idamOpenIdClient) {
         this.professionalApiUrl = professionalApiUrl;
         this.s2sToken = s2sToken;
         this.idamOpenIdClient = idamOpenIdClient;
-        this.idamClient = idamClient;
     }
 
     public IdamOpenIdClient getidamOpenIdClient() {
@@ -158,7 +156,7 @@ public class ProfessionalApiClient {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphabetic(10) + "@somewhere.com".toLowerCase())
+                        .email(generateRandomEmail().toLowerCase())
                         .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(contactInfoList);
@@ -254,7 +252,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .build();
@@ -284,8 +282,7 @@ public class ProfessionalApiClient {
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? randomAlphabetic(10)
-                        + "@hotmail.com".toLowerCase() : email)
+                .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? generateRandomEmail() : email)
                 .roles(userRoles)
                 .jurisdictions(createJurisdictions())
                 .resendInvite(true)
@@ -606,23 +603,6 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
     }
 
-    //with Bearer token
-    public void updateOrganisationWithOldBearerToken(String organisationIdentifier) {
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
-
-        Response response = getMultipleAuthHeadersInternalWithOldBearerToken()
-                .body(organisationCreationRequest)
-                .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
-                .andReturn();
-
-        log.info("Update organisation response: " + response.getStatusCode());
-
-        response.then()
-                .assertThat()
-                .statusCode(OK.value());
-    }
-
     public Map<String, Object> retrieveOrganisationDetailsByStatus(String status, String role) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -810,10 +790,6 @@ public class ProfessionalApiClient {
 
     private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
-    }
-
-    private RequestSpecification getMultipleAuthHeadersInternalWithOldBearerToken() {
-        return getMultipleAuthHeaders(idamClient.getInternalBearerToken());
     }
 
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,
