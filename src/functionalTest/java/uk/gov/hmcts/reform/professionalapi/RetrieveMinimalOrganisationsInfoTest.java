@@ -98,11 +98,12 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     public void should_retrieve_403_when_API_toggled_off() {
         setUpTestData();
 
+        String exceptionMessage = getFeatureFlagName().concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD);
         validateErrorResponse((ErrorResponse) professionalApiClient
                 .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
                     HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
-            getFeatureFlagName().concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD),
-            getFeatureFlagName().concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
+            exceptionMessage,
+            exceptionMessage);
     }
 
     @Test

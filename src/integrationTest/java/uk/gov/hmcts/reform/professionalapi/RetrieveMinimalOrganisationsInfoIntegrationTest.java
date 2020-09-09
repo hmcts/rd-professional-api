@@ -101,7 +101,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         setUpTestData();
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
             .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, FORBIDDEN, FORBIDDEN_EXCEPTION_LD,
+        validateErrorResponse(errorResponseMap, FORBIDDEN, "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD),
             "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 

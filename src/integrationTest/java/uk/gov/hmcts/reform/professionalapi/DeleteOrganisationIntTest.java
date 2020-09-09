@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -47,7 +48,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> errorResponseMap = deleteOrganization();
         assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
         assertThat((String) errorResponseMap.get("response_body"))
-            .contains(FORBIDDEN_EXCEPTION_LD);
+            .contains("test-flag-1".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     @Test

@@ -41,7 +41,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
-import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
@@ -155,7 +154,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Object> handleLaunchDarklyException(Exception ex) {
-        return errorDetailsResponseEntity(ex, FORBIDDEN, FORBIDDEN_EXCEPTION_LD);
+        return errorDetailsResponseEntity(ex, FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
