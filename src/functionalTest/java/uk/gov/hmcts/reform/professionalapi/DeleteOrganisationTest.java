@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -82,7 +80,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         if (deleteOrganisationEnabled) {
             String firstName = "some-fname";
             String lastName = "some-lname";
-            String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+            String email = generateRandomEmail().toLowerCase();
             UserCreationRequest superUser = aUserCreationRequest()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -124,7 +122,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void ac8_could_not_delete_an_active_organisation_with_pending_userProfileByOtherThanPrdAdminThrow403() {
         if (deleteOrganisationEnabled) {
-            String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+            String email = generateRandomEmail().toLowerCase();
             String firstName = "some-fname";
             String lastName = "some-lname";
             UserCreationRequest superUser = createSuperUser(email,firstName,lastName);
