@@ -125,3 +125,9 @@ deleteOrganisationEnabled : ${DELETE_ORG:false}
 activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
 
 loggingComponentName: RD_Professional_API
+
+launchdarkly:
+  sdk:
+    key: ${LD_SDK_KEY:}
+    environment: ${LAUNCH_DARKLY_ENV:local}
+    user: rd
