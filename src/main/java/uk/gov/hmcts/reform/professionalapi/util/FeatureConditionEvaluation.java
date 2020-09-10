@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static java.util.Objects.nonNull;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
+import static org.apache.commons.lang.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
@@ -45,7 +45,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
         String flagName = launchDarklyUrlMap.get(clazz + "." + restMethod);
 
-        if (negate(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
+        if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
             flagStatus = featureToggleService
                 .isFlagEnabled(getServiceName(flagName), launchDarklyUrlMap.get(clazz + "." + restMethod));
@@ -71,7 +71,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
     }
 
     private String removeBearerFromToken(String token) {
-        if (negate(token.startsWith(BEARER))) {
+        if (isNotTrue(token.startsWith(BEARER))) {
             return token;
         } else {
             return token.substring(BEARER.length());

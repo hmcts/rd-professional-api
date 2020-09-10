@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.service.impl.FeatureToggleServiceImpl;
 
 import static java.lang.System.getenv;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
+import static org.apache.commons.lang.BooleanUtils.isNotTrue;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
@@ -37,7 +37,7 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
     @Override
     protected boolean isIgnored(FrameworkMethod child) {
 
-        if (negate(isInitialized)) {
+        if (isNotTrue(isInitialized)) {
             initialize();
         }
 
@@ -50,7 +50,7 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
             boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_professional_api", flagName);
 
             if (isEnabledLD) {
-                if (negate(toggleEnable.withFeature())) {
+                if (isNotTrue(toggleEnable.withFeature())) {
                     return true;
                 }
             } else {
