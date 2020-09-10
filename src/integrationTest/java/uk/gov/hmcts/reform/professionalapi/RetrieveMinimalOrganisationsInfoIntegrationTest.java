@@ -1,21 +1,12 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
@@ -24,14 +15,25 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinim
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.StringUtils.SPACE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
+
 @SuppressWarnings("unchecked")
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    @Value("${activeOrgsExternalEnabled}")
-    private boolean activeOrgsExternalEnabled;
-
     private static final String STATUS_PARAM_INVALID_MESSAGE =
-            "Invalid status param provided, only Active status is allowed";
+        "Invalid status param provided, only Active status is allowed";
+
     List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
     List<OrganisationMinimalInfoResponse> noAddressOrgs = new ArrayList<>();
@@ -54,160 +56,170 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     @Test
     //AC:1
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active()
-            throws JsonProcessingException {
-        if (activeOrgsExternalEnabled) {
+        throws JsonProcessingException {
 
-            setUpTestData();
-            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
-                    professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                            userIdentifier, puiCaa, ACTIVE, true, OrganisationMinimalInfoResponse[].class);
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
+            "test-flag");
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
 
-            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
-                    org.getContactInformation().get(0).getAddressLine1())));
+        setUpTestData();
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+            professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                userIdentifier, puiCaa, ACTIVE, true, OrganisationMinimalInfoResponse[].class);
 
-            assertThat(orgResponseInfo).contains(
-                    activeOrgs.get(0).getOrganisationIdentifier(),
-                    activeOrgs.get(0).getName(),
-                    activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
-                    activeOrgs.get(1).getOrganisationIdentifier(),
-                    activeOrgs.get(1).getName(),
-                    activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
-                    noAddressOrgs.get(0).getOrganisationIdentifier(),
-                    noAddressOrgs.get(0).getName(),
-                    noAddressOrgs.get(1).getOrganisationIdentifier(),
-                    noAddressOrgs.get(1).getName())
-                    .doesNotContain(
-                            pendingOrgs.get(0).getOrganisationIdentifier(),
-                            pendingOrgs.get(0).getName(),
-                            pendingOrgs.get(1).getOrganisationIdentifier(),
-                            pendingOrgs.get(1).getName());
-        }
+        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
+            org.getContactInformation().get(0).getAddressLine1())));
+
+        assertThat(orgResponseInfo).contains(
+            activeOrgs.get(0).getOrganisationIdentifier(),
+            activeOrgs.get(0).getName(),
+            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+            activeOrgs.get(1).getOrganisationIdentifier(),
+            activeOrgs.get(1).getName(),
+            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1(),
+            noAddressOrgs.get(0).getOrganisationIdentifier(),
+            noAddressOrgs.get(0).getName(),
+            noAddressOrgs.get(1).getOrganisationIdentifier(),
+            noAddressOrgs.get(1).getName())
+            .doesNotContain(
+                pendingOrgs.get(0).getOrganisationIdentifier(),
+                pendingOrgs.get(0).getName(),
+                pendingOrgs.get(1).getOrganisationIdentifier(),
+                pendingOrgs.get(1).getName());
+    }
+
+
+    @Test
+    public void returns_launchDarkly_forbidden_when_retrieve_organisations_info_with_invalid_flag()
+        throws JsonProcessingException {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
+            "test-flag");
+        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(false);
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        setUpTestData();
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, FORBIDDEN, "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD),
+            "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     @Test
     public void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
-            throws JsonProcessingException {
-        if (activeOrgsExternalEnabled) {
+        throws JsonProcessingException {
 
-            setUpTestData();
-            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
-                    professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                            userIdentifier, puiCaa, ACTIVE, Boolean.valueOf(null),
-                            OrganisationMinimalInfoResponse[].class);
+        setUpTestData();
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+            professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                userIdentifier, puiCaa, ACTIVE, Boolean.valueOf(null),
+                OrganisationMinimalInfoResponse[].class);
 
-            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
+        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
 
-            assertThat(orgResponseInfo).contains(
-                    activeOrgs.get(0).getOrganisationIdentifier(),
-                    activeOrgs.get(0).getName(),
-                    activeOrgs.get(1).getOrganisationIdentifier(),
-                    activeOrgs.get(1).getName(),
-                    noAddressOrgs.get(0).getOrganisationIdentifier(),
-                    noAddressOrgs.get(0).getName(),
-                    noAddressOrgs.get(1).getOrganisationIdentifier(),
-                    noAddressOrgs.get(1).getName())
-                    .doesNotContain(
-                            pendingOrgs.get(0).getOrganisationIdentifier(),
-                            pendingOrgs.get(0).getName(),
-                            pendingOrgs.get(1).getOrganisationIdentifier(),
-                            pendingOrgs.get(1).getName(),
-                            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
-                            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
-        }
+        assertThat(orgResponseInfo).contains(
+            activeOrgs.get(0).getOrganisationIdentifier(),
+            activeOrgs.get(0).getName(),
+            activeOrgs.get(1).getOrganisationIdentifier(),
+            activeOrgs.get(1).getName(),
+            noAddressOrgs.get(0).getOrganisationIdentifier(),
+            noAddressOrgs.get(0).getName(),
+            noAddressOrgs.get(1).getOrganisationIdentifier(),
+            noAddressOrgs.get(1).getName())
+            .doesNotContain(
+                pendingOrgs.get(0).getOrganisationIdentifier(),
+                pendingOrgs.get(0).getName(),
+                pendingOrgs.get(1).getOrganisationIdentifier(),
+                pendingOrgs.get(1).getName(),
+                activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
+
     }
 
     @Test
     public void should_retrieve_organisations_info_without_address_with_200_for_status_active_false_address_param()
-            throws JsonProcessingException {
-        if (activeOrgsExternalEnabled) {
+        throws JsonProcessingException {
 
-            setUpTestData();
-            List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
-                    professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
-                            userIdentifier, puiCaa, ACTIVE, false, OrganisationMinimalInfoResponse[].class);
+        setUpTestData();
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+            professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                userIdentifier, puiCaa, ACTIVE, false, OrganisationMinimalInfoResponse[].class);
 
-            responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
+        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName())));
 
-            assertThat(orgResponseInfo).contains(
-                    activeOrgs.get(0).getOrganisationIdentifier(),
-                    activeOrgs.get(0).getName(),
-                    activeOrgs.get(1).getOrganisationIdentifier(),
-                    activeOrgs.get(1).getName(),
-                    noAddressOrgs.get(0).getOrganisationIdentifier(),
-                    noAddressOrgs.get(0).getName(),
-                    noAddressOrgs.get(1).getOrganisationIdentifier(),
-                    noAddressOrgs.get(1).getName())
-                    .doesNotContain(
-                            pendingOrgs.get(0).getOrganisationIdentifier(),
-                            pendingOrgs.get(0).getName(),
-                            pendingOrgs.get(1).getOrganisationIdentifier(),
-                            pendingOrgs.get(1).getName(),
-                            activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
-                            activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
-        }
+        assertThat(orgResponseInfo).contains(
+            activeOrgs.get(0).getOrganisationIdentifier(),
+            activeOrgs.get(0).getName(),
+            activeOrgs.get(1).getOrganisationIdentifier(),
+            activeOrgs.get(1).getName(),
+            noAddressOrgs.get(0).getOrganisationIdentifier(),
+            noAddressOrgs.get(0).getName(),
+            noAddressOrgs.get(1).getOrganisationIdentifier(),
+            noAddressOrgs.get(1).getName())
+            .doesNotContain(
+                pendingOrgs.get(0).getOrganisationIdentifier(),
+                pendingOrgs.get(0).getName(),
+                pendingOrgs.get(1).getOrganisationIdentifier(),
+                pendingOrgs.get(1).getName(),
+                activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
+                activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
+
     }
 
     @Test
     //AC:2
     public void shouldFailTo_retrieve_orgInfo_with403_withCorrectRoles_andStatusActive_andPendingCallerUser()
-            throws JsonProcessingException {
+        throws JsonProcessingException {
 
-        if (activeOrgsExternalEnabled) {
 
-            inviteUser(false);
-            getUserProfileByEmailWireMock(HttpStatus.OK);
-            Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                    .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
-            validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
-                    STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE);
-        }
+        inviteUser(false);
+        getUserProfileByEmailWireMock(HttpStatus.OK);
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
+            STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE);
+
     }
 
     @Test
     //AC:3
     public void shouldFailTo_retrieve_orgInfo_with403_withIncorrect_roles_and_status_active()
-            throws JsonProcessingException {
+        throws JsonProcessingException {
 
-        if (activeOrgsExternalEnabled) {
-
-            inviteUser(false);
-            Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                    .retrieveOrganisationsWithMinimalInfo(userIdentifier, "pui-invalid-role",
-                            ACTIVE, true, ErrorResponse.class);
-            validateErrorResponse(errorResponseMap, HttpStatus.FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
-                    ACCESS_IS_DENIED_ERROR_MESSAGE);
-        }
+        inviteUser(false);
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+            .retrieveOrganisationsWithMinimalInfo(userIdentifier, "pui-invalid-role",
+                ACTIVE, true, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
+            ACCESS_IS_DENIED_ERROR_MESSAGE);
     }
 
     @Test
     //AC:5
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_pending()
-            throws JsonProcessingException {
+        throws JsonProcessingException {
 
-        if (activeOrgsExternalEnabled) {
 
-            inviteUser(false);
-            Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                    .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa,
-                            PENDING.toString(), true, ErrorResponse.class);
-            validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(),
-                    STATUS_PARAM_INVALID_MESSAGE);
-        }
+        inviteUser(false);
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa,
+                PENDING.toString(), true, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(),
+            STATUS_PARAM_INVALID_MESSAGE);
+
     }
 
     @Test
     //AC:6
     public void should_fail_to_retrieve_organisations_info_with_404_with_correct_roles_and_status_not_passed()
-            throws JsonProcessingException {
+        throws JsonProcessingException {
 
-        if (activeOrgsExternalEnabled) {
+        inviteUser(false);
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, null, true, ErrorResponse.class);
+        validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(),
+            STATUS_PARAM_INVALID_MESSAGE);
 
-            inviteUser(false);
-            Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                    .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, null, true, ErrorResponse.class);
-            validateErrorResponse(errorResponseMap, HttpStatus.NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage(),
-                    STATUS_PARAM_INVALID_MESSAGE);
-        }
     }
 
     public void validateErrorResponse(Map<String, Object> errorResponseMap, HttpStatus expectedStatus,
@@ -235,9 +247,9 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         }
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         NewUserCreationRequest newUserCreationRequest = inviteUserCreationRequest(
-                randomAlphabetic(5) + "@somedomain.com", getValidRoleList());
+            randomAlphabetic(5) + "@somedomain.com", getValidRoleList());
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(orgIdentifier1,
-                newUserCreationRequest, hmctsAdmin);
+            newUserCreationRequest, hmctsAdmin);
         userIdentifier = (String) newUserResponse.get("userIdentifier");
     }
 
@@ -245,7 +257,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName1 = randomAlphabetic(7);
         orgIdentifier1 = createAndActivateOrganisationWithGivenRequest(
-                someMinimalOrganisationRequest().name(orgName1).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName1).sraId(randomAlphabetic(10)).build());
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier1);
 
@@ -259,7 +271,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String orgName2 = randomAlphabetic(7);
         orgIdentifier2 = createAndActivateOrganisationWithGivenRequest(
-                someMinimalOrganisationRequest().name(orgName2).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName2).sraId(randomAlphabetic(10)).build());
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier2);
 
@@ -272,7 +284,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void createPendingOrganisation1() {
         String orgName3 = randomAlphabetic(7);
         orgIdentifier3 = createOrganisationRequestWithRequest(
-                someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10)).build());
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier3);
 
@@ -284,7 +296,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void createPendingOrganisation2() {
         String orgName4 = randomAlphabetic(7);
         orgIdentifier4 = createOrganisationRequestWithRequest(
-                someMinimalOrganisationRequest().name(orgName4).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName4).sraId(randomAlphabetic(10)).build());
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier4);
 
@@ -295,7 +307,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void createActiveOrganisation3WithAddressRequiredFalse() {
         String orgName5 = randomAlphabetic(7);
         orgIdentifier5 = createAndActivateOrganisationWithGivenRequest(
-                someMinimalOrganisationRequest().name(orgName5).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName5).sraId(randomAlphabetic(10)).build());
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier5);
 
@@ -307,7 +319,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     public void createActiveOrganisation4WithAddressRequiredFalse() {
         String orgName6 = randomAlphabetic(7);
         orgIdentifier6 = createAndActivateOrganisationWithGivenRequest(
-                someMinimalOrganisationRequest().name(orgName6).sraId(randomAlphabetic(10)).build());
+            someMinimalOrganisationRequest().name(orgName6).sraId(randomAlphabetic(10)).build());
 
 
         Organisation persistedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifier6);
@@ -327,6 +339,16 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
             validRoles.add(puiCaa);
         }
         return validRoles;
+    }
+
+    private void retrieveOrganization() throws JsonProcessingException {
+        setUpTestData();
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+            professionalReferenceDataClient.retrieveOrganisationsWithMinimalInfo(
+                userIdentifier, puiCaa, ACTIVE, true, OrganisationMinimalInfoResponse[].class);
+
+        responseList.forEach(org -> orgResponseInfo.addAll(asList(org.getOrganisationIdentifier(), org.getName(),
+            org.getContactInformation().get(0).getAddressLine1())));
     }
 
 }
