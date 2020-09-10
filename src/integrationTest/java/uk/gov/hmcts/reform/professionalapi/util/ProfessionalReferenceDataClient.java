@@ -436,6 +436,4 @@ public class ProfessionalReferenceDataClient {
         deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return deleteOrganisationResponse;
     }
-
-
 }

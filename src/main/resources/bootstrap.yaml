@@ -9,4 +9,5 @@ spring:
         rd.s2s-secret: idam.s2s-auth.totp_secret
         rd.professional-api-POSTGRES-PASS: spring.datasource.password
         rd.AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        rd.LD-SDK-KEY: LD_SDK_KEY
 
