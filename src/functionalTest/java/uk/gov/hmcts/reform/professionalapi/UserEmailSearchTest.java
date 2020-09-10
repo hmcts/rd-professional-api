@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -24,7 +23,7 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
     @Test
     public void can_find_a_user_by_their_email_address() {
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
@@ -48,7 +47,7 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
     @Test
     public void can_search_by_email_regardless_of_case() {
 
-        String emailIgnoreCase = randomAlphabetic(10) + "@usersearch.test".toUpperCase();
+        String emailIgnoreCase = generateRandomEmail().toUpperCase();
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")

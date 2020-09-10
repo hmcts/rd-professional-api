@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +94,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(RandomStringUtils.randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
                 .build();
 
@@ -113,7 +110,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
         String lastName = "some-lname";
-        String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -153,7 +150,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(RandomStringUtils.randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
                 .build();
 
@@ -172,7 +169,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         userRoles.add(puiUserManager);
         String firstName = "someName";
         String lastName = "someLastName";
-        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
 
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)

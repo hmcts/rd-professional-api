@@ -64,9 +64,3 @@ syncInterval: 60
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 
 loggingComponentName: RD_Professional_API
-
-# delete organisation enabled
-deleteOrganisationEnabled : false
-
-# get Active Orgs External enabled
-activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}

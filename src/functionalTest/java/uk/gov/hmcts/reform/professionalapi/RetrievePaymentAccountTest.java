@@ -37,7 +37,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     private RequestSpecification bearerTokenForUser;
     private String orgIdentifier;
-    private String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+    private String email = generateRandomEmail();
     private String lastName = "someLastName";
     private String firstName = "someName";
 
