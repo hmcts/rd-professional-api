@@ -29,15 +29,6 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void can_update_an_organisation_with_no_jurisdiction_should_return_200() {
-
-        Map<String, Object> response = professionalApiClient.createOrganisationWithNoJurisdictionId();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.OK);
-    }
-
-    @Test
     public void can_throw_Unauthorized_Error_code_without_bearertoken_to_update_an_organisation_401() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
