@@ -22,6 +22,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionMapperTest {
@@ -247,7 +248,15 @@ public class ExceptionMapperTest {
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
         assertEquals(httpClientErrorException.getMessage(),
                 ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+    }
 
+    @Test
+    public void test_handle_launchDarkly_exception() {
+        ForbiddenException forbiddenException = new ForbiddenException("LD Forbidden Exception");
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleLaunchDarklyException(forbiddenException);
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals(forbiddenException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+            .getErrorDescription());
     }
 
     private ResponseEntity<Object>
