@@ -16,7 +16,11 @@ def secrets = [
     'rd-${env}': [
         secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
         secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
-        secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID')
+        secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+        secret('professional-api-POSTGRES-HOST', 'FUNC_DATABASE_HOST'),
+        secret('professional-api-POSTGRES-PASS', 'FUNC_DATABASE_PASS'),
+        secret('professional-api-POSTGRES-USER', 'FUNC_DATABASE_NAME'),
+        secret('professional-api-POSTGRES-DATABASE', 'FUNC_DATABASE_USER')
 
     ]
 
