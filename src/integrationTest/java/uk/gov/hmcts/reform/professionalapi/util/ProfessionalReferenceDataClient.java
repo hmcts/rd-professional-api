@@ -204,6 +204,32 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestWithCustomHeader(String uriPath, String role, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(APPLICATION_JSON);
+        headers.add("user-email", "some@email.com");
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(headers);
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
     private Map<String, Object> getRequestForExternal(String uriPath, String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
@@ -303,6 +329,8 @@ public class ProfessionalReferenceDataClient {
 
         return headers;
     }
+
+
 
     private HttpHeaders getMultipleAuthHeaders(String role) {
 

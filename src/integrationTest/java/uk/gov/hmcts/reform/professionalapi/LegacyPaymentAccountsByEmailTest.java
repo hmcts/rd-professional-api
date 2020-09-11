@@ -51,6 +51,35 @@ public class LegacyPaymentAccountsByEmailTest extends AuthorizationEnabledIntegr
     }
 
     @Test
+    public void get_request_returns_correct_payment_accounts_for_user_email_address_fromHeader() {
+
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some@email.com")
+                        .jurisdictions(createJurisdictions())
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
+                .build();
+
+        professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .findLegacyPbaAccountsByUserEmail("");
+
+        assertThat(orgResponse.get("payment_accounts").toString().equals("PBA1234567"));
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
+    }
+
+    @Test
     public void get_request_returns_multiple_payment_accounts_associated_with_user_email_address_ac2() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("pbaNumber-1");
