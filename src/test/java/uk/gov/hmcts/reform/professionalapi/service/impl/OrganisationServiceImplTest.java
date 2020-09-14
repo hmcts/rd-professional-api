@@ -57,7 +57,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -154,11 +153,6 @@ public class OrganisationServiceImplTest {
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
 
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId("PROBATE");
-        List<Jurisdiction> jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdiction);
-
         contactInformationCreationRequests = new ArrayList<>();
         dxAddressRequests = new ArrayList<>();
         organisations = new ArrayList<>();
@@ -174,7 +168,7 @@ public class OrganisationServiceImplTest {
         organisation.setOrganisationIdentifier(generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER));
 
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                "some-email", jurisdictions);
+                "some-email");
 
         dxAddressRequest = new DxAddressCreationRequest("DX 1234567890", "dxExchange");
         dxAddressRequests.add(dxAddressRequest);
@@ -512,13 +506,8 @@ public class OrganisationServiceImplTest {
         String pbaNumber = "PBA1234567";
         paymentAccountList.add(pbaNumber);
 
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId("PROBATE");
-        List<Jurisdiction> jurisdictions = new ArrayList<>();
-        jurisdictions.add(jurisdiction);
-
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                null, jurisdictions);
+                null);
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
                 "sra-id", "false", "company-number", "company-url",
@@ -550,14 +539,11 @@ public class OrganisationServiceImplTest {
 
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
-        when(userAttributeServiceMock.addUserAttributesToSuperUserWithJurisdictions(professionalUser, userAttributes,
-                jurisdictionIds)).thenReturn(userAttributes);
 
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes),
-                        eq(jurisdictionIds));
+                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
         verify(professionalUserRepositoryMock, times(1)).save(any(ProfessionalUser.class));
         verify(organisationRepository, times(1)).save(any(Organisation.class));
     }
@@ -579,14 +565,13 @@ public class OrganisationServiceImplTest {
         attributes.add(userAttribute);
         when(prdEnumRepositoryMock.findAll()).thenReturn(prdEnums);
         when(prdEnumService.findAllPrdEnums()).thenReturn(prdEnums);
-        when(userAttributeServiceMock.addUserAttributesToSuperUserWithJurisdictions(professionalUser, userAttributes,
-                jurisdictionIds)).thenReturn(attributes);
+        when(userAttributeServiceMock.addUserAttributesToSuperUser(professionalUser, userAttributes
+                )).thenReturn(attributes);
 
         assertExpectedOrganisationResponse(sut.createOrganisationFrom(organisationCreationRequest));
 
         verify(userAttributeServiceMock, times(1))
-                .addUserAttributesToSuperUserWithJurisdictions(eq(professionalUser), eq(userAttributes),
-                        eq(jurisdictionIds));
+                .addUserAttributesToSuperUser(eq(professionalUser), eq(userAttributes));
     }
 
     @Test

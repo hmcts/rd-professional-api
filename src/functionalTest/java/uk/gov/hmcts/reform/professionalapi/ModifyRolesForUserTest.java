@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles1)
-                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest,
                 HttpStatus.CREATED);
@@ -88,7 +86,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                     .lastName(lastName)
                     .email(userEmail)
                     .roles(userRoles)
-                    .jurisdictions(createJurisdictions())
                     .build();
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest,
                     HttpStatus.CREATED);
