@@ -4,7 +4,6 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.reform.professionalapi.controller.advice.CcdErrorMessageResolver.resolveStatusAndReturnMessage;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -387,13 +386,6 @@ public class RefDataUtil {
 
         }
         return deleteOrganisationResponse;
-    }
-
-    public static void throwException(int statusCode) {
-        log.info("{}:: Error status code: " + statusCode, loggingComponentName);
-        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
-        String errorMessage = resolveStatusAndReturnMessage(httpStatus);
-        throw new ExternalApiException(httpStatus, errorMessage);
     }
 
     public static ResponseEntity<Object> setOrgIdInGetUserResponse(ResponseEntity<Object> responseEntity,
