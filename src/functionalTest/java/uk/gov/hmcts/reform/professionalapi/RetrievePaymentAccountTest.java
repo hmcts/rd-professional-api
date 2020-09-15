@@ -124,6 +124,28 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void can_retrieve_active_organisation_payment_accounts_user_by_email_fromHeader() {
+
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .paymentAccount(paymentAccounts)
+                .superUser(createUserForTest())
+                .build();
+
+        Map<String, Object> response =  professionalApiClient.createOrganisation(request);
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrievePaymentAccountsByEmailFromHeader(email.toLowerCase(), hmctsAdmin);
+        assertThat(orgResponse).isNotEmpty();
+        responseValidate(orgResponse);
+    }
+
+    @Test
     public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
 
         Set<String> paymentAccounts = new HashSet<>();

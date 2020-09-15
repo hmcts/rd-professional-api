@@ -54,6 +54,7 @@ public class ProfessionalApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String USEREMAIL_HEADER = "User-Email";
     private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     private final String professionalApiUrl;
@@ -358,6 +359,23 @@ public class ProfessionalApiClient {
 
         return response.body().as(Map.class);
     }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrievePaymentAccountsByEmailFromHeader(String email, String role) {
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
+                .body("")
+                .get("/refdata/internal/v1/organisations/pbas?email=" + " ")
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
 
     @SuppressWarnings("unchecked")
     public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email, String role) {
@@ -776,6 +794,17 @@ public class ProfessionalApiClient {
             .header("Accepts", APPLICATION_JSON_VALUE)
             .header(SERVICE_HEADER, "Bearer " + s2sToken)
             .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
+    public RequestSpecification getUserEmailAsHeaderWithExisting(String userToken, String email) {
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken)
+                .header(USEREMAIL_HEADER, email);
     }
 
     public RequestSpecification getMultipleAuthHeadersWithEmptyBearerToken(String userToken) {
