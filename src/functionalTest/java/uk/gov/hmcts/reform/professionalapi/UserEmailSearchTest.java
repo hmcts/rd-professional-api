@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Map;
@@ -30,7 +29,6 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
@@ -55,7 +53,6 @@ public class UserEmailSearchTest extends AuthorizationFunctionalTest {
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(emailIgnoreCase)
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
         Map<String, Object> response = professionalApiClient.createOrganisation(request);

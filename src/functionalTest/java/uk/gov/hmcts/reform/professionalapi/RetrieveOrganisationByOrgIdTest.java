@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -55,7 +54,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest,
@@ -143,7 +141,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
         return user;
     }

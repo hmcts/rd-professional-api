@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.c
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
@@ -48,12 +47,12 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_400() {
+    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        newUserCreationRequest.setJurisdictions(new ArrayList<>());
+
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -97,7 +96,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .lastName("someLastName")
                 .email(generateRandomEmail())
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse = professionalApiClient
@@ -117,7 +115,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         //create Super User in IDAM
@@ -155,7 +152,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .lastName("someLastName")
                 .email(generateRandomEmail())
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         //adding new user with Suspended Super User Bearer Token
@@ -180,7 +176,6 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);

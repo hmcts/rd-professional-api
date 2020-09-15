@@ -12,7 +12,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.mockito.Mockito;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
@@ -29,7 +28,7 @@ public class UserAttributeServiceImplTest {
     private final UserAttributeServiceImpl userAttributeServiceMock
             = new UserAttributeServiceImpl(userAttributeRepositoryMock, prdEnumRepositoryMock, prdEnumServiceMock);
 
-    private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "JURISD_ID");
+    private final PrdEnumId prdEnumIdMock = new PrdEnumId(1, "PRD_ROLE");
     private final Organisation organisation = new Organisation("some-org-name", null, "PENDING",
             null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -56,26 +55,6 @@ public class UserAttributeServiceImplTest {
         userAttributeServiceMock.addUserAttributesToUser(professionalUser, userRoles, prdEnums);
 
         assertThat(professionalUser.getUserAttributes()).isNotNull();
-        verify(userAttributeRepositoryMock, times(1)).saveAll(any());
-    }
-
-    @Test
-    public void test_AddAllAttributes() {
-        prdEnums.add(new PrdEnum(new PrdEnumId(10, "JURISD_ID"), "PROBATE", "PROBATE"));
-
-        when(userAttributeRepositoryMock.saveAll(any())).thenReturn(userAttributes);
-
-        int expectSize = userAttributes.size() + 1;
-
-        ProfessionalUser professionalUserMock = Mockito.mock(ProfessionalUser.class);
-        List<String> jurisdictionIds = new ArrayList<>();
-        jurisdictionIds.add("PROBATE");
-
-        List<UserAttribute> result = userAttributeServiceMock
-                .addUserAttributesToSuperUserWithJurisdictions(professionalUserMock, userAttributes, jurisdictionIds);
-
-        assertThat(result.size()).isEqualTo(expectSize);
-
         verify(userAttributeRepositoryMock, times(1)).saveAll(any());
     }
 }

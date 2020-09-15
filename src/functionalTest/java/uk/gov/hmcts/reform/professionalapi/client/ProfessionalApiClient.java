@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -156,21 +155,8 @@ public class ProfessionalApiClient {
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(generateRandomEmail().toLowerCase())
-                .jurisdictions(createJurisdictions())
                 .build())
             .contactInformation(contactInfoList);
-    }
-
-    public static List<Jurisdiction> createJurisdictions() {
-
-        List<Jurisdiction> jurisdictions = new ArrayList<Jurisdiction>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("PROBATE");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("SSCS");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-        return jurisdictions;
     }
 
     public Map<String, Object> createOrganisation() {
@@ -209,26 +195,6 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> createOrganisationWithUnknownJurisdictionId() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-        organisationCreationRequest.getSuperUser().setJurisdictions(createUnknownJurisdiction());
-        return createOrganisation(organisationCreationRequest);
-    }
-
-    public List<Jurisdiction> createUnknownJurisdiction() {
-        List<Jurisdiction> jurisdictionIds = new ArrayList<>();
-        Jurisdiction jurisdiction = new Jurisdiction();
-        jurisdiction.setId("UNKNOWN");
-        jurisdictionIds.add(jurisdiction);
-        return jurisdictionIds;
-    }
-
-    public Map<String, Object> createOrganisationWithNoJurisdictionId() {
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-        organisationCreationRequest.getSuperUser().setJurisdictions(new ArrayList<>());
-        return createOrganisation(organisationCreationRequest);
-    }
-
     public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest
                                                                           organisationCreationRequest) {
         Response response = getS2sTokenHeaders()
@@ -252,7 +218,6 @@ public class ProfessionalApiClient {
             .lastName("someLastName")
             .email(generateRandomEmail())
             .roles(userRoles)
-            .jurisdictions(createJurisdictions())
             .build();
 
         return userCreationRequest;
@@ -267,7 +232,6 @@ public class ProfessionalApiClient {
             .lastName("someLastName")
             .email(email)
             .roles(userRoles)
-            .jurisdictions(createJurisdictions())
             .build();
 
         return userCreationRequest;
@@ -282,7 +246,6 @@ public class ProfessionalApiClient {
             .lastName("someLastName")
             .email(email.equalsIgnoreCase(RANDOM_EMAIL) ? generateRandomEmail() : email)
             .roles(userRoles)
-            .jurisdictions(createJurisdictions())
             .resendInvite(true)
             .build();
 
