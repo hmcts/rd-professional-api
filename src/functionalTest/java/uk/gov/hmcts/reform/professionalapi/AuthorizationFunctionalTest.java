@@ -192,6 +192,34 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearerToken;
     }
 
+    public RequestSpecification generateBearerTokenForEmailHeader(String role) {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        String userEmail = generateRandomEmail();
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(role, firstName, lastName, userEmail);
+
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+
+
+        return bearerToken;
+    }
+
     public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");

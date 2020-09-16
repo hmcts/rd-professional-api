@@ -174,6 +174,73 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         assertThat(response.get("http_status")).isEqualTo("404");
     }
 
+    @Test
+    public void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_internal() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA1234567");
+
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .name("some-org-name")
+                .paymentAccount(paymentAccounts)
+                .superUser(aUserCreationRequest()
+                        .firstName("some-fname")
+                        .lastName("some-lname")
+                        .email("some@email.com")
+                        .build())
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
+                        .addressLine1("addressLine1").build()))
+                .build();
+
+        Map<String, Object> organisationResponse =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String uuid = (String)organisationResponse.get("organisationIdentifier");
+
+        OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
+                .status("ACTIVE").build();
+
+        Map<String, Object> responseForOrganisationUpdate =
+                professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
+
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("some@email.com", hmctsAdmin);
+
+        assertThat(orgResponse).isNotEmpty();
+        responseValidate(orgResponse);
+
+    }
+
+    @Test
+    public void returns_404_when_unkown_email_not_found_fromDb() {
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.findPaymentAccountsByEmailFromHeader("wrong@email.com", hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("404");
+    }
+
+    @Test
+    public void returns_400_whenEmailIsNullInBothHeaderAndParam() {
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.findPaymentAccountsByEmailFromHeader("", hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+
+    @Test
+    public void get_request_returns_correct_payment_accounts_associated_with_email_fromHeader_external() {
+        String userId = settingUpOrganisation(puiUserManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeaderForExternalUsers("someone@somewhere.com", puiUserManager, userId);
+        assertThat(orgResponse).isNotEmpty();
+        responseValidate(orgResponse);
+
+    }
+
     private void responseValidate(Map<String, Object> orgResponse) {
 
         assertThat(orgResponse.get("http_status").toString().contains("200"));

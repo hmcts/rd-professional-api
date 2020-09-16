@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,6 +70,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class RefDataUtilTest {
@@ -82,6 +84,7 @@ public class RefDataUtilTest {
     private GetUserProfileResponse getUserProfileResponse;
     private UserProfileFeignClient userProfileFeignClient;
     private JsonFeignResponseUtil jsonFeignResponseUtil;
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
     @Before
     public void setUp() {
@@ -930,5 +933,4 @@ public class RefDataUtilTest {
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
 
     }
-
 }

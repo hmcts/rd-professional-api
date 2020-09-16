@@ -691,6 +691,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> findUserStatusByEmailFromHeader(HttpStatus status,
+                                  RequestSpecification requestSpecification, String email) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
                                                                             RequestSpecification requestSpecification) {
 
@@ -784,6 +797,12 @@ public class ProfessionalApiClient {
                                                                String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
+    }
+
+    public RequestSpecification getEmailFromAuthHeadersExternal(String role, String firstName, String lastName,
+                                                               String email) {
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
+        return getUserEmailAsHeaderWithExisting(bearerTokenForSuperUser, email);
     }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {

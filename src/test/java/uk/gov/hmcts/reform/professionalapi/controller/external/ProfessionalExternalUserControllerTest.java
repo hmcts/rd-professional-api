@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +27,8 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -44,6 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
+
+
 public class ProfessionalExternalUserControllerTest {
 
     private OrganisationService organisationServiceMock;
@@ -61,6 +66,7 @@ public class ProfessionalExternalUserControllerTest {
 
     @InjectMocks
     private ProfessionalExternalUserController professionalExternalUserController;
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
 
     @Before
     @SuppressWarnings("unchecked")
@@ -294,24 +300,68 @@ public class ProfessionalExternalUserControllerTest {
         newUserResponse.setIdamStatus("ACTIVE");
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
-
+        String email = "test@email.com";
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
         ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
                 HttpStatus.OK);
 
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-        when(professionalUserServiceMock.findUserStatusByEmailAddress(professionalUser.getEmailAddress()))
+        when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
                 .thenReturn(responseEntity1);
 
         ResponseEntity<NewUserResponse> newResponse = professionalExternalUserController
-                .findUserStatusByEmail(professionalUser.getEmailAddress());
+                .findUserStatusByEmail(email);
 
         assertThat(newResponse).isNotNull();
         assertThat(newResponse.getBody()).isNotNull();
         assertThat(newResponse.getBody().getUserIdentifier()).isEqualTo("a123dfgr46");
 
         verify(professionalUserServiceMock, times(1))
-                .findUserStatusByEmailAddress(professionalUser.getEmailAddress());
+                .findUserStatusByEmailAddress(email);
+    }
+
+    @Test
+    public void test_FindUserStatusByEmailFromHeader() throws JsonProcessingException {
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
+
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("a123dfgr46");
+        newUserResponse.setIdamStatus("ACTIVE");
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(newUserResponse);
+        String email = "test@email.com";
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+
+        ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
+                HttpStatus.OK);
+
+        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+        when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
+                .thenReturn(responseEntity1);
+
+        ResponseEntity<NewUserResponse> newResponse = professionalExternalUserController
+                .findUserStatusByEmail(email);
+
+        assertThat(newResponse).isNotNull();
+        assertThat(newResponse.getBody()).isNotNull();
+        assertThat(newResponse.getBody().getUserIdentifier()).isEqualTo("a123dfgr46");
+
+        verify(professionalUserServiceMock, times(1))
+                .findUserStatusByEmailAddress(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_FindUserStatusByEmailFromHeaderThrows400WhenEmailIsInvalid() {
+        String email = "some-email";
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        professionalExternalUserController.findUserStatusByEmail(email);
     }
 
     @Test(expected = InvalidRequest.class)

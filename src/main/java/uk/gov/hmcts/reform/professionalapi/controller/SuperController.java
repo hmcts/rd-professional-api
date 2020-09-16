@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -36,6 +37,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -69,6 +72,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
@@ -208,7 +213,7 @@ public abstract class SuperController {
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(removeEmptySpaces(email)
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email
                 .toLowerCase());
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
@@ -429,5 +434,17 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         return existingOrganisation;
+    }
+
+    public  String getUserEmail(String email) {
+        String userEmail = null;
+        ServletRequestAttributes servletRequestAttributes =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+
+        if (nonNull(servletRequestAttributes)) {
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            userEmail = request.getHeader("UserEmail") != null ? request.getHeader("UserEmail") : email;
+        }
+        return userEmail;
     }
 }

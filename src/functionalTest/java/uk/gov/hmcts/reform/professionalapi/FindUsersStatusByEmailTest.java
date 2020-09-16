@@ -45,6 +45,44 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200() {
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-case-manager");
+        // creating new user request
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will update in the up
+        professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(),
+                userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
+                generateBearerTokenForEmailHeader(puiUserManager), userCreationRequest.getEmail());
+        assertThat(response.get("userIdentifier")).isNotNull();
+
+    }
+
+    @Test
+    public void findUserStatusByEmailFromHeaderWithPuiUserManagerRoleShouldReturn200() {
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        // creating new user request
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+        // creating user in idam with the same email used in the invite user
+        // so that status automatically will update in the up
+        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, userCreationRequest.getFirstName(),
+                userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
+                generateBearerTokenForEmailHeader(puiUserManager), "prd@prdfunctestuser.com");
+        assertThat(response.get("userIdentifier")).isNotNull();
+
+    }
+
+    @Test
     public void ac2_find_user_status_by_email_with_pui_case_manager_role_should_return_200_with_user_status_active() {
         String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
@@ -80,6 +118,21 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusPendingForUsr() {
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        // creating new user request
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+        // inviting user
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        // find the status of the user
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND,
+                generateBearerTokenForEmailHeader(puiFinanceManager), userCreationRequest.getEmail());
+        assertThat(response.get("userIdentifier")).isNull();
+    }
+
+    @Test
     public void ac4_find_usr_status_by_email_with_active_pui_organisation_manager_role_should_return_status_for_usr() {
 
         // creating new user request
@@ -102,6 +155,31 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 generateBearerTokenForExternalUserRolesSpecified(userRolesForToken), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
     }
+
+    @Test
+    public void findUsrStatusByEmailFrmHeaderWithPuiOrganisationMgrRoleShouldRtnStatusForUsr() {
+
+        // creating new user request
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        userRoles.add("pui-finance-manager");
+        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
+
+        professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(),
+                userCreationRequest.getLastName(), userCreationRequest.getEmail());
+
+        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
+        // inviting user
+        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        // find the status of the user
+        List<String> userRolesForToken = new ArrayList<>();
+        userRolesForToken.add("pui-organisation-manager");
+
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
+                generateBearerTokenForEmailHeader("pui-organisation-manager"), userCreationRequest.getEmail());
+        assertThat(response.get("userIdentifier")).isNotNull();
+    }
+
 
     @Test
     public void rdcc_719_ac1_find_usr_sts_by_email_caseworker_publiclaw_courtadmin_role_shld_rtn_200__usr_sts_active() {
