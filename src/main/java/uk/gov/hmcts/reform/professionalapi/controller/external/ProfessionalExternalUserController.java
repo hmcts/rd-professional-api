@@ -235,7 +235,7 @@ public class ProfessionalExternalUserController extends SuperController {
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
-                    @Authorization(value = "User-Email")
+                    @Authorization(value = "UserEmail")
             }
     )
     @ApiResponses({
