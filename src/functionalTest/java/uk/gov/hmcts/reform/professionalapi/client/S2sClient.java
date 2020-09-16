@@ -36,7 +36,7 @@ public class S2sClient {
     public String signIntoS2S() {
         Map<String, Object> params = ImmutableMap.of("microservice",
                                                      this.microserviceName,
-                                                         "oneTimePassword",
+                                                     "oneTimePassword",
                                                      authenticator.getTotpPassword(this.microserviceKey));
 
         Response response = RestAssured
