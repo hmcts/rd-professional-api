@@ -1,26 +1,22 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
+import net.serenitybdd.rest.SerenityRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListeners;
@@ -29,6 +25,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -38,7 +35,17 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+import static java.lang.System.getenv;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
+
+import javax.sql.DataSource;
+
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -92,6 +99,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected TestConfigProperties configProperties;
 
+    @Autowired
+    private DataSource dataSource;
+
+
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
     protected static  String  s2sToken;
@@ -101,10 +112,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static final String CREDS = "CREDS";
 
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
-
-    @After
-    public void tearDown() {
-    }
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -119,8 +126,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
 
         if (s2sToken == null) {
 
@@ -129,8 +136,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
         professionalApiClient = new ProfessionalApiClient(
-                professionalApiUrl,
-                s2sToken, idamOpenIdClient);
+            professionalApiUrl,
+            s2sToken, idamOpenIdClient);
 
     }
 
@@ -310,4 +317,30 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 
+    @Override
+    public void afterTestClass(TestContext testContext) {
+        deleteTestCaseData();
+    }
+
+    private void deleteTestCaseData() {
+        if ("aat".equalsIgnoreCase(getenv("execution_environment"))) {
+            log.info("Delete test data script execution started");
+            try {
+                Connection connection = dataSource.getConnection();
+                connection.setAutoCommit(false);
+                ScriptUtils.executeSqlScript(connection,
+                        new EncodedResource(new ClassPathResource("delete-functional-test-data.sql")),
+                        false, true,
+                        ScriptUtils.DEFAULT_COMMENT_PREFIX,
+                        ScriptUtils.DEFAULT_STATEMENT_SEPARATOR,
+                        ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
+                        ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
+                log.info("Delete test data script execution completed");
+            } catch (Exception exe) {
+                log.error("Delete test data script execution failed: {}", exe.getMessage());
+            }
+        } else {
+            log.info("Not executing delete test data script");
+        }
+    }
 }

@@ -1,14 +1,14 @@
-targetInstance: ${TEST_URL:http://localhost:8090}
+targetInstance: ${TEST_URL:http://rd-professional-api-aat.service.core-compute-aat.internal}
 
 s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
 s2s-name: rd_professional_api
 
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
-oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
-idam.auth.clientId:${OAUTH2_CLIENT_ID:AAAAAAAAAAAAAAAA}
+oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:cc5f2a6-9690-11e9-bc42-526af7764f64}
+idam.auth.clientId: ${OAUTH2_CLIENT_ID:rd-professional-api}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
-s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+s2s-secret: ${S2S_SECRET:Y2ROIZ3PW4WRHVQZ}
 
 spring.flyway.enabled: false
 ## Secure roles configuration 1
@@ -27,8 +27,14 @@ resendInterval: 60
 # toggle for resendInvite
 resendInviteEnabled : true
 
-# delete organisation enabled
-deleteOrganisationEnabled : false
+#######
+postgres.host_name: ${FUNC_DATABASE_HOST}
+postgres.name: ${FUNC_DATABASE_NAME}
+postgres.user: ${FUNC_DATABASE_USER}
+postgres.password: ${FUNC_DATABASE_PASS}
+postgres.port: ${FUNC_DATABASE_PORT}
+#######
 
-# get Active Orgs External enabled
-activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
+
+
+
