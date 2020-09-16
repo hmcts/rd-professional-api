@@ -272,6 +272,6 @@ public class ProfessionalExternalUserController extends SuperController {
 
         String userEmail = getUserEmail(email);
         validateEmail(userEmail);
-        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase());
+        return professionalUserService.findUserStatusByEmailAddress(userEmail.toLowerCase());
     }
 }
