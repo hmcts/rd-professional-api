@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -159,14 +158,12 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId)
-                .collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes
-                = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser,
-                newProfessionalUser.getUserAttributes(), jurisdictionIds);
+                = userAttributeService.addUserAttributesToSuperUser(persistedSuperUser,
+                newProfessionalUser.getUserAttributes());
         newProfessionalUser.setUserAttributes(attributes);
 
         userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());

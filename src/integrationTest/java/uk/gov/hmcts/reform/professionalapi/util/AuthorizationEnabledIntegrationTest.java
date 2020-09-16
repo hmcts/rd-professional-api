@@ -14,7 +14,6 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
@@ -72,7 +71,7 @@ import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceI
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-        "USER_PROFILE_URL:http://127.0.0.1:8091", "CCD_URL:http://127.0.0.1:8092"})
+        "USER_PROFILE_URL:http://127.0.0.1:8091"})
 @DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -109,9 +108,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091)
             .extensions(new MultipleUsersResponseTransformer()));
-
-    @ClassRule
-    public static WireMockRule ccdService = new WireMockRule(wireMockConfig().port(8092));
 
     @ClassRule
     public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
@@ -210,12 +206,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Before
     public void userProfileGetUserWireMock() {
-
-        ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                ));
-
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -227,14 +217,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"email\": \"super.user@hmcts.net\","
                                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\""
                                 + "}")));
-    }
-
-    public void ccdUserProfileErrorWireMock(HttpStatus httpStatus) {
-
-        ccdService.stubFor(post(urlEqualTo("/user-profile/users"))
-                .willReturn(aResponse()
-                        .withStatus(httpStatus.value())
-                ));
     }
 
     @After
@@ -324,7 +306,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         return userCreationRequest;
@@ -338,7 +319,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .lastName("lastName")
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .resendInvite(true)
                 .build();
 

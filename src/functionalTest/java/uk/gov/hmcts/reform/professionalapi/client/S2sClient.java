@@ -51,7 +51,6 @@ public class S2sClient {
         assertThat(response.getStatusCode()).isEqualTo(200);
 
         String jwtToken = response.getBody().asString();
-        log.debug("Got JWT from S2S service");
         return jwtToken;
     }
 }

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
@@ -22,12 +23,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -95,7 +90,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
             .firstName(firstName)
             .lastName(lastName)
             .email(email)
-            .jurisdictions(createJurisdictions())
             .build();
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName,
