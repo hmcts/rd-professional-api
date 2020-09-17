@@ -206,6 +206,9 @@ public class OrganisationExternalControllerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
     }
 
     @Test
@@ -227,6 +230,9 @@ public class OrganisationExternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
         verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
+
     }
 
     @Test

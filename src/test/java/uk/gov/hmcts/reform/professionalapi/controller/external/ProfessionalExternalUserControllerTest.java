@@ -330,8 +330,6 @@ public class ProfessionalExternalUserControllerTest {
         NewUserResponse newUserResponse = new NewUserResponse();
         newUserResponse.setUserIdentifier("a123dfgr46");
         newUserResponse.setIdamStatus("ACTIVE");
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(newUserResponse);
         String email = "test@email.com";
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
@@ -339,8 +337,6 @@ public class ProfessionalExternalUserControllerTest {
         ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
                 HttpStatus.OK);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
                 .thenReturn(responseEntity1);
 
@@ -354,6 +350,7 @@ public class ProfessionalExternalUserControllerTest {
         verify(professionalUserServiceMock, times(1))
                 .findUserStatusByEmailAddress(email);
         verify(httpRequest, times(2)).getHeader(anyString());
+
     }
 
     @Test(expected = InvalidRequest.class)
