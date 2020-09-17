@@ -246,6 +246,32 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearerToken;
     }
 
+    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles, String email) {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        String userEmail = email;
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(puiUserManager, firstName, lastName,
+                userEmail);
+
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+
+
+        return bearerToken;
+    }
+
     protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
         assertThat(searchResponse.get("idamStatus")).isNotNull();
         assertThat(searchResponse.get("users")).asList().isNotEmpty();
