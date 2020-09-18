@@ -325,7 +325,7 @@ dependencies {
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
     compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
-    compile group:"org.yaml", name: "snakeyaml", version:"1.26"
+    compile group:"org.yaml", name: "snakeyaml", version:"1.27"
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
