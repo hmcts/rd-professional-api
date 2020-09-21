@@ -37,7 +37,7 @@ public class DbConfig {
         log.info("Func DB name: {}", postgresDbName);
         log.info("Func DB user name: {}", postgresUserName);
         String url = String.format("jdbc:postgresql://%s:%s/%s", postgresHost, postgresPort, postgresDbName);
-        log.info("Func DB url :: " + url);
+        log.info("Func DB url: {}",  url);
 
         HikariDataSource dataSource = null;
         try {
