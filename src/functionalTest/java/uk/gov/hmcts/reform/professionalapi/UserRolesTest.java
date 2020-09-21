@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Arrays;
@@ -14,6 +12,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -23,8 +23,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class UserRolesTest extends AuthorizationFunctionalTest {
@@ -39,7 +39,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
@@ -67,7 +67,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
-        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
@@ -128,7 +128,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
         return superUser;
     }
@@ -139,7 +138,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         return newUser;
     }

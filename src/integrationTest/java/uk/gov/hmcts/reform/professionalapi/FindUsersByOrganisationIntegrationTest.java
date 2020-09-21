@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -18,7 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test

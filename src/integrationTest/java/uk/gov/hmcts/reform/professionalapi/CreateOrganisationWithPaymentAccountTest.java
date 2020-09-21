@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Arrays;
@@ -13,17 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+
 public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -38,7 +35,6 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -189,7 +185,6 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -202,7 +197,6 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone1@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))

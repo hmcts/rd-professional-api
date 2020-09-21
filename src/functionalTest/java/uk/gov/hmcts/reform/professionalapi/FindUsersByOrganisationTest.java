@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -17,7 +15,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -26,8 +25,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
@@ -43,7 +42,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add(role);
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
 
@@ -55,7 +54,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,
                 userCreationRequest, HttpStatus.CREATED);
@@ -72,7 +70,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
             List<String> userRoles = new ArrayList<>();
             userRoles.add("pui-case-manager");
-            String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+            String userEmail = generateRandomEmail();
             String lastName = "someLastName";
             String firstName = "someName";
 
@@ -84,7 +82,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                     .lastName(lastName)
                     .email(userEmail)
                     .roles(userRoles)
-                    .jurisdictions(createJurisdictions())
                     .build();
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,
                     userCreationRequest, HttpStatus.CREATED);
@@ -208,7 +205,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "1Aaron";
 
@@ -217,7 +214,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
@@ -297,7 +293,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker-caa");
-        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
 
@@ -323,7 +319,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         List<String> roles = new ArrayList<>();
         roles.add(puiUserManager);
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.nextUserEmail();
+        String email = generateRandomEmail();
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);

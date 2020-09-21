@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -67,7 +68,6 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 @RestController
@@ -95,8 +95,6 @@ public abstract class SuperController {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
-    private JurisdictionServiceImpl jurisdictionService;
-    @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Value("${prd.security.roles.hmcts-admin:}")
@@ -116,9 +114,6 @@ public abstract class SuperController {
 
     @Value("${prdEnumRoleType}")
     protected String prdEnumRoleType;
-
-    @Value("${jurisdictionIdType}")
-    private String jurisdictionIds;
 
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
@@ -247,12 +242,11 @@ public abstract class SuperController {
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 
-            jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
                 UserProfileCreationResponse userProfileCreationResponse
-                        = (UserProfileCreationResponse) responseEntity.getBody();
+                        = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
@@ -327,13 +321,11 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId,
-                newUserCreationRequest.getEmail());
         ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
             UserProfileCreationResponse userProfileCreationResponse
-                    = (UserProfileCreationResponse) responseEntity.getBody();
+                    = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,

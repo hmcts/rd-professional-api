@@ -179,62 +179,6 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         assertThat(persistedOrganisation.getCompanyNumber()).isNotNull();
     }
 
-    @Test
-    public void should_abort_flow_when_ccd_fails() {
-
-        Map<String, Object> responseForOrganisationUpdate;
-        String organisationIdentifier = createOrganisationRequest();
-        OrganisationCreationRequest organisationUpdateRequest
-                = organisationRequestWithAllFieldsAreUpdated().status("ACTIVE").build();
-
-        ccdUserProfileErrorWireMock(HttpStatus.BAD_REQUEST);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.BAD_REQUEST.value()));
-        String responseBody = (String)responseForOrganisationUpdate.get("response_body");
-        assertThat(responseBody).contains("21 : There is a problem with your request. Please check and try again");
-
-        ccdUserProfileErrorWireMock(HttpStatus.NOT_FOUND);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.NOT_FOUND.value()));
-        responseBody = (String)responseForOrganisationUpdate.get("response_body");
-        assertThat(responseBody).contains("22 : Resource not found");
-
-        ccdUserProfileErrorWireMock(HttpStatus.UNAUTHORIZED);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.UNAUTHORIZED.value()));
-
-        ccdUserProfileErrorWireMock(HttpStatus.FORBIDDEN);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.FORBIDDEN.value()));
-        responseBody = (String)responseForOrganisationUpdate.get("response_body");
-        assertThat(responseBody).contains("24 : Access Denied");
-
-        ccdUserProfileErrorWireMock(HttpStatus.CONFLICT);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.CONFLICT.value()));
-        responseBody = (String)responseForOrganisationUpdate.get("response_body");
-        assertThat(responseBody).contains("25 : User already exists");
-
-        ccdUserProfileErrorWireMock(HttpStatus.INTERNAL_SERVER_ERROR);
-        responseForOrganisationUpdate = professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest,
-                hmctsAdmin, organisationIdentifier);
-        assertThat(responseForOrganisationUpdate.get("http_status"))
-                .isEqualTo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-        responseBody = (String)responseForOrganisationUpdate.get("response_body");
-        assertThat(responseBody).contains("26 : error was caused by an unknown exception");
-        ccdUserProfileErrorWireMock(HttpStatus.OK);
-    }
-
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient

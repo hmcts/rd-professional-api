@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import io.restassured.specification.RequestSpecification;
 
@@ -16,7 +15,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,8 +26,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest {
@@ -54,7 +54,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest,
@@ -142,7 +141,6 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
         return user;
     }

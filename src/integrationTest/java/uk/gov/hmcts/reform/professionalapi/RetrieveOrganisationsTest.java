@@ -6,7 +6,6 @@ import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -19,11 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -32,8 +27,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+
 @Slf4j
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
     @SuppressWarnings("unchecked")
@@ -142,7 +137,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someoneElse@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(contactInfoList2)
                 .paymentAccount(paymentAccounts2ndOrg)
@@ -154,7 +148,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .firstName("some-fnam3")
                         .lastName("some-lnam3")
                         .email("someoneEls3@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(contactInfoList3)
                 .paymentAccount(paymentAccounts3rdOrg)
@@ -382,7 +375,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                         .firstName("fname")
                         .lastName("lname1")
                         .email("someone11@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine2").build())).build();
@@ -441,6 +433,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiCaa);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get("organisationIdentifier")).isNotNull();
+
     }
 
 }

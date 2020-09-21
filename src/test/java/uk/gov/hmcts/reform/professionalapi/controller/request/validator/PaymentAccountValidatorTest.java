@@ -23,7 +23,7 @@ public class PaymentAccountValidatorTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test(expected = Test.None.class)
@@ -57,12 +57,6 @@ public class PaymentAccountValidatorTest {
 
         pbaNumber.clear();
         pbaNumber.add("wewdfd");
-
-        Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
-                .isExactlyInstanceOf(InvalidRequest.class);
-
-        pbaNumber.clear();
-        pbaNumber.add(null);
 
         Assertions.assertThatThrownBy(() -> PaymentAccountValidator.checkPbaNumberIsValid(pbaNumber))
                 .isExactlyInstanceOf(InvalidRequest.class);

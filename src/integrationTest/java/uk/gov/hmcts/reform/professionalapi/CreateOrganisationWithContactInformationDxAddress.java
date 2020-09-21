@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 
 import java.util.Arrays;
@@ -16,19 +15,14 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @Slf4j
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithContactInformationDxAddress extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -102,7 +96,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -120,7 +113,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone1@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine2")
                         .build()))
@@ -144,7 +136,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -195,7 +186,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName(null)
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -223,7 +213,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName(null)
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -250,7 +239,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName("some-lname")
                         .email(null)
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -277,7 +265,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .build()))
@@ -304,7 +291,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
                         .email(" someone@somewhere.com ")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1(" addressLine1 ")
                         .addressLine2(" ad  2 ").addressLine3(" ad3 ")

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.specification.RequestSpecification;
@@ -19,7 +18,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,15 +29,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     private RequestSpecification bearerTokenForUser;
     private String orgIdentifier;
-    private String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+    private String email = generateRandomEmail();
     private String lastName = "someLastName";
     private String firstName = "someName";
 
@@ -57,7 +57,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest,
@@ -68,7 +67,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc117_ac1_pui_finance_manager_can_retrieve_a_list_of_pbas_of_a_given_organisation() {
-        log.info("Inside RetrievePaymentAccountTest:");
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
                 generateBearerTokenForUser(puiFinanceManager));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
@@ -164,7 +162,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .firstName("some-fname")
                 .lastName("some-lname")
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
         return user;
     }

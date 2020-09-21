@@ -2,15 +2,12 @@ package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
-
 
 @Getter
 @Setter
@@ -25,15 +22,12 @@ public class UserCreationRequest {
 
     private String email;
 
-    private List<Jurisdiction> jurisdictions;
 
     @JsonCreator
     public UserCreationRequest(
             @JsonProperty("firstName") String firstName,
             @JsonProperty("lastName") String lastName,
-            @JsonProperty("email") String emailAddress,
-            @JsonProperty("jurisdictions") List<Jurisdiction> jurisdictions
-    ) {
+            @JsonProperty("email") String emailAddress) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -42,8 +36,6 @@ public class UserCreationRequest {
 
             this.email = emailAddress.toLowerCase().trim();
         }
-        this.jurisdictions = jurisdictions;
-
     }
 
 

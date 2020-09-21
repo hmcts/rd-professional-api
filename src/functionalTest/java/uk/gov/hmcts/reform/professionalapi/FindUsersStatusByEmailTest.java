@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.specification.RequestSpecification;
@@ -11,6 +10,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
@@ -120,7 +122,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient
                 .getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname",
                         "externalLname", email);
@@ -146,7 +148,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiOrgManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient
                 .getMultipleAuthHeadersExternal("caseworker-publiclaw-courtadmin", "externalFname",
                         "externalLname", email);

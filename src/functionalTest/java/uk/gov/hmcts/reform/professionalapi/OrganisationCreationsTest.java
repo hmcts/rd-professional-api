@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -11,13 +10,15 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import java.util.Arrays;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
@@ -93,8 +94,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
+                        .email(generateRandomEmail())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
@@ -124,8 +124,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
+                        .email(generateRandomEmail())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")
@@ -145,8 +144,7 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphabetic(10) + "@somewhere.com")
-                        .jurisdictions(createJurisdictions())
+                        .email(generateRandomEmail())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")

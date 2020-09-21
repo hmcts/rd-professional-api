@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -110,7 +109,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = saveOrganisation(newOrganisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -130,9 +129,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return persistedOrganisation;
     }
 
-    public void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation) {
+    public void addPbaAccountToOrganisation(Set<String> paymentAccounts,
+                                            Organisation organisation, boolean pbasValidated) {
         if (paymentAccounts != null) {
-            PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            if (!pbasValidated) {
+                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+            }
 
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
@@ -156,14 +158,12 @@ public class OrganisationServiceImpl implements OrganisationService {
                 RefDataUtil.removeAllSpaces(userCreationRequest.getEmail().toLowerCase()),
                 organisation);
 
-        List<String> jurisdictionIds = userCreationRequest.getJurisdictions().stream().map(Jurisdiction::getId)
-                .collect(Collectors.toList());
 
         ProfessionalUser persistedSuperUser = professionalUserRepository.save(newProfessionalUser);
 
         List<UserAttribute> attributes
-                = userAttributeService.addUserAttributesToSuperUserWithJurisdictions(persistedSuperUser,
-                newProfessionalUser.getUserAttributes(), jurisdictionIds);
+                = userAttributeService.addUserAttributesToSuperUser(persistedSuperUser,
+                newProfessionalUser.getUserAttributes());
         newProfessionalUser.setUserAttributes(attributes);
 
         userAccountMapService.persistedUserAccountMap(persistedSuperUser, organisation.getPaymentAccounts());
@@ -371,7 +371,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     private DeleteOrganisationResponse deleteOrganisationEntity(Organisation organisation,
                                                                 DeleteOrganisationResponse deleteOrganisationResponse,
-            String prdAdminUserId) {
+                                                                String prdAdminUserId) {
         organisationRepository.deleteById(organisation.getId());
         deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.STATUS_CODE_204);
         deleteOrganisationResponse.setMessage(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
@@ -388,7 +388,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .findByUserCountByOrganisationId(organisation.getId())) {
             ProfessionalUser user = organisation.getUsers()
                     .get(ProfessionalApiConstants.ZERO_INDEX).toProfessionalUser();
-            NewUserResponse newUserResponse  =  RefDataUtil
+            NewUserResponse newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
             if (StringUtils.isEmpty(newUserResponse.getIdamStatus())) {

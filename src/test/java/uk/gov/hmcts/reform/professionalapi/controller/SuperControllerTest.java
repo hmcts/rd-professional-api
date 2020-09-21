@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,7 +40,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.Organisa
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -55,7 +53,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 public class SuperControllerTest {
@@ -68,7 +65,6 @@ public class SuperControllerTest {
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
     private PrdEnumServiceImpl prdEnumServiceMock;
-    private JurisdictionServiceImpl jurisdictionService;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PrdEnumRepository prdEnumRepository;
@@ -89,7 +85,6 @@ public class SuperControllerTest {
 
     private List<PrdEnum> prdEnumList;
     private List<String> jurisdEnumIds;
-    private List<Jurisdiction> jurisdictions;
 
     @Before
     public void setUp() throws Exception {
@@ -98,7 +93,6 @@ public class SuperControllerTest {
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-        jurisdictionService = mock(JurisdictionServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
@@ -117,29 +111,18 @@ public class SuperControllerTest {
         prdEnumList.add(anEnum2);
         prdEnumList.add(anEnum3);
 
-        jurisdEnumIds = new ArrayList<>();
-        jurisdEnumIds.add("Probate");
-        jurisdEnumIds.add("Bulk Scanning");
-        jurisdictions = new ArrayList<>();
-
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("Probate");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("Bulk Scanning");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, jurisdictions, false);
+                "some@email.com", userRoles, false);
         UserCreationRequest userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                "some@email.com", jurisdictions);
+                "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", "sra-id",
                 "false", "number02", "company-url", userCreationRequest,
                 null, null);
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -215,8 +198,6 @@ public class SuperControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
 
@@ -383,8 +364,6 @@ public class SuperControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, orgId, userId);
 
