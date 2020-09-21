@@ -20,8 +20,8 @@ def secrets = [
                 secret('LD-SDK-KEY', 'LD_SDK_KEY'),
                 secret('professional-api-POSTGRES-HOST', 'FUNC_DATABASE_HOST'),
                 secret('professional-api-POSTGRES-PASS', 'FUNC_DATABASE_PASS'),
-                secret('professional-api-POSTGRES-USER', 'FUNC_DATABASE_NAME'),
-                secret('professional-api-POSTGRES-DATABASE', 'FUNC_DATABASE_USER'),
+                secret('professional-api-POSTGRES-USER', 'FUNC_DATABASE_USER'),
+                secret('professional-api-POSTGRES-DATABASE', 'FUNC_DATABASE_NAME'),
                 secret('professional-api-POSTGRES-PORT', 'FUNC_DATABASE_PORT')
         ]
 ]
