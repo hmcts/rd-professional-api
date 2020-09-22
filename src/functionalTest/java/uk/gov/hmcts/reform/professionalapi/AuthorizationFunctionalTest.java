@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static java.lang.System.getenv;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -97,6 +98,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private DbConfig dbConfig;
 
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
@@ -320,7 +323,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String testUrl = getenv("TEST_URL");
         log.info("isNightlyBuild: {}", isNightlyBuild);
         log.info("testUrl: {}", testUrl);
-        if ("true".equalsIgnoreCase(isNightlyBuild)) {
+        logDbDetails();
+        if ("true".equalsIgnoreCase("true")) {
             log.info("Delete test data script execution started");
             try {
                 connection = dataSource.getConnection();
@@ -347,5 +351,20 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         } else {
             log.info("Not executing delete test data script");
         }
+    }
+
+    private void logDbDetails() {
+        if (nonNull(dbConfig)) {
+            log.info("Func DB host: {}", dbConfig.postgresHost);
+            log.info("Func DB port: {}", dbConfig.postgresPort);
+            log.info("Func DB name: {}", dbConfig.postgresDbName);
+            log.info("Func DB user name: {}", dbConfig.postgresUserName);
+            String url = String.format("jdbc:postgresql://%s:%s/%s", dbConfig.postgresHost,
+                    dbConfig.postgresPort, dbConfig.postgresDbName);
+            log.info("Func DB url: {}", url);
+        } else {
+            log.info("No DB info retrieved");
+        }
+
     }
 }
