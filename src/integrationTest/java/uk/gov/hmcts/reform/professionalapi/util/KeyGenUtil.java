@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.minidev.json.JSONObject;
 
 public class KeyGenUtil {
 
@@ -29,8 +30,8 @@ public class KeyGenUtil {
 
     public static String getDynamicJwksResponse() throws JOSEException, JsonProcessingException {
         RSAKey rsaKey = KeyGenUtil.getRsaJwk();
-        Map<String, List<Map<String, Object>>> body = new LinkedHashMap<>();
-        List<Map<String, Object>> keyList = new ArrayList<>();
+        Map<String, List<JSONObject>> body = new LinkedHashMap<>();
+        List<JSONObject> keyList = new ArrayList<>();
         keyList.add(rsaKey.toJSONObject());
         body.put("keys", keyList);
         ObjectMapper objectMapper = new ObjectMapper();
