@@ -120,15 +120,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = false)
-    public void should_retrieve_403_when_API_toggled_off() {
-        String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisationErrorResponse(
-            orgIdentifierResp, hmctsAdmin, HttpStatus.FORBIDDEN, getFeatureFlagName()
-        );
-    }
-
-    @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac8_could_not_delete_an_active_organisation_with_pending_userProfileByOtherThanPrdAdminThrow403() {
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();

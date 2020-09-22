@@ -81,7 +81,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> response =
                 professionalReferenceDataClient.findUserByEmail("SOMEONE@SOMEWHERE.COM", hmctsAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
 
     @Test
