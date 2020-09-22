@@ -593,22 +593,6 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> retrieveLegacyPbaNumbersByUserEmail(String email) {
-        Response response = withUnauthenticatedRequest()
-            .body("")
-            .get("/search/pba/" + email)
-            .andReturn();
-
-        log.info("Retrieve organisation response: " + response.asString());
-
-        response.then()
-            .assertThat()
-            .statusCode(OK.value());
-
-        return response.body().as(Map.class);
-    }
-
-    @SuppressWarnings("unchecked")
     public Map<String, Object> modifyUserToExistingUserForPrdAdmin(HttpStatus status,
                                                                    UserProfileUpdatedData userProfileUpdatedData,
                                                                    String organisationId, String userId) {
