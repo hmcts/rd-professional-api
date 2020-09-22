@@ -12,8 +12,6 @@ import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListeners;
@@ -45,7 +46,7 @@ import javax.sql.DataSource;
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
-@Slf4j()
+@Slf4j
 @TestExecutionListeners(listeners = {
     AuthorizationFunctionalTest.class,
     DependencyInjectionTestExecutionListener.class})
@@ -318,32 +319,23 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     private void deleteTestCaseData() {
         Connection connection;
-        Statement stmt;
         String isNightlyBuild = getenv("isNightlyBuild");
         String testUrl = getenv("TEST_URL");
         log.info("isNightlyBuild: {}", isNightlyBuild);
         log.info("testUrl: {}", testUrl);
         logDbDetails();
-        if ("true".equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(isNightlyBuild) && testUrl.contains("aat")) {
             log.info("Delete test data script execution started");
             try {
                 connection = dataSource.getConnection();
                 connection.setAutoCommit(false);
-                stmt = connection.createStatement();
-
-                String sql = "SELECT count(*) AS orgcount from organisation";
-                ResultSet rs = stmt.executeQuery(sql);
-                while (rs.next()) {
-                    int count  = rs.getInt("orgcount");
-                    log.info("Query result: {}", count);
-                }
-                /*ScriptUtils.executeSqlScript(connection,
+                ScriptUtils.executeSqlScript(connection,
                         new EncodedResource(new ClassPathResource("delete-functional-test-data.sql")),
                         false, true,
                         ScriptUtils.DEFAULT_COMMENT_PREFIX,
                         ScriptUtils.DEFAULT_STATEMENT_SEPARATOR,
                         ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
-                        ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);*/
+                        ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
                 log.info("Delete test data script execution completed");
             } catch (Exception exe) {
                 log.error("Delete test data script execution failed: {}", exe.getMessage());
