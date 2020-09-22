@@ -348,8 +348,8 @@ dependencies {
 
     testCompile group: 'com.h2database', name: 'h2'
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.10'
-    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.5.10'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.11'
+    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.5.11'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
