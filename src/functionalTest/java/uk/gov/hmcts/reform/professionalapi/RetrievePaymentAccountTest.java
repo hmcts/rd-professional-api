@@ -123,21 +123,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
         responseValidate(orgResponse);
     }
 
-    @Test
-    public void can_return_404_when_pending_organisation_payment_account_user_by_email() {
-
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + randomAlphabetic(7));
-
-        Map<String, Object> response =  professionalApiClient.createOrganisation(
-                someMinimalOrganisationRequest()
-                        .paymentAccount(paymentAccounts)
-                        .superUser(createUserForTest())
-                        .build());
-
-        professionalApiClient.retrieveBadRequestForPendingOrganisationWithPbaEmail(email, hmctsAdmin);
-    }
-
     private void responseValidate(Map<String, Object> orgResponse) {
 
         orgResponse.forEach((k,v) -> {
