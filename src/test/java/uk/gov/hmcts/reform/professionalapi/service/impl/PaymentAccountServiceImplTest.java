@@ -21,6 +21,7 @@ import javax.persistence.EntityTransaction;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.ArgumentMatchers;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -50,6 +51,7 @@ public class PaymentAccountServiceImplTest {
     private final UserAccountMap userAccountMapMock = mock(UserAccountMap.class);
     private final UserAccountMapId userAccountMapIdMock = mock(UserAccountMapId.class);
     private final PaymentAccountValidator paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
+    private final PaymentAccount paymentAccountMock = mock(PaymentAccount.class);
     private final EntityManagerFactory entityManagerFactoryMock =  mock(EntityManagerFactory.class);
     private final EntityManager entityManagerMock = mock(EntityManager.class);
     private final EntityTransaction entityTransactionMock = mock(EntityTransaction.class);
@@ -136,7 +138,8 @@ public class PaymentAccountServiceImplTest {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
         when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
-        when(entityManagerMock.find(any(), any())).thenReturn(null);
+        when(entityManagerMock.find(ArgumentMatchers.eq(UserAccountMap.class), any())).thenReturn(userAccountMapMock);
+        when(entityManagerMock.find(ArgumentMatchers.eq(PaymentAccount.class), any())).thenReturn(paymentAccountMock);
         RefDataUtil.getPaymentAccount(paymentAccounts);
 
         PbaResponse response = sut.editPaymentAccountsByOrganisation(organisation, pbaEditRequest);
@@ -150,11 +153,11 @@ public class PaymentAccountServiceImplTest {
         verify(entityManagerFactoryMock, times(1)).createEntityManager();
         verify(entityManagerMock, times(1)).getTransaction();
         verify(entityManagerMock, times(2)).find(any(), any());
-        verify(entityManagerMock, times(0)).remove(any());
+        verify(entityManagerMock, times(2)).remove(any());
     }
 
     @Test
-    public void testDeleteUserAccountMapsAndPaymentAccounts() {
+    public void testNotDeleteUserAccountMapsAndPaymentAccountsAreNull() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
         when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
@@ -165,6 +168,35 @@ public class PaymentAccountServiceImplTest {
         verify(entityManagerMock, times(2)).find(any(), any());
         verify(entityManagerMock, times(0)).remove(any());
     }
+
+    @Test
+    public void testDeleteUserAccountMapsAndPaymentAccounts() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
+        when(entityManagerMock.find(ArgumentMatchers.eq(UserAccountMap.class), any())).thenReturn(userAccountMapMock);
+        when(entityManagerMock.find(ArgumentMatchers.eq(PaymentAccount.class), any())).thenReturn(paymentAccountMock);
+        sut.deleteUserAccountMapsAndPaymentAccounts(entityManagerMock, organisation);
+
+        assertThat(organisation.getPaymentAccounts()).isEmpty();
+        verify(entityManagerMock, times(2)).find(any(), any());
+        verify(entityManagerMock, times(2)).remove(any());
+    }
+
+    @Test
+    public void testDeleteOnlyPaymentAccounts() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
+        when(entityManagerMock.find(ArgumentMatchers.eq(UserAccountMap.class), any())).thenReturn(null);
+        when(entityManagerMock.find(ArgumentMatchers.eq(PaymentAccount.class), any())).thenReturn(paymentAccountMock);
+        sut.deleteUserAccountMapsAndPaymentAccounts(entityManagerMock, organisation);
+
+        assertThat(organisation.getPaymentAccounts()).isEmpty();
+        verify(entityManagerMock, times(2)).find(any(), any());
+        verify(entityManagerMock, times(1)).remove(any(PaymentAccount.class));
+    }
+
 
     @Test
     public void testAddPaymentAccountsToOrganisationTest() {
