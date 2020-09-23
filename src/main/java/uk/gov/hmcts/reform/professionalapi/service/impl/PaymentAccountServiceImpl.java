@@ -119,9 +119,14 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public void removePaymentAccountAndUserAccountMaps(EntityManager em, List<UserAccountMapId> userAccountMaps) {
         userAccountMaps.forEach(userAccountMap -> {
-            em.remove(em.find(UserAccountMap.class, userAccountMap));
-            em.remove(em.find(PaymentAccount.class, userAccountMap.getPaymentAccount().getId()));
+            UserAccountMap accountMap = em.find(UserAccountMap.class, userAccountMap);
+            if (null != accountMap) {
+                em.remove(accountMap);
+            }
+            PaymentAccount paymentAccount = em.find(PaymentAccount.class, userAccountMap.getPaymentAccount().getId());
+            if (null != paymentAccount) {
+                em.remove(paymentAccount);
+            }
         });
-
     }
 }
