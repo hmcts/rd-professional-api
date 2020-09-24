@@ -148,7 +148,8 @@ public class OrganisationInternalController extends SuperController {
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+                    @Authorization(value = "Authorization"),
+                    @Authorization(value = "UserEmail")
             }
     )
     @ApiResponses({
@@ -179,9 +180,12 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail(@NotNull @RequestParam("email") String email) {
+    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail(
+            @RequestParam(value = "email", required = false) String email) {
+
+        String userEmail = getUserEmail(email);
         //Received request to retrieve an organisations payment accounts by email for internal
-        return retrievePaymentAccountByUserEmail(email);
+        return retrievePaymentAccountByUserEmail(userEmail);
     }
 
     @ApiOperation(

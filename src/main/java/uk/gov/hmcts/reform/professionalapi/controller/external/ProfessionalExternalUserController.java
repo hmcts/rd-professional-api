@@ -234,13 +234,9 @@ public class ProfessionalExternalUserController extends SuperController {
             value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+                    @Authorization(value = "Authorization"),
+                    @Authorization(value = "UserEmail")
             }
-    )
-    @ApiParam(
-            name = "email",
-            type = "string",
-            value = "The Email of the desired User who's Status is to be retrieved"
     )
     @ApiResponses({
             @ApiResponse(
@@ -272,9 +268,10 @@ public class ProfessionalExternalUserController extends SuperController {
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager",
             "caseworker-publiclaw-courtadmin"})
     public ResponseEntity<NewUserResponse> findUserStatusByEmail(
-            @ApiParam(name = "email", required = true) @RequestParam(value = "email") String email) {
+            @RequestParam(value = "email", required = false) String email) {
 
-        validateEmail(email);
-        return professionalUserService.findUserStatusByEmailAddress(email.toLowerCase());
+        String userEmail = getUserEmail(email);
+        validateEmail(userEmail);
+        return professionalUserService.findUserStatusByEmailAddress(userEmail.toLowerCase());
     }
 }
