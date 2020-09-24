@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.lang.System.getenv;
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -11,7 +9,6 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListeners;
@@ -32,7 +26,6 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
-import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -41,9 +34,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import javax.sql.DataSource;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
+
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -96,12 +89,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Autowired
     protected TestConfigProperties configProperties;
-
-    @Autowired
-    private DataSource dataSource;
-    @Autowired
-    private DbConfig dbConfig;
-
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
@@ -312,51 +299,4 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 
-    @Override
-    public void afterTestClass(TestContext testContext) {
-        deleteTestCaseData();
-    }
-
-    private void deleteTestCaseData() {
-        Connection connection;
-        String isNightlyBuild = getenv("isNightlyBuild");
-        String testUrl = getenv("TEST_URL");
-        log.info("isNightlyBuild: {}", isNightlyBuild);
-        log.info("testUrl: {}", testUrl);
-        logDbDetails();
-        if ("true".equalsIgnoreCase(isNightlyBuild) && testUrl.contains("aat")) {
-            log.info("Delete test data script execution started");
-            try {
-                connection = dataSource.getConnection();
-                connection.setAutoCommit(false);
-                ScriptUtils.executeSqlScript(connection,
-                        new EncodedResource(new ClassPathResource("delete-functional-test-data.sql")),
-                        false, true,
-                        ScriptUtils.DEFAULT_COMMENT_PREFIX,
-                        ScriptUtils.DEFAULT_STATEMENT_SEPARATOR,
-                        ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
-                        ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
-                log.info("Delete test data script execution completed");
-            } catch (Exception exe) {
-                log.error("Delete test data script execution failed: {}", exe.getMessage());
-            }
-        } else {
-            log.info("Not executing delete test data script");
-        }
-    }
-
-    private void logDbDetails() {
-        if (nonNull(dbConfig)) {
-            log.info("Func DB host: {}", dbConfig.postgresHost);
-            log.info("Func DB port: {}", dbConfig.postgresPort);
-            log.info("Func DB name: {}", dbConfig.postgresDbName);
-            log.info("Func DB user name: {}", dbConfig.postgresUserName);
-            String url = String.format("jdbc:postgresql://%s:%s/%s", dbConfig.postgresHost,
-                    dbConfig.postgresPort, dbConfig.postgresDbName);
-            log.info("Func DB url: {}", url);
-        } else {
-            log.info("No DB info retrieved");
-        }
-
-    }
 }
