@@ -55,11 +55,116 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_dx_num_invalid() {
 
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("this is an invalid dx number")
                                 .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void can_create_an_organisation_with_Dx_Number_less_than_13() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_more_than_13_throws_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX1234567891011")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_more_than_20_throws_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456789")
+                                .dxExchange("dxExchange12345678901").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_empty_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_empty_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456789")
+                                .dxExchange("").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_null_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber(null)
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_null_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber(null)
+                                .dxExchange("").build()))
                         .build()))
                 .build();
         Map<String, Object> response =

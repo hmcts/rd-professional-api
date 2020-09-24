@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,6 +26,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
+import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -38,7 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -101,10 +100,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static final String CREDS = "CREDS";
 
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
-
-    @After
-    public void tearDown() {
-    }
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -192,6 +187,34 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearerToken;
     }
 
+    public RequestSpecification generateBearerTokenForEmailHeader(String role) {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-user-manager");
+        String userEmail = generateRandomEmail();
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(role, firstName, lastName, userEmail);
+
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+
+
+        return bearerToken;
+    }
+
     public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");
@@ -202,6 +225,32 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String firstName = "someName";
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
+                userEmail);
+
+
+        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+
+
+        return bearerToken;
+    }
+
+    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles, String email) {
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+
+        String userEmail = email;
+        String lastName = "someLastName";
+        String firstName = "someName";
+
+        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(puiUserManager, firstName, lastName,
                 userEmail);
 
 

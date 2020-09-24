@@ -4,8 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
@@ -59,6 +62,9 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
+
 
 public class OrganisationExternalControllerTest {
 
@@ -85,8 +91,9 @@ public class OrganisationExternalControllerTest {
     private Response response;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
+    RefDataUtil refDataUtilMock;
 
-
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(3, "PRD_ROLE");
@@ -96,7 +103,6 @@ public class OrganisationExternalControllerTest {
     private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
 
     private List<PrdEnum> prdEnumList;
-    private List<String> jurisdEnumIds;
 
     @Before
     public void setUp() throws Exception {
@@ -128,7 +134,7 @@ public class OrganisationExternalControllerTest {
         prdEnumList.add(anEnum2);
         prdEnumList.add(anEnum3);
 
-
+        refDataUtilMock = mock(RefDataUtil.class);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
@@ -153,7 +159,6 @@ public class OrganisationExternalControllerTest {
     public void test_CreateOrganisation() {
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
                 .thenReturn(organisationResponse);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationExternalController
@@ -186,20 +191,48 @@ public class OrganisationExternalControllerTest {
     @Test
     public void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
 
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email,
                 UUID.randomUUID().toString().substring(0, 7));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
+    }
+
+    @Test
+    public void testRetrievePaymentAccountByUserEmailFromHeader() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_USER_MANAGER);
+        String email = "test@email.com";
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
+        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(" ",
+                UUID.randomUUID().toString().substring(0, 7));
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
+
     }
 
     @Test
@@ -212,7 +245,6 @@ public class OrganisationExternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
