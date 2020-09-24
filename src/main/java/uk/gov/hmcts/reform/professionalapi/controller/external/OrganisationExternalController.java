@@ -128,7 +128,8 @@ public class OrganisationExternalController extends SuperController {
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+                    @Authorization(value = "Authorization"),
+                    @Authorization(value = "UserEmail")
             }
     )
     @ApiResponses({
@@ -160,11 +161,11 @@ public class OrganisationExternalController extends SuperController {
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
-        retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email,
+        retrievePaymentAccountByEmail(@RequestParam(value = "email", required = false) String email,
                                   @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
-
-        return retrievePaymentAccountByUserEmail(email, orgId);
+        String userEmail = getUserEmail(email);
+        return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
     @ApiOperation(
