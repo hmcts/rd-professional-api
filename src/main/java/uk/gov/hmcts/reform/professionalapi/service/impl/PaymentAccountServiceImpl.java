@@ -83,7 +83,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {
         List<PaymentAccount> paymentAccount = organisation.getPaymentAccounts();
-
+        log.info("PaymentAccount:::Size::" + paymentAccount.size());
         /** Please note:
          * Currently only the Super User of an Organisation is linked to the Payment Accounts via the User Account Map.
          * If this changes then the below method will need to change accordingly */
@@ -118,14 +118,23 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public void removePaymentAccountAndUserAccountMaps(EntityManager em, List<UserAccountMapId> userAccountMaps) {
+        log.info("userAccountMapId Size:::" + userAccountMaps.size());
+        log.info("userAccountMapId:::" + userAccountMaps);
         userAccountMaps.forEach(userAccountMap -> {
+            log.info("userAccountMap:::" + userAccountMap.toString());
             UserAccountMap accountMap = em.find(UserAccountMap.class, userAccountMap);
             if (null != accountMap) {
+                log.info("Inside userAccountMap:::Delete");
                 em.remove(accountMap);
+                log.info("After userAccountMap:::Delete");
             }
+            log.info("PaymentAccount:::" + userAccountMap.getPaymentAccount());
+            log.info("PaymentAccount:::Id::" + userAccountMap.getPaymentAccount().getId());
             PaymentAccount paymentAccount = em.find(PaymentAccount.class, userAccountMap.getPaymentAccount().getId());
             if (null != paymentAccount) {
+                log.info("Inside paymentAccount:::Delete");
                 em.remove(paymentAccount);
+                log.info("after paymentAccount:::Delete");
             }
         });
     }
