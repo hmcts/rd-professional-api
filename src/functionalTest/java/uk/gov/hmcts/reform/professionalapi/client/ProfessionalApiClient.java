@@ -54,6 +54,7 @@ public class ProfessionalApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String USER_EMAIL_HEADER = "UserEmail";
     private static final String RANDOM_EMAIL = "RANDOM_EMAIL";
 
     private final String professionalApiUrl;
@@ -360,6 +361,23 @@ public class ProfessionalApiClient {
     }
 
     @SuppressWarnings("unchecked")
+    public Map<String, Object> retrievePaymentAccountsByEmailFromHeader(String email, String role) {
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
+                .body("")
+                .get("/refdata/internal/v1/organisations/pbas?email=" + "rd@prdfunctestuser.com")
+                .andReturn();
+
+        log.info("Retrieve organisation response: " + response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+
+    @SuppressWarnings("unchecked")
     public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email, String role) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -657,6 +675,19 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> findUserStatusByEmailFromHeader(HttpStatus status,
+                                  RequestSpecification requestSpecification, String email) {
+
+        Response response = requestSpecification
+                .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
                                                                             RequestSpecification requestSpecification) {
 
@@ -752,6 +783,12 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 
+    public RequestSpecification getEmailFromAuthHeadersExternal(String role, String firstName, String lastName,
+                                                               String email) {
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
+        return getUserEmailAsHeaderWithExisting(bearerTokenForSuperUser, email);
+    }
+
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
         return SerenityRest.with()
             .relaxedHTTPSValidation()
@@ -760,6 +797,17 @@ public class ProfessionalApiClient {
             .header("Accepts", APPLICATION_JSON_VALUE)
             .header(SERVICE_HEADER, "Bearer " + s2sToken)
             .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
+    public RequestSpecification getUserEmailAsHeaderWithExisting(String userToken, String email) {
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(professionalApiUrl)
+                .header("Content-Type", APPLICATION_JSON_VALUE)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken)
+                .header(USER_EMAIL_HEADER, email);
     }
 
     public RequestSpecification getMultipleAuthHeadersWithEmptyBearerToken(String userToken) {
