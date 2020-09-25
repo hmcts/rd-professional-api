@@ -27,3 +27,14 @@ resendInterval: 60
 # toggle for resendInvite
 resendInviteEnabled : true
 
+#######
+postgres.host_name: ${FUNC_DATABASE_HOST}
+postgres.name: ${FUNC_DATABASE_NAME}
+postgres.user: ${FUNC_DATABASE_USER}
+postgres.password: ${FUNC_DATABASE_PASS}
+postgres.port: ${FUNC_DATABASE_PORT}
+#######
+
+
+
+

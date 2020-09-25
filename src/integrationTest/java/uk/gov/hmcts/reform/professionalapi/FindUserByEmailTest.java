@@ -71,6 +71,20 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
+    public void return_user_by_email_regardless_of_case() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.findUserByEmail("SOMEONE@SOMEWHERE.COM", hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+    }
+
+    @Test
     public void find_user_status_by_user_email_address_for_organisation_status_as_active() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();

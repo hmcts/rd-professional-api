@@ -81,6 +81,7 @@ public class RefDataUtilTest {
     private UserProfile profile;
     private GetUserProfileResponse getUserProfileResponse;
     private UserProfileFeignClient userProfileFeignClient;
+    private JsonFeignResponseUtil jsonFeignResponseUtil;
 
     @Before
     public void setUp() {
@@ -100,6 +101,7 @@ public class RefDataUtilTest {
         getUserProfileResponse.setIdamMessage("BAD REQUEST");
         paymentAccount.setId(UUID.randomUUID());
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        jsonFeignResponseUtil = mock(JsonFeignResponseUtil.class);
     }
 
     @Test

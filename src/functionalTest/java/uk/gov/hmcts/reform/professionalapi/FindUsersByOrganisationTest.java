@@ -93,24 +93,10 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void find_users_by_active_organisation_with_showDeleted_False() {
-        validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,
-                        "False", HttpStatus.OK, ""), "any",true);
-    }
-
-    @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
         validateRetrievedUsers(professionalApiClient
                 .searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,
                         "True", HttpStatus.OK,""), "any",true);
-    }
-
-    @Test
-    public void find_users_by_active_organisation_with_showDeleted_invalid() {
-        validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), hmctsAdmin,
-                        "invalid", HttpStatus.OK,""), "any",true);
     }
 
     @Test
@@ -138,12 +124,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation();
         String organisationIdentifier = (String) response.get("organisationIdentifier");
         professionalApiClient.searchUsersByOrganisation(organisationIdentifier, hmctsAdmin,"False",
-                HttpStatus.NOT_FOUND,"");
-    }
-
-    @Test
-    public void find_users_for_non_existing_organisation() {
-        professionalApiClient.searchUsersByOrganisation("Q1VHDF3", hmctsAdmin,"False",
                 HttpStatus.NOT_FOUND,"");
     }
 

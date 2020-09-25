@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
@@ -117,15 +116,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         professionalApiClient.deleteOrganisation(orgIdentifierResp, hmctsAdmin, HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = false)
-    public void should_retrieve_403_when_API_toggled_off() {
-        String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisationErrorResponse(
-            orgIdentifierResp, hmctsAdmin, HttpStatus.FORBIDDEN, getFeatureFlagName()
-        );
     }
 
     @Test

@@ -108,13 +108,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
     }
 
-    @Test
-    public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
-
-        professionalApiClient
-                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
-    }
-
     public void validateSingleOrgResponse(Map<String, Object> response, String status) {
 
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
@@ -130,5 +123,4 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.get("contactInformation")).isNotNull();
 
     }
-
 }
