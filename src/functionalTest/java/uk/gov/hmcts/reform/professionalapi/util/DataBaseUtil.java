@@ -47,8 +47,7 @@ public class DataBaseUtil {
         String testUrl = getenv("TEST_URL");
         logDataBaseDetails(isNightlyBuild, testUrl);
 
-        //if (Boolean.TRUE.toString().equalsIgnoreCase(isNightlyBuild) && testUrl.contains("aat")) {
-        if (true) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(isNightlyBuild)) {
             log.info("Delete test data script execution started");
             try {
                 Connection connection = getDataSource().getConnection();
