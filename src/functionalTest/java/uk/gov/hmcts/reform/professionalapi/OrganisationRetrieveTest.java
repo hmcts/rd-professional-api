@@ -10,6 +10,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
+@Ignore
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluatio
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
+@Ignore
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
     private boolean activeOrgsExternalEnabled;
