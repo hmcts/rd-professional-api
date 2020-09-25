@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,7 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
-@Ignore
 public class EndpointSecurityTest extends AuthorizationFunctionalTest {
 
 

@@ -20,7 +20,6 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -33,7 +32,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
-@Ignore
 public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     private RequestSpecification bearerTokenForUser;
