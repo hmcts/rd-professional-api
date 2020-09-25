@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInfo
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 
 import java.util.Arrays;
@@ -16,19 +15,14 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @Slf4j
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateOrganisationWithContactInformationDxAddress extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -61,11 +55,116 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
     @Test
     public void returns_bad_request_when_dx_num_invalid() {
 
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .dxAddress(Arrays.asList(dxAddressCreationRequest()
                                 .dxNumber("this is an invalid dx number")
                                 .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void can_create_an_organisation_with_Dx_Number_less_than_13() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_more_than_13_throws_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX1234567891011")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_more_than_20_throws_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456789")
+                                .dxExchange("dxExchange12345678901").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_empty_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("")
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_empty_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber("DX123456789")
+                                .dxExchange("").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Number_null_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber(null)
+                                .dxExchange("dxExchange").build()))
+                        .build()))
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void create_an_organisation_with_Dx_Exchange_null_returns_400() {
+
+        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields()
+                .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
+                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
+                                .dxNumber(null)
+                                .dxExchange("").build()))
                         .build()))
                 .build();
         Map<String, Object> response =
@@ -102,7 +201,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -120,7 +218,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone1@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine2")
                         .build()))
@@ -144,7 +241,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -195,7 +291,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName(null)
                         .lastName("some-lname")
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -223,7 +318,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName(null)
                         .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -250,7 +344,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName("some-lname")
                         .email(null)
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1("addressLine1")
                         .build()))
@@ -277,7 +370,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName("firstname")
                         .lastName("some-lname")
                         .email("some@email.com")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .build()))
@@ -304,7 +396,6 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
                         .firstName(" some-fname ")
                         .lastName(" some-lname ")
                         .email(" someone@somewhere.com ")
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest().addressLine1(" addressLine1 ")
                         .addressLine2(" ad  2 ").addressLine3(" ad3 ")

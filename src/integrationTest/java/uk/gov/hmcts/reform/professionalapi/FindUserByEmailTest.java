@@ -7,18 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
     @Before
@@ -71,6 +68,20 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.findUserByEmail("someone@somewhere.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
+    }
+
+    @Test
+    public void return_user_by_email_regardless_of_case() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.findUserByEmail("SOMEONE@SOMEWHERE.COM", hmctsAdmin);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
     }
 
     @Test

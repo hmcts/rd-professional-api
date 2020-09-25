@@ -8,12 +8,19 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "rd"
 def component = "professional-api"
-
+/* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-  's2s-${env}': [
-    secret('microservicekey-rd-professional-api', 'S2S_SECRET')
-  ]
+        's2s-${env}': [
+                secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+        ],
+        'rd-${env}': [
+                secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+                secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
+                secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+                secret('LD-SDK-KEY', 'LD_SDK_KEY')
+        ]
 ]
+
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     [$class     : 'AzureKeyVaultSecret',
@@ -40,6 +47,14 @@ withPipeline(type, product, component) {
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+
+    before('functionalTest:preview') {
+        env.execution_environment = "preview"
+    }
+
+    before('functionalTest:aat') {
+        env.execution_environment = "aat"
+    }
 
     after('integrationTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

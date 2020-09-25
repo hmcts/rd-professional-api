@@ -3,17 +3,14 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -27,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+
 public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -216,7 +213,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest,
@@ -229,7 +225,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("lname")
                 .email("")
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest,
@@ -261,7 +256,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("someLastName")
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest,
@@ -274,7 +268,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName(null)
                 .email("somenewuser@email.com")
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse1 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest,
@@ -287,7 +280,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                 .lastName("lname")
                 .email(null)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
         Map<String, Object> newUserResponse2 =
                 professionalReferenceDataClient.addUserToOrganisation(orgIdentifierResponse, userCreationRequest,
@@ -365,7 +357,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         //create and update any other organisation #2
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().status("ACTIVE")
                 .superUser(UserCreationRequest.aUserCreationRequest().firstName("fname").lastName("lname")
-                        .jurisdictions(createJurisdictions()).email("someone1@gmail.com").build()).build();
+                        .email("someone1@gmail.com").build()).build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         String orgIdentifierResponse = (String) response.get("organisationIdentifier");

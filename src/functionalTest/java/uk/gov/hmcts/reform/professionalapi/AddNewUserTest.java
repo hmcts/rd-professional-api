@@ -1,22 +1,19 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
@@ -49,12 +47,12 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_400() {
+    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        newUserCreationRequest.setJurisdictions(new ArrayList<>());
+
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.BAD_REQUEST);
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 
@@ -96,9 +94,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(RandomStringUtils.randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         Map<String, Object> newUserResponse = professionalApiClient
@@ -113,12 +110,11 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
         String lastName = "some-lname";
-        String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         //create Super User in IDAM
@@ -154,9 +150,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
-                .email(RandomStringUtils.randomAlphabetic(10) + "@hotmail.com".toLowerCase())
+                .email(generateRandomEmail())
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         //adding new user with Suspended Super User Bearer Token
@@ -174,14 +169,13 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         userRoles.add(puiUserManager);
         String firstName = "someName";
         String lastName = "someLastName";
-        String email = randomAlphabetic(10) + "@somewhere.com".toLowerCase();
+        String email = generateRandomEmail().toLowerCase();
 
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
                 .roles(userRoles)
-                .jurisdictions(createJurisdictions())
                 .build();
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);

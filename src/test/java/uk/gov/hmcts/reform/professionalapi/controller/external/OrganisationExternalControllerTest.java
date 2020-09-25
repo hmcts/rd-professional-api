@@ -4,9 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +34,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
@@ -48,7 +50,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -60,8 +61,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
+import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
+
+
 
 public class OrganisationExternalControllerTest {
 
@@ -74,7 +77,6 @@ public class OrganisationExternalControllerTest {
     private ProfessionalUserService professionalUserServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
     private PrdEnumServiceImpl prdEnumServiceMock;
-    private JurisdictionServiceImpl jurisdictionService;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PrdEnumRepository prdEnumRepository;
@@ -89,8 +91,9 @@ public class OrganisationExternalControllerTest {
     private Response response;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
+    RefDataUtil refDataUtilMock;
 
-
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
     private final PrdEnumId prdEnumId3 = new PrdEnumId(3, "PRD_ROLE");
@@ -100,8 +103,6 @@ public class OrganisationExternalControllerTest {
     private final PrdEnum anEnum3 = new PrdEnum(prdEnumId3, "pui-case-manager", "PRD_ROLE");
 
     private List<PrdEnum> prdEnumList;
-    private List<String> jurisdEnumIds;
-    private List<Jurisdiction> jurisdictions;
 
     @Before
     public void setUp() throws Exception {
@@ -111,7 +112,6 @@ public class OrganisationExternalControllerTest {
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
-        jurisdictionService = mock(JurisdictionServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
@@ -134,25 +134,15 @@ public class OrganisationExternalControllerTest {
         prdEnumList.add(anEnum2);
         prdEnumList.add(anEnum3);
 
-        jurisdEnumIds = new ArrayList<>();
-        jurisdEnumIds.add("Probate");
-        jurisdEnumIds.add("Bulk Scanning");
-        jurisdictions = new ArrayList<>();
-
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("Probate");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("Bulk Scanning");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
+        refDataUtilMock = mock(RefDataUtil.class);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
 
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, jurisdictions,false);
+                "some@email.com", userRoles,false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                "some@email.com", jurisdictions);
+                "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
@@ -169,7 +159,6 @@ public class OrganisationExternalControllerTest {
     public void test_CreateOrganisation() {
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
                 .thenReturn(organisationResponse);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationExternalController
@@ -202,20 +191,48 @@ public class OrganisationExternalControllerTest {
     @Test
     public void test_RetrievePaymentAccountByUserEmail() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
 
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_USER_MANAGER);
         String email = "test@email.com";
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-
         ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email,
                 UUID.randomUUID().toString().substring(0, 7));
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
+    }
+
+    @Test
+    public void testRetrievePaymentAccountByUserEmailFromHeader() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        List<String> authorities = new ArrayList<>();
+        authorities.add(TestConstants.PUI_USER_MANAGER);
+        String email = "test@email.com";
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
+        when(userInfoMock.getRoles()).thenReturn(authorities);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
+        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(" ",
+                UUID.randomUUID().toString().substring(0, 7));
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+        verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(jwtGrantedAuthoritiesConverterMock, times(1)).getUserInfo();
+        verify(userInfoMock, times(1)).getRoles();
+
     }
 
     @Test
@@ -228,7 +245,6 @@ public class OrganisationExternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -242,8 +258,6 @@ public class OrganisationExternalControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = organisationExternalController
                 .addUserToOrganisationUsingExternalController(newUserCreationRequest, orgId, userId);

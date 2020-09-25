@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Collections.singleton;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 
 import java.util.UUID;
 
@@ -34,20 +32,6 @@ public class ProfessionalUserReqValidatorTest {
     public void test_ValidateRequestNoneNull() {
         profUserReqValidator
                 .validateRequest("ordId", "true", "");
-    }
-
-    @Test
-    public void test_isValidEmailReturnsTrueForValidEmail() {
-        String email = "email@test.com";
-        Boolean result = profUserReqValidator.isValidEmail(email);
-        assertTrue(result);
-    }
-
-    @Test
-    public void test_isValidEmailReturnsFalseForInvalidEmail() {
-        String email = "this-is-not-an-email";
-        Boolean result = profUserReqValidator.isValidEmail(email);
-        assertFalse(result);
     }
 
     @Test(expected = Test.None.class)

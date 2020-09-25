@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -18,7 +16,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+
 public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -46,7 +44,15 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
                 null, hmctsAdmin);
         validateUsers(response, 3, true);
+    }
 
+    @Test
+    public void can_retrieve_users_with_showDeleted_invalid_should_return_status_200() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(organisationIdentifier,
+                "INVALID", hmctsAdmin);
+        validateUsers(response, 3, true);
     }
 
     @Test
@@ -133,6 +139,14 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus(
                 "false", "", puiUserManager, id);
         validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void retrieve_all_users_for_an_organisation_with_pui_user_manager_role_with_invalid_status_return_400() {
+        String id = settingUpOrganisation("pui-user-manager");
+        Map<String, Object> response = professionalReferenceDataClient.findAllUsersForOrganisationByStatus(
+                "false", "INVALID", puiUserManager, id);
+        assertThat(response.get("http_status")).isEqualTo("400");
     }
 
     @Test

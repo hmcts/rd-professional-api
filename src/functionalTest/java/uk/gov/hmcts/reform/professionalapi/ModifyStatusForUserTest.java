@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -16,8 +18,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
-
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
@@ -31,8 +33,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
 
@@ -73,8 +76,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        String email = idamOpenIdClient.createUser("pui-organisation-manager");
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
 
         assertThat(newUserCreationRequest).isNotNull();
 

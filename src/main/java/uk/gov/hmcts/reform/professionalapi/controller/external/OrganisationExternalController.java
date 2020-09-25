@@ -14,7 +14,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -40,7 +39,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -49,8 +47,6 @@ import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 @Slf4j
 public class OrganisationExternalController extends SuperController {
 
-    @Autowired
-    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @ApiOperation(
             value = "Creates an Organisation",
@@ -132,7 +128,8 @@ public class OrganisationExternalController extends SuperController {
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+                    @Authorization(value = "Authorization"),
+                    @Authorization(value = "UserEmail")
             }
     )
     @ApiResponses({
@@ -164,11 +161,11 @@ public class OrganisationExternalController extends SuperController {
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
-        retrievePaymentAccountByEmail(@NotNull @RequestParam("email") String email,
+        retrievePaymentAccountByEmail(@RequestParam(value = "email", required = false) String email,
                                   @ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
-
-        return retrievePaymentAccountByUserEmail(email, orgId);
+        String userEmail = getUserEmail(email);
+        return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
     @ApiOperation(
@@ -232,7 +229,7 @@ public class OrganisationExternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves all Organisations of requested status for user"
+            value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.internal;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -43,7 +46,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Jurisdiction;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -54,8 +56,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
+
+
+
 
 public class OrganisationInternalControllerTest {
     private OrganisationResponse organisationResponse;
@@ -63,7 +67,6 @@ public class OrganisationInternalControllerTest {
     private OrganisationEntityResponse organisationEntityResponse;
     private OrganisationService organisationServiceMock;
     private PaymentAccountService paymentAccountServiceMock;
-    private JurisdictionServiceImpl jurisdictionService;
     private Organisation organisation;
     private OrganisationCreationRequest organisationCreationRequest;
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
@@ -81,14 +84,12 @@ public class OrganisationInternalControllerTest {
     private UserCreationRequest userCreationRequest;
     private PrdEnumServiceImpl prdEnumServiceMock;
     private List<PrdEnum> prdEnumList;
-    private List<String> jurisdEnumIds;
-    private List<Jurisdiction> jurisdictions;
 
     private ProfessionalUser professionalUser;
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private DeleteOrganisationResponse deleteOrganisationResponse;
-
+    HttpServletRequest httpRequest = mock(HttpServletRequest.class);
     @InjectMocks
     private OrganisationInternalController organisationInternalController;
 
@@ -107,31 +108,18 @@ public class OrganisationInternalControllerTest {
         organisationServiceMock = mock(OrganisationService.class);
         professionalUserServiceMock = mock(ProfessionalUserService.class);
         paymentAccountServiceMock = mock(PaymentAccountService.class);
-        jurisdictionService = mock(JurisdictionServiceImpl.class);
         organisationCreationRequestValidatorMock = mock(OrganisationCreationRequestValidator.class);
         paymentAccountValidatorMock = mock(PaymentAccountValidator.class);
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
         prdEnumList.add(anEnum3);
 
-        jurisdEnumIds = new ArrayList<>();
-        jurisdEnumIds.add("Probate");
-        jurisdEnumIds.add("Bulk Scanning");
-        jurisdictions = new ArrayList<>();
-        Jurisdiction jurisdiction1 = new Jurisdiction();
-        jurisdiction1.setId("Probate");
-        Jurisdiction jurisdiction2 = new Jurisdiction();
-        jurisdiction2.setId("Bulk Scanning");
-        jurisdictions.add(jurisdiction1);
-        jurisdictions.add(jurisdiction2);
-
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
-                "some@email.com", jurisdictions);
+                "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
@@ -146,7 +134,7 @@ public class OrganisationInternalControllerTest {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         newUserCreationRequest = new NewUserCreationRequest("some-name", "some-last-name",
-                "some@email.com", userRoles, jurisdictions, false);
+                "some@email.com", userRoles, false);
 
         MockitoAnnotations.openMocks(this);
     }
@@ -157,7 +145,6 @@ public class OrganisationInternalControllerTest {
 
         when(organisationServiceMock.createOrganisationFrom(organisationCreationRequest))
                 .thenReturn(organisationResponse);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumRepository.findAll()).thenReturn(prdEnumList);
 
         ResponseEntity<?> actual = organisationInternalController.createOrganisation(organisationCreationRequest);
@@ -244,14 +231,13 @@ public class OrganisationInternalControllerTest {
 
     @Test
     public void test_RetrievePaymentAccountByEmail() {
-        String email = "some-email@test.com";
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         final List<PaymentAccount> paymentAccounts = new ArrayList<>();
         paymentAccounts.add(new PaymentAccount());
         organisation.setPaymentAccounts(paymentAccounts);
-
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        String email = "some-email@test.com";
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-
         ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
 
         assertThat(actual).isNotNull();
@@ -260,14 +246,42 @@ public class OrganisationInternalControllerTest {
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
     }
 
+    @Test
+    public void test_RetrievePaymentAccountByEmailFromHeader() {
+
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(new PaymentAccount());
+        organisation.setPaymentAccounts(paymentAccounts);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        String email = "some-email@test.com";
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
+
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
+        verify(httpRequest, times(2)).getHeader(anyString());
+    }
+
     @Test(expected = EmptyResultDataAccessException.class)
     public void test_RetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
-        organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email@test.com");
+        String email = "test@email.com";
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_RetrievePaymentAccountByEmailThrows400WhenEmailIsInvalid() {
-        organisationInternalController.retrievePaymentAccountBySuperUserEmail("some-email");
+        String email = "some-email";
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(email);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
     }
 
     @Test
@@ -288,13 +302,8 @@ public class OrganisationInternalControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(paymentAccountServiceMock, times(1)).deleteUserAccountMaps(organisation);
         verify(paymentAccountServiceMock, times(1))
-                .deletePaymentAccountsFromOrganisation(organisation);
-        verify(paymentAccountServiceMock, times(1))
-                .addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        verify(paymentAccountServiceMock, times(1))
-                .addUserAndPaymentAccountsToUserAccountMap(organisation);
+                .editPaymentAccountsByOrganisation(organisation, pbaEditRequest);
     }
 
     @Test
@@ -307,7 +316,6 @@ public class OrganisationInternalControllerTest {
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
-        when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -321,8 +329,6 @@ public class OrganisationInternalControllerTest {
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
-        doNothing().when(jurisdictionService).propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest
-                .getJurisdictions(), userId, newUserCreationRequest.getEmail());
 
         ResponseEntity<?> actual = organisationInternalController.addUserToOrganisation(newUserCreationRequest,
                 orgId, userId);

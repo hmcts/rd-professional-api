@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -85,15 +86,14 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured({"prd-admin", "prd-aac-system"})
-    public ResponseEntity findUsersByOrganisation(@Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message
-            = ORG_ID_VALIDATION_ERROR_MESSAGE) @PathVariable("orgId") @NotBlank String organisationIdentifier,
-                                                      @RequestParam(value = "showDeleted", required = false)
-                                                              String showDeleted,
-                                                      @ApiParam(name = "returnRoles") @RequestParam(value
-                                                              = "returnRoles", required = false, defaultValue = "true")
-                                                              Boolean returnRoles,
-                                                      @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size
+    public ResponseEntity<Object> findUsersByOrganisation(
+            @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+            @PathVariable("orgId") @NotBlank String organisationIdentifier,
+            @RequestParam(value = "showDeleted", required = false) String showDeleted,
+            @ApiParam(name = "returnRoles")
+            @RequestParam(value = "returnRoles", required = false, defaultValue = "true") Boolean returnRoles,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size
     ) {
         String status = EMPTY;
         if (isSystemRoleUser(jwtGrantedAuthoritiesConverter.getUserInfo().getRoles())) {
@@ -138,7 +138,7 @@ public class ProfessionalUserInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity findUserByEmail(@RequestParam(value = "email") String email) {
+    public ResponseEntity<Object> findUserByEmail(@RequestParam(value = "email") String email) {
 
         return retrieveUserByEmail(email);
     }

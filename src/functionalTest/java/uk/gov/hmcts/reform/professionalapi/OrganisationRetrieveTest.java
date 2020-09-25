@@ -7,14 +7,17 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
+import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
+@WithTags({@WithTag("testType:Functional")})
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
@@ -103,13 +106,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
                 .retrieveOrganisationDetailsByStatus(OrganisationStatus.ACTIVE.name(), hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
-    }
-
-    @Test
-    public void can_retrieve_400_error_code_by_request_param_status_value_other_than_required_values() {
-
-        professionalApiClient
-                .retrieveOrganisationDetailsByUnknownStatus("ACTIV", hmctsAdmin);
     }
 
     public void validateSingleOrgResponse(Map<String, Object> response, String status) {
