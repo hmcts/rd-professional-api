@@ -85,7 +85,6 @@ idam:
     totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
-    pbaFromUserAccountMap: false
   s2s-authorised:
     services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac,aac_manage_case_assignment}
   api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
@@ -107,7 +106,6 @@ jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 allowedStatus: ACTIVE
 
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
-ccdUrl: ${CCD_URL:http://ccd-user-profile-api-aat.service.core-compute-aat.internal}
 
 feign:
   allow:
@@ -126,3 +124,9 @@ deleteOrganisationEnabled : ${DELETE_ORG:false}
 activeOrgsExternalEnabled : ${ACTIVE_ORG_EXT:false}
 
 loggingComponentName: RD_Professional_API
+
+launchdarkly:
+  sdk:
+    key: ${LD_SDK_KEY:}
+    environment: ${LAUNCH_DARKLY_ENV:local}
+    user: rd

@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
@@ -51,7 +49,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createReInviteUserRequest(RANDOM_EMAIL);
-            newUserCreationRequest.setJurisdictions(new ArrayList<>());
             Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.NOT_FOUND);
@@ -66,15 +63,17 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active user in UP
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            String email = idamOpenIdClient.createUser("pui-user-manager");
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                    .createNewUserRequest(pumUserCreds.get(EMAIL));
             Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.CREATED);
             assertThat(newUserResponse).isNotNull();
 
             //re inviting active user should return 400
-            NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient.createReInviteUserRequest(email);
+            NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
+                    .createReInviteUserRequest(pumUserCreds.get(EMAIL));
             Map<String, Object> reinviteUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, reInviteUserCreationRequest,
                             HttpStatus.BAD_REQUEST);
@@ -113,19 +112,21 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                    .createNewUserRequest(pumUserCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
 
             // create active caseworker sidam user and invite
-            String email = idamOpenIdClient.createUser("caseworker");
-            newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
+            Map<String,String> caseWorkerCreds = idamOpenIdClient.createUser("caseworker");
+            newUserCreationRequest = professionalApiClient.createNewUserRequest(caseWorkerCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
 
             // get PUM bearer token and reinvite
-            String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
+            String pumBearerToken = idamOpenIdClient
+                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
             newUserCreationRequest.setResendInvite(true);
             Map<String, Object> reinviteUserResponse = professionalApiClient
                     .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
@@ -141,20 +142,22 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                    .createNewUserRequest(pumUserCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
 
 
             // create active caseworker sidam user and invite
-            String email = randomAlphabetic(10) + "@hotmail.com".toLowerCase();
+            String email = generateRandomEmail();
             newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
 
             // get PUM bearer token and reinvite
-            String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
+            String pumBearerToken = idamOpenIdClient
+                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
             newUserCreationRequest.setResendInvite(true);
             Map<String, Object> reinviteUserResponse = professionalApiClient
                     .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
@@ -202,7 +205,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createReInviteUserRequest(organisationCreationRequest1.getSuperUser().getEmail());
-            newUserCreationRequest.setJurisdictions(new ArrayList<>());
             Map<String, Object> newUserResponse = professionalApiClient
                     .addNewUserToAnOrganisation(organisationIdentifier, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.FORBIDDEN);
@@ -218,15 +220,17 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             if (resendInviteEnabled) {
                 // create active PUM sidam user and invite
                 IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-                String pumEmail = idamOpenIdClient.createUser("pui-user-manager");
-                NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(pumEmail);
+                Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+                NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                        .createNewUserRequest(pumUserCreds.get(EMAIL));
                 professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,
                         newUserCreationRequest, HttpStatus.CREATED);
 
                 // get PUM bearer token and reinvite with any other user present in another org
                 organisationCreationRequest = someMinimalOrganisationRequest().build();
                 orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
-                String pumBearerToken = idamOpenIdClient.getOpenIdToken(pumEmail);
+                String pumBearerToken = idamOpenIdClient
+                        .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
                 newUserCreationRequest.setResendInvite(true);
                 newUserCreationRequest.setEmail(organisationCreationRequest.getSuperUser().getEmail());
                 Map<String, Object> reinviteUserResponse = professionalApiClient

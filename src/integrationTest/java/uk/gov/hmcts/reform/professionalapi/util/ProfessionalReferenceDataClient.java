@@ -20,6 +20,7 @@ import org.springframework.http.HttpMethod;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -67,8 +68,15 @@ public class ProfessionalReferenceDataClient {
         return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role, email);
     }
 
-    public Map<String, Object> findPaymentAccountsByEmailForExternalUsers(String email, String role) {
-        return getRequest("/refdata/external/v1/organisations" + "/pbas?email={email}", role, email);
+    public Map<String, Object> findPaymentAccountsByEmailFromHeader(String email, String role) {
+        return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas?email={email}",
+                role, "", email);
+    }
+
+    public Map<String, Object> findPaymentAccountsByEmailFromHeaderForExternalUsers(String email, String role,
+                                                                                    String userId) {
+        return getRequestToGetEmailFromHeader("/refdata/external/v1/organisations" + "/pbas?email={email}",
+                role, userId, email);
     }
 
     public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
@@ -187,7 +195,38 @@ public class ProfessionalReferenceDataClient {
         ResponseEntity<Map> responseEntity;
 
         try {
+
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestToGetEmailFromHeader(String uriPath, String role,String userId,
+                                                               Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+        HttpHeaders httpHeaders = null;
+        try {
+            if (StringUtils.isEmpty(userId)) {
+                httpHeaders = getMultipleAuthHeaders(role);
+            } else {
+                httpHeaders = getMultipleAuthHeaders(role, userId);
+            }
+            httpHeaders.add("User-Email", params[0].toString());
+            HttpEntity<?> request = new HttpEntity<>(httpHeaders);
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
@@ -436,6 +475,4 @@ public class ProfessionalReferenceDataClient {
         deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return deleteOrganisationResponse;
     }
-
-
 }

@@ -35,7 +35,8 @@ public class SwaggerConfiguration {
         return
             newArrayList(
                 new ApiKey("Authorization", "Authorization","header"),
-                new ApiKey("ServiceAuthorization", "ServiceAuthorization", "header")
+                new ApiKey("ServiceAuthorization", "ServiceAuthorization", "header"),
+                new ApiKey("UserEmail", "UserEmail", "header")
             );
     }
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest.dxAddressCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
@@ -30,85 +29,6 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
-
-    @Test
-    public void ac1_can_create_an_organisation_with_valid_Dx_Number_and_valid_Dx_Exchange() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10)
-                + "&" + randomAlphabetic(9));
-        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-    }
-
-
-    @Test
-    public void ac2_5_can_create_an_organisation_with_Dx_Number_less_than_13() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity(randomAlphabetic(6), randomAlphabetic(10)
-                + "&" + randomAlphabetic(9));
-        Map<String, Object> response = professionalApiClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-    }
-
-    @Test
-    public void ac2_create_an_organisation_with_Dx_Number_longer_than_13_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity(randomAlphabetic(14), randomAlphabetic(10)
-                + "&" + randomAlphabetic(9));
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
-
-    @Test
-    public void ac3_create_an_organisation_with_Dx_Exchange_longer_than_20_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity(randomAlphabetic(13), randomAlphabetic(10)
-                + "&" + randomAlphabetic(10));
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
-    @Test
-    public void ac4_create_an_organisation_with_Dx_Number_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity("", randomAlphabetic(10) + "&"
-                + randomAlphabetic(9));
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
-    @Test
-    public void ac5_create_an_organisation_with_Dx_Exchange_empty_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest
-                = createOrganisationWithDxEntity(randomAlphabetic(13), "");
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
-    @Test
-    public void ac6_create_an_organisation_with_Dx_Number_not_provided_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxExchange(randomAlphabetic(20)).build()))
-                        .build()))
-                .build();
-
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
     @Test
     public void ac7_can_throw_Unauthorized_Error_code_without_service_token_create_an_organisation_401() {
         OrganisationCreationRequest organisationCreationRequest
@@ -119,36 +39,13 @@ public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
         assertThat(orgIdentifierResponse).isNotEmpty();
     }
 
-    @Test
-    public void ac7_create_an_organisation_with_Dx_Exchange_not_provided_throws_400() {
-        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
-                .name("some-org-name")
-                .superUser(aUserCreationRequest()
-                        .firstName("some-fname")
-                        .lastName("some-lname")
-                        .email("someone@somewhere.com")
-                        .jurisdictions(createJurisdictions())
-                        .build())
-                .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1")
-                        .dxAddress(Arrays.asList(dxAddressCreationRequest()
-                                .dxNumber(randomAlphabetic(13))
-                                .build()))
-                        .build()))
-                .build();
-
-        professionalApiClient
-                .receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(organisationCreationRequest);
-    }
-
     private OrganisationCreationRequest createOrganisationWithDxEntity(String dxNumber, String dxExchange) {
         return anOrganisationCreationRequest()
                 .name("some-org-name")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
-                        .email(randomAlphabetic(10) + "@somewhere.com")
-                        .jurisdictions(createJurisdictions())
+                        .email(generateRandomEmail())
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
                         .addressLine1("addressLine1")

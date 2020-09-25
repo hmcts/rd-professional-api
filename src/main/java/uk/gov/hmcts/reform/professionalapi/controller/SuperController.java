@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -35,6 +37,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -67,8 +71,9 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.impl.JurisdictionServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Slf4j
@@ -95,8 +100,6 @@ public abstract class SuperController {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
-    private JurisdictionServiceImpl jurisdictionService;
-    @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
 
     @Value("${prd.security.roles.hmcts-admin:}")
@@ -116,9 +119,6 @@ public abstract class SuperController {
 
     @Value("${prdEnumRoleType}")
     protected String prdEnumRoleType;
-
-    @Value("${jurisdictionIdType}")
-    private String jurisdictionIds;
 
     @Value("${resendInviteEnabled}")
     private boolean resendInviteEnabled;
@@ -213,7 +213,7 @@ public abstract class SuperController {
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(removeEmptySpaces(email)
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email
                 .toLowerCase());
         if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
 
@@ -247,12 +247,11 @@ public abstract class SuperController {
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 
-            jurisdictionService.propagateJurisdictionIdsForSuperUserToCcd(professionalUser, userId);
             ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, null, true,
                     false);
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
                 UserProfileCreationResponse userProfileCreationResponse
-                        = (UserProfileCreationResponse) responseEntity.getBody();
+                        = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
                 //Idam registration success
                 professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
                 superUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
@@ -327,13 +326,11 @@ public abstract class SuperController {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
-        jurisdictionService.propagateJurisdictionIdsForNewUserToCcd(newUserCreationRequest.getJurisdictions(), userId,
-                newUserCreationRequest.getEmail());
         ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
             UserProfileCreationResponse userProfileCreationResponse
-                    = (UserProfileCreationResponse) responseEntity.getBody();
+                    = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
             //Idam registration success
             professionalUser.setUserIdentifier(userProfileCreationResponse.getIdamId());
             responseBody = professionalUserService.addNewUserToAnOrganisation(professionalUser, roles,
@@ -437,5 +434,17 @@ public abstract class SuperController {
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
         organisationCreationRequestValidator.isOrganisationActive(existingOrganisation);
         return existingOrganisation;
+    }
+
+    public  String getUserEmail(String email) {
+        String userEmail = null;
+        ServletRequestAttributes servletRequestAttributes =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+
+        if (nonNull(servletRequestAttributes)) {
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            userEmail = request.getHeader("UserEmail") != null ? request.getHeader("UserEmail") : email;
+        }
+        return userEmail;
     }
 }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -18,7 +17,7 @@ public class UserCreationRequestTest {
     @Test
     public void test_hasMandatoryFieldsSpecifiedNotNull() {
         UserCreationRequest userCreationRequest = new UserCreationRequest(null, null,
-                "some@email.com", createJurisdictions());
+                "some@email.com");
 
         Set<ConstraintViolation<UserCreationRequest>> violations = validator.validate(userCreationRequest);
         

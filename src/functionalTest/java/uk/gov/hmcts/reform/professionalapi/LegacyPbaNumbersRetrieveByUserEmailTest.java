@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.createJurisdictions;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.HashSet;
@@ -25,7 +24,7 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
     @Test
     public void can_retrieve_payment_numbers_by_user_email() {
 
-        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+        String email = generateRandomEmail();
 
         Set<String> paymentAccounts = new HashSet<>();
 
@@ -40,7 +39,6 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
                            .firstName("some-fname")
                            .lastName("some-lname")
                            .email(email)
-                           .jurisdictions(createJurisdictions())
                            .build())
                 .build());
 
@@ -53,14 +51,13 @@ public class LegacyPbaNumbersRetrieveByUserEmailTest extends AuthorizationFuncti
     @Test
     public void can_retrieve_no_payment_numbers_if_no_payment_account_associated_with_user_email() {
 
-        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+        String email = generateRandomEmail();
 
         OrganisationCreationRequest request =  someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(email)
-                        .jurisdictions(createJurisdictions())
                         .build())
                 .build();
         professionalApiClient.createOrganisation(request);
