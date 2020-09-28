@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -112,75 +111,6 @@ public class ProfessionalUserServiceImplTest {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
     }
-
-    @Test
-    public void test_retrieveUserByEmail() throws JsonProcessingException {
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
-        List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(users);
-
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisation);
-
-        when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(professionalUser);
-
-        String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
-                "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(userProfileResponse);
-        getUserProfileResponseMock.setRoles(roles);
-
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-        ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress(email);
-        assertEquals(professionalUser.getFirstName(), user1.getFirstName());
-        assertEquals(professionalUser.getLastName(), user1.getLastName());
-        assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
-
-        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
-        verify(userProfileFeignClient, times(1)).getUserProfileById(anyString());
-    }
-
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieveUserByEmail_EmptyData() throws JsonProcessingException {
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
-        List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(users);
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisation);
-
-        when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(null);
-
-        String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
-                "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(userProfileResponse);
-        getUserProfileResponseMock.setRoles(roles);
-
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-        professionalUserService.findProfessionalUserProfileByEmailAddress(email);
-
-        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
-    }
-
 
     @Test
     public void test_findUsersByOrganisation_with_deleted_users() throws Exception {
