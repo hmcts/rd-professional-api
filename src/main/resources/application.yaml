@@ -75,7 +75,6 @@ security:
     - "/swagger-resources/**"
     - "/v2/api-docs"
     - "/webjars/springfox-swagger-ui/**"
-    - "/search/**"
     - "/csrf"
     - "/error"
     - "/favicon.ico"

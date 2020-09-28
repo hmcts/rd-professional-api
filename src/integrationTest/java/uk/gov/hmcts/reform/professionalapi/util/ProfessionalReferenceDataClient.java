@@ -79,10 +79,6 @@ public class ProfessionalReferenceDataClient {
                 role, userId, email);
     }
 
-    public Map<String, Object> findLegacyPbaAccountsByUserEmail(String email) {
-        return getRequest("/search/pba/{email}", "pui-case-manager", email);
-    }
-
     public Map<String, Object> retrieveSingleOrganisation(String id, String role) {
         return getRequest(APP_INT_BASE_PATH + "?id={id}", role, id);
     }
