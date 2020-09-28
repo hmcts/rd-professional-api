@@ -32,7 +32,7 @@ public class DataBaseUtil {
                 dataSourceBuilder.url(String.format("jdbc:postgresql://%s:%s/%s", dbConfig.getPostgresHost(),
                         dbConfig.getPostgresPort(), dbConfig.getPostgresDbName()));
                 dataSourceBuilder.username(dbConfig.getPostgresUserName());
-                dataSourceBuilder.password("wo}7){wj3SEca9@(");
+                dataSourceBuilder.password(dbConfig.getPostgresPassword());
                 dataSource = dataSourceBuilder.build();
             } catch (Exception e) {
                 log.error("Unable to connect to database from functional test case : {}", e.getMessage());
