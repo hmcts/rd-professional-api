@@ -43,11 +43,7 @@ public class DataBaseUtil {
 
     @PreDestroy
     public void runDeleteScript() {
-        String isNightlyBuild = getenv("isNightlyBuild");
-        String testUrl = getenv("TEST_URL");
-        logDataBaseDetails(isNightlyBuild, testUrl);
-
-        if (Boolean.TRUE.toString().equalsIgnoreCase(isNightlyBuild)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(getenv("isNightlyBuild"))) {
             log.info("Delete test data script execution started");
             try {
                 Connection connection = getDataSource().getConnection();
@@ -70,15 +66,4 @@ public class DataBaseUtil {
             log.info("Not executing delete test data script");
         }
     }
-
-    public void logDataBaseDetails(String isNightlyBuild, String testUrl) {
-        log.info("Func DB host: {}", dbConfig.postgresHost);
-        log.info("Func DB port: {}", dbConfig.postgresPort);
-        log.info("Func DB name: {}", dbConfig.postgresDbName);
-        log.info("Func DB user name: {}", dbConfig.postgresUserName);
-        log.info("Func DB url: {}", String.format("jdbc:postgresql://%s:%s/%s",
-                dbConfig.postgresHost, dbConfig.postgresPort, dbConfig.postgresDbName));
-        log.info("isNightlyBuild: {}", isNightlyBuild);
-    }
-
 }
