@@ -60,9 +60,6 @@ public class ProfessionalReferenceDataClient {
         return postRequest(baseUrl, request, null, null);
     }
 
-    public Map<String, Object> findUserByEmail(String email, String role) {
-        return getRequest(APP_INT_BASE_PATH + "/user?email={email}", role, email);
-    }
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
         return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role, email);

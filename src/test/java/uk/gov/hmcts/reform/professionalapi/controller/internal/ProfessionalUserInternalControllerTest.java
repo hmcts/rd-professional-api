@@ -203,34 +203,6 @@ public class ProfessionalUserInternalControllerTest {
     }
 
     @Test
-    public void test_FindUserByEmailWithPuiUserManager() {
-        final String email = "testing@email.com";
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
-                "test@email.com", organisation);
-        List<SuperUser> users = new ArrayList<>();
-        users.add(professionalUser.toSuperUser());
-        organisation.setUsers(users);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress(email)).thenReturn(professionalUser);
-        when(responseEntityMock.getStatusCode()).thenReturn(HttpStatus.OK);
-
-        doNothing().when(organisationIdentifierValidatorMock).validate(any(Organisation.class),
-                any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidatorMock).validateOrganisationIdentifier(any(String.class));
-
-        ResponseEntity actual = professionalUserInternalController.findUserByEmail(email);
-        assertThat(actual).isNotNull();
-        assertThat(actual.getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
-
-        verify(professionalUserServiceMock, times(1))
-                .findProfessionalUserProfileByEmailAddress(email);
-    }
-
-    @Test
     public void test_ModifyRolesForExistingUserOfOrganisation() throws JsonProcessingException {
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();

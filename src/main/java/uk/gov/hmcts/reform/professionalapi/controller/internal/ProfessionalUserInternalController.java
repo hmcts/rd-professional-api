@@ -103,47 +103,6 @@ public class ProfessionalUserInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Retrieves an Active User with the given Email Address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A User and their details",
-                    response = ProfessionalUsersResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Email Address has been provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No User found with the given Email Address"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
-    @GetMapping(
-            value = "/user",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @Secured("prd-admin")
-    public ResponseEntity<Object> findUserByEmail(@RequestParam(value = "email") String email) {
-
-        return retrieveUserByEmail(email);
-    }
-
-    @ApiOperation(
             value = "Modify the Roles or Status of a User",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),

@@ -291,21 +291,6 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> searchForUserByEmailAddress(String email, String role) {
-        Response response = getMultipleAuthHeadersInternal()
-            .param("email", email)
-            .get("/refdata/internal/v1/organisations/user")
-            .andReturn();
-        log.info("Search For User By Email Response: " + response.asString());
-        response.then()
-            .assertThat()
-            .statusCode(OK.value());
-
-        return response.body().as(Map.class);
-    }
-
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrieveOrganisationDetails(String id, String role, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
