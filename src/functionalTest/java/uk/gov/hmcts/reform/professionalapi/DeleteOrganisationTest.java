@@ -63,12 +63,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
-    @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac4_error_when_delete_an_organisation_with_invalid_org_id_should_return_400() {
-        String orgIdentifier = "C345DF";
-        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
-    }
 
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
