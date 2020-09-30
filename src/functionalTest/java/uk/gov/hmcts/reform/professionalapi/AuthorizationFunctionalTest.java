@@ -35,9 +35,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.professionalapi.util.DataBaseUtil;
 
-
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class, DataBaseUtil.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
