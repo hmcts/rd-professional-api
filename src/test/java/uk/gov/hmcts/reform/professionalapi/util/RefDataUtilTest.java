@@ -757,7 +757,7 @@ public class RefDataUtilTest {
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenReturn(response);
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(response);
 
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
@@ -766,7 +766,7 @@ public class RefDataUtilTest {
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.getIdamStatus()).isEqualTo("ACTIVE");
         assertThat(newUserResponse.getUserIdentifier()).isEqualTo("1cb88d5f-ef2c-4587-aca0-f77a7f6f3742");
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test
@@ -778,7 +778,7 @@ public class RefDataUtilTest {
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenReturn(response);
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(response);
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
                 userProfileFeignClient);
@@ -786,7 +786,7 @@ public class RefDataUtilTest {
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.getIdamStatus()).isNull();
         assertThat(newUserResponse.getUserIdentifier()).isNull();
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test(expected = ExternalApiException.class)
@@ -802,12 +802,12 @@ public class RefDataUtilTest {
                 + "  \"idamStatus\": \"ACTIVE\""
                 + "}";
 
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
+        when(userProfileFeignClient.getUserProfileByEmail()).thenThrow(feignException);
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
                 userProfileFeignClient);
         assertThat(newUserResponse).isNotNull();
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test

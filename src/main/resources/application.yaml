@@ -111,6 +111,7 @@ feign:
     headers:
       - authorization
       - serviceauthorization
+      - useremail
 
 defaultPageSize: ${DEFAULTPAGESIZE:10}
 

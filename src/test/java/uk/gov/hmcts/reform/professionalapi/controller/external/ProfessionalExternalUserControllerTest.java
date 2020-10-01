@@ -258,7 +258,7 @@ public class ProfessionalExternalUserControllerTest {
         ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
                 HttpStatus.OK);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
                 .thenReturn(responseEntity1);

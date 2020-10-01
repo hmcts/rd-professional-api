@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -549,7 +548,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -561,7 +560,7 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test
@@ -575,7 +574,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -584,7 +583,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -598,7 +597,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse
@@ -607,7 +606,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(0)).getUserProfileByEmail();
     }
 
     @Test(expected = ExternalApiException.class)
@@ -616,7 +615,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByEmailAddress(professionalUser
                 .getEmailAddress())).thenReturn(professionalUser);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString()))
+        when(userProfileFeignClient.getUserProfileByEmail())
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
         final Throwable raisedException = catchThrowable(() -> professionalUserService
@@ -629,7 +628,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(status.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @SneakyThrows
@@ -644,13 +643,13 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail();
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -674,7 +673,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail()).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
