@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -120,60 +119,6 @@ public class ProfessionalExternalUserController extends SuperController {
         profUsersEntityResponse = searchUsersByOrganisation(organisationIdentifier, showDeleted, returnRoles, status,
                 page, size);
         return profUsersEntityResponse;
-    }
-
-    @ApiOperation(
-            value = "Retrieves an Active User with the given Email Address",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "A User and their details",
-                    response = ProfessionalUsersResponse.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "An invalid Email Address has been provided"
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No User found with the given Email Address"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
-    @GetMapping(
-            value = "/user",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @Secured({"pui-user-manager"})
-    public Optional<ResponseEntity<Object>> findUserByEmail(
-            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
-            @ApiParam(name = "email") @RequestParam(value = "email",
-                    required = false) String email) {
-
-        Optional<ResponseEntity<Object>> optionalResponseEntity;
-        validateEmail(email);
-        //email is valid
-        optionalResponseEntity = Optional.ofNullable(retrieveUserByEmail(email.toLowerCase()));
-
-        if (optionalResponseEntity.isPresent()) {
-            return optionalResponseEntity;
-        } else {
-            throw new ResourceNotFoundException("No user was found with the email provided, please ensure you are "
-                    .concat("using a valid email address"));
-        }
     }
 
     @ApiOperation(
