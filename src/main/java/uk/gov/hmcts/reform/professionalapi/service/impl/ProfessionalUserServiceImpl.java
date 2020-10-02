@@ -96,16 +96,6 @@ public class ProfessionalUserServiceImpl implements ProfessionalUserService {
         return professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
     }
 
-    public ProfessionalUser findProfessionalUserProfileByEmailAddress(String email) {
-        ProfessionalUser user = professionalUserRepository.findByEmailAddress(RefDataUtil.removeAllSpaces(email));
-
-        if (user == null || user.getOrganisation().getStatus() != OrganisationStatus.ACTIVE) {
-            throw new EmptyResultDataAccessException(1);
-        }
-
-        return RefDataUtil.getSingleUserIdFromUserProfile(user, userProfileFeignClient, true);
-    }
-
     @Override
     public ProfessionalUser findProfessionalUserById(UUID id) {
         Optional<ProfessionalUser> professionalUser = professionalUserRepository.findById(id);

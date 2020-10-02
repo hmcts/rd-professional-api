@@ -17,8 +17,6 @@ public interface ProfessionalUserService {
 
     NewUserResponse addNewUserToAnOrganisation(ProfessionalUser newUser, List<String> roles, List<PrdEnum> prdEnums);
 
-    ProfessionalUser findProfessionalUserProfileByEmailAddress(String email);
-
     ProfessionalUser findProfessionalUserById(UUID userIdentifier);
 
     ResponseEntity<Object> findProfessionalUsersByOrganisation(Organisation existingOrganisation, String showDeleted,

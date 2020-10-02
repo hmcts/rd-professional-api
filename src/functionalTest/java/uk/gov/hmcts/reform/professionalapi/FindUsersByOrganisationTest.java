@@ -161,11 +161,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 generateBearerTokenForExternalRole(puiUserManager), "Suspended");
     }
 
-    @Test
-    public void ac6_find_all_status_usrs_for_an_org_with_pui_user_manager_with_invalid_status_provided_shld_rtn_400() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST,
-                generateBearerTokenForExternalRole(puiUserManager), "INVALID");
-    }
 
     @Test
     public void ac7_find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_401() {
@@ -173,11 +168,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 professionalApiClient.getMultipleAuthHeadersWithEmptyBearerToken(""), "");
     }
 
-    @Test
-    public void ac9_find_non_active_status_usrs_for_an_org_non_pui_user_mgr_where_status_not_active_shld_rtn_400() {
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.BAD_REQUEST,
-                generateBearerTokenForNonPuiManager(), "INVALID");
-    }
 
     @Test
     public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
@@ -282,13 +272,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
         professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.FORBIDDEN,
                 bearerTokenForCaseworkerCaa, "");
-    }
-
-    @Test
-    public void rdcc1439_ac7_find_all_active_users_with_invalid_param_given_for_an_organisation_should_return_400() {
-        Map<String, Object> response = professionalApiClient
-                .searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.BAD_REQUEST,
-                        generateBearerTokenForNonPuiManager(), "infealfnk");
     }
 
     @Test
