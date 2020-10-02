@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.professionalapi.configuration.FeignInterceptorConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeleteUserProfilesRequest;
@@ -36,8 +37,8 @@ public interface UserProfileFeignClient {
     @GetMapping(value = "/v1/userprofile")
     @RequestLine("GET /v1/userprofile")
     @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}",
-            "UserEmail: {userEmail}","Content-Type: application/json"})
-    Response getUserProfileByEmail();
+            "Content-Type: application/json"})
+    Response getUserProfileByEmail(@RequestHeader("UserEmail") String userEmail);
 
     @PostMapping(value = "/v1/userprofile/users")
     @RequestLine("POST /v1/userprofile/users")
