@@ -57,7 +57,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.LanguagePreference;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -196,18 +195,6 @@ public abstract class SuperController {
         return ResponseEntity
                 .status(200)
                 .body(organisationResponse);
-    }
-
-    protected ResponseEntity<Object> retrieveUserByEmail(String email) {
-        validateEmail(email);
-
-        ProfessionalUser user = professionalUserService
-                .findProfessionalUserProfileByEmailAddress(removeEmptySpaces(email).toLowerCase());
-
-        ProfessionalUsersResponse professionalUsersResponse = new ProfessionalUsersResponse(user);
-        return ResponseEntity
-                .status(200)
-                .body(professionalUsersResponse);
     }
 
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {

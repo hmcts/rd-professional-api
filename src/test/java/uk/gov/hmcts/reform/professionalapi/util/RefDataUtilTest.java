@@ -757,7 +757,7 @@ public class RefDataUtilTest {
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenReturn(response);
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(response);
 
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
@@ -778,7 +778,7 @@ public class RefDataUtilTest {
 
         Response response = Response.builder().status(400).reason("BAD REQUEST").headers(header).body(body, UTF_8)
                 .request(mock(Request.class)).build();
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenReturn(response);
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(response);
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
                 userProfileFeignClient);
@@ -802,7 +802,7 @@ public class RefDataUtilTest {
                 + "  \"idamStatus\": \"ACTIVE\""
                 + "}";
 
-        when(userProfileFeignClient.getUserProfileByEmail("some_email@hotmail.com")).thenThrow(feignException);
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenThrow(feignException);
 
         NewUserResponse newUserResponse = RefDataUtil.findUserProfileStatusByEmail("some_email@hotmail.com",
                 userProfileFeignClient);

@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -112,75 +110,6 @@ public class ProfessionalUserServiceImplTest {
         superUser.setUserIdentifier(UUID.randomUUID().toString());
         professionalUser.setUserIdentifier(UUID.randomUUID().toString());
     }
-
-    @Test
-    public void test_retrieveUserByEmail() throws JsonProcessingException {
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
-        List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(users);
-
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisation);
-
-        when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(professionalUser);
-
-        String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
-                "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(userProfileResponse);
-        getUserProfileResponseMock.setRoles(roles);
-
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-        ProfessionalUser user1 = professionalUserService.findProfessionalUserProfileByEmailAddress(email);
-        assertEquals(professionalUser.getFirstName(), user1.getFirstName());
-        assertEquals(professionalUser.getLastName(), user1.getLastName());
-        assertEquals(professionalUser.getEmailAddress(), user1.getEmailAddress());
-
-        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
-        verify(userProfileFeignClient, times(1)).getUserProfileById(anyString());
-    }
-
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void test_retrieveUserByEmail_EmptyData() throws JsonProcessingException {
-        List<SuperUser> users = new ArrayList<>();
-        users.add(superUser);
-        List<String> roles = new ArrayList<>();
-        roles.add("pui-case-manager");
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-        professionalUser.getOrganisation().setStatus(OrganisationStatus.ACTIVE);
-        organisation.setUsers(users);
-        List<Organisation> organisations = new ArrayList<>();
-        organisations.add(organisation);
-
-        when(professionalUserRepository.findByEmailAddress(any(String.class))).thenReturn(null);
-
-        String email = "email@org.com";
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), email, "firstName",
-                "lastName", IdamStatus.ACTIVE);
-        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String body = mapper.writeValueAsString(userProfileResponse);
-        getUserProfileResponseMock.setRoles(roles);
-
-        when(userProfileFeignClient.getUserProfileById(anyString())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-        professionalUserService.findProfessionalUserProfileByEmailAddress(email);
-
-        verify(professionalUserRepository, times(1)).findByEmailAddress(email);
-    }
-
 
     @Test
     public void test_findUsersByOrganisation_with_deleted_users() throws Exception {
@@ -619,7 +548,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -631,7 +560,7 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test
@@ -645,7 +574,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -654,7 +583,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -668,7 +597,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse
@@ -677,7 +606,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(any());
     }
 
     @Test(expected = ExternalApiException.class)
@@ -686,7 +615,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByEmailAddress(professionalUser
                 .getEmailAddress())).thenReturn(professionalUser);
-        when(userProfileFeignClient.getUserProfileByEmail(anyString()))
+        when(userProfileFeignClient.getUserProfileByEmail(any()))
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
         final Throwable raisedException = catchThrowable(() -> professionalUserService
@@ -699,7 +628,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(status.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @SneakyThrows
@@ -714,13 +643,13 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
+        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -744,7 +673,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-        when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();

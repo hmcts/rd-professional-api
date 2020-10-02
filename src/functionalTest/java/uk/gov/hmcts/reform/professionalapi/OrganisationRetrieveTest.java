@@ -123,4 +123,5 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         assertThat(response.get("contactInformation")).isNotNull();
 
     }
+
 }
