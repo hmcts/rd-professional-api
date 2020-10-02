@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-<<<<<<< HEAD
-=======
 import static org.mockito.ArgumentMatchers.anyString;
->>>>>>> rdcc-1910-master
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -552,11 +549,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -568,11 +561,7 @@ public class ProfessionalUserServiceImplTest {
 
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
     }
 
     @Test
@@ -586,11 +575,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse = professionalUserService
@@ -599,11 +584,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -617,11 +598,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity<NewUserResponse> newResponse
@@ -630,11 +607,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(newResponse.getStatusCodeValue()).isEqualTo(404);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
     }
 
     @Test(expected = ExternalApiException.class)
@@ -643,11 +616,7 @@ public class ProfessionalUserServiceImplTest {
 
         when(professionalUserRepository.findByEmailAddress(professionalUser
                 .getEmailAddress())).thenReturn(professionalUser);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any()))
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString()))
->>>>>>> rdcc-1910-master
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "UP Email Service Down"));
 
         final Throwable raisedException = catchThrowable(() -> professionalUserService
@@ -660,11 +629,7 @@ public class ProfessionalUserServiceImplTest {
         assertThat(status.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         verify(professionalUserRepository, times(1))
                 .findByEmailAddress(professionalUser.getEmailAddress());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
     }
 
     @SneakyThrows
@@ -679,21 +644,13 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any(String.class));
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -717,11 +674,7 @@ public class ProfessionalUserServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(newUserResponse);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         String userId = UUID.randomUUID().toString();

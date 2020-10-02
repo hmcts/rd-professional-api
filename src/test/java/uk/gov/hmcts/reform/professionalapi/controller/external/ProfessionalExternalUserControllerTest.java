@@ -258,11 +258,7 @@ public class ProfessionalExternalUserControllerTest {
         ResponseEntity<NewUserResponse> responseEntity1 = new ResponseEntity<NewUserResponse>(newUserResponse,
                 HttpStatus.OK);
 
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(professionalUserServiceMock.findUserStatusByEmailAddress(email))
                 .thenReturn(responseEntity1);

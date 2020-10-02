@@ -630,11 +630,7 @@ public class OrganisationServiceImplTest {
         String body = mapper.writeValueAsString(newUserResponse);
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(204).build());
@@ -647,11 +643,7 @@ public class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo(ProfessionalApiConstants.DELETION_SUCCESS_MSG);
         verify(organisationRepository, times(1)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
     }
 
@@ -672,11 +664,7 @@ public class OrganisationServiceImplTest {
         String body = mapper.writeValueAsString(newUserResponse);
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(400).build());
@@ -690,11 +678,7 @@ public class OrganisationServiceImplTest {
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ADMIN_NOT_PENDING);
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
     }
 
@@ -711,11 +695,7 @@ public class OrganisationServiceImplTest {
                 .isEqualTo(ProfessionalApiConstants.ERROR_MESSAGE_400_ORG_MORE_THAN_ONE_USER);
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(0)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(0)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
     }
 
@@ -732,11 +712,7 @@ public class OrganisationServiceImplTest {
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(deleteBody, Charset.defaultCharset()).status(500).build());
@@ -748,11 +724,7 @@ public class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
     }
 
@@ -768,11 +740,7 @@ public class OrganisationServiceImplTest {
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(404).build());
         Organisation organisation = getDeleteOrganisation(OrganisationStatus.ACTIVE);
         DeleteOrganisationResponse deleteOrganisationResponse = sut.deleteOrganisation(organisation,"123456789");
@@ -783,11 +751,7 @@ public class OrganisationServiceImplTest {
                 .isEqualTo(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(0)).deleteUserProfile(any());
     }
 
@@ -804,11 +768,7 @@ public class OrganisationServiceImplTest {
         String deleteBody = mapperOne.writeValueAsString(newUserResponse);
 
         when(professionalUserRepositoryMock.findByUserCountByOrganisationId(any())).thenReturn(1);
-<<<<<<< HEAD
-        when(userProfileFeignClient.getUserProfileByEmail(any())).thenReturn(Response.builder()
-=======
         when(userProfileFeignClient.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
->>>>>>> rdcc-1910-master
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
         when(userProfileFeignClient.deleteUserProfile(any()))
                 .thenThrow(new ExternalApiException(HttpStatus.valueOf(500), "Error while invoking UP"));
@@ -821,11 +781,7 @@ public class OrganisationServiceImplTest {
         assertThat(deleteOrganisationResponse.getMessage()).isEqualTo("Error while invoking UP");
         verify(organisationRepository, times(0)).deleteById(any());
         verify(professionalUserRepositoryMock, times(1)).findByUserCountByOrganisationId(any());
-<<<<<<< HEAD
-        verify(userProfileFeignClient, times(1)).getUserProfileByEmail(any());
-=======
         verify(userProfileFeignClient, times(1)).getUserProfileByEmail(anyString());
->>>>>>> rdcc-1910-master
         verify(userProfileFeignClient, times(1)).deleteUserProfile(any());
     }
 
