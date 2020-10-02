@@ -36,7 +36,7 @@ public interface UserProfileFeignClient {
     @GetMapping(value = "/v1/userprofile")
     @RequestLine("GET /v1/userprofile")
     @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}",
-            "UserEmail: {UserEmail}","Content-Type: application/json"})
+            "UserEmail: {userEmail}","Content-Type: application/json"})
     Response getUserProfileByEmail();
 
     @PostMapping(value = "/v1/userprofile/users")
