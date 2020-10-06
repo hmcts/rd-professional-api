@@ -26,7 +26,6 @@ public class ContactInformationResponseTest {
         contactInformation.setCounty(expectCounty);
         contactInformation.setCountry(expectCountry);
         contactInformation.setTownCity(expectTownCity);
-
         ContactInformationResponse sut = new ContactInformationResponse(contactInformation);
 
         assertThat(sut.getAddressLine1()).isEqualTo(expectAddress1);

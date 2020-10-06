@@ -17,7 +17,6 @@ import feign.Response;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -111,8 +110,6 @@ public class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress"))
-                .thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities,
@@ -159,8 +156,6 @@ public class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress"))
-                .thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_CASE_MANAGER))
@@ -214,8 +209,6 @@ public class ProfessionalExternalUserControllerTest {
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("emailAddress"))
-                .thenReturn(professionalUser);
         when(professionalUserServiceMock.findProfessionalUsersByOrganisation(any(Organisation.class),
                 any(String.class), any(Boolean.class), any(String.class))).thenReturn(responseEntity);
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
@@ -247,47 +240,6 @@ public class ProfessionalExternalUserControllerTest {
                         any(String.class));
         verify(responseEntity, times(1)).getStatusCode();
         verify(responseEntity, times(1)).getBody();
-    }
-
-    @Test
-    public void test_FindUserByEmailWithPuiUserManager() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-
-        ProfessionalUser professionalUser = new ProfessionalUser("fName", "lastName",
-                "test@email.com", organisation);
-        List<SuperUser> users = new ArrayList<>();
-        users.add(professionalUser.toSuperUser());
-        organisation.setUsers(users);
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        UserInfo userInfoMock = mock(UserInfo.class);
-        List<String> authorities = new ArrayList<>();
-        authorities.add(TestConstants.PUI_USER_MANAGER);
-        when(userInfoMock.getRoles()).thenReturn(authorities);
-
-        organisation.setStatus(OrganisationStatus.ACTIVE);
-
-        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
-                .thenReturn(organisation);
-        when(professionalUserServiceMock.findProfessionalUserProfileByEmailAddress("testing@email.com"))
-                .thenReturn(professionalUser);
-        when(organisationIdentifierValidatorImpl.ifUserRoleExists(authorities, TestConstants.PUI_USER_MANAGER))
-                .thenReturn(true);
-        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-
-        doNothing().when(profExtUsrReqValidator).validateRequest(any(String.class), any(String.class),
-                any(String.class));
-        doNothing().when(organisationIdentifierValidatorImpl).validate(any(Organisation.class),
-                any(OrganisationStatus.class), any(String.class));
-        doNothing().when(organisationCreationRequestValidator).validateOrganisationIdentifier(any(String.class));
-
-        Optional<ResponseEntity<Object>> actual = professionalExternalUserController
-                .findUserByEmail(organisation.getOrganisationIdentifier(), "testing@email.com");
-        assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode().value()).isEqualTo(expectedHttpStatus.value());
-
-        verify(professionalUserServiceMock, times(1))
-                .findProfessionalUserProfileByEmailAddress("testing@email.com");
     }
 
     @Test
@@ -361,13 +313,5 @@ public class ProfessionalExternalUserControllerTest {
         professionalExternalUserController.findUserStatusByEmail(email);
     }
 
-    @Test(expected = InvalidRequest.class)
-    public void test_FindUserByEmailWithPuiUserManagerThrows400WithInvalidEmail() {
-        Optional<ResponseEntity<Object>> actual = professionalExternalUserController
-                .findUserByEmail(organisation.getOrganisationIdentifier(), "invalid-email");
 
-        assertThat(actual).isNotNull();
-        assertThat(actual.get().getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        verify(organisationCreationRequestValidator, times(1)).validateEmail("invalid-email");
-    }
 }
