@@ -5,13 +5,8 @@ public class ProfessionalApiConstants {
     private ProfessionalApiConstants() {
     }
 
-    // There are various regex for same email format. We need to take up a task to make all email regex same in both
-    // PRD and UP
-
-    public static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)"
-            + "*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
-    public static String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
-            .concat("[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
+    public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
+            + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
     public static final int LENGTH_OF_UUID = 36;
     public static final int LENGTH_OF_ORGANISATION_IDENTIFIER = 7;
