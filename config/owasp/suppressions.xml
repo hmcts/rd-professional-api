@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-<suppress>
-<notes><![CDATA[
-        file name: spring-security*.jar
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress>
+        <notes><![CDATA[
+    file name: spring-security*.jar
         ]]></notes>
-<packageUrl regex="true">^pkg:maven*.*$</packageUrl>
-<cve>CVE-2018-1258</cve>
-</suppress>
+        <packageUrl regex="true">^pkg:maven*.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
     <suppress until="2021-01-05">
         <notes><![CDATA[
    file name: oauth2-oidc-sdk-7.1.1.jar
