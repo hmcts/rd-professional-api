@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
+    String orgId;
+
+    @Before
+    public void setUp() {
+        orgId = createAndUpdateOrganisationToActive(hmctsAdmin);
+    }
 
     @Test
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");
         // creating new user request
@@ -46,7 +52,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");
         // creating new user request
@@ -65,7 +70,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void findUserStatusByEmailFromHeaderWithPuiUserManagerRoleShouldReturn200() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         // creating new user request
@@ -84,7 +88,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac2_find_user_status_by_email_with_pui_case_manager_role_should_return_200_with_user_status_active() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");
@@ -106,7 +109,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void ac3_find_usr_status_by_email_with_not_active_pui_finance_mgr_role_should_rtn_status_pending_for_usr() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // creating new user request
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
@@ -121,7 +123,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void findUsrStatusByEmailFrmHeaderWithPuiCaseManagerRoleShouldReturn200WithUserStatusActive() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
 
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");
@@ -138,7 +139,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusForUsr() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // creating new user request
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
@@ -153,7 +153,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusPendingForUsr() {
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // creating new user request
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-finance-manager");
@@ -178,7 +177,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
@@ -202,7 +200,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager, userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         // inviting user
         professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
@@ -218,7 +215,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_719_ac1_find_usr_sts_by_email_caseworker_publiclaw_courtadmin_role_shld_rtn_200__usr_sts_active() {
 
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         assertThat(orgId).isNotNull();
 
         // creating new user request
@@ -247,7 +243,6 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_719_ac2_caseworker_publiclaw_courtadmin_role_should_return_403_when_calling_any_other_endpoint() {
 
-        String orgId =  createAndUpdateOrganisationToActive(hmctsAdmin);
         assertThat(orgId).isNotNull();
 
         // creating new user request
