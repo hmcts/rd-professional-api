@@ -20,6 +20,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,24 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     private String email = generateRandomEmail();
     private String lastName = "someLastName";
     private String firstName = "someName";
+    String orgIdentifierResponse;
+
+    @Before
+    public void setUp() {
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + randomAlphabetic(7));
+
+        OrganisationCreationRequest request = someMinimalOrganisationRequest()
+                .paymentAccount(paymentAccounts)
+                .superUser(createUserForTest())
+                .build();
+
+        Map<String, Object> response = professionalApiClient.createOrganisation(request);
+        orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        assertThat(orgIdentifierResponse).isNotEmpty();
+        request.setStatus("ACTIVE");
+        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
+    }
 
     public RequestSpecification generateBearerTokenForUser(String roleUnderTest, String... otherRoles) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -67,20 +86,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
-
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + randomAlphabetic(7));
-
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .paymentAccount(paymentAccounts)
-                .superUser(createUserForTest())
-                .build();
-
-        Map<String, Object> response =  professionalApiClient.createOrganisation(request);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-        request.setStatus("ACTIVE");
-        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(email.toLowerCase(),
                 hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
@@ -89,20 +94,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email_fromHeader() {
-
-        Set<String> paymentAccounts = new HashSet<>();
-        paymentAccounts.add("PBA" + randomAlphabetic(7));
-
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .paymentAccount(paymentAccounts)
-                .superUser(createUserForTest())
-                .build();
-
-        Map<String, Object> response =  professionalApiClient.createOrganisation(request);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-        request.setStatus("ACTIVE");
-        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifierResponse);
         Map<String, Object> orgResponse = professionalApiClient
                 .retrievePaymentAccountsByEmailFromHeader(email.toLowerCase(), hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
@@ -111,10 +102,10 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
     private void responseValidate(Map<String, Object> orgResponse) {
 
-        orgResponse.forEach((k,v) -> {
+        orgResponse.forEach((k, v) -> {
 
             if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) &&  "status".equals(k)
+                    && "name".equals(k) && "status".equals(k)
                     && "superUser".equals(k) && "paymentAccount".equals(k)) {
 
                 Assertions.assertThat(v.toString()).isNotEmpty();
