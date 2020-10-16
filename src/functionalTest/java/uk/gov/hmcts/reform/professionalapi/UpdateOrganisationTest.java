@@ -20,23 +20,14 @@ import org.springframework.test.context.ActiveProfiles;
 @Slf4j
 public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
-    String orgIdentifierResponse;
-
-    @Before
-    public void setUp() {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifierResponse).isNotEmpty();
-    }
-
     @Test
     public void can_update_an_organisation() {
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
+        professionalApiClient.updateOrganisation(activeOrgId, hmctsAdmin);
     }
 
     @Test
     public void can_throw_Unauthorized_Error_code_without_bearertoken_to_update_an_organisation_401() {
-        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin, orgIdentifierResponse,
+        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin, activeOrgId,
                 HttpStatus.UNAUTHORIZED);
     }
 }

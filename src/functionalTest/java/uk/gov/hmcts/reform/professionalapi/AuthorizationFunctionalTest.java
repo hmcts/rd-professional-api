@@ -101,6 +101,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
 
+    public static String activeOrgId;
+
+
     @Override
     public void beforeTestClass(TestContext testContext) {
         testContext.getApplicationContext()
@@ -117,8 +120,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
-        if (s2sToken == null) {
-
+        if (null == s2sToken) {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
 
@@ -127,6 +129,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
 
+        if (null == activeOrgId) {
+            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {

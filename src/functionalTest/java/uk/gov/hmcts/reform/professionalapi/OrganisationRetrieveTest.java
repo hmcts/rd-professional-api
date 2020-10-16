@@ -10,9 +10,9 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Test;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -24,7 +24,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     Map<String, Object> orgResponse;
 
-    @Before
+    @BeforeAll
     public void setUp() {
         orgResponse = professionalApiClient.createOrganisation();
     }
@@ -38,9 +38,11 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_retrieve_a_single_organisation() {
-        orgResponse = professionalApiClient.retrieveOrganisationDetails(
-                (String) orgResponse.get("organisationIdentifier"), puiCaseManager,HttpStatus.OK);
-        validateSingleOrgResponse(orgResponse, "PENDING");
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+
+        response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),
+                puiCaseManager,HttpStatus.OK);
+        validateSingleOrgResponse(response, "PENDING");
     }
 
     @Test
@@ -60,8 +62,6 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     @Test
     public void can_retrieve_Pending_and_Active_organisations() {
 
-        String orgIdentifierOne = (String) orgResponse.get("organisationIdentifier");
-        assertThat(orgIdentifierOne).isNotEmpty();
         Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
         String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
         assertThat(orgIdentifierTwo).isNotEmpty();

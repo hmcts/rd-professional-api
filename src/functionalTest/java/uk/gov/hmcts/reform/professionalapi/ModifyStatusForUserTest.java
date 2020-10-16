@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -25,23 +24,21 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 @Slf4j
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
-    String orgIdentifier;
-    IdamOpenIdClient idamOpenIdClient;
-    NewUserCreationRequest newUserCreationRequest;
-
-    @Before
-    public void setUp() {
-        orgIdentifier = createAndUpdateOrganisationToActive(hmctsAdmin);
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
-
-        newUserCreationRequest = professionalApiClient.createNewUserRequest(userCreds.get(EMAIL));
-    }
-
     @Test
     public void rdcc_418_ac1_update_user_status_from_suspended_to_active() {
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
+
+        assertThat(newUserCreationRequest).isNotNull();
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(activeOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
@@ -51,25 +48,38 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         UserProfileUpdatedData data = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
 
         Map<String,Object> modifyStatusResponse = professionalApiClient
-                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, activeOrgId, userId);
 
-        String status = searchUserStatus(orgIdentifier, userId);
+        String status = searchUserStatus(activeOrgId, userId);
 
         assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
 
         data = getUserStatusUpdateRequest(IdamStatus.ACTIVE);
 
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, activeOrgId, userId);
 
-        status = searchUserStatus(orgIdentifier, userId);
+        status = searchUserStatus(activeOrgId, userId);
 
         assertThat(status).isEqualTo(IdamStatus.ACTIVE.name());
+
+
     }
 
     @Test
     public void rdcc_418_ac2_update_user_status_from_active_to_suspended() {
 
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifier,
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
+
+        IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient
+                .createNewUserRequest(userCreds.get(EMAIL));
+
+        assertThat(newUserCreationRequest).isNotNull();
+
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(activeOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
 
         assertThat(newUserResponse).isNotNull();
@@ -78,9 +88,9 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
         String userId = (String) newUserResponse.get("userIdentifier");
 
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, activeOrgId, userId);
 
-        String status = searchUserStatus(orgIdentifier, userId);
+        String status = searchUserStatus(activeOrgId, userId);
 
         assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
     }
@@ -97,6 +107,4 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
                 .map(user -> (String) user.get("idamStatus"))
                 .collect(Collectors.toList()).get(0);
     }
-
-
 }

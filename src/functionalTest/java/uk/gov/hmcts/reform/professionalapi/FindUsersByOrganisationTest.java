@@ -35,13 +35,6 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     RequestSpecification bearerTokenForExternalRole;
     RequestSpecification bearerTokenForNonPuiUserManager;
-    String orgId;
-
-    @Before
-    public void setUp() {
-        orgId = createAndUpdateOrganisationToActive(hmctsAdmin);
-    }
-
 
     public RequestSpecification generateBearerTokenForExternalRole(String role) {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -101,27 +94,27 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     public void find_users_by_active_organisation_with_showDeleted_True() {
         validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(orgId, hmctsAdmin, "True",
+                .searchUsersByOrganisation(activeOrgId, hmctsAdmin, "True",
                         HttpStatus.OK,""), "any",true);
     }
 
     @Test
     public void find_users_by_active_organisation_with_returnRoles_False() {
         validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(orgId, hmctsAdmin,
+                .searchUsersByOrganisation(activeOrgId, hmctsAdmin,
                         "False", HttpStatus.OK,"false"), "any",false);
     }
 
     @Test
     public void find_users_by_active_organisation_with_returnRoles_True() {
         validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(orgId, hmctsAdmin,
+                .searchUsersByOrganisation(activeOrgId, hmctsAdmin,
                         "True", HttpStatus.OK,"true"), "any",true);
     }
 
     @Test
     public void find_users_by_active_organisation_with_returnRoles_invalid() {
-        professionalApiClient.searchUsersByOrganisation(orgId,
+        professionalApiClient.searchUsersByOrganisation(activeOrgId,
                 puiCaseManager,"True", HttpStatus.FORBIDDEN,"");
     }
 
@@ -191,11 +184,11 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 .build();
 
         professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, userEmail);
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest,
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest,
                 HttpStatus.CREATED);
 
         Map<String, Object> searchResponse = professionalApiClient
-                .searchUsersByOrganisationWithPagination(orgId, hmctsAdmin, "False",
+                .searchUsersByOrganisationWithPagination(activeOrgId, hmctsAdmin, "False",
                         HttpStatus.OK, "0", "1");
 
         validateRetrievedUsers(searchResponse, "any", true);
@@ -205,7 +198,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         assertThat(professionalUsersResponses.get(0).get("firstName")).isEqualTo("1Aaron");
 
         Map<String, Object> searchResponse2 = professionalApiClient
-                .searchUsersByOrganisationWithPagination(orgId, hmctsAdmin, "False",
+                .searchUsersByOrganisationWithPagination(activeOrgId, hmctsAdmin, "False",
                         HttpStatus.OK, "1", "1");
 
         validateRetrievedUsers(searchResponse2, "any", true);
@@ -294,26 +287,26 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                         newUserCreationRequest.getLastName());
 
         // invite new user who is active
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         // search
         Map<String, Object> searchResponse = professionalApiClient
-                .searchUsersByOrganisation(orgId, systemUser, FALSE, HttpStatus.OK, TRUE);
+                .searchUsersByOrganisation(activeOrgId, systemUser, FALSE, HttpStatus.OK, TRUE);
 
         List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
-        assertThat(professionalUsers.size()).isEqualTo(1);
+        assertThat(professionalUsers.size()).isGreaterThan(1);
         validateRetrievedUsers(searchResponse, ACTIVE, false);
     }
 
     @Test
     //RDCC-1531-AC2
     public void find_users_by_active_org_with_system_user_role_should_return_404_when_users_are_not_active_under_org() {
-        professionalApiClient.searchUsersByOrganisation(orgId, systemUser, FALSE, HttpStatus.NOT_FOUND, TRUE);
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, FALSE, HttpStatus.NOT_FOUND, TRUE);
     }
 
     @Test
     //RDCC-1531-AC3
     public void find_users_by_active_organisation_with_non_permitted_role_should_return_403() {
-        professionalApiClient.searchUsersByOrganisation(orgId, puiCaseManager, FALSE, HttpStatus.FORBIDDEN, TRUE);
+        professionalApiClient.searchUsersByOrganisation(activeOrgId, puiCaseManager, FALSE, HttpStatus.FORBIDDEN, TRUE);
     }
 
     void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
