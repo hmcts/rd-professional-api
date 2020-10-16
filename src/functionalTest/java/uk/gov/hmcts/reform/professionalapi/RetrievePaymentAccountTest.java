@@ -22,6 +22,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -42,7 +43,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     private String firstName = "someName";
     String orgIdentifierResponse;
 
-    @Before
+    @BeforeAll
     public void setUp() {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add("PBA" + randomAlphabetic(7));
