@@ -4,4 +4,3 @@ delete from PRD_ENUM where ENUM_CODE = 44 and  ENUM_NAME ='caseworker-sscs-syste
 
 
 
-
