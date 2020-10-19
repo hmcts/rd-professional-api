@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -287,7 +286,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                         newUserCreationRequest.getLastName());
 
         // invite new user who is active
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        professionalApiClient
+                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         // search
         Map<String, Object> searchResponse = professionalApiClient
                 .searchUsersByOrganisation(activeOrgId, systemUser, FALSE, HttpStatus.OK, TRUE);
@@ -300,7 +300,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Test
     //RDCC-1531-AC2
     public void find_users_by_active_org_with_system_user_role_should_return_404_when_users_are_not_active_under_org() {
-        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin), systemUser, FALSE, HttpStatus.NOT_FOUND, TRUE);
+        professionalApiClient.searchUsersByOrganisation(createAndUpdateOrganisationToActive(hmctsAdmin),
+                systemUser, FALSE, HttpStatus.NOT_FOUND, TRUE);
     }
 
     @Test
