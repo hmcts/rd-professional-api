@@ -3,7 +3,8 @@
 properties([
         pipelineTriggers([cron('21 01 * * *')]), // scheduling to trigger jenkins job
         parameters([
-            string(name: 'URL_TO_TEST', defaultValue: 'http://rd-professional-api-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
+                string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
+                string(name: 'URL_TO_TEST', defaultValue: 'http://rd-professional-api-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
             string(name: 'SecurityRules',
                 defaultValue: 'http://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
                 description: 'The URL you want to run these tests against'),
@@ -47,6 +48,12 @@ def vaultOverrides = [
     'spreview': 'saat'
 ]
 
+import uk.gov.hmcts.contino.AppPipelineConfig
+
+def subscription = "nonprod"
+def config = new AppPipelineConfig()
+config.vaultSecrets = secrets
+
 withNightlyPipeline(type, product, component) {
 
 
@@ -55,7 +62,6 @@ withNightlyPipeline(type, product, component) {
     env.execution_environment = "aat"
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.Rules = params.SecurityRules
-    env.isNightlyBuild = 'true'
 
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
@@ -63,4 +69,25 @@ withNightlyPipeline(type, product, component) {
     enableMutationTest()
     enableFullFunctionalTest()
     enableSecurityScan()
+
+    after('fullFunctionalTest') {
+        print "calling delete script for nightly"
+        withSubscription(subscription) {
+            withTeamSecrets(config, params.ENVIRONMENT) {
+                deleteFunctionalDbData()
+            }
+        }
+        print "completed delete script for nightly"
+    }
+}
+
+def deleteFunctionalDbData() {
+    withDocker('jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
+        sh "chmod +x /deletescript/delete-functional-data.sh"
+        sh "/deletescript/delete-functional-data.sh \
+                        ${FUNC_DATABASE_USER} \
+                        ${FUNC_DATABASE_NAME} \
+                        ${FUNC_DATABASE_HOST} \
+                        ${FUNC_DATABASE_PORT}"
+    }
 }
