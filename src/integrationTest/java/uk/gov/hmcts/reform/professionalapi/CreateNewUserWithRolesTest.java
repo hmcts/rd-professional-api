@@ -50,20 +50,6 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void post_request_adds_new_user_to_an_organisation() {
-        List<String> userRoles = new ArrayList<>();
-
-        userRoles.add("pui-user-manager");
-
-        userCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email("somenewuser@email.com")
-                .roles(userRoles)
-                .build();
-    }
-
-    @Test
     public void post_request_adds_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
