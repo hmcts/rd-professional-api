@@ -10,7 +10,7 @@ public class ProfessionalApiConstants {
 
     public static final String EMAILREGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&’*+/=?`{|}~^-]+)"
             + "*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
-    public static String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
+    public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
             .concat("[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 
     public static final int LENGTH_OF_UUID = 36;
