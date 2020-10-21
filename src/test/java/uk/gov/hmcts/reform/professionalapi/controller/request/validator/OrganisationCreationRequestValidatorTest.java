@@ -233,7 +233,6 @@ public class OrganisationCreationRequestValidatorTest {
         String[] validEmails = new String[]{
             "shreedhar.lomte@hmcts.net",
             "shreedhar@yahoo.com",
-            "ad'il@wahoo.com",
             "Email.100@yahoo.com",
             "email111@email.com",
             "email.100@email.com.au",
