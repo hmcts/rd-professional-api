@@ -103,8 +103,9 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 userCreationRequest.getFirstName(),
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
         // inviting user
-        professionalApiClient
-                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,
+                userCreationRequest,  HttpStatus.CREATED);
+        
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 specification,email);
         assertThat(response.get("userIdentifier")).isNotNull();
