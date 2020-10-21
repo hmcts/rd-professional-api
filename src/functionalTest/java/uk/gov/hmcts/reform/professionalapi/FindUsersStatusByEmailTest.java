@@ -13,6 +13,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +24,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 @ActiveProfiles("functional")
 @Slf4j
 public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
+
+    String orgIdentifierResponse = null;
+
+    @BeforeAll
+    public void createAndUpdateOrganisation() {
+        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+    }
 
     @Test
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
@@ -36,7 +44,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 generateBearerTokenFor(puiUserManager), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -55,7 +63,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 generateBearerTokenForEmailHeader(puiUserManager), userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -74,7 +82,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
 
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 generateBearerTokenForEmailHeader(puiUserManager), "prd@prdfunctestuser.com");
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -96,7 +104,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
                 userCreationRequest.getLastName(), userCreationRequest.getEmail());
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest,  HttpStatus.CREATED);
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 specification,email);
         assertThat(response.get("userIdentifier")).isNotNull();
@@ -110,7 +118,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND,
                 generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
@@ -140,7 +148,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 generateBearerTokenForEmailHeader(puiFinanceManager), userCreationRequest.getEmail());
@@ -155,7 +163,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND,
                 generateBearerTokenFor(puiFinanceManager), userCreationRequest.getEmail());
@@ -175,7 +183,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         List<String> userRolesForToken = new ArrayList<>();
         userRolesForToken.add("pui-organisation-manager");
@@ -198,7 +206,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
         // find the status of the user
         List<String> userRolesForToken = new ArrayList<>();
         userRolesForToken.add("pui-organisation-manager");
@@ -223,7 +231,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
         // inviting user
         professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+                .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         String email = generateRandomEmail().toLowerCase();
         RequestSpecification bearerTokenForCourtAdmin = professionalApiClient
