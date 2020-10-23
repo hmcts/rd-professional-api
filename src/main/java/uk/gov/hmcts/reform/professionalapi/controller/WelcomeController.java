@@ -40,6 +40,7 @@ public class WelcomeController {
      *
      * @return Welcome message from the service.
      */
+     
     @ApiOperation("Welcome message for the System Reference Data API")
     @ApiResponses({
         @ApiResponse(
