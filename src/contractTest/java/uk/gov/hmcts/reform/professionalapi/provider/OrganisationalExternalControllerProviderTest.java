@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_organisationalExternalPbas")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors={@VersionSelector(tag ="${PACT_BRANCH_NAME:development}")})
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors={@VersionSelector(tag ="${PACT_BRANCH_NAME:Dev}")})
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
 @TestPropertySource(locations = "/application-contract.yaml")
 public class OrganisationalExternalControllerProviderTest {
