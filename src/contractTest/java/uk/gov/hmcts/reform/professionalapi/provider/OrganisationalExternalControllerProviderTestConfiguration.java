@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.ProfessionalUserReqValidator;
@@ -48,7 +47,8 @@ public class OrganisationalExternalControllerProviderTestConfiguration {
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
-        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient, emf, professionalUserRepository, organisationService,
+        return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
+            emf, professionalUserRepository, organisationService,
             userAccountMapService);
     }
 
