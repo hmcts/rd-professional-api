@@ -184,8 +184,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgForBearerTokens, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
@@ -206,8 +206,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient.
-                addNewUserToAnOrganisation(activeOrgForBearerTokens, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;
@@ -228,8 +228,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgForBearerTokens, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
 
         return bearerToken;
@@ -250,8 +250,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient
-                .addNewUserToAnOrganisation(activeOrgForBearerTokens, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+                        hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
