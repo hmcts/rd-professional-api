@@ -53,11 +53,11 @@ public class IdamOpenIdClient {
         String password = generateSidamPassword();
 
         String id = UUID.randomUUID().toString();
-
-        Role role = new Role(userRoles);
-
         List<Role> roles = new ArrayList<>();
-        roles.add(role);
+        userRoles.forEach(userRole -> {
+            Role role = new Role(userRole);
+            roles.add(role);
+        });
 
         Group group = new Group(userGroup);
 
@@ -160,7 +160,7 @@ public class IdamOpenIdClient {
 
     @AllArgsConstructor
     class Role {
-        private List<String> code;
+        private String code;
     }
 
     @AllArgsConstructor
@@ -187,5 +187,7 @@ public class IdamOpenIdClient {
         }
         return sidamPassword;
     }
+
+
 
 }
