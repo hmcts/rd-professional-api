@@ -4,7 +4,7 @@ DATABASE_USER=$1;
 DATABASE_NAME=$2;
 DATABASE_HOST=$3;
 DATABASE_PORT=$4;
-FILE_NAME="delete-functional-data-script.sql"
+FILE_NAME="delete-functional-test-data.sql"
 
 echo "executing nightly build delete script"
 
