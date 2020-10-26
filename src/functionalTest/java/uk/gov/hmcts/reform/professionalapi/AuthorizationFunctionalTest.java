@@ -352,4 +352,29 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 
+    public List<String> addRoles(String role) {
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        return roles;
+    }
+
+    public List<String> superUserRoles() {
+        List<String> superUserRoles = new ArrayList<String>();
+        superUserRoles.add("pui-case-manager");
+        superUserRoles.add("pui-user-manager");
+        superUserRoles.add("pui-organisation-manager");
+        superUserRoles.add("pui-finance-manager");
+        superUserRoles.add("caseworker");
+        superUserRoles.add("caseworker-publiclaw-solicitor");
+        superUserRoles.add("caseworker-divorce");
+        superUserRoles.add("caseworker-ia");
+        superUserRoles.add("caseworker-divorce-financialremedy");
+        superUserRoles.add("caseworker-probate");
+        superUserRoles.add("caseworker-publiclaw");
+        superUserRoles.add("caseworker-probate-solicitor");
+        superUserRoles.add("caseworker-ia-legalrep-solicitor");
+        superUserRoles.add("caseworker-ia-legalrep-solicitor");
+        superUserRoles.add("caseworker-divorce-solicitor");
+        return superUserRoles;
+    }
 }

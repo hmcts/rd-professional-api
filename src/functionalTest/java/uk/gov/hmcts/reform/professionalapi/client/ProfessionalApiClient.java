@@ -768,6 +768,12 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 
+    public RequestSpecification getMultipleAuthHeadersExternalForSuperUser(List<String> roles, String firstName,
+                                                                           String lastName, String email) {
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(roles, firstName, lastName, email);
+        return getMultipleAuthHeaders(bearerTokenForSuperUser);
+    }
+
     public RequestSpecification getEmailFromAuthHeadersExternal(String role, String firstName, String lastName,
                                                                String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);

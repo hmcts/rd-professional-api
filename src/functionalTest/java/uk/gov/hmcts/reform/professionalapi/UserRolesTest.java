@@ -42,7 +42,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
@@ -70,7 +70,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)

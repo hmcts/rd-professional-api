@@ -43,18 +43,18 @@ public class IdamOpenIdClient {
         this.testConfig = testConfig;
     }
 
-    public Map<String,String> createUser(String userRole) {
-        return createUser(userRole, generateRandomEmail(), "First", "Last");
+    public Map<String,String> createUser(List<String> userRoles) {
+        return createUser(userRoles, generateRandomEmail(), "First", "Last");
     }
 
-    public Map<String,String> createUser(String userRole, String userEmail, String firstName, String lastName) {
+    public Map<String,String> createUser(List<String> userRoles, String userEmail, String firstName, String lastName) {
         //Generating a random user
         String userGroup = "";
         String password = generateSidamPassword();
 
         String id = UUID.randomUUID().toString();
 
-        Role role = new Role(userRole);
+        Role role = new Role(userRoles);
 
         List<Role> roles = new ArrayList<>();
         roles.add(role);
@@ -87,7 +87,9 @@ public class IdamOpenIdClient {
 
     public String getInternalOpenIdToken() {
         if (internalOpenIdTokenPrdAdmin == null) {
-            Map<String,String> userCreds = createUser("prd-admin");
+            List<String> adminRole = new ArrayList<String>();
+            adminRole.add("prd-admin");
+            Map<String,String> userCreds = createUser(adminRole);
             internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
@@ -97,12 +99,21 @@ public class IdamOpenIdClient {
      This is customized method to generate the token based on passed role
      */
     public String getOpenIdTokenWithGivenRole(String role) {
-        Map<String,String> userCreds = createUser(role);
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        Map<String,String> userCreds = createUser(roles);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
-        Map<String,String> userCreds = createUser(role, email, firstName, lastName);
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        Map<String,String> userCreds = createUser(roles, email, firstName, lastName);
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+    }
+
+    public String getExternalOpenIdToken(List<String> roles, String firstName, String lastName, String email) {
+        Map<String,String> userCreds = createUser(roles, email, firstName, lastName);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
@@ -149,7 +160,7 @@ public class IdamOpenIdClient {
 
     @AllArgsConstructor
     class Role {
-        private String code;
+        private List<String> code;
     }
 
     @AllArgsConstructor
