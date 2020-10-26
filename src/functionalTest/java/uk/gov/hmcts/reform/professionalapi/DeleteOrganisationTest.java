@@ -85,7 +85,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
             .email(email)
             .build();
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName,
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName,
             lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
             .superUser(superUser)
@@ -125,8 +125,8 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
-        RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternal(
-            puiUserManager, firstName, lastName, email);
+        RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser
+                (superUserRoles(), firstName, lastName, email);
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier,
             requestSpecification, HttpStatus.FORBIDDEN);

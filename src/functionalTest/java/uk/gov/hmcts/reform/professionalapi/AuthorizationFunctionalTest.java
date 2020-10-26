@@ -307,7 +307,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .email(email)
                 .build();
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(),
+                firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
