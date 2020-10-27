@@ -9,6 +9,7 @@ import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.R
 import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
+@Slf4j
 public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     public static final String mapKey = "OrganisationInternalController.deleteOrganisation";
@@ -74,7 +76,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
         String firstName = "some-fname";
         String lastName = "some-lname";
@@ -94,6 +95,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
+        log.info("Delete organisation");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
     }
@@ -113,7 +115,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac8_could_not_delete_an_active_organisation_with_pending_userProfileByOtherThanPrdAdminThrow403() {
         String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
         String firstName = "some-fname";
@@ -125,9 +126,11 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
+        log.info("Org response::" + orgIdentifier);
         RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(
                 superUserRoles(), firstName, lastName, email);
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
+        log.info("Org response::" + orgIdentifier);
         professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier,
             requestSpecification, HttpStatus.FORBIDDEN);
     }

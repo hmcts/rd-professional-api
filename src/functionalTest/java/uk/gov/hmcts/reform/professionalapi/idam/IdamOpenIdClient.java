@@ -64,7 +64,7 @@ public class IdamOpenIdClient {
         User user = new User(userEmail, firstName, id, lastName, password, roles, group);
 
         String serializedUser = gson.toJson(user);
-
+        log.info("serializedUser: " + serializedUser);
         Response createdUserResponse = RestAssured
             .given()
             .relaxedHTTPSValidation()
@@ -137,7 +137,7 @@ public class IdamOpenIdClient {
             .post("/o/token")
             .andReturn();
 
-        log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
+        log.info("tokenParams::" + tokenParams + "::getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
