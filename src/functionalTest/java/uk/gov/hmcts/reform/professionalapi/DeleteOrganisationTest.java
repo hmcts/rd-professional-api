@@ -100,7 +100,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadminSuccessfully() {
+    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadmin_throws_400() {
         // create and update organisation
         String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
