@@ -36,7 +36,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
 
     RequestSpecification bearerTokenForPuiUserManager;
-    RequestSpecification bearerTokenForNonPuiUserManager;
     String orgIdentifierResponse;
 
     public RequestSpecification generateBearerTokenForPuiManager() {
@@ -63,38 +62,6 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 HttpStatus.CREATED);
 
         return bearerTokenForPuiUserManager;
-    }
-
-    public RequestSpecification generateBearerTokenForNonPuiManager() {
-
-        if (bearerTokenForNonPuiUserManager == null) {
-
-            Map<String, Object> response = professionalApiClient.createOrganisation();
-            String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-            professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-            List<String> userRoles = new ArrayList<>();
-            userRoles.add("pui-case-manager");
-            String userEmail = generateRandomEmail();
-            String lastName = "someLastName";
-            String firstName = "someName";
-
-            bearerTokenForNonPuiUserManager = professionalApiClient.getMultipleAuthHeadersExternal(puiCaseManager,
-                    firstName, lastName, userEmail);
-
-            NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .email(userEmail)
-                    .roles(userRoles)
-                    .build();
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, userCreationRequest,
-                    HttpStatus.CREATED);
-
-            return bearerTokenForNonPuiUserManager;
-        } else {
-            return bearerTokenForNonPuiUserManager;
-        }
     }
 
     @Test
@@ -369,6 +336,23 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         Map<String, Object> searchResponse = professionalApiClient
                 .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+
+        List<String> rolesToBeReturned = new ArrayList<>();
+        professionalUsersResponses.forEach(user -> {
+            if (IdamStatus.ACTIVE.name().equalsIgnoreCase((String) user.get("idamStatus"))) {
+                assertThat(user.get("roles")).isNotNull();
+                rolesToBeReturned.addAll((Collection<? extends String>) user.get("roles"));
+            }
+        });
+        return rolesToBeReturned;
+    }
+
+    private List<String> searchUserInfoExternal(String bearer) {
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusExternal(HttpStatus.OK,
+                        professionalApiClient.getMultipleAuthHeaders(bearer), "Active");
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
         List<String> rolesToBeReturned = new ArrayList<>();
