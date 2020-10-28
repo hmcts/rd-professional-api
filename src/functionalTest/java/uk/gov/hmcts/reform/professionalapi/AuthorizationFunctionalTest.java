@@ -344,8 +344,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public String generateBearerToken(String bearer, String role) {
         if (null == bearer) {
-            log.info("::::: Creating User");
-
             bearerTokenUser = createUserRequest(asList(role));
 
             bearer = professionalApiClient.getBearerTokenExternal(role, bearerTokenUser.getFirstName(),
