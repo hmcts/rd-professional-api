@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +31,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String orgIdentifier;
     private String firstName = "some-fname";
     private String lastName = "some-lname";
-
-    private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
-    private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
 
     @Test
     public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {
