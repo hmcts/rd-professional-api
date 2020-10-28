@@ -47,15 +47,19 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
+
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
-                generateBearerTokenFor(puiCaseManager));
+                professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken));
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
     public void retrieve_an_organisation_with_user_manager_rights_return_200() {
+        puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, puiUserManager);
+
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
-                generateBearerTokenFor(puiUserManager));
+                professionalApiClient.getMultipleAuthHeaders(puiUserManagerBearerToken));
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
