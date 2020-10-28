@@ -41,6 +41,15 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void add_new_user_to_organisation() {
+
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
+                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+    }
+
+    @Test
     public void add_new_user_to_organisation_with_unknown_roles_should_return_404() {
 
         List<String> roles = new ArrayList<>();
