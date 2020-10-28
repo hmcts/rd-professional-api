@@ -2,18 +2,12 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import io.restassured.specification.RequestSpecification;
-
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -22,9 +16,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 
@@ -34,36 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 @Slf4j
 public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
 
-    private RequestSpecification bearerTokenForUser;
-    private String orgIdentifier;
     private String email = generateRandomEmail();
-    private String lastName = "someLastName";
-    private String firstName = "someName";
-
-    public RequestSpecification generateBearerTokenForUser(String roleUnderTest, String... otherRoles) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        orgIdentifier = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
-
-        List<String> userRoles = Arrays.stream(otherRoles).collect(Collectors.toList());
-        userRoles.add(roleUnderTest);
-
-        bearerTokenForUser = professionalApiClient.getMultipleAuthHeadersExternal(roleUnderTest, firstName, lastName,
-                email);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(orgIdentifier, hmctsAdmin, userCreationRequest,
-                HttpStatus.CREATED);
-
-        return bearerTokenForUser;
-    }
-
 
     @Test
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
