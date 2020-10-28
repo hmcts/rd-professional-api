@@ -209,11 +209,11 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void rdcc1439_ac4_find_all_active_users_without_appropriate_role_for_an_organisation_should_return_403() {
-        courtAdminBearerToken = generateBearerToken(courtAdminBearerToken, "caseworker-caa");
-
 
         professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.FORBIDDEN,
-                professionalApiClient.getMultipleAuthHeaders(courtAdminBearerToken), "");
+                professionalApiClient.getMultipleAuthHeaders(
+                        generateBearerToken(courtAdminBearerToken, "caseworker-caa"))
+                , "");
     }
 
     @Test
