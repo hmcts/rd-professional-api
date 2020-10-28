@@ -22,7 +22,6 @@ public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_throw_Unauthorized_Error_code_without_bearertoken_to_update_an_organisation_401() {
-        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin, activeOrgId,
-                HttpStatus.UNAUTHORIZED);
+        professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin, activeOrgId, HttpStatus.UNAUTHORIZED);
     }
 }
