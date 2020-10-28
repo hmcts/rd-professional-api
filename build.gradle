@@ -19,6 +19,7 @@ plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id "org.flywaydb.flyway" version "7.0.2"
     id 'au.com.dius.pact' version '4.1.7'
+    id 'com.github.spacialcircumstances.gradle-cucumber-reporting' version '0.1.22'
 }
 
 
@@ -134,6 +135,7 @@ idea {
 }
 
 configurations {
+    cucumberRuntime.extendsFrom(functionalRuntime)
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
     functionalTestCompile.extendsFrom testCompile
@@ -165,13 +167,17 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-
-    systemProperty "scenario", System.getProperty('scenario')
-
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
-    finalizedBy aggregate
-    //maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
+    doFirst {
+        generateCucumberReports.enabled = true
+        javaexec {
+            main = "uk.gov.hmcts.reform.RefDataBeftaMain"
+            classpath += configurations.cucumberRuntime + sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', "json:$project/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+                    'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features/']
+        }
+    }
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
@@ -366,6 +372,8 @@ dependencies {
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
+    testCompile group: 'uk.gov.hmcts', name: 'befta-fw', version: '5.16.1'
+
     contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
         force = true
     }
@@ -389,6 +397,12 @@ dependencies {
 
     pactTestCompile sourceSets.main.runtimeClasspath
     pactTestCompile sourceSets.test.runtimeClasspath
+}
+
+cucumberReports {
+    outputDir = file("$project/target/cucumber")
+    reports = files("$project/target/cucumber.json")
+    notFailingStatuses = ["skipped","passed"]
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html

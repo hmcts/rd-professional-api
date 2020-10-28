@@ -11,7 +11,8 @@ def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
         's2s-${env}': [
-                secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+                secret('microservicekey-rd-professional-api', 'S2S_SECRET'),
+                secret('microservicekey-rd-professional-api', 'BEFTA_S2S_CLIENT_SECRET')
         ],
         'rd-${env}': [
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
@@ -20,7 +21,6 @@ def secrets = [
                 secret('LD-SDK-KEY', 'LD_SDK_KEY')
         ]
 ]
-
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     [$class     : 'AzureKeyVaultSecret',
@@ -45,8 +45,15 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableAksStagingDeployment()
 
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    //BEFTA releated env variables only for PR against AAT
+    env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.DEFINITION_STORE_HOST= "http://rd-professional-api-aat.service.core-compute-aat.internal"
+    env.CCD_IMPORT_AUTOTEST_EMAIL= "prd-admin@mailinator.com"
+    env.BEFTA_S2S_CLIENT_ID= "rd_professional_api"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.OAUTH2_REDIRECT_URI= "https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect"
+    env.CCD_IMPORT_AUTOTEST_PASSWORD= "AAAAAAA"
+    /////////
 
     before('functionalTest:preview') {
         env.execution_environment = "preview"

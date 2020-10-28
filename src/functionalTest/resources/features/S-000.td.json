@@ -1,0 +1,28 @@
+{
+  "_guid_": "S-000",
+  "title": "must see Ref data health is UP",
+  "_extends_": "F-000_Test_Data_Base",
+  "specs": [
+    "is to be made on behalf of Reference data API"
+  ],
+  "request": {
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]"
+    },
+    "body": {
+      "status": "UP"
+    }
+  }
+}
+

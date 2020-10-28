@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-000_Test_Data_Base",
+
+  "productName": "Reference data API",
+  "operationName": "Reference data health API",
+
+  "method": "GET",
+  "uri": "/health/liveness"
+}
+
