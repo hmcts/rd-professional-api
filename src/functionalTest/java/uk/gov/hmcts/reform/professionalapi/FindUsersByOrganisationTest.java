@@ -201,8 +201,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void rdcc1439_ac3_find_all_active_users_with_no_param_given_for_an_organisation_should_return_200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
 
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK,
-                        professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken), "");
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByReturnRolesParamExternal(
+                HttpStatus.OK, professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken), "");
         validateRetrievedUsers(response, "ACTIVE", true);
     }
 
