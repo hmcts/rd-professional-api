@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -90,19 +91,19 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     protected TestConfigProperties configProperties;
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
-
-    protected static  String  s2sToken;
-
+    protected static String  s2sToken;
     public static final String EMAIL = "EMAIL";
-
     public static final String CREDS = "CREDS";
-
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
-
+    public static String email;
     public static String activeOrgId;
-
-    public static String activeOrgForBearerTokens;
-
+    public static String activeOrgIdForBearerTokens;
+    public static String puiUserManagerBearerToken;
+    public static String puiCaseManagerBearerToken;
+    public static String puiOrgManagerBearerToken;
+    public static String puiFinanceManagerBearerToken;
+    public static String courtAdminBearerToken;
+    public static NewUserCreationRequest bearerTokenUser;
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -133,8 +134,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin);
         }
 
-        if (null == activeOrgForBearerTokens) {
-            activeOrgForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
+        if (null == activeOrgIdForBearerTokens) {
+            activeOrgIdForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
         }
     }
 
@@ -184,7 +185,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
                 hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
@@ -206,9 +207,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
                 hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
 
         return bearerToken;
     }
@@ -228,9 +228,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
                 hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
 
         return bearerToken;
     }
@@ -250,7 +249,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
 
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgForBearerTokens,
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
                         hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
@@ -341,6 +340,22 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static String generateRandomEmail() {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
+    }
+
+    public String generateBearerToken(String bearer, String role) {
+        if (null == bearer) {
+            log.info("::::: Creating User");
+
+            bearerTokenUser = createUserRequest(asList(role));
+
+            bearer = professionalApiClient.getBearerTokenExternal(role, bearerTokenUser.getFirstName(),
+                    bearerTokenUser.getLastName(), bearerTokenUser.getEmail());
+
+            professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                    hmctsAdmin, bearerTokenUser, HttpStatus.CREATED);
+            email = bearerTokenUser.getEmail();
+        }
+        return bearer;
     }
 
 }

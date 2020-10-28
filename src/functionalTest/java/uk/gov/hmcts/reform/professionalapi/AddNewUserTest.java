@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -34,26 +35,9 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Before
     public void createAndUpdateOrganisation() {
-        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-    }
-
-    @Test
-    public void add_new_user_to_organisation() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-    }
-
-    @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
+        if (null == orgIdentifierResponse) {
+            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
     }
 
     @Test
