@@ -42,12 +42,12 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
-
+        log.info("create organisation request");
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
@@ -70,7 +70,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         String email = generateRandomEmail().toLowerCase();
         UserCreationRequest superUser = createSuperUser(email);
 
-        professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
@@ -79,17 +79,20 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
+        log.info("orgIdentifier::" + orgIdentifier);
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
         Map<String, Object> searchUserResponse = professionalApiClient
                 .searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK,
                         "true");
+
+        log.info("searchUserResponse::" + searchUserResponse);
         validateRetrievedUsers(searchUserResponse, "any");
 
         List<Map> users = getNestedValue(searchUserResponse, "users");
         Map superUserDetails = users.get(0);
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
-
+        log.info("superUserRoles::" + superUserRoles);
         assertThat(superUserRoles).doesNotContain(puiCaa, caseworkerCaa);
     }
 
