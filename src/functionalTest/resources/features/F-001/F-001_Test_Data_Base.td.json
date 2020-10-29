@@ -1,0 +1,22 @@
+{
+  "_guid_": "F-001_Test_Data_Base",
+
+  "productName": "Reference data API",
+  "operationName": "Reference data Get users by org id API",
+
+  "request": {
+    "pathVariables": {
+      "organisationIdentifier": "${[scenarioContext][childContexts][S-001_Create_Organisation][testData][actualResponse][body][organisationIdentifier]}"
+    }
+  },
+  "method": "GET",
+  "uri": "/refdata/internal/v1/organisations/{organisationIdentifier}/users",
+
+  "users": {
+    "invokingUser": {
+      "username": "prd-admin-shree@mailinator.com",
+      "password": "Hmcts1234"
+    }
+  }
+}
+

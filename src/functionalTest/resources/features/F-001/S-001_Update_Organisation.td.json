@@ -1,0 +1,54 @@
+{
+  "_guid_": "S-001_Update_Organisation",
+  "productName": "Reference data API",
+  "operationName": "Update Organisation API",
+  "specs": [
+    "to update an organisation"
+  ],
+  "method": "PUT",
+  "uri": "/refdata/internal/v1/organisations/{organisationIdentifier}",
+
+  "users": {
+    "invokingUser": {
+      "username": "prd-admin-shree@mailinator.com",
+      "password": "Hmcts1234"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "organisationIdentifier": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][actualResponse][body][organisationIdentifier]}"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "body": {
+      "name": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][name]}",
+      "status": "ACTIVE",
+      "companyNumber": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][companyNumber]}",
+      "superUser": {
+        "userIdentifier": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][superUser][userIdentifier]}",
+        "firstName": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][superUser][firstName]}",
+        "lastName": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][superUser][lastName]}",
+        "email": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][superUser][email]}"
+      },
+      "contactInformation": [
+        {
+          "addressLine1": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][request][body][contactInformation][0][addressLine1]}"
+        }
+      ]
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}

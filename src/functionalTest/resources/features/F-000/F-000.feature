@@ -11,3 +11,4 @@ Feature: F-000 : Ref data health check
     And it is submitted to call the [Reference data health API] operation of [Reference data API],
     Then a positive response is received,
     And the response has all other details as expected.
+
