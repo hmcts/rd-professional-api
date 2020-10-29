@@ -174,7 +174,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
         javaexec {
             main = "uk.gov.hmcts.reform.RefDataBeftaMain"
             classpath += configurations.cucumberRuntime + sourceSets.functionalTest.runtimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', "json:$project/target/cucumber.json", '--tags', 'not @Ignore', '--glue',
+            args = ['--plugin', "json:${project.buildDir}/cucumber.json", '--tags', 'not @Ignore', '--glue',
                     'uk.gov.hmcts.befta.player', 'src/functionalTest/resources/features/']
         }
     }
@@ -250,7 +250,11 @@ pitest {
     mutationThreshold = 90
 
 }
-
+test {
+    generateCucumberReports.enabled = false
+    useJUnitPlatform()
+    failFast = true
+}
 
 project.tasks['pitest'].group = "Verification"
 
@@ -401,8 +405,8 @@ dependencies {
 }
 
 cucumberReports {
-    outputDir = file("$project/target/cucumber")
-    reports = files("$project/target/cucumber.json")
+    outputDir = file("${project.buildDir}/cucumber")
+    reports = files("${project.buildDir}/cucumber.json")
     notFailingStatuses = ["skipped","passed"]
 }
 
