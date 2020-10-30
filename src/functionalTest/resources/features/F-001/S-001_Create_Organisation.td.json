@@ -19,18 +19,17 @@
       "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
     },
     "body": {
-      "name": "testorg13",
+      "name": "${[scenarioContext][customValues][generateOrgName]}",
       "status": "ACTIVE",
-      "companyNumber": "FC5413",
+      "companyNumber": "${[scenarioContext][customValues][generateCompanyNo]}",
       "superUser": {
-        "userIdentifier": "test",
-        "firstName": "test_user",
-        "lastName": "last_user",
-        "email": "aac_test_super_13@mailinator.com"
+        "firstName": "test_prd_user_first_name",
+        "lastName": "test_prd_last_name",
+        "email": "${[scenarioContext][customValues][generateEmailId]}"
       },
       "contactInformation": [
         {
-          "addressLine1": "test lane 13"
+          "addressLine1": "test lane"
         }
       ]
     }

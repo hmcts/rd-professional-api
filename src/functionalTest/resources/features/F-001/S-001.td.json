@@ -31,7 +31,7 @@
         "lastName" : "[[ANYTHING_PRESENT]]",
         "email" : "[[ANYTHING_PRESENT]]",
         "idamStatus" : "[[ANYTHING_PRESENT]]",
-        "roles" : "[[ANYTHING_PRESENT]]",
+        "roles" : "[[ANY_OBJECT_NULLABLE]]",
         "idamStatusCode" : "[[ANYTHING_PRESENT]]",
         "idamMessage" : "[[ANYTHING_PRESENT]]"
       }
