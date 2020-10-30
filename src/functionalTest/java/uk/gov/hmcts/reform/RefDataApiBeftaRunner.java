@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.befta.BeftaMain;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = "json:target/cucumber.json",
+@CucumberOptions(plugin = "json:build/cucumber.json",
         glue = "uk.gov.hmcts.befta.player",
         features = {"classpath:features"})
 public class RefDataApiBeftaRunner {

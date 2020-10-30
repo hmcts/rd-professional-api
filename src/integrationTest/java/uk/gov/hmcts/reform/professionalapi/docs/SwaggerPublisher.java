@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 import java.io.File;
 import java.io.FileOutputStream;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Before;
@@ -17,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.professionalapi.Application;
@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.Application;
  * Built-in feature which saves service's swagger specs in temporary directory.
  * Each travis run on master should automatically save and upload (if updated) documentation.
  */
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(SpringRunner.class)
 @WithTags({@WithTag("testType:Integration")})
 @SpringBootTest(classes = Application.class, webEnvironment = MOCK)
 public class SwaggerPublisher {

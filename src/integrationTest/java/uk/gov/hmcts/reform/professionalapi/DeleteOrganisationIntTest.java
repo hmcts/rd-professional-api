@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -20,7 +19,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.or
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(SpringRunner.class)
 public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
 
     private String orgIdentifier;
