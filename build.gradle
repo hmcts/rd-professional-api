@@ -252,7 +252,7 @@ pitest {
 }
 test {
     generateCucumberReports.enabled = false
-    useJUnitPlatform()
+    //useJUnitPlatform()
     failFast = true
 }
 
