@@ -53,6 +53,7 @@ withPipeline(type, product, component) {
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
     env.OAUTH2_REDIRECT_URI= "https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect"
     env.CCD_IMPORT_AUTOTEST_PASSWORD= "AAAAAAA"
+    env.BEFTA_RESPONSE_HEADER_CHECK_POLICY= "JUST_WARN"
     /////////
 
     before('functionalTest:preview') {
@@ -72,11 +73,11 @@ withPipeline(type, product, component) {
     }
 
     after('functionalTest:preview') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/cucumber/**/*'
     }
 
     after('functionalTest:aat') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/cucumber/**/*'
     }
 
     enablePactAs([
