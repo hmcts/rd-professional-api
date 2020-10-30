@@ -35,7 +35,7 @@ def versions = [
         reformS2sClient    : '3.1.1',
         serenity           : '2.0.76',
         sonarPitest        : '0.5',
-        springBoot         : '2.3.3.RELEASE',
+        springBoot         : '2.3.4.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
@@ -171,7 +171,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
+    //maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
@@ -300,7 +300,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.0.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
 
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
@@ -325,6 +325,7 @@ dependencies {
 
     compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     compile group:"org.yaml", name: "snakeyaml", version:"1.27"
+
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
