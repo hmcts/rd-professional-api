@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
@@ -63,7 +65,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active user in UP
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(addRoles("pui-user-manager"));
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createNewUserRequest(pumUserCreds.get(EMAIL));
             Map<String, Object> newUserResponse = professionalApiClient
@@ -112,14 +114,18 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            List<String> roles = new ArrayList<String>();
+            roles.add("pui-user-manager");
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(roles);
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createNewUserRequest(pumUserCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
 
             // create active caseworker sidam user and invite
-            Map<String,String> caseWorkerCreds = idamOpenIdClient.createUser("caseworker");
+            List<String> roles1 = new ArrayList<String>();
+            roles.add("caseworker");
+            Map<String,String> caseWorkerCreds = idamOpenIdClient.createUser(roles1);
             newUserCreationRequest = professionalApiClient.createNewUserRequest(caseWorkerCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                     HttpStatus.CREATED);
@@ -142,7 +148,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
         if (resendInviteEnabled) {
             // create active PUM sidam user and invite
             IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(addRoles("pui-user-manager"));
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
                     .createNewUserRequest(pumUserCreds.get(EMAIL));
             professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
@@ -220,7 +226,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             if (resendInviteEnabled) {
                 // create active PUM sidam user and invite
                 IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-                Map<String,String> pumUserCreds = idamOpenIdClient.createUser("pui-user-manager");
+                Map<String,String> pumUserCreds = idamOpenIdClient.createUser(addRoles("pui-user-manager"));
                 NewUserCreationRequest newUserCreationRequest = professionalApiClient
                         .createNewUserRequest(pumUserCreds.get(EMAIL));
                 professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin,
@@ -241,4 +247,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
             }
         }
     }
+
+
 }

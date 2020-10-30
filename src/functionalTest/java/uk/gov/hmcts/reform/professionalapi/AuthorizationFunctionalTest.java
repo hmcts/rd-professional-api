@@ -85,7 +85,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected RequestSpecification bearerToken;
 
-    protected IdamOpenIdClient idamOpenIdClient;
+    protected static IdamOpenIdClient idamOpenIdClient;
 
     @Autowired
     protected TestConfigProperties configProperties;
@@ -125,7 +125,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
 
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        if (null == idamOpenIdClient) {
+            idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        }
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
@@ -297,7 +299,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .email(email)
                 .build();
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(),
+                firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
@@ -340,6 +343,32 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static String generateRandomEmail() {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
+    }
+
+    public List<String> addRoles(String role) {
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        return roles;
+    }
+
+    public List<String> superUserRoles() {
+        List<String> superUserRoles = new ArrayList<String>();
+        superUserRoles.add("pui-case-manager");
+        superUserRoles.add("pui-user-manager");
+        superUserRoles.add("pui-organisation-manager");
+        superUserRoles.add("pui-finance-manager");
+        superUserRoles.add("caseworker-divorce-financialremedy");
+        superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
+        superUserRoles.add("caseworker-divorce-solicitor");
+        superUserRoles.add("caseworker-divorce");
+        superUserRoles.add("caseworker");
+        superUserRoles.add("caseworker-probate");
+        superUserRoles.add("caseworker-probate-solicitor");
+        superUserRoles.add("caseworker-publiclaw");
+        superUserRoles.add("caseworker-publiclaw-solicitor");
+        superUserRoles.add("caseworker-ia-legalrep-solicitor");
+        superUserRoles.add("caseworker-ia");
+        return superUserRoles;
     }
 
     public String generateBearerToken(String bearer, String role) {

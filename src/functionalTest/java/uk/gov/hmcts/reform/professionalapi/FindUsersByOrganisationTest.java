@@ -237,8 +237,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);
         idamOpenIdClient
-                .createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
-                        newUserCreationRequest.getLastName());
+                .createUser(addRoles("hmctsAdmin"), email,
+                        newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName());
 
         // invite new user who is active
         professionalApiClient

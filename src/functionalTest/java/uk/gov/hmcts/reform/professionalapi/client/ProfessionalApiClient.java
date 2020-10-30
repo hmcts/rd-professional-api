@@ -60,7 +60,7 @@ public class ProfessionalApiClient {
     private final String s2sToken;
 
 
-    protected IdamOpenIdClient idamOpenIdClient;
+    protected static IdamOpenIdClient idamOpenIdClient;
 
     public ProfessionalApiClient(
         String professionalApiUrl,
@@ -758,6 +758,13 @@ public class ProfessionalApiClient {
     public RequestSpecification getMultipleAuthHeadersExternal(String role, String firstName, String lastName,
                                                                String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
+        return getMultipleAuthHeaders(bearerTokenForSuperUser);
+    }
+
+    public RequestSpecification getMultipleAuthHeadersExternalForSuperUser(List<String> roles, String firstName,
+                                                                           String lastName, String email) {
+        String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(roles, firstName, lastName, email);
+        log.info("SuperUser Token:" + bearerTokenForSuperUser);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
     }
 

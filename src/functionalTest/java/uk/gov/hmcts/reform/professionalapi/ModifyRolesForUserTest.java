@@ -75,7 +75,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String, String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        Map<String, String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));
         NewUserCreationRequest newUserCreationRequest = professionalApiClient
                 .createNewUserRequest(userCreds.get(EMAIL));
 
@@ -157,7 +157,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         professionalApiClient.updateOrganisation(orgIdentifier, hmctsAdmin);
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String, String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        Map<String, String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));
         NewUserCreationRequest newUserCreationRequest = professionalApiClient
                 .createNewUserRequest(userCreds.get(EMAIL));
 
@@ -271,7 +271,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
         //create test sidam user and add same user in org
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(puiUserManager);
+        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(addRoles(puiUserManager));
         String userId = (String) professionalApiClient.addNewUserToAnOrganisation(activeOrgId, hmctsAdmin,
                 professionalApiClient.createNewUserRequest(pumUserCreds.get(EMAIL)),
                 HttpStatus.CREATED).get("userIdentifier");
@@ -291,7 +291,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     public void should_get_403_when_external_user_modify_roles_of_non_active_user() {
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(puiUserManager);
+        Map<String, String> pumUserCreds = idamOpenIdClient.createUser(addRoles(puiUserManager));
         professionalApiClient.addNewUserToAnOrganisation(activeOrgId, hmctsAdmin,
                 professionalApiClient.createNewUserRequest(pumUserCreds.get(EMAIL)), HttpStatus.CREATED);
 

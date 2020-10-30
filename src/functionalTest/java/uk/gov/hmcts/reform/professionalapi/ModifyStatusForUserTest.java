@@ -27,7 +27,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_418_ac1_update_user_status_from_suspended_to_active() {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        Map<String,String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));
         NewUserCreationRequest newUserCreationRequest = professionalApiClient
                 .createNewUserRequest(userCreds.get(EMAIL));
 
@@ -63,7 +63,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
     @Test
     public void rdcc_418_ac2_update_user_status_from_active_to_suspended() {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        Map<String,String> userCreds = idamOpenIdClient.createUser("pui-organisation-manager");
+        Map<String,String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));
         NewUserCreationRequest newUserCreationRequest = professionalApiClient
                 .createNewUserRequest(userCreds.get(EMAIL));
 
