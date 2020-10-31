@@ -1,0 +1,57 @@
+{
+  "_guid_": "S-001_Invite_User",
+  "productName": "Reference data API",
+  "operationName": "Invite User API",
+  "specs": [
+    "to invite an user"
+  ],
+  "method": "POST",
+  "uri": "/refdata/internal/v1/organisations/{organisationIdentifier}/users/",
+
+  "users": {
+    "invokingUser": {
+      "username": "prd-admin-shree@mailinator.com",
+      "password": "Hmcts1234"
+    }
+  },
+  "request": {
+    "pathVariables": {
+      "organisationIdentifier": "${[scenarioContext][parentContext][childContexts][S-001_Create_Organisation][testData][actualResponse][body][organisationIdentifier]}"
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "body": {
+      "firstName": "FNameUserFortestorg123",
+      "lastName": "LNameUserFortestorg123",
+      "email": "${[scenarioContext][customValues][generateEmailId]}",
+      "roles": [
+        "pui-finance-manager"
+      ],
+      "resendInvite": "false"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]",
+      "Cache-Control": "[[ANYTHING_PRESENT]]",
+      "Expires" :  "[[ANYTHING_PRESENT]]",
+      "Pragma" :  "[[ANYTHING_PRESENT]]",
+      "X-Content-Type-Options" : "[[ANYTHING_PRESENT]]",
+      "X-Frame-Options" :  "[[ANYTHING_PRESENT]]",
+      "X-Xss-Protection" : "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "userIdentifier" : "[[ANYTHING_PRESENT]]",
+      "idamStatus" : null
+    }
+  }
+}

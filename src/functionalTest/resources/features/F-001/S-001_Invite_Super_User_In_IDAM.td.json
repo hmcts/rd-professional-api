@@ -1,0 +1,61 @@
+{
+  "_guid_": "S-001_Invite_Super_User_In_IDAM",
+  "productName": "Reference data API",
+  "operationName": "Invite Super User in IDAM",
+  "specs": [
+    "to IDAM to invite super user"
+  ],
+  "users": {
+    "invokingUser": {
+      "username": "prd-admin-shree@mailinator.com",
+      "password": "Hmcts1234"
+    }
+  },
+  "method": "POST",
+  "uri": "https://idam-api.aat.platform.hmcts.net/testing-support/accounts",
+
+  "request": {
+    "headers": {
+      "Content-Type": "application/json",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    },
+    "body": {
+      "email": "${[scenarioContext][customValues][generateEmailId]}",
+      "forename": "test",
+      "id": "${[scenarioContext][customValues][generateUUID]}",
+      "password": "Testing1234",
+      "roles": [
+        {
+          "code": "pui-user-manager"
+        },
+        {
+          "code": "pui-case-manager"
+        },
+        {
+          "code": "pui-finance-manager"
+        },
+        {
+          "code": "pui-organisarion-manager"
+        },
+        {
+          "code": "pui-caa"
+        }
+      ],
+      "surname": "test",
+      "userGroup": {
+        "code": "string"
+      }
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 201,
+    "responseMessage": "CREATED",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
