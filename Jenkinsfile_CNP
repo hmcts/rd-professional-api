@@ -18,7 +18,8 @@ def secrets = [
                 secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
                 secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
                 secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
-                secret('LD-SDK-KEY', 'LD_SDK_KEY')
+                secret('LD-SDK-KEY', 'LD_SDK_KEY'),
+                secret("s2s-secret",'S2S_SECRET')
         ]
 ]
 
@@ -45,16 +46,16 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableAksStagingDeployment()
 
-    //BEFTA releated env variables only for PR against AAT
-    env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.DEFINITION_STORE_HOST= "http://rd-professional-api-aat.service.core-compute-aat.internal"
-    env.CCD_IMPORT_AUTOTEST_EMAIL= "prd-admin@mailinator.com"
+    //BEFTA related env variables only for PR against AAT
     env.BEFTA_S2S_CLIENT_ID= "rd_professional_api"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.OAUTH2_REDIRECT_URI= "https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect"
-    env.CCD_IMPORT_AUTOTEST_PASSWORD= "AAAAAAA"
+    env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.BEFTA_RESPONSE_HEADER_CHECK_POLICY= "JUST_WARN"
-    /////////
+    env.OAUTH2_REDIRECT_URI= "https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect"
+    env.OAUTH2_ACCESS_TOKEN_TYPE= "OIDC"
+    env.OAUTH2_SCOPE_VARIABLES= "openid profile roles manage-user create-user search-user"
+    env.DEFINITION_STORE_HOST= "http://rd-professional-api-aat.service.core-compute-aat.internal"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    //
 
     before('functionalTest:preview') {
         env.execution_environment = "preview"
