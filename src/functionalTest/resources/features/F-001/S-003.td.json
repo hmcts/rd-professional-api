@@ -1,0 +1,33 @@
+{
+  "_guid_": "S-003",
+  "title": "Get users of an organisation wth return roles invalid",
+  "_extends_": "F-003_Test_Data_Base",
+  "specs": [
+    "active PRD admin role",
+    "is to be made on behalf of Reference data API"
+  ],
+  "request": {
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 400,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+  "errorMessage": "[[ANYTHING_PRESENT]]",
+  "errorDescription": "[[ANYTHING_PRESENT]]",
+  "timeStamp": "[[ANYTHING_PRESENT]]"
+    }
+  }
+}
+

@@ -39,7 +39,41 @@
         },
         {
           "code": "pui-caa"
+        },
+        {
+          "code": "caseworker-publiclaw"
+        },
+        {
+          "code": "caseworker-divorce"
+        },
+        {
+          "code": "caseworker-divorce-solicitor"
+        },
+        {
+          "code": "caseworker-probate"
+        },
+        {
+          "code": "caseworker-probate-solicitor"
+        },
+        {
+          "code":  "caseworker"
+        },
+        {
+          "code":  "caseworker-divorce-financialremedy-solicitor"
+        },
+        {
+          "code": "caseworker-ia-legalrep-solicitor"
+        },
+        {
+          "code": "caseworker-divorce-financialremedy"
+        },
+        {
+          "code": "caseworker-publiclaw-solicitor"
+        },
+        {
+          "code": "caseworker-ia"
         }
+
       ],
       "surname": "test",
       "userGroup": {

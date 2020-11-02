@@ -1,0 +1,21 @@
+{
+  "_guid_": "F-003_Test_Data_Base",
+
+  "productName": "Reference data APIs",
+  "operationName": "Reference data Get users with invalid roles by org id API",
+
+  "request": {
+    "pathVariables": {
+      "organisationIdentifier": "${[scenarioContext][childContexts][S-001_Create_Organisation][testData][actualResponse][body][organisationIdentifier]}"
+    }
+  },
+  "method": "GET",
+  "uri": "/refdata/internal/v1/organisations/{organisationIdentifier}/users?returnRoles=test",
+
+  "users": {
+    "invokingUser": {
+      "username": "mallikarjun.puttana@hmcts.net",
+      "password": "Testing1234"
+    }
+  }
+}
