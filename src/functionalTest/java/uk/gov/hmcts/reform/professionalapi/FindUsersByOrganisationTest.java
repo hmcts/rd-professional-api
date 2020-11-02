@@ -287,7 +287,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
         newUserCreationRequest.setEmail(email);
         newUserCreationRequest.setRoles(roles);
         idamOpenIdClient
-                .createUser(hmctsAdmin, email,
+                .createUser(addRoles("hmctsAdmin"), email,
                         newUserCreationRequest.getFirstName(), newUserCreationRequest.getLastName());
 
         // create and update org

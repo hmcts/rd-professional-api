@@ -20,16 +20,8 @@ public class PrdEnumRepositoryTest extends BaseRepository {
     public void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(39);
+        assertThat(prdEnums).hasSize(43);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
-    }
-
-    @Test
-    public void test_findByEnabledYes() {
-        List<PrdEnum> prdEnums = prdEnumRepository.findByEnabled("NO");
-
-        assertThat(prdEnums).hasSize(8);
-        assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isEqualTo(31);
     }
 
     @Test
