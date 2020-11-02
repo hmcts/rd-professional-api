@@ -38,9 +38,6 @@
           "code": "pui-organisation-manager"
         },
         {
-          "code": "pui-caa"
-        },
-        {
           "code": "caseworker-publiclaw"
         },
         {
@@ -69,6 +66,9 @@
         },
         {
           "code": "caseworker-publiclaw-solicitor"
+        },
+        {
+          "code": "caseworker-ia"
         }
 
       ],
