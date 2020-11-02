@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.0'
+    id 'uk.gov.hmcts.java' version '0.12.1'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.33.0'
