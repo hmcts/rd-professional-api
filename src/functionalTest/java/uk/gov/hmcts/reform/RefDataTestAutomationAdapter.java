@@ -16,7 +16,6 @@ public class RefDataTestAutomationAdapter extends DefaultTestAutomationAdapter {
 
     @Override
     public void doLoadTestData() {
-        //loader.importDefinitions();
     }
 
     @Override
