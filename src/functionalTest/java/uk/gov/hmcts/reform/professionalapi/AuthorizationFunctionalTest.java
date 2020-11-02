@@ -26,7 +26,6 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
-import uk.gov.hmcts.reform.professionalapi.config.DbConfig;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -35,9 +34,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.util.DataBaseUtil;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, DbConfig.class, DataBaseUtil.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
@@ -86,7 +84,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     protected RequestSpecification bearerToken;
 
-    protected IdamOpenIdClient idamOpenIdClient;
+    protected static IdamOpenIdClient idamOpenIdClient;
 
     @Autowired
     protected TestConfigProperties configProperties;
@@ -122,7 +120,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
 
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        if (null == idamOpenIdClient) {
+            idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        }
         professionalApiClient = new ProfessionalApiClient(
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
@@ -309,7 +309,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .email(email)
                 .build();
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName, email);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(),
+                firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
@@ -354,4 +355,29 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 
+    public List<String> addRoles(String role) {
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        return roles;
+    }
+
+    public List<String> superUserRoles() {
+        List<String> superUserRoles = new ArrayList<String>();
+        superUserRoles.add("pui-case-manager");
+        superUserRoles.add("pui-user-manager");
+        superUserRoles.add("pui-organisation-manager");
+        superUserRoles.add("pui-finance-manager");
+        superUserRoles.add("caseworker-divorce-financialremedy");
+        superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
+        superUserRoles.add("caseworker-divorce-solicitor");
+        superUserRoles.add("caseworker-divorce");
+        superUserRoles.add("caseworker");
+        superUserRoles.add("caseworker-probate");
+        superUserRoles.add("caseworker-probate-solicitor");
+        superUserRoles.add("caseworker-publiclaw");
+        superUserRoles.add("caseworker-publiclaw-solicitor");
+        superUserRoles.add("caseworker-ia-legalrep-solicitor");
+        superUserRoles.add("caseworker-ia");
+        return superUserRoles;
+    }
 }
