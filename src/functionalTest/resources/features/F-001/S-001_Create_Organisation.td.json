@@ -25,7 +25,7 @@
       "superUser": {
         "firstName": "test_prd_user_first_name",
         "lastName": "test_prd_last_name",
-        "email": "${[scenarioContext][parentContext][childContexts][S-001_Invite_Super_User_In_IDAM][testData][request][body][email]}"
+        "email": "${[scenarioContext][customValues][generateEmailId]}"
       },
       "contactInformation": [
         {

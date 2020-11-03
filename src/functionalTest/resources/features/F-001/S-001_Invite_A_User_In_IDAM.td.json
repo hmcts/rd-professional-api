@@ -3,7 +3,7 @@
   "productName": "Reference data API",
   "operationName": "Invite A User in IDAM",
   "specs": [
-    "to IDAM to invite a user"
+    "to create PUM IDAM user"
   ],
   "users": {
     "invokingUser": {
@@ -20,7 +20,7 @@
       "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
     },
     "body": {
-      "email": "${[scenarioContext][customValues][generateEmailId]}",
+      "email": "${[scenarioContext][customValues][generateExternalUserEmailId]}",
       "forename": "test",
       "id": "${[scenarioContext][customValues][generateUUID]}",
       "password": "Testing1234",

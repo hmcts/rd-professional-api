@@ -2,7 +2,7 @@
   "_guid_": "F-001_Test_Data_Base",
 
   "productName": "Reference data API",
-  "operationName": "Reference data Get users by org id API",
+  "operationName": "Reference data Get users with roles by org id API",
 
   "request": {
     "pathVariables": {

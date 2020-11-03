@@ -1,9 +1,19 @@
 {
-  "_guid_": "S-001",
-  "title": "Get users and their details with roles from organisation",
-  "_extends_": "F-001_Test_Data_Base",
+  "_guid_": "S-011",
+  "title": "Get users and their details with roles by PUM (external user) from organisation",
+  "productName": "Reference data API",
+  "operationName": "Reference data Get users of an organisation by PUM (external user) by org id API",
+  "method": "GET",
+  "uri": "/refdata/external/v1/organisations/users",
+
+  "users": {
+    "invokingUser": {
+      "username": "[[$EXT_USER_EMAIL_ID]]",
+      "password": "Testing1234"
+    }
+  },
   "specs": [
-    "active PRD admin role",
+    "active PUM user",
     "is to be made on behalf of Reference data API"
   ],
   "request": {
@@ -48,4 +58,3 @@
     }
   }
 }
-

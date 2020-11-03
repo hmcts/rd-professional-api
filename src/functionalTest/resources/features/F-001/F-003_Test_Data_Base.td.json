@@ -2,7 +2,7 @@
   "_guid_": "F-003_Test_Data_Base",
 
   "productName": "Reference data APIs",
-  "operationName": "Reference data Get users with invalid roles by org id API",
+  "operationName": "Reference data Get users with invalid roleRequired param by org id API",
 
   "request": {
     "pathVariables": {

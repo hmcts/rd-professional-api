@@ -5,19 +5,12 @@
   "specs": [
     "to IDAM to invite super user"
   ],
-  "users": {
-    "invokingUser": {
-      "username": "prd-admin-shree@mailinator.com",
-      "password": "Hmcts1234"
-    }
-  },
   "method": "POST",
   "uri": "https://idam-api.aat.platform.hmcts.net/testing-support/accounts",
 
   "request": {
     "headers": {
-      "Content-Type": "application/json",
-      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+      "Content-Type": "application/json"
     },
     "body": {
       "email": "${[scenarioContext][customValues][generateEmailId]}",
@@ -29,25 +22,28 @@
           "code": "pui-user-manager"
         },
         {
-          "code": "pui-case-manager"
+          "code": "pui-organisation-manager"
         },
         {
           "code": "pui-finance-manager"
         },
         {
-          "code": "pui-organisation-manager"
+          "code": "pui-case-manager"
         },
         {
-          "code": "pui-caa"
+          "code": "caseworker-divorce-financialremedy"
         },
         {
-          "code": "caseworker-publiclaw"
+          "code":  "caseworker-divorce-financialremedy-solicitor"
+        },
+        {
+          "code": "caseworker-divorce-solicitor"
         },
         {
           "code": "caseworker-divorce"
         },
         {
-          "code": "caseworker-divorce-solicitor"
+          "code":  "caseworker"
         },
         {
           "code": "caseworker-probate"
@@ -56,24 +52,17 @@
           "code": "caseworker-probate-solicitor"
         },
         {
-          "code":  "caseworker"
-        },
-        {
-          "code":  "caseworker-divorce-financialremedy-solicitor"
-        },
-        {
-          "code": "caseworker-ia-legalrep-solicitor"
-        },
-        {
-          "code": "caseworker-divorce-financialremedy"
+          "code": "caseworker-publiclaw"
         },
         {
           "code": "caseworker-publiclaw-solicitor"
         },
         {
+          "code": "caseworker-ia-legalrep-solicitor"
+        },
+        {
           "code": "caseworker-ia"
         }
-
       ],
       "surname": "test",
       "userGroup": {

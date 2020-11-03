@@ -1,6 +1,6 @@
 {
   "_guid_": "S-002",
-  "title": "Get users of an organisation",
+  "title": "Get users and their details without roles from organisation",
   "_extends_": "F-002_Test_Data_Base",
   "specs": [
     "active PRD admin role",

@@ -1,6 +1,6 @@
 {
   "_guid_": "S-003",
-  "title": "Get users of an organisation wth return roles invalid",
+  "title": "Get users and their details with invalid roleRequired param from organisation",
   "_extends_": "F-003_Test_Data_Base",
   "specs": [
     "active PRD admin role",
