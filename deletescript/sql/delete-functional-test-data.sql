@@ -3,7 +3,7 @@ where professional_user_id in
 (
 select id from professional_user where organisation_id in (
 select org.id from organisation org, professional_user up
-where up.email_address like any (values('%@prdfunctestuser.com'))
+where up.email_address like any (values('%@c'))
 and org.id=up.organisation_id)
 );
 

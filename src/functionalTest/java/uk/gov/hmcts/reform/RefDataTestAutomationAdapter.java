@@ -4,11 +4,9 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 
 import lombok.SneakyThrows;
 import uk.gov.hmcts.befta.DefaultTestAutomationAdapter;
-import uk.gov.hmcts.befta.data.UserData;
 import uk.gov.hmcts.befta.dse.ccd.TestDataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.player.BackEndFunctionalTestScenarioContext;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,7 +68,7 @@ public class RefDataTestAutomationAdapter extends DefaultTestAutomationAdapter {
             field.setAccessible(true);
             Map<String,String> modifiableEnv = (Map<String,String>) field.get(unmodifiableEnv);
             return modifiableEnv;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Unable to access writable environment variable map.");
         }
     }
