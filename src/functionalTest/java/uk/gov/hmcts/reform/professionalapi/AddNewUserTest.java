@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
@@ -38,7 +39,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
 
     @Before
     public void createAndUpdateOrganisation() {
-        if (null == orgIdentifierResponse) {
+        if (nonNull(orgIdentifierResponse)) {
             orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
         }
     }

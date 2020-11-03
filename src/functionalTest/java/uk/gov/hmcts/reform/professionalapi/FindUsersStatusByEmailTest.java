@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Arrays.asList;
 
@@ -29,7 +30,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     @Before
     public void setUp() {
-        if (null == orgId) {
+        if (nonNull(orgId)) {
             orgId = createAndUpdateOrganisationToActive(hmctsAdmin);
         }
     }
