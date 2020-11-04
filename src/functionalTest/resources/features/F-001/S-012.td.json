@@ -1,0 +1,60 @@
+{
+  "_guid_": "S-012",
+  "title": "Get users and their details without roles by PUM (external user) from organisation",
+  "productName": "Reference data API",
+  "operationName": "Reference data Get users of an organisation without roles by PUM (external user) by org id API",
+  "method": "GET",
+  "uri": "/refdata/external/v1/organisations/users?returnRoles=false",
+
+  "users": {
+    "invokingUser": {
+      "username": "[[$EXT_USER_EMAIL_ID]]",
+      "password": "Testing1234"
+    }
+  },
+  "specs": [
+    "active PUM user",
+    "is to be made on behalf of Reference data API"
+  ],
+  "request": {
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "[[DEFAULT_AUTO_VALUE]]",
+      "ServiceAuthorization": "[[DEFAULT_AUTO_VALUE]]"
+    }
+  },
+  "expectedResponse": {
+    "responseCode": 200,
+    "responseMessage": "OK",
+    "headers": {
+      "Content-Length": "[[ANYTHING_PRESENT]]",
+      "Content-Type": "[[ANYTHING_PRESENT]]",
+      "Date": "[[ANYTHING_PRESENT]]",
+      "Request-Context": "[[ANYTHING_PRESENT]]",
+      "Connection": "[[ANYTHING_PRESENT]]"
+    },
+    "body" : {
+      "organisationIdentifier" : "[[ANYTHING_PRESENT]]",
+      "users" : [ {
+        "userIdentifier" : "[[ANYTHING_PRESENT]]",
+        "firstName" : "[[ANYTHING_PRESENT]]",
+        "lastName" : "[[ANYTHING_PRESENT]]",
+        "email" : "[[ANYTHING_PRESENT]]",
+        "idamStatus" : "[[ANYTHING_PRESENT]]",
+        "roles" : "[[ANY_OBJECT_NULLABLE]]",
+        "idamStatusCode" : "[[ANYTHING_PRESENT]]",
+        "idamMessage" : "[[ANYTHING_PRESENT]]"
+      },{
+        "userIdentifier" : "[[ANYTHING_PRESENT]]",
+        "firstName" : "[[ANYTHING_PRESENT]]",
+        "lastName" : "[[ANYTHING_PRESENT]]",
+        "email" : "[[ANYTHING_PRESENT]]",
+        "idamStatus" : "[[ANYTHING_PRESENT]]",
+        "roles" : "[[ANY_OBJECT_NULLABLE]]",
+        "idamStatusCode" : "[[ANYTHING_PRESENT]]",
+        "idamMessage" : "[[ANYTHING_PRESENT]]"
+      }
+      ]
+    }
+  }
+}

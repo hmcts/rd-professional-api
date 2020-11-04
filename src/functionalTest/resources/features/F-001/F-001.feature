@@ -39,3 +39,19 @@ Feature: F-001 : Get all users and their details from organisation
     And the request [is to be made on behalf of Reference data API]
     And it is submitted to call the [Reference data Get users of an organisation by PUM (external user) by org id API] operation of [Reference data API]
     Then a positive response is received.
+
+  @S-012
+  Scenario: Get users and their details without roles by PUM (external user) from organisation
+    And a user with [active PUM user]
+    When a request is prepared with appropriate values
+    And the request [is to be made on behalf of Reference data API]
+    And it is submitted to call the [Reference data Get users of an organisation without roles by PUM (external user) by org id API] operation of [Reference data API]
+    Then a positive response is received.
+
+  @S-013
+  Scenario: Get users and their details with invalid roleRequired param by PUM (external user) from organisation
+    And a user with [active PUM user]
+    When a request is prepared with appropriate values
+    And the request [is to be made on behalf of Reference data API]
+    And it is submitted to call the [Reference data Get users of an organisation wwith invalid roleRequired param by PUM (external user) by org id API] operation of [Reference data API]
+    Then a negative response is received.
