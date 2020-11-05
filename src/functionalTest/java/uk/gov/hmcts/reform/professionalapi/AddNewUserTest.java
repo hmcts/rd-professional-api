@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
@@ -35,11 +35,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Slf4j
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
-    String orgIdentifierResponse = null;
+    static String orgIdentifierResponse = null;
 
     @Before
     public void createAndUpdateOrganisation() {
-        if (nonNull(orgIdentifierResponse)) {
+        if (isEmpty(orgIdentifierResponse)) {
             orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
         }
     }
