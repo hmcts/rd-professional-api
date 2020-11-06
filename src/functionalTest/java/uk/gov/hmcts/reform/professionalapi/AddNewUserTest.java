@@ -115,7 +115,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .build();
 
         //create Super User in IDAM
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName,
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName,
                 lastName, email);
 
         log.info("Super User Token" + bearerToken);
