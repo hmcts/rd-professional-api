@@ -300,7 +300,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         if (idamResponse.equalsIgnoreCase("504")) {
             email = generateRandomEmail().toLowerCase();
-            idamResponse = idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+            idamResponse =
+                    idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
         }
 
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamResponse);
