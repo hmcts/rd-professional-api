@@ -293,14 +293,23 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String firstName = "some-fname";
         String lastName = "some-lname";
         String email = generateRandomEmail();
+
+
+        String idamResponse =
+                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+
+        if (idamResponse.equalsIgnoreCase("504")) {
+            email = generateRandomEmail().toLowerCase();
+            idamResponse = idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+        }
+
+        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamResponse);
+
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
                 .build();
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(),
-                firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
