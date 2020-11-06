@@ -368,8 +368,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         superUserRoles.add("pui-organisation-manager");
         superUserRoles.add("pui-finance-manager");
         superUserRoles.add("caseworker-divorce-financialremedy");
-        //Below role commented out until we optimise IDAM User Creation Call with roles => 15
-        //superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
+        superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
         superUserRoles.add("caseworker-divorce-solicitor");
         superUserRoles.add("caseworker-divorce");
         superUserRoles.add("caseworker");
