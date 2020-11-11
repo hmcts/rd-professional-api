@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -33,27 +35,19 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Slf4j
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
-    String orgIdentifierResponse = null;
+    static String orgIdentifierResponse = null;
 
     @Before
     public void createAndUpdateOrganisation() {
-        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        if (isEmpty(orgIdentifierResponse)) {
+            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
     }
 
     @Test
     public void add_new_user_to_organisation() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-    }
-
-    @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
@@ -121,7 +115,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .build();
 
         //create Super User in IDAM
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName,
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName,
                 lastName, email);
 
         log.info("Super User Token" + bearerToken);
