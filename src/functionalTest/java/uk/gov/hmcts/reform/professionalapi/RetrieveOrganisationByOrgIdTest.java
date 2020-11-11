@@ -64,16 +64,20 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
 
     @Test
     public void rdcc117_ac1_pui_finance_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
+        puiFinanceManagerBearerToken = generateBearerToken(puiFinanceManagerBearerToken, puiFinanceManager);
+
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
-                generateBearerTokenForUser(puiFinanceManager));
+                professionalApiClient.getMultipleAuthHeaders(puiFinanceManagerBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         responseValidate(response);
     }
 
     @Test
     public void rdcc117_ac2_pui_organisation_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
+        puiOrgManagerBearerToken = generateBearerToken(puiOrgManagerBearerToken, puiOrgManager);
+
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
-                generateBearerTokenForUser(puiOrgManager));
+                professionalApiClient.getMultipleAuthHeaders(puiOrgManagerBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
     }
 
@@ -102,16 +106,20 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
 
     @Test
     public void can_retrieve_organisation_by_orgIdentifier_for_pui_user_manager_External() {
+        puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, puiUserManager);
+
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
-                generateBearerTokenForUser(puiUserManager));
+                professionalApiClient.getMultipleAuthHeaders(puiUserManagerBearerToken));
         assertThat(response).isNotEmpty();
         responseValidate(response);
     }
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
+
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
-                generateBearerTokenFor(puiCaseManager));
+                professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken));
         assertThat(response).isNotEmpty();
         responseValidate(response);
     }
