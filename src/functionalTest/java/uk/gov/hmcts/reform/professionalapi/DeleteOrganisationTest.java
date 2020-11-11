@@ -102,7 +102,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadminSuccessfully() {
+    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadmin_throws_400() {
         // create and update organisation
         String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
@@ -127,8 +127,18 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         String orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
         log.info("Org response::" + orgIdentifier);
-        RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(
-                superUserRoles(), firstName, lastName, email);
+
+        String idamResponse =
+                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+
+        if (idamResponse.equalsIgnoreCase("504")) {
+            email = generateRandomEmail().toLowerCase();
+            idamResponse =
+                    idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+        }
+
+        RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeaders(idamResponse);
+
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
         log.info("Org response::" + orgIdentifier);
         professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier,

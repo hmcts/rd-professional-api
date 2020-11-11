@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +32,20 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String firstName = "some-fname";
     private String lastName = "some-lname";
 
-    private List<String> dummyRoles = Arrays.asList("dummy-role-one", "dummy-role-two");
-    private List<String> puiUserManagerRoleOnly = Arrays.asList("pui-user-manager");
-
     @Test
-    public void rdcc_720_ac1_super_user_can_have_fpla_or_iac_roles() {
+    public void rdcc_720_and_1387_ac1_super_user_can_have_caa_roles_fpla_or_iac_roles_not_puiCaa_caseworkerCaa() {
 
         String email = generateRandomEmail().toLowerCase();
+
+        String idamResponse =
+                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+
+        if (idamResponse.equalsIgnoreCase("504")) {
+            email = generateRandomEmail().toLowerCase();
+            idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+        }
+
         UserCreationRequest superUser = createSuperUser(email);
-
-        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
-
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
@@ -62,37 +64,6 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
 
         assertThat(superUserRoles).contains("caseworker");
-
-    }
-
-    @Test
-    public void rdcc_1387_ac1_super_user_can_have_caa_roles() {
-        String email = generateRandomEmail().toLowerCase();
-        UserCreationRequest superUser = createSuperUser(email);
-
-        professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName, lastName, email);
-
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(superUser)
-                .build();
-
-        Map<String, Object> response = professionalApiClient.createOrganisation(request);
-        orgIdentifier = (String) response.get("organisationIdentifier");
-        request.setStatus("ACTIVE");
-        log.info("orgIdentifier::" + orgIdentifier);
-        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-
-        Map<String, Object> searchUserResponse = professionalApiClient
-                .searchUsersByOrganisation(orgIdentifier, hmctsAdmin, "false", HttpStatus.OK,
-                        "true");
-
-        log.info("searchUserResponse::" + searchUserResponse);
-        validateRetrievedUsers(searchUserResponse, "any");
-
-        List<Map> users = getNestedValue(searchUserResponse, "users");
-        Map superUserDetails = users.get(0);
-        List<String> superUserRoles = getNestedValue(superUserDetails, "roles");
-        log.info("superUserRoles::" + superUserRoles);
         assertThat(superUserRoles).doesNotContain(puiCaa, caseworkerCaa);
     }
 
@@ -135,7 +106,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
         return superUser;
     }
 
-    private NewUserCreationRequest createNewUser(String email,List<String> userRoles) {
+    private NewUserCreationRequest createNewUser(String email, List<String> userRoles) {
         NewUserCreationRequest newUser = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)

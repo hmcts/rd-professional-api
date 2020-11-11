@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
@@ -90,14 +91,19 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     protected TestConfigProperties configProperties;
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
-
-    protected static  String  s2sToken;
-
+    protected static String  s2sToken;
     public static final String EMAIL = "EMAIL";
-
     public static final String CREDS = "CREDS";
-
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
+    public static String email;
+    public static String activeOrgId;
+    public static String activeOrgIdForBearerTokens;
+    public static String puiUserManagerBearerToken;
+    public static String puiCaseManagerBearerToken;
+    public static String puiOrgManagerBearerToken;
+    public static String puiFinanceManagerBearerToken;
+    public static String courtAdminBearerToken;
+    public static NewUserCreationRequest bearerTokenUser;
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -115,8 +121,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
-        if (s2sToken == null) {
-
+        if (null == s2sToken) {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
 
@@ -127,6 +132,13 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
 
+        if (null == activeOrgId) {
+            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
+
+        if (null == activeOrgIdForBearerTokens) {
+            activeOrgIdForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -160,11 +172,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     }
 
     public RequestSpecification generateBearerTokenFor(String role) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         String userEmail = generateRandomEmail();
@@ -173,26 +180,20 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
 
-
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
 
     public RequestSpecification generateBearerTokenForEmailHeader(String role) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
-
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
         String userEmail = generateRandomEmail();
@@ -201,25 +202,20 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(role, firstName, lastName, userEmail);
 
-
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
 
     public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
         String userEmail = generateRandomEmail();
         String lastName = "someLastName";
         String firstName = "someName";
@@ -227,25 +223,20 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
                 userEmail);
 
-
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
 
     public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles, String email) {
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
-        professionalApiClient.updateOrganisation(orgIdentifierResponse, hmctsAdmin);
-
         String userEmail = email;
         String lastName = "someLastName";
         String firstName = "someName";
@@ -253,16 +244,15 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(puiUserManager, firstName, lastName,
                 userEmail);
 
-
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(userEmail)
                 .roles(userRoles)
                 .build();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
+        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                        hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
 
         return bearerToken;
     }
@@ -303,14 +293,24 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String firstName = "some-fname";
         String lastName = "some-lname";
         String email = generateRandomEmail();
+
+
+        String idamResponse =
+                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+
+        if (idamResponse.equalsIgnoreCase("504")) {
+            email = generateRandomEmail().toLowerCase();
+            idamResponse =
+                    idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+        }
+
+        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamResponse);
+
         UserCreationRequest superUser = aUserCreationRequest()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
                 .build();
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(),
-                firstName, lastName, email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
@@ -380,4 +380,19 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         superUserRoles.add("caseworker-ia");
         return superUserRoles;
     }
+
+    public String generateBearerToken(String bearer, String role) {
+        if (null == bearer) {
+            bearerTokenUser = createUserRequest(asList(role));
+
+            bearer = professionalApiClient.getBearerTokenExternal(role, bearerTokenUser.getFirstName(),
+                    bearerTokenUser.getLastName(), bearerTokenUser.getEmail());
+
+            professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
+                    hmctsAdmin, bearerTokenUser, HttpStatus.CREATED);
+            email = bearerTokenUser.getEmail();
+        }
+        return bearer;
+    }
+
 }
