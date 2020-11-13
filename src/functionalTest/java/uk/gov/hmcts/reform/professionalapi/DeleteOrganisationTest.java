@@ -129,13 +129,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         log.info("Org response::" + orgIdentifier);
 
         String idamResponse =
-                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-
-        if (idamResponse.equalsIgnoreCase("504")) {
-            email = generateRandomEmail().toLowerCase();
-            idamResponse =
-                    idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-        }
+                idamOpenIdClient.getExternalOpenIdToken("pui-user-manager", firstName, lastName, email);
 
         RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeaders(idamResponse);
 
