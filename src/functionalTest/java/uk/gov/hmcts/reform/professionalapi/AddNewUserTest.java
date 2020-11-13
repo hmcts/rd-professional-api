@@ -90,7 +90,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         String email = generateRandomEmail();
 
         bearerToken = professionalApiClient.getMultipleAuthHeadersExternal("pui-user-manager", firstName,
-                        lastName, generateRandomEmail());
+                        lastName, email);
 
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(aUserCreationRequest()
