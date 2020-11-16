@@ -43,28 +43,28 @@ public class IdamOpenIdClient {
         this.testConfig = testConfig;
     }
 
-    public Map<String,String> createUser(String userRole) {
-        return createUser(userRole, generateRandomEmail(), "First", "Last");
+    public Map<String,String> createUser(List<String> userRoles) {
+        return createUser(userRoles, generateRandomEmail(), "First", "Last");
     }
 
-    public Map<String,String> createUser(String userRole, String userEmail, String firstName, String lastName) {
+    public Map<String,String> createUser(List<String> userRoles, String userEmail, String firstName, String lastName) {
         //Generating a random user
         String userGroup = "";
         String password = generateSidamPassword();
 
         String id = UUID.randomUUID().toString();
-
-        Role role = new Role(userRole);
-
         List<Role> roles = new ArrayList<>();
-        roles.add(role);
+        userRoles.forEach(userRole -> {
+            Role role = new Role(userRole);
+            roles.add(role);
+        });
 
         Group group = new Group(userGroup);
 
         User user = new User(userEmail, firstName, id, lastName, password, roles, group);
 
         String serializedUser = gson.toJson(user);
-
+        log.info("serializedUser: " + serializedUser);
         Response createdUserResponse = RestAssured
             .given()
             .relaxedHTTPSValidation()
@@ -85,9 +85,43 @@ public class IdamOpenIdClient {
         return userCreds;
     }
 
+    public int createSuperUserWithRetry(List<String> userRoles, String userEmail, String firstName,
+                                        String lastName, String password) {
+        //Generating a random user
+        String userGroup = "";
+
+        String id = UUID.randomUUID().toString();
+        List<Role> roles = new ArrayList<>();
+        userRoles.forEach(userRole -> {
+            Role role = new Role(userRole);
+            roles.add(role);
+        });
+
+        Group group = new Group(userGroup);
+
+        User user = new User(userEmail, firstName, id, lastName, password, roles, group);
+
+        String serializedUser = gson.toJson(user);
+        log.info("serializedUser: " + serializedUser);
+        Response createdUserResponse = RestAssured
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .body(serializedUser)
+            .post("/testing-support/accounts")
+            .andReturn();
+
+        log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+
+        return createdUserResponse.getStatusCode();
+    }
+
     public String getInternalOpenIdToken() {
         if (internalOpenIdTokenPrdAdmin == null) {
-            Map<String,String> userCreds = createUser("prd-admin");
+            List<String> adminRole = new ArrayList<String>();
+            adminRole.add("prd-admin");
+            Map<String,String> userCreds = createUser(adminRole);
             internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
@@ -97,12 +131,30 @@ public class IdamOpenIdClient {
      This is customized method to generate the token based on passed role
      */
     public String getOpenIdTokenWithGivenRole(String role) {
-        Map<String,String> userCreds = createUser(role);
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        Map<String,String> userCreds = createUser(roles);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
-        Map<String,String> userCreds = createUser(role, email, firstName, lastName);
+        List<String> roles = new ArrayList<String>();
+        roles.add(role);
+        Map<String,String> userCreds = createUser(roles, email, firstName, lastName);
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+    }
+
+    public String getExternalOpenIdTokenWithRetry(List<String> roles, String firstName, String lastName, String email) {
+        String password = generateSidamPassword();
+        int statusCode = createSuperUserWithRetry(roles, email, firstName, lastName, password);
+
+        if (statusCode != 201) {
+            return String.valueOf(statusCode);
+        }
+
+        Map<String,String> userCreds = new HashMap<>();
+        userCreds.put(EMAIL, email);
+        userCreds.put(CREDS, password);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
@@ -126,7 +178,7 @@ public class IdamOpenIdClient {
             .post("/o/token")
             .andReturn();
 
-        log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
+        log.info("tokenParams::" + tokenParams + "::getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
@@ -176,5 +228,7 @@ public class IdamOpenIdClient {
         }
         return sidamPassword;
     }
+
+
 
 }
