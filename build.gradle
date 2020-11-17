@@ -324,7 +324,7 @@ dependencies {
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.2.0'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
