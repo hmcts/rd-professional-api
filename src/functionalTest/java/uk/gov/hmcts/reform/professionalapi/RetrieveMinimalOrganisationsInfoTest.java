@@ -38,11 +38,6 @@ import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluatio
 @ActiveProfiles("functional")
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
-    private boolean activeOrgsExternalEnabled;
-
-    private static final String STATUS_PARAM_INVALID_MESSAGE =
-        "Invalid status param provided, only Active status is allowed";
-
     private List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> noAddressOrgs = new ArrayList<>();

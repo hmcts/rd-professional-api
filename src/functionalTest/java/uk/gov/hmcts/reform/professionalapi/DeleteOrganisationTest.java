@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
-import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +100,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadminSuccessfully() {
+    public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadmin_throws_400() {
         // create and update organisation
         String orgIdentifierResp = createAndUpdateOrganisationToActive(hmctsAdmin);
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
@@ -112,26 +110,5 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
 
         professionalApiClient.deleteOrganisation(orgIdentifierResp, hmctsAdmin, HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    public void ac8_could_not_delete_an_active_organisation_with_pending_userProfileByOtherThanPrdAdminThrow403() {
-        String email = randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        String firstName = "some-fname";
-        String lastName = "some-lname";
-        UserCreationRequest superUser = createSuperUser(email, firstName, lastName);
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-            .superUser(superUser)
-            .build();
-        Map<String, Object> response = professionalApiClient.createOrganisation(request);
-        String orgIdentifier = (String) response.get("organisationIdentifier");
-        request.setStatus("ACTIVE");
-        log.info("Org response::" + orgIdentifier);
-        RequestSpecification requestSpecification = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(
-                superUserRoles(), firstName, lastName, email);
-        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-        log.info("Org response::" + orgIdentifier);
-        professionalApiClient.deleteOrganisationByExternalUsersBearerToken(orgIdentifier,
-            requestSpecification, HttpStatus.FORBIDDEN);
     }
 }

@@ -38,7 +38,7 @@ def versions = [
         springBoot         : '2.3.4.RELEASE',
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
-        pact_version       : '3.5.24',
+        pact_version       : '4.1.7',
         launchDarklySdk    : "5.0.5"
 ]
 
@@ -171,7 +171,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    //maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
+    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
@@ -367,10 +367,14 @@ dependencies {
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
-    contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
-        force = true
-    }
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
     contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
