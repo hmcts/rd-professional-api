@@ -38,11 +38,6 @@ import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluatio
 @ActiveProfiles("functional")
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
 
-    private boolean activeOrgsExternalEnabled;
-
-    private static final String STATUS_PARAM_INVALID_MESSAGE =
-        "Invalid status param provided, only Active status is allowed";
-
     private List<OrganisationMinimalInfoResponse> activeOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> pendingOrgs = new ArrayList<>();
     private List<OrganisationMinimalInfoResponse> noAddressOrgs = new ArrayList<>();
@@ -159,7 +154,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
 
         Map<String, String> userCreds =
-            idamOpenIdClient.createUser(hmctsAdmin, email, newUserCreationRequest.getFirstName(),
+            idamOpenIdClient.createUser(addRoles("hmctsAdmin"), email, newUserCreationRequest.getFirstName(),
                 newUserCreationRequest.getLastName());
         bearerToken = professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient
             .getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS)));

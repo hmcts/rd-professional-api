@@ -14,12 +14,14 @@ java:
     CCD_URL: http://ccd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
-
   image: 'hmctspublic.azurecr.io/rd/professional-api:latest'
   keyVaults:
     rd:
       secrets:
         - professional-api-POSTGRES-PASS
-        - s2s-secret
         - AppInsightsInstrumentationKey
         - LD-SDK-KEY
+  autoscaling:
+    enabled: true
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80

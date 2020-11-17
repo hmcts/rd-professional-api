@@ -37,7 +37,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
@@ -61,7 +60,7 @@ public class ProfessionalApiClient {
     private final String s2sToken;
 
 
-    protected IdamOpenIdClient idamOpenIdClient;
+    protected static IdamOpenIdClient idamOpenIdClient;
 
     public ProfessionalApiClient(
         String professionalApiUrl,
@@ -182,18 +181,12 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> createOrganisationWithoutS2SToken(OrganisationCreationRequest
+    public Response createOrganisationWithoutS2SToken(OrganisationCreationRequest
                                                                      organisationCreationRequest) {
-        Response response = withUnauthenticatedRequest()
+        return withUnauthenticatedRequest()
             .body(organisationCreationRequest)
             .post("/refdata/external/v1/organisations")
             .andReturn();
-
-        response.then()
-            .assertThat()
-            .statusCode(UNAUTHORIZED.value());
-
-        return response.body().as(Map.class);
     }
 
     public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest
@@ -766,6 +759,19 @@ public class ProfessionalApiClient {
                                                                String email) {
         String bearerTokenForSuperUser = idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
         return getMultipleAuthHeaders(bearerTokenForSuperUser);
+    }
+
+    public RequestSpecification getMultipleAuthHeadersExternalForSuperUser(List<String> roles, String firstName,
+                                                                           String lastName, String email) {
+        String bearerTokenForSuperUser =
+                idamOpenIdClient.getExternalOpenIdTokenWithRetry(roles, firstName, lastName, email);
+        log.info("SuperUser Token:" + bearerTokenForSuperUser);
+        return getMultipleAuthHeaders(bearerTokenForSuperUser);
+    }
+
+    public String getBearerTokenExternal(String role, String firstName, String lastName,
+                                                               String email) {
+        return idamOpenIdClient.getExternalOpenIdToken(role, firstName, lastName, email);
     }
 
     public RequestSpecification getEmailFromAuthHeadersExternal(String role, String firstName, String lastName,

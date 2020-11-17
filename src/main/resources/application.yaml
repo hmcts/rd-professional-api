@@ -68,6 +68,7 @@ security:
   anonymousPaths:
     - "/"
     - "/health"
+    - "/health/readiness"
     - "/health/liveness"
     - "/actuator/**"
     - "/loggers/**"
@@ -85,7 +86,7 @@ idam:
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
-    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac,aac_manage_case_assignment}
+    services: ${PRD_S2S_AUTHORISED_SERVICES:rd_professional_api,rd_user_profile_api,xui_webapp,finrem_payment_service,fpl_case_service,iac,aac_manage_case_assignment,divorce_frontend}
   api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
@@ -104,7 +105,7 @@ prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 allowedStatus: ACTIVE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-549.service.core-compute-preview.internal}
 
 feign:
   allow:
