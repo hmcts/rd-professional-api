@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.getNestedValue;
@@ -8,9 +9,9 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -21,11 +22,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -33,27 +31,19 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 @Slf4j
 public class AddNewUserTest extends AuthorizationFunctionalTest {
 
-    String orgIdentifierResponse = null;
+    static String orgIdentifierResponse = null;
 
     @Before
     public void createAndUpdateOrganisation() {
-        orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        if (isEmpty(orgIdentifierResponse)) {
+            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        }
     }
 
     @Test
     public void add_new_user_to_organisation() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-    }
-
-    @Test
-    public void add_new_user_to_organisation_with_no_jurisdiction_should_return_201() {
-
-        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
@@ -94,65 +84,27 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     public void add_new_user_to_organisation_by_super_user() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
-        NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
-                .firstName("someName")
-                .lastName("someLastName")
-                .email(generateRandomEmail())
-                .roles(userRoles)
-                .build();
 
-        Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisationExternal(newUserCreationRequest, generateSuperUserBearerToken(),
-                        HttpStatus.CREATED);
-        assertThat(newUserResponse).isNotNull();
-    }
-
-    //currently returning 500 response status code which is coming 500 from SIDAM - but comes 403 when testing in
-    // Swagger
-    @Test
-    public void add_new_user_to_organisation_when_super_user_is_not_active_throws_403() {
         String firstName = "some-fname";
         String lastName = "some-lname";
-        String email = generateRandomEmail().toLowerCase();
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .build();
+        String email = generateRandomEmail();
 
-        //create Super User in IDAM
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName,
-                lastName, email);
+        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal("pui-user-manager", firstName,
+                        lastName, email);
 
-        log.info("Super User Token" + bearerToken);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(superUser)
+                .superUser(aUserCreationRequest()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .email(email)
+                        .build())
                 .build();
 
-        //Create organisation with Super User that is already Active in IDAM
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         String orgIdentifier = (String) response.get("organisationIdentifier");
         request.setStatus("ACTIVE");
         professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
 
-        log.info("After Update The Organisation::");
-        //Retrieve User Identifier to update status
-        Map<String, Object> searchUsersResponse = professionalApiClient.searchUsersByOrganisation(orgIdentifier,
-                hmctsAdmin, "false", HttpStatus.OK, "true");
-        assertThat(searchUsersResponse.get("users")).asList().isNotEmpty();
-
-        log.info("After searchUsersResponse::" + searchUsersResponse);
-        UserProfileUpdatedData data = new UserProfileUpdatedData();
-        data.setFirstName("UpdatedFirstName");
-        data.setLastName("UpdatedLastName");
-        data.setIdamStatus(IdamStatus.SUSPENDED.name());
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchUsersResponse.get("users");
-        String userId = (String) professionalUsersResponses.get(0).get("userIdentifier");
-        //Updating user status from Active to Suspended
-        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, orgIdentifier, userId);
-
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("caseworker");
         NewUserCreationRequest newUserCreationRequest = aNewUserCreationRequest()
                 .firstName("someName")
                 .lastName("someLastName")
@@ -160,11 +112,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
                 .roles(userRoles)
                 .build();
 
-        //adding new user with Suspended Super User Bearer Token
         Map<String, Object> newUserResponse = professionalApiClient
-                .addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken,
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-        log.info("New User Response::" + newUserResponse);
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest, bearerToken, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
     }
 

@@ -12,6 +12,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -21,10 +22,15 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 @Slf4j
 public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
 
+    Map<String, Object> orgResponse;
+
+    @BeforeAll
+    public void setUp() {
+        orgResponse = professionalApiClient.createOrganisation();
+    }
+
     @Test
     public void can_retrieve_all_organisations() {
-        professionalApiClient.createOrganisation();
-
         Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
         Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
@@ -37,29 +43,29 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
         response = professionalApiClient.retrieveOrganisationDetails((String) response.get("organisationIdentifier"),
                 puiCaseManager,HttpStatus.OK);
         validateSingleOrgResponse(response, "PENDING");
-
     }
 
     @Test
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
+        puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
+
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
-                generateBearerTokenFor(puiCaseManager));
+                professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken));
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
     public void retrieve_an_organisation_with_user_manager_rights_return_200() {
+        puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, puiUserManager);
+
         Map<String, Object> response = professionalApiClient.retrievePbaAccountsForAnOrganisationExternal(HttpStatus.OK,
-                generateBearerTokenFor(puiUserManager));
+                professionalApiClient.getMultipleAuthHeaders(puiUserManagerBearerToken));
         validateSingleOrgResponse(response, "ACTIVE");
     }
 
     @Test
     public void can_retrieve_Pending_and_Active_organisations() {
 
-        Map<String, Object> orgResponseOne =  professionalApiClient.createOrganisation();
-        String orgIdentifierOne = (String) orgResponseOne.get("organisationIdentifier");
-        assertThat(orgIdentifierOne).isNotEmpty();
         Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
         String orgIdentifierTwo = (String) orgResponseTwo.get("organisationIdentifier");
         assertThat(orgIdentifierTwo).isNotEmpty();

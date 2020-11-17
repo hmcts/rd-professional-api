@@ -25,7 +25,7 @@ public class EditPbaTest extends AuthorizationFunctionalTest {
 
     @Test
     public void can_edit_active_organisation_payment_accounts_by_orgId() {
-        String email = randomAlphabetic(10) + "@pbasearch.test".toLowerCase();
+        String email = randomAlphabetic(10) + "@prdfunctestuser.com".toLowerCase();
         String pbaNumber = "PBA" + randomAlphabetic(7);
 
         Set<String> paymentAccounts = new HashSet<>();
