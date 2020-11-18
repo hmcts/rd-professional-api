@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
@@ -264,7 +265,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
 
     public List<String> getOrganisationInfo(OrganisationMinimalInfoResponse org) {
         List<String> details = new ArrayList<>();
-        if (null != org.getContactInformation().get(0).getAddressLine1()) {
+        if (null != org.getContactInformation() && isNotEmpty(org.getContactInformation().get(0).getAddressLine1())) {
             details.add(org.getContactInformation().get(0).getAddressLine1());
         }
         details.add(org.getName());
