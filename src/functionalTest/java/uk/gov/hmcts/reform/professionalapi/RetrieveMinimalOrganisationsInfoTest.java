@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
@@ -35,7 +34,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
@@ -63,7 +62,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         + ".retrieveOrganisationsByStatusWithAddressDetailsOptional";
 
     @Test
-//    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
