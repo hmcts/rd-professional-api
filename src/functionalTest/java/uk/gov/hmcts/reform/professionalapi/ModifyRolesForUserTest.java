@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -242,6 +243,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void should_get_400_when_modify_roles_for_pending_user_internal() {
 
@@ -255,6 +257,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .isEqualTo("3 : There is a problem with your request. Please check and try again");
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void should_get_404_when_modify_roles_for_unknown_user_internal() {
         String unknownUserId = UUID.randomUUID().toString();

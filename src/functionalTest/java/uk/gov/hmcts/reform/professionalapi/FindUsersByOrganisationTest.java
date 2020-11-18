@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -45,18 +46,21 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 "False", HttpStatus.OK, "false"), "any", false);
     }
 
+    @Ignore //TODO: duplicate test of ac1, ac2, ac3 etc. below - to be removed
     @Test
     public void find_users_by_active_organisation_with_returnRoles_True() {
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(activeOrgId, hmctsAdmin,
                 "True", HttpStatus.OK, "true"), "any", true);
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void find_users_by_active_organisation_with_returnRoles_invalid() {
         professionalApiClient.searchUsersByOrganisation(activeOrgId,
                 puiCaseManager, "True", HttpStatus.FORBIDDEN, "");
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void find_users_for_non_active_organisation() {
         professionalApiClient.searchUsersByOrganisation(
@@ -64,6 +68,8 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
                 hmctsAdmin, "False", HttpStatus.NOT_FOUND, "");
     }
 
+    //TODO: remove, duplicate of rdcc1439_ac2_find_all_active_users_with_roles_for_an_organisation_should_return_200()
+    @Ignore
     @Test
     public void ac1_find_all_active_users_with_roles_for_an_org_with_non_pui_user_manager_role_should_rtn_200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);

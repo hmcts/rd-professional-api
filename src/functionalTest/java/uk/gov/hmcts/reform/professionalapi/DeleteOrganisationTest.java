@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac3_error_when_delete_an_organisation_with_unknown_org_identifier_should_return_404() {
@@ -98,6 +100,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadmin_throws_400() {
