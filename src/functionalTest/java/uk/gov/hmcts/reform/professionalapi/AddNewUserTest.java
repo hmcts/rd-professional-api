@@ -18,6 +18,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -117,6 +118,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
         List<String> userRoles = new ArrayList<>();
