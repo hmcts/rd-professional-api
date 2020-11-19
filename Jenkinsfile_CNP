@@ -82,8 +82,8 @@ withPipeline(type, product, component) {
             AppPipelineDsl.PactRoles.CONSUMER
     ])
 
-   // onMaster() {
-   //     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
-   // }
+    onMaster() {
+        enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+    }
 
 }
