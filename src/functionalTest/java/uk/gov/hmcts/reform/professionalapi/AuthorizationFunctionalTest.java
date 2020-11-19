@@ -367,17 +367,17 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         superUserRoles.add("pui-user-manager");
         superUserRoles.add("pui-organisation-manager");
         superUserRoles.add("pui-finance-manager");
-        superUserRoles.add("caseworker-divorce-financialremedy");
-        superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
-        superUserRoles.add("caseworker-divorce-solicitor");
-        superUserRoles.add("caseworker-divorce");
-        superUserRoles.add("caseworker");
-        superUserRoles.add("caseworker-probate");
-        superUserRoles.add("caseworker-probate-solicitor");
-        superUserRoles.add("caseworker-publiclaw");
-        superUserRoles.add("caseworker-publiclaw-solicitor");
-        superUserRoles.add("caseworker-ia-legalrep-solicitor");
-        superUserRoles.add("caseworker-ia");
+        //superUserRoles.add("caseworker-divorce-financialremedy");
+        //superUserRoles.add("caseworker-divorce-financialremedy-solicitor");
+        //superUserRoles.add("caseworker-divorce-solicitor");
+        //superUserRoles.add("caseworker-divorce");
+        //superUserRoles.add("caseworker");
+        //superUserRoles.add("caseworker-probate");
+        //superUserRoles.add("caseworker-probate-solicitor");
+        //superUserRoles.add("caseworker-publiclaw");
+        //superUserRoles.add("caseworker-publiclaw-solicitor");
+        //superUserRoles.add("caseworker-ia-legalrep-solicitor");
+        //superUserRoles.add("caseworker-ia");
         return superUserRoles;
     }
 

@@ -36,6 +36,12 @@ def vaultOverrides = [
     'spreview': 'saat'
 ]
 
+// Vars for Kubernetes
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+env.PACT_BROKER_PORT = "443"
+env.PACT_BROKER_SCHEME = "https"
+
 withPipeline(type, product, component) {
   
     overrideVaultEnvironments(vaultOverrides)
@@ -75,5 +81,9 @@ withPipeline(type, product, component) {
     enablePactAs([
             AppPipelineDsl.PactRoles.CONSUMER
     ])
+
+   // onMaster() {
+   //     enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+   // }
 
 }

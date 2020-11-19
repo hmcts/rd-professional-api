@@ -14,6 +14,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Ignore //TODO: remove - Duplicate of findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200()
     @Test
     public void ac2_find_user_status_by_email_with_pui_case_manager_role_should_return_200_with_user_status_active() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
@@ -182,6 +184,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Ignore //TODO: remove - unnecessary test case/not required
     @Test
     public void rdcc_719_ac2_caseworker_publiclaw_courtadmin_role_should_return_403_when_calling_any_other_endpoint() {
         courtAdminBearerToken = generateBearerToken(courtAdminBearerToken, "pui-user-manager");
