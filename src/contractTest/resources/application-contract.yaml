@@ -1,0 +1,45 @@
+targetInstance: ${TEST_URL:http://localhost:8090}
+
+s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+
+s2s-name: rd_professional_api
+
+idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
+oauth2-client-secret: ${OAUTH2_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+idam.auth.clientId: ${OAUTH2_CLIENT_ID:AAAAAAAAAAAAAAAA}
+idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect}
+s2s-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+
+spring.flyway.enabled: false
+## Secure roles configuration 1
+prd.security.roles.hmcts-admin: prd-admin
+prd.security.roles.pui-user-manager: pui-user-manager
+prd.security.roles.pui-organisation-manager: pui-organisation-manager
+prd.security.roles.pui-finance-manager: pui-finance-manager
+prd.security.roles.pui-case-manager: pui-case-manager
+prd.security.roles.pui-caa: pui-caa
+prd.security.roles.caseworker-caa: caseworker-caa
+prd.security.roles.prd-aac-system: prd-aac-system
+
+# resent user invite interval in minutes
+resendInterval: 60
+
+# toggle for resendInvite
+resendInviteEnabled : true
+
+#######
+postgres.host_name: ${FUNC_DATABASE_HOST}
+postgres.name: ${FUNC_DATABASE_NAME}
+postgres.user: ${FUNC_DATABASE_USER}
+postgres.password: ${FUNC_DATABASE_PASS}
+postgres.port: ${FUNC_DATABASE_PORT}
+#######
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    uk.gov.hmcts.reform.divorce.orchestration: DEBUG
+    au.com.dius.pact: DEBUG
+
+
+
