@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -72,6 +73,7 @@ public class OrganisationInternalControllerTest {
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
+    private S2sClient s2sClientMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -113,6 +115,7 @@ public class OrganisationInternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        s2sClientMock = mock(S2sClient.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
@@ -317,6 +320,7 @@ public class OrganisationInternalControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
+        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
@@ -326,7 +330,7 @@ public class OrganisationInternalControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
