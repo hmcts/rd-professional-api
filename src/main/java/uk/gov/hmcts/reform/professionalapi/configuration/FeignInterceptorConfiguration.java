@@ -14,6 +14,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 
+import static uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter.AUTHORISATION;
+
 
 @Slf4j
 public class FeignInterceptorConfiguration {
@@ -36,7 +38,7 @@ public class FeignInterceptorConfiguration {
                         String name = headerNames.nextElement();
                         String value = request.getHeader(name);
                         if (config.getHeaders().contains(name.toLowerCase())) {
-                            if (name.equalsIgnoreCase("serviceAuthorization")) {
+                            if (name.equalsIgnoreCase(AUTHORISATION)) {
                                 value = s2sClient.signIntoS2S();
                             }
                             requestTemplate.header(name, value);

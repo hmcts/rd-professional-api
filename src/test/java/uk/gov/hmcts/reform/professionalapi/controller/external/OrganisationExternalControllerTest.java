@@ -37,7 +37,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -92,7 +91,6 @@ public class OrganisationExternalControllerTest {
     private Response response;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
-    private S2sClient s2sClientMock;
     RefDataUtil refDataUtilMock;
 
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
@@ -118,7 +116,6 @@ public class OrganisationExternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         userInfoMock = mock(UserInfo.class);
-        s2sClientMock = mock(S2sClient.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -249,7 +246,6 @@ public class OrganisationExternalControllerTest {
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress("test@email.com"))
                 .thenReturn(professionalUser);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
