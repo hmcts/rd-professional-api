@@ -7,14 +7,19 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 
 
 @Slf4j
 public class FeignInterceptorConfiguration {
+
+    @Autowired
+    S2sClient s2sClient;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -31,6 +36,9 @@ public class FeignInterceptorConfiguration {
                         String name = headerNames.nextElement();
                         String value = request.getHeader(name);
                         if (config.getHeaders().contains(name.toLowerCase())) {
+                            if (name.equalsIgnoreCase("serviceAuthorization")) {
+                                value = s2sClient.signIntoS2S();
+                            }
                             requestTemplate.header(name, value);
                         }
                     }

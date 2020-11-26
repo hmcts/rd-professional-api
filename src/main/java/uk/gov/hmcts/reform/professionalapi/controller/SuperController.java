@@ -100,8 +100,6 @@ public abstract class SuperController {
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
-    @Autowired
-    protected S2sClient s2sClient;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
@@ -269,7 +267,7 @@ public abstract class SuperController {
                 userRoles,
                 isResendInvite);
 
-        try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest, getS2sToken())) {
+        try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
             Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
@@ -435,9 +433,5 @@ public abstract class SuperController {
             userEmail = request.getHeader("UserEmail") != null ? request.getHeader("UserEmail") : email;
         }
         return userEmail;
-    }
-
-    public String getS2sToken() {
-        return s2sClient.signIntoS2S();
     }
 }

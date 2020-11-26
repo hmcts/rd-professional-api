@@ -17,8 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 
-@Component
 @Slf4j
+@Component
 public class S2sClient {
 
     @Value("${idam.s2s-auth.totp_secret}")
@@ -32,21 +32,15 @@ public class S2sClient {
 
     private final GoogleAuthenticator authenticator = new GoogleAuthenticator();
 
-    /**
-     * Sign in to s2s.
-     *
-     * @return s2s JWT token.
-     */
     public String signIntoS2S() {
-        Map<String, Object> params = ImmutableMap.of("microservice",
-                s2sMicroServiceName,
-                "oneTimePassword",
-                authenticator.getTotpPassword(s2sSecret));
+        Map<String, Object> params = ImmutableMap.of(
+                "microservice", s2sMicroServiceName,
+                "oneTimePassword", authenticator.getTotpPassword(s2sSecret));
 
         Response response = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
-                .baseUri(this.s2sUrl)
+                .baseUri(s2sUrl)
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(params)
                 .post("/lease")
@@ -59,3 +53,4 @@ public class S2sClient {
         return response.getBody().asString();
     }
 }
+

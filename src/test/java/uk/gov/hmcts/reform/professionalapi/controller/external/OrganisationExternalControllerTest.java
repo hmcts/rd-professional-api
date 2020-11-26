@@ -259,7 +259,7 @@ public class OrganisationExternalControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 

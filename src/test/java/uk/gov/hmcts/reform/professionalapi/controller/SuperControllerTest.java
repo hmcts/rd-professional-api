@@ -74,7 +74,6 @@ public class SuperControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
-    private S2sClient s2sClientMock;
 
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
@@ -97,7 +96,6 @@ public class SuperControllerTest {
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
-        s2sClientMock = mock(S2sClient.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -188,7 +186,6 @@ public class SuperControllerTest {
                 .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
@@ -198,7 +195,7 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
@@ -258,7 +255,6 @@ public class SuperControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
@@ -268,7 +264,7 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
@@ -296,7 +292,6 @@ public class SuperControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
         when(professionalUserServiceMock.findProfessionalUserByEmailAddress(any())).thenReturn(professionalUser);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         ErrorResponse errorDetails = new ErrorResponse("errorMessage", "errorDescription",
                 "23:13");
@@ -305,9 +300,8 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorDetails);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
-                .thenReturn(Response.builder().request(mock(Request.class))
-                        .body(body, Charset.defaultCharset()).status(409).build());
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response
+                .builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser
                 .getOrganisation().getOrganisationIdentifier(), userId);
@@ -358,7 +352,6 @@ public class SuperControllerTest {
                 .thenReturn(professionalUser);
         when(prdEnumServiceMock.getPrdEnumByEnumType(any())).thenReturn(jurisdEnumIds);
         when(prdEnumServiceMock.findAllPrdEnums()).thenReturn(prdEnumList);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
@@ -368,7 +361,7 @@ public class SuperControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
