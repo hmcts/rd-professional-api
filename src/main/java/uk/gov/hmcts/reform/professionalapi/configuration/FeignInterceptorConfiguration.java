@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 
 import static uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter.AUTHORISATION;
@@ -21,7 +22,7 @@ import static uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter.AUTHOR
 public class FeignInterceptorConfiguration {
 
     @Autowired
-    S2sClient s2sClient;
+    AuthTokenGenerator authTokenGenerator;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -39,7 +40,7 @@ public class FeignInterceptorConfiguration {
                         String value = request.getHeader(name);
                         if (config.getHeaders().contains(name.toLowerCase())) {
                             if (name.equalsIgnoreCase(AUTHORISATION)) {
-                                value = s2sClient.signIntoS2S();
+                                value = authTokenGenerator.generate();
                             }
                             requestTemplate.header(name, value);
                         }
