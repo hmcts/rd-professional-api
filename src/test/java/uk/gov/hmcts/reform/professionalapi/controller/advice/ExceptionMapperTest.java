@@ -200,43 +200,35 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_data_integrity_violation_exception_with_custom_message_for_sra_id() {
-        String errorCause = "SRA_ID";
-        ResponseEntity<Object> responseEntity
-                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+    public void test_handle_data_integrity_violation_exception_with_custom_message_for_different_causes() {
+        String errorCauseSraId = "SRA_ID";
+        ResponseEntity<Object> responseEntitySra
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCauseSraId);
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
-    }
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntitySra.getStatusCode());
+        assertTrue(((ErrorResponse)responseEntitySra.getBody()).getErrorMessage().contains(errorCauseSraId));
 
-    @Test
-    public void test_handle_data_integrity_violation_exception_with_custom_message_for_company_number() {
-        String errorCause = "COMPANY_NUMBER";
-        ResponseEntity<Object> responseEntity
-                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        String errorCauseCompanyNumber = "COMPANY_NUMBER";
+        ResponseEntity<Object> responseEntityCompanyNumber
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCauseCompanyNumber);
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
-    }
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntityCompanyNumber.getStatusCode());
+        assertTrue(((ErrorResponse)responseEntityCompanyNumber.getBody()).getErrorMessage()
+                .contains(errorCauseCompanyNumber));
 
-    @Test
-    public void test_handle_data_integrity_violation_exception_with_custom_message_for_email_address() {
-        String errorCause = "EMAIL_ADDRESS";
-        ResponseEntity<Object> responseEntity
-                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        String errorCauseEmail = "EMAIL_ADDRESS";
+        ResponseEntity<Object> responseEntityEmail
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCauseEmail);
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains("EMAIL"));
-    }
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntityEmail.getStatusCode());
+        assertTrue(((ErrorResponse)responseEntityEmail.getBody()).getErrorMessage().contains("EMAIL"));
 
-    @Test
-    public void test_handle_data_integrity_violation_exception_with_custom_message_for_pba_number() {
-        String errorCause = "PBA_NUMBER";
-        ResponseEntity<Object> responseEntity
-                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCause);
+        String errorCausePba = "PBA_NUMBER";
+        ResponseEntity<Object> responseEntityPba
+                = generateCustomDataIntegrityViolationResponseMessageForSpecificCause(errorCausePba);
 
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(((ErrorResponse)responseEntity.getBody()).getErrorMessage().contains(errorCause));
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntityPba.getStatusCode());
+        assertTrue(((ErrorResponse)responseEntityPba.getBody()).getErrorMessage().contains(errorCausePba));
     }
 
     @Test

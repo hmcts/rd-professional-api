@@ -311,7 +311,7 @@ public abstract class SuperController {
                                                                String userId, ProfessionalUser professionalUser,
                                                                List<String> roles) {
 
-        Object responseBody = null;
+        Object responseBody;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
         ResponseEntity<Object> responseEntity = createUserProfileFor(professionalUser, roles, false,
                 false);
@@ -337,7 +337,7 @@ public abstract class SuperController {
                                                        ProfessionalUser professionalUser, List<String> roles,
                                                        String organisationIdentifier) {
 
-        Object responseBody = null;
+        Object responseBody;
         ProfessionalUser existingUser = professionalUserService
                 .findProfessionalUserByEmailAddress(newUserCreationRequest.getEmail());
         if (existingUser == null) {
