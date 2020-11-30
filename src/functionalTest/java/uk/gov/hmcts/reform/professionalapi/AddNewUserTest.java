@@ -42,6 +42,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void add_new_user_to_organisation() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
@@ -51,6 +52,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void add_new_user_to_organisation_with_unknown_roles_should_return_404() {
 
         List<String> roles = new ArrayList<>();
@@ -64,6 +66,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void should_throw_409_when_add_duplicate_new_user_to_organisation() {
 
         // create pending org

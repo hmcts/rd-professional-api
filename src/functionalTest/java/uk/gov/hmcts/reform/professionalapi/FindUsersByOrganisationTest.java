@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void find_users_by_active_organisation_with_showDeleted_True() {
         validateRetrievedUsers(professionalApiClient
                 .searchUsersByOrganisation(activeOrgId, hmctsAdmin, "True",
@@ -41,6 +42,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void find_users_by_active_organisation_with_returnRoles_False() {
         validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(activeOrgId, hmctsAdmin,
                 "False", HttpStatus.OK, "false"), "any", false);
@@ -123,6 +125,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void find_all_users_for_an_organisation_with_pagination_should_return_200() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-case-manager");

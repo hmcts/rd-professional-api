@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import net.serenitybdd.rest.SerenityRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -104,6 +106,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static String puiFinanceManagerBearerToken;
     public static String courtAdminBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
+    public static String superUserEmail;
+
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -118,8 +122,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
 
         if (null == s2sToken) {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
@@ -133,7 +137,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             s2sToken, idamOpenIdClient);
 
         if (null == activeOrgId) {
-            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin);
+            // create pending org
+            OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
+            superUserEmail = organisationCreationRequest.getSuperUser().getEmail();
+            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
         }
 
         if (null == activeOrgIdForBearerTokens) {

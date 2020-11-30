@@ -10,6 +10,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -37,6 +38,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_a_single_organisation() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
@@ -64,6 +66,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_Pending_and_Active_organisations() {
 
         Map<String, Object> orgResponseTwo =  professionalApiClient.createOrganisation();
@@ -98,6 +101,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_pending() {
 
         Map<String, Object> response = professionalApiClient
@@ -106,6 +110,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_an_organisation_by_request_param_status_equal_to_active() {
 
         Map<String, Object> response = professionalApiClient
