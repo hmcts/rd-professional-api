@@ -45,6 +45,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
@@ -88,6 +89,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void findUsrStatusByEmailFrmHeaderWithPuiCaseManagerRoleShouldReturn200WithUserStatusActive() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
@@ -97,6 +99,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusForUsr() {
         // creating new user request
@@ -111,6 +114,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusPendingForUsr() {
         // creating new user request
@@ -125,6 +129,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNull();
     }
 
+    @Ignore //TODO: convert to integration test
     @Test
     public void ac4_find_usr_status_by_email_with_active_pui_organisation_manager_role_should_return_status_for_usr() {
         puiOrgManagerBearerToken = generateBearerToken(puiOrgManagerBearerToken, "pui-user-manager");

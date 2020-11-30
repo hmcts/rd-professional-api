@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -31,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -296,37 +296,27 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return userCreationRequest;
     }
 
-    public RequestSpecification generateSuperUserBearerToken() {
-        String firstName = "some-fname";
-        String lastName = "some-lname";
-        String email = generateRandomEmail();
 
+    public String getExternalSuperUserTokenWithRetry(String email, String firstName, String lastName) {
+        int counter = 0;
 
-        String idamResponse =
-                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+        String idamResponse = idamOpenIdClient
+                .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
 
-        if (idamResponse.equalsIgnoreCase("504")) {
+        while (idamResponse.equalsIgnoreCase("504") && counter < 4) {
+            log.info("Retry Super User Token attempt :" + counter + "/3");
             email = generateRandomEmail().toLowerCase();
-            idamResponse =
-                    idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+            idamResponse = idamOpenIdClient
+                    .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
+            counter++;
         }
 
-        bearerToken = professionalApiClient.getMultipleAuthHeaders(idamResponse);
-
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .build();
-        OrganisationCreationRequest request = someMinimalOrganisationRequest()
-                .superUser(superUser)
-                .build();
-
-        Map<String, Object> response = professionalApiClient.createOrganisation(request);
-        String orgIdentifier = (String) response.get("organisationIdentifier");
-        request.setStatus("ACTIVE");
-        professionalApiClient.updateOrganisation(request, hmctsAdmin, orgIdentifier);
-        return bearerToken;
+        if (idamResponse.equalsIgnoreCase("504")) {
+            throw new ExternalApiException(HttpStatus.GATEWAY_TIMEOUT,
+                    "Received more than 3 timeouts from IDAM while Generating Token");
+        } else {
+            return email;
+        }
     }
 
     public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
