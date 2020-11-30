@@ -105,7 +105,7 @@ prdEnumRoleType: ADMIN_ROLE,JURISD_ID
 jurisdictionIdType: ADMIN_ROLE,CCD_ROLE,SIDAM_ROLE
 allowedStatus: ACTIVE
 
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-581.service.core-compute-preview.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-549.service.core-compute-preview.internal}
 
 feign:
   allow:
