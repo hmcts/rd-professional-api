@@ -18,6 +18,7 @@ import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void rdcc117_ac1_pui_finance_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
         puiFinanceManagerBearerToken = generateBearerToken(puiFinanceManagerBearerToken, puiFinanceManager);
 
@@ -73,6 +75,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void rdcc117_ac2_pui_organisation_manager_can_retrieve_organisation_by_orgIdentifier_for_external() {
         puiOrgManagerBearerToken = generateBearerToken(puiOrgManagerBearerToken, puiOrgManager);
 
@@ -83,6 +86,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
 
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void rdcc117_ac4_puiOrganisationOrFinanceManagerWithoutActiveStatusCannotRetrieveOrganisationbyOrgId() {
 
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().superUser(
@@ -105,6 +109,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_organisation_by_orgIdentifier_for_pui_user_manager_External() {
         puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, puiUserManager);
 
@@ -115,6 +120,7 @@ public class RetrieveOrganisationByOrgIdTest extends AuthorizationFunctionalTest
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
 

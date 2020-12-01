@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -13,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +25,10 @@ import java.util.Map;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
-public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest{
+public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
+    String intActiveOrgId;
+    String superUserEmail;
     /*
     Create Organisation
     Approve Org
@@ -35,13 +40,29 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     public void testInternalUserScenario() {
-
-        //create and approve org already taken care in AuthorizationFunctionalTest in BeforeTest
+        setUpTestData();
+        //create and approve org already taken care in AuthorizationFunctionalTest in BeforeClass
         inviteUserScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
 
+    }
+
+    public void setUpTestData() {
+        superUserEmail = generateRandomEmail();
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest()
+                        .firstName("firstName")
+                        .lastName("lastName")
+                        .email(superUserEmail)
+                        .build())
+                .build();
+        // TODO: super user fails 
+        //superUserBearerToken = professionalApiClient.getMultipleAuthHeaders(
+        //getExternalSuperUserTokenWithRetry(superUserEmail, "firstName", "lastName"));
+        intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
+ 
     }
 
     public void inviteUserScenarios() {
@@ -68,11 +89,11 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findOrganisationPbaWithEmailByInternalUserShouldBeSuccess();
         findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess();
     }
-    /////////////////////
+    
     public NewUserCreationRequest inviteUserByInternalUser() {
-        log.info("inviteUserByInternalUser :: STARTED" );
+        log.info("inviteUserByInternalUser :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(activeOrgId,
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
         assertThat(newUserResponse).isNotNull();
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
@@ -86,7 +107,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         List<String> roles = new ArrayList<>();
         roles.add("unknown");
         newUserCreationRequest.setRoles(roles);
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(activeOrgId,
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND);
         log.info("inviteUserWithInvalidRolesShouldReturnNotFound :: END");
         assertThat(newUserResponse).isNotNull();
@@ -96,23 +117,23 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: STARTED");
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
         newUserCreationRequest.setEmail(existingUserCreationRequest.getEmail());
-        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(activeOrgId,
+        Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CONFLICT);
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
-    /////////////////////
+    
     public void findUsersByInternalUserWithRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient
-                .searchUsersByOrganisation(activeOrgId, hmctsAdmin, "True",
+                .searchUsersByOrganisation(intActiveOrgId, hmctsAdmin, "True",
                         OK, ""), "any", true);
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: END");
     }
 
     public void findUsersByInternalUserWithoutRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithoutRolesShouldReturnSuccess :: STARTED");
-        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(activeOrgId, hmctsAdmin,
+        validateRetrievedUsers(professionalApiClient.searchUsersByOrganisation(intActiveOrgId, hmctsAdmin,
                 "False", OK, "false"), "any", false);
         log.info("findUsersByInternalUserWithoutRolesShouldReturnSuccess :: END");
     }
@@ -120,7 +141,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void findUsersByInternalUserWithPaginationShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithPaginationShouldReturnSuccess :: STARTED");
         Map<String, Object> searchResponse = professionalApiClient
-                .searchUsersByOrganisationWithPagination(activeOrgId, hmctsAdmin, "False",
+                .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
                         OK, "0", "1");
 
         validateRetrievedUsers(searchResponse, "any", true);
@@ -129,7 +150,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(professionalUsersResponses.size()).isEqualTo(1);
 
         Map<String, Object> searchResponse2 = professionalApiClient
-                .searchUsersByOrganisationWithPagination(activeOrgId, hmctsAdmin, "False",
+                .searchUsersByOrganisationWithPagination(intActiveOrgId, hmctsAdmin, "False",
                         OK, "1", "1");
 
         validateRetrievedUsers(searchResponse2, "any", true);
@@ -137,7 +158,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
         log.info("findUsersByInternalUserWithPaginationShouldReturnSuccess :: END");
     }
-    /////////////////////
+    
     public void findAllOrganisationsByInternalUserShouldBeSuccess() {
         log.info("findAllOrganisationsByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
@@ -149,7 +170,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: STARTED");
         validateSingleOrgResponse(professionalApiClient.retrieveOrganisationDetails(
-                activeOrgId, hmctsAdmin, OK), "ACTIVE");
+                intActiveOrgId, hmctsAdmin, OK), "ACTIVE");
         log.info("findOrganisationByIdByInternalUserShouldBeSuccess :: END");
     }
 
@@ -178,7 +199,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
-    //////////////////
+    
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
@@ -194,7 +215,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         validatePbaResponse(orgResponse);
         log.info("findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess :: END");
     }
-    ///////////////////////////
+    
     public void validatePbaResponse(Map<String, Object> response) {
         List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
         assertThat(pbaList).hasSize(3);

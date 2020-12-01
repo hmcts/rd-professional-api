@@ -106,7 +106,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static String puiFinanceManagerBearerToken;
     public static String courtAdminBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
-    public static String superUserEmail;
 
 
     @Override
@@ -139,7 +138,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         if (null == activeOrgId) {
             // create pending org
             OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-            superUserEmail = organisationCreationRequest.getSuperUser().getEmail();
             activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
         }
 

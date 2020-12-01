@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import java.util.Set;
+import org.apache.commons.lang.RandomStringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 
 
@@ -20,16 +21,19 @@ public class OrganisationFixtures {
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder someMinimalOrganisationRequest() {
-
+        Set<String> paymentAccounts = new HashSet<>();
+        paymentAccounts.add("PBA" + RandomStringUtils.randomAlphabetic(7));
         return anOrganisationCreationRequest()
                 .name("some-org-name")
+                .status("ACTIVE")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")
                         .email(randomAlphanumeric(7).concat("@hmcts.net"))
                         .build())
                 .contactInformation(Arrays.asList(aContactInformationCreationRequest()
-                        .addressLine1("addressLine1").build()));
+                        .addressLine1("addressLine1").build()))
+                .paymentAccount(paymentAccounts);
     }
 
     public static OrganisationCreationRequest.OrganisationCreationRequestBuilder whiteSpaceTrimOrganisationRequest() {

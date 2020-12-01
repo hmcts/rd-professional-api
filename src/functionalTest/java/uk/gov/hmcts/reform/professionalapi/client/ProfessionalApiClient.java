@@ -34,7 +34,6 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -365,6 +364,21 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> searchUsersByOrganisation(RequestSpecification requestSpecification,
+                                                         String organisationId, String showDeleted,
+                                                         HttpStatus status, String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&returnRoles=" + returnRoles)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        log.info("find users response: " + response.statusCode());
+        return response.body().as(Map.class);
+    }
+
     public Map<String, Object> searchUsersByOrganisationWithPagination(String organisationId, String role,
                                                                        String showDeleted, HttpStatus status,
                                                                        String pageNumber, String size) {
@@ -423,9 +437,13 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?status=" + userStatus)
             .andReturn();
 
+        log.info("find users by status: " + response.statusCode());
+
         response.then()
             .assertThat()
             .statusCode(status.value());
+
+
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -440,7 +458,7 @@ public class ProfessionalApiClient {
         Response response = requestSpecification
             .get("/refdata/external/v1/organisations")
             .andReturn();
-
+        log.info("find org by orgId (External): " + response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -456,6 +474,7 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
             .andReturn();
 
+        log.info("find org by orgId (External): " + response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -725,7 +744,7 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
     }
 
-    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+    public RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
     }
 

@@ -85,6 +85,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void add_new_user_to_organisation_by_super_user() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
