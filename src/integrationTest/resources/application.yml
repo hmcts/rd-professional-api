@@ -49,7 +49,7 @@ prd:
       prd-aac-system: prd-aac-system
 
 ## user profile feign connection
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-581.service.core-compute-preview.internal}
+user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
