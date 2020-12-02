@@ -37,18 +37,13 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
 
         String email = generateRandomEmail().toLowerCase();
 
-        String idamResponse =
-                idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-
-        if (idamResponse.equalsIgnoreCase("504")) {
-            email = generateRandomEmail().toLowerCase();
-            idamOpenIdClient.getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-        }
+        email = getExternalSuperUserTokenWithRetry(email, firstName, lastName);
 
         UserCreationRequest superUser = createSuperUser(email);
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
                 .superUser(superUser)
                 .build();
+
         log.info("create organisation request");
         Map<String, Object> response = professionalApiClient.createOrganisation(request);
         orgIdentifier = (String) response.get("organisationIdentifier");

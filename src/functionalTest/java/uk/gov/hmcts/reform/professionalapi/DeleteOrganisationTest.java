@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -79,15 +78,16 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
         String firstName = "some-fname";
         String lastName = "some-lname";
-        String email = RandomStringUtils.randomAlphabetic(10) + "@usersearch.test".toLowerCase();
-        UserCreationRequest superUser = aUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(email)
-            .build();
+        String email = generateRandomEmail().toLowerCase();
 
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternalForSuperUser(superUserRoles(), firstName,
-            lastName, email);
+        email = getExternalSuperUserTokenWithRetry(email, firstName, lastName);
+
+        UserCreationRequest superUser = aUserCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .build();
+
         OrganisationCreationRequest request = someMinimalOrganisationRequest()
             .superUser(superUser)
             .build();
