@@ -40,6 +40,7 @@ public class FeignInterceptorConfiguration {
                         if (config.getHeaders().contains(name.toLowerCase())) {
                             if (name.equalsIgnoreCase(AUTHORISATION)) {
                                 value = authTokenGenerator.generate();
+                                log.info("S2S Value::::: " + value);
                             }
                             requestTemplate.header(name, value);
                         }
