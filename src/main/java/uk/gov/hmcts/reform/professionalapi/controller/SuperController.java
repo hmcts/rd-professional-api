@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -100,6 +101,8 @@ public abstract class SuperController {
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+    @Autowired
+    AuthTokenGenerator authTokenGenerator;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;
@@ -267,7 +270,8 @@ public abstract class SuperController {
                 userRoles,
                 isResendInvite);
 
-        try (Response response = userProfileFeignClient.createUserProfile(userCreationRequest)) {
+        try (Response response =
+                     userProfileFeignClient.createUserProfile(userCreationRequest, authTokenGenerator.generate())) {
             Object clazz = response.status() > 300 ? ErrorResponse.class : UserProfileCreationResponse.class;
             return JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
