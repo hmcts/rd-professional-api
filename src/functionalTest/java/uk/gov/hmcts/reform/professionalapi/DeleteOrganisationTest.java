@@ -74,6 +74,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
 
+    @Ignore //TODO: convert to integration test once RDCC-2050 is completed
     @Test
     public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
         String firstName = "some-fname";
