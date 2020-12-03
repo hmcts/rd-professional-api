@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -72,6 +73,7 @@ public class OrganisationInternalControllerTest {
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
+    private AuthTokenGenerator authTokenGeneratorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -113,6 +115,7 @@ public class OrganisationInternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        authTokenGeneratorMock = mock(AuthTokenGenerator.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
@@ -325,8 +328,10 @@ public class OrganisationInternalControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
