@@ -4,23 +4,21 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
-
 def type = "java"
 def product = "rd"
 def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-        's2s-${env}': [
-                secret('microservicekey-rd-professional-api', 'S2S_SECRET')
-        ],
-        'rd-${env}': [
-                secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
-                secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
-                secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
-                secret('LD-SDK-KEY', 'LD_SDK_KEY')
-        ]
+    's2s-${env}': [
+        secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+    ],
+    'rd-${env}': [
+        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+        secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
+        secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+        secret('LD-SDK-KEY', 'LD_SDK_KEY')
+    ]
 ]
-
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
     [$class     : 'AzureKeyVaultSecret',
@@ -36,6 +34,9 @@ def vaultOverrides = [
     'spreview': 'saat'
 ]
 
+// Configure branches to sync with master branch
+def branchesToSync = ['demo', 'perftest']
+
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
@@ -50,6 +51,9 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     disableLegacyDeployment()
     enableAksStagingDeployment()
+
+    // Sync demo and perftest with master branch
+    syncBranchesWithMaster(branchesToSync)
 
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
@@ -79,11 +83,10 @@ withPipeline(type, product, component) {
     }
 
     enablePactAs([
-            AppPipelineDsl.PactRoles.CONSUMER
+        AppPipelineDsl.PactRoles.CONSUMER
     ])
 
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
     }
-
 }
