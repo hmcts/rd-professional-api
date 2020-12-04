@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
@@ -82,6 +81,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${prd.security.roles.prd-aac-system}")
     protected String systemUser;
+
+    @Value("${resendInterval}")
+    protected String resendInterval;
 
     protected static ProfessionalApiClient professionalApiClient;
 

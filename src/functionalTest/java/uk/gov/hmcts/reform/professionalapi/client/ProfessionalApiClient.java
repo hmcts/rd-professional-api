@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -43,7 +42,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -646,19 +644,6 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> findUserStatusByEmailFromHeader(HttpStatus status,
-                                  RequestSpecification requestSpecification, String email) {
-
-        Response response = requestSpecification
-                .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-        return response.body().as(Map.class);
-    }
-
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
                                                                             RequestSpecification requestSpecification) {
 
@@ -686,13 +671,6 @@ public class ProfessionalApiClient {
         return response;
     }
 
-    public void deleteOrganisationErrorResponse(String organisationId, String role, HttpStatus status, String flag) {
-        Response response = deleteOrganisation(organisationId, role, status);
-        ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorDescription().equalsIgnoreCase(
-            flag.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD)));
-    }
-
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .body("")
@@ -708,23 +686,6 @@ public class ProfessionalApiClient {
             .statusCode(status.value());
 
 
-    }
-
-    public void deleteOrganisationByExternalUsersBearerToken(String organisationId,
-                                                             RequestSpecification requestSpecification,
-                                                             HttpStatus status) {
-        Response response = requestSpecification
-            .body("")
-            .delete("/refdata/internal/v1/organisations/" + organisationId)
-            .andReturn();
-
-        if (response.statusCode() != NO_CONTENT.value()) {
-            log.info("Delete organisation response: " + response.asString());
-        }
-
-        response.then()
-            .assertThat()
-            .statusCode(status.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {

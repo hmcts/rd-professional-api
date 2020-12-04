@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
@@ -15,7 +17,6 @@ import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -30,21 +31,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
+@SuppressWarnings("unchecked")
 public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
     String intActiveOrgId;
     String superUserEmail;
     String invitedUserEmail;
     String invitedUserId;
-
     OrganisationCreationRequest organisationCreationRequest;
-
-    @Value("${resendInterval}")
-    protected String resendInterval;
 
     /*
     Create Organisation
@@ -60,9 +59,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     Find User by email--done
     Reinvite User--done
     Edit PBA--done
-    --Modify status of the user
-    --Delete Organisation
-    --Get all active org
+    Modify status of the user--done
+    Delete Organisation --done
      */
 
     @Test
@@ -74,9 +72,9 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         findOrganisationScenarios();
         retrieveOrganisationPbaScenarios();
         modifyUserRolesScenarios();
-
         reinviteUserScenarios();
         editPbaScenarios();
+        deleteOrganisationScenarios();
         //Find User by email is only external
         //Get all orgs are only external scenarios
 
@@ -143,9 +141,14 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void editPbaScenarios() {
         editPaymentAccountsShouldReturnSuccess();
     }
+
+    public void deleteOrganisationScenarios() {
+        deletePendingOrganisationShouldReturnSuccess();
+        deleteActiveOrganisationShouldReturnSuccess();
+    }
+
     public NewUserCreationRequest inviteUserByInternalUser() {
         log.info("inviteUserByInternalUser :: STARTED");
-
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest(invitedUserEmail);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
                 hmctsAdmin, newUserCreationRequest, HttpStatus.CREATED);
@@ -163,7 +166,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add("unknown");
         newUserCreationRequest.setRoles(roles);
         Map<String, Object> newUserResponse = professionalApiClient.addNewUserToAnOrganisation(intActiveOrgId,
-                hmctsAdmin, newUserCreationRequest, HttpStatus.NOT_FOUND);
+                hmctsAdmin, newUserCreationRequest, NOT_FOUND);
         log.info("inviteUserWithInvalidRolesShouldReturnNotFound :: END");
         assertThat(newUserResponse).isNotNull();
     }
@@ -279,7 +282,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add(role1);
         userProfileUpdatedData.setRolesAdd(roles);
         Map<String, Object> modifiedUserResponse = professionalApiClient
-                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
+                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
+                        invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
         assertThat(((Map)modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
         List<String> rolesToValidate = new ArrayList<>();
@@ -300,9 +304,11 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add(role1);
         userProfileUpdatedData.setRolesDelete(roles);
         Map<String, Object> modifiedUserResponse = professionalApiClient
-                .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
+                .modifyUserToExistingUserForPrdAdmin(
+                        HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
-        assertThat(((Map)((List)modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode")).isEqualTo("204");
+        assertThat(((Map)((List)modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
+                .isEqualTo("204");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
         rolesToValidate.add(puiOrgManager);
@@ -325,14 +331,14 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
     public void reinviteUserWithinOneHourShouldReturnConflict() {
         log.info("reinviteUserWithinOneHourShouldReturnConflict :: STARTED");
-            NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
-                    .createReInviteUserRequest(superUserEmail);
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest,
-                            TOO_MANY_REQUESTS);
-            assertThat((String) reinviteUserResponse.get("errorDescription"))
-                    .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
-                            + " time", resendInterval));
+        NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
+                .createReInviteUserRequest(superUserEmail);
+        Map<String, Object> reinviteUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, reInviteUserCreationRequest,
+                        TOO_MANY_REQUESTS);
+        assertThat((String) reinviteUserResponse.get("errorDescription"))
+                .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
+                        + " time", resendInterval));
         log.info("reinviteUserWithinOneHourShouldReturnConflict :: END");
     }
 
@@ -358,21 +364,47 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("editPaymentAccountsShouldReturnSuccess :: END");
     }
 
+    public void modifyUserStatusToSuspendedShouldReturnSuccess() {
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: STARTED");
+        UserProfileUpdatedData data = getUserStatusUpdateRequest(IdamStatus.SUSPENDED);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, data, activeOrgId, invitedUserId);
+        String status = searchUserStatus(activeOrgId, invitedUserId);
+        assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
+    }
+
+    public void deletePendingOrganisationShouldReturnSuccess() {
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(pendingOrgIdentifier).isNotEmpty();
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, NOT_FOUND);
+        log.info("modifyUserStatusToSuspendedShouldReturnSuccess :: END");
+    }
+
+    public void deleteActiveOrganisationShouldReturnSuccess() {
+        log.info("deleteActiveOrganisationShouldReturnSuccess :: STARTED");
+        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
+        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, NO_CONTENT);
+        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, NOT_FOUND);
+        log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
+    }
 
 
-
-
-
-
-
-
-
-
-
+    public String searchUserStatus(String orgIdentifier, String userId) {
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+        return professionalUsersResponses.stream()
+                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
+                .map(user -> (String) user.get("idamStatus"))
+                .collect(Collectors.toList()).get(0);
+    }
 
     public void validateRoles(List<String> rolesToValidate) {
-        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(intActiveOrgId,
-                hmctsAdmin, HttpStatus.OK);
+        Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(
+                intActiveOrgId, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses1 = (List<Map>) searchResponse.get("users");
         Map professionalUsersResponse1 = getActiveUser(professionalUsersResponses1);
         assertThat(professionalUsersResponse1.get("roles")).isNotNull();

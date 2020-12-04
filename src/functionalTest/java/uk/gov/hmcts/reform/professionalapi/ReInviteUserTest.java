@@ -113,6 +113,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC7:  professional(external) user resend invite user who is not in the 'Pending' state
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void should_return_400_when_user_reinvited_by_extrenal_user_is_active() {
 
         if (resendInviteEnabled) {
@@ -147,6 +148,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC8: professional(external) resend invite to a given user who was last invited less than one hour before
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void should_return_400_when_user_reinvited_by_extrenal_user_is_invited_within_one_hour() {
 
         if (resendInviteEnabled) {

@@ -46,7 +46,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
-    @Test
+    @Test //TODO: convert to integration test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac2_could_throw_not_found_error_when_delete_an_organisation_with_external_endpoint_404() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -73,7 +73,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
-
+    @Ignore //TODO: convert to integration test
     @Test
     public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
         String firstName = "some-fname";

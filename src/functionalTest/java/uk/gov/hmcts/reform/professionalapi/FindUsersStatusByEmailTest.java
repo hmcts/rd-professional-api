@@ -37,6 +37,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
         puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, "pui-user-manager");
 
@@ -57,6 +58,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void findUserStatusByEmailFromHeaderWithPuiUserManagerRoleShouldReturn200() {
         puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, "pui-user-manager");
 
@@ -76,6 +78,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void ac3_find_usr_status_by_email_with_not_active_pui_finance_mgr_role_should_rtn_status_pending_for_usr() {
         // creating new user request
         List<String> userRoles = new ArrayList<>();
@@ -140,7 +143,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
-    @Test
+    @Test  //TODO: convert to integration test
     public void findUsrStatusByEmailFrmHeaderWithPuiOrganisationMgrRoleShouldRtnStatusForUsr() {
 
         // creating new user request
@@ -163,7 +166,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
 
-    @Test
+    @Test  //TODO: convert to integration test
     public void rdcc_719_ac1_find_usr_sts_by_email_caseworker_publiclaw_courtadmin_role_shld_rtn_200__usr_sts_active() {
 
         // creating new user request
