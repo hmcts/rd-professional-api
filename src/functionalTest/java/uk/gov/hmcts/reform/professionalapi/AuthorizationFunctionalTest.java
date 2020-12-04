@@ -135,7 +135,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
 
-        if (null == activeOrgId) {
+        /*if (null == activeOrgId) {
             // create pending org
             OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
             activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
@@ -143,7 +143,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         if (null == activeOrgIdForBearerTokens) {
             activeOrgIdForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
-        }
+        }*/
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {

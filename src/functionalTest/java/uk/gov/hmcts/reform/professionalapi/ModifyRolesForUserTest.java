@@ -66,6 +66,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -149,6 +150,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void ac3_delete_role_existing_user_to_organisation_internal() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 

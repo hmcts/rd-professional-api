@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.springframework.http.HttpStatus.CREATED;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -58,7 +58,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void setUpTestData() {
         String superUserEmail = generateRandomEmail();
-        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest()
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest()
                         .firstName("firstName")
                         .lastName("lastName")
@@ -184,7 +184,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         log.info("findOrgByPfmShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
-        assertThat(response.get("paymentAccount")).asList().hasSize(1);
+        assertThat(response.get("paymentAccount")).asList().hasSize(3);
         log.info("findOrgByPfmShouldBeSuccess :: END");
         responseValidate(response);
     }
@@ -193,7 +193,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         log.info("findOrgByPomShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
-        assertThat(response.get("paymentAccount")).asList().hasSize(1);
+        assertThat(response.get("paymentAccount")).asList().hasSize(3);
         log.info("findOrgByPomShouldBeSuccess :: END");
     }
 
