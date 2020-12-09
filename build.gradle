@@ -39,7 +39,7 @@ def versions = [
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
-        launchDarklySdk    : "5.0.5"
+        launchDarklySdk    : "5.1.1"
 ]
 
 
@@ -333,6 +333,14 @@ dependencies {
                 'literal is used in the SQL comments of the query. This flaw could allow an attacker to access unauthorized ' +
                 'information or possibly conduct further attacks. The highest threat from this vulnerability is to data ' +
                 'confidentiality and integrity.'
+    }
+    implementation('org.apache.tomcat.embed:tomcat-embed-core:9.0.40') {
+        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
+    }
+    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:9.0.40') {
+        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
     }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
