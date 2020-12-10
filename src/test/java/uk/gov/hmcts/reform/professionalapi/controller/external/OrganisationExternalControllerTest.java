@@ -36,8 +36,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -92,7 +92,7 @@ public class OrganisationExternalControllerTest {
     private Response response;
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
     private UserInfo userInfoMock;
-    private S2sClient s2sClientMock;
+    private AuthTokenGenerator authTokenGeneratorMock;
     RefDataUtil refDataUtilMock;
 
     HttpServletRequest httpRequest = mock(HttpServletRequest.class);
@@ -118,7 +118,7 @@ public class OrganisationExternalControllerTest {
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         jwtGrantedAuthoritiesConverterMock = mock(JwtGrantedAuthoritiesConverter.class);
         userInfoMock = mock(UserInfo.class);
-        s2sClientMock = mock(S2sClient.class);
+        authTokenGeneratorMock = mock(AuthTokenGenerator.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -257,7 +257,7 @@ public class OrganisationExternalControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(s2sClientMock.signIntoS2S()).thenReturn("serviceAuthorization");
+        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
