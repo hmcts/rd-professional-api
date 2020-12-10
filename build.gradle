@@ -396,6 +396,10 @@ dependencies {
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
+    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
+
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
     contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
