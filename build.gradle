@@ -343,6 +343,22 @@ dependencies {
                 'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
     }
 
+    implementation('org.codehaus.groovy:groovy:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts'
+    }
+    implementation('org.codehaus.groovy:groovy-json:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+    }
+    implementation('org.codehaus.groovy:groovy-xml:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+    }
+
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
@@ -395,6 +411,10 @@ dependencies {
     testCompile group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
+
+    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
