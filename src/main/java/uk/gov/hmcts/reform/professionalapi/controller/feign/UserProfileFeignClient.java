@@ -24,8 +24,7 @@ public interface UserProfileFeignClient {
 
     @PostMapping(value = "/v1/userprofile")
     @RequestLine("POST /v1/userprofile")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "Content-Type: application/json"})
+    @Headers({"Authorization: {authorization}", "Content-Type: application/json"})
     Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest,
                                @RequestHeader("ServiceAuthorization") String s2s);
 
