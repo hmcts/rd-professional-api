@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.professionalapi.controller.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -60,8 +60,6 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
 
 
-
-
 public class OrganisationInternalControllerTest {
     private OrganisationResponse organisationResponse;
     private OrganisationsDetailResponse organisationsDetailResponse;
@@ -73,7 +71,7 @@ public class OrganisationInternalControllerTest {
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
-    private AuthTokenGenerator authTokenGeneratorMock;
+    private S2sClient s2sClientMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -102,7 +100,7 @@ public class OrganisationInternalControllerTest {
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
-        deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
+        deleteOrganisationResponse = new DeleteOrganisationResponse(204, "successfully deleted");
         organisationResponse = new OrganisationResponse(organisation);
         organisationsDetailResponse = new OrganisationsDetailResponse(singletonList(organisation), false);
         organisationEntityResponse = new OrganisationEntityResponse(organisation, false);
@@ -115,7 +113,7 @@ public class OrganisationInternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
-        authTokenGeneratorMock = mock(AuthTokenGenerator.class);
+        s2sClientMock = mock(S2sClient.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
@@ -328,9 +326,7 @@ public class OrganisationInternalControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
-
-
+        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
@@ -353,12 +349,12 @@ public class OrganisationInternalControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         organisation.setStatus(OrganisationStatus.PENDING);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
-        when(organisationServiceMock.deleteOrganisation(organisation,"123456789"))
+        when(organisationServiceMock.deleteOrganisation(organisation, "123456789"))
                 .thenReturn(deleteOrganisationResponse);
-        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId,"123456789");
+        ResponseEntity<?> actual = organisationInternalController.deleteOrganisation(orgId, "123456789");
 
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
-        verify(organisationServiceMock, times(1)).deleteOrganisation(organisation,"123456789");
+        verify(organisationServiceMock, times(1)).deleteOrganisation(organisation, "123456789");
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -368,7 +364,7 @@ public class OrganisationInternalControllerTest {
     public void testDeleteOrganisationThrows404WhenNoOrgFound() {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
-        organisationInternalController.deleteOrganisation(orgId,"123456789");
+        organisationInternalController.deleteOrganisation(orgId, "123456789");
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
 }

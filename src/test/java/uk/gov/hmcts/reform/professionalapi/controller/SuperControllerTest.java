@@ -14,11 +14,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -75,7 +76,7 @@ public class SuperControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
-    private AuthTokenGenerator authTokenGeneratorMock;
+    private S2sClient s2sClientMock;
 
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
@@ -98,7 +99,7 @@ public class SuperControllerTest {
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
-        authTokenGeneratorMock = mock(AuthTokenGenerator.class);
+        s2sClientMock = mock(S2sClient.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -197,7 +198,7 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
+        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
 
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
@@ -267,8 +268,7 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
-
+        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
@@ -304,11 +304,10 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorDetails);
-        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
-
+        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
-                .thenReturn(Response
-                .builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
+                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
+                        .status(409).build());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser
                 .getOrganisation().getOrganisationIdentifier(), userId);
@@ -367,8 +366,7 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(authTokenGeneratorMock.generate()).thenReturn("serviceAuthorization");
-
+        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
         when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
