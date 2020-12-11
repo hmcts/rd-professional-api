@@ -38,6 +38,14 @@ public class S2sClient {
         signInDetails.put("microservice", s2sMicroServiceName);
         signInDetails.put("oneTimePassword", oneTimePassword);
 
-        return serviceAuthorisationApi.serviceToken(signInDetails);
+        log.info(":::::: S2S Secret: " + s2sSecret);
+        log.info(":::::: S2S Service Name: " + s2sMicroServiceName);
+        log.info(":::::: S2S OTP: " + oneTimePassword);
+
+        String s2sToken = serviceAuthorisationApi.serviceToken(signInDetails);
+
+        log.info(":::::: S2S Token: " + s2sToken);
+
+        return s2sToken;
     }
 }
