@@ -19,7 +19,6 @@ java:
     rd:
       secrets:
         - professional-api-POSTGRES-PASS
-        - s2s-secret
         - AppInsightsInstrumentationKey
         - LD-SDK-KEY
   autoscaling:
