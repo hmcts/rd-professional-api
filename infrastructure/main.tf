@@ -51,7 +51,9 @@ resource "azurerm_resource_group" "rg" {
 
 module "db-professional-ref-data" {
   source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product         = join("-", [var.product, var.component, "postgres-db"])
+  product         = var.product
+  component       = var.component
+  name            = join("-", [var.product, var.component, "postgres-db"])
   location        = var.location
   subscription    = var.subscription
   env             = var.env
