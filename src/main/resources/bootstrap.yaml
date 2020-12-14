@@ -9,4 +9,3 @@ spring:
         rd.professional-api-POSTGRES-PASS: spring.datasource.password
         rd.AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         rd.LD-SDK-KEY: LD_SDK_KEY
-
