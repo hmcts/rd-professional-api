@@ -82,7 +82,7 @@ security:
 ### dependency configuration
 idam:
   s2s-auth:
-    totp_secret: ${s2s_secret}
+    totp_secret: ${s2s_secret:AAAAAAAAAAAAAAAA}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
