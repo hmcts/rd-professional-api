@@ -171,7 +171,7 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     finalizedBy aggregate
-    //maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2)  ? 2 : 1
+    maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(2) >= 2) ? 2 : 1
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
@@ -203,7 +203,17 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
     classpath = sourceSets.contractTest.runtimeClasspath
 }
 
+task runProviderPactVerification(type: Test) {
+    logger.lifecycle("Runs pact Tests")
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+}
+
 runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+runProviderPactVerification.dependsOn contract
+
+runProviderPactVerification.finalizedBy pactVerify
 
 pact {
     publish {
@@ -406,11 +416,14 @@ dependencies {
     testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
     testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
     contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+
+    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-
     contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
