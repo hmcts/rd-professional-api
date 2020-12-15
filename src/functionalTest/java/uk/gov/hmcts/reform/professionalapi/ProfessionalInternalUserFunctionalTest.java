@@ -58,9 +58,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         reinviteUserScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
-        //Find User by email is only external
-        //Get all active orgs are only external scenarios
-
     }
 
     public void setUpTestData() {

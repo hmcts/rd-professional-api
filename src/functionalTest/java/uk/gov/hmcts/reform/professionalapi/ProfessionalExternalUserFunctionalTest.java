@@ -53,14 +53,14 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     @Test
     public void testExternalUserScenario() {
         setUpTestData();
-        //inviteUserScenarios();
-        //findUsersByOrganisationScenarios();
-        //findOrganisationScenarios();
+        inviteUserScenarios();
+        findUsersByOrganisationScenarios();
+        findOrganisationScenarios();
         findActiveOrganisationScenarios();
-        /*reinviteUserScenarios();
+        reinviteUserScenarios();
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
-        suspendUserScenarios();*/
+        suspendUserScenarios();
     }
 
     public void setUpTestData() {
