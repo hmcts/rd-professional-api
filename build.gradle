@@ -12,13 +12,13 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.0'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.36.0'
     id "info.solidsoft.pitest" version '1.5.2'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'org.sonarqube' version '2.8'
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id "org.flywaydb.flyway" version "7.0.2"
-    id 'au.com.dius.pact' version '4.1.7'
+    id 'au.com.dius.pact' version '4.1.12'
 }
 
 
@@ -39,7 +39,7 @@ def versions = [
         springHystrix      : '2.1.1.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
-        launchDarklySdk    : "5.0.5"
+        launchDarklySdk    : "5.1.1"
 ]
 
 
@@ -304,7 +304,7 @@ dependencies {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
     }
-    compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.3'
+    compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.0'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -323,6 +323,41 @@ dependencies {
     compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation('org.apache.httpcomponents:httpclient:4.5.13') {
+        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
+    }
+    implementation('org.hibernate:hibernate-core:5.4.24.Final') {
+        because 'A flaw was found in hibernate-core in versions prior to and including 5.4.23.Final. ' +
+                'A SQL injection in the implementation of the JPA Criteria API can permit unsanitized literals when a ' +
+                'literal is used in the SQL comments of the query. This flaw could allow an attacker to access unauthorized ' +
+                'information or possibly conduct further attacks. The highest threat from this vulnerability is to data ' +
+                'confidentiality and integrity.'
+    }
+    implementation('org.apache.tomcat.embed:tomcat-embed-core:9.0.40') {
+        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
+    }
+    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:9.0.40') {
+        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
+    }
+
+    implementation('org.codehaus.groovy:groovy:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts'
+    }
+    implementation('org.codehaus.groovy:groovy-json:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+    }
+    implementation('org.codehaus.groovy:groovy-xml:2.5.14') {
+        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+    }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
@@ -358,8 +393,8 @@ dependencies {
 
     testCompile group: 'com.h2database', name: 'h2'
     testCompile "com.github.tomakehurst:wiremock:2.19.0"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.5.13'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
+    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.6.28'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
@@ -376,6 +411,10 @@ dependencies {
     testCompile group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
     testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
+
+    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+    testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version

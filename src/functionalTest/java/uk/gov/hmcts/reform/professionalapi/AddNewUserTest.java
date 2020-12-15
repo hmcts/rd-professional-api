@@ -84,8 +84,8 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
     }
 
+    @Ignore //TODO: convert to integration test once RDCC-2050 is completed
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
     public void add_new_user_to_organisation_by_super_user() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("caseworker");
