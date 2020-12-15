@@ -1,7 +1,7 @@
 spring:
   cloud:
     propertiesvolume:
-      prefixed: true
+      prefixed: false
       paths: /mnt/secrets/rd
       aliases:
         s2s-secret: S2S_SECRET
