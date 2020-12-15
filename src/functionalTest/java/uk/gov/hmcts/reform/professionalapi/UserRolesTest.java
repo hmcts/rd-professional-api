@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class UserRolesTest extends AuthorizationFunctionalTest {
     private String lastName = "some-lname";
 
     @Test
+    @Ignore // not a practical scenario
     public void rdcc_720_and_1387_ac1_super_user_can_have_caa_roles_fpla_or_iac_roles_not_puiCaa_caseworkerCaa() {
 
         String email = generateRandomEmail().toLowerCase();

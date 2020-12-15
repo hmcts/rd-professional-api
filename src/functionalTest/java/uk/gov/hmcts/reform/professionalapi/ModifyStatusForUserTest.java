@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
@@ -86,18 +84,5 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
         String status = searchUserStatus(activeOrgId, userId);
 
         assertThat(status).isEqualTo(IdamStatus.SUSPENDED.name());
-    }
-
-    @SuppressWarnings("unchecked")
-    private String searchUserStatus(String orgIdentifier, String userId) {
-
-        Map<String, Object> searchResponse = professionalApiClient
-                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
-
-        return professionalUsersResponses.stream()
-                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
-                .map(user -> (String) user.get("idamStatus"))
-                .collect(Collectors.toList()).get(0);
     }
 }

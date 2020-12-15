@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
@@ -20,8 +22,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
-import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 import static uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner.getFeatureFlagName;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
-@RunWith(CustomSerenityRunner.class)
+@RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctionalTest {
@@ -62,7 +62,8 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         + ".retrieveOrganisationsByStatusWithAddressDetailsOptional";
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @Ignore // covered in ProfessionalInternUserTest
+    //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
         setUpTestData();
         List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
@@ -91,7 +92,8 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = false)
+    @Ignore // not required since this api is in prod with toggled on
+    //@ToggleEnable(mapKey = mapKey, withFeature = false)
     public void should_retrieve_403_when_API_toggled_off() {
         setUpTestData();
 
@@ -104,7 +106,8 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @Ignore // covered in ProfessionalInternUserTest
+    //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
         // invite new user having invalid roles
         List<String> userRoles = new ArrayList<>();

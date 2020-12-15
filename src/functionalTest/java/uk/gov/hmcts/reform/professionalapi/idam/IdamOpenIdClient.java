@@ -64,7 +64,8 @@ public class IdamOpenIdClient {
         User user = new User(userEmail, firstName, id, lastName, password, roles, group);
 
         String serializedUser = gson.toJson(user);
-        log.info("serializedUser: " + serializedUser);
+        //required logs for debug
+        //log.info("serializedUser: " + serializedUser);
         Response createdUserResponse = RestAssured
             .given()
             .relaxedHTTPSValidation()
@@ -75,7 +76,7 @@ public class IdamOpenIdClient {
             .andReturn();
 
 
-        log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+        log.info("SIDAM createUser response: " + createdUserResponse.getStatusCode());
 
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
@@ -112,7 +113,7 @@ public class IdamOpenIdClient {
             .post("/testing-support/accounts")
             .andReturn();
 
-        log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
+        log.info("SIDAM createUser with retry response: " + createdUserResponse.getStatusCode());
 
         return createdUserResponse.getStatusCode();
     }
@@ -178,7 +179,7 @@ public class IdamOpenIdClient {
             .post("/o/token")
             .andReturn();
 
-        log.info("tokenParams::" + tokenParams + "::getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
+        log.info("Generate OpenId Token response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 

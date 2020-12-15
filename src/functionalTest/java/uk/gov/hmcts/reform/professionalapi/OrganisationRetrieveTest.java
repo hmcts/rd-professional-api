@@ -31,6 +31,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_retrieve_all_organisations() {
         Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
         assertThat(response.get("organisations")).isNotNull();
@@ -48,6 +49,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void retrieve_an_organisation_with_case_manager_rights_return_200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, puiCaseManager);
 
@@ -57,6 +59,7 @@ public class OrganisationRetrieveTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void retrieve_an_organisation_with_user_manager_rights_return_200() {
         puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, puiUserManager);
 

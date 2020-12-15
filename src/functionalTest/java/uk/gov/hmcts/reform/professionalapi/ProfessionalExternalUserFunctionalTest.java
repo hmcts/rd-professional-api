@@ -2,8 +2,15 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.SUSPENDED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
@@ -13,13 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,68 +34,55 @@ import java.util.Map;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
+@SuppressWarnings("unchecked")
 public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctionalTest {
 
-    /*
-    Create Organisation
-    Approve Org
-    Invite User to Org
-    Find user by Org
-    Get Org
-    Get PBA
-     */
-
-    /*
-    Add/Modify roles to user
-    Modify status of the user
-    Find User by email--done
-    Reinvite User--done
-    Edit PBA--done no ext scenarios
-    Delete Organisation--done no ext scenarios
-     */
     String pumBearerToken;
     String pcmBearerToken;
     String pomBearerToken;
     String pfmBearerToken;
+    String caseworkerBearerToken;
     String systemUserBearerToken;
     String extActiveOrgId;
     String activeUserEmail;
+    String activeUserId;
     String superUserEmail;
+    String superUserId;
+    OrganisationCreationRequest organisationCreationRequest;
 
     @Test
-    public void testInternalUserScenario() {
+    public void testExternalUserScenario() {
         setUpTestData();
-        //create and approve org already taken care in AuthorizationFunctionalTest in BeforeTest
-        inviteUserScenarios();
-        findUsersByOrganisationScenarios();
-        findOrganisationScenarios();
-        reinviteUserScenarios();
+        //inviteUserScenarios();
+        //findUsersByOrganisationScenarios();
+        //findOrganisationScenarios();
+        findActiveOrganisationScenarios();
+        /*reinviteUserScenarios();
         findUserStatusByEmailScenarios();
-        // Get pba scenarios covered in integration test cases
-
+        modifyRolesScenarios();
+        suspendUserScenarios();*/
     }
 
     public void setUpTestData() {
         superUserEmail = generateRandomEmail();
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
-                        .firstName("firstName")
-                        .lastName("lastName")
-                        .email(superUserEmail)
+        organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName("firstName").lastName("lastName").email(superUserEmail)
                         .build())
                 .build();
-        // TODO: super user fails
-        //superUserBearerToken = professionalApiClient.getMultipleAuthHeaders(
-        //getExternalSuperUserTokenWithRetry(superUserEmail, "firstName", "lastName"));
 
         organisationCreationRequest.setStatus("ACTIVE");
         extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
-        //created active org
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
+        List<Map<String,Object>> professionalUsersResponses = (List<Map<String,Object>>) searchResponse.get("users");
+        superUserId = (String)(professionalUsersResponses.get(0)).get("userIdentifier");
+
         pumBearerToken = inviteUser(puiUserManager);
         pcmBearerToken = inviteUser(puiCaseManager);
         pomBearerToken = inviteUser(puiOrgManager);
         pfmBearerToken = inviteUser(puiFinanceManager);
-        // created PUM internally
+        caseworkerBearerToken = inviteUser("caseworker");
     }
 
     public void inviteUserScenarios() {
@@ -115,6 +108,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findOrgByUnknownUserShouldReturnForbidden();
     }
 
+    public void findActiveOrganisationScenarios() {
+        findActiveOrganisationByPumShouldBeSuccess();
+    }
+
     public void findUserStatusByEmailScenarios() {
         findUserStatusByEmailByPumShouldBeSuccess();
         findUserStatusByEmailInHeaderByPumShouldBeSuccess();
@@ -124,6 +121,16 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void reinviteUserScenarios() {
         reinviteActiveUserByPumShouldReturnBadRequest();
         reinviteUserByPumWithinOneHourShouldReturnConflict();
+    }
+
+    public void modifyRolesScenarios() {
+        addRolesByPumShouldBeSuccess();
+        deleteRolesByPumShouldBeSuccess();
+        addRolesByPendingExtUserShouldReturnForbidden();
+    }
+
+    public void suspendUserScenarios() {
+        suspendUserByPumShouldBeSuccess();
     }
 
     public void inviteUserByPuiUserManagerShouldBeSuccess() {
@@ -137,7 +144,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUsersByNonPumAndNoStatusProvidedShouldBeSuccess() {
         log.info("findUsersByNonPumAndNoStatusProvidedShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pcmBearerToken), "");
         validateRetrievedUsers(response, "ACTIVE", true);
         log.info("findUsersByNonPumAndNoStatusProvidedShouldBeSuccess :: END");
@@ -145,7 +152,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUsersByPumAndNoStatusProvidedShouldBeSuccess() {
         log.info("findUsersByPumAndNoStatusProvidedShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "");
         validateRetrievedUsers(response, "ACTIVE", true);
         log.info("findUsersByPumAndNoStatusProvidedShouldBeSuccess :: END");
@@ -153,7 +160,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUsersByPumAndWithStatusProvidedShouldBeSuccess() {
         log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.searchOrganisationUsersByStatusExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "Active");
         validateRetrievedUsers(response, "ACTIVE", true);
         log.info("findUsersByPumAndWithStatusProvidedShouldBeSuccess :: END");
@@ -161,14 +168,14 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUsersByPumAndWithStatusSuspendedProvidedShouldReturnNotFound() {
         log.info("findUsersByPumAndWithStatusSuspendedProvidedShouldReturnNotFound :: STARTED");
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.NOT_FOUND,
+        professionalApiClient.searchOrganisationUsersByStatusExternal(NOT_FOUND,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), "Suspended");
         log.info("findUsersByPumAndWithStatusSuspendedProvidedShouldReturnNotFound :: END");
     }
 
     public void findUsersByInvalidUserAndNoStatusProvidedShouldReturnNotFound() {
         log.info("findUsersByInvalidUserAndNoStatusProvidedShouldReturnNotFound :: STARTED");
-        professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.UNAUTHORIZED,
+        professionalApiClient.searchOrganisationUsersByStatusExternal(UNAUTHORIZED,
                 professionalApiClient.getMultipleAuthHeadersWithEmptyBearerToken(""), "");
         log.info("findUsersByInvalidUserAndNoStatusProvidedShouldReturnNotFound :: END");
     }
@@ -176,7 +183,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void findUsersByPcmAndNoRolesRequiredShouldBeSuccess() {
         log.info("findUsersByPcmAndNoRolesRequiredShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-                .searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK,
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
                         professionalApiClient.getMultipleAuthHeaders(pcmBearerToken), "false");
         validateRetrievedUsers(response, "ACTIVE", false);
         log.info("findUsersByPcmAndNoRolesRequiredShouldBeSuccess :: END");
@@ -185,7 +192,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void findUsersByPcmAndWithRolesRequiredShouldBeSuccess() {
         log.info("findUsersByPcmAndWithRolesRequiredShouldBeSuccess :: STARTED");
         Map<String, Object> response = professionalApiClient
-                .searchOrganisationUsersByReturnRolesParamExternal(HttpStatus.OK,
+                .searchOrganisationUsersByReturnRolesParamExternal(OK,
                         professionalApiClient.getMultipleAuthHeaders(pcmBearerToken), "true");
         validateRetrievedUsers(response, "ACTIVE", true);
         log.info("findUsersByPcmAndWithRolesRequiredShouldBeSuccess :: END");
@@ -197,9 +204,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 "firstName", "lastName", generateRandomEmail());
         Map<String, Object> searchResponse = professionalApiClient
                 .searchUsersByOrganisation(professionalApiClient.getMultipleAuthHeaders(systemUserBearerToken),
-                        extActiveOrgId, FALSE, HttpStatus.OK, TRUE);
+                        extActiveOrgId, FALSE, OK, TRUE);
 
-        List<HashMap> professionalUsers = (List<HashMap>) searchResponse.get("users");
+        List<HashMap<String,Object>> professionalUsers = (List<HashMap<String,Object>>) searchResponse.get("users");
         assertThat(professionalUsers.size()).isGreaterThan(1);
         validateRetrievedUsers(searchResponse, ACTIVE, false);
         log.info("findUsersBySystemAdminWithoutRolesRequiredShouldBeSuccess :: END");
@@ -207,7 +214,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findOrgByPfmShouldBeSuccess() {
         log.info("findOrgByPfmShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         log.info("findOrgByPfmShouldBeSuccess :: END");
@@ -216,7 +223,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findOrgByPomShouldBeSuccess() {
         log.info("findOrgByPomShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pomBearerToken));
         assertThat(response.get("paymentAccount")).asList().hasSize(3);
         log.info("findOrgByPomShouldBeSuccess :: END");
@@ -224,7 +231,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findOrgByPumShouldBeSuccess() {
         log.info("findOrgByPumShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
         responseValidate(response);
         log.info("findOrgByPumShouldBeSuccess :: END");
@@ -232,7 +239,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findOrgByPcmShouldBeSuccess() {
         log.info("findOrgByPcmShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pcmBearerToken));
         responseValidate(response);
         log.info("findOrgByPcmShouldBeSuccess :: END");
@@ -240,7 +247,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findOrgByUnknownUserShouldReturnForbidden() {
         log.info("findOrgByUnknownUserShouldReturnForbidden :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(HttpStatus.FORBIDDEN,
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(FORBIDDEN,
                 professionalApiClient.getMultipleAuthHeaders(systemUserBearerToken));
         assertThat(response.get("errorMessage")).isNotNull();
         assertThat(response.get("errorMessage")).isEqualTo("9 : Access Denied");
@@ -249,7 +256,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUserStatusByEmailByPumShouldBeSuccess() {
         log.info("findUserStatusByEmailByPumShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserEmail);
         assertThat(response.get("userIdentifier")).isNotNull();
         log.info("findUserStatusByEmailByPumShouldBeSuccess :: END");
@@ -257,7 +264,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUserStatusByEmailInHeaderByPumShouldBeSuccess() {
         log.info("findUserStatusByEmailInHeaderByPumShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(OK,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserEmail);
         assertThat(response.get("userIdentifier")).isNotNull();
         log.info("findUserStatusByEmailInHeaderByPumShouldBeSuccess :: END");
@@ -265,12 +272,25 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findUserStatusOfPendingUserByEmailShouldReturnNotFound() {
         log.info("findUserStatusOfPendingUserByEmailShouldReturnNotFound :: STARTED");
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND,
+        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(NOT_FOUND,
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken), superUserEmail);
         assertThat(response.get("userIdentifier")).isNull();
         log.info("findUserStatusOfPendingUserByEmailShouldReturnNotFound :: END");
     }
 
+    public void findActiveOrganisationByPumShouldBeSuccess() {
+        log.info("findActiveOrganisationByPumShouldBeSuccess :: STARTED");
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+                professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
+                        professionalApiClient.getMultipleAuthHeaders(pumBearerToken), OK, ACTIVE, true);
+
+        assertThat(responseList.size()).isGreaterThanOrEqualTo(1);
+        OrganisationMinimalInfoResponse org = responseList.get(0);
+        assertThat(org.getName()).isNotNull();
+        assertThat(org.getOrganisationIdentifier()).isNotNull();
+        assertThat(org.getContactInformation()).isNotNull();
+        log.info("findActiveOrganisationByPumShouldBeSuccess :: END");
+    }
 
     public void reinviteActiveUserByPumShouldReturnBadRequest() {
         log.info("reinviteActiveUserByPumShouldReturnBadRequest :: STARTED");
@@ -279,11 +299,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         newUserCreationRequest.setResendInvite(true);
         Map<String, Object> reinviteUserResponse = professionalApiClient
                 .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
-                        .getMultipleAuthHeaders(pumBearerToken), HttpStatus.BAD_REQUEST);
+                        .getMultipleAuthHeaders(pumBearerToken), BAD_REQUEST);
         assertThat((String) reinviteUserResponse.get("errorDescription")).contains("User is not in PENDING state");
         log.info("reinviteActiveUserByPumShouldReturnBadRequest :: END");
     }
-
 
     public void reinviteUserByPumWithinOneHourShouldReturnConflict() {
         log.info("reinviteUserByPumWithinOneHourShouldReturnConflict :: STARTED");
@@ -292,69 +311,78 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         newUserCreationRequest.setResendInvite(true);
         Map<String, Object> reinviteUserResponse = professionalApiClient
                 .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
-                        .getMultipleAuthHeaders(pumBearerToken), HttpStatus.TOO_MANY_REQUESTS);
+                        .getMultipleAuthHeaders(pumBearerToken), TOO_MANY_REQUESTS);
         assertThat((String) reinviteUserResponse.get("errorDescription"))
                 .contains(String.format("The request was last made less than %s minutes ago. Please try after some "
                         + "time", resendInterval));
         log.info("reinviteUserByPumWithinOneHourShouldReturnConflict :: END");
     }
 
+    public void addRolesByPumShouldBeSuccess() {
+        log.info("addRolesByPumShouldBeSuccess :: STARTED");
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, addRoleRequest(puiOrgManager),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
 
-    void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
+        List<Map<String,Object>> professionalUsersResponses = (List<Map<String,Object>>) searchResponse.get("users");
+        Map<String,Object> professionalUsersResponse = getUserById(professionalUsersResponses, activeUserId);
+        assertThat(professionalUsersResponse.get("roles")).isNotNull();
 
-        professionalUsersResponses.forEach(user -> {
-            assertThat(user.get("idamStatus")).isNotNull();
-            assertThat(user.get("userIdentifier")).isNotNull();
-            assertThat(user.get("firstName")).isNotNull();
-            assertThat(user.get("lastName")).isNotNull();
-            assertThat(user.get("email")).isNotNull();
-            if (!expectedStatus.equals("any")) {
-                assertThat(user.get("idamStatus").equals(expectedStatus));
-            }
-            if (rolesReturned) {
-                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(user.get("roles")).isNotNull();
-                } else {
-                    assertThat(user.get("roles")).isNull();
-                }
-            }
-        });
+        List<String> roles = (List<String>) professionalUsersResponse.get("roles");
+        assertThat(roles.size()).isEqualTo(3);
+        assertThat(roles).contains(puiFinanceManager).contains(puiOrgManager).contains(puiUserManager);
+        log.info("addRolesByPumShouldBeSuccess :: END");
+    }
+
+    public void deleteRolesByPumShouldBeSuccess() {
+        log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
+        professionalApiClient.modifyUserToExistingUserForExternal(OK, deleteRoleRequest(puiOrgManager),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserId);
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
+        List<Map<String,Object>> professionalUsersResponses = (List<Map<String,Object>>) searchResponse.get("users");
+        Map professionalUsersResponse = getUserById(professionalUsersResponses, activeUserId);
+        assertThat(professionalUsersResponse.get("roles")).isNotNull();
+
+        List<String> modifiedRoles = (List<String>) professionalUsersResponse.get("roles");
+        assertThat(modifiedRoles.size()).isEqualTo(2);
+        assertThat(modifiedRoles).contains(puiFinanceManager).contains(puiUserManager);
+        log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
+    }
+
+    public void addRolesByPendingExtUserShouldReturnForbidden() {
+        log.info("addRolesByPendingExtUserShouldReturnForbidden :: STARTED");
+        Map<String, Object> modifiedUserResponse = professionalApiClient.modifyUserToExistingUserForExternal(FORBIDDEN,
+                addRoleRequest(puiOrgManager),
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), superUserId);
+        assertThat(modifiedUserResponse.get("errorMessage")).isEqualTo("9 : Access Denied");
+        assertThat(modifiedUserResponse.get("errorDescription"))
+                .isEqualTo("User status must be Active to perform this operation");
+        log.info("addRolesByPendingExtUserShouldReturnForbidden :: END");
+    }
+
+    public void suspendUserByPumShouldBeSuccess() {
+        log.info("suspendUserByPumShouldBeSuccess :: STARTED");
+        UserProfileUpdatedData data = getUserStatusUpdateRequest(SUSPENDED);
+        professionalApiClient.modifyUserToExistingUserForPrdAdmin(OK, data, extActiveOrgId, activeUserId);
+        assertThat(searchUserStatus(extActiveOrgId, activeUserId)).isEqualTo(SUSPENDED.name());
+        log.info("suspendUserByPumShouldBeSuccess :: END");
     }
 
     public String inviteUser(String role) {
         List<String> userRoles = new ArrayList<>();
         activeUserEmail = generateRandomEmail();
         userRoles.add(role);
-        NewUserCreationRequest pumUserCreationRequest = createUserRequest(userRoles);
-        pumUserCreationRequest.setEmail(activeUserEmail);
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(userRoles);
+        newUserCreationRequest.setEmail(activeUserEmail);
         String bearerToken = idamOpenIdClient.getExternalOpenIdToken(puiUserManager,
                 "firstName", "lastName", activeUserEmail);
 
         Map<String, Object> pumInternalUserResponse = professionalApiClient
-                .addNewUserToAnOrganisation(extActiveOrgId, hmctsAdmin, pumUserCreationRequest, CREATED);
+                .addNewUserToAnOrganisation(extActiveOrgId, hmctsAdmin, newUserCreationRequest, CREATED);
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
+        activeUserId = (String)pumInternalUserResponse.get("userIdentifier");
         return bearerToken;
-    }
-
-    private void responseValidate(Map<String, Object> orgResponse) {
-
-        orgResponse.forEach((k,v) -> {
-
-            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) &&  "status".equals(k)
-                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
-
-                Assertions.assertThat(v.toString()).isNotEmpty();
-                Assertions.assertThat(v.toString().contains("Ok"));
-                Assertions.assertThat(v.toString().contains("some-org-name"));
-                Assertions.assertThat(v.toString().equals("ACTIVE"));
-                Assertions.assertThat(v.toString()).isNotEmpty();
-            }
-
-        });
-
     }
 }

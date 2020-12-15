@@ -38,10 +38,10 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
     protected boolean isIgnored(FrameworkMethod child) {
 
         if (isNotTrue(isInitialized)) {
-            initialize();
+            //initialize();
         }
 
-        ToggleEnable toggleEnable = child.getAnnotation(ToggleEnable.class);
+        /*ToggleEnable toggleEnable = child.getAnnotation(ToggleEnable.class);
         if (toggleEnable != null) {
             featureToggleService.mapServiceToFlag();
             flagName = featureToggleService.getLaunchDarklyMap()
@@ -58,8 +58,8 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
                     return true;
                 }
             }
-        }
-        return super.isIgnored(child);
+        }*/
+        return false;
     }
 
     private void initialize() {

@@ -11,10 +11,14 @@ import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,6 +38,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -137,15 +142,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
 
-        /*if (null == activeOrgId) {
-            // create pending org
-            OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
-        }
-
-        if (null == activeOrgIdForBearerTokens) {
-            activeOrgIdForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
-        }*/
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -348,6 +344,18 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return activeUserMap;
     }
 
+    public Map getUserById(List<Map<String,Object>> professionalUsersResponses, String userId) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("userIdentifier").equals(userId)) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
+    }
+
     public static String generateRandomEmail() {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
@@ -390,6 +398,102 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             email = bearerTokenUser.getEmail();
         }
         return bearer;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String searchUserStatus(String orgIdentifier, String userId) {
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+
+        return professionalUsersResponses.stream()
+                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
+                .map(user -> (String) user.get("idamStatus"))
+                .collect(Collectors.toList()).get(0);
+    }
+
+    public void responseValidate(Map<String, Object> orgResponse) {
+
+        orgResponse.forEach((k,v) -> {
+
+            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
+                    && "name".equals(k) &&  "status".equals(k)
+                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
+
+                Assertions.assertThat(v.toString()).isNotEmpty();
+                Assertions.assertThat(v.toString().contains("Ok"));
+                Assertions.assertThat(v.toString().contains("some-org-name"));
+                Assertions.assertThat(v.toString().equals("ACTIVE"));
+                Assertions.assertThat(v.toString()).isNotEmpty();
+            }
+
+        });
+
+    }
+
+    public UserProfileUpdatedData deleteRoleRequest(String role) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesDelete(roles);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addRoleRequest(String role) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
+    }
+
+    public void validatePbaResponse(Map<String, Object> response) {
+        List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
+        assertThat(pbaList).hasSize(3);
+    }
+
+    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
+
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response.get("status")).isEqualTo(status);
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+
+    }
+
+    public void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus,
+                                       Boolean rolesReturned) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        professionalUsersResponses.forEach(user -> {
+            assertThat(user.get("idamStatus")).isNotNull();
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("firstName")).isNotNull();
+            assertThat(user.get("lastName")).isNotNull();
+            assertThat(user.get("email")).isNotNull();
+            if (!expectedStatus.equals("any")) {
+                assertThat(user.get("idamStatus").equals(expectedStatus));
+            }
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(user.get("roles")).isNotNull();
+                } else {
+                    assertThat(user.get("roles")).isNull();
+                }
+            }
+        });
     }
 
 }

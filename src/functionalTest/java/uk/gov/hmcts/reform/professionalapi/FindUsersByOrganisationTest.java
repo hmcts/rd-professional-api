@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -122,6 +121,7 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
 
 
     @Test
+    @Ignore //TODO: convert to integration test
     public void ac7_find_all_active_users_for_an_organisation_with_invalid_bearer_token_should_return_401() {
         professionalApiClient.searchOrganisationUsersByStatusExternal(HttpStatus.UNAUTHORIZED,
                 professionalApiClient.getMultipleAuthHeadersWithEmptyBearerToken(""), "");
@@ -284,29 +284,5 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     @Ignore //TODO: convert to integration test
     public void find_users_by_active_organisation_with_non_permitted_role_should_return_403() {
         professionalApiClient.searchUsersByOrganisation(activeOrgId, puiCaseManager, FALSE, HttpStatus.FORBIDDEN, TRUE);
-    }
-
-    void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-
-        professionalUsersResponses.forEach(user -> {
-            assertThat(user.get("idamStatus")).isNotNull();
-            assertThat(user.get("userIdentifier")).isNotNull();
-            assertThat(user.get("firstName")).isNotNull();
-            assertThat(user.get("lastName")).isNotNull();
-            assertThat(user.get("email")).isNotNull();
-            if (!expectedStatus.equals("any")) {
-                assertThat(user.get("idamStatus").equals(expectedStatus));
-            }
-            if (rolesReturned) {
-                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(user.get("roles")).isNotNull();
-                } else {
-                    assertThat(user.get("roles")).isNull();
-                }
-            }
-        });
     }
 }

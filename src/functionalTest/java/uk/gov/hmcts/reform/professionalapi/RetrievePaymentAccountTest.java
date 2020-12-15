@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,25 +72,6 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
                 .retrievePaymentAccountsByEmailFromHeader(email.toLowerCase(), hmctsAdmin);
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
-    }
-
-    private void responseValidate(Map<String, Object> orgResponse) {
-
-        orgResponse.forEach((k,v) -> {
-
-            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) &&  "status".equals(k)
-                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
-
-                Assertions.assertThat(v.toString()).isNotEmpty();
-                Assertions.assertThat(v.toString().contains("Ok"));
-                Assertions.assertThat(v.toString().contains("some-org-name"));
-                Assertions.assertThat(v.toString().equals("ACTIVE"));
-                Assertions.assertThat(v.toString()).isNotEmpty();
-            }
-
-        });
-
     }
 
     private UserCreationRequest createUserForTest() {

@@ -11,7 +11,7 @@ import java.util.Set;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 public class EditPbaTest extends AuthorizationFunctionalTest {
 
     @Test
+    @Ignore // covered in ProfessionalInternUserTest
     public void can_edit_active_organisation_payment_accounts_by_orgId() {
         String email = randomAlphabetic(10) + "@prdfunctestuser.com".toLowerCase();
         String pbaNumber = "PBA" + randomAlphabetic(7);
@@ -66,26 +67,4 @@ public class EditPbaTest extends AuthorizationFunctionalTest {
 
         assertThat(pbaResponse).isNotEmpty();
     }
-
-
-    private void responseValidate(Map<String, Object> orgResponse) {
-
-        orgResponse.forEach((k, v) -> {
-
-            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                    && "name".equals(k) && "status".equals(k)
-                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
-
-                Assertions.assertThat(v.toString()).isNotEmpty();
-                Assertions.assertThat(v.toString().contains("Ok"));
-                Assertions.assertThat(v.toString().contains("some-org-name"));
-                Assertions.assertThat(v.toString().equals("ACTIVE"));
-                Assertions.assertThat(v.toString()).isNotEmpty();
-            }
-
-        });
-
-    }
-
-
 }

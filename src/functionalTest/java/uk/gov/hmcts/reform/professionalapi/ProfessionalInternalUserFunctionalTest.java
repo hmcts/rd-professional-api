@@ -8,8 +8,10 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
@@ -31,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -45,28 +46,10 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     String invitedUserId;
     OrganisationCreationRequest organisationCreationRequest;
 
-    /*
-    Create Organisation
-    Approve Org
-    Invite User to Org
-    Find user by Org
-    Get Org
-    Get PBA
-     */
-
-    /*
-    Add/Modify roles to user --done
-    Find User by email--done
-    Reinvite User--done
-    Edit PBA--done
-    Modify status of the user--done
-    Delete Organisation --done
-     */
-
     @Test
     public void testInternalUserScenario() {
         setUpTestData();
-        //create and approve org already taken care in AuthorizationFunctionalTest in BeforeClass
+        createOrganisationScenario();
         inviteUserScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
@@ -76,7 +59,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         editPbaScenarios();
         deleteOrganisationScenarios();
         //Find User by email is only external
-        //Get all orgs are only external scenarios
+        //Get all active orgs are only external scenarios
 
     }
 
@@ -90,9 +73,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                         .email(superUserEmail)
                         .build())
                 .build();
-        // TODO: super user fails 
-        //superUserBearerToken = professionalApiClient.getMultipleAuthHeaders(
-        //getExternalSuperUserTokenWithRetry(superUserEmail, "firstName", "lastName"));
         intActiveOrgId = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
 
         List<String> roles = new ArrayList<>();
@@ -101,6 +81,10 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
  
+    }
+
+    public void createOrganisationScenario() {
+        createOrganisationWithoutS2STokenShouldReturnAuthorised();
     }
 
     public void inviteUserScenarios() {
@@ -145,6 +129,12 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void deleteOrganisationScenarios() {
         deletePendingOrganisationShouldReturnSuccess();
         deleteActiveOrganisationShouldReturnSuccess();
+    }
+
+    public void createOrganisationWithoutS2STokenShouldReturnAuthorised() {
+        Response response =
+                professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
     public NewUserCreationRequest inviteUserByInternalUser() {
@@ -391,17 +381,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("deleteActiveOrganisationShouldReturnSuccess :: END");
     }
 
-
-    public String searchUserStatus(String orgIdentifier, String userId) {
-        Map<String, Object> searchResponse = professionalApiClient
-                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
-        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
-        return professionalUsersResponses.stream()
-                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
-                .map(user -> (String) user.get("idamStatus"))
-                .collect(Collectors.toList()).get(0);
-    }
-
     public void validateRoles(List<String> rolesToValidate) {
         Map<String, Object> searchResponse = professionalApiClient.searchOrganisationUsersByStatusInternal(
                 intActiveOrgId, hmctsAdmin, HttpStatus.OK);
@@ -412,51 +391,4 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(rolesSize.size()).isEqualTo(rolesToValidate.size());
         assertThat(rolesSize).containsAll(rolesToValidate);
     }
-
-    public void validatePbaResponse(Map<String, Object> response) {
-        List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
-        assertThat(pbaList).hasSize(3);
-    }
-
-    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
-
-        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        assertThat(response.get("organisationIdentifier")).isNotNull();
-        assertThat(response.get("name")).isNotNull();
-        assertThat(response.get("status")).isEqualTo(status);
-        assertThat(response.get("sraId")).isNotNull();
-        assertThat(response.get("sraRegulated")).isNotNull();
-        assertThat(response.get("companyNumber")).isNotNull();
-        assertThat(response.get("companyUrl")).isNotNull();
-        assertThat(response.get("superUser")).isNotNull();
-        assertThat(response.get("paymentAccount")).isNotNull();
-        assertThat(response.get("contactInformation")).isNotNull();
-
-    }
-
-    void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus, Boolean rolesReturned) {
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-
-        professionalUsersResponses.forEach(user -> {
-            assertThat(user.get("idamStatus")).isNotNull();
-            assertThat(user.get("userIdentifier")).isNotNull();
-            assertThat(user.get("firstName")).isNotNull();
-            assertThat(user.get("lastName")).isNotNull();
-            assertThat(user.get("email")).isNotNull();
-            if (!expectedStatus.equals("any")) {
-                assertThat(user.get("idamStatus").equals(expectedStatus));
-            }
-            if (rolesReturned) {
-                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
-                    assertThat(user.get("roles")).isNotNull();
-                } else {
-                    assertThat(user.get("roles")).isNull();
-                }
-            }
-        });
-    }
-
-
 }

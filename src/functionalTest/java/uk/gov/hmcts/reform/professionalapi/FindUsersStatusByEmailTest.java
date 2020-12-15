@@ -143,7 +143,9 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
-    @Test  //TODO: convert to integration test
+    @Test
+    @Ignore //TODO: convert to integration test
+
     public void findUsrStatusByEmailFrmHeaderWithPuiOrganisationMgrRoleShouldRtnStatusForUsr() {
 
         // creating new user request
@@ -166,7 +168,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
 
-    @Test  //TODO: convert to integration test
+    @Test
+    @Ignore //TODO: convert to integration test
     public void rdcc_719_ac1_find_usr_sts_by_email_caseworker_publiclaw_courtadmin_role_shld_rtn_200__usr_sts_active() {
 
         // creating new user request
