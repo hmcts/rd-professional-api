@@ -14,13 +14,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -76,7 +74,6 @@ public class SuperControllerTest {
     private NewUserCreationRequest newUserCreationRequest;
     private UserProfileFeignClient userProfileFeignClient;
     private UserProfileUpdatedData userProfileUpdatedData;
-    private S2sClient s2sClientMock;
 
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
     private final PrdEnumId prdEnumId2 = new PrdEnumId(13, "JURISD_ID");
@@ -99,7 +96,6 @@ public class SuperControllerTest {
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
         userProfileUpdateRequestValidator = mock(UserProfileUpdateRequestValidator.class);
-        s2sClientMock = mock(S2sClient.class);
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
@@ -198,9 +194,8 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
 
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
@@ -268,8 +263,8 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
@@ -304,10 +299,9 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorDetails);
-        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
-                .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
-                        .status(409).build());
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class))).thenReturn(Response
+                .builder().request(mock(Request.class)).body(body, Charset.defaultCharset()).status(409).build());
 
         ResponseEntity<?> actual = superController.inviteUserToOrganisation(newUserCreationRequest, professionalUser
                 .getOrganisation().getOrganisationIdentifier(), userId);
@@ -366,8 +360,8 @@ public class SuperControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(s2sClientMock.generateS2S()).thenReturn("serviceAuthorization");
-        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class), any(String.class)))
+
+        when(userProfileFeignClient.createUserProfile(any(UserProfileCreationRequest.class)))
                 .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                         .status(200).build());
 
