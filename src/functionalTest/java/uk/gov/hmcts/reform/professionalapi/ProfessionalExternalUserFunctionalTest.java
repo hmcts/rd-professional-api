@@ -330,8 +330,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(professionalUsersResponse.get("roles")).isNotNull();
 
         List<String> roles = (List<String>) professionalUsersResponse.get("roles");
-        assertThat(roles.size()).isEqualTo(3);
-        assertThat(roles).contains(puiFinanceManager).contains(puiOrgManager).contains(puiUserManager);
+        assertThat(roles).contains(puiOrgManager);
         log.info("addRolesByPumShouldBeSuccess :: END");
     }
 
@@ -346,8 +345,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(professionalUsersResponse.get("roles")).isNotNull();
 
         List<String> modifiedRoles = (List<String>) professionalUsersResponse.get("roles");
-        assertThat(modifiedRoles.size()).isEqualTo(2);
-        assertThat(modifiedRoles).contains(puiFinanceManager).contains(puiUserManager);
+        assertThat(modifiedRoles).doesNotContain(puiOrgManager);
         log.info("deleteRolesByPumShouldBeSuccess :: STARTED");
     }
 
