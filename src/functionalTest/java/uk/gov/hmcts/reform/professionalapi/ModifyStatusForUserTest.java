@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
 
     @Test
-    @Ignore // not a scenario in PRD
+    @Ignore("Remove- not a scenario in PRD")
     public void rdcc_418_ac1_update_user_status_from_suspended_to_active() {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         Map<String,String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));
@@ -61,7 +61,7 @@ public class ModifyStatusForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void rdcc_418_ac2_update_user_status_from_active_to_suspended() {
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
         Map<String,String> userCreds = idamOpenIdClient.createUser(addRoles("pui-organisation-manager"));

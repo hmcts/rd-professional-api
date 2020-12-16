@@ -18,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 public class UpdateOrganisationTest extends AuthorizationFunctionalTest {
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_update_an_organisation() {
         professionalApiClient.updateOrganisation(activeOrgId, hmctsAdmin);
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_throw_Unauthorized_Error_code_without_bearertoken_to_update_an_organisation_401() {
         professionalApiClient.updateOrganisationWithoutBearerToken(hmctsAdmin, activeOrgId, HttpStatus.UNAUTHORIZED);
     }

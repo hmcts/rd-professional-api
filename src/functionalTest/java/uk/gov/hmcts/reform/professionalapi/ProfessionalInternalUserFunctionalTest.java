@@ -97,7 +97,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     public void findOrganisationScenarios() {
-        findAllOrganisationsByInternalUserShouldBeSuccess();
         findOrganisationByIdByInternalUserShouldBeSuccess();
         findActiveAndPendingOrganisationsByInternalUserShouldBeSuccess();
         findActiveOrganisationsByInternalUserShouldBeSuccess();
@@ -202,14 +201,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         List<HashMap> professionalUsersResponses2 = (List<HashMap>) searchResponse2.get("users");
         assertThat(professionalUsersResponses2.size()).isEqualTo(1);
         log.info("findUsersByInternalUserWithPaginationShouldReturnSuccess :: END");
-    }
-    
-    public void findAllOrganisationsByInternalUserShouldBeSuccess() {
-        log.info("findAllOrganisationsByInternalUserShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.retrieveAllOrganisations(hmctsAdmin);
-        assertThat(response.get("organisations")).isNotNull();
-        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
-        log.info("findAllOrganisationsByInternalUserShouldBeSuccess :: END");
     }
 
     public void findOrganisationByIdByInternalUserShouldBeSuccess() {

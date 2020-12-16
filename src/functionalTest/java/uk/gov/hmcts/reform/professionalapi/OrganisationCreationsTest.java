@@ -20,13 +20,13 @@ import org.springframework.test.context.ActiveProfiles;
 public class OrganisationCreationsTest extends AuthorizationFunctionalTest {
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_create_an_organisation() {
         assertThat(createAndUpdateOrganisationToActive(hmctsAdmin)).isNotEmpty();
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void ac7_can_throw_Unauthorized_Error_code_without_service_token_create_an_organisation_401() {
         Response response =
                 professionalApiClient.createOrganisationWithoutS2SToken(anOrganisationCreationRequest().build());

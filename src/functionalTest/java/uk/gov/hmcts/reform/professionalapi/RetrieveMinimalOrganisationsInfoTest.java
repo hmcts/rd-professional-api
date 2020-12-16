@@ -62,7 +62,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
         + ".retrieveOrganisationsByStatusWithAddressDetailsOptional";
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void should_retrieve_organisations_info_with_200_with_correct_roles_and_status_active() {
         setUpTestData();
@@ -92,7 +92,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     }
 
     @Test
-    @Ignore // not required since this api is in prod with toggled on
+    @Ignore("Remove -not required since this api is in prod with toggled on")
     //@ToggleEnable(mapKey = mapKey, withFeature = false)
     public void should_retrieve_403_when_API_toggled_off() {
         setUpTestData();
@@ -106,7 +106,7 @@ public class RetrieveMinimalOrganisationsInfoTest extends AuthorizationFunctiona
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
         // invite new user having invalid roles

@@ -42,7 +42,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void add_new_user_to_organisation() {
 
         NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
@@ -52,7 +52,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void add_new_user_to_organisation_with_unknown_roles_should_return_404() {
 
         List<String> roles = new ArrayList<>();
@@ -66,7 +66,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_throw_409_when_add_duplicate_new_user_to_organisation() {
 
         // create pending org
@@ -84,7 +84,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
     }
 
-    @Ignore //TODO: convert to integration test once RDCC-2050 is completed
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void add_new_user_to_organisation_by_super_user() {
         List<String> userRoles = new ArrayList<>();
@@ -122,7 +122,7 @@ public class AddNewUserTest extends AuthorizationFunctionalTest {
         assertThat(newUserResponse).isNotNull();
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void add_new_user_with_caa_roles_to_organisation_should_return_201() {
         List<String> userRoles = new ArrayList<>();

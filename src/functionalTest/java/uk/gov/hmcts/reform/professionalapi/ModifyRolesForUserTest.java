@@ -66,7 +66,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void ac1_modify_role_existing_user_to_organisation_internal() {
 
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -119,7 +119,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void ac2_add_role_existing_user_using_pui_user_manager_for_external_200() {
 
         Map<String, Object> searchResponse = professionalApiClient
@@ -151,7 +151,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void ac3_delete_role_existing_user_to_organisation_internal() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
 
@@ -205,7 +205,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
 
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void ac4_delete_role_existing_user_using_pui_user_manager_for_external_200() {
 
         Map<String, Object> searchResponse = professionalApiClient
@@ -247,7 +247,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
         //assertThat(!rolesInfo.contains("pui-organisation-manager"));
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void should_get_400_when_modify_roles_for_pending_user_internal() {
 
@@ -261,7 +261,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
                 .isEqualTo("3 : There is a problem with your request. Please check and try again");
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void should_get_404_when_modify_roles_for_unknown_user_internal() {
         String unknownUserId = UUID.randomUUID().toString();
@@ -274,7 +274,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // This is not a practical scenario
+    @Ignore("Remove -This is not a practical scenario")
     public void should_get_403_when_non_active_external_user_modify_roles() {
 
         //create test sidam user and add same user in org
@@ -296,7 +296,7 @@ public class ModifyRolesForUserTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_get_403_when_external_user_modify_roles_of_non_active_user() {
 
         IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);

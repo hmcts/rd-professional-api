@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 public class EditPbaTest extends AuthorizationFunctionalTest {
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_edit_active_organisation_payment_accounts_by_orgId() {
         String email = randomAlphabetic(10) + "@prdfunctestuser.com".toLowerCase();
         String pbaNumber = "PBA" + randomAlphabetic(7);

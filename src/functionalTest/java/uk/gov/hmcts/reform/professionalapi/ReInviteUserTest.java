@@ -48,7 +48,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC3: resend invite to a given user who does not exist
     @Test
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     public void should_return_404_when_reinvited_user_not_exists() {
         if (resendInviteEnabled) {
             NewUserCreationRequest newUserCreationRequest = professionalApiClient
@@ -62,7 +62,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC4: resend invite to a given user who is not in the 'Pending' state
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_return_400_when_reinvited_user_is_active() {
 
         if (resendInviteEnabled) {
@@ -88,7 +88,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC5: resend invite to a given user who was last invited less than one hour before
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_return_429_when_user_reinvited_within_one_hour() {
 
         if (resendInviteEnabled) {
@@ -113,7 +113,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC7:  professional(external) user resend invite user who is not in the 'Pending' state
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_return_400_when_user_reinvited_by_extrenal_user_is_active() {
 
         if (resendInviteEnabled) {
@@ -148,7 +148,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //AC8: professional(external) resend invite to a given user who was last invited less than one hour before
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void should_return_400_when_user_reinvited_by_extrenal_user_is_invited_within_one_hour() {
 
         if (resendInviteEnabled) {
@@ -182,7 +182,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     //re inviting super user
     @Test
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     public void should_reinvite_super_user_within_one_hour() {
 
         if (resendInviteEnabled) {
@@ -208,7 +208,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     // should not re invite when user does not exists in organisation for internal user
     @Test
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     public void should_return_403_when_internal_user_reinvites_user_which_does_not_exists_in_same_organisation() {
         if (resendInviteEnabled) {
 
@@ -229,7 +229,7 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
 
     // should not re invite when user does not exists in organisation for external user
     @Test
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     public void should_return_403_when_external_user_reinvites_user_which_does_not_exists_in_same_organisation() {
         if (resendInviteEnabled) {
             if (resendInviteEnabled) {

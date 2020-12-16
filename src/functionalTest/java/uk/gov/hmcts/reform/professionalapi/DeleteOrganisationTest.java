@@ -35,7 +35,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac1_can_delete_an_organisation_with_valid_org_identifier_by_prd_admin() {
 
@@ -47,7 +47,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore//TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac2_could_throw_not_found_error_when_delete_an_organisation_with_external_endpoint_404() {
         Map<String, Object> response = professionalApiClient.createOrganisation();
@@ -57,7 +57,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac3_error_when_delete_an_organisation_with_unknown_org_identifier_should_return_404() {
@@ -67,7 +67,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
 
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac5_delete_an_active_organisation_with_pending_user_profile_by_prd_admin_successfully() {
         String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
@@ -75,7 +75,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void ac6_could_not_delete_an_active_organisation_with_active_user_profile_by_prd_admin() {
         String firstName = "some-fname";
@@ -102,7 +102,7 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.BAD_REQUEST);
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     //@ToggleEnable(mapKey = mapKey, withFeature = true)
     public void ac7_could_not_delete_an_active_organisation_with_more_than_one_userProfile_by_prdadmin_throws_400() {

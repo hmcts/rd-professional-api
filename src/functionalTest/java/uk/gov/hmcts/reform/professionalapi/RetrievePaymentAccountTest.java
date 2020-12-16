@@ -29,7 +29,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     private String email = generateRandomEmail();
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_retrieve_active_organisation_payment_accounts_user_by_email() {
 
         Set<String> paymentAccounts = new HashSet<>();
@@ -52,7 +52,7 @@ public class RetrievePaymentAccountTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @Ignore // covered in ProfessionalInternUserTest
+    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
     public void can_retrieve_active_organisation_payment_accounts_user_by_email_fromHeader() {
 
         Set<String> paymentAccounts = new HashSet<>();
