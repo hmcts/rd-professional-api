@@ -410,7 +410,7 @@ dependencies {
     testCompile 'io.github.openfeign:feign-jackson:10.7.0'
     testCompile group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
+    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.5.RELEASE'
 
     testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
     testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
