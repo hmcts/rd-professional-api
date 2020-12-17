@@ -359,7 +359,7 @@ dependencies {
                 'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
     }
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '7.3.2'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
