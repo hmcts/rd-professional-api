@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
@@ -57,126 +55,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.NOT_FOUND);
             assertThat((String) newUserResponse.get("errorDescription")).contains("User does not exist");
-        }
-    }
-
-    //AC4: resend invite to a given user who is not in the 'Pending' state
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    public void should_return_400_when_reinvited_user_is_active() {
-
-        if (resendInviteEnabled) {
-            // create active user in UP
-            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(addRoles("pui-user-manager"));
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient
-                    .createNewUserRequest(pumUserCreds.get(EMAIL));
-            Map<String, Object> newUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                            HttpStatus.CREATED);
-            assertThat(newUserResponse).isNotNull();
-
-            //re inviting active user should return 400
-            NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
-                    .createReInviteUserRequest(pumUserCreds.get(EMAIL));
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, reInviteUserCreationRequest,
-                            HttpStatus.BAD_REQUEST);
-            assertThat((String) reinviteUserResponse.get("errorDescription")).contains("User is not in PENDING state");
-        }
-    }
-
-    //AC5: resend invite to a given user who was last invited less than one hour before
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    public void should_return_429_when_user_reinvited_within_one_hour() {
-
-        if (resendInviteEnabled) {
-            // create pending user in UP
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient.createNewUserRequest();
-            Map<String, Object> newUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                            HttpStatus.CREATED);
-            assertThat(newUserResponse).isNotNull();
-
-            //re inviting active user should return 400
-            NewUserCreationRequest reInviteUserCreationRequest = professionalApiClient
-                    .createReInviteUserRequest(newUserCreationRequest.getEmail());
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, reInviteUserCreationRequest,
-                            HttpStatus.TOO_MANY_REQUESTS);
-            assertThat((String) reinviteUserResponse.get("errorDescription"))
-                    .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
-                            + " time", resendInterval));
-        }
-    }
-
-    //AC7:  professional(external) user resend invite user who is not in the 'Pending' state
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    public void should_return_400_when_user_reinvited_by_extrenal_user_is_active() {
-
-        if (resendInviteEnabled) {
-            // create active PUM sidam user and invite
-            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            List<String> roles = new ArrayList<String>();
-            roles.add("pui-user-manager");
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(roles);
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient
-                    .createNewUserRequest(pumUserCreds.get(EMAIL));
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                    HttpStatus.CREATED);
-
-            // create active caseworker sidam user and invite
-            List<String> roles1 = new ArrayList<String>();
-            roles.add("caseworker");
-            Map<String,String> caseWorkerCreds = idamOpenIdClient.createUser(roles1);
-            newUserCreationRequest = professionalApiClient.createNewUserRequest(caseWorkerCreds.get(EMAIL));
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                    HttpStatus.CREATED);
-
-            // get PUM bearer token and reinvite
-            String pumBearerToken = idamOpenIdClient
-                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
-            newUserCreationRequest.setResendInvite(true);
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
-                            .getMultipleAuthHeaders(pumBearerToken), HttpStatus.BAD_REQUEST);
-            assertThat((String) reinviteUserResponse.get("errorDescription")).contains("User is not in PENDING state");
-        }
-    }
-
-    //AC8: professional(external) resend invite to a given user who was last invited less than one hour before
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    public void should_return_400_when_user_reinvited_by_extrenal_user_is_invited_within_one_hour() {
-
-        if (resendInviteEnabled) {
-            // create active PUM sidam user and invite
-            IdamOpenIdClient idamOpenIdClient = new IdamOpenIdClient(configProperties);
-            Map<String,String> pumUserCreds = idamOpenIdClient.createUser(addRoles("pui-user-manager"));
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient
-                    .createNewUserRequest(pumUserCreds.get(EMAIL));
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                    HttpStatus.CREATED);
-
-
-            // create active caseworker sidam user and invite
-            String email = generateRandomEmail();
-            newUserCreationRequest = professionalApiClient.createNewUserRequest(email);
-            professionalApiClient.addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                    HttpStatus.CREATED);
-
-            // get PUM bearer token and reinvite
-            String pumBearerToken = idamOpenIdClient
-                    .getOpenIdToken(pumUserCreds.get(EMAIL), pumUserCreds.get(CREDS));
-            newUserCreationRequest.setResendInvite(true);
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisationExternal(newUserCreationRequest, professionalApiClient
-                            .getMultipleAuthHeaders(pumBearerToken), HttpStatus.TOO_MANY_REQUESTS);
-            assertThat((String) reinviteUserResponse.get("errorDescription"))
-                    .contains(String.format("The request was last made less than %s minutes ago. Please try after some "
-                            + "time", resendInterval));
         }
     }
 

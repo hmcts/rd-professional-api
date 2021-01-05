@@ -98,7 +98,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected TestConfigProperties configProperties;
 
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static String  s2sToken;
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
@@ -106,11 +105,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static String email;
     public static String activeOrgId;
     public static String activeOrgIdForBearerTokens;
-    public static String puiUserManagerBearerToken;
     public static String puiCaseManagerBearerToken;
     public static String puiOrgManagerBearerToken;
-    public static String puiFinanceManagerBearerToken;
-    public static String courtAdminBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
 
 

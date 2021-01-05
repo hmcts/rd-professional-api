@@ -34,17 +34,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         super.beforeTestClass(testContext);
     }
 
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    //@ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac1_can_delete_an_organisation_with_valid_org_identifier_by_prd_admin() {
-
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String orgIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(orgIdentifier).isNotEmpty();
-        professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NO_CONTENT);
-        professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
-    }
 
     @Test
     @Ignore("convert to integration test once RDCC-2050 is completed")
@@ -65,15 +54,6 @@ public class DeleteOrganisationTest extends AuthorizationFunctionalTest {
         professionalApiClient.deleteOrganisation(orgIdentifier, hmctsAdmin, HttpStatus.NOT_FOUND);
     }
 
-
-    @Test
-    @Ignore("covered in ProfessionalInternalUserTest or ProfessionalExternalUserTest")
-    //@ToggleEnable(mapKey = mapKey, withFeature = true)
-    public void ac5_delete_an_active_organisation_with_pending_user_profile_by_prd_admin_successfully() {
-        String orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin);
-        professionalApiClient.deleteOrganisation(orgIdentifierResponse, hmctsAdmin, HttpStatus.NO_CONTENT);
-        professionalApiClient.retrieveOrganisationDetails(orgIdentifierResponse, hmctsAdmin, HttpStatus.NOT_FOUND);
-    }
 
     @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
