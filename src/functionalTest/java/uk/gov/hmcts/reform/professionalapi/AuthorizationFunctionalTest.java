@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -36,7 +35,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -122,9 +120,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
-
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         if (null == s2sToken) {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
@@ -234,45 +229,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearerToken;
     }
 
-    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles, String email) {
-        String userEmail = email;
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(puiUserManager, firstName, lastName,
-                userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                        hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
-        assertThat(searchResponse.get("idamStatus")).isNotNull();
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
-
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-        assertThat(professionalUsersResponse.get("email")).isNotNull();
-        if (rolesRequired) {
-            assertThat(professionalUsersResponse.get("roles")).isNotNull();
-        } else {
-            assertThat(professionalUsersResponse.get("roles")).isNull();
-        }
-    }
-
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
 
         String userEmail = generateRandomEmail();
@@ -308,15 +264,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         } else {
             return email;
         }
-    }
-
-    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .build();
-        return superUser;
     }
 
     public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
@@ -395,7 +342,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearer;
     }
 
-    @SuppressWarnings("unchecked")
     public String searchUserStatus(String orgIdentifier, String userId) {
 
         Map<String, Object> searchResponse = professionalApiClient

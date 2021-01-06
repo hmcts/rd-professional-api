@@ -36,7 +36,6 @@ def versions = [
         serenity           : '2.0.76',
         sonarPitest        : '0.5',
         springBoot         : '2.3.4.RELEASE',
-        springHystrix      : '2.1.6.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
         launchDarklySdk    : "5.1.1"
@@ -293,7 +292,6 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springBoot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springHystrix
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
 
@@ -321,6 +319,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-oauth2-client"
     compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation "io.github.openfeign:feign-httpclient:10.7.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation('org.apache.httpcomponents:httpclient:4.5.13') {
