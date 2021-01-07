@@ -116,6 +116,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void reinviteUserScenarios() {
         reinviteActiveUserShouldReturnBadRequest();
         reinviteUserWithinOneHourShouldReturnConflict();
+        reinviteSuperUserWithinOneHourShouldReturnTooManyRequest();
     }
 
     public void editPbaScenarios() {
@@ -318,6 +319,17 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .contains(String.format("The request was last made less than %s minutes ago. Please try after some"
                         + " time", resendInterval));
         log.info("reinviteUserWithinOneHourShouldReturnConflict :: END");
+    }
+
+    public void reinviteSuperUserWithinOneHourShouldReturnTooManyRequest() {
+        log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: STARTED");
+        NewUserCreationRequest newUserCreationRequest = professionalApiClient.createReInviteUserRequest(superUserEmail);
+        Map<String, Object> reinviteUserResponse = professionalApiClient
+                .addNewUserToAnOrganisation(intActiveOrgId, hmctsAdmin, newUserCreationRequest, TOO_MANY_REQUESTS);
+        assertThat((String) reinviteUserResponse.get("errorDescription"))
+                .contains(String.format("The request was last made less than %s minutes ago. Please try after "
+                        + "some time", resendInterval));
+        log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: END");
     }
 
     public void editPaymentAccountsShouldReturnSuccess() {

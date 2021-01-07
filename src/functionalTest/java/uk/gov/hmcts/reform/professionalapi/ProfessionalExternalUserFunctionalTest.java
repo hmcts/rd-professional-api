@@ -16,17 +16,20 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     String superUserEmail;
     String superUserId;
     OrganisationCreationRequest organisationCreationRequest;
+    String firstName = "firstName";
+    String lastName = "lastName";
 
     @Test
     public void testExternalUserScenario() {
@@ -66,7 +71,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void setUpTestData() {
         superUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName("firstName").lastName("lastName").email(superUserEmail)
+                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(superUserEmail)
                         .build())
                 .build();
 
@@ -87,6 +92,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void inviteUserScenarios() {
         inviteUserByPuiUserManagerShouldBeSuccess();
+        inviteUserBySuperUserShouldBeSuccess();
     }
 
     public void findUsersByOrganisationScenarios() {
@@ -140,6 +146,27 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                         professionalApiClient.getMultipleAuthHeaders(pumBearerToken), CREATED);
         assertThat(newUserResponse.get("userIdentifier")).isNotNull();
         log.info("inviteUserByPuiUserManagerShouldBeSuccess :: END");
+    }
+
+    public void inviteUserBySuperUserShouldBeSuccess() {
+        log.info("inviteUserBySuperUserShouldBeSuccess :: STARTED");
+        String email = generateRandomEmail();
+        RequestSpecification superUserToken =
+                professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                        superUserRoles(), firstName, lastName, email));
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(email).build())
+                .status("ACTIVE").build();
+        createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+
+        NewUserCreationRequest newUserCreationRequest = createUserRequest(Arrays.asList("caseworker"));
+
+        Map<String, Object> newUserResponse = professionalApiClient
+                .addNewUserToAnOrganisationExternal(newUserCreationRequest, superUserToken, HttpStatus.CREATED);
+        assertThat(newUserResponse).isNotNull();
+        assertThat(newUserResponse.get("userIdentifier")).isNotNull();
+        log.info("inviteUserBySuperUserShouldBeSuccess :: END");
     }
 
     public void findUsersByNonPumAndNoStatusProvidedShouldBeSuccess() {

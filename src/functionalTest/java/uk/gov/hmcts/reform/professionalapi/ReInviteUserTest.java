@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Map;
@@ -55,32 +54,6 @@ public class ReInviteUserTest extends AuthorizationFunctionalTest {
                     .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
                             HttpStatus.NOT_FOUND);
             assertThat((String) newUserResponse.get("errorDescription")).contains("User does not exist");
-        }
-    }
-
-    //re inviting super user
-    @Test
-    @Ignore("convert to integration test once RDCC-2050 is completed")
-    public void should_reinvite_super_user_within_one_hour() {
-
-        if (resendInviteEnabled) {
-
-            //create and  activate org
-            OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().build();
-
-            orgIdentifierResponse = createAndUpdateOrganisationToActive(hmctsAdmin, organisationCreationRequest);
-
-            // re invite super user
-            NewUserCreationRequest newUserCreationRequest = professionalApiClient
-                    .createReInviteUserRequest(organisationCreationRequest.getSuperUser().getEmail());
-
-            Map<String, Object> reinviteUserResponse = professionalApiClient
-                    .addNewUserToAnOrganisation(orgIdentifierResponse, hmctsAdmin, newUserCreationRequest,
-                            HttpStatus.TOO_MANY_REQUESTS);
-
-            assertThat((String) reinviteUserResponse.get("errorDescription"))
-                    .contains(String.format("The request was last made less than %s minutes ago. Please try after "
-                            + "some time", resendInterval));
         }
     }
 

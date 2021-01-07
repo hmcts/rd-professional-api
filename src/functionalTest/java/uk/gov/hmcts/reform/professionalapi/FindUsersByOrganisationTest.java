@@ -81,4 +81,17 @@ public class FindUsersByOrganisationTest extends AuthorizationFunctionalTest {
     public void find_users_by_active_organisation_with_non_permitted_role_should_return_403() {
         professionalApiClient.searchUsersByOrganisation(activeOrgId, puiCaseManager, FALSE, HttpStatus.FORBIDDEN, TRUE);
     }
+
+    @Ignore("convert to integration test once RDCC-2050 is completed")
+    @Test
+    public void should_fail_to_retrieve_organisations_info_with_403_with_incorrect_roles_and_status_active() {
+        // invite new user having invalid roles
+       /* List<String> userRoles = new ArrayList<>();
+        userRoles.add("caseworker");
+        inviteNewUser(userRoles);
+        validateErrorResponse((ErrorResponse) professionalApiClient
+                        .retrieveAllActiveOrganisationsWithMinimalInfo(bearerToken,
+                                HttpStatus.FORBIDDEN, ACTIVE.toString(), true),
+                ACCESS_EXCEPTION.getErrorMessage(), ACCESS_IS_DENIED_ERROR_MESSAGE);*/
+    }
 }
