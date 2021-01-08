@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
-import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +35,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         }
     }
 
-    @Test
-    public void ac1_find_user_status_by_email_with_pui_user_manager_role_should_return_200() {
-        puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, "pui-user-manager");
-
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
-                professionalApiClient.getMultipleAuthHeaders(puiUserManagerBearerToken), email);
-        assertThat(response.get("userIdentifier")).isNotNull();
-    }
-
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
@@ -56,40 +46,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
     }
 
-    @Test
-    public void findUserStatusByEmailFromHeaderWithPuiUserManagerRoleShouldReturn200() {
-        puiUserManagerBearerToken = generateBearerToken(puiUserManagerBearerToken, "pui-user-manager");
-
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
-                professionalApiClient.getMultipleAuthHeaders(puiUserManagerBearerToken), email);
-        assertThat(response.get("userIdentifier")).isNotNull();
-    }
-
-    @Ignore //TODO: remove - Duplicate of findUserStatusByEmailFromHeaderWithPuiCaseManagerRoleShouldReturn200()
-    @Test
-    public void ac2_find_user_status_by_email_with_pui_case_manager_role_should_return_200_with_user_status_active() {
-        puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
-
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
-                professionalApiClient.getMultipleAuthHeaders(puiCaseManagerBearerToken), email);
-        assertThat(response.get("userIdentifier")).isNotNull();
-    }
-
-    @Test
-    public void ac3_find_usr_status_by_email_with_not_active_pui_finance_mgr_role_should_rtn_status_pending_for_usr() {
-        // creating new user request
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-finance-manager");
-        NewUserCreationRequest userCreationRequest = createUserRequest(userRoles);
-        // inviting user
-        professionalApiClient.addNewUserToAnOrganisation(orgId, hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-        // find the status of the user
-        Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.NOT_FOUND,
-                generateBearerTokenForExternalUserRolesSpecified(userRoles), userCreationRequest.getEmail());
-        assertThat(response.get("userIdentifier")).isNull();
-    }
-
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void findUsrStatusByEmailFrmHeaderWithPuiCaseManagerRoleShouldReturn200WithUserStatusActive() {
         puiCaseManagerBearerToken = generateBearerToken(puiCaseManagerBearerToken, "pui-user-manager");
@@ -99,7 +56,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusForUsr() {
         // creating new user request
@@ -114,7 +71,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNotNull();
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void findUsrStatusByEmailFrmHeaderWithNotActivePuiFinanceMgrRoleShouldRtnStatusPendingForUsr() {
         // creating new user request
@@ -129,7 +86,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         assertThat(response.get("userIdentifier")).isNull();
     }
 
-    @Ignore //TODO: convert to integration test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     @Test
     public void ac4_find_usr_status_by_email_with_active_pui_organisation_manager_role_should_return_status_for_usr() {
         puiOrgManagerBearerToken = generateBearerToken(puiOrgManagerBearerToken, "pui-user-manager");
@@ -141,6 +98,8 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
+
     public void findUsrStatusByEmailFrmHeaderWithPuiOrganisationMgrRoleShouldRtnStatusForUsr() {
 
         // creating new user request
@@ -164,6 +123,7 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
 
 
     @Test
+    @Ignore("convert to integration test once RDCC-2050 is completed")
     public void rdcc_719_ac1_find_usr_sts_by_email_caseworker_publiclaw_courtadmin_role_shld_rtn_200__usr_sts_active() {
 
         // creating new user request
@@ -187,15 +147,5 @@ public class FindUsersStatusByEmailTest extends AuthorizationFunctionalTest {
         Map<String, Object> response = professionalApiClient.findUserStatusByEmail(HttpStatus.OK,
                 bearerTokenForCourtAdmin, userCreationRequest.getEmail());
         assertThat(response.get("userIdentifier")).isNotNull();
-    }
-
-    @Ignore //TODO: remove - unnecessary test case/not required
-    @Test
-    public void rdcc_719_ac2_caseworker_publiclaw_courtadmin_role_should_return_403_when_calling_any_other_endpoint() {
-        courtAdminBearerToken = generateBearerToken(courtAdminBearerToken, "pui-user-manager");
-
-        professionalApiClient.addNewUserToAnOrganisationExternal(
-                createUserRequest(asList("caseworker-publiclaw-courtadmin")),
-                professionalApiClient.getMultipleAuthHeaders(courtAdminBearerToken), HttpStatus.FORBIDDEN);
     }
 }

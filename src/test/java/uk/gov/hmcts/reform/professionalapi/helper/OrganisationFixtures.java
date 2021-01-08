@@ -23,6 +23,7 @@ public class OrganisationFixtures {
 
         return anOrganisationCreationRequest()
                 .name("some-org-name")
+                .status("ACTIVE")
                 .superUser(aUserCreationRequest()
                         .firstName("some-fname")
                         .lastName("some-lname")

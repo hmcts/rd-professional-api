@@ -4,16 +4,19 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -32,7 +35,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiExceptio
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
@@ -81,6 +84,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Value("${prd.security.roles.prd-aac-system}")
     protected String systemUser;
 
+    @Value("${resendInterval}")
+    protected String resendInterval;
+
     protected static ProfessionalApiClient professionalApiClient;
 
     protected RequestSpecification bearerToken;
@@ -90,7 +96,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected TestConfigProperties configProperties;
 
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
     protected static String  s2sToken;
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
@@ -98,12 +103,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static String email;
     public static String activeOrgId;
     public static String activeOrgIdForBearerTokens;
-    public static String puiUserManagerBearerToken;
     public static String puiCaseManagerBearerToken;
     public static String puiOrgManagerBearerToken;
-    public static String puiFinanceManagerBearerToken;
-    public static String courtAdminBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
+
 
     @Override
     public void beforeTestClass(TestContext testContext) {
@@ -118,9 +121,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
 
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
-
         if (null == s2sToken) {
             s2sToken = new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S();
         }
@@ -132,13 +132,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             professionalApiUrl,
             s2sToken, idamOpenIdClient);
 
-        if (null == activeOrgId) {
-            activeOrgId = createAndUpdateOrganisationToActive(hmctsAdmin);
-        }
-
-        if (null == activeOrgIdForBearerTokens) {
-            activeOrgIdForBearerTokens = createAndUpdateOrganisationToActive(hmctsAdmin);
-        }
     }
 
     protected String createAndUpdateOrganisationToActive(String role) {
@@ -236,45 +229,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return bearerToken;
     }
 
-    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles, String email) {
-        String userEmail = email;
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(puiUserManager, firstName, lastName,
-                userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                        hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    protected void validateUsers(Map<String, Object> searchResponse, Boolean rolesRequired) {
-        assertThat(searchResponse.get("idamStatus")).isNotNull();
-        assertThat(searchResponse.get("users")).asList().isNotEmpty();
-
-        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
-        HashMap professionalUsersResponse = professionalUsersResponses.get(0);
-
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isNotNull();
-        assertThat(professionalUsersResponse.get("lastName")).isNotNull();
-        assertThat(professionalUsersResponse.get("email")).isNotNull();
-        if (rolesRequired) {
-            assertThat(professionalUsersResponse.get("roles")).isNotNull();
-        } else {
-            assertThat(professionalUsersResponse.get("roles")).isNull();
-        }
-    }
-
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
 
         String userEmail = generateRandomEmail();
@@ -312,15 +266,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         }
     }
 
-    public UserCreationRequest createSuperUser(String email, String firstName, String lastName) {
-        UserCreationRequest superUser = aUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .build();
-        return superUser;
-    }
-
     public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
         UserProfileUpdatedData data = new UserProfileUpdatedData();
         data.setFirstName("UpdatedFirstName");
@@ -335,6 +280,18 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         for (Map userMap : professionalUsersResponses) {
             if (userMap.get("idamStatus").equals(IdamStatus.ACTIVE.name())) {
+                activeUserMap = userMap;
+            }
+        }
+        return activeUserMap;
+    }
+
+    public Map getUserById(List<Map<String,Object>> professionalUsersResponses, String userId) {
+
+        Map activeUserMap = null;
+
+        for (Map userMap : professionalUsersResponses) {
+            if (userMap.get("userIdentifier").equals(userId)) {
                 activeUserMap = userMap;
             }
         }
@@ -383,6 +340,101 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             email = bearerTokenUser.getEmail();
         }
         return bearer;
+    }
+
+    public String searchUserStatus(String orgIdentifier, String userId) {
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+        List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
+
+        return professionalUsersResponses.stream()
+                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
+                .map(user -> (String) user.get("idamStatus"))
+                .collect(Collectors.toList()).get(0);
+    }
+
+    public void responseValidate(Map<String, Object> orgResponse) {
+
+        orgResponse.forEach((k,v) -> {
+
+            if ("organisationIdentifier".equals(k) && "http_status".equals(k)
+                    && "name".equals(k) &&  "status".equals(k)
+                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
+
+                Assertions.assertThat(v.toString()).isNotEmpty();
+                Assertions.assertThat(v.toString().contains("Ok"));
+                Assertions.assertThat(v.toString().contains("some-org-name"));
+                Assertions.assertThat(v.toString().equals("ACTIVE"));
+                Assertions.assertThat(v.toString()).isNotEmpty();
+            }
+
+        });
+
+    }
+
+    public UserProfileUpdatedData deleteRoleRequest(String role) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesDelete(roles);
+        return userProfileUpdatedData;
+    }
+
+    public UserProfileUpdatedData addRoleRequest(String role) {
+        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
+        RoleName roleName = new RoleName(role);
+        Set<RoleName> roles = new HashSet<>();
+        roles.add(roleName);
+        userProfileUpdatedData.setRolesAdd(roles);
+        return userProfileUpdatedData;
+    }
+
+    public void validatePbaResponse(Map<String, Object> response) {
+        List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
+        assertThat(pbaList).hasSize(3);
+    }
+
+    public void validateSingleOrgResponse(Map<String, Object> response, String status) {
+
+        Assertions.assertThat(response.size()).isGreaterThanOrEqualTo(1);
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get("name")).isNotNull();
+        assertThat(response.get("status")).isEqualTo(status);
+        assertThat(response.get("sraId")).isNotNull();
+        assertThat(response.get("sraRegulated")).isNotNull();
+        assertThat(response.get("companyNumber")).isNotNull();
+        assertThat(response.get("companyUrl")).isNotNull();
+        assertThat(response.get("superUser")).isNotNull();
+        assertThat(response.get("paymentAccount")).isNotNull();
+        assertThat(response.get("contactInformation")).isNotNull();
+
+    }
+
+    public void validateRetrievedUsers(Map<String, Object> searchResponse, String expectedStatus,
+                                       Boolean rolesReturned) {
+        assertThat(searchResponse.get("users")).asList().isNotEmpty();
+        assertThat(searchResponse.get("organisationIdentifier")).isNotNull();
+        List<HashMap> professionalUsersResponses = (List<HashMap>) searchResponse.get("users");
+
+        professionalUsersResponses.forEach(user -> {
+            assertThat(user.get("idamStatus")).isNotNull();
+            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get("firstName")).isNotNull();
+            assertThat(user.get("lastName")).isNotNull();
+            assertThat(user.get("email")).isNotNull();
+            if (!expectedStatus.equals("any")) {
+                assertThat(user.get("idamStatus").equals(expectedStatus));
+            }
+            if (rolesReturned) {
+                if (user.get("idamStatus").equals(IdamStatus.ACTIVE.toString())) {
+                    assertThat(user.get("roles")).isNotNull();
+                } else {
+                    assertThat(user.get("roles")).isNull();
+                }
+            }
+        });
     }
 
 }
