@@ -48,6 +48,8 @@ public class S2sClient {
                 .post("/lease")
                 .andReturn();
 
+        log.info("Generate S2S Bearer token response: " + response.getStatusCode());
+
         assertThat(response.getStatusCode()).isEqualTo(200);
 
         String jwtToken = response.getBody().asString();
