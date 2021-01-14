@@ -21,7 +21,7 @@ java:
         - professional-api-POSTGRES-PASS
         - AppInsightsInstrumentationKey
         - LD-SDK-KEY
-        - s2s-secret
+        - professional-api-s2s-secret
   autoscaling:
     enabled: true
     maxReplicas: 5
