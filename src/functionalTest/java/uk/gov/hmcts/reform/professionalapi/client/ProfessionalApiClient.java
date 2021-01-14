@@ -30,11 +30,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -44,7 +42,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCr
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
 public class ProfessionalApiClient {
@@ -189,20 +186,6 @@ public class ProfessionalApiClient {
             .andReturn();
     }
 
-    public void receiveBadResponseForCreateOrganisationWithInvalidDxAddressFields(OrganisationCreationRequest
-                                                                          organisationCreationRequest) {
-        Response response = getS2sTokenHeaders()
-            .body(organisationCreationRequest)
-            .post("/refdata/external/v1/organisations")
-            .andReturn();
-
-        log.info("Create organisation response: " + response.asString());
-
-        response.then()
-            .assertThat()
-            .statusCode(BAD_REQUEST.value());
-    }
-
     public NewUserCreationRequest createNewUserRequest() {
         List<String> userRoles = new ArrayList<>();
         userRoles.add("pui-user-manager");
@@ -265,7 +248,7 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
-
+        log.info("Add new user (Internal) response: " + response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -281,6 +264,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(expectedStatus.value());
 
+        log.info("Add new user (Internal) response: " + response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -292,7 +276,7 @@ public class ProfessionalApiClient {
             .andReturn();
 
         if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.asString());
+            log.info("Retrieve organisation response: " + response.statusCode());
         }
 
         response.then()
@@ -319,6 +303,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
 
+        log.info("Retrieve all orgs (Internal) response: " + response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -329,7 +314,7 @@ public class ProfessionalApiClient {
             .get("/refdata/internal/v1/organisations/pbas?email=" + email)
             .andReturn();
 
-        log.info("Retrieve organisation response: " + response.asString());
+        log.info("Retrieve organisation (Internal) response: " + response.statusCode());
 
         response.then()
             .assertThat()
@@ -345,7 +330,7 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations/pbas?email=" + "rd@prdfunctestuser.com")
                 .andReturn();
 
-        log.info("Retrieve organisation response: " + response.asString());
+        log.info("Retrieve pba by email (Internal) response: " + response.statusCode());
 
         response.then()
                 .assertThat()
@@ -356,28 +341,12 @@ public class ProfessionalApiClient {
 
 
     @SuppressWarnings("unchecked")
-    public void retrieveBadRequestForPendingOrganisationWithPbaEmail(String email, String role) {
-
-        Response response = getMultipleAuthHeadersInternal()
-            .body("")
-            .get("/refdata/internal/v1/organisations/pbas?email=" + email)
-            .andReturn();
-
-        log.info("Retrieve organisation response: " + response.asString());
-
-        response.then()
-            .assertThat()
-            .statusCode(NOT_FOUND.value());
-    }
-
-
-    @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,
                                                          HttpStatus status, String returnRoles) {
 
         // Use the role supplied to generate tokens appropritely
         RequestSpecification requestSpecification;
-        if (!StringUtils.isBlank(role)) {
+        if (!StringUtils.isBlank(role) && !"prd-admin".equals(role)) {
             requestSpecification = getMultipleAuthHeadersWithGivenRole(role);
         } else {
             requestSpecification = getMultipleAuthHeadersInternal();
@@ -389,6 +358,22 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(status.value());
+        log.info("find users response: " + response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> searchUsersByOrganisation(RequestSpecification requestSpecification,
+                                                         String organisationId, String showDeleted,
+                                                         HttpStatus status, String returnRoles) {
+
+        Response response = requestSpecification
+                .get("/refdata/internal/v1/organisations/" + organisationId + "/users?showDeleted="
+                        + showDeleted + "&returnRoles=" + returnRoles)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+        log.info("find users response: " + response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -404,6 +389,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
+        log.info("find users response: " + response.statusCode());
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -449,9 +435,13 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?status=" + userStatus)
             .andReturn();
 
+        log.info("find users by status: " + response.statusCode());
+
         response.then()
             .assertThat()
             .statusCode(status.value());
+
+
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -466,7 +456,7 @@ public class ProfessionalApiClient {
         Response response = requestSpecification
             .get("/refdata/external/v1/organisations")
             .andReturn();
-
+        log.info("find org by orgId (External): " + response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -482,6 +472,7 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
             .andReturn();
 
+        log.info("find org by orgId (External): " + response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -653,19 +644,6 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> findUserStatusByEmailFromHeader(HttpStatus status,
-                                  RequestSpecification requestSpecification, String email) {
-
-        Response response = requestSpecification
-                .get("/refdata/external/v1/organisations/users/accountId?email=" + email)
-                .andReturn();
-
-        response.then()
-                .assertThat()
-                .statusCode(status.value());
-        return response.body().as(Map.class);
-    }
-
     public Map<String, Object> retrievePbaAccountsForAnOrganisationExternal(HttpStatus status,
                                                                             RequestSpecification requestSpecification) {
 
@@ -693,13 +671,6 @@ public class ProfessionalApiClient {
         return response;
     }
 
-    public void deleteOrganisationErrorResponse(String organisationId, String role, HttpStatus status, String flag) {
-        Response response = deleteOrganisation(organisationId, role, status);
-        ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
-        assertThat(errorResponse.getErrorDescription().equalsIgnoreCase(
-            flag.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD)));
-    }
-
     public void deleteOrganisationByExternalUser(String organisationId, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
             .body("")
@@ -715,23 +686,6 @@ public class ProfessionalApiClient {
             .statusCode(status.value());
 
 
-    }
-
-    public void deleteOrganisationByExternalUsersBearerToken(String organisationId,
-                                                             RequestSpecification requestSpecification,
-                                                             HttpStatus status) {
-        Response response = requestSpecification
-            .body("")
-            .delete("/refdata/internal/v1/organisations/" + organisationId)
-            .andReturn();
-
-        if (response.statusCode() != NO_CONTENT.value()) {
-            log.info("Delete organisation response: " + response.asString());
-        }
-
-        response.then()
-            .assertThat()
-            .statusCode(status.value());
     }
 
     private RequestSpecification withUnauthenticatedRequest() {
@@ -751,7 +705,7 @@ public class ProfessionalApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken());
     }
 
-    private RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
+    public RequestSpecification getMultipleAuthHeadersWithGivenRole(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenWithGivenRole(role));
     }
 
