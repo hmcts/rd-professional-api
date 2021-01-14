@@ -4,7 +4,7 @@ spring:
       prefixed: false
       paths: /mnt/secrets/rd
       aliases:
-        s2s-secret: S2S_SECRET
+        professional-api-s2s-secret: S2S_SECRET
         s2s-url: S2S_URL
         professional-api-POSTGRES-PASS: spring.datasource.password
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
