@@ -87,6 +87,42 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
+    public void post_request_adds_new_user_with_caa_roles_to_an_active_organisation() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userRoles.add(puiCaa);
+        userRoles.add(caseworkerCaa);
+
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
+        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+
+        professionalReferenceDataClient.updateOrganisation(
+                someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(orgIdentifierResponse);
+
+        Map<String, Object> newUserResponse = professionalReferenceDataClient
+                .addUserToOrganisationWithUserId(orgIdentifierResponse,
+                        inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin,
+                        userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+
+        assertThat(newUserResponse).isNotNull();
+        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+
+        Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
+        List<ProfessionalUser> updatedUsers = professionalUserRepository.findByOrganisation(updatedOrganisation);
+        assertThat(updatedUsers.size()).isEqualTo(2);
+
+        ProfessionalUser persistedProfessionalUser = professionalUserRepository
+                .findByUserIdentifier(userIdentifierResponse);
+        assertThat(persistedProfessionalUser).isNotNull();
+    }
+
+    @Test
     public void should_return_400_when_UP_fails_while_adding_new_user_to_an_active_organisation() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 

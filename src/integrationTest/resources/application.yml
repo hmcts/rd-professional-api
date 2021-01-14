@@ -46,6 +46,7 @@ prd:
       pui-finance-manager: pui-finance-manager
       pui-case-manager: pui-case-manager
       pui-caa: pui-caa
+      caseworker-caa: caseworker-caa
       prd-aac-system: prd-aac-system
 
 ## user profile feign connection
