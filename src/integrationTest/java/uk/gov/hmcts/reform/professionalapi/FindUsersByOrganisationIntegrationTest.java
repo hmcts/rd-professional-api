@@ -276,6 +276,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     }
 
     @Test
+    public void retrieve_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithoutAuthHeaders(
+                createAndActivateOrganisation(), "True",null);
+        assertThat(response.get("http_status")).isEqualTo("401");
+    }
+
+    @Test
     public void cannot_retrieve_users_when_invalid_user_roles_should_return_status_403() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
                 createAndActivateOrganisation(), "True", "InvalidRole",null);
@@ -303,7 +310,13 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response = professionalReferenceDataClient
                 .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
         assertThat(response.get("http_status")).isEqualTo("400");
+    }
 
+    @Test
+    public void retrieve_users_for_an_organisation_with_system_roles_should_return_404_when_users_are_not_active() {
+        Map<String, Object> response = professionalReferenceDataClient
+                .findUsersByOrganisation(createOrganisationRequest(),"false", systemUser);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test
