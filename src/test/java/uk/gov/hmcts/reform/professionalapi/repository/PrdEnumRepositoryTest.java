@@ -20,7 +20,7 @@ public class PrdEnumRepositoryTest extends BaseRepository {
     public void test_findAll() {
         List<PrdEnum> prdEnums = prdEnumRepository.findAll();
 
-        assertThat(prdEnums).hasSize(46);
+        assertThat(prdEnums).hasSize(45);
         assertThat(prdEnums.get(0).getPrdEnumId().getEnumCode()).isZero();
     }
 
@@ -32,6 +32,5 @@ public class PrdEnumRepositoryTest extends BaseRepository {
         assertThat(prdEnums.get(38).getEnumName()).isEqualTo("caseworker-caa");
         assertThat(prdEnums.get(43).getEnumName()).isEqualTo("caseworker-civil");
         assertThat(prdEnums.get(44).getEnumName()).isEqualTo("caseworker-civil-solicitor");
-        assertThat(prdEnums.get(45).getEnumName()).isEqualTo("caseworker-civil-systemupdate");
     }
 }
