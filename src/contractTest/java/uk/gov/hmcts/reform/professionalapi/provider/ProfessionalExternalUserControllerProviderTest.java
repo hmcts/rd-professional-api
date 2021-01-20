@@ -7,58 +7,66 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponseTest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@Provider("referenceData_organisationalExternalPbas")
+@Provider("referenceData_professionalExternalUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
-@Import(OrganisationalExternalControllerProviderTestConfiguration.class)
+@Import(ProfessionalExternalUserControllerProviderTestConfiguration.class)
 @TestPropertySource(locations = "/application-contract.yaml")
-public class OrganisationalExternalControllerProviderTest {
+public class ProfessionalExternalUserControllerProviderTest {
 
+    private static final String PROFESSIONAL_USER_ID = "123456";
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
 
     @Autowired
-    OrganisationExternalController organisationExternalController;
+    ProfessionalExternalUserController professionalExternalUserController;
 
     @Autowired
     UserProfileFeignClient userProfileFeignClientMock;
@@ -74,23 +82,35 @@ public class OrganisationalExternalControllerProviderTest {
         context.verifyInteraction();
     }
 
+
     @BeforeEach
     void before(PactVerificationContext context) {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(organisationExternalController);
+        testTarget.setControllers(professionalExternalUserController);
         context.setTarget(testTarget);
     }
 
-    @State({"Pbas organisational data exists for identifier " + ORGANISATION_EMAIL})
-    public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
+    @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID})
+    public void toRetreiveOrganisationalDataForIdentifier() throws IOException, JSONException {
 
+        setupInteractionsForProfessionalUser();
+    }
+
+    @State({"Professional User exists for modification with identifier " + PROFESSIONAL_USER_ID })
+    public void toUpdateUserRolesForIdentifier() throws IOException, JSONException {
+
+        setupInteractionsForProfessionalUser();
+    }
+
+    private void setupInteractionsForProfessionalUser() throws JsonProcessingException {
         String name = "name";
         String sraId = "sraId";
         String companyNumber = "companyNumber";
         String companyUrl = "companyUrl";
 
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
+        professionalUser.setEmailAddress("someUserIdentifier");
 
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
             "firstName", "lastName", IdamStatus.ACTIVE);
@@ -103,11 +123,21 @@ public class OrganisationalExternalControllerProviderTest {
                 .request(mock(Request.class))
                 .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(jwtGrantedAuthoritiesConverterMock.getUserInfo())
-            .thenReturn(UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).build());
 
-        when(professionalUserRepositoryMock.findByEmailAddress(ORGANISATION_EMAIL)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
+        ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamMessage("some message");
+        roleAdditionResponse.setIdamStatusCode("200");
+        modifyUserRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        String bodyModifyUserRoles = objectMapper.writeValueAsString(modifyUserRolesResponse);
+
+        when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
     }
 
     @NotNull
