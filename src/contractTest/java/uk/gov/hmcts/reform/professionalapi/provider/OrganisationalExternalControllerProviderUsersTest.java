@@ -124,9 +124,11 @@ public class OrganisationalExternalControllerProviderUsersTest {
 
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
-        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("joe.bloggs@mailnesia.com")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("joe.bloggs@mailnesia.com"))
+            .thenReturn(professionalUser);
 
-        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier")).thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
+            .thenReturn(organisation);
 
 
         setUpUserProfileClientInteraction();
@@ -150,7 +152,8 @@ public class OrganisationalExternalControllerProviderUsersTest {
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
 
-        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier")).thenReturn(organisation);
+        when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
+            .thenReturn(organisation);
 
     }
 
@@ -193,6 +196,16 @@ public class OrganisationalExternalControllerProviderUsersTest {
 
     }
 
+    @NotNull
+    private ProfessionalUser setUpProfessionalUser() {
+        String name = "name";
+        String sraId = "sraId";
+        String companyNumber = "companyNumber";
+        String companyUrl = "companyUrl";
+
+        return setUpProfessionalUser(name, sraId, companyNumber, companyUrl);
+    }
+
     private void setUpOrganisation(String name, String sraId, String companyNumber, String companyUrl) {
         organisation = new Organisation();
         organisation.setName(name);
@@ -210,13 +223,4 @@ public class OrganisationalExternalControllerProviderUsersTest {
         organisation.setContactInformations(Arrays.asList(contactInformation));
     }
 
-    @NotNull
-    private ProfessionalUser setUpProfessionalUser() {
-        String name = "name";
-        String sraId = "sraId";
-        String companyNumber = "companyNumber";
-        String companyUrl = "companyUrl";
-
-        return setUpProfessionalUser(name, sraId, companyNumber, companyUrl);
-    }
 }
