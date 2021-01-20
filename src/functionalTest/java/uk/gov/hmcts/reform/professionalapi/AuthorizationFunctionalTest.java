@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContext;
@@ -41,13 +42,14 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, TestConfig.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 @TestExecutionListeners(listeners = {
     AuthorizationFunctionalTest.class,
     DependencyInjectionTestExecutionListener.class})
+@Import(TestConfig.class)
 public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${s2s-url}")
