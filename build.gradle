@@ -203,7 +203,6 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
 }
 
 task runProviderPactVerification(type: Test) {
-    logger.lifecycle("Runs pact Tests")
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 }

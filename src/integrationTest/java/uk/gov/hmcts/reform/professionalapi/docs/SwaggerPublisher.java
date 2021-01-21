@@ -17,9 +17,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.professionalapi.Application;
+import uk.gov.hmcts.reform.professionalapi.repository.TestConfig;
 
 /**
  * Built-in feature which saves service's swagger specs in temporary directory.
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.Application;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
 @SpringBootTest(classes = Application.class, webEnvironment = MOCK)
+@Import(TestConfig.class)
 public class SwaggerPublisher {
 
     private static final Logger LOG = getLogger(SwaggerPublisher.class);
