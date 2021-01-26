@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -103,8 +102,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static String email;
     public static String activeOrgId;
     public static String activeOrgIdForBearerTokens;
-    public static String puiCaseManagerBearerToken;
-    public static String puiOrgManagerBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
 
 
@@ -164,71 +161,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return organisationIdentifier;
     }
 
-    public RequestSpecification generateBearerTokenFor(String role) {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    public RequestSpecification generateBearerTokenForEmailHeader(String role) {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(role, firstName, lastName, userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
-                userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(userEmail)
-                .roles(userRoles)
-                .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
 
         String userEmail = generateRandomEmail();
@@ -241,29 +173,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
                 .roles(userRoles)
                 .build();
         return userCreationRequest;
-    }
-
-
-    public String getExternalSuperUserTokenWithRetry(String email, String firstName, String lastName) {
-        int counter = 0;
-
-        String idamResponse = idamOpenIdClient
-                .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-
-        while (idamResponse.equalsIgnoreCase("504") && counter < 4) {
-            log.info("Retry Super User Token attempt :" + counter + "/3");
-            email = generateRandomEmail().toLowerCase();
-            idamResponse = idamOpenIdClient
-                    .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-            counter++;
-        }
-
-        if (idamResponse.equalsIgnoreCase("504")) {
-            throw new ExternalApiException(HttpStatus.GATEWAY_TIMEOUT,
-                    "Received more than 3 timeouts from IDAM while Generating Token");
-        } else {
-            return email;
-        }
     }
 
     public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
