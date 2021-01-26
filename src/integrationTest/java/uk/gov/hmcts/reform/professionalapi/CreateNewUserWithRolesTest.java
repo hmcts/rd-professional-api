@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +22,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -395,5 +400,45 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         assertThat(newUserResponse.get("http_status")).isEqualTo("409");
         assertThat((String) newUserResponse.get("response_body"))
                 .contains("\"errorDescription\":\"409 User already exists\"");
+    }
+
+    @Test
+    public void super_user_can_have_caa_roles_fpla_or_iac_roles_not_puiCaa_caseworkerCaa() {
+        userProfileCreateUserWireMockWithExtraRoles();
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(puiUserManager);
+        userRoles.add("caseworker");
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        userProfileCreateUserWireMockWithExtraRoles();
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
+                        hmctsAdmin, userIdentifier);
+
+        String id = (String) newUserResponse.get("userIdentifier");
+
+        userProfileCreateUserWireMockWithExtraRoles();
+
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
+                "true", puiCaseManager, id);
+
+        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(1);
+        List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
+
+        assertThat(professionalUsersResponses.get(0).get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponses.get(0).get("firstName")).isNotNull();
+        assertThat(professionalUsersResponses.get(0).get("lastName")).isNotNull();
+        assertThat(professionalUsersResponses.get(0).get("email")).isNotNull();
+        assertThat(professionalUsersResponses.get(0).get("idamStatus")).isNotNull();
+        assertThat(((List) professionalUsersResponses.get(0).get("roles")).size()).isEqualTo(2);
+        assertTrue(((List) professionalUsersResponses.get(0).get("roles"))
+                .containsAll(asList("caseworker", "pui-organisation-manager")));
     }
 }

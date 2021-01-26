@@ -188,16 +188,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
-                                +  "  \"id\": \"%s\","
-                                +  "  \"uid\": \"%s\","
-                                +  "  \"forename\": \"Super\","
-                                +  "  \"surname\": \"User\","
-                                +  "  \"email\": \"super.user@hmcts.net\","
-                                +  "  \"accountStatus\": \"active\","
-                                +  "  \"roles\": ["
-                                +  "  \"%s\""
-                                +  "  ]"
-                                +  "}")
+                                + "  \"id\": \"%s\","
+                                + "  \"uid\": \"%s\","
+                                + "  \"forename\": \"Super\","
+                                + "  \"surname\": \"User\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"accountStatus\": \"active\","
+                                + "  \"roles\": ["
+                                + "  \"%s\""
+                                + "  ]"
+                                + "}")
                         .withTransformers("external_user-token-response")));
 
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
@@ -380,7 +380,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
-                + "  \"userIdentifier\":\"%s"  + "\","
+                + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
@@ -426,7 +426,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"idamMessage\": \"\""
                 + "  },"
                 + " {"
-                + "  \"userIdentifier\":\"%s"  + "\","
+                + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"adil\","
                 + "  \"lastName\": \"oozeerally\","
                 + "  \"email\": \"adil.ooze@hmcts.net\","
@@ -445,6 +445,51 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 aResponse()
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(usersBodyWithoutRoles)
+                                        .withTransformers("transformer-multi-user-response")
+                                        .withStatus(200)
+                        )
+        );
+    }
+
+    public void userProfileCreateUserWireMockWithExtraRoles() {
+
+        String body = null;
+        body = "{"
+                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                + "  \"idamRegistrationResponse\":\"201\""
+                + "}";
+
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(body)
+                        .withStatus(201)
+                ));
+
+        String usersBody = "{"
+                + "  \"userProfiles\": ["
+                + "  {"
+                + "  \"userIdentifier\":\"%s" + "\","
+                + "  \"firstName\": \"Adil\","
+                + "  \"lastName\": \"Oozeerally\","
+                + "  \"email\": \"super.user@hmcts.net\","
+                + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
+                + "  \"roles\": ["
+                + "  \"pui-organisation-manager\","
+                + "  \"caseworker\""
+                + "  ],"
+                + "  \"idamStatusCode\": \"0\","
+                + "  \"idamMessage\": \"\""
+                + "  }"
+                + " ]"
+                + "}";
+
+        userProfileService.stubFor(
+                post(urlPathMatching("/v1/userprofile/users.*"))
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(usersBody)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
                         )
@@ -484,7 +529,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  \"idamMessage\": \"Internal Server Error\""
                     + "  } ,"
                     + "  \"roleDeletionResponse\": ["
-                    +   "{"
+                    + "{"
                     + "  \"idamStatusCode\": \"500\","
                     + "  \"idamMessage\": \"Internal Server Error\""
                     + "  } "
@@ -592,20 +637,20 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
                     + "}";
             returnHttpStatus = 204;
-        }  else if (status == HttpStatus.BAD_REQUEST) {
+        } else if (status == HttpStatus.BAD_REQUEST) {
             body = "{"
 
                     + "  \"statusCode\": \"400\","
                     + "  \"message\": \"User Profile Delete Request has some problem\""
 
-                + "}";
+                    + "}";
         } else if (status == HttpStatus.NOT_FOUND) {
             body = "{"
 
                     + "  \"statusCode\": \"404\","
                     + "  \"message\": \"User Profile Not Found To Delete\""
 
-                + "}";
+                    + "}";
         }
 
         userProfileService.stubFor(
@@ -650,7 +695,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             ObjectMapper mapper = new ObjectMapper();
             Optional<HashMap<String, List<String>>> ids = Optional.empty();
             try {
-                ids =  Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
+                ids = Optional.ofNullable(mapper.readValue(request.getBodyAsString(), HashMap.class));
             } catch (IOException e) {
                 //Do Nothing
             }
