@@ -54,7 +54,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void find_user_status_by_user_email_address_for_organisation_status_as_active() {
+    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_user_manager() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
@@ -76,7 +76,108 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get("userIdentifier")).isNotNull();
+    }
 
+    @Test
+    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_case_manager() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiCaseManager);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void find_user_status_by_user_email_address_for_organisation_status_as_active_with_pui_finance_manager() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+        Map<String, Object> response =
+                professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiFinanceManager);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void find_usr_status_by_usr_email_address_for_organisation_status_as_active_with_pui_organisation_manager() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+        Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiOrgManager);
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
+    }
+
+    @Test
+    public void find_usr_status_by_usr_email_address_for_org_status_as_active_with_caseworker_publiclaw_courtadmin() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add("pui-finance-manager");
+        String userEmail = randomAlphabetic(5).toLowerCase() + "@hotmail.com";
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        assertThat(userIdentifierResponse).isNotNull();
+        Map<String, Object> response =
+                professionalReferenceDataClient.findUserStatusByEmail(userEmail, "caseworker-publiclaw-courtadmin");
+
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response.get("userIdentifier")).isNotNull();
     }
 
 
