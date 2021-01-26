@@ -462,13 +462,20 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  } "
                     + "}";
             returnHttpStatus = 200;
-        } else if (status.is4xxClientError()) {
+        } else if (status.value() == 400) {
             body = "{"
                     + "  \"errorMessage\": \"400\","
                     + "  \"errorDescription\": \"BAD REQUEST\","
                     + "  \"timeStamp\": \"23:10\""
                     + "}";
             returnHttpStatus = 400;
+        } else if (status.value() == 404) {
+            body = "{"
+                    + "  \"errorMessage\": \"404\","
+                    + "  \"errorDescription\": \"No User found with the given ID\","
+                    + "  \"timeStamp\": \"23:10\""
+                    + "}";
+            returnHttpStatus = 404;
         } else if (status.is5xxServerError()) {
 
             body = "{"
