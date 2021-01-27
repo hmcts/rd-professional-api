@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
@@ -46,13 +45,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -122,14 +117,15 @@ public class ProfessionalExternalUserControllerProviderTest {
     public void toRetrieveAllActiveOrganisations() throws IOException, JSONException {
 
         setupInteractionsForProfessionalUser();
-        when(organisationServiceMock.getOrganisationByOrgIdentifier("someOrganisationIdentifier")).thenReturn(organisation);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier("someOrganisationIdentifier"))
+            .thenReturn(organisation);
 
         List<ProfessionalUser> users = new ArrayList<>();
 
         ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
             "email@org.com", organisation);
         profile.setIdamStatus(IdamStatus.ACTIVE);
-        profile.setRoles(Arrays.asList("pui-user-manager"," pui-case-manager"));
+        profile.setRoles(Arrays.asList("pui-user-manager", " pui-case-manager"));
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -169,7 +165,8 @@ public class ProfessionalExternalUserControllerProviderTest {
 
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
-        when(professionalUserRepositoryMock.findByOrganisation(organisation)).thenReturn(Arrays.asList(professionalUser));
+        when(professionalUserRepositoryMock.findByOrganisation(organisation))
+            .thenReturn(Arrays.asList(professionalUser));
         when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
