@@ -18,9 +18,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -47,6 +47,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 
 @Provider("referenceData_organisationalExternalUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
@@ -55,8 +56,7 @@ import static org.mockito.Mockito.when;
     consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @WebMvcTest({OrganisationExternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
-@Import(OrganisationalExternalControllerProviderUsersTestConfiguration.class)
-@TestPropertySource(locations = "/application-contract.yaml")
+@ContextConfiguration(classes = {OrganisationalExternalControllerProviderUsersTestConfiguration.class, WebConfig.class})
 public class OrganisationalExternalControllerProviderUsersTest {
 
     @Autowired
@@ -154,6 +154,17 @@ public class OrganisationalExternalControllerProviderUsersTest {
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
             .thenReturn(organisation);
+
+    }
+
+    @State({"Organisations exists with status of Active"})
+    public void toRetreiveActiveOrganisations() throws IOException {
+
+        ProfessionalUser professionalUser = setUpProfessionalUser();
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserServiceMock.findProfessionalUserByEmailAddress("joe.bloggs@mailnesia.com"))
+            .thenReturn(professionalUser);
+        when(organisationRepository.findByStatus(ACTIVE)).thenReturn(Arrays.asList(organisation));
 
     }
 

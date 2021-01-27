@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.professionalapi.repository.TestConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 @TestExecutionListeners(listeners = {
     AuthorizationFunctionalTest.class,
     DependencyInjectionTestExecutionListener.class})
-@Import(TestConfig.class)
 public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${s2s-url}")

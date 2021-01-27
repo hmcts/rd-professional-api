@@ -18,7 +18,6 @@ public class PactJwtGrantedAuthoritiesConverter extends JwtGrantedAuthoritiesCon
 
     @Override
     public UserInfo getUserInfo() {
-
         return UserInfo.builder().roles(Arrays.asList("pui-finance-manager")).uid("someUid").build();
     }
 }

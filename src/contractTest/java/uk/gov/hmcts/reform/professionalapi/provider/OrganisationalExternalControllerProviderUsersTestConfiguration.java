@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
-@TestConfiguration
+@Configuration
 public class OrganisationalExternalControllerProviderUsersTestConfiguration extends ProviderTestConfiguration {
 
     @MockBean
@@ -73,4 +73,9 @@ public class OrganisationalExternalControllerProviderUsersTestConfiguration exte
     }
 
 
+    @Bean
+    @Primary
+    public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
+        return new PactJwtGrantedAuthoritiesConverter(idamRepository);
+    }
 }

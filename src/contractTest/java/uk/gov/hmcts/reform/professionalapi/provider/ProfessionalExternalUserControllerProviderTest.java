@@ -8,6 +8,7 @@ import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
@@ -17,13 +18,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -33,33 +38,48 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @Provider("referenceData_professionalExternalUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}",
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
-@Import(ProfessionalExternalUserControllerProviderTestConfiguration.class)
-@TestPropertySource(locations = "/application-contract.yaml")
+@WebMvcTest({ProfessionalExternalUserController.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
 public class ProfessionalExternalUserControllerProviderTest {
 
     private static final String PROFESSIONAL_USER_ID = "123456";
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
+
+    @Autowired
+    MockMvc mockMvc;
+
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
+
+    @Autowired
+    OrganisationService organisationServiceMock;
 
     @Autowired
     ProfessionalExternalUserController professionalExternalUserController;
@@ -71,6 +91,7 @@ public class ProfessionalExternalUserControllerProviderTest {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    private Organisation organisation;
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -82,9 +103,7 @@ public class ProfessionalExternalUserControllerProviderTest {
     @BeforeEach
     void before(PactVerificationContext context) {
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        testTarget.setControllers(professionalExternalUserController);
-        context.setTarget(testTarget);
+        context.setTarget(new MockMvcTestTarget(mockMvc));
     }
 
     @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID})
@@ -99,7 +118,37 @@ public class ProfessionalExternalUserControllerProviderTest {
         setupInteractionsForProfessionalUser();
     }
 
-    private void setupInteractionsForProfessionalUser() throws JsonProcessingException {
+    @State({"Professional users exist for an Active organisation"})
+    public void toRetrieveAllActiveOrganisations() throws IOException, JSONException {
+
+        setupInteractionsForProfessionalUser();
+        when(organisationServiceMock.getOrganisationByOrgIdentifier("someOrganisationIdentifier")).thenReturn(organisation);
+
+        List<ProfessionalUser> users = new ArrayList<>();
+
+        ProfessionalUser profile = new ProfessionalUser("firstName", "lastName",
+            "email@org.com", organisation);
+        profile.setIdamStatus(IdamStatus.ACTIVE);
+        profile.setRoles(Arrays.asList("pui-user-manager"," pui-case-manager"));
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
+        List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
+
+        ProfessionalUsersResponse userProfileResponse = new ProfessionalUsersResponse(profile);
+        userProfileResponse.setUserIdentifier(PROFESSIONAL_USER_ID);
+        userProfiles.add(userProfileResponse);
+        professionalUsersEntityResponse.setUserProfiles(userProfiles);
+        ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+            false);
+        String body = mapper.writeValueAsString(professionalUsersEntityResponse);
+
+        when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
+
+    }
+
+    private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
         String name = "name";
         String sraId = "sraId";
         String companyNumber = "companyNumber";
@@ -108,8 +157,7 @@ public class ProfessionalExternalUserControllerProviderTest {
         ProfessionalUser professionalUser = getProfessionalUser(name, sraId, companyNumber, companyUrl);
         professionalUser.setEmailAddress("someUserIdentifier");
 
-        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
-            "firstName", "lastName", IdamStatus.ACTIVE);
+        UserProfile profile = getUserProfile();
 
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
@@ -119,8 +167,9 @@ public class ProfessionalExternalUserControllerProviderTest {
                 .request(mock(Request.class))
                 .body(body, Charset.defaultCharset()).status(200).build());
 
-
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByOrganisation(organisation)).thenReturn(Arrays.asList(professionalUser));
         when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
@@ -134,17 +183,27 @@ public class ProfessionalExternalUserControllerProviderTest {
 
         when(userProfileFeignClientMock.modifyUserRoles(any(), any(), any())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
+
+        return professionalUser;
+    }
+
+    @NotNull
+    private UserProfile getUserProfile() {
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+            "firstName", "lastName", IdamStatus.ACTIVE);
+        return profile;
     }
 
     @NotNull
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
-        Organisation organisation = new Organisation();
+        organisation = new Organisation();
         organisation.setName(name);
         organisation.setCompanyNumber(companyNumber);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         organisation.setSraId(sraId);
         organisation.setSraRegulated(true);
         organisation.setCompanyUrl(companyUrl);
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
 
         SuperUser su = new SuperUser();
         su.setEmailAddress("superUser@email.com");
@@ -159,6 +218,7 @@ public class ProfessionalExternalUserControllerProviderTest {
         organisation.setUsers(Arrays.asList(su));
 
         ProfessionalUser pu = new ProfessionalUser();
+        pu.setUserIdentifier(PROFESSIONAL_USER_ID);
         pu.setEmailAddress(ORGANISATION_EMAIL);
         pu.setOrganisation(organisation);
         return pu;

@@ -69,11 +69,9 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.repository.TestConfig;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Import(TestConfig.class)
 public class RefDataUtilTest {
 
     private PaymentAccount paymentAccount;
