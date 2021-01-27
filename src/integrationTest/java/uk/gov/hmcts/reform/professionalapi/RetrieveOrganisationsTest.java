@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-
 @Slf4j
 public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTest {
 
