@@ -95,10 +95,10 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(2);
 
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("adil");
-        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("oozeerally");
-        assertThat(professionalUsersResponse.get("email")).isEqualTo("adil.ooze@hmcts.net");
+        assertThat(professionalUsersResponse.get(USER_IDENTIFIER)).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("Adil");
+        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("O");
+        assertThat(professionalUsersResponse.get("email")).isEqualTo("super.user@hmcts.net");
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");
         assertThat(professionalUsersResponse.get("idamStatusCode")).isEqualTo("404");
         assertThat(professionalUsersResponse.get("idamMessage")).isEqualTo("16 Resource not found");
@@ -234,12 +234,12 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     private void validateUsers(Map<String, Object> response, int expectedUserCount, Boolean rolesReturned) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
         professionalUsersResponses.stream().forEach(user -> {
-            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get(USER_IDENTIFIER)).isNotNull();
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();

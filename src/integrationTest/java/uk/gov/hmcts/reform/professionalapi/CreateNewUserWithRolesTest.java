@@ -61,7 +61,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE")
                 .build();
@@ -77,10 +77,10 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin,
                         userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
 
         assertThat(newUserResponse).isNotNull();
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+        assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
         Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
         List<ProfessionalUser> updatedUsers = professionalUserRepository.findByOrganisation(updatedOrganisation);
@@ -99,7 +99,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         professionalReferenceDataClient.updateOrganisation(
                 someMinimalOrganisationRequest().status("ACTIVE").build(), hmctsAdmin, orgIdentifierResponse);
@@ -113,10 +113,10 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin,
                         userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
 
         assertThat(newUserResponse).isNotNull();
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+        assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
         Organisation updatedOrganisation = organisationRepository.findByOrganisationIdentifier(orgIdentifierResponse);
         List<ProfessionalUser> updatedUsers = professionalUserRepository.findByOrganisation(updatedOrganisation);
@@ -135,7 +135,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE")
                 .build();
@@ -165,7 +165,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> newUserResponse =
@@ -220,7 +220,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE")
                 .build();
@@ -269,7 +269,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest().status("ACTIVE")
                 .build();
@@ -324,7 +324,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest()
                 .status("ACTIVE").build();
@@ -353,7 +353,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
 
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdationRequest = someMinimalOrganisationRequest()
                 .status("ACTIVE").build();
@@ -387,7 +387,7 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                         .email("someone1@gmail.com").build()).build();
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         professionalReferenceDataClient.updateOrganisation(organisationCreationRequest, hmctsAdmin,
                 orgIdentifierResponse);
 
@@ -421,18 +421,18 @@ public class CreateNewUserWithRolesTest extends AuthorizationEnabledIntegrationT
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin, userIdentifier);
 
-        String id = (String) newUserResponse.get("userIdentifier");
+        String id = (String) newUserResponse.get(USER_IDENTIFIER);
 
         userProfileCreateUserWireMockWithExtraRoles();
 
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithReturnRoles(
                 "true", puiCaseManager, id);
 
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(1);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
-        assertThat(professionalUsersResponses.get(0).get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponses.get(0).get(USER_IDENTIFIER)).isNotNull();
         assertThat(professionalUsersResponses.get(0).get("firstName")).isNotNull();
         assertThat(professionalUsersResponses.get(0).get("lastName")).isNotNull();
         assertThat(professionalUsersResponses.get(0).get("email")).isNotNull();

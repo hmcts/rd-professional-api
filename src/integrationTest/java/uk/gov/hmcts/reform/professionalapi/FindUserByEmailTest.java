@@ -46,7 +46,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(0);
 
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
+        assertThat(professionalUsersResponse.get(USER_IDENTIFIER)).isNotNull();
         assertThat(professionalUsersResponse.get("firstName")).isNotNull();
         assertThat(professionalUsersResponse.get("lastName")).isNotNull();
         assertThat(professionalUsersResponse.get("email")).isNotNull();
@@ -70,12 +70,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiUserManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get(USER_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -95,12 +95,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiCaseManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get(USER_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -120,13 +120,13 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response =
                 professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiFinanceManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get(USER_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -146,12 +146,12 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, puiOrgManager);
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get(USER_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -171,13 +171,13 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         assertThat(userIdentifierResponse).isNotNull();
         Map<String, Object> response =
                 professionalReferenceDataClient.findUserStatusByEmail(userEmail, "caseworker-publiclaw-courtadmin");
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("userIdentifier")).isNotNull();
+        assertThat(response.get(USER_IDENTIFIER)).isNotNull();
     }
 
 
@@ -196,7 +196,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
 
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail(userEmail, hmctsAdmin);
 
@@ -219,7 +219,7 @@ public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
                         inviteUserCreationRequest(userEmail, userRoles), hmctsAdmin);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
         Map<String, Object> response = professionalReferenceDataClient.findUserStatusByEmail("@@" + userEmail,
                 puiUserManager);
 

@@ -41,7 +41,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
                 professionalReferenceDataClient.retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
 
         assertThat(orgResponse.get("http_status")).isEqualTo("200 OK");
-        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
+        assertThat(orgResponse.get(ORG_IDENTIFIER)).isEqualTo(orgIdentifierResponse);
 
         assertThat(orgResponse.get("name")).isEqualTo("some-org-name");
         assertThat(orgResponse.get("sraId")).isEqualTo("sra-id");
@@ -79,7 +79,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
                 puiCaseManager);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -88,7 +88,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
                 puiFinanceManager);
         assertThat(response.get("http_status").toString().contains(OK.name()));
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -97,7 +97,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId,
                 puiOrgManager);
         assertThat(response.get("http_status").toString().contains(OK.name()));
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -274,8 +274,8 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> activeOrganisation = ((List<Map<String, Object>>) orgResponse.get("organisations")).get(0);
 
         Map<String, Object> superUser = ((Map<String, Object>) activeOrganisation.get("superUser"));
-        assertThat(superUser.get("firstName")).isEqualTo("prashanth");
-        assertThat(superUser.get("lastName")).isEqualTo("rao");
+        assertThat(superUser.get("firstName")).isEqualTo("Prashanth");
+        assertThat(superUser.get("lastName")).isEqualTo("R");
         assertThat(superUser.get("email")).isEqualTo("super.user@hmcts.net");
     }
 
@@ -305,7 +305,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         organisationCreationRequest = organisationRequestWithAllFields().status(status).build();
         Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     @Test
@@ -322,7 +322,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
         Map<String, Object> organisationResponse = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        String orgIdentifierResponse = (String) organisationResponse.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) organisationResponse.get(ORG_IDENTIFIER);
 
         professionalReferenceDataClient.updateOrganisation(someMinimalOrganisationRequest().status("ACTIVE").build(),
                 hmctsAdmin, orgIdentifierResponse);
@@ -344,7 +344,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> orgResponse = professionalReferenceDataClient
                 .retrieveSingleOrganisation(orgIdentifierResponse, hmctsAdmin);
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
-        assertThat(orgResponse.get("organisationIdentifier")).isEqualTo(orgIdentifierResponse);
+        assertThat(orgResponse.get(ORG_IDENTIFIER)).isEqualTo(orgIdentifierResponse);
 
         Map<String, Object> superUser = ((Map<String, Object>) orgResponse.get("superUser"));
         assertThat(superUser.get("firstName")).isEqualTo("prashanth");
@@ -385,7 +385,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgId = (String) response.get("organisationIdentifier");
+        String orgId = (String) response.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();
@@ -413,8 +413,8 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> superUserSecond = ((Map<String, Object>) organisationSecond.get("superUser"));
 
-        assertThat(superUserSecond.get("firstName")).isEqualTo("prashanth");
-        assertThat(superUserSecond.get("lastName")).isEqualTo("rao");
+        assertThat(superUserSecond.get("firstName")).isEqualTo("Prashanth");
+        assertThat(superUserSecond.get("lastName")).isEqualTo("R");
         assertThat(superUserSecond.get("email")).isEqualTo("super.user@hmcts.net");
     }
 
@@ -424,7 +424,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response = professionalReferenceDataClient
                 .retrieveExternalOrganisation(userId, puiUserManager);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
     }
 
     @Test
@@ -432,7 +432,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         String userId = settingUpOrganisation(puiCaa);
         Map<String, Object> response = professionalReferenceDataClient.retrieveExternalOrganisation(userId, puiCaa);
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
 
     }
 

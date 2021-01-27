@@ -44,15 +44,15 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             Map<String, Object> newUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
                             hmctsAdmin);
-            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
+            assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
                     userRoles);
             Map<String, Object> reInviteUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, reinviteRequest,
                             hmctsAdmin);
-            assertNotNull(reInviteUserResponse.get("userIdentifier"));
+            assertNotNull(reInviteUserResponse.get(USER_IDENTIFIER));
         }
     }
 
@@ -81,8 +81,8 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             Map<String, Object> newUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
                             hmctsAdmin);
-            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
+            assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.BAD_REQUEST);
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
@@ -106,8 +106,8 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             Map<String, Object> newUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
                             hmctsAdmin);
-            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
+            assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.TOO_MANY_REQUESTS);
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),
@@ -133,8 +133,8 @@ public class ReInviteUserIntegrationTest extends AuthorizationEnabledIntegration
             Map<String, Object> newUserResponse =
                     professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier, userCreationRequest,
                             hmctsAdmin);
-            String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
-            assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+            String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
+            assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
             reinviteUserMock(HttpStatus.CONFLICT);
             NewUserCreationRequest reinviteRequest = reInviteUserCreationRequest(userCreationRequest.getEmail(),

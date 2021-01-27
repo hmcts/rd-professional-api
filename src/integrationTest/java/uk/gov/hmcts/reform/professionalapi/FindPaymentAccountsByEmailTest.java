@@ -51,7 +51,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String uuid = (String)organisationResponse.get("organisationIdentifier");
+        String uuid = (String)organisationResponse.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();
@@ -90,7 +90,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String uuid = (String)organisationResponse.get("organisationIdentifier");
+        String uuid = (String)organisationResponse.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();
@@ -123,7 +123,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String uuid = (String)organisationResponse.get("organisationIdentifier");
+        String uuid = (String)organisationResponse.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();
@@ -196,7 +196,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         Map<String, Object> organisationResponse =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String uuid = (String)organisationResponse.get("organisationIdentifier");
+        String uuid = (String)organisationResponse.get(ORG_IDENTIFIER);
 
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
                 .status("ACTIVE").build();

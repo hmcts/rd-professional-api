@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static com.gargoylesoftware.htmlunit.util.MimeType.APPLICATION_JSON;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import io.restassured.http.ContentType;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -157,6 +157,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected static final String STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE =
             "User status must be Active to perform this operation";
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
+    protected static final String USER_IDENTIFIER = "userIdentifier";
+    protected static final String ORG_IDENTIFIER = "organisationIdentifier";
 
     @MockBean
     protected FeatureToggleServiceImpl featureToggleService;
@@ -173,13 +175,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         s2sService.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody("rd_professional_api")));
 
         s2sService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ"
                                 + ".UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2"
                                 + "AUgA")));
@@ -187,7 +189,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody("{"
                                 + "  \"id\": \"%s\","
                                 + "  \"uid\": \"%s\","
@@ -204,7 +206,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(getDynamicJwksResponse())));
     }
 
@@ -212,7 +214,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfileGetUserWireMock() {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withStatus(200)
                         .withBody("{"
                                 + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
@@ -253,26 +255,26 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
 
 
-        return (String) newUserResponse.get("userIdentifier");
+        return (String) newUserResponse.get(USER_IDENTIFIER);
     }
 
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public String createOrganisationRequestWithRequest(OrganisationCreationRequest organisationCreationRequest) {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public String createOrganisationWithGivenRequest(OrganisationCreationRequest organisationCreationRequest) {
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
     public void updateOrganisation(String organisationIdentifier, String role, String status) {
@@ -349,7 +351,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));
@@ -358,8 +360,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"prashanth\","
-                + "  \"lastName\": \"rao\","
+                + "  \"firstName\": \"Prashanth\","
+                + "  \"lastName\": \"R\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
@@ -371,7 +373,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  {"
                 + "  \"userIdentifier\":\" %s" + "\","
                 + "  \"firstName\": \"Shreedhar\","
-                + "  \"lastName\": \"Lomte\","
+                + "  \"lastName\": \"L\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
@@ -382,9 +384,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + " {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"adil\","
-                + "  \"lastName\": \"oozeerally\","
-                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"firstName\": \"Adil\","
+                + "  \"lastName\": \"O\","
+                + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"DELETED\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"404\","
@@ -397,7 +399,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", ContentType.JSON.name())
+                                        .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBody)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -408,8 +410,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  \"userProfiles\": ["
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"prashanth\","
-                + "  \"lastName\": \"rao\","
+                + "  \"firstName\": \"Prashanth\","
+                + "  \"lastName\": \"R\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
@@ -419,7 +421,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"Shreedhar\","
-                + "  \"lastName\": \"Lomte\","
+                + "  \"lastName\": \"L\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": [],"
@@ -428,9 +430,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  },"
                 + " {"
                 + "  \"userIdentifier\":\"%s" + "\","
-                + "  \"firstName\": \"adil\","
-                + "  \"lastName\": \"oozeerally\","
-                + "  \"email\": \"adil.ooze@hmcts.net\","
+                + "  \"firstName\": \"Adil\","
+                + "  \"lastName\": \"O\","
+                + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\","
                 + "  \"roles\": [],"
                 + "  \"idamStatusCode\": \"0\","
@@ -444,7 +446,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withQueryParam("rolesRequired", equalTo("false"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", ContentType.JSON.name())
+                                        .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBodyWithoutRoles)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -462,7 +464,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(body)
                         .withStatus(201)
                 ));
@@ -472,7 +474,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 + "  {"
                 + "  \"userIdentifier\":\"%s" + "\","
                 + "  \"firstName\": \"Adil\","
-                + "  \"lastName\": \"Oozeerally\","
+                + "  \"lastName\": \"O\","
                 + "  \"email\": \"super.user@hmcts.net\","
                 + "  \"idamStatus\": \"" + IdamStatus.ACTIVE + "\","
                 + "  \"roles\": ["
@@ -489,7 +491,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", ContentType.JSON.name())
+                                        .withHeader("Content-Type", APPLICATION_JSON)
                                         .withBody(usersBody)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -541,7 +543,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 put(urlPathMatching("/v1/userprofile/.*"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", ContentType.JSON.name())
+                                .withHeader("Content-Type", APPLICATION_JSON)
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -589,7 +591,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(body)
                         .withStatus(status.value())
                 ));
@@ -618,7 +620,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 put(urlPathMatching("/v1/userprofile/.*"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", ContentType.JSON.name())
+                                .withHeader("Content-Type", APPLICATION_JSON)
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -657,7 +659,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 delete(urlEqualTo("/v1/userprofile"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", ContentType.JSON.name())
+                                .withHeader("Content-Type", APPLICATION_JSON)
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -682,7 +684,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", ContentType.JSON.name())
+                        .withHeader("Content-Type", APPLICATION_JSON)
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));

@@ -61,7 +61,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
 
         Map<String, Object> response =
             professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        String orgIdentifier = (String) response.get("organisationIdentifier");
+        String orgIdentifier = (String) response.get(ORG_IDENTIFIER);
         assertThat(orgIdentifier).isNotNull();
         Map<String, Object> deleteResponse =
             professionalReferenceDataClient.deleteOrganisation(puiCaseManager, orgIdentifier);
@@ -121,10 +121,10 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
                 .addUserToOrganisation(orgIdentifier,
                         inviteUserCreationRequest("somenewuser@email.com", userRoles), hmctsAdmin);
 
-        String userIdentifierResponse = (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse = (String) newUserResponse.get(USER_IDENTIFIER);
 
         assertThat(newUserResponse).isNotNull();
-        assertEquals(newUserResponse.get("userIdentifier"), userIdentifierResponse);
+        assertEquals(newUserResponse.get(USER_IDENTIFIER), userIdentifierResponse);
 
         Map<String, Object> deleteResponse =
                 professionalReferenceDataClient.deleteOrganisation(hmctsAdmin, orgIdentifier);
@@ -150,7 +150,7 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> response =
             professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        orgIdentifier = (String) response.get("organisationIdentifier");
+        orgIdentifier = (String) response.get(ORG_IDENTIFIER);
 
         assertThat(orgIdentifier).isNotNull();
         assertThat(orgIdentifier.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);

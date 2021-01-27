@@ -250,7 +250,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
             randomAlphabetic(5) + "@somedomain.com", getValidRoleList());
         Map<String, Object> newUserResponse = professionalReferenceDataClient.addUserToOrganisation(orgIdentifier1,
             newUserCreationRequest, hmctsAdmin);
-        userIdentifier = (String) newUserResponse.get("userIdentifier");
+        userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
     }
 
     public String createActiveOrganisation1() {

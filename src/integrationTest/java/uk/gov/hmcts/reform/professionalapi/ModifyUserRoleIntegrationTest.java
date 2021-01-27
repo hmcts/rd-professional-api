@@ -41,7 +41,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
         Map<String, Object> response = professionalReferenceDataClient
@@ -70,7 +70,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(" ");
@@ -131,7 +131,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin, userIdentifier);
 
-        String userIdentifierResponse =  (String) newUserResponse.get("userIdentifier");
+        String userIdentifierResponse =  (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
@@ -205,7 +205,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
@@ -230,7 +230,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .addUserToOrganisation(organisationIdentifier,
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
                                 asList(puiCaseManager)), hmctsAdmin);
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         Map<String, Object> response = professionalReferenceDataClient
                 .modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);
