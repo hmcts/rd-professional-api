@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.helper;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -56,10 +55,10 @@ public class BaseRepository {
     @Before
     public void setUp() {
         organisation = new Organisation("some-name", OrganisationStatus.ACTIVE, "sra-id",
-                "companyN", Boolean.FALSE, "company-url");
+            "companyN", Boolean.FALSE, "company-url");
         organisation = organisationRepository.save(organisation);
         professionalUser = new ProfessionalUser("fName", "lName", "user@test.com",
-                organisation);
+            organisation);
         professionalUser = professionalUserRepository.save(professionalUser);
         organisationRepository.save(organisation);
 
