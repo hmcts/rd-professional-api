@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.restassured.http.ContentType;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -172,13 +173,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         s2sService.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody("rd_professional_api")));
 
         s2sService.stubFor(post(urlEqualTo("/lease"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyZF9wcm9mZXNzaW9uYWxfYXBpIiwiZXhwIjoxNTY0NzU2MzY4fQ"
                                 + ".UnRfwq_yGo6tVWEoBldCkD1zFoiMSqqm1rTHqq4f_PuTEHIJj2IHeARw3wOnJG2c3MpjM71ZTFa0RNE4D2"
                                 + "AUgA")));
@@ -186,7 +187,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody("{"
                                 + "  \"id\": \"%s\","
                                 + "  \"uid\": \"%s\","
@@ -203,7 +204,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody(getDynamicJwksResponse())));
     }
 
@@ -211,7 +212,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfileGetUserWireMock() {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withStatus(200)
                         .withBody("{"
                                 + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
@@ -348,7 +349,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));
@@ -396,7 +397,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", "application/json")
+                                        .withHeader("Content-Type", ContentType.JSON.name())
                                         .withBody(usersBody)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -443,7 +444,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withQueryParam("rolesRequired", equalTo("false"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", "application/json")
+                                        .withHeader("Content-Type", ContentType.JSON.name())
                                         .withBody(usersBodyWithoutRoles)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -461,7 +462,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody(body)
                         .withStatus(201)
                 ));
@@ -488,7 +489,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 post(urlPathMatching("/v1/userprofile/users.*"))
                         .willReturn(
                                 aResponse()
-                                        .withHeader("Content-Type", "application/json")
+                                        .withHeader("Content-Type", ContentType.JSON.name())
                                         .withBody(usersBody)
                                         .withTransformers("transformer-multi-user-response")
                                         .withStatus(200)
@@ -540,7 +541,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 put(urlPathMatching("/v1/userprofile/.*"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
+                                .withHeader("Content-Type", ContentType.JSON.name())
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -588,7 +589,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody(body)
                         .withStatus(status.value())
                 ));
@@ -617,7 +618,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 put(urlPathMatching("/v1/userprofile/.*"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
+                                .withHeader("Content-Type", ContentType.JSON.name())
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -656,7 +657,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(
                 delete(urlEqualTo("/v1/userprofile"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
+                                .withHeader("Content-Type", ContentType.JSON.name())
                                 .withBody(body)
                                 .withStatus(returnHttpStatus)
                         )
@@ -681,7 +682,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile"))
                 .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Content-Type", ContentType.JSON.name())
                         .withBody(body)
                         .withStatus(returnHttpStaus)
                 ));
