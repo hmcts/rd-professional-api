@@ -108,7 +108,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
                 .status("PENDING").paymentAccount(existingPaymentAccounts).sraId("someSra").build();
         java.util.Map<String, Object> responseForFirstOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(firstOrganisationCreationRequest);
-        String firstOrgId = (String) responseForFirstOrganisationCreation.get("organisationIdentifier");
+        String firstOrgId = (String) responseForFirstOrganisationCreation.get(ORG_IDENTIFIER);
         updateOrganisation(firstOrgId, hmctsAdmin, ACTIVE);
 
         Set<String> newPaymentAccounts = new HashSet<>();
@@ -154,7 +154,7 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
                 .paymentAccount(existingPaymentAccounts).build();
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
-        String orgId = (String) responseForOrganisationCreation.get("organisationIdentifier");
+        String orgId = (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
         updateOrganisation(orgId, hmctsAdmin, ACTIVE);
 
         return orgId;

@@ -86,7 +86,7 @@ public class RoleBasedAccessForUpdateTest extends AuthorizationEnabledIntegratio
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
         Map<String, Object> responseForOrganisationCreation
                 = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get("organisationIdentifier");
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
 }

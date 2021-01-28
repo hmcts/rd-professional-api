@@ -33,7 +33,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
@@ -249,7 +249,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier()).isEqualTo(orgIdentifierResponse);
@@ -411,7 +411,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
@@ -451,7 +451,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);
@@ -466,7 +466,7 @@ public class CreateOrganisationWithContactInformationDxAddress extends Authoriza
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
         assertThat(persistedOrganisation.getOrganisationIdentifier().toString()).isEqualTo(orgIdentifierResponse);

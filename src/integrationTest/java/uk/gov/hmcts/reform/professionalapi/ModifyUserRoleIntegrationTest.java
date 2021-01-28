@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
         Map<String, Object> response = professionalReferenceDataClient
@@ -69,7 +70,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(" ");
@@ -109,6 +110,50 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifier, puiUserManager);
         assertThat(response.get("http_status")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
+    }
+
+    @Test
+    public void modify_roles_of_pending_user_for_an_active_organisation_should_rtn_400() {
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
+
+        List<String> userRoles = new ArrayList<>();
+        userRoles.add(puiUserManager);
+
+        String userIdentifier = retrieveSuperUserIdFromOrganisationId(organisationIdentifier);
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        Map<String, Object> newUserResponse =
+                professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
+                        inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
+                        hmctsAdmin, userIdentifier);
+
+        String userIdentifierResponse =  (String) newUserResponse.get(USER_IDENTIFIER);
+
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+
+        updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData, userIdentifierResponse, puiUserManager);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("400");
+    }
+
+    @Test
+    public void modify_roles_of_unknown_user_for_an_active_organisation_with_pui_user_mgr_role_should_rtn_404() {
+
+        updateUserProfileRolesMock(HttpStatus.NOT_FOUND);
+        UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
+        String userIdentifier = settingUpOrganisation(puiUserManager);
+        Map<String, Object> response = professionalReferenceDataClient
+                .modifyUserRolesOfOrganisationExternal(userProfileUpdatedData,
+                        userIdentifier, puiUserManager);
+        assertThat(response.get("http_status")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("404");
+        assertTrue(response.get("response_body").toString().contains("No User found with the given ID"));
     }
 
     //TODO review validation with biz requirements
@@ -160,7 +205,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
 
@@ -185,7 +230,7 @@ public class ModifyUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                 .addUserToOrganisation(organisationIdentifier,
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
                                 asList(puiCaseManager)), hmctsAdmin);
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         Map<String, Object> response = professionalReferenceDataClient
                 .modifyUserRolesOfOrganisation(createModifyUserProfileData(), "%7C", userIdentifier, hmctsAdmin);

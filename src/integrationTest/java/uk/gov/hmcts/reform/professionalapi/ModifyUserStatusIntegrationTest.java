@@ -38,7 +38,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
                 professionalReferenceDataClient.addUserToOrganisation(organisationIdentifier,
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         //modify user details
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
@@ -79,7 +79,7 @@ public class ModifyUserStatusIntegrationTest extends AuthorizationEnabledIntegra
                                 userRoles), hmctsAdmin);
 
         //modify user details
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
         UserProfileUpdatedData userProfileUpdatedData = createModifyUserProfileData();
         userProfileUpdatedData.setIdamStatus("SUSPENDED");
         updateUserProfileRolesMock(HttpStatus.BAD_REQUEST);
