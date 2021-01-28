@@ -43,11 +43,11 @@ public class IdamOpenIdClient {
         this.testConfig = testConfig;
     }
 
-    public Map<String,String> createUser(List<String> userRoles) {
+    public Map<String, String> createUser(List<String> userRoles) {
         return createUser(userRoles, generateRandomEmail(), "First", "Last");
     }
 
-    public Map<String,String> createUser(List<String> userRoles, String userEmail, String firstName, String lastName) {
+    public Map<String, String> createUser(List<String> userRoles, String userEmail, String firstName, String lastName) {
         //Generating a random user
         String userGroup = "";
         String password = generateSidamPassword();
@@ -66,21 +66,31 @@ public class IdamOpenIdClient {
         String serializedUser = gson.toJson(user);
         //required logs for debug
         //log.info("serializedUser: " + serializedUser);
-        Response createdUserResponse = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .body(serializedUser)
-            .post("/testing-support/accounts")
-            .andReturn();
 
+        Response createdUserResponse = null;
+
+        for (int i = 0; i < 5; i++) {
+            log.info("SIDAM createUser retry attempt : " + i + 1);
+            createdUserResponse = RestAssured
+                    .given()
+                    .relaxedHTTPSValidation()
+                    .baseUri(testConfig.getIdamApiUrl())
+                    .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                    .body(serializedUser)
+                    .post("/testing-support/accounts")
+                    .andReturn();
+            if (createdUserResponse.getStatusCode() == 504) {
+                log.info("SIDAM createUser retry response for attempt " + i + 1 + " 504");
+            } else {
+                break;
+            }
+        }
 
         log.info("SIDAM createUser response: " + createdUserResponse.getStatusCode());
 
         assertThat(createdUserResponse.getStatusCode()).isEqualTo(201);
 
-        Map<String,String> userCreds = new HashMap<>();
+        Map<String, String> userCreds = new HashMap<>();
         userCreds.put(EMAIL, userEmail);
         userCreds.put(CREDS, password);
         return userCreds;
@@ -105,13 +115,13 @@ public class IdamOpenIdClient {
         String serializedUser = gson.toJson(user);
         log.info("serializedUser: " + serializedUser);
         Response createdUserResponse = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .body(serializedUser)
-            .post("/testing-support/accounts")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(serializedUser)
+                .post("/testing-support/accounts")
+                .andReturn();
 
         log.info("SIDAM createUser with retry response: " + createdUserResponse.getStatusCode());
 
@@ -122,7 +132,7 @@ public class IdamOpenIdClient {
         if (internalOpenIdTokenPrdAdmin == null) {
             List<String> adminRole = new ArrayList<String>();
             adminRole.add("prd-admin");
-            Map<String,String> userCreds = createUser(adminRole);
+            Map<String, String> userCreds = createUser(adminRole);
             internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
@@ -134,14 +144,14 @@ public class IdamOpenIdClient {
     public String getOpenIdTokenWithGivenRole(String role) {
         List<String> roles = new ArrayList<String>();
         roles.add(role);
-        Map<String,String> userCreds = createUser(roles);
+        Map<String, String> userCreds = createUser(roles);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getExternalOpenIdToken(String role, String firstName, String lastName, String email) {
         List<String> roles = new ArrayList<String>();
         roles.add(role);
-        Map<String,String> userCreds = createUser(roles, email, firstName, lastName);
+        Map<String, String> userCreds = createUser(roles, email, firstName, lastName);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
@@ -153,7 +163,7 @@ public class IdamOpenIdClient {
             return String.valueOf(statusCode);
         }
 
-        Map<String,String> userCreds = new HashMap<>();
+        Map<String, String> userCreds = new HashMap<>();
         userCreds.put(EMAIL, email);
         userCreds.put(CREDS, password);
         return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
@@ -171,20 +181,20 @@ public class IdamOpenIdClient {
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         Response openIdTokenResponse = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-            .params(tokenParams)
-            .post("/o/token")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+                .params(tokenParams)
+                .post("/o/token")
+                .andReturn();
 
         log.info("Generate OpenId Token response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
         IdamOpenIdClient.BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody()
-            .asString(), IdamOpenIdClient.BearerTokenResponse.class);
+                .asString(), IdamOpenIdClient.BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
     }
@@ -229,7 +239,6 @@ public class IdamOpenIdClient {
         }
         return sidamPassword;
     }
-
 
 
 }
