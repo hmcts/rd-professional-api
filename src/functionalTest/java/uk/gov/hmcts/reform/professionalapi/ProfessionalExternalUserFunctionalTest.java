@@ -92,7 +92,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void inviteUserScenarios() {
         inviteUserByPuiUserManagerShouldBeSuccess();
-        inviteUserBySuperUserShouldBeSuccess();
+        //inviteUserBySuperUserShouldBeSuccess();
     }
 
     public void findUsersByOrganisationScenarios() {
