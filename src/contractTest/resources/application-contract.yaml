@@ -35,11 +35,10 @@ postgres.password: ${FUNC_DATABASE_PASS}
 postgres.port: ${FUNC_DATABASE_PORT}
 #######
 
-#logging:
-#  level:
-#    org.springframework.web: DEBUG
-#    uk.gov.hmcts.reform.divorce.orchestration: DEBUG
-#    au.com.dius.pact: DEBUG
+logging:
+  level:
+    org.springframework.web: DEBUG
+    au.com.dius.pact: DEBUG
 
 
 
