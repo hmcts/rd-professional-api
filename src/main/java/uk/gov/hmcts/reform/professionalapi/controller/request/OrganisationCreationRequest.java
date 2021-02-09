@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 
 @Getter
 @Setter
@@ -36,6 +37,9 @@ public class OrganisationCreationRequest {
     @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
+    @NotNull
+    private MFAStatus mfa;
+
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
@@ -46,7 +50,8 @@ public class OrganisationCreationRequest {
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,
             @JsonProperty("paymentAccount") Set<String> paymentAccount,
-            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
+            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest,
+            @JsonProperty("mfa") MFAStatus mfa) {
 
         this.name = name;
         this.status = status;
@@ -57,5 +62,6 @@ public class OrganisationCreationRequest {
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
+        this.mfa = mfa;
     }
 }

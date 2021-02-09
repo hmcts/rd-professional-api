@@ -55,19 +55,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
-import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
-import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -181,7 +169,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
                 "sra-id", "false", "number01", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests, MFAStatus.EMAIL);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
 
         when(dxAddressRepositoryMock.save(any(DxAddress.class))).thenReturn(dxAddress);
@@ -495,7 +483,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests, MFAStatus.EMAIL);
 
         sut.createOrganisationFrom(organisationCreationRequest);
     }
@@ -511,7 +499,7 @@ public class OrganisationServiceImplTest {
 
         organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
                 "sra-id", "false", "company-number", "company-url",
-                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
+                superUserCreationRequest, paymentAccountList, contactInformationCreationRequests, MFAStatus.EMAIL);
 
         sut.createOrganisationFrom(organisationCreationRequest);
     }

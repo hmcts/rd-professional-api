@@ -19,12 +19,7 @@ import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
-import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
-import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
-import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.*;
 
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -355,5 +350,66 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).asString().contains("400");
+    }
+
+    @Test
+    public void returns_200_when_MFA_default_value() {
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+
+        assertThat(orgIdentifierResponse).isNotNull();
+        assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(orgIdentifierResponse.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
+
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(persistedOrganisation.getMfa()).isEqualTo(MFAStatus.EMAIL);
+    }
+
+    @Test
+    public void returns_200_when_MFA_value_Email() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .mfa(MFAStatus.EMAIL)
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+
+        assertThat(orgIdentifierResponse).isNotNull();
+        assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(orgIdentifierResponse.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
+
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(persistedOrganisation.getMfa()).isEqualTo(MFAStatus.EMAIL);
+    }
+
+    @Test
+    public void returns_200_when_MFA_value_None() {
+        OrganisationCreationRequest organisationCreationRequest = anOrganisationCreationRequest()
+                .mfa(MFAStatus.NONE)
+                .build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+
+        assertThat(orgIdentifierResponse).isNotNull();
+        assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(orgIdentifierResponse.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
+
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(persistedOrganisation.getMfa()).isEqualTo(MFAStatus.NONE);
     }
 }
