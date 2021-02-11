@@ -7,8 +7,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 
 public class OrganisationCreationRequestTest {
 
@@ -20,12 +18,12 @@ public class OrganisationCreationRequestTest {
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest(null, null, null, "false",
                         null, null, null, null,
-                        null, null);
+                        null);
 
         Set<ConstraintViolation<OrganisationCreationRequest>> violations = validator
                 .validate(organisationCreationRequest);
 
-        assertThat(violations.size()).isEqualTo(4);
+        assertThat(violations.size()).isEqualTo(3);
     }
 
     @Test
@@ -34,7 +32,7 @@ public class OrganisationCreationRequestTest {
         OrganisationCreationRequest organisationCreationRequest =
                 new OrganisationCreationRequest("test", "PENDING", "sra-id", "false",
                         "number02", "company-url", null, null,
-                        null, MFAStatus.EMAIL);
+                        null);
 
         organisationCreationRequest.setStatus("ACTIVE");
 

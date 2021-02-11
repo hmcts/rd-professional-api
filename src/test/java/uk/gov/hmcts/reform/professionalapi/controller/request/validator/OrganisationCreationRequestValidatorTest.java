@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.RequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -54,7 +53,7 @@ public class OrganisationCreationRequestValidatorTest {
                 .email("test@email.com").build();
         organisationCreationRequest = new OrganisationCreationRequest("Company", "PENDING", "SraId",
                 "true", "12345678", "www.company.com", userCreationRequest,
-                new HashSet<>(), null, MFAStatus.EMAIL);
+                new HashSet<>(), null);
     }
 
     @Test
@@ -125,7 +124,7 @@ public class OrganisationCreationRequestValidatorTest {
         paymentAccounts.add("");
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
                 "true", "", "", null, paymentAccounts,
-                null, null);
+                null);
         organisationCreationRequestValidator.validateOrganisationRequest(orgReq);
     }
 
@@ -303,7 +302,7 @@ public class OrganisationCreationRequestValidatorTest {
     public void test_should_validate_company_no_length_and_throw_if_length_more_than_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
                 "true", "123456789", "", null, new HashSet<>(),
-                null, MFAStatus.EMAIL);
+                null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 
@@ -311,7 +310,7 @@ public class OrganisationCreationRequestValidatorTest {
     public void test_should_validate_company_no_length_and_not_throw_if_length_is_8() {
         OrganisationCreationRequest orgReq = new OrganisationCreationRequest("", "", "",
                 "true", "12345678", "", null, new HashSet<>(),
-                null, MFAStatus.EMAIL);
+                null);
         organisationCreationRequestValidator.validateCompanyNumber(orgReq);
     }
 

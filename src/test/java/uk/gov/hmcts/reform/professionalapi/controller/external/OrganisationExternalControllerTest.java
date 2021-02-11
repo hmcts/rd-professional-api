@@ -50,7 +50,12 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntit
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.*;
+import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
+import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
@@ -140,7 +145,7 @@ public class OrganisationExternalControllerTest {
                 "some@email.com");
         organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
                 "sra-id", "false", "number02", "company-url",
-                userCreationRequest, null, null, MFAStatus.EMAIL);
+                userCreationRequest, null, null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",
                 "some-name", "some-last-name", EN, PROFESSIONAL, EXTERNAL, userRoles,
                 false);

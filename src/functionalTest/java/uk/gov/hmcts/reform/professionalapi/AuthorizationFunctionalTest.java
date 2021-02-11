@@ -315,8 +315,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         assertThat(response.get("sraRegulated")).isNotNull();
         assertThat(response.get("companyNumber")).isNotNull();
         assertThat(response.get("companyUrl")).isNotNull();
-        assertThat(response.get("mfa")).isNotNull();
-        assertThat(response.get("mfa")).isEqualTo("EMAIL");
         assertThat(response.get("superUser")).isNotNull();
         assertThat(response.get("paymentAccount")).isNotNull();
         assertThat(response.get("contactInformation")).isNotNull();

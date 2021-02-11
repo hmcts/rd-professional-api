@@ -37,9 +37,6 @@ public class OrganisationCreationRequest {
     @NotNull
     private List<ContactInformationCreationRequest> contactInformation;
 
-    @NotNull
-    private MFAStatus mfa;
-
     @JsonCreator
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
@@ -50,8 +47,7 @@ public class OrganisationCreationRequest {
             @JsonProperty("companyUrl") String companyUrl,
             @JsonProperty("superUser") UserCreationRequest superUser,
             @JsonProperty("paymentAccount") Set<String> paymentAccount,
-            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest,
-            @JsonProperty("mfa") MFAStatus mfa) {
+            @JsonProperty("contactInformation") List<ContactInformationCreationRequest> contactInformationRequest) {
 
         this.name = name;
         this.status = status;
@@ -62,6 +58,5 @@ public class OrganisationCreationRequest {
         this.superUser = superUser;
         this.paymentAccount = paymentAccount;
         this.contactInformation = contactInformationRequest;
-        this.mfa = mfa;
     }
 }

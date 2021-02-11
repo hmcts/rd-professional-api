@@ -65,4 +65,14 @@ public class OrganisationTest {
         assertThat(organisation.getContactInformation()).containsExactly(contactInformation);
         assertThat(organisation.getContactInformations()).isNotEmpty();
     }
+
+    @Test
+    public void test_adds_organisation_mfa_status_correctly() {
+        OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
+        Organisation organisation = new Organisation();
+        organisation.addOrganisationMfaStatus(organisationMfaStatus);
+
+        assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
+        assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);
+    }
 }

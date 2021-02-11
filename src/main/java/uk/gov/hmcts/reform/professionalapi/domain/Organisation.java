@@ -9,7 +9,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.CascadeType;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,6 +66,9 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation")
+    private OrganisationMfaStatus organisationMfaStatus;
+
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
@@ -83,9 +98,6 @@ public class Organisation implements Serializable {
     @Column(name = "ORGANISATION_IDENTIFIER")
     private String organisationIdentifier;
 
-    @Column(name = "MFA")
-    @Enumerated(EnumType.STRING)
-    private MFAStatus mfa;
 
     public Organisation(
             String name,
@@ -114,6 +126,10 @@ public class Organisation implements Serializable {
 
     public void addContactInformation(ContactInformation contactInformation) {
         contactInformations.add(contactInformation);
+    }
+
+    public void addOrganisationMfaStatus(OrganisationMfaStatus organisationMfaStatus) {
+        this.setOrganisationMfaStatus(organisationMfaStatus);
     }
 
     public UUID getId() {
@@ -166,5 +182,9 @@ public class Organisation implements Serializable {
 
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
+    }
+
+    public OrganisationMfaStatus getOrganisationMfaStatus() {
+        return organisationMfaStatus;
     }
 }
