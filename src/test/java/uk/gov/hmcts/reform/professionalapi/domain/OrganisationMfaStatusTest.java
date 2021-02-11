@@ -24,7 +24,7 @@ public class OrganisationMfaStatusTest {
 
     @Test
     public void test_creates_organisation_mfa_status_correctly() {
-        assertThat(organisationMfaStatus.getOrganisation_id()).isNull();
+        assertThat(organisationMfaStatus.getOrganisationId()).isNull();
         assertThat(organisationMfaStatus.getMfaStatus()).isEqualTo(MFAStatus.EMAIL);
         assertThat(organisationMfaStatus.getLastUpdated()).isNotNull();
         assertThat(organisationMfaStatus.getOrganisation()).isNotNull();

@@ -142,7 +142,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationMfaStatus.setOrganisation(organisation);
         organisationMfaStatus.setMfaStatus(EMAIL);
 
-        OrganisationMfaStatus persistedOrganisationMfaStatus = organisationMfaStatusRepository.save(organisationMfaStatus);
+        OrganisationMfaStatus persistedOrganisationMfaStatus
+                = organisationMfaStatusRepository.save(organisationMfaStatus);
         organisation.addOrganisationMfaStatus(persistedOrganisationMfaStatus);
 
     }

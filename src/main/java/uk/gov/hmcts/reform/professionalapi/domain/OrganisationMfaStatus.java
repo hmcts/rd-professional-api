@@ -29,10 +29,11 @@ import java.util.UUID;
 public class OrganisationMfaStatus implements Serializable {
 
     @Id
-    private UUID organisation_id;
+    @Column(name = "ORGANISATION_ID")
+    private UUID organisationId;
 
     @OneToOne
-    @JoinColumn(name = "organisation_id")
+    @JoinColumn(name = "ORGANISATION_ID")
     @MapsId
     private Organisation organisation;
 

@@ -96,7 +96,8 @@ public class OrganisationServiceImplTest {
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
-    private final OrganisationMfaStatusRepository organisationMfaStatusRepositoryMock = mock(OrganisationMfaStatusRepository.class);
+    private final OrganisationMfaStatusRepository organisationMfaStatusRepositoryMock
+            = mock(OrganisationMfaStatusRepository.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
@@ -201,7 +202,8 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
         when(organisationRepository.findByStatus(any())).thenReturn(organisations);
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
-        when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class))).thenReturn(organisationMfaStatus);
+        when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
+                .thenReturn(organisationMfaStatus);
     }
 
     @Test
