@@ -18,7 +18,6 @@ public class OrganisationMfaStatusTest {
         organisationMfaStatus.setMfaStatus(MFAStatus.EMAIL);
         organisationMfaStatus.setLastUpdated(LocalDateTime.now());
         organisationMfaStatus.setCreated(LocalDateTime.now());
-
         organisationMfaStatus.setOrganisation(organisation);
     }
 
@@ -27,6 +26,7 @@ public class OrganisationMfaStatusTest {
         assertThat(organisationMfaStatus.getOrganisationId()).isNull();
         assertThat(organisationMfaStatus.getMfaStatus()).isEqualTo(MFAStatus.EMAIL);
         assertThat(organisationMfaStatus.getLastUpdated()).isNotNull();
+        assertThat(organisationMfaStatus.getCreated()).isNotNull();
         assertThat(organisationMfaStatus.getOrganisation()).isNotNull();
     }
 
