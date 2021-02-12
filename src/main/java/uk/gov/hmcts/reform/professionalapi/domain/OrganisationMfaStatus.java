@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
+import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,7 +41,7 @@ public class OrganisationMfaStatus implements Serializable {
 
     @Column(name = "MFA_STATUS")
     @Enumerated(EnumType.STRING)
-    private MFAStatus mfaStatus;
+    private MFAStatus mfaStatus = EMAIL;
 
     @CreatedDate
     @Column(name = "CREATED")

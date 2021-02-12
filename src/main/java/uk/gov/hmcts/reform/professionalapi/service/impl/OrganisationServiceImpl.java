@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -140,7 +139,6 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
         organisationMfaStatus.setOrganisation(organisation);
-        organisationMfaStatus.setMfaStatus(EMAIL);
 
         OrganisationMfaStatus persistedOrganisationMfaStatus
                 = organisationMfaStatusRepository.save(organisationMfaStatus);
