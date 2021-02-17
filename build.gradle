@@ -38,7 +38,7 @@ def versions = [
         springBoot         : '2.3.4.RELEASE',
         springfoxSwagger   : '2.9.2',
         pact_version       : '4.1.7',
-        launchDarklySdk    : "5.1.1"
+        launchDarklySdk    : "5.2.2"
 ]
 
 
