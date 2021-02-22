@@ -46,7 +46,6 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
     @MockBean
     IdamRepository idamRepository;
 
-
     @Bean
     @Primary
     protected OrganisationInternalController organisationInternalController() {
