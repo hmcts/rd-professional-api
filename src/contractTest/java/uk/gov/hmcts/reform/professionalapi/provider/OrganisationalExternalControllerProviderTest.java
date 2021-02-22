@@ -1,23 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -40,15 +30,9 @@ import java.util.UUID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @Provider("referenceData_organisationalExternalPbas")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @Import(OrganisationalExternalControllerProviderTestConfiguration.class)
-@TestPropertySource(locations = "/application-contract.yaml")
-public class OrganisationalExternalControllerProviderTest {
+public class OrganisationalExternalControllerProviderTest extends MockMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
@@ -66,18 +50,9 @@ public class OrganisationalExternalControllerProviderTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    @TestTemplate
-    @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void pactVerificationTestTemplate(PactVerificationContext context) {
-        context.verifyInteraction();
-    }
-
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        MockMvcTestTarget testTarget = new MockMvcTestTarget();
+    @Override
+    void setController() {
         testTarget.setControllers(organisationExternalController);
-        context.setTarget(testTarget);
     }
 
     @State({"Pbas organisational data exists for identifier " + ORGANISATION_EMAIL})

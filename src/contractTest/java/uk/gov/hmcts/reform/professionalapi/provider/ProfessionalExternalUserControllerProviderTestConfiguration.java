@@ -4,6 +4,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
@@ -25,6 +26,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
 
     @MockBean
     protected OrganisationService organisationService;
+
+    @MockBean
+    protected ClientRegistrationRepository clientRegistrationRepository;
 
     @MockBean
     IdamRepository idamRepository;
