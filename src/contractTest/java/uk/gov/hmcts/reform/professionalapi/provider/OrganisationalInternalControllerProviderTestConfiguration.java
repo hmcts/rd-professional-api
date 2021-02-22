@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
-import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -50,7 +49,7 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
 
     @Bean
     @Primary
-    protected OrganisationInternalController organisationInternalController(){
+    protected OrganisationInternalController organisationInternalController() {
         return new OrganisationInternalController();
     }
 

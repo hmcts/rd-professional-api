@@ -39,10 +39,7 @@ import static org.mockito.Mockito.when;
 
 @Provider("referenceData_organisationalInternal")
 @Import(OrganisationalInternalControllerProviderTestConfiguration.class)
-public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest
-{
-
-
+public class OrganisationalInternalControllerProviderTest extends MockMvcProviderTest {
     @Autowired
     OrganisationRepository organisationRepository;
 
@@ -67,7 +64,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     @State("Users exists for an Organisation")
-    public void setUpUsersForOrganisation() throws IOException {
+    public void setUpUsersForOrganisation() {
 
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
             "companyN", false, "www.org.com");
@@ -129,7 +126,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
 
     @State("An Organisation exists for update")
-    public void setUpOrganisationForUpdate() throws IOException {
+    public void setUpOrganisationForUpdate() {
 
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
             "companyN", false, "www.org.com");
@@ -140,7 +137,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     }
 
     @State("An Organisation with PBA accounts exists")
-    public void setUpOrganisationForPBAsUpdate() throws IOException {
+    public void setUpOrganisationForPBAsUpdate() {
 
         Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
             "companyN", false, "www.org.com");
@@ -148,9 +145,9 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
-        when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class), any(PbaEditRequest.class)))
+        when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
+            any(PbaEditRequest.class)))
             .thenReturn(new PbaResponse("200", "Success"));
-
     }
 
     private void addSuperUser(Organisation organisation) {

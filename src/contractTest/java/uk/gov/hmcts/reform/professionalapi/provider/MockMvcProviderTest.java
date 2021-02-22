@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(locations = "/application-contract.yaml")
-abstract public class MockMvcProviderTest extends BaseProviderTest{
+public abstract class MockMvcProviderTest extends BaseProviderTest {
 
     MockMvcTestTarget testTarget = new MockMvcTestTarget();
 

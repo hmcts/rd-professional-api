@@ -15,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
     @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @IgnoreNoPactsToVerify
-abstract public class BaseProviderTest {
+public abstract class BaseProviderTest {
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
