@@ -1,8 +1,20 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
+
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
 import io.restassured.specification.RequestSpecification;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +31,12 @@ import uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient;
 import uk.gov.hmcts.reform.professionalapi.client.S2sClient;
 import uk.gov.hmcts.reform.professionalapi.config.Oauth2;
 import uk.gov.hmcts.reform.professionalapi.config.TestConfigProperties;
-import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class})
 @ComponentScan("uk.gov.hmcts.reform.professionalapi")
@@ -97,15 +95,13 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Autowired
     protected TestConfigProperties configProperties;
 
-    protected static String s2sToken;
+    protected static String  s2sToken;
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
     public static final String EMAIL_TEMPLATE = "freg-test-user-%s@prdfunctestuser.com";
     public static String email;
     public static String activeOrgId;
     public static String activeOrgIdForBearerTokens;
-    public static String puiCaseManagerBearerToken;
-    public static String puiOrgManagerBearerToken;
     public static NewUserCreationRequest bearerTokenUser;
 
 
@@ -149,9 +145,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     }
 
     protected String createAndctivateOrganisationWithGivenRequest(
-        OrganisationCreationRequest organisationCreationRequest, String role) {
+            OrganisationCreationRequest organisationCreationRequest, String role) {
         Map<String, Object> organisationCreationResponse = professionalApiClient
-            .createOrganisation(organisationCreationRequest);
+                .createOrganisation(organisationCreationRequest);
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
         professionalApiClient.updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
@@ -161,73 +157,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     protected String activateOrganisation(Map<String, Object> organisationCreationResponse, String role) {
         String organisationIdentifier = (String) organisationCreationResponse.get("organisationIdentifier");
         assertThat(organisationIdentifier).isNotEmpty();
-        professionalApiClient.updateOrganisation(organisationIdentifier, role);
+        professionalApiClient.updateOrganisation(organisationIdentifier,role);
         return organisationIdentifier;
-    }
-
-    public RequestSpecification generateBearerTokenFor(String role) {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(role, firstName, lastName, userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-            hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    public RequestSpecification generateBearerTokenForEmailHeader(String role) {
-        List<String> userRoles = new ArrayList<>();
-        userRoles.add("pui-user-manager");
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getEmailFromAuthHeadersExternal(role, firstName, lastName, userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-            hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
-    }
-
-    public RequestSpecification generateBearerTokenForExternalUserRolesSpecified(List<String> userRoles) {
-        String userEmail = generateRandomEmail();
-        String lastName = "someLastName";
-        String firstName = "someName";
-
-        bearerToken = professionalApiClient.getMultipleAuthHeadersExternal(puiUserManager, firstName, lastName,
-            userEmail);
-
-        NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .build();
-
-        professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-            hmctsAdmin, userCreationRequest, HttpStatus.CREATED);
-
-        return bearerToken;
     }
 
     protected NewUserCreationRequest createUserRequest(List<String> userRoles) {
@@ -236,35 +167,12 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         String lastName = "someLastName";
         String firstName = "someFirstName";
         NewUserCreationRequest userCreationRequest = aNewUserCreationRequest()
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(userEmail)
-            .roles(userRoles)
-            .build();
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
         return userCreationRequest;
-    }
-
-
-    public String getExternalSuperUserTokenWithRetry(String email, String firstName, String lastName) {
-        int counter = 0;
-
-        String idamResponse = idamOpenIdClient
-            .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-
-        while (idamResponse.equalsIgnoreCase("504") && counter < 4) {
-            log.info("Retry Super User Token attempt :" + counter + "/3");
-            email = generateRandomEmail().toLowerCase();
-            idamResponse = idamOpenIdClient
-                .getExternalOpenIdTokenWithRetry(superUserRoles(), firstName, lastName, email);
-            counter++;
-        }
-
-        if (idamResponse.equalsIgnoreCase("504")) {
-            throw new ExternalApiException(HttpStatus.GATEWAY_TIMEOUT,
-                "Received more than 3 timeouts from IDAM while Generating Token");
-        } else {
-            return email;
-        }
     }
 
     public UserProfileUpdatedData getUserStatusUpdateRequest(IdamStatus status) {
@@ -287,7 +195,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return activeUserMap;
     }
 
-    public Map getUserById(List<Map<String, Object>> professionalUsersResponses, String userId) {
+    public Map getUserById(List<Map<String,Object>> professionalUsersResponses, String userId) {
 
         Map activeUserMap = null;
 
@@ -334,10 +242,10 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
             bearerTokenUser = createUserRequest(asList(role));
 
             bearer = professionalApiClient.getBearerTokenExternal(role, bearerTokenUser.getFirstName(),
-                bearerTokenUser.getLastName(), bearerTokenUser.getEmail());
+                    bearerTokenUser.getLastName(), bearerTokenUser.getEmail());
 
             professionalApiClient.addNewUserToAnOrganisation(activeOrgIdForBearerTokens,
-                hmctsAdmin, bearerTokenUser, HttpStatus.CREATED);
+                    hmctsAdmin, bearerTokenUser, HttpStatus.CREATED);
             email = bearerTokenUser.getEmail();
         }
         return bearer;
@@ -346,22 +254,22 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public String searchUserStatus(String orgIdentifier, String userId) {
 
         Map<String, Object> searchResponse = professionalApiClient
-            .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
+                .searchOrganisationUsersByStatusInternal(orgIdentifier, hmctsAdmin, HttpStatus.OK);
         List<Map> professionalUsersResponses = (List<Map>) searchResponse.get("users");
 
         return professionalUsersResponses.stream()
-            .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
-            .map(user -> (String) user.get("idamStatus"))
-            .collect(Collectors.toList()).get(0);
+                .filter(user -> ((String) user.get("userIdentifier")).equalsIgnoreCase(userId))
+                .map(user -> (String) user.get("idamStatus"))
+                .collect(Collectors.toList()).get(0);
     }
 
     public void responseValidate(Map<String, Object> orgResponse) {
 
-        orgResponse.forEach((k, v) -> {
+        orgResponse.forEach((k,v) -> {
 
             if ("organisationIdentifier".equals(k) && "http_status".equals(k)
-                && "name".equals(k) && "status".equals(k)
-                && "superUser".equals(k) && "paymentAccount".equals(k)) {
+                    && "name".equals(k) &&  "status".equals(k)
+                    && "superUser".equals(k) && "paymentAccount".equals(k)) {
 
                 Assertions.assertThat(v.toString()).isNotEmpty();
                 Assertions.assertThat(v.toString().contains("Ok"));
@@ -393,7 +301,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     }
 
     public void validatePbaResponse(Map<String, Object> response) {
-        List<String> pbaList = (List) ((Map) response.get("organisationEntityResponse")).get("paymentAccount");
+        List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
         assertThat(pbaList).hasSize(3);
     }
 

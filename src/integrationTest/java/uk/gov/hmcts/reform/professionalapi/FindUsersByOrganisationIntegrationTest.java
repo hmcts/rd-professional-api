@@ -95,10 +95,10 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
         HashMap professionalUsersResponse = professionalUsersResponses.get(2);
 
-        assertThat(professionalUsersResponse.get("userIdentifier")).isNotNull();
-        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("adil");
-        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("oozeerally");
-        assertThat(professionalUsersResponse.get("email")).isEqualTo("adil.ooze@hmcts.net");
+        assertThat(professionalUsersResponse.get(USER_IDENTIFIER)).isNotNull();
+        assertThat(professionalUsersResponse.get("firstName")).isEqualTo("Adil");
+        assertThat(professionalUsersResponse.get("lastName")).isEqualTo("O");
+        assertThat(professionalUsersResponse.get("email")).isEqualTo("super.user@hmcts.net");
         assertThat(professionalUsersResponse.get("idamStatus")).isEqualTo("DELETED");
         assertThat(professionalUsersResponse.get("idamStatusCode")).isEqualTo("404");
         assertThat(professionalUsersResponse.get("idamMessage")).isEqualTo("16 Resource not found");
@@ -234,12 +234,12 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     private void validateUsers(Map<String, Object> response, int expectedUserCount, Boolean rolesReturned) {
 
         assertThat(response.get("http_status")).isEqualTo("200 OK");
-        assertThat(response.get("organisationIdentifier")).isNotNull();
+        assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
         assertThat(((List<ProfessionalUsersResponse>) response.get("users")).size()).isEqualTo(expectedUserCount);
         List<HashMap> professionalUsersResponses = (List<HashMap>) response.get("users");
 
         professionalUsersResponses.stream().forEach(user -> {
-            assertThat(user.get("userIdentifier")).isNotNull();
+            assertThat(user.get(USER_IDENTIFIER)).isNotNull();
             assertThat(user.get("firstName")).isNotNull();
             assertThat(user.get("lastName")).isNotNull();
             assertThat(user.get("email")).isNotNull();
@@ -257,35 +257,42 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
     @Test
     public void can_retrieve_users_when_false_should_return_status_200_without_roles() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
-                createAndActivateOrganisation(), "True", hmctsAdmin,"false");
+                createAndActivateOrganisation(), "True", hmctsAdmin, "false");
         validateUsers(response, 3, false);
     }
 
     @Test
     public void can_retrieve_users_when_true_should_return_status_200_with_roles() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
-                createAndActivateOrganisation(), "True", hmctsAdmin,"true");
+                createAndActivateOrganisation(), "True", hmctsAdmin, "true");
         validateUsers(response, 3, true);
     }
 
     @Test
     public void can_retrieve_users_when_default_should_return_status_200_with_roles() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
-                createAndActivateOrganisation(), "True", hmctsAdmin,null);
+                createAndActivateOrganisation(), "True", hmctsAdmin, null);
         validateUsers(response, 3, true);
+    }
+
+    @Test
+    public void retrieve_active_users_for_an_organisation_with_invalid_bearer_token_should_return_403() {
+        Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisationWithoutAuthHeaders(
+                createAndActivateOrganisation(), "True", null);
+        assertThat(response.get("http_status")).isEqualTo("401");
     }
 
     @Test
     public void cannot_retrieve_users_when_invalid_user_roles_should_return_status_403() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
-                createAndActivateOrganisation(), "True", "InvalidRole",null);
+                createAndActivateOrganisation(), "True", "InvalidRole", null);
         assertThat(response.get("http_status")).isEqualTo("403");
     }
 
     @Test
     public void can_retrieve_users_when_param_is_invalid_should_return_status_400_with_roles() {
         Map<String, Object> response = professionalReferenceDataClient.findUsersByOrganisation(
-                createAndActivateOrganisation(), "True", hmctsAdmin,"thisisinvalid");
+                createAndActivateOrganisation(), "True", hmctsAdmin, "thisisinvalid");
         assertThat(response.get("http_status")).isEqualTo("400");
     }
 
@@ -303,22 +310,28 @@ public class FindUsersByOrganisationIntegrationTest extends AuthorizationEnabled
         Map<String, Object> response = professionalReferenceDataClient
                 .findAllUsersForOrganisationByStatus("false", "PENDING", puiCaa, id);
         assertThat(response.get("http_status")).isEqualTo("400");
+    }
 
+    @Test
+    public void retrieve_users_for_an_organisation_with_system_roles_should_return_404_when_users_are_not_active() {
+        Map<String, Object> response = professionalReferenceDataClient
+                .findUsersByOrganisation(createOrganisationRequest(), "false", systemUser);
+        assertThat(response.get("http_status")).isEqualTo("404");
     }
 
     @Test
     public void retrieve_all_users_for_an_organisation_with_system_role_role_should_return_200() {
         Map<String, Object> response = professionalReferenceDataClient
-                .findUsersByOrganisation(createAndActivateOrganisation(),"false", systemUser);
+                .findUsersByOrganisation(createAndActivateOrganisation(), "false", systemUser);
         validateUsers(response, 2, false);
     }
 
     @Test
     public void retrieve_all_users_for_an_organisation_with_invalid_role_role_should_return_403() {
         Map<String, Object> response = professionalReferenceDataClient
-                .findUsersByOrganisation(createAndActivateOrganisation(),"false", "invalidRole");
+                .findUsersByOrganisation(createAndActivateOrganisation(), "false", "invalidRole");
         assertThat(response.get("http_status")).isEqualTo("403");
-        assertThat((String)response.get("response_body"))
+        assertThat((String) response.get("response_body"))
                 .contains("{\"errorMessage\":\"9 : Access Denied\",\"errorDescription\":\"Access is denied\"");
     }
 }

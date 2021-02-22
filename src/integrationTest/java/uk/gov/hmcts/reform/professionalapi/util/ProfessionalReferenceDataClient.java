@@ -133,6 +133,12 @@ public class ProfessionalReferenceDataClient {
                 + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", role, showDeleted, returnRoles);
     }
 
+    public Map<String, Object> findUsersByOrganisationWithoutAuthHeaders(
+            String organisationIdentifier, String showDeleted, String returnRoles) {
+        return getRequestWithoutAuthHeaders(APP_INT_BASE_PATH + "/" + organisationIdentifier
+                + "/users?showDeleted={showDeleted}&returnRoles={returnRoles}", showDeleted, returnRoles);
+    }
+
     public Map<String, Object> findUsersByOrganisationWithPaginationInformation(String organisationIdentifier,
                                                                                 String showDeleted, String role) {
         return getRequest(APP_INT_BASE_PATH + "/" + organisationIdentifier
@@ -190,6 +196,30 @@ public class ProfessionalReferenceDataClient {
         try {
 
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate
+                    .exchange("http://localhost:" + prdApiPort + uriPath,
+                            HttpMethod.GET,
+                            request,
+                            Map.class,
+                            params);
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Map<String, Object> getRequestWithoutAuthHeaders(String uriPath, Object... params) {
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+
+            HttpEntity<?> request = new HttpEntity<>(new HttpHeaders());
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
                             HttpMethod.GET,
@@ -454,6 +484,26 @@ public class ProfessionalReferenceDataClient {
 
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + organisationIdentifier;
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> deleteOrganisationResponse = new HashMap<>();
+        deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return deleteOrganisationResponse;
+    }
+
+    public Map<String, Object> deleteOrganisationExternal(
+            String role, String organisationIdentifier) {
+
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/" + organisationIdentifier;
         try {
             HttpEntity<?> requestEntity = new HttpEntity<>(getMultipleAuthHeaders(role));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);

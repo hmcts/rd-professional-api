@@ -43,7 +43,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
         assertThat(persistedPaymentAccounts.size()).isEqualTo(1);
         assertThat(persistedPaymentAccounts.get(0).getOrganisation().getName())
@@ -101,7 +101,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
-        String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) createOrganisationResponse.get(ORG_IDENTIFIER);
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(orgIdentifierResponse);
@@ -130,7 +130,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         Map<String, Object> createOrganisationResponse = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) createOrganisationResponse.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) createOrganisationResponse.get(ORG_IDENTIFIER);
 
         List<PaymentAccount> persistedPaymentAccounts = paymentAccountRepository.findAll();
 
@@ -205,12 +205,12 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse1 = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse1 = (String) response.get(ORG_IDENTIFIER);
 
         Map<String, Object> response2 =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest2);
 
-        String orgIdentifierResponse2 = (String) response2.get("organisationIdentifier");
+        String orgIdentifierResponse2 = (String) response2.get(ORG_IDENTIFIER);
 
         assertThat(orgIdentifierResponse1).isNotEqualTo(orgIdentifierResponse2);
 

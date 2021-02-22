@@ -38,7 +38,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         assertThat(orgIdentifierResponse).isNotNull();
         assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
@@ -194,7 +194,7 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
         Map<String, Object> response =
                 professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
-        String orgIdentifierResponse = (String) response.get("organisationIdentifier");
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
 
         assertThat(orgIdentifierResponse).isNotNull();
         assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);

@@ -38,7 +38,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
                                 userRoles), hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
         UserProfileUpdatedData userProfileUpdatedData = createAddRolesUserProfileData();
 
         Map<String, Object> response = professionalReferenceDataClient
@@ -77,7 +77,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com",
                                 userRoles), hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData();
         RoleName roleName1 = new RoleName(" ");
@@ -177,7 +177,7 @@ public class DeleteUserRoleIntegrationTest extends AuthorizationEnabledIntegrati
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin);
 
-        String userIdentifier = (String) newUserResponse.get("userIdentifier");
+        String userIdentifier = (String) newUserResponse.get(USER_IDENTIFIER);
 
         UserProfileUpdatedData userProfileUpdatedData = createDeleteRolesUserProfileData();
 
