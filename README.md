@@ -4,7 +4,7 @@ Professional Reference Data API
 
 ## Purpose
 
-Provides professional reference data to client applications.  Implemented as a Java/SpringBoot application.
+Provides professional reference data to client applications. Implemented as a Java/SpringBoot application.
 
 ### Prerequisites
 
@@ -13,9 +13,9 @@ To run the project you will need to have the following installed:
 * Java 11
 * Docker (optional)
 
-For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
+For information about the software versions used to build this API and a complete list of its dependencies see build.gradle
 
-While not essential, it is highly recommended to use the pre-push git hook included in this repository to ensure that all tests are passing. This can be done by running the following command:
+While not essential, it is highly recommended using the pre-push git hook included in this repository to ensure that all tests are passing. This can be done by running the following command:
 `$ git config core.hooksPath .githooks`
 
 ### Environment Vars
