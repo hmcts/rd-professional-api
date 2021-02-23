@@ -67,12 +67,16 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
         suspendUserScenarios();
+        findMFAByUserIDScenario();
     }
 
     public void setUpTestData() {
         superUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(superUserEmail)
+                .superUser(aUserCreationRequest()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .email(superUserEmail)
                         .build())
                 .build();
 
@@ -411,5 +415,16 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         activeUserId = (String) pumInternalUserResponse.get("userIdentifier");
         return bearerToken;
+    }
+
+    public void findMFAByUserIDScenario() {
+        findMFAByUserIDShouldBeSuccess();
+    }
+
+    public void findMFAByUserIDShouldBeSuccess() {
+        log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
+        Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
+        assertThat(mfaStatusResponse.get("mfa")).isEqualTo("EMAIL");
+        log.info("findMFAByUserIDShouldBeSuccess :: END");
     }
 }

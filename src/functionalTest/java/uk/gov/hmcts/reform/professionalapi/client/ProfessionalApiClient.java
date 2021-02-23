@@ -778,4 +778,19 @@ public class ProfessionalApiClient {
             return response.getBody().as(ErrorResponse.class);
         }
     }
+
+    public Map<String, Object> findMFAByUserId(HttpStatus expectedStatus, String userId) {
+
+        Response response = withUnauthenticatedRequest()
+                .body("")
+                .get("/refdata/external/v1/organisations/mfa?user_id=" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("find mfa response: " + response.statusCode());
+        return response.body().as(Map.class);
+    }
 }
