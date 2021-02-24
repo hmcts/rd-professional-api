@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Slf4j
@@ -74,6 +75,10 @@ public class ProfessionalReferenceDataClient {
                                                                                     String userId) {
         return getRequestToGetEmailFromHeader("/refdata/external/v1/organisations" + "/pbas?email={email}",
                 role, userId, email);
+    }
+
+    public Map<String, Object> findMFAByUserID(String professionalUserID) {
+        return getRequestWithoutAuthHeaders(APP_EXT_BASE_PATH + "/mfa?user_id={userIdentifier}", professionalUserID);
     }
 
     public Map<String, Object> retrieveSingleOrganisation(String id, String role) {
