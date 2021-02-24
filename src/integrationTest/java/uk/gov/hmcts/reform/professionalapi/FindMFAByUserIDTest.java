@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
@@ -14,22 +12,15 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 
 @Slf4j
 public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
-    String organisationIdentifier;
-    String pendingOrganisationId;
-
-    @Before
-    public void setUp(){
-        organisationIdentifier = createOrganisationRequest();
-        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
-    }
 
     @Test
     public void get_request_with_valid_user_id_returns_mfa_status() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         Organisation persistedOrganisation = organisationRepository
                 .findByOrganisationIdentifier(organisationIdentifier);
@@ -54,8 +45,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void returns_404_when_organisation_not_active() {
 
-        pendingOrganisationId = createOrganisationRequest();
-        updateOrganisation(pendingOrganisationId, hmctsAdmin, "PENDING");
+        String pendingOrganisationId = createOrganisationRequest();
         Organisation ppOrganisation = organisationRepository
                 .findByOrganisationIdentifier(pendingOrganisationId);
 
@@ -75,14 +65,5 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
         assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body").toString()).contains("Bad Request");
     }
-
-    private String createPendingOrganisationRequest() {
-        OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().status("PENDING").build();
-        Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
-                .createOrganisation(organisationCreationRequest);
-        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
-    }
-
-
-
+    
 }
