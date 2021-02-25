@@ -12,7 +12,6 @@ public abstract class MockMvcProviderTest extends BaseProviderTest {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         this.setController();
         if (context != null) {
             context.setTarget(testTarget);

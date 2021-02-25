@@ -187,6 +187,10 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     }
 }
 
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
 task contract(type: Test) {
     description = 'Runs the consumer Pact tests'
     useJUnitPlatform()
@@ -194,6 +198,8 @@ task contract(type: Test) {
     classpath = sourceSets.contractTest.runtimeClasspath
     include "uk/gov/hmcts/reform/professionalapi/**"
     systemProperty 'pact.rootDir', "pacts"
+    systemProperty 'pact.verifier.publishResults', true
+    systemProperty 'pact.provider.version', project.pactVersion
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
@@ -213,13 +219,16 @@ runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
 
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 pact {
     publish {
         pactDirectory = 'pacts'
-        //pactBrokerUrl = 'http://localhost:9292'
-        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
-        tags = ['Dev']
-        version = "2.3"
+        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+        version = project.pactVersion
     }
 }
 

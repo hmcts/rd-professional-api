@@ -15,7 +15,7 @@ public class WebMvcProviderTest extends BaseProviderTest {
 
     @BeforeEach
     void before(PactVerificationContext context) {
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         if (context != null) {
             context.setTarget(new MockMvcTestTarget(mockMvc));
         }
