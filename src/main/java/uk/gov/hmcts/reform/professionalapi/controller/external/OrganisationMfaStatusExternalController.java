@@ -43,7 +43,7 @@ public class OrganisationMfaStatusExternalController extends SuperController {
     })
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    ResponseEntity<MfaStatusResponse> retrieveMfaStatusByUserId(
+    public ResponseEntity<MfaStatusResponse> retrieveMfaStatusByUserId(
             @RequestParam(value = "user_id", required = true) String userId) {
 
         return retrieveMfaStatusUsingUserId(userId);
