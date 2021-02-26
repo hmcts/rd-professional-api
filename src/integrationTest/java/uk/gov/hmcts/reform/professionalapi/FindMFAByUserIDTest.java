@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -39,23 +40,27 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(UUID.randomUUID().toString());
         assertThat(response.get("http_status")).isEqualTo("404");
-        assertThat(response.get("errorDescription")).isEqualTo("The requested user does not exist");
+        assertThat(response.get("response_body").toString()).contains("The requested user does not exist");
     }
 
     @Test
     public void returns_404_when_organisation_not_active() {
 
         String pendingOrganisationId = createOrganisationRequest();
-        Organisation ppOrganisation = organisationRepository
-                .findByOrganisationIdentifier(pendingOrganisationId);
+        updateOrganisation(pendingOrganisationId, hmctsAdmin, "PENDING");
+        Organisation pendingOrganisation = organisationRepository.findByOrganisationIdentifier(pendingOrganisationId);
 
-        SuperUser persistedSuperUser = ppOrganisation.getUsers().get(0);
 
-        Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(persistedSuperUser
+        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname",
+                "soMeone@somewhere.com", pendingOrganisation);
+        superUser.setUserIdentifier(UUID.randomUUID().toString());
+        professionalUserRepository.save(superUser);
+
+        Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(superUser
                 .getUserIdentifier());
 
         assertThat(response.get("http_status")).isEqualTo("404");
-        assertThat(response.get("errorDescription")).isEqualTo("The requested user's organisation is not 'Active'");
+        assertThat(response.get("response_body").toString()).contains("The requested user's organisation is not 'Active'");
     }
 
     @Test
@@ -63,7 +68,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(StringUtils.EMPTY);
         assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString()).contains("Bad Request");
+        assertThat(response.get("response_body").toString()).contains("Invalid user id");
     }
     
 }

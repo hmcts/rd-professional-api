@@ -782,7 +782,6 @@ public class ProfessionalApiClient {
     public Map<String, Object> findMFAByUserId(HttpStatus expectedStatus, String userId) {
 
         Response response = withUnauthenticatedRequest()
-                .body("")
                 .get("/refdata/external/v1/organisations/mfa?user_id=" + userId)
                 .andReturn();
 
