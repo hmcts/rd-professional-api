@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 public class MfaStatusResponse {
 
     @JsonProperty
-    private String  mfa;
+    private String mfa;
 
-    public MfaStatusResponse(OrganisationMfaStatus mfaStatus){
-        this.mfa = mfaStatus.getMfaStatus().name() ;
+    public MfaStatusResponse(OrganisationMfaStatus mfaStatus) {
+        this.mfa = mfaStatus.getMfaStatus().name();
     }
 
 }

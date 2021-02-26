@@ -60,7 +60,8 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
                 .getUserIdentifier());
 
         assertThat(response.get("http_status")).isEqualTo("404");
-        assertThat(response.get("response_body").toString()).contains("The requested user's organisation is not 'Active'");
+        assertThat(response.get("response_body").toString())
+            .contains("The requested user's organisation is not 'Active'");
     }
 
     @Test

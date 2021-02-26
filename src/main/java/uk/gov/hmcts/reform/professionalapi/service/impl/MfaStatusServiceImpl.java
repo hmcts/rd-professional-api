@@ -22,20 +22,19 @@ public class MfaStatusServiceImpl implements MfaStatusService {
     @Override
     public MfaStatusResponse findMfaStatusByUserId(String id) {
 
-        if(StringUtils.isEmpty(id)) {
+        if (StringUtils.isEmpty(id)) {
             throw new InvalidRequest("Invalid user id");
         }
 
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);
-        if(user == null) {
+        if (user == null) {
             throw new ResourceNotFoundException("The requested user does not exist");
         }
 
         Organisation org = user.getOrganisation();
-        if(org.isOrganisationStatusActive()) {
+        if (org.isOrganisationStatusActive()) {
             return new MfaStatusResponse(org.getOrganisationMfaStatus());
-        }
-        else {
+        } else {
             throw new ResourceNotFoundException("The requested user's organisation is not 'Active'");
         }
     }

@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
-
-import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationMfaStatusExternalControllerTest {

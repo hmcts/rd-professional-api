@@ -66,7 +66,11 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.professionalapi.service.*;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
+import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
