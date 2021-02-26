@@ -50,7 +50,8 @@ public class MfaStatusServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_findMfaStatusByUserId_shouldReturn400_whenEmptyUserID() {
-        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
+        // Unnecessary mock.
+        //when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser)
 
         mfaStatusService.findMfaStatusByUserId(StringUtils.EMPTY);
     }
