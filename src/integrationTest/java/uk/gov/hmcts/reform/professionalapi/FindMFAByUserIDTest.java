@@ -69,7 +69,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
 
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(StringUtils.EMPTY);
         assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString()).contains("Invalid user id");
+        assertThat(response.get("response_body").toString()).contains("User Id cannot be empty");
     }
     
 }

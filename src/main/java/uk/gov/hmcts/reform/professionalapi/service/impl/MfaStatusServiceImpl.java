@@ -23,7 +23,7 @@ public class MfaStatusServiceImpl implements MfaStatusService {
     public MfaStatusResponse findMfaStatusByUserId(String id) {
 
         if (StringUtils.isEmpty(id)) {
-            throw new InvalidRequest("Invalid user id");
+            throw new InvalidRequest("User Id cannot be empty");
         }
 
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);

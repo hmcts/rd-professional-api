@@ -15,8 +15,8 @@ public class MfaStatusResponse {
     @JsonProperty
     private String mfa;
 
-    public MfaStatusResponse(OrganisationMfaStatus mfaStatus) {
-        this.mfa = mfaStatus.getMfaStatus().name();
+    public MfaStatusResponse(OrganisationMfaStatus orgMfaStatus) {
+        this.mfa = orgMfaStatus.getMfaStatus().toString();
     }
 
 }

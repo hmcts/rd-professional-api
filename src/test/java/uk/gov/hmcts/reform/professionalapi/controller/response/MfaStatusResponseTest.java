@@ -12,6 +12,7 @@ public class MfaStatusResponseTest {
     public void test_getMfaStatusResponse() {
         OrganisationMfaStatus orgMfaStatus = new OrganisationMfaStatus();
         MfaStatusResponse mfaStatusResponse = new MfaStatusResponse(orgMfaStatus);
+        mfaStatusResponse.setMfa(orgMfaStatus.getMfaStatus().toString());
 
         assertThat(mfaStatusResponse.getMfa()).isEqualTo(orgMfaStatus.getMfaStatus().toString());
     }

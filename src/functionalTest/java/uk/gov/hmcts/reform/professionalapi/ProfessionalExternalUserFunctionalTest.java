@@ -67,7 +67,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
         suspendUserScenarios();
-        findMFAByUserIDScenario();
+        findMFAScenario();
     }
 
     public void setUpTestData() {
@@ -417,7 +417,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         return bearerToken;
     }
 
-    public void findMFAByUserIDScenario() {
+    public void findMFAScenario() {
         findMFAByUserIDShouldBeSuccess();
     }
 
