@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -58,6 +58,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     String lastName = "lastName";
 
     @Test
+    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
     public void testExternalUserScenario() {
         setUpTestData();
         inviteUserScenarios();
@@ -422,7 +423,6 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findMFAByUserIDShouldBeSuccess();
     }
 
-    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
     public void findMFAByUserIDShouldBeSuccess() {
         log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
