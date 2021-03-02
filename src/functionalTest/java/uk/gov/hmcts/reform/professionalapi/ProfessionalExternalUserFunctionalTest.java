@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -421,6 +422,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findMFAByUserIDShouldBeSuccess();
     }
 
+    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
     public void findMFAByUserIDShouldBeSuccess() {
         log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
