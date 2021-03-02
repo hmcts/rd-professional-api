@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -64,7 +65,10 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
         if (nonNull(servletRequestAttributes)) {
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
+
+            if (StringUtils.isNotEmpty(request.getHeader(SERVICE_AUTHORIZATION))) {
+                return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
+            }
         }
 
         throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));

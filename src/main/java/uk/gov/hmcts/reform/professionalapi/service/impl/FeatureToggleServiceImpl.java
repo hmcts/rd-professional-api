@@ -37,6 +37,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
             "prd-aac-get-org-by-status");
         launchDarklyMap.put("OrganisationInternalController.deleteOrganisation",
             "prd-delete-org");
+        launchDarklyMap.put("OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId",
+            "prd-mfa-flag");
     }
 
     @Override
