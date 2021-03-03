@@ -58,9 +58,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     String lastName = "lastName";
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
     public void testExternalUserScenario() {
-        setUpTestData();
+        setUpOrgTestData();
+        setUpUserBearerTokens();
         inviteUserScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
@@ -72,7 +72,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findMFAScenario();
     }
 
-    public void setUpTestData() {
+    public void setUpOrgTestData() {
         superUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
                 .superUser(aUserCreationRequest()
@@ -89,7 +89,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
         List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
         superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+    }
 
+    public void setUpUserBearerTokens() {
         pumBearerToken = inviteUser(puiUserManager);
         pcmBearerToken = inviteUser(puiCaseManager);
         pomBearerToken = inviteUser(puiOrgManager);
@@ -419,7 +421,10 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         return bearerToken;
     }
 
+    @Test
+    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
     public void findMFAScenario() {
+        setUpOrgTestData();
         findMFAByUserIDShouldBeSuccess();
     }
 

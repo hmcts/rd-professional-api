@@ -49,7 +49,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
             flagStatus = featureToggleService
-                .isFlagEnabled(getServiceName(flagName), launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(getServiceName(), launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
@@ -58,7 +58,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         return flagStatus;
     }
 
-    public String getServiceName(String flagName) {
+    public String getServiceName() {
 
         ServletRequestAttributes servletRequestAttributes =
             ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
@@ -71,7 +71,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
             }
         }
 
-        throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
+        return null;
     }
 
     private String removeBearerFromToken(String token) {
