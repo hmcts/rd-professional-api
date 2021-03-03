@@ -69,7 +69,6 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
         suspendUserScenarios();
-        findMFAScenario();
     }
 
     public void setUpOrgTestData() {
