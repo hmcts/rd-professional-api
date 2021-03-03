@@ -337,7 +337,7 @@ dependencies {
         because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
                 'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
     }
-    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:9.0.40') {
+    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:10.0.2') {
         because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
                 'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
     }
