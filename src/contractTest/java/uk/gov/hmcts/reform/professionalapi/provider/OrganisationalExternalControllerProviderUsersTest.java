@@ -1,25 +1,15 @@
 package uk.gov.hmcts.reform.professionalapi.provider;
 
-import au.com.dius.pact.provider.junit5.PactVerificationContext;
-import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.professionalapi.configuration.WebConfig;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
@@ -53,7 +43,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTI
 @WebMvcTest({OrganisationExternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {OrganisationalExternalControllerProviderUsersTestConfiguration.class, WebConfig.class})
-public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest{
+public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest {
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
