@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreatio
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
@@ -66,8 +67,16 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("Users exists for an Organisation")
     public void setUpUsersForOrganisation() {
 
-        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
-            "companyN", false, "www.org.com");
+        Organisation organisation = getOrganisation();
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+
+    }
+
+    //retrieveOrganisations
+    @State("Organisation exists for given Id")
+    public void setUpOrganisationForGivenId() {
+
+        Organisation organisation = getOrganisation();
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
     }
@@ -112,9 +121,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(Arrays.asList("role"));
 
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
-        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
@@ -123,7 +130,6 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             .thenReturn(Response.builder().request(mock(Request.class)).body(body, Charset.defaultCharset())
                 .status(201).build());
     }
-
 
     @State("An Organisation exists for update")
     public void setUpOrganisationForUpdate() {
@@ -158,5 +164,26 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         users.add(superUser);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         organisation.setUsers(users);
+    }
+
+    private Organisation getOrganisation() {
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+            "companyN", false, "www.org.com");
+        organisation.setSraRegulated(true);
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setCountry("country");
+        contactInformation.setPostCode("HA5 1BJ");
+        organisation.setContactInformations(Arrays.asList(contactInformation));
+        return organisation;
+    }
+
+    private UserProfileCreationResponse getUserProfileCreationResponse() {
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
+        return userProfileCreationResponse;
     }
 }

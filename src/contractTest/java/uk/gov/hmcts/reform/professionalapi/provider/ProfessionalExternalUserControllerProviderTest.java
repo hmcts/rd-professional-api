@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExternalUserController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
@@ -54,21 +53,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Provider("referenceData_professionalExternalUsers")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @WebMvcTest({ProfessionalExternalUserController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
-public class ProfessionalExternalUserControllerProviderTest {
+public class ProfessionalExternalUserControllerProviderTest extends WebMvcProviderTest {
 
     private static final String PROFESSIONAL_USER_ID = "123456";
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
-
-
-    @Autowired
-    MockMvc mockMvc;
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
@@ -88,33 +79,20 @@ public class ProfessionalExternalUserControllerProviderTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
-    @TestTemplate
-    @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void pactVerificationTestTemplate(PactVerificationContext context) {
-        context.verifyInteraction();
-    }
-
-
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        context.setTarget(new MockMvcTestTarget(mockMvc));
-    }
 
     @State({"Professional User exists for identifier " + PROFESSIONAL_USER_ID})
-    public void toRetreiveOrganisationalDataForIdentifier() throws IOException, JSONException {
-
+    public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
         setupInteractionsForProfessionalUser();
     }
 
     @State({"Professional User exists for modification with identifier " + PROFESSIONAL_USER_ID})
-    public void toUpdateUserRolesForIdentifier() throws IOException, JSONException {
+    public void toUpdateUserRolesForIdentifier() throws IOException {
 
         setupInteractionsForProfessionalUser();
     }
 
     @State({"Professional users exist for an Active organisation"})
-    public void toRetrieveAllActiveOrganisations() throws IOException, JSONException {
+    public void toRetrieveAllActiveOrganisations() throws IOException {
 
         setupInteractionsForProfessionalUser();
         when(organisationServiceMock.getOrganisationByOrgIdentifier("someOrganisationIdentifier"))
@@ -140,8 +118,6 @@ public class ProfessionalExternalUserControllerProviderTest {
 
         when(userProfileFeignClientMock.getUserProfiles(any(), any(), any())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
-
-
     }
 
     private ProfessionalUser setupInteractionsForProfessionalUser() throws JsonProcessingException {
@@ -163,12 +139,22 @@ public class ProfessionalExternalUserControllerProviderTest {
                 .request(mock(Request.class))
                 .body(body, Charset.defaultCharset()).status(200).build());
 
+        NewUserResponse newUserResponse = new NewUserResponse();
+        newUserResponse.setUserIdentifier("a123dfgr46");
+        newUserResponse.setIdamStatus("ACTIVE");
+        String newUserResponseBody = objectMapper.writeValueAsString(newUserResponse);
+
+        when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
+            .request(mock(Request.class)).body(newUserResponseBody, Charset.defaultCharset()).status(200).build());
+
+
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
         when(professionalUserRepositoryMock.findByUserIdentifier(PROFESSIONAL_USER_ID)).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByEmailAddress(anyString())).thenReturn(professionalUser);
+
         when(professionalUserRepositoryMock.findByOrganisation(organisation))
             .thenReturn(Arrays.asList(professionalUser));
-        when(userProfileFeignClientMock.getUserProfileByEmail(anyString())).thenReturn(Response.builder()
-            .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(200).build());
+
 
         ModifyUserRolesResponse modifyUserRolesResponse = new ModifyUserRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -184,14 +170,12 @@ public class ProfessionalExternalUserControllerProviderTest {
         return professionalUser;
     }
 
-    @NotNull
     private UserProfile getUserProfile() {
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
             "firstName", "lastName", IdamStatus.ACTIVE);
         return profile;
     }
 
-    @NotNull
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
         organisation = new Organisation();
         organisation.setName(name);
@@ -202,11 +186,7 @@ public class ProfessionalExternalUserControllerProviderTest {
         organisation.setCompanyUrl(companyUrl);
         organisation.setOrganisationIdentifier("someOrganisationIdentifier");
 
-        SuperUser su = new SuperUser();
-        su.setEmailAddress("superUser@email.com");
-        su.setFirstName("some-fname");
-        su.setLastName("some-lname");
-        su.setUserIdentifier("someUserIdentifier");
+        SuperUser su = getSuperUser();
 
         PaymentAccount pa = new PaymentAccount();
         pa.setPbaNumber("pbaNumber");
@@ -220,5 +200,14 @@ public class ProfessionalExternalUserControllerProviderTest {
         pu.setOrganisation(organisation);
         return pu;
 
+    }
+
+    private SuperUser getSuperUser() {
+        SuperUser su = new SuperUser();
+        su.setEmailAddress("superUser@email.com");
+        su.setFirstName("some-fname");
+        su.setLastName("some-lname");
+        su.setUserIdentifier("someUserIdentifier");
+        return su;
     }
 }

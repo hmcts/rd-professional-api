@@ -5,7 +5,6 @@ import au.com.dius.pact.provider.junitsupport.State;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -83,7 +82,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     }
 
-    @NotNull
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
         Organisation organisation = new Organisation();
         organisation.setName(name);

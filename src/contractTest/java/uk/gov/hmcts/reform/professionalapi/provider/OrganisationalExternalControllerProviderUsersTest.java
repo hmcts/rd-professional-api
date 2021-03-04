@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.provider;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
@@ -11,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,17 +50,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 
 @Provider("referenceData_organisationalExternalUsers")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}",
-    port = "${PACT_BROKER_PORT:80}",
-    consumerVersionSelectors = {@VersionSelector(tag = "${PACT_BRANCH_NAME:Dev}")})
 @WebMvcTest({OrganisationExternalController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {OrganisationalExternalControllerProviderUsersTestConfiguration.class, WebConfig.class})
-public class OrganisationalExternalControllerProviderUsersTest {
-
-    @Autowired
-    MockMvc mockMvc;
+public class OrganisationalExternalControllerProviderUsersTest extends WebMvcProviderTest{
 
     private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
@@ -85,18 +78,6 @@ public class OrganisationalExternalControllerProviderUsersTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
 
-    @TestTemplate
-    @ExtendWith(PactVerificationInvocationContextProvider.class)
-    void pactVerificationTestTemplate(PactVerificationContext context) {
-        context.verifyInteraction();
-    }
-
-    @BeforeEach
-    void before(PactVerificationContext context) {
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
-        context.setTarget(new MockMvcTestTarget(mockMvc));
-
-    }
 
     @State({"a request to register an organisation"})
     public void toRegisterNewOrganisation() throws IOException {
@@ -137,11 +118,8 @@ public class OrganisationalExternalControllerProviderUsersTest {
     @State({"Organisation with Id exists"})
     public void toRetreiveOrganisationalDataForIdentifier() throws IOException {
 
-        ProfessionalUser professionalUser = setUpProfessionalUser();
-
         UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
             "firstName", "lastName", IdamStatus.ACTIVE);
-
         GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
         String body = objectMapper.writeValueAsString(userProfileResponse);
 
@@ -150,7 +128,8 @@ public class OrganisationalExternalControllerProviderUsersTest {
                 .request(mock(Request.class))
                 .body(body, Charset.defaultCharset()).status(200).build());
 
-        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
+        when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(
+            setUpProfessionalUser());
 
         when(organisationRepository.findByOrganisationIdentifier("someOrganisationIdentifier"))
             .thenReturn(organisation);
@@ -158,7 +137,7 @@ public class OrganisationalExternalControllerProviderUsersTest {
     }
 
     @State({"Organisations exists with status of Active"})
-    public void toRetreiveActiveOrganisations() throws IOException {
+    public void toRetrieveActiveOrganisations() throws IOException {
 
         ProfessionalUser professionalUser = setUpProfessionalUser();
         when(professionalUserRepositoryMock.findByUserIdentifier("someUid")).thenReturn(professionalUser);
@@ -173,7 +152,6 @@ public class OrganisationalExternalControllerProviderUsersTest {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
-        String userId = UUID.randomUUID().toString();
 
         ObjectMapper mapper = new ObjectMapper();
         String bodyUp = mapper.writeValueAsString(userProfileCreationResponse);
@@ -184,7 +162,6 @@ public class OrganisationalExternalControllerProviderUsersTest {
     }
 
 
-    @NotNull
     private ProfessionalUser setUpProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
         setUpOrganisation(name, sraId, companyNumber, companyUrl);
 
@@ -207,7 +184,6 @@ public class OrganisationalExternalControllerProviderUsersTest {
 
     }
 
-    @NotNull
     private ProfessionalUser setUpProfessionalUser() {
         String name = "name";
         String sraId = "sraId";
