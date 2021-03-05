@@ -68,8 +68,6 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         Map<String, Object> dxAddress = ((List<Map<String, Object>>) contactInfo.get("dxAddress")).get(0);
         assertThat(dxAddress.get("dxNumber")).isEqualTo("DX 1234567890");
         assertThat(dxAddress.get("dxExchange")).isEqualTo("dxExchange");
-
-        //RetrieveOrganisationsTest:Received response to retrieve an organisation details
     }
 
     @Test
@@ -433,6 +431,15 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
         assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(response.get(ORG_IDENTIFIER)).isNotNull();
 
+    }
+
+    @Test
+    public void find_all_active_orgs_with_200_for_caseworker_publiclaw_systemupdate() {
+        Map<String, Object> orgResponse =
+                professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(ACTIVE, fplaSystemUpdate);
+        assertThat(orgResponse.get("organisations")).isNotNull();
+        assertThat(orgResponse.get("organisations")).asList().isNotEmpty();
+        assertThat(orgResponse.get("http_status").toString().contains("OK"));
     }
 
 }

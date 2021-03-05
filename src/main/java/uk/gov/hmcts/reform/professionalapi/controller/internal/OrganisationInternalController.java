@@ -133,7 +133,7 @@ public class OrganisationInternalController extends SuperController {
             )
     })
 
-    @Secured("prd-admin")
+    @Secured({"prd-admin", "caseworker-publiclaw-systemupdate"})
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> retrieveOrganisations(
             @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX, message = ORG_ID_VALIDATION_ERROR_MESSAGE)

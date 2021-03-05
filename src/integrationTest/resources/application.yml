@@ -48,6 +48,7 @@ prd:
       pui-caa: pui-caa
       caseworker-caa: caseworker-caa
       prd-aac-system: prd-aac-system
+      fpla-systemupdate-role: caseworker-publiclaw-systemupdate
 
 ## user profile feign connection
 user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}

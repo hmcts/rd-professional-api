@@ -141,6 +141,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${prd.security.roles.prd-aac-system}")
     protected String systemUser;
 
+    @Value("${prd.security.roles.fpla-systemupdate-role}")
+    protected String fplaSystemUpdate;
+
     @Value("${resendInterval}")
     protected String resendInterval;
 
