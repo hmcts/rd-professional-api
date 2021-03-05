@@ -7,5 +7,5 @@ spring:
         professional-api-s2s-secret: S2S_SECRET
         s2s-url: S2S_URL
         professional-api-POSTGRES-PASS: spring.datasource.password
-        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        ApplicationInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         LD-SDK-KEY: LD_SDK_KEY
