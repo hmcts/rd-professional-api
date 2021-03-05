@@ -33,10 +33,13 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     @PostConstruct
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
+        /*
+        add controller.method name, flag name  in map to apply ld flag on api like below
+
         launchDarklyMap.put("OrganisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional",
-            "prd-aac-get-org-by-status");
-        launchDarklyMap.put("OrganisationInternalController.deleteOrganisation",
-            "prd-delete-org");
+                "prd-aac-get-org-by-status");
+
+         */
     }
 
     @Override
