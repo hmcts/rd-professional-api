@@ -435,6 +435,7 @@ public class RetrieveOrganisationsTest extends AuthorizationEnabledIntegrationTe
 
     @Test
     public void find_all_active_orgs_with_200_for_caseworker_publiclaw_systemupdate() {
+        createAndActivateOrganisation();
         Map<String, Object> orgResponse =
                 professionalReferenceDataClient.retrieveAllOrganisationDetailsByStatusTest(ACTIVE, fplaSystemUpdate);
         assertThat(orgResponse.get("organisations")).isNotNull();
