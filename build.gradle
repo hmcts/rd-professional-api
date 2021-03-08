@@ -333,14 +333,6 @@ dependencies {
                 'information or possibly conduct further attacks. The highest threat from this vulnerability is to data ' +
                 'confidentiality and integrity.'
     }
-    implementation('org.apache.tomcat.embed:tomcat-embed-core:9.0.40') {
-        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
-                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
-    }
-    implementation('org.apache.tomcat.embed:tomcat-embed-websocket:9.0.40') {
-        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
-                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
-    }
 
     implementation('org.codehaus.groovy:groovy:2.5.14') {
         because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
