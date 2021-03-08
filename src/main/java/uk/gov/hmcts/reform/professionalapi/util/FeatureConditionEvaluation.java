@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import com.auth0.jwt.JWT;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
@@ -49,7 +50,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
             flagStatus = featureToggleService
-                .isFlagEnabled(getServiceName(), launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(String.valueOf(getServiceName()), launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
@@ -58,7 +59,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         return flagStatus;
     }
 
-    public String getServiceName() {
+    public Optional<Object> getServiceName() {
 
         ServletRequestAttributes servletRequestAttributes =
             ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
@@ -67,11 +68,11 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
             HttpServletRequest request = servletRequestAttributes.getRequest();
 
             if (StringUtils.isNotEmpty(request.getHeader(SERVICE_AUTHORIZATION))) {
-                return JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject();
+                return Optional.ofNullable(JWT.decode(removeBearerFromToken(request.getHeader(SERVICE_AUTHORIZATION))).getSubject());
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private String removeBearerFromToken(String token) {

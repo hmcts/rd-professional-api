@@ -69,7 +69,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void returns_LaunchDarkly_Forbidden_when_retrieve_mfa_status_with_invalid_flag() {
         Map<String, String> launchDarklyMap = new HashMap<>();
-        launchDarklyMap.put("OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId",
+        launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId",
                 "test-get-mfa-flag");
         when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);

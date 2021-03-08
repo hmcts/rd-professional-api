@@ -421,7 +421,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationMfaStatusExternalController.retrieveMfaStatusByUserId", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
     public void findMFAScenario() {
         setUpOrgTestData();
         findMFAByUserIDShouldBeSuccess();

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 
 @Setter
 @Getter
@@ -14,9 +13,5 @@ public class MfaStatusResponse {
 
     @JsonProperty
     private String mfa;
-
-    public MfaStatusResponse(OrganisationMfaStatus orgMfaStatus) {
-        this.mfa = orgMfaStatus.getMfaStatus().toString();
-    }
 
 }

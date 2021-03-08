@@ -17,7 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
         path = "/refdata/external/v1/organisations/mfa"
 )
 @RestController
-public class OrganisationMfaStatusExternalController extends SuperController {
+public class OrganisationMfaStatusController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the mfa status of the organisation a user belongs to"
@@ -46,15 +46,11 @@ public class OrganisationMfaStatusExternalController extends SuperController {
     public ResponseEntity<MfaStatusResponse> retrieveMfaStatusByUserId(
             @RequestParam(value = "user_id", required = true) String userId) {
 
-        return retrieveMfaStatusUsingUserId(userId);
-    }
-
-    protected ResponseEntity<MfaStatusResponse> retrieveMfaStatusUsingUserId(String id) {
-
-        MfaStatusResponse mfaStatusResponse = mfaStatusService.findMfaStatusByUserId(id);
+        MfaStatusResponse mfaStatusResponse = mfaStatusService.findMfaStatusByUserId(userId);
 
         return ResponseEntity
                 .status(200)
                 .body(mfaStatusResponse);
     }
+
 }

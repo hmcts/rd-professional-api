@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
+import static java.util.Objects.isNull;
+
 @Service
 @Slf4j
 public class MfaStatusServiceImpl implements MfaStatusService {
@@ -27,13 +29,16 @@ public class MfaStatusServiceImpl implements MfaStatusService {
         }
 
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);
-        if (user == null) {
+        if (isNull(user)) {
             throw new ResourceNotFoundException("The requested user does not exist");
         }
 
         Organisation org = user.getOrganisation();
+
         if (org.isOrganisationStatusActive()) {
-            return new MfaStatusResponse(org.getOrganisationMfaStatus());
+            MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
+            mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
+            return mfaStatusResponse;
         } else {
             throw new ResourceNotFoundException("The requested user's organisation is not 'Active'");
         }

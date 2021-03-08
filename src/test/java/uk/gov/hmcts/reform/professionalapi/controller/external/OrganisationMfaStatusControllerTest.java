@@ -20,10 +20,10 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OrganisationMfaStatusExternalControllerTest {
+public class OrganisationMfaStatusControllerTest {
 
     @InjectMocks
-    private OrganisationMfaStatusExternalController orgMfaStatusExternalController;
+    private OrganisationMfaStatusController orgMfaStatusExternalController;
 
     @Mock
     private MfaStatusService mfaStatusServicemock;
@@ -34,7 +34,8 @@ public class OrganisationMfaStatusExternalControllerTest {
     @Before
     public void setUp() {
         organisationMfaStatus = new OrganisationMfaStatus();
-        mfaStatusResponse = new MfaStatusResponse(organisationMfaStatus);
+        mfaStatusResponse = new MfaStatusResponse();
+        mfaStatusResponse.setMfa(organisationMfaStatus.getMfaStatus().toString());
     }
 
     @Test
