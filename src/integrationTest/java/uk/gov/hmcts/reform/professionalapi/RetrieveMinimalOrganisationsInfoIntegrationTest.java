@@ -167,21 +167,6 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     }
 
     @Test
-    //AC:2
-    public void shouldFailTo_retrieve_orgInfo_with403_withCorrectRoles_andStatusActive_andPendingCallerUser()
-        throws JsonProcessingException {
-
-
-        inviteUser(false);
-        getUserProfileByEmailWireMock(HttpStatus.OK);
-        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
-            STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE);
-
-    }
-
-    @Test
     //AC:3
     public void shouldFailTo_retrieve_orgInfo_with403_withIncorrect_roles_and_status_active()
         throws JsonProcessingException {

@@ -282,7 +282,7 @@ public class OrganisationExternalControllerTest {
 
         ResponseEntity<List<OrganisationMinimalInfoResponse>> responseEntity =
                 organisationExternalController.retrieveOrganisationsByStatusWithAddressDetailsOptional(
-                        UUID.randomUUID().toString(), ACTIVE.name(), true);
+                        ACTIVE.name(), true);
         List<OrganisationMinimalInfoResponse> minimalInfoResponseList = responseEntity.getBody();
         assertThat(minimalInfoResponseList).usingFieldByFieldElementComparator()
                 .contains(organisationMinimalInfoResponse);
@@ -296,8 +296,7 @@ public class OrganisationExternalControllerTest {
         ReflectionTestUtils.setField(organisationExternalController, "allowedOrganisationStatus", ACTIVE.name());
         when(organisationServiceMock.getOrganisationByStatus(any())).thenReturn(new ArrayList<>());
         Throwable raisedException = catchThrowable(() -> organisationExternalController
-                .retrieveOrganisationsByStatusWithAddressDetailsOptional(UUID.randomUUID().toString(),
-                        ACTIVE.name(), true));
+                .retrieveOrganisationsByStatusWithAddressDetailsOptional(ACTIVE.name(), true));
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith("No Organisations found");
         verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());

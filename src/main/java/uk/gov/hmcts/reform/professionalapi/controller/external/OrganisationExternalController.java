@@ -265,14 +265,12 @@ public class OrganisationExternalController extends SuperController {
             path = "/status/{status}",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager"})
+    @Secured({"pui-organisation-manager", "pui-finance-manager", "pui-case-manager", "pui-caa", "pui-user-manager",
+            "citizen", "caseworker"})
     public ResponseEntity<List<OrganisationMinimalInfoResponse>>
         retrieveOrganisationsByStatusWithAddressDetailsOptional(
-            @ApiParam(hidden = true) @UserId String userId,
             @PathVariable("status") String status,
             @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
-
-        professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         return retrieveAllOrganisationsByStatus(status, address);
     }
