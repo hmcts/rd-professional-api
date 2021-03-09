@@ -322,33 +322,6 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation "io.github.openfeign:feign-httpclient:11.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation('org.apache.httpcomponents:httpclient:4.5.13') {
-        because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
-                'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
-    }
-    implementation('org.hibernate:hibernate-core:5.4.24.Final') {
-        because 'A flaw was found in hibernate-core in versions prior to and including 5.4.23.Final. ' +
-                'A SQL injection in the implementation of the JPA Criteria API can permit unsanitized literals when a ' +
-                'literal is used in the SQL comments of the query. This flaw could allow an attacker to access unauthorized ' +
-                'information or possibly conduct further attacks. The highest threat from this vulnerability is to data ' +
-                'confidentiality and integrity.'
-    }
-
-    implementation('org.codehaus.groovy:groovy:2.5.14') {
-        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
-                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
-                'Java JDK method call that is potentially not secure on some operating systems in some contexts'
-    }
-    implementation('org.codehaus.groovy:groovy-json:2.5.14') {
-        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
-                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
-                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
-    }
-    implementation('org.codehaus.groovy:groovy-xml:2.5.14') {
-        because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
-                'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
-                'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
-    }
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
