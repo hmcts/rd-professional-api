@@ -50,6 +50,7 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Creates an Organisation",
+            notes = "Roles to access API : No role restriction",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -88,6 +89,8 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves Organisation details of the requesting User",
+            notes = "Roles to access API : pui-organisation-manager,pui-finance-manager,pui-case-manager,pui-caa,"
+                    + "pui-user-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -126,6 +129,8 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            notes = "Roles to access API : pui-finance-manager,pui-user-manager,pui-organisation-manager,"
+                    + "pui-case-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
@@ -170,6 +175,7 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Add a new User to an Organisation",
+            notes = "Roles to access API : pui-user-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -231,6 +237,8 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
+            notes = "Roles to access API : pui-organisation-manager,pui-finance-manager,pui-case-manager,pui-caa,"
+                    + "pui-user-manager,citizen,caseworker",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")

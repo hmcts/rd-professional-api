@@ -48,6 +48,10 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
+            notes = "Roles to access API : pui-finance-manager,pui-user-manager,pui-organisation-manager,"
+                    + "pui-case-manager,caseworker-divorce-financialremedy,"
+                    + "caseworker-divorce-financialremedy-solicitor,"
+                    + "caseworker-divorce-solicitor,caseworker-divorce,caseworker,pui-caa",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -55,6 +59,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
+
     @ApiParam(
             name = "showDeleted",
             type = "string",
@@ -123,6 +128,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
             value = "Modify the Roles or Status of a User with the given ID",
+            notes = "Roles to access API : pui-user-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -177,6 +183,8 @@ public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
+            notes = "Roles to access API : pui-finance-manager,pui-user-manager,pui-organisation-manager,"
+                    + "pui-case-manager,caseworker-publiclaw-courtadmin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
