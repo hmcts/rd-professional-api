@@ -47,7 +47,7 @@ public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag",
-            notes = "Roles to access API : prd-admin,prd-aac-system",
+            notes = "**IDAM Roles to access API ** :\n prd-admin,\n prd-aac-system",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -105,7 +105,7 @@ public class ProfessionalUserInternalController extends SuperController {
 
     @ApiOperation(
             value = "Modify the Roles or Status of a User",
-            notes = "Roles to access API : prd-admin",
+            notes = "**IDAM Roles to access API ** :\n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
