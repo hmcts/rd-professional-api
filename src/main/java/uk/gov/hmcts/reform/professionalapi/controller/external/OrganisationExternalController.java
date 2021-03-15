@@ -50,7 +50,7 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Creates an Organisation",
-            notes = "**IDAM Roles to access API **: \n No role restriction",
+            notes = "**IDAM Roles to access API**: \n No role restriction",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -129,7 +129,7 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
-            notes = "**IDAM Roles to access API ** : \n pui-finance-manager,\n pui-user-manager,"
+            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
                     + "\n pui-organisation-manager,\n pui-case-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
@@ -175,7 +175,7 @@ public class OrganisationExternalController extends SuperController {
 
     @ApiOperation(
             value = "Add a new User to an Organisation",
-            notes = "**IDAM Roles to access API ** :\n pui-user-manager",
+            notes = "**IDAM Roles to access API** :\n pui-user-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -237,7 +237,7 @@ public class OrganisationExternalController extends SuperController {
     @ApiOperation(
             value = "Retrieves all Active Organisations of requested status for user"
                     + " with minimal e.g. organisationIdentifier, name and contact information if address flag is true",
-            notes = "**IDAM Roles to access API ** : \n pui-organisation-manager,\n pui-finance-manager,"
+            notes = "**IDAM Roles to access API** : \n pui-organisation-manager,\n pui-finance-manager,"
                     + "\n pui-case-manager,pui-caa,\n pui-user-manager,citizen,caseworker",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
