@@ -17,16 +17,13 @@ import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationT
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.ACCESS_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @SuppressWarnings("unchecked")
 public class RetrieveMinimalOrganisationsInfoIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -90,6 +87,8 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
     }
 
 
+    /*
+    sample integration test for launch darkly flag testing. Currently no flag available.
     @Test
     public void returns_launchDarkly_forbidden_when_retrieve_organisations_info_with_invalid_flag()
         throws JsonProcessingException {
@@ -104,6 +103,7 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
         validateErrorResponse(errorResponseMap, FORBIDDEN, "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD),
             "test-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
+    */
 
     @Test
     public void should_retrieve_organisations_info_without_address_with_200_for_status_active_null_address_param()
@@ -163,21 +163,6 @@ public class RetrieveMinimalOrganisationsInfoIntegrationTest extends Authorizati
                 pendingOrgs.get(1).getName(),
                 activeOrgs.get(0).getContactInformation().get(0).getAddressLine1(),
                 activeOrgs.get(1).getContactInformation().get(0).getAddressLine1());
-
-    }
-
-    @Test
-    //AC:2
-    public void shouldFailTo_retrieve_orgInfo_with403_withCorrectRoles_andStatusActive_andPendingCallerUser()
-        throws JsonProcessingException {
-
-
-        inviteUser(false);
-        getUserProfileByEmailWireMock(HttpStatus.OK);
-        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-            .retrieveOrganisationsWithMinimalInfo(userIdentifier, puiCaa, ACTIVE, true, ErrorResponse.class);
-        validateErrorResponse(errorResponseMap, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage(),
-            STATUS_MUST_BE_ACTIVE_ERROR_MESSAGE);
 
     }
 

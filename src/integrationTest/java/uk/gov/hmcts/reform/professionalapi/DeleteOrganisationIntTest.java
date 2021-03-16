@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,16 +11,12 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTest {
@@ -39,19 +34,6 @@ public class DeleteOrganisationIntTest extends AuthorizationEnabledIntegrationTe
             hmctsAdmin);
 
         assertThat(orgResponse.get("http_status").toString().contains("OK"));
-    }
-
-    @Test
-    public void returns_LaunchDarkly_Forbidden_when_delete_minimal_pending_organisation_with_invalid_flag() {
-        Map<String, String> launchDarklyMap = new HashMap<>();
-        launchDarklyMap.put("OrganisationInternalController.deleteOrganisation",
-            "test-flag-1");
-        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(false);
-        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        Map<String, Object> errorResponseMap = deleteOrganization();
-        assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
-        assertThat((String) errorResponseMap.get("response_body"))
-            .contains("test-flag-1".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     @Test

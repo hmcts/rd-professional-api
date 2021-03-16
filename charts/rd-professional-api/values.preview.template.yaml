@@ -16,5 +16,5 @@ java:
     rd:
       secrets:
         - LD-SDK-KEY
-        - AppInsightsInstrumentationKey
+        - ApplicationInsightsInstrumentationKey
         - professional-api-s2s-secret

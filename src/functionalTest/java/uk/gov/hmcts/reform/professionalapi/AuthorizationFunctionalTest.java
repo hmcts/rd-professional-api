@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCrea
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
-import io.restassured.specification.RequestSpecification;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,12 +82,16 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Value("${prd.security.roles.prd-aac-system}")
     protected String systemUser;
 
+    @Value("${prd.security.roles.caseworker}")
+    protected String caseworker;
+
+    @Value("${prd.security.roles.citizen}")
+    protected String citizen;
+
     @Value("${resendInterval}")
     protected String resendInterval;
 
     protected static ProfessionalApiClient professionalApiClient;
-
-    protected RequestSpecification bearerToken;
 
     protected static IdamOpenIdClient idamOpenIdClient;
 

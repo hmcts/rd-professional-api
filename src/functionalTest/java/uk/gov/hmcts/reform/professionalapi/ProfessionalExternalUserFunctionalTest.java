@@ -88,7 +88,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         pcmBearerToken = inviteUser(puiCaseManager);
         pomBearerToken = inviteUser(puiOrgManager);
         pfmBearerToken = inviteUser(puiFinanceManager);
-        caseworkerBearerToken = inviteUser("caseworker");
+        caseworkerBearerToken = inviteUser(caseworker);
     }
 
     public void inviteUserScenarios() {
@@ -118,6 +118,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     public void findActiveOrganisationScenarios() {
         findActiveOrganisationByPumShouldBeSuccess();
+        findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess();
     }
 
     public void findUserStatusByEmailScenarios() {
@@ -319,6 +320,18 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(org.getOrganisationIdentifier()).isNotNull();
         assertThat(org.getContactInformation()).isNotNull();
         log.info("findActiveOrganisationByPumShouldBeSuccess :: END");
+    }
+
+    public void findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess() {
+        log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: STARTED");
+        List<OrganisationMinimalInfoResponse> responseList = (List<OrganisationMinimalInfoResponse>)
+                professionalApiClient.retrieveAllActiveOrganisationsWithMinimalInfo(
+                        professionalApiClient.getMultipleAuthHeaders(idamOpenIdClient.getExternalOpenIdTokenWithRetry(
+                                Arrays.asList(caseworker, citizen), firstName, lastName, generateRandomEmail())), OK,
+                        ACTIVE, true);
+
+        assertThat(responseList.size()).isGreaterThanOrEqualTo(1);
+        log.info("findActiveOrganisationByCitizenOrCaseWorkerShouldBeSuccess :: END");
     }
 
     public void reinviteActiveUserByPumShouldReturnBadRequest() {
