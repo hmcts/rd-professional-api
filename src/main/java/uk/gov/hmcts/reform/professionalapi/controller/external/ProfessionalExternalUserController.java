@@ -50,9 +50,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     + " returnRoles is False",
             notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
                     + "\n pui-organisation-manager,"
-                    + "\n pui-case-manager,\n caseworker-divorce-financialremedy,"
-                    + "\n caseworker-divorce-financialremedy-solicitor,"
-                    + "\n caseworker-divorce-solicitor,\n caseworker-divorce,caseworker,pui-caa",
+                    + "\n pui-case-manager,\n pui-caa",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
