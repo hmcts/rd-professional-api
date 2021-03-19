@@ -4,6 +4,7 @@ import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.professionalapi.BaseProviderTest;
 
 @TestPropertySource(locations = "/application-contract.yaml")
 public abstract class MockMvcProviderTest extends BaseProviderTest {

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.professionalapi.provider;
+package uk.gov.hmcts.reform.professionalapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;

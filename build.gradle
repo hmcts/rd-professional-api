@@ -191,31 +191,16 @@ project.ext {
     pactVersion = getCheckedOutGitCommitHash()
 }
 
-task contract(type: Test) {
+
+task runProviderPactVerification(type: Test) {
+    systemProperty 'pact.provider.version', project.pactVersion
     description = 'Runs the consumer Pact tests'
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    include "uk/gov/hmcts/reform/professionalapi/**"
-    systemProperty 'pact.rootDir', "pacts"
-    systemProperty 'pact.verifier.publishResults', true
-    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
 
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
-    // Nothing to do here
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-task runProviderPactVerification(type: Test) {
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
-runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
 
@@ -226,7 +211,6 @@ def getCheckedOutGitCommitHash() {
 pact {
     publish {
         pactDirectory = 'pacts'
-        pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
         tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
         version = project.pactVersion
     }
