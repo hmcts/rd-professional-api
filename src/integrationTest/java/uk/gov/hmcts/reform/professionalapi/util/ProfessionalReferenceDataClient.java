@@ -25,6 +25,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -375,6 +376,19 @@ public class ProfessionalReferenceDataClient {
         return getMultipleAuthHeaders(role, null);
     }
 
+    private HttpHeaders getInvalidAuthHeaders(String role) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(APPLICATION_JSON);
+
+        headers.add("ServiceAuthorization", "Invalid token");
+
+        String bearerToken = "Bearer ".concat(getBearerToken(UUID.randomUUID().toString(), role));
+        headers.add("Authorization", bearerToken);
+
+        return headers;
+    }
+
     private final String getBearerToken(String userId, String role) {
 
         return generateToken(issuer, expiration, userId, role);
@@ -461,6 +475,46 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, String orgId,
+                                                  String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
+
+        try {
+            HttpEntity<MfaUpdateRequest> requestEntity = new HttpEntity<>(mfaUpdateRequest,
+                    getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> updateOrgMfaStatusUnauthorised(MfaUpdateRequest mfaUpdateRequest, String orgId,
+                                                  String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
+
+        try {
+            HttpEntity<MfaUpdateRequest> requestEntity = new HttpEntity<>(mfaUpdateRequest,
+                    getInvalidAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
 
         return getResponse(responseEntity);
     }
