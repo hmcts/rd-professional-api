@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -790,6 +791,22 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
 
         log.info("find mfa response: " + response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest,
+                                                  String organisationId, String role) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(mfaUpdateRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/mfa")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        log.info("Update organisation mfa status response: " + response.getStatusCode());
         return response.body().as(Map.class);
     }
 }

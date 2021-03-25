@@ -21,12 +21,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -390,5 +394,33 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         List<String> rolesSize = (List) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(rolesToValidate.size());
         assertThat(rolesSize).containsAll(rolesToValidate);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationMfaStatusController.updateOrgMfaStatus", withFeature = true)
+    public void updateOrgMfaScenario() {
+        setUpTestData();;
+        updateOrgMfaShouldBeSuccess();
+    }
+
+    public void updateOrgMfaShouldBeSuccess() {
+        log.info("updateOrgMFAShouldBeSuccess :: STARTED");
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(intActiveOrgId, hmctsAdmin, OK);
+        List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
+        String superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+
+        MFAStatus status = MFAStatus.NONE;
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
+
+        Map<String, Object> updateMfaStatusResponse = professionalApiClient
+                .updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin);
+        assertThat(updateMfaStatusResponse).isNotEmpty();
+
+        Map<String, Object> findOrgMfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
+        assertThat(findOrgMfaStatusResponse.get("mfa")).isEqualTo(status.toString());
+
+        log.info("updateOrgMFAShouldBeSuccess :: END");
     }
 }
