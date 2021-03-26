@@ -414,9 +414,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         MFAStatus status = MFAStatus.NONE;
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
 
-        Map<String, Object> updateMfaStatusResponse = professionalApiClient
-                .updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin);
-        assertThat(updateMfaStatusResponse).isNotEmpty();
+        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin);
 
         Map<String, Object> findOrgMfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
         assertThat(findOrgMfaStatusResponse.get("mfa")).isEqualTo(status.toString());

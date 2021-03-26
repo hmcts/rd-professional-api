@@ -13,11 +13,11 @@ import javax.validation.constraints.NotNull;
 public class MfaUpdateRequest {
 
     @NotNull
-    private MFAStatus mfaStatus;
+    private MFAStatus mfa;
 
     @JsonCreator
-    public MfaUpdateRequest(@JsonProperty MFAStatus mfaStatus) {
-        this.mfaStatus = mfaStatus;
+    public MfaUpdateRequest(@JsonProperty MFAStatus mfa) {
+        this.mfa = mfa;
     }
 
 }

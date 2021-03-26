@@ -53,7 +53,7 @@ public class MfaStatusServiceImpl implements MfaStatusService {
     @Override
     public void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, Organisation organisation) {
 
-        MFAStatus newStatus = mfaUpdateRequest.getMfaStatus();
+        MFAStatus newStatus = mfaUpdateRequest.getMfa();
         organisation.getOrganisationMfaStatus().setMfaStatus(newStatus);
         organisationRepository.save(organisation);
     }

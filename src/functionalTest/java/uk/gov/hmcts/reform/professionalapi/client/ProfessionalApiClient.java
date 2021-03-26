@@ -794,7 +794,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest,
+    public void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest,
                                                   String organisationId, String role) {
 
         Response response = getMultipleAuthHeadersInternal()
@@ -807,6 +807,5 @@ public class ProfessionalApiClient {
                 .statusCode(OK.value());
 
         log.info("Update organisation mfa status response: " + response.getStatusCode());
-        return response.body().as(Map.class);
     }
 }
