@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -134,6 +135,12 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handleHttpStatusException(HttpStatusCodeException ex) {
         HttpStatus httpStatus = ex.getStatusCode();
         return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
+    }
+
+    @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, "The MFA status value provided is not valid. " +
+                "Please provide a valid value for the MFA preference of the organisation and try again.");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

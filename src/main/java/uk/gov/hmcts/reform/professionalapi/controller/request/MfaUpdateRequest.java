@@ -1,19 +1,21 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 public class MfaUpdateRequest {
 
-    @NotEmpty
+    @NotNull
     private MFAStatus mfaStatus;
 
+    @JsonCreator
     public MfaUpdateRequest(@JsonProperty MFAStatus mfaStatus) {
         this.mfaStatus = mfaStatus;
     }
