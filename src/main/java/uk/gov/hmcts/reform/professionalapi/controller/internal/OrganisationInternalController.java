@@ -441,7 +441,7 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Organisation found with the given ID"
+                    message = "No Organisation was found with the given organisationIdentifier"
             ),
             @ApiResponse(
                     code = 500,

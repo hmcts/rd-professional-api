@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -364,7 +364,7 @@ public class ProfessionalReferenceDataClient {
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        String bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+        String bearerToken = "Bearer ".concat(getBearerToken(isNull(userId) ? UUID.randomUUID().toString()
                 : userId, role));
         headers.add("Authorization", bearerToken);
 
@@ -383,7 +383,7 @@ public class ProfessionalReferenceDataClient {
 
         headers.add("ServiceAuthorization", "Invalid token");
 
-        String bearerToken = "Bearer ".concat(getBearerToken(UUID.randomUUID().toString(), role));
+        String bearerToken = "Bearer ".concat("invalid token");
         headers.add("Authorization", bearerToken);
 
         return headers;
@@ -405,10 +405,12 @@ public class ProfessionalReferenceDataClient {
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {
 
-        Map response = objectMapper
-                .convertValue(
-                        responseEntity.getBody(),
-                        Map.class);
+        Map response = new HashMap<>();
+        if (responseEntity.hasBody()) {
+            response = objectMapper
+                    .convertValue(
+                         responseEntity.getBody(), Map.class);
+        }
 
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
@@ -485,7 +487,8 @@ public class ProfessionalReferenceDataClient {
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
 
         try {
-            HttpEntity<MfaUpdateRequest> requestEntity = new HttpEntity<>(mfaUpdateRequest,
+            HttpEntity<?> requestEntity = new HttpEntity<>(
+                    isNull(mfaUpdateRequest) ? "{\"mfa\":\"error\"}" : mfaUpdateRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 

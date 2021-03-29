@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,9 +31,8 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     public void update_mfa_status_with_invalid_mfa_should_return_400() {
-        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(null);
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgMfaStatus(mfaUpdateRequest, getOrganisationId(), hmctsAdmin);
+                .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
         assertThat(updateResponse.get("http_status")).isEqualTo("400");
         assertThat(updateResponse.get("response_body").toString())
@@ -58,11 +56,11 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
     @Test
     public void update_mfa_status_when_organisation_not_found_should_return_404() {
         Map<String, Object> updateResponse = professionalReferenceDataClient
-                .updateOrgMfaStatus(createMfaUpdateRequest(), UUID.randomUUID().toString(), hmctsAdmin);
+                .updateOrgMfaStatus(createMfaUpdateRequest(), "ABCDEF7", hmctsAdmin);
 
         assertThat(updateResponse.get("http_status")).isEqualTo("404");
         assertThat(updateResponse.get("response_body").toString())
-                .contains("The requested Organisation does not exist");
+                .contains("No Organisation was found with the given organisationIdentifier");
     }
 
     @Test

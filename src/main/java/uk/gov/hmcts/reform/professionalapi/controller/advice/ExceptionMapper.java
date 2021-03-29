@@ -24,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -137,16 +138,10 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
 
-    @ExceptionHandler(InvalidFormatException.class)
-    public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, "The MFA status value provided is not valid. " +
-                "Please provide a valid value for the MFA preference of the organisation and try again.");
-    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON.getErrorMessage());
-
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -184,9 +179,25 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
+        String errorDescription = getRootException(ex).getLocalizedMessage();
+
+        if (mfaEnumException(ex)) {
+            errorDescription = "The MFA status value provided is not valid. "
+                + "Please provide a valid value for the MFA preference of the organisation and try again.";
+        }
+
+        ErrorResponse errorDetails = new ErrorResponse(errorMsg, errorDescription,
                 getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
+    }
+
+    private boolean mfaEnumException(Exception ex) {
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+            if (ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class)))
+                return true;
+        }
+        return false;
     }
 }
