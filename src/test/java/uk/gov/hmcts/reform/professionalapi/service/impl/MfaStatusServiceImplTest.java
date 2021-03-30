@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -80,5 +81,6 @@ public class MfaStatusServiceImplTest {
         when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
 
         mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
+        assertEquals(organisation.getOrganisationMfaStatus().getMfaStatus(),mfaUpdateRequest.getMfa());
     }
 }
