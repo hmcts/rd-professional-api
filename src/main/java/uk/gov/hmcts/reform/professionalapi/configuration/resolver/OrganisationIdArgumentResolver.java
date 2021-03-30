@@ -44,13 +44,13 @@ public class OrganisationIdArgumentResolver implements HandlerMethodArgumentReso
 
     @Override
     public Object resolveArgument(
-            MethodParameter methodParameter,
-            ModelAndViewContainer modelAndViewContainer,
-            NativeWebRequest nativeWebRequest,
-            WebDataBinderFactory webDataBinderFactory) throws EmptyResultDataAccessException {
+        MethodParameter methodParameter,
+        ModelAndViewContainer modelAndViewContainer,
+        NativeWebRequest nativeWebRequest,
+        WebDataBinderFactory webDataBinderFactory) throws EmptyResultDataAccessException {
 
         HttpServletRequest request
-                = (HttpServletRequest) nativeWebRequest.getNativeRequest();
+            = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         String userId;
         String orgId = null;
         ProfessionalUser professionalUser;
