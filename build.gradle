@@ -193,14 +193,14 @@ project.ext {
 
 
 task runProviderPactVerification(type: Test) {
-    systemProperty 'pact.provider.version', project.pactVersion
-    description = 'Runs the consumer Pact tests'
+    description = 'Runs the provider Pact tests'
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
+    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+    systemProperty 'pact.provider.version', project.pactVersion
     include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
-
 
 runProviderPactVerification.finalizedBy pactVerify
 
