@@ -8,10 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 
 import java.util.UUID;
@@ -34,6 +37,8 @@ public class MfaStatusServiceImplTest {
     private ProfessionalUser professionalUser;
     @Mock
     private Organisation organisation;
+    @Mock
+    private OrganisationRepository organisationRepository;
 
     @Test
     public void test_findMfaStatusByUserId() {
@@ -67,5 +72,13 @@ public class MfaStatusServiceImplTest {
         when(professionalUser.getOrganisation()).thenReturn(organisation);
 
         mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
+    }
+
+    @Test
+    public void test_updateOrgMfaStatus() {
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.EMAIL);
+        when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
+
+        mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
     }
 }

@@ -5,9 +5,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -75,6 +80,21 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> response = professionalReferenceDataClient
                 .updateOrgMfaStatusUnauthorised(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
         assertThat(response.get("http_status")).isEqualTo("401");
+    }
+
+    @Test
+    public void returns_launchDarkly_forbidden_when_update_mfa_status_with_invalid_flag() {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus",
+                "test-update-mfa-flag");
+        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(false);
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        Map<String, Object> errorResponseMap = professionalReferenceDataClient
+                .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
+
+        assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
+        assertThat((String) errorResponseMap.get("response_body"))
+                .contains("test-update-mfa-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }
 
     private MfaUpdateRequest createMfaUpdateRequest() {

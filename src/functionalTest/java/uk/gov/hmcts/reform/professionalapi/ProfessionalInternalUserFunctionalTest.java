@@ -397,9 +397,9 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-  //  @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
     public void updateOrgMfaScenario() {
-        setUpTestData();;
+        setUpTestData();
         updateOrgMfaShouldBeSuccess();
     }
 
