@@ -65,8 +65,8 @@ public class MfaStatusServiceImplTest {
         mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void test_findMfaStatusByUserId_shouldReturn404_whenInactiveOrg() {
+    @Test(expected = InvalidRequest.class)
+    public void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
         when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
         when(organisation.isOrganisationStatusActive()).thenReturn(false);
         when(professionalUser.getOrganisation()).thenReturn(organisation);

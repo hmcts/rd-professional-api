@@ -39,14 +39,13 @@ public class MfaStatusServiceImpl implements MfaStatusService {
         }
 
         Organisation org = user.getOrganisation();
-        //Check for nulls
+
         if (org.isOrganisationStatusActive()) {
             MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
             mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
             return mfaStatusResponse;
         } else {
-            //TODO: change this to throw new InvalidRequest()
-            throw new ResourceNotFoundException("The requested user's organisation is not 'Active'");
+            throw new InvalidRequest("The requested user's organisation is not 'Active'");
         }
     }
 

@@ -11,12 +11,13 @@ public class MfaUpdateRequestTest {
     public void testMfaUpdateRequest() {
 
         MFAStatus statusPhone = MFAStatus.PHONE;
-        MFAStatus statusEmail = MFAStatus.EMAIL;
+        MFAStatus statusNone = MFAStatus.NONE;
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(statusPhone);
-        MfaUpdateRequest mfaUpdateRequest2 = new MfaUpdateRequest(statusEmail);
+        MfaUpdateRequest mfaUpdateRequest2 = new MfaUpdateRequest(statusPhone);
+        mfaUpdateRequest2.setMfa(statusNone);
 
         assertThat(mfaUpdateRequest.getMfa()).isEqualTo(statusPhone);
-        assertThat(mfaUpdateRequest2.getMfa()).isEqualTo(statusEmail);
+        assertThat(mfaUpdateRequest2.getMfa()).isEqualTo(statusNone);
     }
 
 }

@@ -40,7 +40,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     }
 
     @Test
-    public void returns_404_when_organisation_not_active() {
+    public void returns_400_when_organisation_not_active() {
         String pendingOrganisationId = createOrganisationRequest();
         updateOrganisation(pendingOrganisationId, hmctsAdmin, "PENDING");
         Organisation pendingOrganisation = organisationRepository.findByOrganisationIdentifier(pendingOrganisationId);
@@ -54,7 +54,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(superUser
                 .getUserIdentifier());
 
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response.get("http_status")).isEqualTo("400");
         assertThat(response.get("response_body").toString())
             .contains("The requested user's organisation is not 'Active'");
     }
