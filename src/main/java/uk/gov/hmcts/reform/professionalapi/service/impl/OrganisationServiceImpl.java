@@ -142,7 +142,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         OrganisationMfaStatus persistedOrganisationMfaStatus
                 = organisationMfaStatusRepository.save(organisationMfaStatus);
-        organisation.addOrganisationMfaStatus(persistedOrganisationMfaStatus);
+        organisation.setOrganisationMfaStatus(persistedOrganisationMfaStatus);
 
     }
 

@@ -70,7 +70,7 @@ public class OrganisationTest {
     public void test_adds_organisation_mfa_status_correctly() {
         OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
         Organisation organisation = new Organisation();
-        organisation.addOrganisationMfaStatus(organisationMfaStatus);
+        organisation.setOrganisationMfaStatus(organisationMfaStatus);
 
         assertThat(organisation.getOrganisationMfaStatus()).isNotNull();
         assertThat(organisation.getOrganisationMfaStatus()).isEqualTo(organisationMfaStatus);

@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.service;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 
 public interface MfaStatusService {
 
-    MfaStatusResponse findMfaStatusByUserId(String id);
+    ResponseEntity<MfaStatusResponse> findMfaStatusByUserId(String id);
 
-    void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, Organisation organisation);
+    ResponseEntity<Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, Organisation organisation);
 
 }

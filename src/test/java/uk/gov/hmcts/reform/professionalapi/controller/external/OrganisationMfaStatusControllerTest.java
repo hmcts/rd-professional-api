@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,7 +15,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.response.MfaStatusResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,32 +24,24 @@ public class OrganisationMfaStatusControllerTest {
     private OrganisationMfaStatusController orgMfaStatusExternalController;
 
     @Mock
-    private MfaStatusService mfaStatusServicemock;
-    private MfaStatusResponse mfaStatusResponse;
-    private OrganisationMfaStatus organisationMfaStatus;
-
-
-    @Before
-    public void setUp() {
-        organisationMfaStatus = new OrganisationMfaStatus();
-        mfaStatusResponse = new MfaStatusResponse();
-        mfaStatusResponse.setMfa(organisationMfaStatus.getMfaStatus().toString());
-    }
+    private MfaStatusService mfaStatusServiceMock;
+    private ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity;
 
     @Test
     public void test_retrieveMfaStatusByUserId() {
 
+        mfaStatusResponseEntity = ResponseEntity.status(HttpStatus.OK).body(new MfaStatusResponse());
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         String id = UUID.randomUUID().toString();
 
-        when(mfaStatusServicemock.findMfaStatusByUserId(id)).thenReturn(mfaStatusResponse);
+        when(mfaStatusServiceMock.findMfaStatusByUserId(id)).thenReturn(mfaStatusResponseEntity);
 
         ResponseEntity<?> actual = orgMfaStatusExternalController.retrieveMfaStatusByUserId(id);
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(mfaStatusServicemock, times(1)).findMfaStatusByUserId(id);
+        verify(mfaStatusServiceMock, times(1)).findMfaStatusByUserId(id);
     }
 
 }

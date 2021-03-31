@@ -12,6 +12,8 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MFA_VALUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -21,8 +23,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
 
-        assertThat(updateResponse.get("http_status")).isNotNull();
-        assertThat(updateResponse.get("http_status")).isEqualTo("200 OK");
+        assertThat(updateResponse).containsEntry("http_status", "200 OK");
     }
 
     @Test
@@ -30,8 +31,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
-        assertThat(updateResponse.get("http_status")).isNotNull();
-        assertThat(updateResponse.get("http_status")).isEqualTo("400");
+        assertThat(updateResponse).containsEntry("http_status", "400");
     }
 
     @Test
@@ -39,10 +39,8 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(null, getOrganisationId(), hmctsAdmin);
 
-        assertThat(updateResponse.get("http_status")).isEqualTo("400");
-        assertThat(updateResponse.get("response_body").toString())
-                .contains("The MFA status value provided is not valid. "
-                + "Please provide a valid value for the MFA preference of the organisation and try again");
+        assertThat(updateResponse).containsEntry("http_status", "400");
+        assertThat(updateResponse.get("response_body").toString()).contains(INVALID_MFA_VALUE);
     }
 
     @Test
@@ -53,9 +51,9 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), pendingOrganisationId, hmctsAdmin);
 
-        assertThat(updateResponse.get("http_status")).isEqualTo("400");
+        assertThat(updateResponse).containsEntry("http_status", "400");
         assertThat(updateResponse.get("response_body").toString())
-                .contains("The requested Organisation is not 'Active'");
+                .contains(ORG_NOT_ACTIVE);
     }
 
     @Test
@@ -63,23 +61,23 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), "ABCDEF7", hmctsAdmin);
 
-        assertThat(updateResponse.get("http_status")).isEqualTo("404");
+        assertThat(updateResponse).containsEntry("http_status", "404");
         assertThat(updateResponse.get("response_body").toString())
                 .contains("No Organisation was found with the given organisationIdentifier");
     }
 
     @Test
     public void update_mfa_status_with_invalid_user_roles_should_return_403() {
-        Map<String, Object> response = professionalReferenceDataClient
+        Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), "Invalid Role");
-        assertThat(response.get("http_status")).isEqualTo("403");
+        assertThat(updateResponse).containsEntry("http_status", "403");
     }
 
     @Test
     public void update_mfa_status_returns_401_when_invalid_authentication() {
-        Map<String, Object> response = professionalReferenceDataClient
+        Map<String, Object> updateResponse = professionalReferenceDataClient
                 .updateOrgMfaStatusUnauthorised(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
-        assertThat(response.get("http_status")).isEqualTo("401");
+        assertThat(updateResponse).containsEntry("http_status", "401");
     }
 
     @Test
@@ -92,7 +90,7 @@ public class UpdateOrgMfaStatusIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> errorResponseMap = professionalReferenceDataClient
                 .updateOrgMfaStatus(createMfaUpdateRequest(), getOrganisationId(), hmctsAdmin);
 
-        assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
+        assertThat(errorResponseMap).containsEntry("http_status", "403");
         assertThat((String) errorResponseMap.get("response_body"))
                 .contains("test-update-mfa-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
@@ -16,6 +17,10 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY_USER_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 @Service
 @Slf4j
@@ -27,33 +32,44 @@ public class MfaStatusServiceImpl implements MfaStatusService {
     OrganisationRepository organisationRepository;
 
     @Override
-    public MfaStatusResponse findMfaStatusByUserId(String id) {
+    public ResponseEntity<MfaStatusResponse> findMfaStatusByUserId(String id) {
 
         if (StringUtils.isEmpty(id)) {
-            throw new InvalidRequest("User Id cannot be empty");
+            throw new InvalidRequest(EMPTY_USER_ID);
         }
 
         ProfessionalUser user = professionalUserRepository.findByUserIdentifier(id);
         if (isNull(user)) {
-            throw new ResourceNotFoundException("The requested user does not exist");
+            throw new ResourceNotFoundException(NO_USER_FOUND);
         }
 
         Organisation org = user.getOrganisation();
+        MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
 
         if (org.isOrganisationStatusActive()) {
-            MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
-            mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
-            return mfaStatusResponse;
+            if (nonNull(org.getOrganisationMfaStatus())) {
+                mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
+            } else {
+                mfaStatusResponse.setMfa(MFAStatus.EMAIL.toString());
+            }
         } else {
-            throw new InvalidRequest("The requested user's organisation is not 'Active'");
+            throw new InvalidRequest(ORG_NOT_ACTIVE);
         }
+
+        return ResponseEntity
+                .status(200)
+                .body(mfaStatusResponse);
     }
 
     @Override
-    public void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, Organisation organisation) {
+    public ResponseEntity<Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, Organisation organisation) {
 
         MFAStatus newStatus = mfaUpdateRequest.getMfa();
         organisation.getOrganisationMfaStatus().setMfaStatus(newStatus);
         organisationRepository.save(organisation);
+
+        return ResponseEntity
+                .status(200)
+                .build();
     }
 }

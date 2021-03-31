@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MFA_VALUE;
 
 @Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
@@ -182,8 +183,7 @@ public class ExceptionMapper {
         String errorDescription = getRootException(ex).getLocalizedMessage();
 
         if (mfaEnumException(ex)) {
-            errorDescription = "The MFA status value provided is not valid. "
-                + "Please provide a valid value for the MFA preference of the organisation and try again.";
+            errorDescription = INVALID_MFA_VALUE;
         }
 
         ErrorResponse errorDetails = new ErrorResponse(errorMsg, errorDescription,
@@ -195,9 +195,7 @@ public class ExceptionMapper {
     private boolean mfaEnumException(Exception ex) {
         if (ex.getCause() instanceof InvalidFormatException) {
             InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
-            if (ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class))) {
-                return true;
-            }
+            return ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class));
         }
         return false;
     }

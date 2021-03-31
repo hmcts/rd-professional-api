@@ -378,19 +378,23 @@ public class OrganisationInternalControllerTest {
     @Test
     public void testUpdateOrgMfa() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(HttpStatus.OK).build();
 
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.NONE);
         organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
                 .thenReturn(organisation);
+        when(mfaStatusServiceMock.updateOrgMfaStatus(mfaUpdateRequest, organisation)).thenReturn(updateResponseEntity);
 
-        ResponseEntity response = organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest,
+        ResponseEntity<Object> response = organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest,
                 organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(mfaStatusServiceMock, times(1)).updateOrgMfaStatus(mfaUpdateRequest,organisation);
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
     }
 
     @Test(expected = InvalidRequest.class)

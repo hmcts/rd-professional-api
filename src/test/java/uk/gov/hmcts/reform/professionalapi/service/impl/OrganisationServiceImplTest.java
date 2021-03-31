@@ -272,7 +272,7 @@ public class OrganisationServiceImplTest {
 
         sut.addDefaultMfaStatusToOrganisation(organisationMock);
 
-        verify(organisationMock,times(1)).addOrganisationMfaStatus(any(OrganisationMfaStatus.class));
+        verify(organisationMock,times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
     }
 
     @Test

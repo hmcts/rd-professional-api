@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -416,7 +417,7 @@ public class OrganisationInternalController extends SuperController {
     }
 
     @ApiOperation(
-            value = "Update the MFA preference of an Organisation",
+            value = "Updates the MFA preference of an Organisation",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -458,20 +459,16 @@ public class OrganisationInternalController extends SuperController {
                                                      message = ORG_ID_VALIDATION_ERROR_MESSAGE)
                                                      @PathVariable("orgId") @NotBlank String organisationIdentifier) {
 
-        log.info("{}:: Received request to update organisation mfa preference...", loggingComponentName);
+        log.info("{}:: Received request to update organisation mfa preference::", loggingComponentName);
 
         organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(organisationIdentifier);
 
         Organisation organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
 
         if (isNotTrue(organisation.isOrganisationStatusActive())) {
-            throw new InvalidRequest("The requested Organisation is not 'Active'");
+            throw new InvalidRequest(ORG_NOT_ACTIVE);
         }
 
-        mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest,organisation);
-
-        return ResponseEntity
-                .status(200)
-                .build();
+        return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest,organisation);
     }
 }

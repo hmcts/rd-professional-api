@@ -46,11 +46,7 @@ public class OrganisationMfaStatusController extends SuperController {
     public ResponseEntity<MfaStatusResponse> retrieveMfaStatusByUserId(
             @RequestParam(value = "user_id", required = true) String userId) {
 
-        MfaStatusResponse mfaStatusResponse = mfaStatusService.findMfaStatusByUserId(userId);
-
-        return ResponseEntity
-                .status(200)
-                .body(mfaStatusResponse);
+        return mfaStatusService.findMfaStatusByUserId(userId);
     }
 
 }

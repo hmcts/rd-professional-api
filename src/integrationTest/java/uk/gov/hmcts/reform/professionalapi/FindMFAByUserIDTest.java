@@ -17,6 +17,9 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY_USER_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.util.FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
 @Slf4j
@@ -27,16 +30,16 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
     public void get_request_with_valid_user_id_returns_mfa_status() {
         Map<String, Object> response = createOrganization();
 
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        assertThat(response).containsEntry("http_status", "200 OK");
         assertThat(response.get("mfa")).isNotNull();
-        assertThat(response.get("mfa")).isEqualTo("EMAIL");
+        assertThat(response).containsEntry("mfa", "EMAIL");
     }
 
     @Test
     public void returns_404_when_user_identifier_not_found() {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(UUID.randomUUID().toString());
-        assertThat(response.get("http_status")).isEqualTo("404");
-        assertThat(response.get("response_body").toString()).contains("The requested user does not exist");
+        assertThat(response).containsEntry("http_status", "404");
+        assertThat(response.get("response_body").toString()).contains(NO_USER_FOUND);
     }
 
     @Test
@@ -54,16 +57,15 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(superUser
                 .getUserIdentifier());
 
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString())
-            .contains("The requested user's organisation is not 'Active'");
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString()).contains(ORG_NOT_ACTIVE);
     }
 
     @Test
     public void returns_400_when_user_id_not_present() {
         Map<String, Object> response = professionalReferenceDataClient.findMFAByUserID(StringUtils.EMPTY);
-        assertThat(response.get("http_status")).isEqualTo("400");
-        assertThat(response.get("response_body").toString()).contains("User Id cannot be empty");
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString()).contains(EMPTY_USER_ID);
     }
 
     @Test
@@ -75,7 +77,7 @@ public class FindMFAByUserIDTest extends AuthorizationEnabledIntegrationTest {
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
         Map<String, Object> errorResponseMap = createOrganization();
 
-        assertThat(errorResponseMap.get("http_status")).isEqualTo("403");
+        assertThat(errorResponseMap).containsEntry("http_status", "403");
         assertThat((String) errorResponseMap.get("response_body"))
                 .contains("test-get-mfa-flag".concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
     }

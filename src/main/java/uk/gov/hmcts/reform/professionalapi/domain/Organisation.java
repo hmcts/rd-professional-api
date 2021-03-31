@@ -128,10 +128,6 @@ public class Organisation implements Serializable {
         contactInformations.add(contactInformation);
     }
 
-    public void addOrganisationMfaStatus(OrganisationMfaStatus organisationMfaStatus) {
-        this.setOrganisationMfaStatus(organisationMfaStatus);
-    }
-
     public UUID getId() {
         return id;
     }
@@ -182,9 +178,5 @@ public class Organisation implements Serializable {
 
     public boolean isOrganisationStatusActive() {
         return OrganisationStatus.ACTIVE == getStatus();
-    }
-
-    public OrganisationMfaStatus getOrganisationMfaStatus() {
-        return organisationMfaStatus;
     }
 }

@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -41,17 +43,51 @@ public class MfaStatusServiceImplTest {
     @Mock
     private OrganisationRepository organisationRepository;
 
-    @Test
-    public void test_findMfaStatusByUserId() {
+    private MfaStatusResponse mfaStatusResponse;
+    private OrganisationMfaStatus orgMfaStatus;
+
+
+    @Before
+    public void setUp() {
+        orgMfaStatus = new OrganisationMfaStatus();
+        mfaStatusResponse = new MfaStatusResponse();
+        mfaStatusResponse.setMfa(MFAStatus.EMAIL.toString());
+
         when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
         when(organisation.isOrganisationStatusActive()).thenReturn(true);
         when(professionalUser.getOrganisation()).thenReturn(organisation);
-        when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
+    }
 
-        MfaStatusResponse mfaStatusResponse = mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
+    @Test
+    public void test_findMfaStatusByUserId() {
+        when(organisation.getOrganisationMfaStatus()).thenReturn(orgMfaStatus);
 
-        assertThat(mfaStatusResponse).isNotNull();
+        ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
+                .findMfaStatusByUserId(UUID.randomUUID().toString());
+
+        assertThat(mfaStatusResponseEntity).isNotNull();
+        assertThat(mfaStatusResponseEntity.getBody()).isNotNull();
+        assertThat(mfaStatusResponseEntity.getBody().getMfa()).isEqualTo(mfaStatusResponse.getMfa());
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any());
+        verify(organisation, times(1)).isOrganisationStatusActive();
+        verify(professionalUser, times(1)).getOrganisation();
+        verify(organisation, times(2)).getOrganisationMfaStatus();
+    }
+
+    @Test
+    public void test_findMfaStatusByUserId_whenMfaStatusNull() {
+        when(organisation.getOrganisationMfaStatus()).thenReturn(null);
+
+        ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
+                .findMfaStatusByUserId(UUID.randomUUID().toString());
+
+        assertThat(mfaStatusResponseEntity).isNotNull();
+        assertThat(mfaStatusResponseEntity.getBody()).isNotNull();
+        assertThat(mfaStatusResponseEntity.getBody().getMfa()).isEqualTo(mfaStatusResponse.getMfa());
+        verify(professionalUserRepository, times(1)).findByUserIdentifier(any());
+        verify(organisation, times(1)).isOrganisationStatusActive();
+        verify(professionalUser, times(1)).getOrganisation();
+        verify(organisation, times(1)).getOrganisationMfaStatus();
     }
 
     @Test(expected = InvalidRequest.class)
@@ -68,9 +104,7 @@ public class MfaStatusServiceImplTest {
 
     @Test(expected = InvalidRequest.class)
     public void test_findMfaStatusByUserId_shouldReturn400_whenInactiveOrg() {
-        when(professionalUserRepository.findByUserIdentifier(any())).thenReturn(professionalUser);
         when(organisation.isOrganisationStatusActive()).thenReturn(false);
-        when(professionalUser.getOrganisation()).thenReturn(organisation);
 
         mfaStatusService.findMfaStatusByUserId(UUID.randomUUID().toString());
     }
@@ -81,6 +115,7 @@ public class MfaStatusServiceImplTest {
         when(organisation.getOrganisationMfaStatus()).thenReturn(new OrganisationMfaStatus());
 
         mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest, organisation);
+        verify(organisation, times(1)).getOrganisationMfaStatus();
         assertEquals(organisation.getOrganisationMfaStatus().getMfaStatus(),mfaUpdateRequest.getMfa());
     }
 }
