@@ -88,6 +88,6 @@ withPipeline(type, product, component) {
     }
 
     after('runProviderVerification') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/runProviderPactVerification/**/*'
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/runProviderPactVerification/**/*'
     }
 }
