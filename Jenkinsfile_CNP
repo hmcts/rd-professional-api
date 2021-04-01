@@ -89,6 +89,6 @@ withPipeline(type, product, component) {
     }
 
     after('runProviderVerification'){
-        archiveArtifacts "build/reports/tests/**/*.*"
+        steps.archiveArtifacts "build/reports/tests/**/*.*"
     }
 }
