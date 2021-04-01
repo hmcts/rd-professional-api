@@ -87,8 +87,4 @@ withPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
 
     }
-
-    after('runProviderVerification'){
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
-    }
 }
