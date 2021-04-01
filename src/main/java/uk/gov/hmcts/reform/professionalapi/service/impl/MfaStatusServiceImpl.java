@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY_USER_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_USER_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
@@ -47,11 +46,7 @@ public class MfaStatusServiceImpl implements MfaStatusService {
         MfaStatusResponse mfaStatusResponse = new MfaStatusResponse();
 
         if (org.isOrganisationStatusActive()) {
-            if (nonNull(org.getOrganisationMfaStatus())) {
-                mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
-            } else {
-                mfaStatusResponse.setMfa(MFAStatus.EMAIL.toString());
-            }
+            mfaStatusResponse.setMfa(org.getOrganisationMfaStatus().getMfaStatus().toString());
         } else {
             throw new InvalidRequest(ORG_NOT_ACTIVE);
         }

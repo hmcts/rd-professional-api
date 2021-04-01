@@ -71,22 +71,6 @@ public class MfaStatusServiceImplTest {
         verify(professionalUserRepository, times(1)).findByUserIdentifier(any());
         verify(organisation, times(1)).isOrganisationStatusActive();
         verify(professionalUser, times(1)).getOrganisation();
-        verify(organisation, times(2)).getOrganisationMfaStatus();
-    }
-
-    @Test
-    public void test_findMfaStatusByUserId_whenMfaStatusNull() {
-        when(organisation.getOrganisationMfaStatus()).thenReturn(null);
-
-        ResponseEntity<MfaStatusResponse> mfaStatusResponseEntity = mfaStatusService
-                .findMfaStatusByUserId(UUID.randomUUID().toString());
-
-        assertThat(mfaStatusResponseEntity).isNotNull();
-        assertThat(mfaStatusResponseEntity.getBody()).isNotNull();
-        assertThat(mfaStatusResponseEntity.getBody().getMfa()).isEqualTo(mfaStatusResponse.getMfa());
-        verify(professionalUserRepository, times(1)).findByUserIdentifier(any());
-        verify(organisation, times(1)).isOrganisationStatusActive();
-        verify(professionalUser, times(1)).getOrganisation();
         verify(organisation, times(1)).getOrganisationMfaStatus();
     }
 
