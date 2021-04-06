@@ -80,10 +80,7 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    after('runProviderVerification:aat'){
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
-    }
-    after('runProviderVerification:preview'){
+    after('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
