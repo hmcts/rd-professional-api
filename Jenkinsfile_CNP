@@ -80,6 +80,13 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
+    after('runProviderVerification:aat'){
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+    }
+    after('runProviderVerification:preview'){
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+    }
+
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
     }
