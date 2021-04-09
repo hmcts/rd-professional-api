@@ -33,7 +33,6 @@ public class JsonFeignResponseUtil {
         }
     }
 
-
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
         Optional<Object>  payload = decode(response, clazz);
 
