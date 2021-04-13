@@ -1,5 +1,6 @@
 #!groovy
-
+@Library("Infrastructure")
+import uk.gov.hmcts.contino.AppPipelineDsl
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -9,15 +10,15 @@ def product = "rd"
 def component = "professional-api"
 /* The below Key Vault secrets will be used for functional and smoke tests */
 def secrets = [
-    's2s-${env}': [
-        secret('microservicekey-rd-professional-api', 'S2S_SECRET')
-    ],
-    'rd-${env}': [
-        secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
-        secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
-        secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
-        secret('LD-SDK-KEY', 'LD_SDK_KEY')
-    ]
+        's2s-${env}': [
+                secret('microservicekey-rd-professional-api', 'S2S_SECRET')
+        ],
+        'rd-${env}' : [
+                secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+                secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
+                secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+                secret('LD-SDK-KEY', 'LD_SDK_KEY')
+        ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -30,8 +31,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-    'preview' : 'aat',
-    'spreview': 'saat'
+        'preview' : 'aat',
+        'spreview': 'saat'
 ]
 
 // Configure branches to sync with master branch
@@ -39,12 +40,13 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
-env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
-env.PACT_BROKER_PORT = "443"
-env.PACT_BROKER_SCHEME = "https"
+env.PACT_BROKER_URL = 'pact-broker.platform.hmcts.net'
+env.PACT_BROKER_SCHEME = 'https'
+env.PACT_BROKER_PORT = '443'
+
 
 withPipeline(type, product, component) {
-  
+
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
@@ -82,11 +84,15 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    enablePactAs([
-        AppPipelineDsl.PactRoles.CONSUMER
-    ])
+    after('pact-provider-verification') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
+    }
 
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+    }
+    onPR() {
+        enablePactAs([AppPipelineDsl.PactRoles.PROVIDER])
+
     }
 }
