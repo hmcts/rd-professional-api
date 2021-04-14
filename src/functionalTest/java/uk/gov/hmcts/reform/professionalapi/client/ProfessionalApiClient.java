@@ -800,7 +800,7 @@ public class ProfessionalApiClient {
     }
 
     public void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest,
-                                                  String organisationId, String role) {
+                                   String organisationId, String role, HttpStatus expectedStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .body(mfaUpdateRequest)
@@ -809,7 +809,7 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(expectedStatus.value());
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }

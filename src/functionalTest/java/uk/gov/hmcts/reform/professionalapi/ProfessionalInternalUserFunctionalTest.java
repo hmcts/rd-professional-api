@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -414,11 +416,24 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         MFAStatus status = MFAStatus.NONE;
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
 
-        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin);
+        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, OK);
 
         Map<String, Object> findOrgMfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
         assertThat(findOrgMfaStatusResponse.get("mfa")).isEqualTo(status.toString());
 
         log.info("updateOrgMFAShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = false)
+    public void updateOrgMfaShouldReturn403WhenToggledOff() throws IOException {
+        log.info("updateOrgMFAShouldReturn403 :: STARTED");
+
+        MFAStatus status = MFAStatus.NONE;
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
+
+        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
+
+        log.info("updateOrgMFAShouldReturn403 :: END");
     }
 }

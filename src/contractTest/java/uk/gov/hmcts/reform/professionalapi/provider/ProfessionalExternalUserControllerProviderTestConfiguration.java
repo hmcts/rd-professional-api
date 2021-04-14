@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.external.ProfessionalExter
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.UserProfileUpdateRequestValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.ProfessionalUserServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.UserAttributeServiceImpl;
@@ -62,6 +64,9 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @MockBean
     UserAttributeServiceImpl userAttributeService;
 
+    @MockBean
+    OrganisationMfaStatusRepository organisationMfaStatusRepository;
+
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
@@ -86,5 +91,11 @@ public class ProfessionalExternalUserControllerProviderTestConfiguration extends
     @Primary
     public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
+    }
+
+    @Bean
+    @Primary
+    protected MfaStatusServiceImpl mfaStatusService() {
+        return new MfaStatusServiceImpl();
     }
 }
