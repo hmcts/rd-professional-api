@@ -429,6 +429,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void updateOrgMfaShouldReturn403WhenToggledOff() throws IOException {
         log.info("updateOrgMFAShouldReturn403 :: STARTED");
 
+        setUpTestData();
+
         MFAStatus status = MFAStatus.NONE;
         MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
 
