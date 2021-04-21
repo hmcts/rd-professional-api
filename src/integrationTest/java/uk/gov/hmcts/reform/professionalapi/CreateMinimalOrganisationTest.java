@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.Organisatio
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.whiteSpaceTrimOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -355,5 +356,24 @@ public class CreateMinimalOrganisationTest extends AuthorizationEnabledIntegrati
 
         Map<String, Object> response = professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
         assertThat(response.get("http_status")).asString().contains("400");
+    }
+
+    @Test
+    public void returns_200_when_MFA_default_value() {
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        Map<String, Object> response =
+                professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
+
+        String orgIdentifierResponse = (String) response.get(ORG_IDENTIFIER);
+
+        assertThat(orgIdentifierResponse).isNotNull();
+        assertThat(orgIdentifierResponse.length()).isEqualTo(LENGTH_OF_ORGANISATION_IDENTIFIER);
+        assertThat(orgIdentifierResponse.matches(ORGANISATION_IDENTIFIER_FORMAT_REGEX)).isTrue();
+
+        Organisation persistedOrganisation = organisationRepository
+                .findByOrganisationIdentifier(orgIdentifierResponse);
+
+        assertThat(response.get("http_status")).isEqualTo("201 CREATED");
+        assertThat(persistedOrganisation.getOrganisationMfaStatus().getMfaStatus()).isEqualTo(EMAIL);
     }
 }

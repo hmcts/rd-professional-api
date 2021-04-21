@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.helper;
 
+import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
+
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAttributeRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
 public class BaseRepository {
@@ -41,6 +45,8 @@ public class BaseRepository {
     public UserAccountMapRepository userAccountMapRepository;
     @Autowired
     public UserAttributeRepository userAttributeRepository;
+    @Autowired
+    public OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     public ContactInformation contactInformation;
     public DxAddress dxAddress;
@@ -51,6 +57,7 @@ public class BaseRepository {
     public UserAccountMap userAccountMap;
     public UserAttribute userAttribute;
     public PrdEnum prdEnum;
+    public OrganisationMfaStatus organisationMfaStatus;
 
     @Before
     public void setUp() {
@@ -88,6 +95,11 @@ public class BaseRepository {
 
         userAttribute = new UserAttribute(professionalUser, prdEnum);
         userAttributeRepository.save(userAttribute);
+
+        organisationMfaStatus = new OrganisationMfaStatus();
+        organisationMfaStatus.setMfaStatus(EMAIL);
+        organisationMfaStatus.setOrganisation(organisation);
+        organisationMfaStatusRepository.save(organisationMfaStatus);
     }
 
     @After
@@ -100,5 +112,6 @@ public class BaseRepository {
         paymentAccountRepository.deleteAll();
         organisationRepository.deleteAll();
         prdEnumRepository.deleteAll();
+        organisationMfaStatusRepository.deleteAll();
     }
 }
