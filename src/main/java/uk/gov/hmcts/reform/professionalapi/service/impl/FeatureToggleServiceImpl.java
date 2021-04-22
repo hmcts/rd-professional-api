@@ -38,6 +38,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     @PostConstruct
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId", "prd-mfa-flag");
+        launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus", "prd-mfa-flag");
     }
 
     @Override

@@ -44,4 +44,10 @@ public class ProfessionalApiConstants {
     public static final String DELETION_SUCCESS_MSG = "The organisation has deleted successfully";
     public static final String PRD_AAC_SYSTEM = "prd-aac-system";
 
+    public static final String ORG_NOT_ACTIVE = "The requested Organisation is not 'Active'";
+    public static final String INVALID_MFA_VALUE = "The MFA status value provided is not valid. "
+            + "Please provide a valid value for the MFA preference of the organisation and try again.";
+    public static final String NO_USER_FOUND = "The requested user does not exist";
+    public static final String EMPTY_USER_ID = "User Id cannot be empty";
+
 }

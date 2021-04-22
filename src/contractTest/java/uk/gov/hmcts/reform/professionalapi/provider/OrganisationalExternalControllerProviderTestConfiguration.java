@@ -7,9 +7,12 @@ import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PaymentAccountServiceImpl;
 
 @TestConfiguration
@@ -40,4 +43,16 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
 
     @MockBean
     protected JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+
+    @MockBean
+    OrganisationMfaStatusRepository organisationMfaStatusRepository;
+
+    @MockBean
+    OrganisationRepository organisationRepository;
+
+    @Bean
+    @Primary
+    protected MfaStatusServiceImpl mfaStatusService() {
+        return new MfaStatusServiceImpl();
+    }
 }

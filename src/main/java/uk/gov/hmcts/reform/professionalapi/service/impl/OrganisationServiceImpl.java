@@ -49,12 +49,14 @@ import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
@@ -88,6 +90,8 @@ public class OrganisationServiceImpl implements OrganisationService {
     UserAttributeService userAttributeService;
     @Autowired
     PaymentAccountValidator paymentAccountValidator;
+    @Autowired
+    OrganisationMfaStatusRepository organisationMfaStatusRepository;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -109,6 +113,8 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         Organisation organisation = saveOrganisation(newOrganisation);
 
+        addDefaultMfaStatusToOrganisation(organisation);
+
         addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
@@ -127,6 +133,17 @@ public class OrganisationServiceImpl implements OrganisationService {
             persistedOrganisation = organisationRepository.save(organisation);
         }
         return persistedOrganisation;
+    }
+
+    public void addDefaultMfaStatusToOrganisation(Organisation organisation) {
+
+        OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
+        organisationMfaStatus.setOrganisation(organisation);
+
+        OrganisationMfaStatus persistedOrganisationMfaStatus
+                = organisationMfaStatusRepository.save(organisationMfaStatus);
+        organisation.setOrganisationMfaStatus(persistedOrganisationMfaStatus);
+
     }
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts,

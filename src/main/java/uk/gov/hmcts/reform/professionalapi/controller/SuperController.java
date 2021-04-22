@@ -66,6 +66,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserCategory;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.domain.UserType;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
@@ -100,6 +101,8 @@ public abstract class SuperController {
     private UserProfileFeignClient userProfileFeignClient;
     @Autowired
     protected UserProfileUpdateRequestValidator userProfileUpdateRequestValidator;
+    @Autowired
+    protected MfaStatusService mfaStatusService;
 
     @Value("${prd.security.roles.hmcts-admin:}")
     protected String prdAdmin;

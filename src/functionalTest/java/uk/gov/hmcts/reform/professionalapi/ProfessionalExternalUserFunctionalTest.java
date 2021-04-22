@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
@@ -28,6 +27,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -58,7 +59,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     @Test
     public void testExternalUserScenario() {
-        setUpTestData();
+        setUpOrgTestData();
+        setUpUserBearerTokens();
         inviteUserScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
@@ -69,10 +71,13 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         suspendUserScenarios();
     }
 
-    public void setUpTestData() {
+    public void setUpOrgTestData() {
         superUserEmail = generateRandomEmail();
         organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest().firstName(firstName).lastName(lastName).email(superUserEmail)
+                .superUser(aUserCreationRequest()
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .email(superUserEmail)
                         .build())
                 .build();
 
@@ -83,7 +88,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
         List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
         superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+    }
 
+    public void setUpUserBearerTokens() {
         pumBearerToken = inviteUser(puiUserManager);
         pcmBearerToken = inviteUser(puiCaseManager);
         pomBearerToken = inviteUser(puiOrgManager);
@@ -424,5 +431,19 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(pumInternalUserResponse.get("userIdentifier")).isNotNull();
         activeUserId = (String) pumInternalUserResponse.get("userIdentifier");
         return bearerToken;
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationMfaStatusController.retrieveMfaStatusByUserId", withFeature = true)
+    public void findMFAScenario() {
+        setUpOrgTestData();
+        findMFAByUserIDShouldBeSuccess();
+    }
+
+    public void findMFAByUserIDShouldBeSuccess() {
+        log.info("findMFAByUserIDShouldBeSuccess :: STARTED");
+        Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
+        assertThat(mfaStatusResponse.get("mfa")).isEqualTo("EMAIL");
+        log.info("findMFAByUserIDShouldBeSuccess :: END");
     }
 }
