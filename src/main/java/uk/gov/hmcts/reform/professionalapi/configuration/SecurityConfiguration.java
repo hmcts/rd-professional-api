@@ -58,7 +58,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-                    .antMatchers(anonymousPaths.toArray(new String[0]));
+                    .antMatchers(anonymousPaths.toArray(new String[0]))
+                    .antMatchers("/refdata/external/v1/organisations/mfa");
     }
 
     @Inject

@@ -9,12 +9,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProf
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.IdamRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.service.impl.MfaStatusServiceImpl;
 import uk.gov.hmcts.reform.professionalapi.service.impl.OrganisationServiceImpl;
 
 @Configuration
@@ -46,6 +48,9 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
     @MockBean
     IdamRepository idamRepository;
 
+    @MockBean
+    OrganisationMfaStatusRepository organisationMfaStatusRepository;
+
     @Bean
     @Primary
     protected OrganisationInternalController organisationInternalController() {
@@ -62,5 +67,11 @@ public class OrganisationalInternalControllerProviderTestConfiguration extends P
     @Primary
     public PactJwtGrantedAuthoritiesConverter pactJwtGrantedAuthoritiesConverter() {
         return new PactJwtGrantedAuthoritiesConverter(idamRepository);
+    }
+
+    @Bean
+    @Primary
+    protected MfaStatusServiceImpl mfaStatusService() {
+        return new MfaStatusServiceImpl();
     }
 }

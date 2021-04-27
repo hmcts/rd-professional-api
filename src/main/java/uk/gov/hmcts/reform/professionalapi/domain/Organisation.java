@@ -20,6 +20,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.CascadeType;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,6 +66,9 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation")
+    private OrganisationMfaStatus organisationMfaStatus;
+
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)
     private OrganisationStatus status;
@@ -92,6 +97,7 @@ public class Organisation implements Serializable {
 
     @Column(name = "ORGANISATION_IDENTIFIER")
     private String organisationIdentifier;
+
 
     public Organisation(
             String name,
