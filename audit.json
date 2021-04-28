@@ -122,7 +122,7 @@
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/_POST": "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/orgId/mfa_PUT": "ignore",
-  "10010_Cookie No HttpOnly Flag_http://rd-professional-apiaat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
