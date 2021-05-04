@@ -33,6 +33,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
@@ -203,7 +204,7 @@ public class RefDataUtil {
 
         GetUserProfileResponse userProfileResponse =
                 (GetUserProfileResponse) requireNonNull(responseResponseEntity.getBody());
-        if (!StringUtils.isEmpty(userProfileResponse)) {
+        if (!ObjectUtils.isEmpty(userProfileResponse)) {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
@@ -220,7 +221,7 @@ public class RefDataUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = value;
-        if (!StringUtils.isEmpty(modValue)) {
+        if (StringUtils.hasLength(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
         }
         return modValue;
@@ -228,7 +229,7 @@ public class RefDataUtil {
 
     public static String removeAllSpaces(String value) {
         String modValue = value;
-        if (!StringUtils.isEmpty(modValue)) {
+        if (StringUtils.hasLength(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
         }
         return modValue;

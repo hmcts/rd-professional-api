@@ -112,7 +112,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
-            status = StringUtils.isEmpty(status) ? ACTIVE : status;
+            status = !StringUtils.hasLength(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 

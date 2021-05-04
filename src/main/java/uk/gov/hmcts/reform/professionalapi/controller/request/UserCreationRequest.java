@@ -33,7 +33,7 @@ public class UserCreationRequest {
         this.firstName = firstName;
         this.lastName = lastName;
 
-        if (!StringUtils.isEmpty(emailAddress)) {
+        if (StringUtils.hasLength(emailAddress)) {
 
             this.email = emailAddress.toLowerCase().trim();
         }

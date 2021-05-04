@@ -408,7 +408,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             NewUserResponse newUserResponse = RefDataUtil
                     .findUserProfileStatusByEmail(user.getEmailAddress(), userProfileFeignClient);
 
-            if (StringUtils.isEmpty(newUserResponse.getIdamStatus())) {
+            if (!StringUtils.hasLength(newUserResponse.getIdamStatus())) {
 
                 deleteOrganisationResponse.setStatusCode(ProfessionalApiConstants.ERROR_CODE_500);
                 deleteOrganisationResponse.setMessage(ProfessionalApiConstants.ERR_MESG_500_ADMIN_NOTFOUNDUP);

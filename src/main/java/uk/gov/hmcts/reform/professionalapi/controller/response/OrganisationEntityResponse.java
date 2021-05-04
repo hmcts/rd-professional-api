@@ -33,7 +33,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
+        this.organisationIdentifier = !StringUtils.hasLength(organisation.getOrganisationIdentifier())
                 ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
         this.status = organisation.getStatus();

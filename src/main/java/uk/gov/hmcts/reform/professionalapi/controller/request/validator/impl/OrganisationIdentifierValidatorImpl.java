@@ -75,7 +75,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         boolean doesRoleExist = false;
         for (String roleName : roles) {
 
-            if (!StringUtils.isEmpty(roleName) && role.equals(roleName.trim())) {
+            if (StringUtils.hasLength(roleName) && role.equals(roleName.trim())) {
                 doesRoleExist = true;
                 break;
             }
