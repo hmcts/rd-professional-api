@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 
 @Getter
@@ -33,7 +33,7 @@ public class UserCreationRequest {
         this.firstName = firstName;
         this.lastName = lastName;
 
-        if (StringUtils.hasLength(emailAddress)) {
+        if (!ObjectUtils.isEmpty(emailAddress)) {
 
             this.email = emailAddress.toLowerCase().trim();
         }

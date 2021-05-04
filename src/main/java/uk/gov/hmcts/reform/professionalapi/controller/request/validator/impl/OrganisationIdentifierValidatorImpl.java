@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -75,7 +75,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         boolean doesRoleExist = false;
         for (String roleName : roles) {
 
-            if (StringUtils.hasLength(roleName) && role.equals(roleName.trim())) {
+            if (!ObjectUtils.isEmpty(roleName) && role.equals(roleName.trim())) {
                 doesRoleExist = true;
                 break;
             }
