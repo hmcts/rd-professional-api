@@ -4,6 +4,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -220,7 +221,7 @@ public class RefDataUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = value;
-        if (!ObjectUtils.isEmpty(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
         }
         return modValue;
@@ -228,7 +229,7 @@ public class RefDataUtil {
 
     public static String removeAllSpaces(String value) {
         String modValue = value;
-        if (!ObjectUtils.isEmpty(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
         }
         return modValue;
