@@ -425,6 +425,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Updates the MFA preference of an Organisation",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
