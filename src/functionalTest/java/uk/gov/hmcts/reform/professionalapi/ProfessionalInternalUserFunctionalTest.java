@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -13,7 +14,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreatio
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.assertj.core.api.Assertions;
@@ -21,12 +21,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -390,5 +396,46 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         List<String> rolesSize = (List) professionalUsersResponse1.get("roles");
         assertThat(rolesSize.size()).isEqualTo(rolesToValidate.size());
         assertThat(rolesSize).containsAll(rolesToValidate);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = true)
+    public void updateOrgMfaScenario() {
+        setUpTestData();
+        updateOrgMfaShouldBeSuccess();
+    }
+
+    public void updateOrgMfaShouldBeSuccess() {
+        log.info("updateOrgMFAShouldBeSuccess :: STARTED");
+
+        Map<String, Object> searchResponse = professionalApiClient
+                .searchOrganisationUsersByStatusInternal(intActiveOrgId, hmctsAdmin, OK);
+        List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
+        String superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+
+        MFAStatus status = MFAStatus.NONE;
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
+
+        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, OK);
+
+        Map<String, Object> findOrgMfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
+        assertThat(findOrgMfaStatusResponse.get("mfa")).isEqualTo(status.toString());
+
+        log.info("updateOrgMFAShouldBeSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateOrgMfaStatus", withFeature = false)
+    public void updateOrgMfaShouldReturn403WhenToggledOff() throws IOException {
+        log.info("updateOrgMFAShouldReturn403 :: STARTED");
+
+        setUpTestData();
+
+        MFAStatus status = MFAStatus.NONE;
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(status);
+
+        professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
+
+        log.info("updateOrgMFAShouldReturn403 :: END");
     }
 }

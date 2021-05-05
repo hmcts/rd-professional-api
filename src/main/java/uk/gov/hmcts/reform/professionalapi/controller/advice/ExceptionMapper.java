@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Locale;
 import javax.validation.ConstraintViolationException;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -41,6 +43,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorCons
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.METHOD_ARG_NOT_VALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.INVALID_MFA_VALUE;
 
 @Slf4j
 @ControllerAdvice(basePackages = "uk.gov.hmcts.reform.professionalapi.controller")
@@ -136,10 +139,10 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, httpStatus, httpStatus.getReasonPhrase());
     }
 
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, MALFORMED_JSON.getErrorMessage());
-
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -177,9 +180,23 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(errorMsg, getRootException(ex).getLocalizedMessage(),
+        String errorDescription = getRootException(ex).getLocalizedMessage();
+
+        if (mfaEnumException(ex)) {
+            errorDescription = INVALID_MFA_VALUE;
+        }
+
+        ErrorResponse errorDetails = new ErrorResponse(errorMsg, errorDescription,
                 getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
+    }
+
+    private boolean mfaEnumException(Exception ex) {
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+            return ifx.getTargetType().isEnum() && (ifx.getTargetType().equals(MFAStatus.class));
+        }
+        return false;
     }
 }

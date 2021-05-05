@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
+import static java.util.Objects.isNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.generateToken;
 
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +25,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -74,6 +75,10 @@ public class ProfessionalReferenceDataClient {
                                                                                     String userId) {
         return getRequestToGetEmailFromHeader("/refdata/external/v1/organisations" + "/pbas?email={email}",
                 role, userId, email);
+    }
+
+    public Map<String, Object> findMFAByUserID(String professionalUserID) {
+        return getRequestWithoutAuthHeaders(APP_EXT_BASE_PATH + "/mfa?user_id={userIdentifier}", professionalUserID);
     }
 
     public Map<String, Object> retrieveSingleOrganisation(String id, String role) {
@@ -359,7 +364,7 @@ public class ProfessionalReferenceDataClient {
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        String bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+        String bearerToken = "Bearer ".concat(getBearerToken(isNull(userId) ? UUID.randomUUID().toString()
                 : userId, role));
         headers.add("Authorization", bearerToken);
 
@@ -369,6 +374,19 @@ public class ProfessionalReferenceDataClient {
     private HttpHeaders getMultipleAuthHeaders(String role) {
 
         return getMultipleAuthHeaders(role, null);
+    }
+
+    private HttpHeaders getInvalidAuthHeaders(String role) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(APPLICATION_JSON);
+
+        headers.add("ServiceAuthorization", "Invalid token");
+
+        String bearerToken = "Bearer ".concat("invalid token");
+        headers.add("Authorization", bearerToken);
+
+        return headers;
     }
 
     private final String getBearerToken(String userId, String role) {
@@ -387,10 +405,12 @@ public class ProfessionalReferenceDataClient {
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {
 
-        Map response = objectMapper
-                .convertValue(
-                        responseEntity.getBody(),
-                        Map.class);
+        Map response = new HashMap<>();
+        if (responseEntity.hasBody()) {
+            response = objectMapper
+                    .convertValue(
+                         responseEntity.getBody(), Map.class);
+        }
 
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
@@ -457,6 +477,47 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, String orgId,
+                                                  String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
+
+        try {
+            HttpEntity<?> requestEntity = new HttpEntity<>(
+                    isNull(mfaUpdateRequest) ? "{\"mfa\":\"error\"}" : mfaUpdateRequest,
+                    getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> updateOrgMfaStatusUnauthorised(MfaUpdateRequest mfaUpdateRequest, String orgId,
+                                                  String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
+
+        try {
+            HttpEntity<MfaUpdateRequest> requestEntity = new HttpEntity<>(mfaUpdateRequest,
+                    getInvalidAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
 
         return getResponse(responseEntity);
     }

@@ -17,10 +17,12 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -45,6 +47,9 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 
 @Slf4j
 public class ProfessionalApiClient {
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -168,7 +173,7 @@ public class ProfessionalApiClient {
             .andReturn();
 
         if (response.statusCode() != CREATED.value()) {
-            log.info("Create organisation response: " + response.asString());
+            log.info("{}:: Create organisation response: {}", loggingComponentName, response.asString());
         }
 
         response.then()
@@ -248,7 +253,7 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
-        log.info("Add new user (Internal) response: " + response.statusCode());
+        log.info("{}:: Add new user (Internal) response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -264,7 +269,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(expectedStatus.value());
 
-        log.info("Add new user (Internal) response: " + response.statusCode());
+        log.info("{}:: Add new user (Internal) response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -276,7 +281,7 @@ public class ProfessionalApiClient {
             .andReturn();
 
         if (response.statusCode() != OK.value()) {
-            log.info("Retrieve organisation response: " + response.statusCode());
+            log.info("{}:: Retrieve organisation response: {}", loggingComponentName, response.statusCode());
         }
 
         response.then()
@@ -303,7 +308,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(OK.value());
 
-        log.info("Retrieve all orgs (Internal) response: " + response.statusCode());
+        log.info("{}:: Retrieve all orgs (Internal) response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -314,7 +319,7 @@ public class ProfessionalApiClient {
             .get("/refdata/internal/v1/organisations/pbas?email=" + email)
             .andReturn();
 
-        log.info("Retrieve organisation (Internal) response: " + response.statusCode());
+        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
 
         response.then()
             .assertThat()
@@ -330,7 +335,7 @@ public class ProfessionalApiClient {
                 .get("/refdata/internal/v1/organisations/pbas?email=" + "rd@prdfunctestuser.com")
                 .andReturn();
 
-        log.info("Retrieve pba by email (Internal) response: " + response.statusCode());
+        log.info("{}:: Retrieve pba by email (Internal) response: {}", loggingComponentName, response.statusCode());
 
         response.then()
                 .assertThat()
@@ -358,7 +363,7 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(status.value());
-        log.info("find users response: " + response.statusCode());
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -373,7 +378,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(status.value());
-        log.info("find users response: " + response.statusCode());
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
         return response.body().as(Map.class);
     }
 
@@ -389,7 +394,7 @@ public class ProfessionalApiClient {
             .assertThat()
             .statusCode(status.value());
         assertThat(response.headers().hasHeaderWithName("Paginationinfo")).isTrue();
-        log.info("find users response: " + response.statusCode());
+        log.info("{}:: find users response: {}", loggingComponentName, response.statusCode());
         if (HttpStatus.OK == status) {
             return response.as(Map.class);
         } else {
@@ -435,7 +440,7 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?status=" + userStatus)
             .andReturn();
 
-        log.info("find users by status: " + response.statusCode());
+        log.info("{}:: find users by status: {}", loggingComponentName, response.statusCode());
 
         response.then()
             .assertThat()
@@ -456,7 +461,7 @@ public class ProfessionalApiClient {
         Response response = requestSpecification
             .get("/refdata/external/v1/organisations")
             .andReturn();
-        log.info("find org by orgId (External): " + response.statusCode());
+        log.info("{}:: find org by orgId (External): {}", loggingComponentName, response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -472,7 +477,7 @@ public class ProfessionalApiClient {
             .get("/refdata/external/v1/organisations/users?returnRoles=" + returnRoles)
             .andReturn();
 
-        log.info("find org by orgId (External): " + response.statusCode());
+        log.info("{}:: find org by orgId (External): {}", loggingComponentName, response.statusCode());
         response.then()
             .assertThat()
             .statusCode(status.value());
@@ -515,7 +520,7 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
-        log.info("Update organisation response: " + response.getStatusCode());
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
 
         response.then()
             .assertThat()
@@ -530,7 +535,7 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/organisations/" + organisationIdentifier)
             .andReturn();
 
-        log.info("Update organisation response: " + response.getStatusCode());
+        log.info("{}:: Update organisation response: {}", loggingComponentName, response.getStatusCode());
 
         response.then()
             .assertThat()
@@ -544,7 +549,7 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/users/" + userIdentifier)
             .andReturn();
 
-        log.info("Update user response: " + response.getStatusCode());
+        log.info("{}:: Update user response: {}", loggingComponentName, response.getStatusCode());
 
         response.then()
             .assertThat()
@@ -557,7 +562,7 @@ public class ProfessionalApiClient {
             .body("")
             .get("/refdata/internal/v1/organisations?status=" + status)
             .andReturn();
-        log.debug("Retrieve organisation response by status: " + response.getStatusCode());
+        log.debug("{}:: Retrieve organisation response by status: {}", loggingComponentName, response.getStatusCode());
         response.then()
             .assertThat()
             .statusCode(OK.value());
@@ -572,7 +577,8 @@ public class ProfessionalApiClient {
             .get("/refdata/internal/v1/organisations?status=" + status)
             .andReturn();
 
-        log.debug("Retrieve organisation response for unknown status: " + response.asString());
+        log.debug("{}:: Retrieve organisation response for unknown status: {}",
+                loggingComponentName, response.asString());
 
         response.then()
             .assertThat()
@@ -604,7 +610,7 @@ public class ProfessionalApiClient {
             .put("/refdata/internal/v1/organisations/" + orgId + "/pbas")
             .andReturn();
 
-        log.info("Retrieve edit pba response: " + response.asString());
+        log.info("{}:: Retrieve edit pba response: {}", loggingComponentName, response.asString());
 
         response.then()
             .assertThat()
@@ -663,7 +669,7 @@ public class ProfessionalApiClient {
             .andReturn();
 
         if (response.statusCode() != NO_CONTENT.value()) {
-            log.info("Delete organisation response: " + response.asString());
+            log.info("{}:: Delete organisation response: {}", loggingComponentName, response.asString());
         }
         response.then()
             .assertThat()
@@ -678,7 +684,7 @@ public class ProfessionalApiClient {
             .andReturn();
 
         if (response.statusCode() != NO_CONTENT.value()) {
-            log.info("Delete organisation response: " + response.asString());
+            log.info("{}:: Delete organisation response: {}", loggingComponentName, response.asString());
         }
 
         response.then()
@@ -777,5 +783,34 @@ public class ProfessionalApiClient {
         } else {
             return response.getBody().as(ErrorResponse.class);
         }
+    }
+
+    public Map<String, Object> findMFAByUserId(HttpStatus expectedStatus, String userId) {
+
+        Response response = withUnauthenticatedRequest()
+                .get("/refdata/external/v1/organisations/mfa?user_id=" + userId)
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: find mfa response: {}", loggingComponentName, response.statusCode());
+        return response.body().as(Map.class);
+    }
+
+    public void updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest,
+                                   String organisationId, String role, HttpStatus expectedStatus) {
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(mfaUpdateRequest)
+                .put("/refdata/internal/v1/organisations/" + organisationId + "/mfa")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
 }

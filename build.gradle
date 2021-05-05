@@ -187,40 +187,32 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     }
 }
 
-task contract(type: Test) {
-    description = 'Runs the consumer Pact tests'
+project.ext {
+    pactVersion = getCheckedOutGitCommitHash()
+}
+
+
+task runProviderPactVerification(type: Test) {
+    description = 'Runs the provider Pact tests'
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-    include "uk/gov/hmcts/reform/professionalapi/**"
-    systemProperty 'pact.rootDir', "pacts"
+    systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+    systemProperty 'pact.provider.version', project.pactVersion
+    include "uk/gov/hmcts/reform/professionalapi/provider/**"
 }
-
-task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
-    // Nothing to do here
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-task runProviderPactVerification(type: Test) {
-    logger.lifecycle("Runs pact Tests")
-    testClassesDirs = sourceSets.contractTest.output.classesDirs
-    classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
-runProviderPactVerification.dependsOn contract
 
 runProviderPactVerification.finalizedBy pactVerify
+
+def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
 
 pact {
     publish {
         pactDirectory = 'pacts'
-        //pactBrokerUrl = 'http://localhost:9292'
-        pactBrokerUrl = 'https://pact-broker.platform.hmcts.net'
-        tags = ['Dev']
-        version = "2.3"
+        tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+        version = project.pactVersion
     }
 }
 
@@ -322,6 +314,8 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation "io.github.openfeign:feign-httpclient:11.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    //Fix for CVE-2021-29425
+    implementation 'commons-io:commons-io:2.8.0'
 
     compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'

@@ -34,6 +34,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -41,11 +42,13 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationReques
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -53,6 +56,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -72,6 +76,8 @@ public class OrganisationInternalControllerTest {
     private OrganisationCreationRequestValidator organisationCreationRequestValidatorMock;
     private PaymentAccountValidator paymentAccountValidatorMock;
     private ProfessionalUserService professionalUserServiceMock;
+    private MfaStatusService mfaStatusServiceMock;
+    private OrganisationIdentifierValidatorImpl orgIdValidatorMock;
 
     private PrdEnumRepository prdEnumRepository;
     private final PrdEnumId prdEnumId1 = new PrdEnumId(10, "JURISD_ID");
@@ -113,6 +119,8 @@ public class OrganisationInternalControllerTest {
         prdEnumServiceMock = mock(PrdEnumServiceImpl.class);
         prdEnumRepository = mock(PrdEnumRepository.class);
         userProfileFeignClient = mock(UserProfileFeignClient.class);
+        mfaStatusServiceMock = mock(MfaStatusService.class);
+        orgIdValidatorMock = mock(OrganisationIdentifierValidatorImpl.class);
         prdEnumList = new ArrayList<>();
         prdEnumList.add(anEnum1);
         prdEnumList.add(anEnum2);
@@ -364,6 +372,41 @@ public class OrganisationInternalControllerTest {
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(null);
         organisationInternalController.deleteOrganisation(orgId,"123456789");
+        verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+    }
+
+    @Test
+    public void testUpdateOrgMfa() {
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        ResponseEntity<Object> updateResponseEntity = ResponseEntity.status(HttpStatus.OK).build();
+
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.NONE);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier()))
+                .thenReturn(organisation);
+        when(mfaStatusServiceMock.updateOrgMfaStatus(mfaUpdateRequest, organisation)).thenReturn(updateResponseEntity);
+
+        ResponseEntity<Object> response = organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest,
+                organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(mfaStatusServiceMock, times(1)).updateOrgMfaStatus(mfaUpdateRequest,organisation);
+        verify(organisationServiceMock, times(1))
+                .getOrganisationByOrgIdentifier(organisation.getOrganisationIdentifier());
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testUpdateOrgMfaThrows400WhenOrgNotActive() {
+        MfaUpdateRequest mfaUpdateRequest = new MfaUpdateRequest(MFAStatus.NONE);
+        String orgId = organisation.getOrganisationIdentifier();
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(orgId)).thenReturn(organisation);
+
+        organisationInternalController.updateOrgMfaStatus(mfaUpdateRequest, orgId);
+
+        verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(orgId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
     }
 }

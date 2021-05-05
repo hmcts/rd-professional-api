@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -75,6 +76,7 @@ import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
@@ -94,6 +96,8 @@ public class OrganisationServiceImplTest {
     private final UserAccountMapService userAccountMapServiceMock = mock(UserAccountMapService.class);
     private final UserAttributeService userAttributeServiceMock = mock(UserAttributeService.class);
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
+    private final OrganisationMfaStatusRepository organisationMfaStatusRepositoryMock
+            = mock(OrganisationMfaStatusRepository.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
@@ -106,6 +110,7 @@ public class OrganisationServiceImplTest {
     private final UserAccountMap userAccountMap = new UserAccountMap();
     private final SuperUser superUser = new SuperUser("some-fname", "some-lname",
             "some-email-address", organisation);
+    private final OrganisationMfaStatus organisationMfaStatus = new OrganisationMfaStatus();
 
     private final String organisationIdentifier = generateUniqueAlphanumericId(LENGTH_OF_ORGANISATION_IDENTIFIER);
     private final PrdEnumService prdEnumService = new PrdEnumServiceImpl(prdEnumRepositoryMock);
@@ -148,6 +153,7 @@ public class OrganisationServiceImplTest {
         sut.setPrdEnumService(prdEnumService);
         sut.setUserAttributeService(userAttributeServiceMock);
         sut.setPaymentAccountValidator(paymentAccountValidator);
+        sut.setOrganisationMfaStatusRepository(organisationMfaStatusRepositoryMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -196,6 +202,8 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
         when(organisationRepository.findByStatus(any())).thenReturn(organisations);
         when(organisationRepositoryImplNullReturnedMock.findByOrganisationIdentifier(any())).thenReturn(null);
+        when(organisationMfaStatusRepositoryMock.save(any(OrganisationMfaStatus.class)))
+                .thenReturn(organisationMfaStatus);
     }
 
     @Test
@@ -220,6 +228,7 @@ public class OrganisationServiceImplTest {
         verify(dxAddressRepositoryMock, times(1)).saveAll(any());
         verify(userAccountMapServiceMock, times(1))
                 .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
+        verify(organisationMfaStatusRepositoryMock, times(1)).save(any(OrganisationMfaStatus.class));
     }
 
     @Test
@@ -255,6 +264,15 @@ public class OrganisationServiceImplTest {
         sut.addSuperUserToOrganisation(superUserCreationRequest, organisationMock);
 
         verify(organisationMock, times(1)).addProfessionalUser(any(SuperUser.class));
+    }
+
+    @Test
+    public void test_addDefaultMfaStatusToOrganisation() {
+        Organisation organisationMock = mock(Organisation.class);
+
+        sut.addDefaultMfaStatusToOrganisation(organisationMock);
+
+        verify(organisationMock,times(1)).setOrganisationMfaStatus(any(OrganisationMfaStatus.class));
     }
 
     @Test

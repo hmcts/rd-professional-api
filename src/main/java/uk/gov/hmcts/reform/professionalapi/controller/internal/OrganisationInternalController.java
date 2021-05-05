@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_ID_VALIDATION_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +39,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -417,5 +421,61 @@ public class OrganisationInternalController extends SuperController {
         return ResponseEntity
                 .status(deleteOrganisationResponse.getStatusCode())
                 .body(deleteOrganisationResponse);
+    }
+
+    @ApiOperation(
+            value = "Updates the MFA preference of an Organisation",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "The MFA preference of the organisation has been successfully updated"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request was provided"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "No Organisation was found with the given organisationIdentifier"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PutMapping(
+            path = "/{orgId}/mfa",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("prd-admin")
+    public ResponseEntity<Object> updateOrgMfaStatus(@Valid @NotNull @RequestBody MfaUpdateRequest mfaUpdateRequest,
+                                                     @Pattern(regexp = ORGANISATION_IDENTIFIER_FORMAT_REGEX,
+                                                     message = ORG_ID_VALIDATION_ERROR_MESSAGE)
+                                                     @PathVariable("orgId") @NotBlank String organisationIdentifier) {
+
+        log.info("{}:: Received request to update organisation mfa preference::", loggingComponentName);
+
+        organisationIdentifierValidatorImpl.validateOrganisationExistsWithGivenOrgId(organisationIdentifier);
+
+        Organisation organisation = organisationService.getOrganisationByOrgIdentifier(organisationIdentifier);
+
+        if (isNotTrue(organisation.isOrganisationStatusActive())) {
+            throw new InvalidRequest(ORG_NOT_ACTIVE);
+        }
+
+        return mfaStatusService.updateOrgMfaStatus(mfaUpdateRequest,organisation);
     }
 }
