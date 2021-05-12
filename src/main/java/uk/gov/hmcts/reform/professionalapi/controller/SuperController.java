@@ -138,8 +138,8 @@ public abstract class SuperController {
     private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
 
 
-    protected ResponseEntity<OrganisationResponse>
-        createOrganisationFrom(OrganisationCreationRequest organisationCreationRequest) {
+    protected ResponseEntity<OrganisationResponse> createOrganisationFrom(
+            OrganisationCreationRequest organisationCreationRequest) {
 
         organisationCreationRequestValidator.validate(organisationCreationRequest);
 
@@ -365,9 +365,8 @@ public abstract class SuperController {
                 .body(responseBody);
     }
 
-    private ProfessionalUser
-        validateInviteUserRequestAndCreateNewUserObject(NewUserCreationRequest newUserCreationRequest,
-                                                        String organisationIdentifier, List<String> roles) {
+    private ProfessionalUser validateInviteUserRequestAndCreateNewUserObject(
+            NewUserCreationRequest newUserCreationRequest, String organisationIdentifier, List<String> roles) {
 
         validateNewUserCreationRequestForMandatoryFields(newUserCreationRequest);
         final Organisation existingOrganisation = checkOrganisationIsActive(removeEmptySpaces(organisationIdentifier));
@@ -410,7 +409,7 @@ public abstract class SuperController {
 
         userProfileUpdatedData = userProfileUpdateRequestValidator.validateRequest(userProfileUpdatedData);
 
-        return  professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
+        return professionalUserService.modifyRolesForUser(userProfileUpdatedData, userId, origin);
     }
 
     public void checkUserAlreadyExist(String userEmail) {
@@ -426,15 +425,25 @@ public abstract class SuperController {
         return existingOrganisation;
     }
 
-    public  String getUserEmail(String email) {
+    public String getUserEmail(String email) {
         String userEmail = null;
         ServletRequestAttributes servletRequestAttributes =
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         if (nonNull(servletRequestAttributes)) {
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            userEmail = request.getHeader("UserEmail") != null ? request.getHeader("UserEmail") : email;
+
+            if (nonNull(request.getHeader("UserEmail"))) {
+                userEmail = request.getHeader("UserEmail");
+
+            } else if (nonNull(email)) {
+                userEmail = email;
+
+            } else {
+                throw new InvalidRequest("No User Email provided via header or param");
+            }
         }
+
         return userEmail;
     }
 }
