@@ -112,6 +112,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void retrieveOrganisationPbaScenarios() {
         findOrganisationPbaWithEmailByInternalUserShouldBeSuccess();
         findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess();
+        findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest();
     }
 
     public void modifyUserRolesScenarios() {
@@ -249,6 +250,12 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 superUserEmail.toLowerCase(), hmctsAdmin);
         validatePbaResponse(orgResponse);
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest() {
+        log.info("findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest :: STARTED");
+        professionalApiClient.retrievePaymentAccountsWithoutEmailForInternal();
+        log.info("findOrganisationPbaWithoutEmailByInternalUserShouldBeBadRequest :: END");
     }
 
     public void findOrganisationPbaWithEmailThroughHeaderByInternalUserShouldBeSuccess() {

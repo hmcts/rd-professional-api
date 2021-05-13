@@ -62,6 +62,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens();
         inviteUserScenarios();
+        retrieveOrganisationPbaScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
         findActiveOrganisationScenarios();
@@ -445,5 +446,18 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> mfaStatusResponse = professionalApiClient.findMFAByUserId(OK, superUserId);
         assertThat(mfaStatusResponse.get("mfa")).isEqualTo("EMAIL");
         log.info("findMFAByUserIDShouldBeSuccess :: END");
+    }
+
+    public void retrieveOrganisationPbaScenarios() {
+        findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest();
+    }
+
+    public void findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest() {
+        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: STARTED");
+
+        professionalApiClient.retrievePaymentAccountsWithoutEmailForExternal(
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
+
+        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
     }
 }
