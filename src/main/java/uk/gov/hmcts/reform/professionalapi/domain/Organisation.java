@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -66,7 +67,7 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation")
+    @OneToOne(optional = false,cascade = CascadeType.ALL, mappedBy = "organisation", fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
     @Column(name = "STATUS")
