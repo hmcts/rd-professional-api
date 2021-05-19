@@ -67,7 +67,7 @@ public class Organisation implements Serializable {
     @OneToMany(targetEntity = ContactInformation.class, mappedBy = "organisation")
     private List<ContactInformation> contactInformations = new ArrayList<>();
 
-    @OneToOne(optional = false,cascade = CascadeType.ALL, mappedBy = "organisation", fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "organisation", optional = false, fetch = FetchType.LAZY)
     private OrganisationMfaStatus organisationMfaStatus;
 
     @Column(name = "STATUS")
