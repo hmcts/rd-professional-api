@@ -7,27 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
-import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 
 public class FindUserByEmailTest extends AuthorizationEnabledIntegrationTest {
-
-    @Before
-    public void setUp() {
-        Organisation organisation = new Organisation("some-org-name", null, "PENDING",
-                null, null, null);
-        ProfessionalUser superUser = new ProfessionalUser("some-fname", "some-lname",
-                "soMeone@somewhere.com", organisation);
-        organisationRepository.save(organisation);
-        professionalUserRepository.save(superUser);
-    }
-
 
     @Test
     public void search_returns_valid_user_with_organisation_status_as_active() {
