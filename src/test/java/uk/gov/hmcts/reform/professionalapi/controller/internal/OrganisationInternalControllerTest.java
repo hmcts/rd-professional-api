@@ -292,6 +292,13 @@ public class OrganisationInternalControllerTest {
         organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
     }
 
+    @Test(expected = InvalidRequest.class)
+    public void test_RetrievePaymentAccountByEmailThrows400WhenEmailIsNull() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(null);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail(null);
+    }
+
     @Test
     public void test_EditPaymentAccountsByOrgId() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
