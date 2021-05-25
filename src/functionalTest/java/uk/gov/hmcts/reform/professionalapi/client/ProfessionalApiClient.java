@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -326,6 +327,35 @@ public class ProfessionalApiClient {
             .statusCode(OK.value());
 
         return response.body().as(Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void retrievePaymentAccountsWithoutEmailForInternal() {
+        Response response = getMultipleAuthHeadersInternal()
+                .get("/refdata/internal/v1/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value())
+                .body("errorDescription", equalTo("No User Email provided via header or param"));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void retrievePaymentAccountsWithoutEmailForExternal(RequestSpecification requestSpecification) {
+        Response response = requestSpecification
+                .get("refdata/external/v1/organisations/pbas")
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(BAD_REQUEST.value())
+                .body("errorDescription", equalTo("No User Email provided via header or param"));
     }
 
     @SuppressWarnings("unchecked")
