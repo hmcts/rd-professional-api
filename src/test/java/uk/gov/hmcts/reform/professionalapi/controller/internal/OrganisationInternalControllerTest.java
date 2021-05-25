@@ -297,6 +297,8 @@ public class OrganisationInternalControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(null);
         organisationInternalController.retrievePaymentAccountBySuperUserEmail(null);
+
+        verify(httpRequest, times(2)).getHeader(null);
     }
 
     @Test
