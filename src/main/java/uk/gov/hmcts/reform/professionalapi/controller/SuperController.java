@@ -431,11 +431,12 @@ public abstract class SuperController {
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         if (nonNull(servletRequestAttributes)) {
+
             HttpServletRequest request = servletRequestAttributes.getRequest();
-
             if (nonNull(request.getHeader("UserEmail"))) {
-                userEmail = request.getHeader("UserEmail");
 
+                userEmail = request.getHeader("UserEmail");
+                log.warn("** [DEPRECATED USAGE] Setting user email on the header will be deprecated soon ! ** referer - {} ", request.getHeader("Referer"));
             } else if (nonNull(email)) {
                 userEmail = email;
 
