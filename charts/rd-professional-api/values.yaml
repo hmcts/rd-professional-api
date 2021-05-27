@@ -18,10 +18,14 @@ java:
   keyVaults:
     rd:
       secrets:
-        - professional-api-POSTGRES-PASS
-        - ApplicationInsightsInstrumentationKey
-        - LD-SDK-KEY
-        - professional-api-s2s-secret
+        - name: professional-api-POSTGRES-PASS
+          alias: spring.datasource.password
+        - name: ApplicationInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+        - name: LD-SDK-KEY
+          alias: LD_SDK_KEY
+        - name: professional-api-s2s-secret
+          alias: S2S_SECRET
   autoscaling:
     enabled: true
     maxReplicas: 5

@@ -7,7 +7,8 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
+
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 
 @Getter
@@ -33,7 +34,7 @@ public class UserCreationRequest {
         this.firstName = firstName;
         this.lastName = lastName;
 
-        if (!StringUtils.isEmpty(emailAddress)) {
+        if (isNotBlank(emailAddress)) {
 
             this.email = emailAddress.toLowerCase().trim();
         }

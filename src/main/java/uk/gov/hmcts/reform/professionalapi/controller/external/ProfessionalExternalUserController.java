@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -116,7 +116,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
-            status = StringUtils.isEmpty(status) ? ACTIVE : status;
+            status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 

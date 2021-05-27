@@ -4,7 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import org.springframework.util.StringUtils;
+
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 
@@ -33,7 +34,7 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        this.organisationIdentifier = StringUtils.isEmpty(organisation.getOrganisationIdentifier())
+        this.organisationIdentifier = ObjectUtils.isEmpty(organisation.getOrganisationIdentifier())
                 ? "" : organisation.getOrganisationIdentifier();
         this.name = organisation.getName();
         this.status = organisation.getStatus();
