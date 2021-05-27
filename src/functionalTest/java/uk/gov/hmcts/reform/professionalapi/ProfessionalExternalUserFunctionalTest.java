@@ -62,9 +62,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens();
         inviteUserScenarios();
+        retrieveOrganisationPbaScenarios();
         findUsersByOrganisationScenarios();
         findOrganisationScenarios();
-        retrieveOrganisationPbaScenarios();
         findActiveOrganisationScenarios();
         reinviteUserScenarios();
         findUserStatusByEmailScenarios();
@@ -449,16 +449,15 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     public void retrieveOrganisationPbaScenarios() {
-        findOrganisationPbaWithEmailByExternalUserShouldBeSuccess();
+        findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest();
     }
 
-    public void findOrganisationPbaWithEmailByExternalUserShouldBeSuccess() {
-        log.info("findOrganisationPbaWithEmailByExternalUserShouldBeSuccess :: STARTED");
+    public void findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest() {
+        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: STARTED");
 
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmailForExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(pumBearerToken), activeUserEmail);
-        validatePbaResponse(orgResponse);
-        log.info("findOrganisationPbaWithEmailByExternalUserShouldBeSuccess :: END");
+        professionalApiClient.retrievePaymentAccountsWithoutEmailForExternal(
+                professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
+
+        log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
     }
-
 }
