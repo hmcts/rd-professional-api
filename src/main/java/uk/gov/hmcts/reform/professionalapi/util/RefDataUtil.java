@@ -4,6 +4,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
@@ -33,7 +34,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
@@ -203,7 +204,7 @@ public class RefDataUtil {
 
         GetUserProfileResponse userProfileResponse =
                 (GetUserProfileResponse) requireNonNull(responseResponseEntity.getBody());
-        if (!StringUtils.isEmpty(userProfileResponse)) {
+        if (!ObjectUtils.isEmpty(userProfileResponse)) {
             user.setFirstName(userProfileResponse.getFirstName());
             user.setLastName(userProfileResponse.getLastName());
             user.setEmailAddress(userProfileResponse.getEmail());
@@ -220,7 +221,7 @@ public class RefDataUtil {
 
     public static String removeEmptySpaces(String value) {
         String modValue = value;
-        if (!StringUtils.isEmpty(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = value.trim().replaceAll("\\s+", " ");
         }
         return modValue;
@@ -228,7 +229,7 @@ public class RefDataUtil {
 
     public static String removeAllSpaces(String value) {
         String modValue = value;
-        if (!StringUtils.isEmpty(modValue)) {
+        if (isNotBlank(modValue)) {
             modValue = modValue.replaceAll("\\s+", "");
         }
         return modValue;

@@ -374,6 +374,23 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> retrievePaymentAccountsByEmailForExternal(HttpStatus status,
+                                                                         RequestSpecification requestSpecification,
+                                                                         String email) {
+        Response response = requestSpecification
+                .body("")
+                .get("refdata/external/v1/organisations/pbas?email=" + email)
+                .andReturn();
+
+        log.info("{}:: Retrieve organisation (External) response: {}", loggingComponentName, response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(status.value());
+
+        return response.body().as(Map.class);
+    }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> searchUsersByOrganisation(String organisationId, String role, String showDeleted,

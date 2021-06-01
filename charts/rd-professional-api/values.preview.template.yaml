@@ -15,6 +15,9 @@ java:
   keyVaults:
     rd:
       secrets:
-        - LD-SDK-KEY
-        - ApplicationInsightsInstrumentationKey
-        - professional-api-s2s-secret
+        - name: LD-SDK-KEY
+          alias: LD_SDK_KEY
+        - name: ApplicationInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+        - name: professional-api-s2s-secret
+          alias: S2S_SECRET

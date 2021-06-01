@@ -20,7 +20,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class OrganisationMfaStatusController extends SuperController {
 
     @ApiOperation(
-            value = "Retrieves the mfa status of the organisation a user belongs to"
+            value = "Retrieves the mfa status of the organisation a user belongs to",
+            notes = "**IDAM Roles to access API** : \n No role restriction"
     )
     @ApiResponses({
             @ApiResponse(
