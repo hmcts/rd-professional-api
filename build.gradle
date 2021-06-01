@@ -133,13 +133,13 @@ idea {
 }
 
 configurations {
-    integrationTestCompile.extendsFrom testCompile
+    integrationTestImplementation.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
-    functionalTestCompile.extendsFrom testCompile
+    functionalTestImplementation.extendsFrom testCompile
     functionalTestRuntime.extendsFrom testRuntime
-    contractTestCompile.extendsFrom testCompile
-    contractTestRuntime.extendsFrom testRuntime
-    pactTestCompile.extendsFrom testCompile
+    contractTestImplementation.extendsFrom testCompile
+    contractTestRuntimeOnly.extendsFrom testRuntime
+    pactTestImplementation.extendsFrom testCompile
     pactTestRuntime.extendsFrom testRuntime
 }
 
@@ -276,59 +276,59 @@ repositories {
 }
 
 dependencies {
-    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springBoot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: versions.springBoot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springBoot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
 
-    compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
-    compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
-    compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-    compile (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
+    implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
+    implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
+    implementation (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
         exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
         exclude group: "org.apache.sling"
     }
-    compile group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.0'
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-    compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
+    implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
+    implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+    implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+    implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
 
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
-    compile group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
-    compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
-    compile "org.springframework.boot:spring-boot-starter-oauth2-client"
-    compile "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
-    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
+    implementation group: 'javax.inject', name: 'javax.inject', version: '1'
+    implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation "io.github.openfeign:feign-httpclient:11.0"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Fix for CVE-2021-29425
     implementation 'commons-io:commons-io:2.8.0'
 
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
 
-    compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
-    compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '30.0-jre'
+    implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
-    compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
-    compile group:"org.yaml", name: "snakeyaml", version:"1.27"
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
+    implementation group:"org.yaml", name: "snakeyaml", version:"1.27"
 
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -342,66 +342,66 @@ dependencies {
     smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testCompile("org.hamcrest:hamcrest-junit:2.0.0.0") {
+    testImplementation("org.hamcrest:hamcrest-junit:2.0.0.0") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
         exclude group: "org.hamcrest", module: "hamcrest-library"
     }
 
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
-    testCompile group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.0.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: '4.2.0'
 
-    testCompile group: 'com.h2database', name: 'h2'
-    testCompile "com.github.tomakehurst:wiremock:2.19.0"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.6.28'
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
+    testImplementation group: 'com.h2database', name: 'h2'
+    testImplementation "com.github.tomakehurst:wiremock:2.19.0"
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.6.28'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-    testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testCompile 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
-    testCompile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
+    testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
+    testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-    testCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-    testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
-    testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-    testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-    testCompile 'io.github.openfeign:feign-jackson:10.7.0'
-    testCompile group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+    testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+    testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
+    testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
+    testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
 
-    testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
-    testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
-    testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-    contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
-    contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
-    contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
+    contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+    contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.0')
 
 
-    integrationTestCompile sourceSets.main.runtimeClasspath
-    integrationTestCompile sourceSets.test.runtimeClasspath
+    integrationTestImplementation sourceSets.main.runtimeClasspath
+    integrationTestImplementation sourceSets.test.runtimeClasspath
 
-    functionalTestCompile sourceSets.main.runtimeClasspath
-    functionalTestCompile sourceSets.test.runtimeClasspath
+    functionalTestImplementation sourceSets.main.runtimeClasspath
+    functionalTestImplementation sourceSets.test.runtimeClasspath
 
-    smokeTestCompile sourceSets.main.runtimeClasspath
-    smokeTestCompile sourceSets.test.runtimeClasspath
+    smokeTestImplementation sourceSets.main.runtimeClasspath
+    smokeTestImplementation sourceSets.test.runtimeClasspath
 
-    contractTestCompile sourceSets.main.runtimeClasspath
-    contractTestCompile sourceSets.test.runtimeClasspath
+    contractTestImplementation sourceSets.main.runtimeClasspath
+    contractTestImplementation sourceSets.test.runtimeClasspath
 
-    pactTestCompile sourceSets.main.runtimeClasspath
-    pactTestCompile sourceSets.test.runtimeClasspath
+    pactTestImplementation sourceSets.main.runtimeClasspath
+    pactTestImplementation sourceSets.test.runtimeClasspath
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -425,7 +425,7 @@ dependencyUpdates.resolutionStrategy = {
 gradle.startParameter.continueOnFailure = true
 
 bootJar {
-    archiveName = jarName
+    archiveFileName = jarName
     manifest {
         attributes('Implementation-Version': project.version.toString())
     }
