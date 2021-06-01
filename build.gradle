@@ -17,7 +17,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.1.1'
     id 'org.springframework.boot' version '2.4.5'
-    id "org.flywaydb.flyway" version "7.0.2"
+    id "org.flywaydb.flyway" version "7.9.1"
     id 'au.com.dius.pact' version '4.1.7'// do not change, otherwise serenity report fails
 }
 
