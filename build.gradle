@@ -322,7 +322,7 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
     implementation group: 'com.google.guava', name: 'guava', version: '30.0-jre'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
