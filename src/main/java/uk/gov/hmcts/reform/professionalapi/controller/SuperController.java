@@ -436,10 +436,11 @@ public abstract class SuperController {
             if (nonNull(request.getHeader("UserEmail"))) {
 
                 userEmail = request.getHeader("UserEmail");
-                log.warn("** [DEPRECATED USAGE] Setting user email on the header will be deprecated soon !"
-                        + " ** referer - {} ", request.getHeader("Referer"));
+                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
             } else if (nonNull(email)) {
                 userEmail = email;
+                log.warn("** [DEPRECATED USAGE] Setting user email on the path variable will be deprecated soon !"
+                        + " ** referer - {} ", request.getHeader("Referer"));
 
             } else {
                 throw new InvalidRequest("No User Email provided via header or param");
