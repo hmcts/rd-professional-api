@@ -126,5 +126,12 @@
   "10054_Cookie Without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET": "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/status/status?address=false_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/mfa?user_id=user_id_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations_POST" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas?email=foo-bar@example.com_GET" : "ignore"
 }

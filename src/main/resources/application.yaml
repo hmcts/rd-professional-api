@@ -71,6 +71,9 @@ spring:
       log-abandoned: true
       abandon-when-percentage-full: 0
 
+  config:
+    import: "optional:configtree:/mnt/secrets/rd/"
+
 security:
   anonymousPaths:
     - "/"

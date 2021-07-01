@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl;
 
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_403_FORBIDDEN;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationIdentifierValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -75,7 +75,7 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
         boolean doesRoleExist = false;
         for (String roleName : roles) {
 
-            if (!StringUtils.isEmpty(roleName) && role.equals(roleName.trim())) {
+            if (isNotBlank(roleName) && role.equals(roleName.trim())) {
                 doesRoleExist = true;
                 break;
             }

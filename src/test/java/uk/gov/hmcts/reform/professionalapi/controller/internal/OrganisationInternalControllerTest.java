@@ -272,7 +272,7 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
-        verify(httpRequest, times(2)).getHeader(anyString());
+        verify(httpRequest, times(3)).getHeader(anyString());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
@@ -290,6 +290,15 @@ public class OrganisationInternalControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
         organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_RetrievePaymentAccountByEmailThrows400WhenEmailIsNull() {
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(null);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail(null);
+
+        verify(httpRequest, times(2)).getHeader(null);
     }
 
     @Test

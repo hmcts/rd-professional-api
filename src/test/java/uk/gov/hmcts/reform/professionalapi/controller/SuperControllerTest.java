@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -28,10 +29,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -54,6 +58,8 @@ import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.service.impl.PrdEnumServiceImpl;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class SuperControllerTest {
 
@@ -423,5 +429,29 @@ public class SuperControllerTest {
         verify(userProfileUpdateRequestValidator, times(1)).validateRequest(userProfileUpdatedData);
         verify(professionalUserServiceMock, times(1)).modifyRolesForUser(userProfileUpdatedData,
                 userId, Optional.of("EXUI"));
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testGetUserEmailThrows400WhenEmailIsNull() {
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(null);
+
+        superController.getUserEmail(null);
+
+        verify(httpRequest, times(1)).getHeader(null);
+    }
+
+    @Test
+    public void testGetUserEmailUsesParamEmailWhenHeaderEmailNull() {
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        String email = "adil@praveen.com";
+
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn(null);
+
+        assertThat(email).isEqualTo(superController.getUserEmail(email));
+
+        verify(httpRequest, times(1)).getHeader("UserEmail");
     }
 }

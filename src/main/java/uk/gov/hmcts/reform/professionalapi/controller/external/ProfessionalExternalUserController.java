@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.external;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PUI_USER_MANAGER;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,6 +48,9 @@ public class ProfessionalExternalUserController extends SuperController {
     @ApiOperation(
             value = "Retrieves the Users of an Active Organisation based on the showDeleted flag and without roles if"
                     + " returnRoles is False",
+            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
+                    + "\n pui-organisation-manager,"
+                    + "\n pui-case-manager,\n pui-caa",
             response = ProfessionalUsersResponse.class,
             responseContainer = "list",
             authorizations = {
@@ -55,6 +58,7 @@ public class ProfessionalExternalUserController extends SuperController {
                     @Authorization(value = "Authorization")
             }
     )
+
     @ApiParam(
             name = "showDeleted",
             type = "string",
@@ -112,7 +116,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
         if (!organisationIdentifierValidatorImpl.ifUserRoleExists(jwtGrantedAuthoritiesConverter.getUserInfo()
                 .getRoles(), PUI_USER_MANAGER)) {
-            status = StringUtils.isEmpty(status) ? ACTIVE : status;
+            status = isBlank(status) ? ACTIVE : status;
             profExtUsrReqValidator.validateStatusIsActive(status);
         }
 
@@ -123,6 +127,7 @@ public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
             value = "Modify the Roles or Status of a User with the given ID",
+            notes = "**IDAM Roles to access API** : \n pui-user-manager",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -177,6 +182,9 @@ public class ProfessionalExternalUserController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves the Status of a User belonging to an Active Organisation with the given Email Address",
+            notes = "**IDAM Roles to access API** : \n pui-finance-manager,\n pui-user-manager,"
+                    + "\n pui-organisation-manager,"
+                    + "\n pui-case-manager,\n caseworker-publiclaw-courtadmin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),

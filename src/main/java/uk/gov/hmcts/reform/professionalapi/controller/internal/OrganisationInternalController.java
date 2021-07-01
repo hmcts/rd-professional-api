@@ -66,6 +66,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Creates an Organisation",
+            notes = "**IDAM Roles to access API** : \n No role restriction",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization")
             }
@@ -104,6 +105,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves all Organisations filtered by given Status or one Organisation if ID is given",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -150,6 +152,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Retrieves an Organisation's Payment Accounts with a User's Email Address",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization"),
@@ -194,6 +197,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Edit the PBAs of an Organisation by Organisation ID",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -252,6 +256,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Updates an Organisation",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -296,6 +301,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Add a new User to an Organisation",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -353,6 +359,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Delete an Organisation",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -418,6 +425,7 @@ public class OrganisationInternalController extends SuperController {
 
     @ApiOperation(
             value = "Updates the MFA preference of an Organisation",
+            notes = "**IDAM Roles to access API** : \n prd-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
