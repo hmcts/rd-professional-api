@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -119,6 +120,11 @@ public class OrganisationExternalControllerTest {
 
         organisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
                 "companyN", false, "www.org.com");
+
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234567");
+        organisation.addPaymentAccount(paymentAccount);
+
         organisation1 = new Organisation("Org-Name2", OrganisationStatus.ACTIVE, "sra-id2",
                 "companyN2", false, "www2.org.com");
         organisationResponse = new OrganisationResponse(organisation);
@@ -214,7 +220,6 @@ public class OrganisationExternalControllerTest {
     @Test
     public void testRetrievePaymentAccountByUserEmailFromHeader() {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
-
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         List<String> authorities = new ArrayList<>();
         authorities.add(TestConstants.PUI_USER_MANAGER);
