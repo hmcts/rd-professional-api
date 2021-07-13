@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.util;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +27,7 @@ public class JsonFeignResponseUtil {
         try {
             return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()),
                     (Class<Object>) clazz));
-        } catch (IOException e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
