@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_ORGANISATION_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
@@ -14,6 +16,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -239,6 +242,25 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
 
+    }
+
+    @Test
+    public void get_request_returns_404_when_unknown_email_passed_in_header_external() {
+        String userId = settingUpOrganisation(puiUserManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeaderForExternalUsers("dummy23@dummy.com", puiUserManager, userId);
+        assertThat(orgResponse.get("http_status")).isEqualTo("404");
+        assertThat((String)orgResponse.get("response_body")).contains(ERROR_MSG_NO_ORGANISATION_FOUND);
+    }
+
+    @Test
+    public void get_request_returns_404_when_organisation_doesnt_have_pba_email_passed_in_header_external() {
+        Pair<String,String> userInfo = settingUpMinimalFieldOrganisation(puiUserManager);
+        Map<String, Object> orgResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeaderForExternalUsers(userInfo.getFirst(), puiUserManager,
+                        userInfo.getSecond());
+        assertThat(orgResponse.get("http_status")).isEqualTo("404");
+        assertThat((String)orgResponse.get("response_body")).contains(ERROR_MSG_NO_PBA_FOUND);
     }
 
     private void responseValidate(Map<String, Object> orgResponse) {
