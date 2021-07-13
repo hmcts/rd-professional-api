@@ -304,7 +304,7 @@ dependencies {
     implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
     implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
 
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.3'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.3'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
