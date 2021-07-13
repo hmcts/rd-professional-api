@@ -18,4 +18,16 @@ public class OrganisationEntityResponseTest {
 
         assertThat(organisationEntityResponse).isNotNull();
     }
+
+    @Test
+    public void test_OrganisationEntityResponse_organisation_null() {
+
+        OrganisationEntityResponse organisationEntityResponse = new OrganisationEntityResponse(null,
+                false);
+
+        assertThat(organisationEntityResponse).isNotNull();
+        assertThat(organisationEntityResponse.getName()).isNull();
+        assertThat(organisationEntityResponse.getOrganisationIdentifier()).isNull();
+        assertThat(organisationEntityResponse.getContactInformation()).isNull();
+    }
 }

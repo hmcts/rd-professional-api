@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -14,6 +15,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_ORGANISATION_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.isSystemRoleUser;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.setOrgIdInGetUserResponse;
@@ -635,6 +639,29 @@ public class RefDataUtilTest {
     }
 
     @Test
+    public void test_GetSingleUserIdFromUserProfile_WhenResponseIs300_body_is_null() throws Exception {
+        Map<String, Collection<String>> header = new HashMap<>();
+        Collection<String> list = new ArrayList<>();
+        header.put("content-encoding", list);
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "some@email.com",
+                "firstName", "lastName", IdamStatus.ACTIVE);
+        GetUserProfileResponse userProfileResponse = new GetUserProfileResponse(profile, false);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Response response = Response.builder().status(301).reason("").headers(header).body(null, UTF_8)
+                .request(mock(Request.class)).build();
+        when(userProfileFeignClient.getUserProfileById(any())).thenReturn(response);
+
+        assertThat(catchThrowable(() -> RefDataUtil.getSingleUserIdFromUserProfile(new ProfessionalUser("firstName",
+                "lastName", "some@email.com", new Organisation("name",
+                OrganisationStatus.PENDING, "sraId", "companyNumber", Boolean.TRUE,
+                "companyUrl")), userProfileFeignClient, Boolean.TRUE)))
+                .isExactlyInstanceOf(ExternalApiException.class)
+                .hasMessage(ERROR_MESSAGE_UP_FAILED);
+        verify(userProfileFeignClient, times(1)).getUserProfileById(any());
+    }
+
+    @Test
     public void test_getMultipleUserProfilesFromUp() throws JsonProcessingException {
         Map<String, Organisation> activeOrganisationDetails = new ConcurrentHashMap<>();
         activeOrganisationDetails.put("someId", organisation);
@@ -931,4 +958,17 @@ public class RefDataUtilTest {
 
     }
 
+    @Test
+    public void testCheckOrganisationExists() {
+        assertThat(catchThrowable(() -> RefDataUtil.checkOrganisationAndPbaExists(null)))
+                .isExactlyInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(ERROR_MSG_NO_ORGANISATION_FOUND);
+    }
+
+    @Test
+    public void testCheckPbaExists() {
+        assertThat(catchThrowable(() -> RefDataUtil.checkOrganisationAndPbaExists(organisation)))
+                .isExactlyInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(ERROR_MSG_NO_PBA_FOUND);
+    }
 }

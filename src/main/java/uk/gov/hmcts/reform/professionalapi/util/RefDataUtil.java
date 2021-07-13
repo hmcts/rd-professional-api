@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.professionalapi.util;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.DELETION_SUCCESS_MSG;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_CODE_500;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MESSAGE_UP_FAILED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_ORGANISATION_FOUND;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_NO_PBA_FOUND;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PRD_AAC_SYSTEM;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.STATUS_CODE_204;
 
@@ -129,10 +133,9 @@ public class RefDataUtil {
             ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
             if (response.status() > 300) {
-                ErrorResponse userProfileErrorResponse =
-                        (ErrorResponse) requireNonNull(responseResponseEntity.getBody());
-                throw new ExternalApiException(responseResponseEntity.getStatusCode(),
-                        userProfileErrorResponse.getErrorMessage());
+                String errorMessage = nonNull(responseResponseEntity.getBody())
+                        ? ((ErrorResponse)responseResponseEntity.getBody()).getErrorMessage() : ERROR_MESSAGE_UP_FAILED;
+                throw new ExternalApiException(responseResponseEntity.getStatusCode(), errorMessage);
 
             }
             mapUserInfo(user, responseResponseEntity, isRequiredRoles);
@@ -420,5 +423,13 @@ public class RefDataUtil {
 
     public static boolean isSystemRoleUser(List<String> roles) {
         return roles.size() == 1 && roles.contains(PRD_AAC_SYSTEM);
+    }
+
+    public static void checkOrganisationAndPbaExists(Organisation organisation) {
+        if (isNull(organisation)) {
+            throw new ResourceNotFoundException(ERROR_MSG_NO_ORGANISATION_FOUND);
+        } else if (CollectionUtils.isEmpty(organisation.getPaymentAccounts())) {
+            throw new ResourceNotFoundException(ERROR_MSG_NO_PBA_FOUND);
+        }
     }
 }
