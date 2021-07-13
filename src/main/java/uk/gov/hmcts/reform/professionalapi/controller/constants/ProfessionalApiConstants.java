@@ -50,4 +50,7 @@ public class ProfessionalApiConstants {
     public static final String NO_USER_FOUND = "The requested user does not exist";
     public static final String EMPTY_USER_ID = "User Id cannot be empty";
 
+    public static final String ERROR_MSG_NO_ORGANISATION_FOUND = "No organisation belongs to given email";
+    public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
+
 }
