@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
@@ -275,7 +276,7 @@ public class OrganisationInternalControllerTest {
         verify(httpRequest, times(3)).getHeader(anyString());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void test_RetrievePaymentAccountByEmailThrows404WhenNoAccFound() {
         String email = "test@email.com";
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
