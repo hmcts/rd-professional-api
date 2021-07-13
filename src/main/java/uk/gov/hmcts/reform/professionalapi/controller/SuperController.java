@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.O
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
@@ -29,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -203,12 +203,9 @@ public abstract class SuperController {
     protected ResponseEntity<Object> retrievePaymentAccountByUserEmail(String email) {
 
         validateEmail(email);
-        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email
-                .toLowerCase());
-        if (null == organisation || organisation.getPaymentAccounts().isEmpty()) {
+        Organisation organisation = paymentAccountService.findPaymentAccountsByEmail(email.toLowerCase());
 
-            throw new EmptyResultDataAccessException(1);
-        }
+        checkOrganisationAndPbaExists(organisation);
 
         return ResponseEntity
                 .status(200)
