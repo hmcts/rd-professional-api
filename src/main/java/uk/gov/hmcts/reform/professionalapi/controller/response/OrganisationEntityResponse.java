@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +30,9 @@ public class OrganisationEntityResponse extends OrganisationMinimalInfoResponse 
 
     public OrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {
 
-        getOrganisationEntityResponse(organisation, isRequiredAllEntities);
+        if (nonNull(organisation)) {
+            getOrganisationEntityResponse(organisation, isRequiredAllEntities);
+        }
     }
 
     private void getOrganisationEntityResponse(Organisation organisation, Boolean isRequiredAllEntities) {

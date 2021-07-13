@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
+import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.decodeJwtToken;
 import static uk.gov.hmcts.reform.professionalapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 import static uk.gov.hmcts.reform.professionalapi.util.KeyGenUtil.getDynamicJwksResponse;
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -239,6 +241,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected String settingUpOrganisation(String role) {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         String organisationIdentifier = createOrganisationRequest();
+        return updateOrgAndInviteUser(organisationIdentifier, role);
+    }
+
+    protected Pair<String,String> settingUpMinimalFieldOrganisation(String role) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
+        String userEmail = organisationCreationRequest.getSuperUser().getEmail();
+        String userId = updateOrgAndInviteUser(
+                createAndActivateOrganisationWithGivenRequest(organisationCreationRequest), role);
+        return Pair.of(userEmail, userId);
+    }
+
+    protected String updateOrgAndInviteUser(String organisationIdentifier, String role) {
         updateOrganisation(organisationIdentifier, hmctsAdmin, "ACTIVE");
 
         List<String> userRoles = new ArrayList<>();
@@ -252,14 +267,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 professionalReferenceDataClient.addUserToOrganisationWithUserId(organisationIdentifier,
                         inviteUserCreationRequest(randomAlphabetic(5) + "@email.com", userRoles),
                         hmctsAdmin, userIdentifier);
-
-
-
         return (String) newUserResponse.get(USER_IDENTIFIER);
     }
 
+
     public String createOrganisationRequest() {
         OrganisationCreationRequest organisationCreationRequest = organisationRequestWithAllFields().build();
+        java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
+                .createOrganisation(organisationCreationRequest);
+        return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
+    }
+
+    public String createOrganisationWithMinimumFieldRequest() {
+        OrganisationCreationRequest organisationCreationRequest = someMinimalOrganisationRequest().build();
         java.util.Map<String, Object> responseForOrganisationCreation = professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest);
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
