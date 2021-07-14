@@ -456,7 +456,7 @@ public class SuperControllerTest {
     }
 
     @Test
-    public void testGetUserEmailFromHeaderWhenHeaderEmailNull() {
+    public void testGetUserEmailFromHeader() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         String email = "adil@praveen.com";
 
