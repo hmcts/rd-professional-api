@@ -340,7 +340,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value())
-                .body("errorDescription", equalTo("No User Email provided via header or param"));
+                .body("errorDescription", equalTo("No User Email provided via header"));
 
     }
 
