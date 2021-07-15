@@ -5,6 +5,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
+import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationMfaStatusController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProfileUpdateRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
@@ -39,6 +40,12 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     @Primary
     public OrganisationExternalController organisationExternalController() {
         return new OrganisationExternalController();
+    }
+
+    @Bean
+    @Primary
+    public OrganisationMfaStatusController organisationMfaStatusController() {
+        return new OrganisationMfaStatusController();
     }
 
     @MockBean

@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
-import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -47,9 +46,6 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
-
-    @Autowired
-    MfaStatusService mfaStatusService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
