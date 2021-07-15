@@ -22,11 +22,15 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ModifyUserRolesResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleAdditionResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
+import uk.gov.hmcts.reform.professionalapi.service.MfaStatusService;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 
 import java.io.IOException;
@@ -34,14 +38,14 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
-import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getProfessionalUser;
-import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getUserProfile;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
@@ -63,6 +67,9 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
 
     @Autowired
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverterMock;
+
+    @Autowired
+    MfaStatusService mfaStatusService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private Organisation organisation;
@@ -156,5 +163,46 @@ public class ProfessionalExternalUserControllerProviderTest extends WebMvcProvid
             .request(mock(Request.class)).body(bodyModifyUserRoles, Charset.defaultCharset()).status(200).build());
 
         return professionalUser;
+    }
+
+    private UserProfile getUserProfile() {
+        UserProfile profile = new UserProfile(UUID.randomUUID().toString(), "email@org.com",
+            "firstName", "lastName", IdamStatus.ACTIVE);
+        return profile;
+    }
+
+    private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
+        organisation = new Organisation();
+        organisation.setName(name);
+        organisation.setCompanyNumber(companyNumber);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
+        organisation.setSraId(sraId);
+        organisation.setSraRegulated(true);
+        organisation.setCompanyUrl(companyUrl);
+        organisation.setOrganisationIdentifier("someOrganisationIdentifier");
+
+        SuperUser su = getSuperUser();
+
+        PaymentAccount pa = new PaymentAccount();
+        pa.setPbaNumber("pbaNumber");
+
+        organisation.setPaymentAccounts(Arrays.asList(pa));
+        organisation.setUsers(Arrays.asList(su));
+
+        ProfessionalUser pu = new ProfessionalUser();
+        pu.setUserIdentifier(PROFESSIONAL_USER_ID);
+        pu.setEmailAddress(ORGANISATION_EMAIL);
+        pu.setOrganisation(organisation);
+        return pu;
+
+    }
+
+    private SuperUser getSuperUser() {
+        SuperUser su = new SuperUser();
+        su.setEmailAddress("superUser@email.com");
+        su.setFirstName("some-fname");
+        su.setLastName("some-lname");
+        su.setUserIdentifier("someUserIdentifier");
+        return su;
     }
 }
