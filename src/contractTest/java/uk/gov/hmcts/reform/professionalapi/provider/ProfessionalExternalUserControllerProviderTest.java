@@ -44,15 +44,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.ORGANISATION_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.PROFESSIONAL_USER_ID;
 
 @Provider("referenceData_professionalExternalUsers")
 @WebMvcTest({ProfessionalExternalUserController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = {ProfessionalExternalUserControllerProviderTestConfiguration.class, WebConfig.class})
 public class ProfessionalExternalUserControllerProviderTest extends WebMvcProviderTest {
-
-    private static final String PROFESSIONAL_USER_ID = "123456";
-    private static final String ORGANISATION_EMAIL = "someemailaddress@organisation.com";
 
     @Autowired
     ProfessionalUserRepository professionalUserRepositoryMock;
