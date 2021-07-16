@@ -8,6 +8,7 @@ import feign.Request;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
@@ -38,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.pact.util.PactUtils.getOrgWithMfaStatus;
 
 @Provider("referenceData_organisationalInternal")
 @Import(OrganisationalInternalControllerProviderTestConfiguration.class)
@@ -63,9 +65,13 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @Autowired
     MfaStatusService mfaStatusService;
 
+    @Autowired
+    MappingJackson2HttpMessageConverter httpMessageConverter;
+
     @Override
     void setController() {
         testTarget.setControllers(organisationInternalController);
+        testTarget.setMessageConverters(httpMessageConverter);
     }
 
     @State("Users exists for an Organisation")
@@ -158,6 +164,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
             any(PbaEditRequest.class)))
             .thenReturn(new PbaResponse("200", "Success"));
+    }
+
+    //MFA put api test
+    @State("An Organisation exists with MFA")
+    public void setUpOrganisationForMfaUpdate() {
+        when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(getOrgWithMfaStatus());
     }
 
     private void addSuperUser(Organisation organisation) {
