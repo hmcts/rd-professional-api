@@ -33,7 +33,7 @@ public class OrganisationalMfaStatusControllerProviderTest extends MockMvcProvid
     }
 
     //MFA pact get api test
-    @State("An MFA exists for Organisation")
+    @State("MFA exists for Organisation")
     public void setUpUserWithOrganisation() {
         Organisation organisation = getOrgWithMfaStatus();
         ProfessionalUser professionalUser = getProfessionalUser();
