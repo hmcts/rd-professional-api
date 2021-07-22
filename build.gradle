@@ -269,7 +269,7 @@ project.tasks['sonarqube'].group = "Verification"
 repositories {
 
     maven {
-        url "https://dl.bintray.com/hmcts/hmcts-maven"
+        url "https://jitpack.io/"
     }
 
     jcenter()
