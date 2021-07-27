@@ -269,7 +269,7 @@ project.tasks['sonarqube'].group = "Verification"
 repositories {
 
     maven {
-        url "https://dl.bintray.com/hmcts/hmcts-maven"
+        url "https://jitpack.io/"
     }
 
     jcenter()
@@ -402,6 +402,18 @@ dependencies {
 
     pactTestImplementation sourceSets.main.runtimeClasspath
     pactTestImplementation sourceSets.test.runtimeClasspath
+}
+
+dependencyManagement {
+
+    dependencies {
+        // CVE-2021-25122
+        dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.50') {
+            entry 'tomcat-embed-core'
+            entry 'tomcat-embed-el'
+            entry 'tomcat-embed-websocket'
+        }
+    }
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
