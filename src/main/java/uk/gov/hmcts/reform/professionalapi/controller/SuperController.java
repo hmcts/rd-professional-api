@@ -213,7 +213,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
-                                                            String organisationIdentifier, String userId) {
+                                                            String organisationIdentifier) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -303,13 +303,12 @@ public abstract class SuperController {
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
             return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
         } else {
-            return inviteNewUserToOrganisation(newUserCreationRequest, userId, professionalUser, roles);
+            return inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
         }
     }
 
     private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
-                                                               String userId, ProfessionalUser professionalUser,
-                                                               List<String> roles) {
+                                                               ProfessionalUser professionalUser, List<String> roles) {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
