@@ -296,7 +296,7 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        return updateOrganisationById(organisationCreationRequest, organisationIdentifier, userId);
+        return updateOrganisationById(organisationCreationRequest, organisationIdentifier);
     }
 
     @ApiOperation(
@@ -406,18 +406,16 @@ public class OrganisationInternalController extends SuperController {
             @PathVariable("orgId") @NotBlank String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
-        DeleteOrganisationResponse deleteOrganisationResponse = new DeleteOrganisationResponse();
-        //Received request to delete an organisation for internal user
         Optional<Organisation> organisation = Optional.ofNullable(organisationService
                     .getOrganisationByOrgIdentifier(organisationIdentifier));
 
         if (organisation.isEmpty()) {
-
             throw new EmptyResultDataAccessException(1);
-
         }
 
-        deleteOrganisationResponse = organisationService.deleteOrganisation(organisation.get(), userId);
+        DeleteOrganisationResponse deleteOrganisationResponse =
+                organisationService.deleteOrganisation(organisation.get(), userId);
+
         return ResponseEntity
                 .status(deleteOrganisationResponse.getStatusCode())
                 .body(deleteOrganisationResponse);
