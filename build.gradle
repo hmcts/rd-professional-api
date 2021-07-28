@@ -231,6 +231,7 @@ jacocoTestReport {
 
 pitest {
     targetClasses = ['uk.gov.hmcts.reform.professionalapi.*']
+    testSourceSets = [sourceSets.integrationTest, sourceSets.test]
     excludedClasses = [
             'uk.gov.hmcts.reform.professionalapi.configuration.*',
             'uk.gov.hmcts.reform.professionalapi.controller.*',
