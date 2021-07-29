@@ -454,4 +454,17 @@ public class SuperControllerTest {
 
         verify(httpRequest, times(1)).getHeader("UserEmail");
     }
+
+    @Test
+    public void testGetUserEmailFromHeader() {
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        String email = "adil@praveen.com";
+
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(httpRequest.getHeader(anyString())).thenReturn("adil@praveen.com");
+
+        assertThat(email).isEqualTo(superController.getUserEmailFromHeader());
+
+        verify(httpRequest, times(2)).getHeader("UserEmail");
+    }
 }

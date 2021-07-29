@@ -63,7 +63,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
+                .findPaymentAccountsByEmailFromHeader("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
         responseValidate(orgResponse);
@@ -102,7 +102,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
+                .findPaymentAccountsByEmailFromHeader("some@email.com", hmctsAdmin);
 
         assertThat(orgResponse).isNotEmpty();
 
@@ -136,7 +136,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin, uuid);
 
         Map<String, Object> orgResponse = professionalReferenceDataClient
-                .findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
+                .findPaymentAccountsByEmailFromHeader("some@email.com", hmctsAdmin);
         assertThat(orgResponse.get("http_status")).isEqualTo("404");
 
     }
@@ -162,7 +162,7 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
         professionalReferenceDataClient.createOrganisation(organisationCreationRequest);
 
         Map<String, Object> response = professionalReferenceDataClient
-                .findPaymentAccountsByEmail("some@email.com", hmctsAdmin);
+                .findPaymentAccountsByEmailFromHeader("some@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
 
@@ -171,8 +171,8 @@ public class FindPaymentAccountsByEmailTest extends AuthorizationEnabledIntegrat
     @Test
     public void returns_404_when_email_not_found() {
 
-        Map<String, Object> response =
-                professionalReferenceDataClient.findPaymentAccountsByEmail("wrong@email.com", hmctsAdmin);
+        Map<String, Object> response = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("wrong@email.com", hmctsAdmin);
 
         assertThat(response.get("http_status")).isEqualTo("404");
     }

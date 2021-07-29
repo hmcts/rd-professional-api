@@ -39,8 +39,8 @@ public class EditPaymentAccountsTest extends AuthorizationEnabledIntegrationTest
         assertThat(pbaResponse.get("http_status")).isEqualTo("200 OK");
         assertThat(pbaResponse.get("statusMessage")).isEqualTo(HttpStatus.OK.getReasonPhrase());
 
-        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse =
-                professionalReferenceDataClient.findPaymentAccountsByEmail("someone@somewhere.com", hmctsAdmin);
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
 
         Map organisationEntityResponse = (Map) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
         List paymentAccount = (List) organisationEntityResponse.get("paymentAccount");
