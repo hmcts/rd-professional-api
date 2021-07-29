@@ -446,4 +446,24 @@ public abstract class SuperController {
 
         return userEmail;
     }
+
+    public String getUserEmailFromHeader() {
+        String userEmail = null;
+        ServletRequestAttributes servletRequestAttributes =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+
+        if (nonNull(servletRequestAttributes)) {
+
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            if (nonNull(request.getHeader("UserEmail"))) {
+
+                userEmail = request.getHeader("UserEmail");
+                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
+            } else {
+                throw new InvalidRequest("No User Email provided via header");
+            }
+        }
+
+        return userEmail;
+    }
 }
