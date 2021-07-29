@@ -239,23 +239,6 @@ public class OrganisationInternalControllerTest {
     }
 
     @Test
-    public void test_RetrievePaymentAccountByEmail() {
-        final HttpStatus expectedHttpStatus = HttpStatus.OK;
-        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(new PaymentAccount());
-        organisation.setPaymentAccounts(paymentAccounts);
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
-        String email = "some-email@test.com";
-        when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
-
-        assertThat(actual).isNotNull();
-        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
-
-        verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
-    }
-
-    @Test
     public void test_RetrievePaymentAccountByEmailFromHeader() {
 
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
@@ -267,7 +250,7 @@ public class OrganisationInternalControllerTest {
         when(httpRequest.getHeader(anyString())).thenReturn(email);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
 
-        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
+        ResponseEntity<?> actual = organisationInternalController.retrievePaymentAccountBySuperUserEmail();
 
         assertThat(actual).isNotNull();
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
@@ -282,7 +265,7 @@ public class OrganisationInternalControllerTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-        organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail();
     }
 
     @Test(expected = InvalidRequest.class)
@@ -290,14 +273,14 @@ public class OrganisationInternalControllerTest {
         String email = "some-email";
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(email);
-        organisationInternalController.retrievePaymentAccountBySuperUserEmail(email);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail();
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_RetrievePaymentAccountByEmailThrows400WhenEmailIsNull() {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(httpRequest.getHeader(anyString())).thenReturn(null);
-        organisationInternalController.retrievePaymentAccountBySuperUserEmail(null);
+        organisationInternalController.retrievePaymentAccountBySuperUserEmail();
 
         verify(httpRequest, times(2)).getHeader(null);
     }

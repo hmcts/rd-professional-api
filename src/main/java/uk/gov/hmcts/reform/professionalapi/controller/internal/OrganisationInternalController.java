@@ -187,10 +187,9 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail(
-            @RequestParam(value = "email", required = false) String email) {
+    public ResponseEntity<Object> retrievePaymentAccountBySuperUserEmail() {
 
-        String userEmail = getUserEmail(email);
+        String userEmail = getUserEmailFromHeader();
         //Received request to retrieve an organisations payment accounts by email for internal
         return retrievePaymentAccountByUserEmail(userEmail);
     }
