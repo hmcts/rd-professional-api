@@ -63,17 +63,17 @@ public class ProfessionalReferenceDataClient {
 
 
     public Map<String, Object> findPaymentAccountsByEmail(String email, String role) {
-        return getRequest("/refdata/internal/v1/organisations" + "/pbas?email={email}", role, email);
+        return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas", role, email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmailFromHeader(String email, String role) {
-        return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas?email={email}",
+        return getRequestToGetEmailFromHeader("/refdata/internal/v1/organisations" + "/pbas",
                 role, "", email);
     }
 
     public Map<String, Object> findPaymentAccountsByEmailFromHeaderForExternalUsers(String email, String role,
                                                                                     String userId) {
-        return getRequestToGetEmailFromHeader("/refdata/external/v1/organisations" + "/pbas?email={email}",
+        return getRequestToGetEmailFromHeader("/refdata/external/v1/organisations" + "/pbas",
                 role, userId, email);
     }
 
@@ -253,7 +253,7 @@ public class ProfessionalReferenceDataClient {
             } else {
                 httpHeaders = getMultipleAuthHeaders(role, userId);
             }
-            httpHeaders.add("User-Email", params[0].toString());
+            httpHeaders.add("UserEmail", params[0].toString());
             HttpEntity<?> request = new HttpEntity<>(httpHeaders);
             responseEntity = restTemplate
                     .exchange("http://localhost:" + prdApiPort + uriPath,
