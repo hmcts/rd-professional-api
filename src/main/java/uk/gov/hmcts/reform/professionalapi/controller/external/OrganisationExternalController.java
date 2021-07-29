@@ -167,10 +167,9 @@ public class OrganisationExternalController extends SuperController {
     )
     @Secured({"pui-finance-manager", "pui-user-manager", "pui-organisation-manager", "pui-case-manager"})
     public ResponseEntity<OrganisationPbaResponse>
-        retrievePaymentAccountByEmail(@RequestParam(value = "email", required = false) String email,
-                                  @ApiParam(hidden = true) @OrgId String orgId) {
+        retrievePaymentAccountByEmail(@ApiParam(hidden = true) @OrgId String orgId) {
         //Received request to retrieve an organisations payment accounts by email for external
-        String userEmail = getUserEmail(email);
+        String userEmail = getUserEmailFromHeader();
         return retrievePaymentAccountByUserEmail(userEmail, orgId);
     }
 
