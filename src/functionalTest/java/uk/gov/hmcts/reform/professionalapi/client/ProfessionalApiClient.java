@@ -315,9 +315,9 @@ public class ProfessionalApiClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmail(String email, String role) {
-        Response response = getMultipleAuthHeadersInternal()
+        Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
             .body("")
-            .get("/refdata/internal/v1/organisations/pbas?email=" + email)
+            .get("/refdata/internal/v1/organisations/pbas")
             .andReturn();
 
         log.info("{}:: Retrieve organisation (Internal) response: {}", loggingComponentName, response.statusCode());
@@ -340,7 +340,7 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value())
-                .body("errorDescription", equalTo("No User Email provided via header or param"));
+                .body("errorDescription", equalTo("No User Email provided via header"));
 
     }
 
@@ -355,14 +355,14 @@ public class ProfessionalApiClient {
         response.then()
                 .assertThat()
                 .statusCode(BAD_REQUEST.value())
-                .body("errorDescription", equalTo("No User Email provided via header or param"));
+                .body("errorDescription", equalTo("No User Email provided via header"));
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> retrievePaymentAccountsByEmailFromHeader(String email, String role) {
         Response response = getUserEmailAsHeaderWithExisting(idamOpenIdClient.getInternalOpenIdToken(), email)
                 .body("")
-                .get("/refdata/internal/v1/organisations/pbas?email=" + "rd@prdfunctestuser.com")
+                .get("/refdata/internal/v1/organisations/pbas")
                 .andReturn();
 
         log.info("{}:: Retrieve pba by email (Internal) response: {}", loggingComponentName, response.statusCode());
