@@ -206,7 +206,7 @@ public class OrganisationExternalControllerTest {
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(email,
+        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
                 UUID.randomUUID().toString().substring(0, 7));
 
         assertThat(actual).isNotNull();
@@ -228,7 +228,7 @@ public class OrganisationExternalControllerTest {
         when(jwtGrantedAuthoritiesConverterMock.getUserInfo()).thenReturn(userInfoMock);
         when(userInfoMock.getRoles()).thenReturn(authorities);
         when(paymentAccountServiceMock.findPaymentAccountsByEmail(email)).thenReturn(organisation);
-        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(" ",
+        ResponseEntity<?> actual = organisationExternalController.retrievePaymentAccountByEmail(
                 UUID.randomUUID().toString().substring(0, 7));
 
         assertThat(actual).isNotNull();
