@@ -133,5 +133,11 @@
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations_POST" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas?email=foo-bar@example.com_GET" : "ignore"
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas?email=foo-bar@example.com_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://****-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas_GET": "ignore",
+  "10054_Cookie without SameSite Attribute_http://****-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://****-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://****-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations/pbas_GET": "ignore",
+  "90033_Loosely Scoped Cookie_http://****-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas_GET": "ignore",
+  "10096_Timestamp Disclosure - Unix_http://****-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/pbas_GET": "ignore"
 }
