@@ -6,6 +6,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.REFERER;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -429,14 +431,14 @@ public abstract class SuperController {
         if (nonNull(servletRequestAttributes)) {
 
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            if (nonNull(request.getHeader("UserEmail"))) {
+            if (nonNull(request.getHeader(USER_EMAIL))) {
 
-                userEmail = request.getHeader("UserEmail");
-                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
+                userEmail = request.getHeader(USER_EMAIL);
+                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader(REFERER));
             } else if (nonNull(email)) {
                 userEmail = email;
                 log.warn("** [DEPRECATED USAGE] Setting user email on the path variable will be deprecated soon !"
-                        + " ** referer - {} ", request.getHeader("Referer"));
+                        + " ** referer - {} ", request.getHeader(REFERER));
 
             } else {
                 throw new InvalidRequest("No User Email provided via header or param");
@@ -454,10 +456,10 @@ public abstract class SuperController {
         if (nonNull(servletRequestAttributes)) {
 
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            if (nonNull(request.getHeader("UserEmail"))) {
+            if (nonNull(request.getHeader(USER_EMAIL))) {
 
-                userEmail = request.getHeader("UserEmail");
-                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
+                userEmail = request.getHeader(USER_EMAIL);
+                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader(REFERER));
             } else {
                 throw new InvalidRequest("No User Email provided via header");
             }

@@ -5,6 +5,7 @@ public class ProfessionalApiConstants {
     private ProfessionalApiConstants() {
     }
 
+
     public static final String EMAIL_REGEX = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@"
             + "[A-Za-z0-9]+(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
@@ -24,6 +25,9 @@ public class ProfessionalApiConstants {
     public static final String FALSE = "false";
     public static final String PUI_USER_MANAGER = "pui-user-manager";
     public static final String ACTIVE = "Active";
+    public static final String USER_EMAIL = "UserEmail";
+    public static final String REFERER = "Referer";
+    
     public static final String ERROR_MESSAGE_INVALID_STATUS_PASSED =
             "Invalid status param provided, only Active status is allowed";
     public static final String FIRST_NAME = "firstName";
