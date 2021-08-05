@@ -62,7 +62,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
     public List<UserAttribute> addUserAttributesToSuperUser(ProfessionalUser user,
                                                                              List<UserAttribute> attributes) {
         prdEnumService.findAllPrdEnums().stream()
-                .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType(),prdEnum))
+                .filter(prdEnum -> isValidEnumType(prdEnum.getPrdEnumId().getEnumType()))
                 .map(prdEnum -> {
                     PrdEnum e = new PrdEnum(prdEnum.getPrdEnumId(), prdEnum.getEnumName(),
                             prdEnum.getEnumDescription());
@@ -77,7 +77,7 @@ public class UserAttributeServiceImpl implements UserAttributeService {
 
     }
 
-    private boolean isValidEnumType(String enumType, PrdEnum prdEnum) {
+    private boolean isValidEnumType(String enumType) {
         return enumType.equalsIgnoreCase(PrdEnumType.SIDAM_ROLE.name())
                 || enumType.equalsIgnoreCase(PrdEnumType.ADMIN_ROLE.name());
     }
