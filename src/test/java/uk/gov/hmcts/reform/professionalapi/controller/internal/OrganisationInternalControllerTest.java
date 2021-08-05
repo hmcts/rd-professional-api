@@ -256,7 +256,7 @@ public class OrganisationInternalControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
 
         verify(paymentAccountServiceMock, times(1)).findPaymentAccountsByEmail(email);
-        verify(httpRequest, times(3)).getHeader(anyString());
+        verify(httpRequest, times(2)).getHeader(anyString());
     }
 
     @Test(expected = ResourceNotFoundException.class)
