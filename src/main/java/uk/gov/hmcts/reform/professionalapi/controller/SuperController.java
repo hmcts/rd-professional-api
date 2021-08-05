@@ -6,6 +6,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
@@ -213,7 +214,7 @@ public abstract class SuperController {
     }
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
-                                                            String organisationIdentifier, String userId) {
+                                                            String organisationIdentifier) {
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -303,13 +304,12 @@ public abstract class SuperController {
         if (newUserCreationRequest.isResendInvite() && resendInviteEnabled) {
             return reInviteExpiredUser(newUserCreationRequest, professionalUser, roles, organisationIdentifier);
         } else {
-            return inviteNewUserToOrganisation(newUserCreationRequest, userId, professionalUser, roles);
+            return inviteNewUserToOrganisation(newUserCreationRequest, professionalUser, roles);
         }
     }
 
     private ResponseEntity<Object> inviteNewUserToOrganisation(NewUserCreationRequest newUserCreationRequest,
-                                                               String userId, ProfessionalUser professionalUser,
-                                                               List<String> roles) {
+                                                               ProfessionalUser professionalUser, List<String> roles) {
 
         Object responseBody = null;
         checkUserAlreadyExist(newUserCreationRequest.getEmail());
@@ -430,14 +430,11 @@ public abstract class SuperController {
         if (nonNull(servletRequestAttributes)) {
 
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            if (nonNull(request.getHeader("UserEmail"))) {
+            if (nonNull(request.getHeader(USER_EMAIL))) {
 
-                userEmail = request.getHeader("UserEmail");
-                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
+                userEmail = request.getHeader(USER_EMAIL);
             } else if (nonNull(email)) {
                 userEmail = email;
-                log.warn("** [DEPRECATED USAGE] Setting user email on the path variable will be deprecated soon !"
-                        + " ** referer - {} ", request.getHeader("Referer"));
 
             } else {
                 throw new InvalidRequest("No User Email provided via header or param");
@@ -455,10 +452,9 @@ public abstract class SuperController {
         if (nonNull(servletRequestAttributes)) {
 
             HttpServletRequest request = servletRequestAttributes.getRequest();
-            if (nonNull(request.getHeader("UserEmail"))) {
+            if (nonNull(request.getHeader(USER_EMAIL))) {
 
-                userEmail = request.getHeader("UserEmail");
-                log.warn("** Setting user email on the header  ** referer - {} ", request.getHeader("Referer"));
+                userEmail = request.getHeader(USER_EMAIL);
             } else {
                 throw new InvalidRequest("No User Email provided via header");
             }
