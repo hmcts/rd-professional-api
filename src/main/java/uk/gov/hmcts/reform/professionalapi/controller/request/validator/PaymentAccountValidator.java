@@ -41,7 +41,7 @@ public class PaymentAccountValidator {
         String invalidPbas = paymentAccounts.stream()
                 .filter(pbaAccount -> {
                     if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
-                        Pattern pattern = Pattern.compile("(?i)pba.[[\\\\w[^_]]{7}]*$");
+                        Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
                         Matcher matcher = pattern.matcher(pbaAccount);
                         if (matcher.matches()) {
                             return false;
