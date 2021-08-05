@@ -301,7 +301,7 @@ public class ProfessionalExternalUserControllerTest {
 
         verify(professionalUserServiceMock, times(1))
                 .findUserStatusByEmailAddress(email);
-        verify(httpRequest, times(3)).getHeader(anyString());
+        verify(httpRequest, times(2)).getHeader(anyString());
 
     }
 
