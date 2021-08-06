@@ -39,6 +39,14 @@ where organisation_id in
  and up.email_address like any (values('%@prdfunctestuser.com'))
 );
 
+delete from organisation_mfa_status
+where organisation_id in
+(
+ select org.id from organisation org , professional_user up
+ where up.organisation_id = org.id
+ and up.email_address like any (values('%@prdfunctestuser.com'))
+);
+
 delete from professional_user
 where organisation_id in
 (
