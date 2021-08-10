@@ -32,5 +32,7 @@ public class PaymentAccountTest {
         assertThat(paymentAccount.getCreated()).isNotNull();
         assertThat(paymentAccount.getId()).isNotNull();
         assertThat(paymentAccount.getPbaNumber()).isNotNull();
+        assertThat(paymentAccount.getPbaStatus()).isNotNull();
+        assertThat(paymentAccount.getStatusMessage()).isNotNull();
     }
 }
