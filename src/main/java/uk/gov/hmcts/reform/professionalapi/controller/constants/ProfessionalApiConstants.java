@@ -55,5 +55,6 @@ public class ProfessionalApiConstants {
 
     public static final String ERROR_MSG_NO_ORGANISATION_FOUND = "No organisation belongs to given email";
     public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
+    public static final String PBA_STATUS_MESSAGE = "Edited by Admin";
 
 }

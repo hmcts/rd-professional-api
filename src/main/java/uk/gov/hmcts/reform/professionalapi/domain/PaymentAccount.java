@@ -38,6 +38,14 @@ public class PaymentAccount implements Serializable {
     @Size(min = 10, max = 10)
     private String pbaNumber;
 
+    @Column(name = "PBA_STATUS")
+    @Size(max = 10)
+    private String pbaStatus;
+
+    @Column(name = "STATUS_MESSAGE")
+    @Size(max = 256)
+    private String statusMessage;
+
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID")
     private Organisation organisation;

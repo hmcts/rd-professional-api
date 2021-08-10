@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -156,6 +158,8 @@ public class OrganisationServiceImpl implements OrganisationService {
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
+                paymentAccount.setPbaStatus(ACCEPTED.name());
+                paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE);
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
