@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ public class PaymentAccountTest {
         paymentAccount.setId(UUID.randomUUID());
         paymentAccount.setPbaNumber("some-pba-number");
         paymentAccount.setPbaStatus(ACCEPTED.name());
-        paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE);
+        paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
         assertThat(paymentAccount.getLastUpdated()).isNotNull();

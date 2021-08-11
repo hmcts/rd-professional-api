@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -117,7 +117,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addDefaultMfaStatusToOrganisation(organisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -149,7 +149,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts,
-                                            Organisation organisation, boolean pbasValidated) {
+                                            Organisation organisation, boolean pbasValidated, boolean isEditPba) {
         if (paymentAccounts != null) {
             if (!pbasValidated) {
                 PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
@@ -158,12 +158,18 @@ public class OrganisationServiceImpl implements OrganisationService {
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
-                paymentAccount.setPbaStatus(ACCEPTED.name());
-                paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE);
+                if (isEditPba) {
+                    updateStatusAndMessage(paymentAccount, ACCEPTED.name(), PBA_STATUS_MESSAGE_ACCEPTED);
+                }
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
+    }
+
+    private void updateStatusAndMessage(PaymentAccount paymentAccount, String pbaStatus, String statusMessage) {
+        paymentAccount.setPbaStatus(pbaStatus);
+        paymentAccount.setStatusMessage(statusMessage);
     }
 
     public void addSuperUserToOrganisation(

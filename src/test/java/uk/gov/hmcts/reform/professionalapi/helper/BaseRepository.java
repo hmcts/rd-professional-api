@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.helper;
 
 import static uk.gov.hmcts.reform.professionalapi.domain.MFAStatus.EMAIL;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
 import org.junit.After;
 import org.junit.Before;
@@ -88,7 +88,7 @@ public class BaseRepository {
         paymentAccount = new PaymentAccount("pba1234567");
         paymentAccount.setOrganisation(organisation);
         paymentAccount.setPbaStatus(ACCEPTED.name());
-        paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE);
+        paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
         paymentAccount = paymentAccountRepository.save(paymentAccount);
 
         userAccountMapId = new UserAccountMapId(professionalUser, paymentAccount);
