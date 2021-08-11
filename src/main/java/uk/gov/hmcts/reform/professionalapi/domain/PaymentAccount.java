@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class PaymentAccount implements Serializable {
 
     @Column(name = "PBA_STATUS")
     @Size(max = 10)
-    private String pbaStatus;
+    private String pbaStatus = PENDING.name();
 
     @Column(name = "STATUS_MESSAGE")
     @Size(max = 256)
