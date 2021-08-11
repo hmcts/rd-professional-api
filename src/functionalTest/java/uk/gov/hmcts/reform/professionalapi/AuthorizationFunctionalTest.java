@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest.aNewUserCreationRequest;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
@@ -307,7 +306,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public void validatePbaResponse(Map<String, Object> response) {
         List<String> pbaList = (List)((Map)response.get("organisationEntityResponse")).get("paymentAccount");
         assertThat(pbaList).hasSize(3);
-        assertThat(pbaList.get(0)).isEqualTo(ACCEPTED);
     }
 
     public void validateSingleOrgResponse(Map<String, Object> response, String status) {
