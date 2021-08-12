@@ -51,7 +51,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                 .isEqualTo("some-org-name");
         List<UserAccountMap> userAccountMaps = userAccountMapRepository.findAll();
         assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
-        assertThat(persistedPaymentAccounts.get(0).getPbaStatus()).isEqualTo(PENDING.name());
+        assertThat(persistedPaymentAccounts.get(0).getPbaStatus()).isEqualTo(PENDING);
     }
 
     @Test

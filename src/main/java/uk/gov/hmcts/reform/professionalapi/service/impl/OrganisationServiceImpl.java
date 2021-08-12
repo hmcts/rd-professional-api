@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
@@ -161,7 +162,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
                 if (isEditPba) {
-                    updateStatusAndMessage(paymentAccount, ACCEPTED.name(), PBA_STATUS_MESSAGE_ACCEPTED);
+                    updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
                 }
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
@@ -169,7 +170,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void updateStatusAndMessage(PaymentAccount paymentAccount, String pbaStatus, String statusMessage) {
+    private void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
         paymentAccount.setPbaStatus(pbaStatus);
         paymentAccount.setStatusMessage(statusMessage);
     }
@@ -346,7 +347,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public void updatePaymentAccounts(List<PaymentAccount> pbas) {
         //update Organisation's PBAs to ACCEPTED
-        pbas.forEach(pba -> updateStatusAndMessage(pba, ACCEPTED.name(), PBA_STATUS_MESSAGE_AUTO_ACCEPTED));
+        pbas.forEach(pba -> updateStatusAndMessage(pba, ACCEPTED, PBA_STATUS_MESSAGE_AUTO_ACCEPTED));
         paymentAccountRepository.saveAll(pbas);
     }
 

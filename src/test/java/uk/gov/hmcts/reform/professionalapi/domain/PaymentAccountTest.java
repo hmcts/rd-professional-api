@@ -24,7 +24,7 @@ public class PaymentAccountTest {
         paymentAccount.setCreated(LocalDateTime.now());
         paymentAccount.setId(UUID.randomUUID());
         paymentAccount.setPbaNumber("some-pba-number");
-        paymentAccount.setPbaStatus(ACCEPTED.name());
+        paymentAccount.setPbaStatus(ACCEPTED);
         paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
 
         assertThat(paymentAccount.getOrganisation()).isSameAs(organisation);
