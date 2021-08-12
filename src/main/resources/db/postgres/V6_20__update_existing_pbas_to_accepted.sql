@@ -3,5 +3,5 @@
 update payment_account
 set pba_status = 'ACCEPTED', last_updated = now()
 FROM organisation
-WHERE payment_account.organisation_id::text = organisation.organisation_identifier::text
+WHERE payment_account.organisation_id::text = organisation.id::text
 AND organisation.status = 'ACTIVE';
