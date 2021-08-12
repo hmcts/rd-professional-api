@@ -341,7 +341,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         return new OrganisationResponse(organisation);
     }
 
-    public void updatePaymentAccounts(List<PaymentAccount> pbas){
+    public void updatePaymentAccounts(List<PaymentAccount> pbas) {
         //update Organisation's PBAs to ACCEPTED
         pbas.forEach(pba -> updateStatusAndMessage(pba, ACCEPTED.name(), PBA_STATUS_MESSAGE_AUTO_ACCEPTED));
         paymentAccountRepository.saveAll(pbas);
