@@ -37,4 +37,3 @@ public interface OrganisationService {
 
     void updatePaymentAccounts(List<PaymentAccount> pbas);
 }
-
