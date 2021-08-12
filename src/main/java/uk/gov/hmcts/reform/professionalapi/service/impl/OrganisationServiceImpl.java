@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
@@ -336,7 +337,9 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
-        updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
+        if (isNotEmpty(savedOrganisation.getPaymentAccounts())) {
+            updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
+        }
 
         return new OrganisationResponse(organisation);
     }
