@@ -283,7 +283,9 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json', version: versions.springBoot
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springBoot
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
+    implementation (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot){
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
@@ -301,7 +303,9 @@ dependencies {
 
     implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
     implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-    implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+    implementation (group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'){
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
     implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
 
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
@@ -314,7 +318,10 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation "io.github.openfeign:feign-httpclient:11.0"
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation ('org.springframework.boot:spring-boot-starter-validation'){
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
+
     //Fix for CVE-2021-29425
     implementation 'commons-io:commons-io:2.8.0'
 
@@ -329,7 +336,6 @@ dependencies {
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     implementation group:"org.yaml", name: "snakeyaml", version:"1.27"
-
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
