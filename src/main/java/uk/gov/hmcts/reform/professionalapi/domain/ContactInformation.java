@@ -86,5 +86,4 @@ public class ContactInformation implements Serializable {
     }
 
 
-
 }
