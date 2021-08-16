@@ -330,8 +330,6 @@ dependencies {
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
     implementation group:"org.yaml", name: "snakeyaml", version:"1.27"
 
-    //Fix for CVE-2021-28170
-    implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
