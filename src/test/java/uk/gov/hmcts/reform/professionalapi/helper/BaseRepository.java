@@ -87,7 +87,7 @@ public class BaseRepository {
 
         paymentAccount = new PaymentAccount("pba1234567");
         paymentAccount.setOrganisation(organisation);
-        paymentAccount.setPbaStatus(ACCEPTED.name());
+        paymentAccount.setPbaStatus(ACCEPTED);
         paymentAccount.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED);
         paymentAccount = paymentAccountRepository.save(paymentAccount);
 

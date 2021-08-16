@@ -10,6 +10,8 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -40,11 +42,10 @@ public class PaymentAccount implements Serializable {
     private String pbaNumber;
 
     @Column(name = "PBA_STATUS")
-    @Size(max = 10)
-    private String pbaStatus = PENDING.name();
+    @Enumerated(EnumType.STRING)
+    private PbaStatus pbaStatus = PENDING;
 
     @Column(name = "STATUS_MESSAGE")
-    @Size(max = 256)
     private String statusMessage;
 
     @ManyToOne
