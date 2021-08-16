@@ -15,9 +15,3 @@ UPDATE  PRD_ENUM SET ENUM_NAME = 'pui-organisation-manager' , ENUM_TYPE = 'SIDAM
 UPDATE  PRD_ENUM SET ENUM_NAME = 'pui-finance-manager' , ENUM_TYPE = 'SIDAM_ROLE' WHERE ENUM_CODE = 2;
 UPDATE  PRD_ENUM SET ENUM_NAME = 'pui-case-manager' , ENUM_TYPE = 'SIDAM_ROLE' WHERE ENUM_CODE = 3;
 UPDATE  PRD_ENUM SET ENUM_NAME = 'organisation-admin' , ENUM_TYPE = 'ADMIN_ROLE' WHERE ENUM_CODE = 4;
-
-alter table payment_account add COLUMN pba_status VARCHAR(10) default 'PENDING' not null;
-
-alter table payment_account add COLUMN status_message VARCHAR(256);
-
-alter table payment_account add CONSTRAINT pba_status_values_constraint CHECK (pba_status IN ('PENDING','ACCEPTED','REJECTED'));
