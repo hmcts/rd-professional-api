@@ -24,6 +24,7 @@
         <cve>CVE-2020-29243</cve>
         <cve>CVE-2020-29244</cve>
         <cve>CVE-2020-29245</cve>
+        <cve>CVE-2020-23171</cve>
     </suppress>
     <suppress until="2021-11-16">
         <notes><![CDATA[
@@ -31,12 +32,5 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.glassfish/jakarta\.el@.*$</packageUrl>
         <cve>CVE-2021-28170</cve>
-    </suppress>
-    <suppress until="2021-11-16">
-        <notes><![CDATA[
-   file name: lang-tag-1.4.4.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
-        <cve>CVE-2020-23171</cve>
     </suppress>
 </suppressions>
