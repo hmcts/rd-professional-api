@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -281,6 +283,18 @@ public class OrganisationExternalController extends SuperController {
             @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
 
         return retrieveAllOrganisationsByStatus(status, address);
+    }
+
+    @DeleteMapping(path = "/pba")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"pui-finance-manager"})
+    public void deletePaymentAccountsOfOrganisation(
+            @Valid @NotNull @RequestBody DeletePbaRequest deletePbaRequest,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
+
+        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
+
     }
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,

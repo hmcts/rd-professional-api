@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -23,6 +24,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -33,8 +35,10 @@ import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -70,6 +74,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
         suspendUserScenarios();
+        deletePbaOfOrganisationScenarios();
     }
 
     public void setUpOrgTestData() {
@@ -459,5 +464,34 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
 
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
+    }
+
+    public void deletePbaOfOrganisationScenarios() {
+        deletePbaOfExistingOrganisationShouldBeSuccess();
+    }
+
+    private void deletePbaOfExistingOrganisationShouldBeSuccess() {
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
+        assertThat(pendingOrgIdentifier).isNotEmpty();
+
+        Map<String, Object> orgResponse =
+                professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, OK);
+        List<String> paymentAccounts = (List<String>) orgResponse.get("paymentAccounts");
+        assertThat(paymentAccounts).isNotEmpty();
+
+        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        deletePbaRequest.setPaymentAccounts(new HashSet<>(paymentAccounts));
+
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
+
+        orgResponse =
+                professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, OK);
+        paymentAccounts = (List<String>) orgResponse.get("paymentAccounts");
+        assertThat(paymentAccounts).isEmpty();
+        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 }

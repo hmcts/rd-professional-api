@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DxAddressCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
@@ -859,5 +860,22 @@ public class ProfessionalApiClient {
                 .statusCode(expectedStatus.value());
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
+    }
+
+    public void deletePaymentAccountsOfOrganisation(DeletePbaRequest deletePbaRequest,
+                                                    RequestSpecification requestSpecification,
+                                                    HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(deletePbaRequest)
+                .delete("/refdata/external/v1/organisations/pba")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Delete PBA of organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+
     }
 }
