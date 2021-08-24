@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,6 +51,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
@@ -115,7 +120,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         addDefaultMfaStatusToOrganisation(organisation);
 
-        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false);
+        addPbaAccountToOrganisation(organisationCreationRequest.getPaymentAccount(), organisation, false, false);
 
         addSuperUserToOrganisation(organisationCreationRequest.getSuperUser(), organisation);
 
@@ -147,7 +152,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     public void addPbaAccountToOrganisation(Set<String> paymentAccounts,
-                                            Organisation organisation, boolean pbasValidated) {
+                                            Organisation organisation, boolean pbasValidated, boolean isEditPba) {
         if (paymentAccounts != null) {
             if (!pbasValidated) {
                 PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
@@ -156,10 +161,18 @@ public class OrganisationServiceImpl implements OrganisationService {
             paymentAccounts.forEach(pbaAccount -> {
                 PaymentAccount paymentAccount = new PaymentAccount(pbaAccount.toUpperCase());
                 paymentAccount.setOrganisation(organisation);
+                if (isEditPba) {
+                    updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
+                }
                 PaymentAccount persistedPaymentAccount = paymentAccountRepository.save(paymentAccount);
                 organisation.addPaymentAccount(persistedPaymentAccount);
             });
         }
+    }
+
+    private void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
+        paymentAccount.setPbaStatus(pbaStatus);
+        paymentAccount.setStatusMessage(statusMessage);
     }
 
     public void addSuperUserToOrganisation(
@@ -322,10 +335,20 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
                 .getSraRegulated().toLowerCase())));
         organisation.setCompanyUrl(RefDataUtil.removeAllSpaces(organisationCreationRequest.getCompanyUrl()));
-        organisationRepository.save(organisation);
+        Organisation savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
+        if (isNotEmpty(savedOrganisation.getPaymentAccounts())) {
+            updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
+        }
+
         return new OrganisationResponse(organisation);
+    }
+
+    public void updatePaymentAccounts(List<PaymentAccount> pbas) {
+        //update Organisation's PBAs to ACCEPTED
+        pbas.forEach(pba -> updateStatusAndMessage(pba, ACCEPTED, PBA_STATUS_MESSAGE_AUTO_ACCEPTED));
+        paymentAccountRepository.saveAll(pbas);
     }
 
     @Override
