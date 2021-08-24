@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.domain;
 
 import static javax.persistence.GenerationType.AUTO;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,6 +10,8 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -37,6 +40,13 @@ public class PaymentAccount implements Serializable {
     @Column(name = "PBA_NUMBER")
     @Size(min = 10, max = 10)
     private String pbaNumber;
+
+    @Column(name = "PBA_STATUS")
+    @Enumerated(EnumType.STRING)
+    private PbaStatus pbaStatus = PENDING;
+
+    @Column(name = "STATUS_MESSAGE")
+    private String statusMessage;
 
     @ManyToOne
     @JoinColumn(name = "ORGANISATION_ID")
