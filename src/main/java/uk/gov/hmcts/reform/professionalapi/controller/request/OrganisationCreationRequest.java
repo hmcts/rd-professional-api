@@ -20,6 +20,8 @@ public class OrganisationCreationRequest {
 
     private String status;
 
+    private String statusMessage;
+
     private final String sraId;
 
     private String sraRegulated;
@@ -40,6 +42,7 @@ public class OrganisationCreationRequest {
     public OrganisationCreationRequest(
             @JsonProperty("name") String name,
             @JsonProperty("status") String status,
+            @JsonProperty("statusMessage") String statusMessage,
             @JsonProperty("sraId") String sraId,
             @JsonProperty("sraRegulated") String sraRegulated,
             @JsonProperty("companyNumber") String companyNumber,
@@ -50,6 +53,7 @@ public class OrganisationCreationRequest {
 
         this.name = name;
         this.status = status;
+        this.statusMessage = statusMessage;
         this.sraId = sraId;
         this.sraRegulated = sraRegulated;
         this.companyNumber = companyNumber;

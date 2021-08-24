@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
@@ -119,6 +120,23 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     }
 
     @Test
+    public void can_update_organisation_status_from_pending_to_review_should_returns_status_200() {
+        updateAndValidateOrganisation(createOrganisationRequest(), "REVIEW",200);
+    }
+
+    @Test
+    public void can_update_organisation_status_from_review_to_active_should_returns_status_200() {
+        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE",200);
+    }
+
+    @Test
+    public void can_not_update_organisation_status_from_active_to_review_should_returns_status_400() {
+        String organisationIdentifier = createOrganisationRequest();
+        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", 200);
+        updateAndValidateOrganisation(organisationIdentifier, "REVIEW",400);
+    }
+
+    @Test
     public void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
         Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
@@ -186,7 +204,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
-    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status,
+    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status, String statusMessage
                                                       Integer httpStatus) {
         userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
         Organisation persistedOrganisation = null;
@@ -203,6 +221,9 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         if (httpStatus == 200) {
             assertThat(persistedOrganisation.getName()).isEqualTo("some-org-name1");
             assertThat(persistedOrganisation.getStatus()).isEqualTo(OrganisationStatus.valueOf(status));
+            if (nonNull(statusMessage)) {
+                assertThat(persistedOrganisation.getStatusMessage()).isEqualTo(statusMessage);
+            }
             assertThat(persistedOrganisation.getSraId()).isEqualTo("sra-id1");
             assertThat(persistedOrganisation.getSraRegulated()).isEqualTo(Boolean.TRUE);
             assertThat(persistedOrganisation.getCompanyUrl()).isEqualTo("company-url1");
