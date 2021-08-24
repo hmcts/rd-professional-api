@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
@@ -79,6 +80,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         transaction.commit();
         em.close();
         return pbaResponse;
+    }
+
+    @Override
+    public void deletePaymentsOfOrganization(DeletePbaRequest deletePbaRequest, Organisation organisation) {
+        organisationService.deletePaymentsOfOrganization(deletePbaRequest.getPaymentAccounts(), organisation);
     }
 
     public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {

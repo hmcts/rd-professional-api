@@ -32,5 +32,7 @@ public interface OrganisationService {
     List<Organisation> getOrganisationByStatus(OrganisationStatus status);
 
     void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation, boolean pbasValidated);
+
+    void deletePaymentsOfOrganization(Set<String> paymentAccounts, Organisation organisation);
 }
 

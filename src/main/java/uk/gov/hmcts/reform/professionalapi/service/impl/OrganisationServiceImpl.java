@@ -162,6 +162,19 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
+    @Override
+    public void deletePaymentsOfOrganization(Set<String> paymentAccounts, Organisation organisation) {
+        List<PaymentAccount> accountsToDelete = new ArrayList<>();
+        organisation.getPaymentAccounts().forEach(account -> {
+            if (paymentAccounts.contains(account.getPbaNumber())) {
+                paymentAccountRepository.delete(account);
+                accountsToDelete.add(account);
+            }
+        });
+
+        accountsToDelete.forEach(account -> organisation.getPaymentAccounts().remove(account));
+    }
+
     public void addSuperUserToOrganisation(
             UserCreationRequest userCreationRequest,
             Organisation organisation) {

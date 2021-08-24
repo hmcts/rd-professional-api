@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -255,6 +256,14 @@ public class OrganisationServiceImplTest {
         sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false);
 
         verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void test_deletePbaAccountFromOrganisation() {
+        doNothing().when(paymentAccountRepositoryMock).delete(any(PaymentAccount.class));
+        sut.deletePaymentsOfOrganization(paymentAccountList, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).delete(any(PaymentAccount.class));
+        assertThat(organisation.getPaymentAccounts()).isEmpty();
     }
 
     @Test

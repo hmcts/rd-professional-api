@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -399,6 +400,27 @@ public abstract class SuperController {
                     showDeleted, returnRoles, status);
         }
         return responseEntity;
+    }
+
+    protected void deletePaymentAccountsOfGivenOrganisation(DeletePbaRequest deletePbaRequest,
+                                                            String orgId, String userId) {
+        //check if user status is 'ACTIVE'
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
+
+        //check if organisation is present in the database and that it has payment accounts associated
+        checkOrganisationAndPbaExists(existingOrganisation);
+
+        //if the organisation is present, check if it is 'ACTIVE'
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+
+        //check the pba account number format, remove any blank strings passed
+        //And check if pba belongs to the organisation
+        paymentAccountValidator.validatePaymentAccounts(deletePbaRequest.getPaymentAccounts(), orgId);
+
+        //delete the passed pba account numbers from the organisation
+        paymentAccountService.deletePaymentsOfOrganization(deletePbaRequest, existingOrganisation);
     }
 
     protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
