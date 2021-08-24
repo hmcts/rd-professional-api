@@ -97,7 +97,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     }
 
     public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
-        organisationService.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation, true);
+        organisationService.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation, true, true);
     }
 
     public PbaResponse addUserAndPaymentAccountsToUserAccountMap(Organisation organisation) {
