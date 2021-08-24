@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.ContactInformationCreationRequest.aContactInformationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 import java.util.Arrays;
@@ -50,6 +51,7 @@ public class CreateOrganisationWithPaymentAccountTest extends AuthorizationEnabl
                 .isEqualTo("some-org-name");
         List<UserAccountMap> userAccountMaps = userAccountMapRepository.findAll();
         assertThat(persistedPaymentAccounts.size()).isEqualTo(userAccountMaps.size());
+        assertThat(persistedPaymentAccounts.get(0).getPbaStatus()).isEqualTo(PENDING);
     }
 
     @Test

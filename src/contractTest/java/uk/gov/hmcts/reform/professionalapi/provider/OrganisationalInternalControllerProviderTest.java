@@ -148,7 +148,12 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             "companyN", false, "www.org.com");
         addSuperUser(organisation);
 
+        Organisation updatedOrganisation = new Organisation("Org-Name", OrganisationStatus.PENDING, "sra-id",
+            "companyN", false, "www.org.com");
+        addSuperUser(organisation);
+
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
+        when(organisationRepository.save(any())).thenReturn(updatedOrganisation);
 
     }
 
