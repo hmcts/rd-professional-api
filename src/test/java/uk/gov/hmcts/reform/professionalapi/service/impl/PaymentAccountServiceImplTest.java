@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -67,6 +68,7 @@ public class PaymentAccountServiceImplTest {
     private List<PaymentAccount> paymentAccounts = new ArrayList<>();
     private Set<String> pbas = new HashSet<>();
     private PbaEditRequest pbaEditRequest = new PbaEditRequest();
+    private DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
 
     @Before
     public void setUp() {
@@ -82,6 +84,7 @@ public class PaymentAccountServiceImplTest {
         paymentAccounts.add(paymentAccount);
         pbas.add("PBA0000001");
         pbaEditRequest.setPaymentAccounts(pbas);
+        pbaDeleteRequest.setPaymentAccounts(pbas);
         userAccountMaps.add(userAccountMapMock);
 
         paymentAccount.setId(UUID.randomUUID());
@@ -169,6 +172,13 @@ public class PaymentAccountServiceImplTest {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void testDeletePaymentAccountsFromOrganisationTest() {
+        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
+        sut.deletePaymentsOfOrganization(pbaDeleteRequest, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).delete(any(PaymentAccount.class));
     }
 
     @Test
