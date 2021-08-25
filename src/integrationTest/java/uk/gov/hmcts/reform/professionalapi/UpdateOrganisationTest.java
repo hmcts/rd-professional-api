@@ -27,119 +27,119 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
 
     @Test
     public void updates_non_existing_organisation_returns_status_404() {
-        updateAndValidateOrganisation("AA11NNF", "ACTIVE",404);
+        updateAndValidateOrganisation("AA11NNF", "ACTIVE", null,404);
     }
 
     @Test
     public void updates_organisation_with_organisation_identifier_null_returns_status_400() {
-        updateAndValidateOrganisation(null, "ACTIVE",400);
+        updateAndValidateOrganisation(null, "ACTIVE", null, 400);
     }
 
     @Test
     public void updates_organisation_with_invalid_organisation_identifier_returns_status_400() {
-        updateAndValidateOrganisation("1234ab12", "ACTIVE",400);
+        updateAndValidateOrganisation("1234ab12", "ACTIVE", null, 400);
     }
 
     @Test
     public void can_update_organisation_status_from_pending_to_active_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE",200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_active_to_blocked_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE",200);
-        updateAndValidateOrganisation(organisationIdentifier,"BLOCKED",200);
+        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier,"BLOCKED", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_active_to_deleted_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",200);
-        updateAndValidateOrganisation(organisationIdentifier, "DELETED",200);
+        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "DELETED", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_pending_to_deleted_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "DELETED",200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "DELETED", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_pending_to_pending_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "PENDING",200);
+        updateAndValidateOrganisation(organisationIdentifier, "PENDING", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_active_to_active_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", 200);
-        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", 200);
+        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null, 200);
     }
 
     @Test
     public void can_update_organisation_status_from_blocked_to_blocked_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED",200);
-        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED",200);
+        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED", null, 200);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_active_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier,"DELETED",200);
-        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", 400);
+        updateAndValidateOrganisation(organisationIdentifier,"DELETED", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", null, 400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_pending_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "DELETED",200);
-        updateAndValidateOrganisation(organisationIdentifier, "PENDING",400);
+        updateAndValidateOrganisation(organisationIdentifier, "DELETED", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "PENDING", null, 400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_blocked_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier, "DELETED",200);
-        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED",400);
+        updateAndValidateOrganisation(organisationIdentifier, "DELETED", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "BLOCKED", null, 400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_deleted_to_deleted_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier,"DELETED",200);
-        updateAndValidateOrganisation(organisationIdentifier,"DELETED",400);
+        updateAndValidateOrganisation(organisationIdentifier,"DELETED", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier,"DELETED", null, 400);
     }
 
     @Test
     public void can_not_update_organisation_status_from_active_to_pending_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", 200);
-        updateAndValidateOrganisation(organisationIdentifier, "PENDING",400);
+        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier, "PENDING", null, 400);
     }
 
     @Test
     public void can_update_organisation_status_from_pending_to_review_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "REVIEW",200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "REVIEW", "Company in review", 200);
     }
 
     @Test
     public void can_update_organisation_status_from_review_to_active_should_returns_status_200() {
-        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE",200);
+        updateAndValidateOrganisation(createOrganisationRequest(), "ACTIVE", "Company approved", 200);
     }
 
     @Test
     public void can_not_update_organisation_status_from_active_to_review_should_returns_status_400() {
         String organisationIdentifier = createOrganisationRequest();
-        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", 200);
-        updateAndValidateOrganisation(organisationIdentifier, "REVIEW",400);
+        updateAndValidateOrganisation(organisationIdentifier,"ACTIVE", null, 200);
+        updateAndValidateOrganisation(organisationIdentifier,"REVIEW", null, 400);
     }
 
     @Test
     public void entities_other_than_organisation_should_remain_unchanged_if_updated_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null,
                 200);
 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
@@ -166,7 +166,7 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
     @Test
     public void fields_other_than_organisation_should_override_if_same_and_should_returns_status_200() {
         String organisationIdentifier = createOrganisationRequest();
-        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE",
+        Organisation persistedOrganisation = updateAndValidateOrganisation(organisationIdentifier, "ACTIVE", null,
                 200);
     }
 
@@ -204,12 +204,14 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
-    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status, String statusMessage
+    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status, String statusMessage,
                                                       Integer httpStatus) {
         userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
         Organisation persistedOrganisation = null;
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()
-                .status(status).build();
+                .status(status)
+                .statusMessage(statusMessage)
+                .build();
 
         Map<String, Object> responseForOrganisationUpdate =
                 professionalReferenceDataClient.updateOrganisation(organisationUpdateRequest, hmctsAdmin,
@@ -241,7 +243,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
                 assertThat(responseForOrganisationUpdate.get("http_status")).isEqualTo(httpStatus);
             }
 
-            if (persistedOrganisation != null && !(OrganisationStatus.PENDING.toString() == status)) {
+            if (persistedOrganisation != null && !(OrganisationStatus.PENDING.toString().equals(status)
+                                                    || OrganisationStatus.REVIEW.toString().equals(status))) {
                 SuperUser professionalUser = persistedOrganisation.getUsers().get(0);
                 assertThat(professionalUser.getUserIdentifier()).isNull();
                 assertThat(persistedOrganisation.getStatus()).isNotEqualTo(OrganisationStatus.ACTIVE);

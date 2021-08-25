@@ -231,7 +231,8 @@ public abstract class SuperController {
 
         SuperUser superUser = existingOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+        if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
+                && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 

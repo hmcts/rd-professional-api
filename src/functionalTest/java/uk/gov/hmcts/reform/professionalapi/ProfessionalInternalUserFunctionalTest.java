@@ -459,7 +459,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
 
         Map<String, Object> orgResponse = professionalApiClient.retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
-        assertEquals(REVIEW, orgResponse.get("status"));
+        assertEquals(REVIEW.toString(), orgResponse.get("status"));
         assertEquals(statusMessage, orgResponse.get("statusMessage"));
 
         log.info("updateOrgStatusShouldBeSuccess :: END");
