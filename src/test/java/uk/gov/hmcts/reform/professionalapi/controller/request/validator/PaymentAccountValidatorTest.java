@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.professionalapi.controller.request.validator;
 
 import static java.util.Collections.singleton;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
@@ -13,14 +17,15 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
 public class PaymentAccountValidatorTest {
 
     @Mock
-    private PaymentAccountRepository paymentAccountRepository = mock(PaymentAccountRepository.class);
+    private PaymentAccountRepository paymentAccountRepositoryMock = mock(PaymentAccountRepository.class);
 
-    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepository);
+    PaymentAccountValidator paymentAccountValidator = new PaymentAccountValidator(paymentAccountRepositoryMock);
 
     @Before
     public void setUp() {
@@ -86,8 +91,33 @@ public class PaymentAccountValidatorTest {
         Assert.assertFalse(paymentAccountValidator.checkSinglePbaIsValid("abc1234567"));
     }
 
+    @Test
+    public void test_checkSinglePbaIsValid_False_length() {
+        Assert.assertFalse(paymentAccountValidator.checkSinglePbaIsValid("abc123456789"));
+    }
+
     @Test(expected = Test.None.class)
     public void test_checkSinglePbaIsUnique() {
         paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567");
+    }
+
+    @Test
+    public void test_checkSinglePbaIsUnique_true() {
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234567");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(paymentAccounts);
+        Assert.assertTrue(paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567"));
+    }
+
+    @Test
+    public void test_checkSinglePbaIsUnique_false() {
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234568");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(paymentAccounts);
+        Assert.assertTrue(paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567"));
     }
 }
