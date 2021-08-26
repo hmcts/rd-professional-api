@@ -509,7 +509,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         }
 
-        if (validPaymentAccounts.isEmpty()) {
+        if (!validPaymentAccounts.isEmpty()) {
             pbaEditRequest.getPaymentAccounts().clear();
             pbaEditRequest.setPaymentAccounts(validPaymentAccounts);
 

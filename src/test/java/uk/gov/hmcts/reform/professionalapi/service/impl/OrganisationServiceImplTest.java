@@ -39,6 +39,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
@@ -872,7 +873,77 @@ public class OrganisationServiceImplTest {
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
         verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pba_invalid() {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA00000012");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+        doNothing().when(paymentAccountServiceMock)
+                .addPaymentAccountsByOrganisation(any(Organisation.class), any(PbaEditRequest.class));
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pbaDb_NoMatch() {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA00000012");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA1234568");
+        List<PaymentAccount> paymentAccounts = new ArrayList<>();
+        paymentAccounts.add(paymentAccount);
+        when(paymentAccountRepositoryMock.findByPbaNumber(anyString())).thenReturn(paymentAccounts);
+        doNothing().when(paymentAccountServiceMock)
+                .addPaymentAccountsByOrganisation(any(Organisation.class), any(PbaEditRequest.class));
+
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(new AddPbaResponse());
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest,
+                UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
 
     }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void test_addPaymentAccountsToOrganisationEmpty() {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(null);
+        doNothing().when(paymentAccountServiceMock)
+                .addPaymentAccountsByOrganisation(any(Organisation.class), any(PbaEditRequest.class));
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+
 
 }
