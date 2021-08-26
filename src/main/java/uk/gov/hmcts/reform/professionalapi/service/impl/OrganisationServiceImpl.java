@@ -497,7 +497,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         pbaEditRequest.getPaymentAccounts().forEach(pbaAccount -> {
             if (!paymentAccountValidator.checkSinglePbaIsValid(pbaAccount)) {
                 invalidPaymentAccounts.add(pbaAccount);
-            } else if (!paymentAccountValidator.checkSinglePbaIsUnique(pbaAccount, organisationIdentifier)) {
+            } else if (!paymentAccountValidator.checkSinglePbaIsUnique(pbaAccount)) {
                 duplicatePaymentAccounts.add(pbaAccount);
             } else {
                 validPaymentAccounts.add(pbaAccount);

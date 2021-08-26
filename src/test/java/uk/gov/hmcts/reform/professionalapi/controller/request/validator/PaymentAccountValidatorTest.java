@@ -88,6 +88,6 @@ public class PaymentAccountValidatorTest {
 
     @Test(expected = Test.None.class)
     public void test_checkSinglePbaIsUnique() {
-        paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567", "");
+        paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567");
     }
 }

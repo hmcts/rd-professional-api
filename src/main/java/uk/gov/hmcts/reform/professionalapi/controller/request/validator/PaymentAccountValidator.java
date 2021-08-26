@@ -89,7 +89,7 @@ public class PaymentAccountValidator {
         return false;
     }
 
-    public boolean checkSinglePbaIsUnique(String pbaAccount, String orgId) {
+    public boolean checkSinglePbaIsUnique(String pbaAccount) {
         List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumber(
                 pbaAccount.toUpperCase());
         AtomicBoolean isUnique = new AtomicBoolean(true);

@@ -132,7 +132,6 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
-        //deleteUserAccountMapsAndPaymentAccounts(em, organisation);
         addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
         addUserAndPaymentAccountsToUserAccountMap(organisation);
 
