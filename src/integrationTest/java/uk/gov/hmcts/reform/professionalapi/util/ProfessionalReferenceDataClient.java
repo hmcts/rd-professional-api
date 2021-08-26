@@ -25,6 +25,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -477,6 +478,26 @@ public class ProfessionalReferenceDataClient {
             return statusAndBody;
         }
 
+
+        return getResponse(responseEntity);
+    }
+
+    public Map<String, Object> deletePaymentsAccountsByOrgId(DeletePbaRequest pbaDeleteRequest, String supportedRole,
+                                                             String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
+
+        try {
+            HttpEntity<DeletePbaRequest> requestEntity = new HttpEntity<>(pbaDeleteRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
 
         return getResponse(responseEntity);
     }

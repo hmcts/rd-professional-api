@@ -163,16 +163,20 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
+    @Transactional
     public void deletePaymentsOfOrganization(Set<String> paymentAccounts, Organisation organisation) {
         List<PaymentAccount> accountsToDelete = new ArrayList<>();
+        final Set<String> paymentAccountsUpper = paymentAccounts.stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
         organisation.getPaymentAccounts().forEach(account -> {
-            if (paymentAccounts.contains(account.getPbaNumber())) {
-                paymentAccountRepository.delete(account);
+            if (paymentAccountsUpper.contains(account.getPbaNumber().toUpperCase())) {
                 accountsToDelete.add(account);
             }
         });
 
-        accountsToDelete.forEach(account -> organisation.getPaymentAccounts().remove(account));
+        paymentAccountRepository.deleteByPbaNumberUpperCase(paymentAccountsUpper);
+        organisation.getPaymentAccounts().removeAll(accountsToDelete);
     }
 
     public void addSuperUserToOrganisation(

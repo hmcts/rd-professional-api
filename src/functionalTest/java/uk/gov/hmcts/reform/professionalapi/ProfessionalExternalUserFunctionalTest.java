@@ -85,6 +85,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                         .lastName(lastName)
                         .email(superUserEmail)
                         .build())
+                .paymentAccount(Set.of("PBA0000021", "PBA0000022", "PBA0000023"))
                 .build();
 
         organisationCreationRequest.setStatus("ACTIVE");
@@ -472,26 +473,18 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
     private void deletePbaOfExistingOrganisationShouldBeSuccess() {
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
-        Map<String, Object> response = professionalApiClient.createOrganisation();
-        String pendingOrgIdentifier = (String) response.get("organisationIdentifier");
-        assertThat(pendingOrgIdentifier).isNotEmpty();
-
-        Map<String, Object> orgResponse =
-                professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, OK);
-        List<String> paymentAccounts = (List<String>) orgResponse.get("paymentAccounts");
-        assertThat(paymentAccounts).isNotEmpty();
 
         DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
-        deletePbaRequest.setPaymentAccounts(new HashSet<>(paymentAccounts));
+        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
 
-        orgResponse =
-                professionalApiClient.retrieveOrganisationDetails(pendingOrgIdentifier, hmctsAdmin, OK);
-        paymentAccounts = (List<String>) orgResponse.get("paymentAccounts");
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+
+        var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();
-        professionalApiClient.deleteOrganisation(pendingOrgIdentifier, hmctsAdmin, NO_CONTENT);
         log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 }
