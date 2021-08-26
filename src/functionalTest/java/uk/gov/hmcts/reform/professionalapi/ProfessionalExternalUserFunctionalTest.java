@@ -1,5 +1,28 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
+import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -16,29 +39,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-
-import io.restassured.specification.RequestSpecification;
-import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
-import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
-import uk.gov.hmcts.reform.professionalapi.util.ToggleEnable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -85,7 +85,9 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                         .lastName(lastName)
                         .email(superUserEmail)
                         .build())
-                .paymentAccount(Set.of("PBA0000021", "PBA0000022", "PBA0000023"))
+                .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                        "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
                 .build();
 
         organisationCreationRequest.setStatus("ACTIVE");
@@ -467,21 +469,40 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
     }
 
+    @Test
     public void deletePbaOfOrganisationScenarios() {
+        setUpOrgTestData();
+        setUpUserBearerTokens();
         deletePbaOfExistingOrganisationShouldBeSuccess();
+        deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff();
     }
 
-    private void deletePbaOfExistingOrganisationShouldBeSuccess() {
-        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
+    private void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
+
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    private void deletePbaOfExistingOrganisationShouldBeSuccess() {
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+
+        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
+
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+                professionalApiClient.getMultipleAuthHeaders(hmctsAdmin));
 
         var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();
