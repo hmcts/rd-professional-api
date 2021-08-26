@@ -404,6 +404,11 @@ public abstract class SuperController {
 
     protected void deletePaymentAccountsOfGivenOrganisation(DeletePbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
+
+        if (isEmpty(deletePbaRequest.getPaymentAccounts())) {
+            throw new InvalidRequest("No PBA number passed in the request");
+        }
+
         //check if user status is 'ACTIVE'
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 

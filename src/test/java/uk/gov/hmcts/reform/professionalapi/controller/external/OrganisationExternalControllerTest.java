@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
@@ -331,6 +332,18 @@ public class OrganisationExternalControllerTest {
                 .validateOrganisationIsActive(any(Organisation.class));
         verify(paymentAccountServiceMock, times(1))
                 .deletePaymentsOfOrganization(any(DeletePbaRequest.class), any(Organisation.class));
+
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
+        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        var accountsToDelete = new HashSet<String>();
+        deletePbaRequest.setPaymentAccounts(accountsToDelete);
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        organisationExternalController
+                .deletePaymentAccountsOfOrganisation(deletePbaRequest, orgId, userId);
 
     }
 }
