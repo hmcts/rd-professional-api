@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -55,6 +57,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
@@ -77,9 +80,13 @@ import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import org.springframework.http.ResponseEntity;
 
 public class OrganisationServiceImplTest {
 
@@ -98,6 +105,12 @@ public class OrganisationServiceImplTest {
     private final UserProfileFeignClient userProfileFeignClient = mock(UserProfileFeignClient.class);
     private final OrganisationMfaStatusRepository organisationMfaStatusRepositoryMock
             = mock(OrganisationMfaStatusRepository.class);
+    private final ProfessionalUserService professionalUserServiceMock
+            = mock(ProfessionalUserService.class);
+    private final OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock
+            = mock(OrganisationIdentifierValidatorImpl.class);
+    private final PaymentAccountService paymentAccountServiceMock
+            = mock(PaymentAccountService.class);
 
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
@@ -135,6 +148,7 @@ public class OrganisationServiceImplTest {
     Set<String> paymentAccountList;
     private DeleteOrganisationResponse deleteOrganisationResponse;
 
+
     @InjectMocks
     private OrganisationServiceImpl sut;
 
@@ -154,6 +168,9 @@ public class OrganisationServiceImplTest {
         sut.setUserAttributeService(userAttributeServiceMock);
         sut.setPaymentAccountValidator(paymentAccountValidator);
         sut.setOrganisationMfaStatusRepository(organisationMfaStatusRepositoryMock);
+        sut.setProfessionalUserService(professionalUserServiceMock);
+        sut.setOrganisationIdentifierValidatorImpl(organisationIdentifierValidatorImplMock);
+        sut.setPaymentAccountService(paymentAccountServiceMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -833,6 +850,29 @@ public class OrganisationServiceImplTest {
         userAccountMaps.add(userAccountMap);
         organisation.addPaymentAccount(paymentAccount);
         return organisation;
+    }
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation() {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+        doNothing().when(paymentAccountServiceMock)
+                .addPaymentAccountsByOrganisation(any(Organisation.class), any(PbaEditRequest.class));
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+        assertThat(responseEntity.getBody()).isNotNull();
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
+
     }
 
 }

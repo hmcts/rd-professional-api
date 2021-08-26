@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -73,5 +74,20 @@ public class PaymentAccountValidatorTest {
         Set<String> paymentAccounts = new HashSet<>();
         paymentAccounts.add(pba);
         paymentAccountValidator.validatePaymentAccounts(paymentAccounts, "");
+    }
+
+    @Test
+    public void test_checkSinglePbaIsValid_True() {
+        Assert.assertTrue(paymentAccountValidator.checkSinglePbaIsValid("PBA1234567"));
+    }
+
+    @Test
+    public void test_checkSinglePbaIsValid_False() {
+        Assert.assertFalse(paymentAccountValidator.checkSinglePbaIsValid("abc1234567"));
+    }
+
+    @Test(expected = Test.None.class)
+    public void test_checkSinglePbaIsUnique() {
+        paymentAccountValidator.checkSinglePbaIsUnique("PBA1234567", "");
     }
 }

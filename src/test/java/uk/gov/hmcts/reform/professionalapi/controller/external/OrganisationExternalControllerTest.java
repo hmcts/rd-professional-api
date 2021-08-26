@@ -24,6 +24,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
@@ -44,12 +46,14 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationReq
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -305,5 +309,35 @@ public class OrganisationExternalControllerTest {
         assertThat(raisedException).isExactlyInstanceOf(ResourceNotFoundException.class)
                 .hasMessageStartingWith("No Organisations found");
         verify(organisationServiceMock, times(1)).getOrganisationByStatus(any());
+    }
+
+
+    @Test
+    public void test_addPaymentAccountsToOrganisation() throws JsonProcessingException {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        addPbaResponse.setMessage("");
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationServiceMock.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId))
+                .thenReturn(responseEntity);
+
+        ResponseEntity<?> actual = organisationExternalController
+                .addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+
+        final HttpStatus expectedHttpStatus = HttpStatus.OK;
+        assertThat(actual).isNotNull();
+        assertThat(actual.getStatusCode()).isEqualTo(expectedHttpStatus);
+
+        verify(organisationServiceMock, times(1))
+                .addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+
     }
 }
