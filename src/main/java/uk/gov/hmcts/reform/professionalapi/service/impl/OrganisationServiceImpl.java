@@ -67,7 +67,17 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
+import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
 
 @Service
 @Slf4j
@@ -97,6 +107,12 @@ public class OrganisationServiceImpl implements OrganisationService {
     PaymentAccountValidator paymentAccountValidator;
     @Autowired
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
+    @Autowired
+    ProfessionalUserService professionalUserService;
+    @Autowired
+    PaymentAccountService paymentAccountService;
+    @Autowired
+    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -458,5 +474,53 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationRepository.findByStatus(status);
     }
 
+    @Override
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest,
+                                                      String organisationIdentifier, String userId) {
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+
+        Optional<Organisation> organisation = Optional.ofNullable(
+                getOrganisationByOrgIdentifier(organisationIdentifier));
+
+        if (organisation.isEmpty()) {
+            log.error("{}:: {}", loggingComponentName, NO_ORG_FOUND_FOR_GIVEN_ID);
+            throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
+        }
+
+        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation.get());
+        professionalUserService.checkUserStatusIsActiveByUserId(userId);
+
+        Set<String> invalidPaymentAccounts = new HashSet<>();
+        Set<String> duplicatePaymentAccounts = new HashSet<>();
+        Set<String> validPaymentAccounts = new HashSet<>();
+
+        pbaEditRequest.getPaymentAccounts().forEach(pbaAccount -> {
+            if (!paymentAccountValidator.checkSinglePbaIsValid(pbaAccount)) {
+                invalidPaymentAccounts.add(pbaAccount);
+            } else if (!paymentAccountValidator.checkSinglePbaIsUnique(pbaAccount, organisationIdentifier)) {
+                duplicatePaymentAccounts.add(pbaAccount);
+            } else {
+                validPaymentAccounts.add(pbaAccount);
+            }
+        });
+
+        if (invalidPaymentAccounts.size() > 0 || duplicatePaymentAccounts.size() > 0) {
+            addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
+            addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
+        }
+
+        if (validPaymentAccounts.size() > 0) {
+            pbaEditRequest.getPaymentAccounts().clear();
+            pbaEditRequest.setPaymentAccounts(validPaymentAccounts);
+
+            paymentAccountService
+                    .addPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
+        }
+
+        return ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+    }
 }
 

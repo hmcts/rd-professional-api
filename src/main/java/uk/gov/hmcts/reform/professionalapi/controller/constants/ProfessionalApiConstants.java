@@ -58,4 +58,6 @@ public class ProfessionalApiConstants {
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
 
+    public static final String ERROR_MSG_PARTIAL_SUCCESS = "Some of the PBAs successfully added to organisation";
+
 }

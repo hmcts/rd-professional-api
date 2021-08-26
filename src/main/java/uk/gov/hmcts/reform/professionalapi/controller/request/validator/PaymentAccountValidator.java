@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Slf4j
@@ -75,6 +76,29 @@ public class PaymentAccountValidator {
             throw new InvalidRequest("The PBA numbers you have entered: " + String.join(", ", uniquePBas)
                     .concat(" belongs to another Organisation"));
         }
+    }
+
+    public boolean checkSinglePbaIsValid(String pbaAccount) {
+        if (pbaAccount.length() == 10) {
+            Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
+            Matcher matcher = pattern.matcher(pbaAccount);
+            if (matcher.matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkSinglePbaIsUnique(String pbaAccount, String orgId) {
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumber(
+                pbaAccount.toUpperCase());
+        AtomicBoolean isUnique = new AtomicBoolean(true);
+        paymentAccountsInDatabase.forEach(pbaInDb -> {
+            if (pbaInDb.getPbaNumber().equals(pbaAccount)) {
+                isUnique.set(false);
+            }
+        });
+        return isUnique.get();
     }
 
 }

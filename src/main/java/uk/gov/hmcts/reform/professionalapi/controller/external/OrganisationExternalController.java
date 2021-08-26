@@ -40,6 +40,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaRe
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -310,4 +312,51 @@ public class OrganisationExternalController extends SuperController {
                 .status(200)
                 .body(organisationResponse);
     }
+
+    @ApiOperation(
+            value = "Add multiple PBAs associated with their organisation",
+            notes = "**IDAM Roles to access API** :\n pui-finance-manager",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "All PBAs got added successfully",
+                    response = AddPbaResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request was provided"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PostMapping(
+            path = "/pbas/",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseBody
+    @Secured("pui-finance-manager")
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(
+            @Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
+
+        log.info("Received request to add payment accounts to organisation Id");
+
+        return organisationService.addPaymentAccountsToOrganisation(pbaEditRequest, organisationIdentifier, userId);
+
+    }
+
 }
