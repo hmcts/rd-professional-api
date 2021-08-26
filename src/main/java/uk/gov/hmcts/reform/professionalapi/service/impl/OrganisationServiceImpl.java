@@ -504,12 +504,12 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         });
 
-        if (invalidPaymentAccounts.size() > 0 || duplicatePaymentAccounts.size() > 0) {
+        if (!invalidPaymentAccounts.isEmpty() || !duplicatePaymentAccounts.isEmpty()) {
             addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
             addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         }
 
-        if (validPaymentAccounts.size() > 0) {
+        if (validPaymentAccounts.isEmpty()) {
             pbaEditRequest.getPaymentAccounts().clear();
             pbaEditRequest.setPaymentAccounts(validPaymentAccounts);
 
