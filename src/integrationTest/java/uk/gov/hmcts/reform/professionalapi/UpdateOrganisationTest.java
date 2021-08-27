@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 
@@ -145,6 +146,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         List<PaymentAccount> pbaAccounts = persistedOrganisation.getPaymentAccounts();
         PaymentAccount paymentAccount = pbaAccounts.get(0);
         assertThat(paymentAccount.getPbaNumber()).isEqualTo("PBA1234567");
+        assertThat(paymentAccount.getPbaStatus()).isEqualTo(ACCEPTED);
+        assertThat(paymentAccount.getStatusMessage()).isEqualTo("Auto approved by Admin");
 
         List<SuperUser> professionalUsers = persistedOrganisation.getUsers();
         SuperUser professionalUser = professionalUsers.get(0);
