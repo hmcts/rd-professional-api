@@ -77,7 +77,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsSldRtn400IfPaymentAccountBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
+    public void test_deletePaymentAccountsSldRtn400IfPbaBelongsToAnotherOrganisation_WithPbaInErrorMessage() {
         Set<String> existingPaymentAccounts = new HashSet<>();
         existingPaymentAccounts.add("PBA0000002");
         existingPaymentAccounts.add("PBA0000009");
@@ -98,11 +98,12 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         String userId = createActiveUserAndOrganisation(true);
 
-        Map<String, Object> pbaResponse = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
-                puiFinanceManager, userId);
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .deletePaymentsAccountsByOrgId(pbaDeleteRequest, puiFinanceManager, userId);
 
         assertThat(pbaResponse).containsEntry("http_status", "400");
-        assertThat(pbaResponse.get("response_body").toString()).contains("The PBA numbers you have entered: PBA0000002 "
+        assertThat(pbaResponse.get("response_body").toString())
+                .contains("The PBA numbers you have entered: PBA0000002 "
                 + "belongs to another Organisation");
     }
 

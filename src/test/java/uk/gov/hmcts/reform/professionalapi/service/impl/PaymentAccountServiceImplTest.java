@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -178,7 +179,7 @@ public class PaymentAccountServiceImplTest {
     public void testDeletePaymentAccountsFromOrganisationTest() {
         when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
         sut.deletePaymentsOfOrganization(pbaDeleteRequest, organisation);
-        verify(paymentAccountRepositoryMock, times(1)).delete(any(PaymentAccount.class));
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
     }
 
     @Test
