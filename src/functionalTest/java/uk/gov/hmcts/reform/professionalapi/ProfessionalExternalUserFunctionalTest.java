@@ -74,7 +74,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         findUserStatusByEmailScenarios();
         modifyRolesScenarios();
         suspendUserScenarios();
-        deletePbaOfOrganisationScenarios();
+        deletePbaOfExistingOrganisationShouldBeSuccess();
     }
 
     public void setUpOrgTestData() {
@@ -470,16 +470,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    public void deletePbaOfOrganisationScenarios() {
-        setUpOrgTestData();
-        setUpUserBearerTokens();
-        deletePbaOfExistingOrganisationShouldBeSuccess();
-        deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff();
-    }
-
     @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
-    private void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
-
+    public void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
 
         DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
@@ -502,7 +494,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
-                professionalApiClient.getMultipleAuthHeaders(hmctsAdmin));
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
 
         var paymentAccounts = (List<String>) response.get("paymentAccount");
         assertThat(paymentAccounts).isEmpty();

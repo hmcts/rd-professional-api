@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
@@ -49,8 +50,15 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
+            Optional<Object> optionalServiceName = getServiceName();
+            String serviceName = (optionalServiceName.isPresent()) ? String.valueOf(optionalServiceName.get()) : EMPTY;
+
+            if (serviceName.isEmpty()) {
+                throw new ForbiddenException("No service name provided.");
+            }
+
             flagStatus = featureToggleService
-                .isFlagEnabled(String.valueOf(getServiceName()), launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(serviceName, launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
