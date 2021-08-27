@@ -66,7 +66,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         reinviteUserScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
-        updateOrgStatusShouldBeSuccess();
+        updateOrgStatusScenarios();
     }
 
     public void setUpTestData() {
@@ -447,6 +447,10 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updateOrgMFAShouldReturn403 :: END");
+    }
+
+    public void  updateOrgStatusScenarios() {
+        updateOrgStatusShouldBeSuccess();
     }
 
     public void updateOrgStatusShouldBeSuccess() {
