@@ -149,7 +149,7 @@ public class OrganisationExternalControllerTest {
                 "some@email.com", userRoles,false);
         userCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 "some@email.com");
-        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("test", "PENDING", null,
                 "sra-id", "false", "number02", "company-url",
                 userCreationRequest, null, null);
         userProfileCreationRequest = new UserProfileCreationRequest("some@email.com",

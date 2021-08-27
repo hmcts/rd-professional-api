@@ -204,8 +204,8 @@ public class UpdateOrganisationTest extends AuthorizationEnabledIntegrationTest 
         return (String) responseForOrganisationCreation.get(ORG_IDENTIFIER);
     }
 
-    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status, String statusMessage,
-                                                      Integer httpStatus) {
+    public Organisation updateAndValidateOrganisation(String organisationIdentifier, String status,
+                                                      String statusMessage, Integer httpStatus) {
         userProfileCreateUserWireMock(HttpStatus.resolve(httpStatus));
         Organisation persistedOrganisation = null;
         OrganisationCreationRequest organisationUpdateRequest = organisationRequestWithAllFieldsAreUpdated()

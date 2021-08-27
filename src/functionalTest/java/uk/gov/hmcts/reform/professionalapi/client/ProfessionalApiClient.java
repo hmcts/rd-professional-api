@@ -551,16 +551,6 @@ public class ProfessionalApiClient {
         updateOrganisation(organisationCreationRequest, role, organisationIdentifier, expectedStatus);
     }
 
-    public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
-
-        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
-                .status("REVIEW")
-                .statusMessage(statusMessage)
-                .build();
-
-        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
-    }
-
     //with OPENID implementation
     public void updateOrganisation(OrganisationCreationRequest organisationCreationRequest, String role,
                                    String organisationIdentifier) {
@@ -582,6 +572,16 @@ public class ProfessionalApiClient {
         response.then()
             .assertThat()
             .statusCode(expectedStatus.value());
+    }
+
+    public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .status("REVIEW")
+                .statusMessage(statusMessage)
+                .build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
     }
 
     public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
