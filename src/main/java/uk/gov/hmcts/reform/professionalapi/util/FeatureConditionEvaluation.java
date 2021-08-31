@@ -50,15 +50,8 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
-            Optional<Object> optionalServiceName = getServiceName();
-            String serviceName = (optionalServiceName.isPresent()) ? String.valueOf(optionalServiceName.get()) : EMPTY;
-
-            if (serviceName.isEmpty()) {
-                throw new ForbiddenException("No service name provided.");
-            }
-
             flagStatus = featureToggleService
-                .isFlagEnabled(serviceName, launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(EMPTY, launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));

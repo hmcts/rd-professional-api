@@ -48,7 +48,6 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     public boolean isFlagEnabled(String serviceName, String flagName) {
         LDUser user = new LDUser.Builder(userName)
             .firstName(userName)
-            .custom("servicename", serviceName)
             .custom("environment", environment)
             .build();
 
