@@ -860,4 +860,21 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
+
+    public void addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
+                                                    RequestSpecification requestSpecification,
+                                                    HttpStatus expectedStatus) {
+        Response response = requestSpecification
+                .body(pbaEditRequest)
+                .post("/refdata/external/v1/organisations/pba")
+                .andReturn();
+
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+
+        log.info("{}:: Add PBA of organisation status response: {}",
+                loggingComponentName, response.getStatusCode());
+
+    }
 }

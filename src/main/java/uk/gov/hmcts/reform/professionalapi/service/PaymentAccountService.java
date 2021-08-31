@@ -9,6 +9,4 @@ public interface PaymentAccountService {
     Organisation findPaymentAccountsByEmail(String email);
 
     PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest);
-
-    void addPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest);
 }

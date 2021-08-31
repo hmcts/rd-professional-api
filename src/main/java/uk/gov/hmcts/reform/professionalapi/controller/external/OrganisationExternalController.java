@@ -323,7 +323,7 @@ public class OrganisationExternalController extends SuperController {
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
+                    code = 200,
                     message = "All PBAs got added successfully",
                     response = AddPbaResponse.class
             ),
@@ -341,11 +341,11 @@ public class OrganisationExternalController extends SuperController {
             )
     })
     @PostMapping(
-            path = "/pbas/",
+            path = "/pba",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(

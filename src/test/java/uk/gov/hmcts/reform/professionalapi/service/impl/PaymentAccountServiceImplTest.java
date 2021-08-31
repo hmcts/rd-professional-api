@@ -189,30 +189,4 @@ public class PaymentAccountServiceImplTest {
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
     }
-
-    @Test
-    public void test_addPaymentAccountsByOrganisation() {
-
-        Organisation organisationMock = mock(Organisation.class);
-        final List<PaymentAccount> paymentAccounts = new ArrayList<>();
-        paymentAccounts.add(new PaymentAccount());
-        ProfessionalUser professionalUserMock = mock(ProfessionalUser.class);
-
-        when(professionalUserMock.getOrganisation()).thenReturn(organisationMock);
-        when(organisationMock.getStatus()).thenReturn(OrganisationStatus.ACTIVE);
-        when(organisationMock.getPaymentAccounts()).thenReturn(paymentAccounts);
-        when(organisationRepositoryMock.findByOrganisationIdentifier(any(String.class))).thenReturn(organisation);
-        when(entityManagerFactoryMock.createEntityManager()).thenReturn(entityManagerMock);
-        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
-
-        RefDataUtil.getPaymentAccount(paymentAccounts);
-
-        sut.addPaymentAccountsByOrganisation(organisation, pbaEditRequest);
-
-        verify(paymentAccountRepositoryMock, times(1)).save(any(PaymentAccount.class));
-        verify(userAccountMapServiceMock, times(1))
-                .persistedUserAccountMap(any(ProfessionalUser.class), anyList());
-        verify(entityManagerFactoryMock, times(1)).createEntityManager();
-        verify(entityManagerMock, times(1)).getTransaction();
-    }
 }

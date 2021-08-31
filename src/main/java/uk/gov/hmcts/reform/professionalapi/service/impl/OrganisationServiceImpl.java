@@ -69,7 +69,6 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
 import java.util.Optional;
@@ -109,8 +108,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
     @Autowired
     ProfessionalUserService professionalUserService;
-    @Autowired
-    PaymentAccountService paymentAccountService;
     @Autowired
     OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
@@ -513,8 +510,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             pbaEditRequest.getPaymentAccounts().clear();
             pbaEditRequest.setPaymentAccounts(validPaymentAccounts);
 
-            paymentAccountService
-                    .addPaymentAccountsByOrganisation(organisation.get(), pbaEditRequest);
+            addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation.get(), false, false);
         }
 
         return ResponseEntity

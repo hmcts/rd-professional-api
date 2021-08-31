@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
@@ -50,7 +51,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
             flagStatus = featureToggleService
-                .isFlagEnabled(String.valueOf(getServiceName()), launchDarklyUrlMap.get(clazz + "." + restMethod));
+                    .isFlagEnabled(EMPTY, launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
@@ -62,7 +63,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
     public Optional<Object> getServiceName() {
 
         ServletRequestAttributes servletRequestAttributes =
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
 
         if (nonNull(servletRequestAttributes)) {
             HttpServletRequest request = servletRequestAttributes.getRequest();

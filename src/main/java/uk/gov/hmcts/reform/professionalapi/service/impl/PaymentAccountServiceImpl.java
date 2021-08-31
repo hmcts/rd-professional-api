@@ -124,18 +124,4 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         });
 
     }
-
-    @Override
-    @Transactional
-    public void addPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-        transaction.begin();
-
-        addPaymentAccountsToOrganisation(pbaEditRequest, organisation);
-        addUserAndPaymentAccountsToUserAccountMap(organisation);
-
-        transaction.commit();
-        em.close();
-    }
 }

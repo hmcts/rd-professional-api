@@ -20,11 +20,13 @@ import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -35,6 +37,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -60,7 +68,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     @Test
     public void testExternalUserScenario() {
         setUpOrgTestData();
-        setUpUserBearerTokens();
+        setUpUserBearerTokens(List.of(puiUserManager, puiCaseManager, puiOrgManager, puiFinanceManager, caseworker));
         inviteUserScenarios();
         retrieveOrganisationPbaScenarios();
         findUsersByOrganisationScenarios();
@@ -73,30 +81,47 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     public void setUpOrgTestData() {
-        superUserEmail = generateRandomEmail();
-        organisationCreationRequest = createOrganisationRequest()
-                .superUser(aUserCreationRequest()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .email(superUserEmail)
-                        .build())
-                .build();
+        if (isEmpty(extActiveOrgId)) {
+            log.info("Setting up organization...");
+            superUserEmail = generateRandomEmail();
+            organisationCreationRequest = createOrganisationRequest()
+                    .superUser(aUserCreationRequest()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(superUserEmail)
+                            .build())
+                    .paymentAccount(Set.of("PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7)),
+                            "PBA".concat(RandomStringUtils.randomAlphanumeric(7))))
+                    .build();
 
-        organisationCreationRequest.setStatus("ACTIVE");
-        extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
+            organisationCreationRequest.setStatus("ACTIVE");
+            extActiveOrgId = createAndctivateOrganisationWithGivenRequest(organisationCreationRequest, hmctsAdmin);
 
-        Map<String, Object> searchResponse = professionalApiClient
-                .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
-        List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
-        superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+            Map<String, Object> searchResponse = professionalApiClient
+                    .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
+            List<Map<String, Object>> professionalUsersResponses =
+                    (List<Map<String, Object>>) searchResponse.get("users");
+            superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
+        }
     }
 
-    public void setUpUserBearerTokens() {
-        pumBearerToken = inviteUser(puiUserManager);
-        pcmBearerToken = inviteUser(puiCaseManager);
-        pomBearerToken = inviteUser(puiOrgManager);
-        pfmBearerToken = inviteUser(puiFinanceManager);
-        caseworkerBearerToken = inviteUser(caseworker);
+    public void setUpUserBearerTokens(List<String> roles) {
+        if (roles.contains(puiUserManager)) {
+            pumBearerToken = inviteUser(puiUserManager);
+        }
+        if (roles.contains(puiCaseManager)) {
+            pcmBearerToken = inviteUser(puiCaseManager);
+        }
+        if (roles.contains(puiOrgManager)) {
+            pomBearerToken = inviteUser(puiOrgManager);
+        }
+        if (roles.contains(puiFinanceManager)) {
+            pfmBearerToken = inviteUser(puiFinanceManager);
+        }
+        if (roles.contains(caseworker)) {
+            caseworkerBearerToken = inviteUser(caseworker);
+        }
     }
 
     public void inviteUserScenarios() {
@@ -459,5 +484,51 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
 
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
+    public void addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+        log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
+
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
+
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
+    public void addPbaOfExistingOrganisationShouldBeSuccess() {
+        log.info("addPaymentAccountsToOrganisation :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        Set<String> addPaymentAccounts =  new HashSet<>();
+        addPaymentAccounts.add("PBA".concat(RandomStringUtils.randomAlphanumeric(7)));
+
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(addPaymentAccounts);
+
+        professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), OK);
+
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+
+        var paymentAccounts = (List<String>) response.get("paymentAccount");
+
+        addPaymentAccounts.addAll(organisationCreationRequest.getPaymentAccount());
+        addPaymentAccounts = addPaymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+
+        assertThat(paymentAccounts).hasSameElementsAs(addPaymentAccounts);
+        log.info("addPbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 }
