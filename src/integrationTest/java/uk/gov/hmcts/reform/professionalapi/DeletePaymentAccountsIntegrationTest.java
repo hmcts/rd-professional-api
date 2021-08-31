@@ -46,7 +46,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfUserIsNotActive() {
+    public void test_deletePaymentAccountsShouldThrow403IfUserIsNotActive() {
         DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("PBA0000003");
