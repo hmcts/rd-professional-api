@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 
 
 public interface OrganisationService {
@@ -34,5 +35,6 @@ public interface OrganisationService {
     void addPbaAccountToOrganisation(Set<String> paymentAccounts, Organisation organisation, boolean pbasValidated);
 
     void deletePaymentsOfOrganization(Set<String> paymentAccounts, Organisation organisation);
-}
 
+    void updatePaymentAccounts(List<PaymentAccount> pbas);
+}
