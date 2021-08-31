@@ -4,7 +4,6 @@ import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -99,7 +97,8 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
 
             Map<String, Object> searchResponse = professionalApiClient
                     .searchOrganisationUsersByStatusInternal(extActiveOrgId, hmctsAdmin, OK);
-            List<Map<String, Object>> professionalUsersResponses = (List<Map<String, Object>>) searchResponse.get("users");
+            List<Map<String, Object>> professionalUsersResponses =
+                    (List<Map<String, Object>>) searchResponse.get("users");
             superUserId = (String) (professionalUsersResponses.get(0)).get("userIdentifier");
         }
     }
