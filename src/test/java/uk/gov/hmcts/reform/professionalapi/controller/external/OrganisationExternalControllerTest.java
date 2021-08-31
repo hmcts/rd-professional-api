@@ -17,10 +17,10 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.TestConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -314,7 +314,7 @@ public class OrganisationExternalControllerTest {
 
     @Test
     public void testDeletePaymentAccounts() {
-        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        PbaRequest deletePbaRequest = new PbaRequest();
         var accountsToDelete = new HashSet<String>();
         accountsToDelete.add("PBA1234567");
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
@@ -331,13 +331,13 @@ public class OrganisationExternalControllerTest {
         verify(organisationIdentifierValidatorImplMock, times(1))
                 .validateOrganisationIsActive(any(Organisation.class));
         verify(paymentAccountServiceMock, times(1))
-                .deletePaymentsOfOrganization(any(DeletePbaRequest.class), any(Organisation.class));
+                .deletePaymentsOfOrganisation(any(PbaRequest.class), any(Organisation.class));
 
     }
 
     @Test(expected = InvalidRequest.class)
     public void test_deletePaymentAccounts_NoPaymentAccountsPassed() {
-        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        PbaRequest deletePbaRequest = new PbaRequest();
         var accountsToDelete = new HashSet<String>();
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
         String orgId = UUID.randomUUID().toString().substring(0, 7);

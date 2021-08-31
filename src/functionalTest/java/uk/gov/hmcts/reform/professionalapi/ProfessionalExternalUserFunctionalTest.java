@@ -8,9 +8,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -494,7 +494,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiFinanceManager));
 
-        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
@@ -511,7 +511,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         setUpOrgTestData();
         setUpUserBearerTokens(List.of(puiFinanceManager));
 
-        DeletePbaRequest deletePbaRequest = new DeletePbaRequest();
+        PbaRequest deletePbaRequest = new PbaRequest();
         deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
 
         professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,

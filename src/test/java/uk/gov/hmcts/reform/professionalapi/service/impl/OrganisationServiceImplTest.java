@@ -261,7 +261,6 @@ public class OrganisationServiceImplTest {
         doNothing().when(paymentAccountRepositoryMock).delete(any(PaymentAccount.class));
         sut.deletePaymentsOfOrganization(paymentAccountList, organisation);
         verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
-        assertThat(organisation.getPaymentAccounts()).isEmpty();
     }
 
     @Test

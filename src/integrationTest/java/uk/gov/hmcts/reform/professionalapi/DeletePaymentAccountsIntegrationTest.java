@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.HashSet;
@@ -24,7 +24,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         paymentAccountsToDelete.add("PBA0000001");
         paymentAccountsToDelete.add("PBA0000003");
 
-        DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
+        PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
 
         String userId = createActiveUserAndOrganisation(true);
@@ -47,7 +47,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void test_deletePaymentAccountsShouldThrow403IfUserIsNotActive() {
-        DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
+        PbaRequest pbaDeleteRequest = new PbaRequest();
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("PBA0000003");
         paymentAccountsToDelete.add("PBA0000004");
@@ -66,7 +66,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         Set<String> paymentAccountsToDelete = new HashSet<>();
         paymentAccountsToDelete.add("this-is-invalid");
 
-        DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
+        PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
 
         String userId = createActiveUserAndOrganisation(true);
@@ -93,7 +93,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         paymentAccountsToDelete.add("PBA0000002");
         paymentAccountsToDelete.add("PBA0000005");
 
-        DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
+        PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
 
         String userId = createActiveUserAndOrganisation(true);
@@ -112,7 +112,7 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         Set<String> accountsToDelete = new HashSet<>();
         accountsToDelete.add("this-is-invalid");
 
-        DeletePbaRequest pbaDeleteRequest = new DeletePbaRequest();
+        PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(accountsToDelete);
 
         String userId = createActiveUserAndOrganisation(true);

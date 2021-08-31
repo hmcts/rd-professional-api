@@ -25,11 +25,10 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -461,13 +460,13 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> editPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String orgId,
+    public Map<String, Object> editPaymentsAccountsByOrgId(PbaRequest pbaEditRequest, String orgId,
                                                            String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pbas";
 
         try {
-            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest,
+            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaEditRequest,
                     getMultipleAuthHeaders(hmctsAdmin));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
 
@@ -482,13 +481,13 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> deletePaymentsAccountsByOrgId(DeletePbaRequest pbaDeleteRequest, String supportedRole,
+    public Map<String, Object> deletePaymentsAccountsByOrgId(PbaRequest pbaDeleteRequest, String supportedRole,
                                                              String userId) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
 
         try {
-            HttpEntity<DeletePbaRequest> requestEntity = new HttpEntity<>(pbaDeleteRequest,
+            HttpEntity<PbaRequest> requestEntity = new HttpEntity<>(pbaDeleteRequest,
                     getMultipleAuthHeaders(supportedRole, userId));
             responseEntity = restTemplate.exchange(urlPath, HttpMethod.DELETE, requestEntity, Map.class);
 

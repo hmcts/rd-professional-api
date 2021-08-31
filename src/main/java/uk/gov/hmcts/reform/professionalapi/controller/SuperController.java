@@ -44,10 +44,10 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.DeletePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
@@ -402,7 +402,7 @@ public abstract class SuperController {
         return responseEntity;
     }
 
-    protected void deletePaymentAccountsOfGivenOrganisation(DeletePbaRequest deletePbaRequest,
+    protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
 
         if (isEmpty(deletePbaRequest.getPaymentAccounts())) {
@@ -425,7 +425,7 @@ public abstract class SuperController {
         paymentAccountValidator.validatePaymentAccounts(deletePbaRequest.getPaymentAccounts(), orgId);
 
         //delete the passed pba account numbers from the organisation
-        paymentAccountService.deletePaymentsOfOrganization(deletePbaRequest, existingOrganisation);
+        paymentAccountService.deletePaymentsOfOrganisation(deletePbaRequest, existingOrganisation);
     }
 
     protected ResponseEntity<Object> modifyRolesForUserOfOrganisation(UserProfileUpdatedData userProfileUpdatedData,
