@@ -579,4 +579,24 @@ public class ProfessionalReferenceDataClient {
         deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return deleteOrganisationResponse;
     }
+
+    public Map<String, Object> addPaymentsAccountsByOrgId(PbaEditRequest pbaEditRequest, String supportedRole,
+                                                             String userId) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_EXT_BASE_PATH + "/pba";
+
+        try {
+            HttpEntity<PbaEditRequest> requestEntity = new HttpEntity<>(pbaEditRequest,
+                    getMultipleAuthHeaders(supportedRole, userId));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.POST, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
 }

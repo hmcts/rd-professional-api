@@ -25,6 +25,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -474,8 +475,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     @Override
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest,
                                                       String organisationIdentifier, String userId) {
-        AddPbaResponse addPbaResponse = new AddPbaResponse();
-
         Optional<Organisation> organisation = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
 
@@ -501,22 +500,31 @@ public class OrganisationServiceImpl implements OrganisationService {
             }
         });
 
+        return getResponse(organisation.get(), invalidPaymentAccounts,
+                duplicatePaymentAccounts, validPaymentAccounts);
+
+    }
+
+    private ResponseEntity<Object> getResponse(Organisation organisation, Set<String> invalidPaymentAccounts,
+                                               Set<String> duplicatePaymentAccounts, Set<String> validPaymentAccounts) {
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+
         if (!invalidPaymentAccounts.isEmpty() || !duplicatePaymentAccounts.isEmpty()) {
             addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
             addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         }
 
         if (!validPaymentAccounts.isEmpty()) {
-            pbaEditRequest.getPaymentAccounts().clear();
-            pbaEditRequest.setPaymentAccounts(validPaymentAccounts);
-
-            addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation.get(), false, false);
+            addPbaAccountToOrganisation(validPaymentAccounts, organisation, false, false);
+            return ResponseEntity
+                    .status(HttpStatus.OK.value())
+                    .body(addPbaResponse);
         }
-
         return ResponseEntity
-                .status(200)
+                .status(HttpStatus.BAD_REQUEST.value())
                 .body(addPbaResponse);
-
     }
+
+
 }
 
