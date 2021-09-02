@@ -861,7 +861,7 @@ public class ProfessionalApiClient {
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
 
-    public void addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
+    public Map<String, Object> addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
                                                     RequestSpecification requestSpecification,
                                                     HttpStatus expectedStatus) {
         Response response = requestSpecification
@@ -875,6 +875,8 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Add PBA of organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
+
+        return response.body().as(Map.class);
 
     }
 }

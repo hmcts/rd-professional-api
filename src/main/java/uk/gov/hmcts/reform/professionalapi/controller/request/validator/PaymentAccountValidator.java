@@ -93,11 +93,13 @@ public class PaymentAccountValidator {
         List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumber(
                 pbaAccount.toUpperCase());
         AtomicBoolean isUnique = new AtomicBoolean(true);
-        paymentAccountsInDatabase.forEach(pbaInDb -> {
-            if (pbaInDb.getPbaNumber().equals(pbaAccount)) {
-                isUnique.set(false);
-            }
-        });
+        if(!paymentAccountsInDatabase.isEmpty()){
+            paymentAccountsInDatabase.forEach(pbaInDb -> {
+                if (pbaInDb.getPbaNumber().equals(pbaAccount)) {
+                    isUnique.set(false);
+                }
+            });
+        }
         return isUnique.get();
     }
 
