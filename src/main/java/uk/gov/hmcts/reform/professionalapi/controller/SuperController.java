@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -217,8 +216,7 @@ public abstract class SuperController {
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
 
-        if (isNull(organisationCreationRequest.getStatus())
-                || StringUtils.isEmpty(organisationCreationRequest.getStatus())) {
+        if (isBlank(organisationCreationRequest.getStatus())) {
             throw new InvalidRequest("Mandatory field status is missing");
         }
 
