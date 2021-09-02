@@ -177,7 +177,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     @Override
     @Transactional
-    public void deletePaymentsOfOrganization(Set<String> paymentAccounts, Organisation organisation) {
+    public void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation) {
         final Set<String> paymentAccountsUpper = paymentAccounts.stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());

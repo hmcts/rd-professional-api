@@ -414,11 +414,11 @@ public abstract class SuperController {
 
         Organisation existingOrganisation = organisationService.getOrganisationByOrgIdentifier(orgId);
 
-        //check if organisation is present in the database and that it has payment accounts associated
-        checkOrganisationAndPbaExists(existingOrganisation);
-
         //if the organisation is present, check if it is 'ACTIVE'
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(existingOrganisation);
+
+        //check if organisation is present in the database and that it has payment accounts associated
+        checkOrganisationAndPbaExists(existingOrganisation);
 
         //check the pba account number format, remove any blank strings passed
         //And check if pba belongs to the organisation

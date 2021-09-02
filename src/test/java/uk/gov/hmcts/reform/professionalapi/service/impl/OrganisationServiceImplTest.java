@@ -259,7 +259,7 @@ public class OrganisationServiceImplTest {
     @Test
     public void test_deletePbaAccountFromOrganisation() {
         doNothing().when(paymentAccountRepositoryMock).delete(any(PaymentAccount.class));
-        sut.deletePaymentsOfOrganization(paymentAccountList, organisation);
+        sut.deletePaymentsOfOrganisation(paymentAccountList, organisation);
         verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
     }
 

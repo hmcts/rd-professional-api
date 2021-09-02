@@ -83,7 +83,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     @Override
     public void deletePaymentsOfOrganisation(PbaRequest deletePbaRequest, Organisation organisation) {
-        organisationService.deletePaymentsOfOrganization(deletePbaRequest.getPaymentAccounts(), organisation);
+        organisationService.deletePaymentsOfOrganisation(deletePbaRequest.getPaymentAccounts(), organisation);
     }
 
     public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {

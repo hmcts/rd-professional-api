@@ -318,7 +318,7 @@ public class OrganisationExternalControllerTest {
         var accountsToDelete = new HashSet<String>();
         accountsToDelete.add("PBA1234567");
         deletePbaRequest.setPaymentAccounts(accountsToDelete);
-        doNothing().when(organisationServiceMock).deletePaymentsOfOrganization(accountsToDelete, organisation);
+        doNothing().when(organisationServiceMock).deletePaymentsOfOrganisation(accountsToDelete, organisation);
         when(organisationServiceMock.getOrganisationByOrgIdentifier(anyString())).thenReturn(organisation);
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
