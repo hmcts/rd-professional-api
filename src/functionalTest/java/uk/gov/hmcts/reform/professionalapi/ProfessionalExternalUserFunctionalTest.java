@@ -519,7 +519,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         pbaEditRequest.setPaymentAccounts(addPaymentAccounts);
 
         ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
-                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), OK);
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), CREATED);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));

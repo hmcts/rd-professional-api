@@ -519,7 +519,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     private ResponseEntity<Object> getResponse(Set<String> invalidPaymentAccounts,
                                                Set<String> duplicatePaymentAccounts, Set<String> validPaymentAccounts) {
         AddPbaResponse addPbaResponse = null;
-        HttpStatus status = HttpStatus.OK;
+        HttpStatus status = HttpStatus.CREATED;
 
         if ((!isEmpty(invalidPaymentAccounts) || !isEmpty(duplicatePaymentAccounts))
                 && (!isEmpty(validPaymentAccounts))) {

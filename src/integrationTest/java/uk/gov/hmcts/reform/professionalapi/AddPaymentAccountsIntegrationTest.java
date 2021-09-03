@@ -19,7 +19,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_addPaymentAccountsShouldReturn200() {
+    public void test_addPaymentAccountsShouldReturn201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000002");
 
@@ -31,7 +31,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> pbaResponse = professionalReferenceDataClient
                 .addPaymentsAccountsByOrgId(pbaEditRequest, puiFinanceManager, userId);
 
-        assertThat(pbaResponse).containsEntry("http_status", "200 OK");
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
 
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
@@ -46,7 +46,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_addPaymentAccountsPartialShouldReturn200() {
+    public void test_addPaymentAccountsPartialShouldReturn201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000002");
@@ -59,7 +59,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> pbaResponse = professionalReferenceDataClient
                 .addPaymentsAccountsByOrgId(pbaEditRequest, puiFinanceManager, userId);
 
-        assertThat(pbaResponse).containsEntry("http_status", "200 OK");
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
 
         java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
                 .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
