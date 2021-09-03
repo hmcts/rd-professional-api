@@ -144,5 +144,6 @@
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations_POST" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/userId?origin=EXUI_PUT" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/internal/v1/organisations_POST" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/userId?origin=EXUI_PUT" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users/userId?origin=EXUI_PUT" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-professional-api-aat.service.core-compute-aat.internal/refdata/external/v1/organisations/users?page=10&returnRoles=true&showDeleted=showDeleted&size=10&status=status_GET" : "ignore"
 }
