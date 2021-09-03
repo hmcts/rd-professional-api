@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Slf4j
@@ -33,12 +32,12 @@ public class PaymentAccountValidator {
     public void validatePaymentAccounts(Set<String> paymentAccounts, String orgId) {
         if (!CollectionUtils.isEmpty(paymentAccounts)) {
             paymentAccounts.removeIf(String::isBlank);
-            checkPbaNumberIsValid(paymentAccounts);
+            checkPbaNumberIsValid(paymentAccounts, true);
             checkPbasAreUniqueWithOrgId(paymentAccounts, orgId);
         }
     }
 
-    public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
+    public static String checkPbaNumberIsValid(Set<String> paymentAccounts, boolean throwException) {
         String invalidPbas = paymentAccounts.stream()
                 .filter(pbaAccount -> {
                     if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
@@ -52,15 +51,16 @@ public class PaymentAccountValidator {
                 })
                 .collect(Collectors.joining(", "));
 
-        if (!StringUtils.isEmpty(invalidPbas)) {
+        if (throwException && !StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
                     .concat("characters. The following PBAs entered are invalid: " + invalidPbas));
+        } else {
+            return invalidPbas;
         }
     }
 
-
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
-        Set<String> upperCasePbas = paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
+        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
 
         List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
         List<String> uniquePBas = new ArrayList<>();
@@ -78,29 +78,15 @@ public class PaymentAccountValidator {
         }
     }
 
-    public boolean checkSinglePbaIsValid(String pbaAccount) {
-        if (pbaAccount.length() == 10) {
-            Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
-            Matcher matcher = pattern.matcher(pbaAccount);
-            if (matcher.matches()) {
-                return true;
-            }
-        }
-        return false;
+    public Set<String> getDuplicatePbas(Set<String> paymentAccounts) {
+        Set<String> upperCasePbas = getUpperCasePbas(paymentAccounts);
+        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumberIn(upperCasePbas);
+        return paymentAccountsInDatabase.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toSet());
     }
 
-    public boolean checkSinglePbaIsUnique(String pbaAccount) {
-        List<PaymentAccount> paymentAccountsInDatabase = paymentAccountRepository.findByPbaNumber(
-                pbaAccount.toUpperCase());
-        AtomicBoolean isUnique = new AtomicBoolean(true);
-        if (!paymentAccountsInDatabase.isEmpty()) {
-            paymentAccountsInDatabase.forEach(pbaInDb -> {
-                if (pbaInDb.getPbaNumber().equals(pbaAccount)) {
-                    isUnique.set(false);
-                }
-            });
-        }
-        return isUnique.get();
+    private Set<String> getUpperCasePbas(Set<String> paymentAccounts) {
+        return paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());
     }
+
 
 }

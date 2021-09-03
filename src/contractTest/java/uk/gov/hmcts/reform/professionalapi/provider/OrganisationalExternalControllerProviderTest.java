@@ -119,8 +119,8 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
                 .thenReturn(organisationMock);
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
         doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
-        doNothing().when(paymentAccountValidatorMock).checkSinglePbaIsValid(any());
-        doNothing().when(paymentAccountValidatorMock).checkSinglePbaIsUnique(any());
+        doNothing().when(paymentAccountValidatorMock).checkPbaNumberIsValid(any(), any());
+        doNothing().when(paymentAccountValidatorMock).getDuplicatePbas(any());
 
         PaymentAccount paymentAccount = new PaymentAccount();
         paymentAccount.setPbaNumber("PBA0000001");

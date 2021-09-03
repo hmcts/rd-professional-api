@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
@@ -18,9 +19,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +81,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundExc
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
+import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -169,7 +173,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                                             Organisation organisation, boolean pbasValidated, boolean isEditPba) {
         if (paymentAccounts != null) {
             if (!pbasValidated) {
-                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts);
+                PaymentAccountValidator.checkPbaNumberIsValid(paymentAccounts, true);
             }
 
             paymentAccounts.forEach(pbaAccount -> {
@@ -486,43 +490,55 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        Set<String> invalidPaymentAccounts = new HashSet<>();
-        Set<String> duplicatePaymentAccounts = new HashSet<>();
-        Set<String> validPaymentAccounts = new HashSet<>();
+        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaEditRequest);
 
-        pbaEditRequest.getPaymentAccounts().forEach(pbaAccount -> {
-            if (!paymentAccountValidator.checkSinglePbaIsValid(pbaAccount)) {
-                invalidPaymentAccounts.add(pbaAccount);
-            } else if (!paymentAccountValidator.checkSinglePbaIsUnique(pbaAccount)) {
-                duplicatePaymentAccounts.add(pbaAccount);
-            } else {
-                validPaymentAccounts.add(pbaAccount);
-            }
-        });
-
-        return getResponse(organisation.get(), invalidPaymentAccounts,
-                duplicatePaymentAccounts, validPaymentAccounts);
+        if (!isEmpty(pbaEditRequest.getPaymentAccounts())) {
+            addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation.get(), false, false);
+        }
+        return getResponse(unsuccessfulPbas.getLeft(),
+                unsuccessfulPbas.getRight(), pbaEditRequest.getPaymentAccounts());
 
     }
 
-    private ResponseEntity<Object> getResponse(Organisation organisation, Set<String> invalidPaymentAccounts,
-                                               Set<String> duplicatePaymentAccounts, Set<String> validPaymentAccounts) {
-        AddPbaResponse addPbaResponse = new AddPbaResponse();
-
-        if (!invalidPaymentAccounts.isEmpty() || !duplicatePaymentAccounts.isEmpty()) {
-            addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
-            addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
+    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaEditRequest pbaEditRequest) {
+        Set<String> invalidPaymentAccounts = null;
+        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaEditRequest.getPaymentAccounts(),
+                Boolean.FALSE);
+        if (StringUtils.isNotEmpty(invalidPbas)) {
+            invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
+            pbaEditRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
         }
 
-        if (!validPaymentAccounts.isEmpty()) {
-            addPbaAccountToOrganisation(validPaymentAccounts, organisation, false, false);
-            return ResponseEntity
-                    .status(HttpStatus.OK.value())
-                    .body(addPbaResponse);
+        Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
+                pbaEditRequest.getPaymentAccounts());
+        pbaEditRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
+
+        return Pair.of(invalidPaymentAccounts, duplicatePaymentAccounts);
+    }
+
+    private ResponseEntity<Object> getResponse(Set<String> invalidPaymentAccounts,
+                                               Set<String> duplicatePaymentAccounts, Set<String> validPaymentAccounts) {
+        AddPbaResponse addPbaResponse = null;
+        HttpStatus status = HttpStatus.OK;
+
+        if ((!isEmpty(invalidPaymentAccounts) || !isEmpty(duplicatePaymentAccounts))
+                && (!isEmpty(validPaymentAccounts))) {
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts);
+        } else if (validPaymentAccounts.isEmpty()) {
+            status = HttpStatus.BAD_REQUEST;
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts);
         }
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(status)
                 .body(addPbaResponse);
+    }
+
+    private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts, Set<String> duplicatePaymentAccounts) {
+        AddPbaResponse addPbaResponse;
+        addPbaResponse = new AddPbaResponse();
+        addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
+        addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
+        return addPbaResponse;
     }
 
 

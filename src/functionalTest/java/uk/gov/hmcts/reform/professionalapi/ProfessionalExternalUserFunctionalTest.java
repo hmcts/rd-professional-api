@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
@@ -497,7 +498,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
 
-        Map<String, Object> addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
+        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
 
         log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
@@ -517,7 +518,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         PbaEditRequest pbaEditRequest = new PbaEditRequest();
         pbaEditRequest.setPaymentAccounts(addPaymentAccounts);
 
-        Map<String, Object> addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
+        ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaEditRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), OK);
 
         Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,

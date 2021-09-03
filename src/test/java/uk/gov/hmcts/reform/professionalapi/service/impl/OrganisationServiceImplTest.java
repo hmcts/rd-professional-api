@@ -863,7 +863,7 @@ public class OrganisationServiceImplTest {
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
-        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
         verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
     }

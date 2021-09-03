@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -861,9 +862,9 @@ public class ProfessionalApiClient {
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
 
-    public Map<String, Object> addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
-                                                    RequestSpecification requestSpecification,
-                                                    HttpStatus expectedStatus) {
+    public ResponseBody addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
+                                                         RequestSpecification requestSpecification,
+                                                         HttpStatus expectedStatus) {
         Response response = requestSpecification
                 .body(pbaEditRequest)
                 .post("/refdata/external/v1/organisations/pba")
@@ -876,7 +877,6 @@ public class ProfessionalApiClient {
         log.info("{}:: Add PBA of organisation status response: {}",
                 loggingComponentName, response.getStatusCode());
 
-        return response.body().as(Map.class);
-
+        return response.body();
     }
 }
