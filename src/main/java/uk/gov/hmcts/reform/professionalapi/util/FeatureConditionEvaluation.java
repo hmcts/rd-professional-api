@@ -60,29 +60,4 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         return flagStatus;
     }
 
-    public Optional<Object> getServiceName() {
-
-        ServletRequestAttributes servletRequestAttributes =
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
-
-        if (nonNull(servletRequestAttributes)) {
-            HttpServletRequest request = servletRequestAttributes.getRequest();
-
-            if (StringUtils.isNotEmpty(request.getHeader(SERVICE_AUTHORIZATION))) {
-                return Optional.ofNullable(JWT.decode(removeBearerFromToken(request
-                        .getHeader(SERVICE_AUTHORIZATION))).getSubject());
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    private String removeBearerFromToken(String token) {
-        if (isNotTrue(token.startsWith(BEARER))) {
-            return token;
-        } else {
-            return token.substring(BEARER.length());
-        }
-    }
-
 }
