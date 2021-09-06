@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Slf4j
@@ -578,5 +579,25 @@ public class ProfessionalReferenceDataClient {
         Map<String, Object> deleteOrganisationResponse = new HashMap<>();
         deleteOrganisationResponse.put("http_status", responseEntity.getStatusCodeValue());
         return deleteOrganisationResponse;
+    }
+
+    public Map<String, Object> findOrganisationsByPbaStatus(String pbaStatus, String role, boolean isUnauthorised) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/pba/" + pbaStatus;
+
+        try {
+            HttpEntity<?> request = new HttpEntity<>(isUnauthorised ?
+                    getInvalidAuthHeaders(role) : getMultipleAuthHeaders(role));
+
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.GET, request, Map.class);
+
+        } catch (HttpStatusCodeException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
     }
 }
