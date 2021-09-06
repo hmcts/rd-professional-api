@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -444,5 +446,23 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updateOrgMFAShouldReturn403 :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "", withFeature = true)
+    public void retrieveOrgsByPbaStatusScenario() {
+        findOrganisationByPbaStatus();
+    }
+
+    public void findOrganisationByPbaStatusShouldBeSuccess() {
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
+
+        Map<String, Object> orgsResponse = (Map<String, Object>) professionalApiClient
+                .findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        assertNotNull(orgsResponse);
+        assertNotNull(orgsResponse.get("organisations"));
+
+        log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
     }
 }
