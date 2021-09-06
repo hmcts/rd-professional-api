@@ -324,12 +324,16 @@ public class OrganisationExternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "All PBAs got added successfully",
+                    message = "All PBAs got added successfully or Partial success",
                     response = AddPbaResponse.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid request was provided"
+                    message = "PBA number invalid or Duplicate PBA or Organisation is not active"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "S2S unauthorised"
             ),
             @ApiResponse(
                     code = 403,
