@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreati
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 
 @Slf4j
@@ -581,23 +581,50 @@ public class ProfessionalReferenceDataClient {
         return deleteOrganisationResponse;
     }
 
-    public Map<String, Object> findOrganisationsByPbaStatus(String pbaStatus, String role, boolean isUnauthorised) {
-        ResponseEntity<Map> responseEntity = null;
+    public Object findOrganisationsByPbaStatus(String pbaStatus, String role, boolean isUnauthorised)
+            throws JsonProcessingException {
+
+        ResponseEntity<Object> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/pba/" + pbaStatus;
 
-        try {
-            HttpEntity<?> request = new HttpEntity<>(isUnauthorised ?
-                    getInvalidAuthHeaders(role) : getMultipleAuthHeaders(role));
+        responseEntity = getRequestForInternalWithGivenResponseType(urlPath, role,
+                OrganisationsWithPbaStatusResponse[].class, isUnauthorised);
 
-            responseEntity = restTemplate.exchange(urlPath, HttpMethod.GET, request, Map.class);
-
-        } catch (HttpStatusCodeException ex) {
-            HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
-            statusAndBody.put("response_body", ex.getResponseBodyAsString());
-            return statusAndBody;
+        HttpStatus status = responseEntity.getStatusCode();
+        if (status.is2xxSuccessful()) {
+            return Arrays.asList(objectMapper.convertValue(
+                    responseEntity.getBody(), OrganisationsWithPbaStatusResponse[].class));
+        } else {
+            return getErrorResponseMap(responseEntity, status);
         }
+    }
 
-        return getResponse(responseEntity);
+    private Map<String, Object> getErrorResponseMap(ResponseEntity<Object> responseEntity, HttpStatus status)
+            throws JsonProcessingException {
+        Map<String, Object> errorResponseMap = new HashMap<>();
+        String body = (String) responseEntity.getBody();
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(body)) {
+            errorResponseMap.put("response_body",  objectMapper.readValue(
+                    body, ErrorResponse.class));
+        } else {
+            errorResponseMap.put("response_body", null);
+        }
+        errorResponseMap.put("http_status", status);
+
+        return errorResponseMap;
+    }
+
+    private ResponseEntity<Object> getRequestForInternalWithGivenResponseType(
+            String uriPath, String role, Class clasz, Boolean isUnauthorised) {
+
+        ResponseEntity<Object> responseEntity;
+        try {
+            HttpEntity<?> request = new HttpEntity<>(
+                    isUnauthorised ? getInvalidAuthHeaders(role) : (getMultipleAuthHeaders(role)));
+            responseEntity = restTemplate.exchange(uriPath, HttpMethod.GET, request, clasz);
+        } catch (HttpStatusCodeException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+        }
+        return responseEntity;
     }
 }

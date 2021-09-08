@@ -1,74 +1,79 @@
 package uk.gov.hmcts.reform.professionalapi;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.professionalapi.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ErrorConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFields;
 
+@SuppressWarnings("unchecked")
 public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
-    public void get_request_returns_organisations_with_correct_pba_status() {
+    public void get_request_returns_organisations_with_correct_pba_status() throws JsonProcessingException {
         createOrganizationsAndEditPbas();
 
-        Map<String, Object> orgPbaResponse = professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.FALSE);
+        List<OrganisationsWithPbaStatusResponse> orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalReferenceDataClient.findOrganisationsByPbaStatus(
+                        PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.FALSE);
 
-        assertThat(orgPbaResponse).isNotNull().containsEntry("http_status", "200 OK");
-        assertThat(orgPbaResponse.get("orgWithPbas")).isNotNull();
+        assertThat(orgPbaResponse).isNotNull();
     }
 
     @Test
-    public void get_request_returns_no_organisations_for_given_pba_status() {
+    public void get_request_returns_no_organisations_for_given_pba_status() throws JsonProcessingException {
         createOrganizationsAndEditPbas();
 
-        Map<String, Object> orgPbaResponse = professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(PbaStatus.REJECTED.toString(), hmctsAdmin, Boolean.FALSE);
+        List<OrganisationsWithPbaStatusResponse> orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalReferenceDataClient.findOrganisationsByPbaStatus(
+                        PbaStatus.REJECTED.toString(), hmctsAdmin, Boolean.FALSE);
 
-        assertThat(orgPbaResponse).isNotNull().containsEntry("http_status", "200 OK");
-        assertThat(orgPbaResponse.get("orgWithPbas")).isNull();
+        assertThat(orgPbaResponse).isEmpty();
     }
 
     @Test
-    public void get_request_returns_400_when_invalid_pba_status() {
+    public void get_request_returns_400_when_invalid_pba_status() throws JsonProcessingException {
         createOrganizationsAndEditPbas();
 
-        Map<String, Object> orgPbaResponse = professionalReferenceDataClient
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("Invalid Status", hmctsAdmin, Boolean.FALSE);
+        ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
 
-        assertThat(orgPbaResponse).isNotNull().containsEntry("http_status", "400");
-        assertThat(orgPbaResponse.get("response_body").toString())
-                .contains(ErrorConstants.INVALID_REQUEST.getErrorMessage());
+        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.BAD_REQUEST);
+        assertThat(errorResponse.getErrorMessage()).isEqualTo(ErrorConstants.INVALID_REQUEST.getErrorMessage());
     }
 
     @Test
-    public void get_request_returns_403_when_invalid_role() {
+    public void get_request_returns_403_when_invalid_role() throws JsonProcessingException {
         createOrganizationsAndEditPbas();
 
-        Map<String, Object> orgPbaResponse = professionalReferenceDataClient
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), "invalid role", Boolean.FALSE);
+        ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
 
-        assertThat(orgPbaResponse).isNotNull().containsEntry("http_status", "403");
+        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.FORBIDDEN);
+        assertThat(errorResponse.getErrorMessage()).isEqualTo(ErrorConstants.ACCESS_EXCEPTION.getErrorMessage());
     }
 
     @Test
-    public void get_request_returns_401_when_invalid_role() {
-        createOrganizationsAndEditPbas();
-
-        Map<String, Object> orgPbaResponse = professionalReferenceDataClient
+    public void get_request_returns_401_when_invalid_role() throws JsonProcessingException {
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.TRUE);
 
-        assertThat(orgPbaResponse).isNotNull().containsEntry("http_status", "401");
+        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -94,15 +99,6 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
 
         updateOrganisation(organisationIdentifier1, hmctsAdmin, "ACTIVE");
         updateOrganisation(organisationIdentifier2, hmctsAdmin, "ACTIVE");
-
-        PbaEditRequest pbaEditRequest1 = new PbaEditRequest();
-        pbaEditRequest1.setPaymentAccounts(paymentAccounts_org1);
-
-        PbaEditRequest pbaEditRequest2 = new PbaEditRequest();
-        pbaEditRequest2.setPaymentAccounts(paymentAccounts_org2);
-
-        professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest1, organisationIdentifier1, hmctsAdmin);
-        professionalReferenceDataClient.editPaymentsAccountsByOrgId(pbaEditRequest2, organisationIdentifier2, hmctsAdmin);
     }
 
 
