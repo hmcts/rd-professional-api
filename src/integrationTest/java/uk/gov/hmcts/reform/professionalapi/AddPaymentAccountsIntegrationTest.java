@@ -46,7 +46,7 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
 
     @Test
     @SuppressWarnings("unchecked")
-    public void test_addPaymentAccountsPartialShouldReturn201() {
+    public void test_addPaymentAccountsPartialDuplShouldReturn201() {
         Set<String> paymentAccountsToAdd = new HashSet<>();
         paymentAccountsToAdd.add("PBA0000001");
         paymentAccountsToAdd.add("PBA0000002");
@@ -70,6 +70,61 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         assertThat(paymentAccount)
                 .hasSize(8)
                 .containsAll(paymentAccountsToAdd);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void test_addPaymentAccountsPartialInvlShouldReturn201() {
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("invalid-test");
+        paymentAccountsToAdd.add("PBA0000002");
+
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(paymentAccountsToAdd);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaEditRequest, puiFinanceManager, userId);
+
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(8);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void test_addPaymentAccountsPartialInvlDupShouldReturn201() {
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("invalid-test");
+        paymentAccountsToAdd.add("PBA0000001");
+        paymentAccountsToAdd.add("PBA0000002");
+
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(paymentAccountsToAdd);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaEditRequest, puiFinanceManager, userId);
+
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(8);
     }
 
     @Test

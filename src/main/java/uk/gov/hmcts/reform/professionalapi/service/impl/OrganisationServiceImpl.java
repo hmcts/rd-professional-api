@@ -188,7 +188,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         }
     }
 
-    private void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
+    public void updateStatusAndMessage(PaymentAccount paymentAccount, PbaStatus pbaStatus, String statusMessage) {
         paymentAccount.setPbaStatus(pbaStatus);
         paymentAccount.setStatusMessage(statusMessage);
     }
@@ -523,20 +523,22 @@ public class OrganisationServiceImpl implements OrganisationService {
 
         if ((!isEmpty(invalidPaymentAccounts) || !isEmpty(duplicatePaymentAccounts))
                 && (!isEmpty(validPaymentAccounts))) {
-            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts);
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts,
+                    duplicatePaymentAccounts, ERROR_MSG_PARTIAL_SUCCESS);
         } else if (validPaymentAccounts.isEmpty()) {
             status = HttpStatus.BAD_REQUEST;
-            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts);
+            addPbaResponse = getAddPbaResponse(invalidPaymentAccounts, duplicatePaymentAccounts, null);
         }
         return ResponseEntity
                 .status(status)
                 .body(addPbaResponse);
     }
 
-    private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts, Set<String> duplicatePaymentAccounts) {
+    private AddPbaResponse getAddPbaResponse(Set<String> invalidPaymentAccounts,
+                                             Set<String> duplicatePaymentAccounts, String msg) {
         AddPbaResponse addPbaResponse;
         addPbaResponse = new AddPbaResponse();
-        addPbaResponse.setMessage(ERROR_MSG_PARTIAL_SUCCESS);
+        addPbaResponse.setMessage(msg);
         addPbaResponse.setReason(new FailedPbaReason(duplicatePaymentAccounts, invalidPaymentAccounts));
         return addPbaResponse;
     }
