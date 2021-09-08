@@ -330,6 +330,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
+        organisation.setStatusMessage(organisationCreationRequest.getStatusMessage());
         organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         organisation.setCompanyNumber(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest

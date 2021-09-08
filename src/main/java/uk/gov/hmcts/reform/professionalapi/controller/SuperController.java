@@ -215,6 +215,11 @@ public abstract class SuperController {
 
     protected ResponseEntity<Object> updateOrganisationById(OrganisationCreationRequest organisationCreationRequest,
                                                             String organisationIdentifier) {
+
+        if (isBlank(organisationCreationRequest.getStatus())) {
+            throw new InvalidRequest("Mandatory field status is missing");
+        }
+
         organisationCreationRequest.setStatus(organisationCreationRequest.getStatus().toUpperCase());
 
         String orgId = removeEmptySpaces(organisationIdentifier);
@@ -231,7 +236,8 @@ public abstract class SuperController {
 
         SuperUser superUser = existingOrganisation.getUsers().get(0);
         ProfessionalUser professionalUser = professionalUserService.findProfessionalUserById(superUser.getId());
-        if (existingOrganisation.getStatus().isPending() && organisationCreationRequest.getStatus() != null
+        if ((existingOrganisation.getStatus().isPending() || existingOrganisation.getStatus().isReview())
+                && organisationCreationRequest.getStatus() != null
                 && organisationCreationRequest.getStatus().equalsIgnoreCase("ACTIVE")) {
             //Organisation is getting activated
 
