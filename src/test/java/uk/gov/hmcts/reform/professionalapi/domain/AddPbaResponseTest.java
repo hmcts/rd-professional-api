@@ -58,4 +58,5 @@ public class AddPbaResponseTest {
         assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts().size()).isEqualTo(1);
         assertThat(addPbaResponse.getMessage()).isEqualTo(success);
     }
+    
 }
