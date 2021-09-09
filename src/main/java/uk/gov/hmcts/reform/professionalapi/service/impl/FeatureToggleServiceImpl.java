@@ -40,6 +40,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
         launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("OrganisationMfaStatusController.retrieveMfaStatusByUserId", "prd-mfa-flag");
         launchDarklyMap.put("OrganisationInternalController.updateOrgMfaStatus", "prd-mfa-flag");
+        launchDarklyMap.put("OrganisationInternalController.retrieveOrgByPbaStatus", "rd-professional-multi-pba");
     }
 
     @Override
