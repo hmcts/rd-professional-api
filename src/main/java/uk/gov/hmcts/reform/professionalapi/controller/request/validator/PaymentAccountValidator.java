@@ -49,7 +49,7 @@ public class PaymentAccountValidator {
                     }
                     return true;
                 })
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(","));
 
         if (throwException && !StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -941,6 +942,31 @@ public class OrganisationServiceImplTest {
         sut.updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
     }
 
+    @Test
+    public void test_addPaymentAccountsToOrganisation_pba_valid_And_invalid() {
+        Set<String> pbas = new HashSet<>();
+        pbas.add("PBA0000001");
+        pbas.add("test");
+        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        pbaEditRequest.setPaymentAccounts(pbas);
+        AddPbaResponse addPbaResponse = new AddPbaResponse();
+        ResponseEntity<Object> responseEntity = ResponseEntity
+                .status(200)
+                .body(addPbaResponse);
+
+        String orgId = UUID.randomUUID().toString().substring(0, 7);
+        String userId = UUID.randomUUID().toString();
+        when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
+
+        responseEntity = sut.addPaymentAccountsToOrganisation(pbaEditRequest, orgId, userId);
+        AddPbaResponse response = (AddPbaResponse)responseEntity.getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getReason()).isNotNull();
+        assertThat(response.getMessage()).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
+        verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
+        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
+    }
 
 
 }
