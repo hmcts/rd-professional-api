@@ -78,18 +78,18 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
 
 
     private void createOrganizationsAndEditPbas() {
-        Set<String> paymentAccounts_org1 = new HashSet<>();
-        paymentAccounts_org1.add("PBA1234568");
+        Set<String> paymentAccountsOrg1 = new HashSet<>();
+        paymentAccountsOrg1.add("PBA1234568");
 
-        Set<String> paymentAccounts_org2 =  new HashSet<>();
-        paymentAccounts_org2.add("PBA1234568");
-        paymentAccounts_org2.add("PBA1234569");
+        Set<String> paymentAccountsOrg2 =  new HashSet<>();
+        paymentAccountsOrg2.add("PBA1234568");
+        paymentAccountsOrg2.add("PBA1234569");
 
         OrganisationCreationRequest organisationCreationRequest1 = organisationRequestWithAllFields()
-                .paymentAccount(paymentAccounts_org1).build();
+                .paymentAccount(paymentAccountsOrg1).build();
 
         OrganisationCreationRequest organisationCreationRequest2 = organisationRequestWithAllFields()
-                .paymentAccount(paymentAccounts_org2).build();
+                .paymentAccount(paymentAccountsOrg2).build();
 
         String organisationIdentifier1 = (String) professionalReferenceDataClient
                 .createOrganisation(organisationCreationRequest1).get(ORG_IDENTIFIER);
