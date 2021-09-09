@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -26,8 +27,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -449,20 +453,51 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    @ToggleEnable(mapKey = "", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = true)
     public void retrieveOrgsByPbaStatusScenario() {
-        findOrganisationByPbaStatus();
+        setUpTestData();
+        findOrganisationByPbaStatusShouldBeSuccessWithPbas();
+        findOrganisationByPbaStatusShouldBeSuccessWithNoPbas();
     }
 
-    public void findOrganisationByPbaStatusShouldBeSuccess() {
+    public void findOrganisationByPbaStatusShouldBeSuccessWithPbas() {
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
 
-        Map<String, Object> orgsResponse = (Map<String, Object>) professionalApiClient
-                .findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+        List<OrganisationsWithPbaStatusResponse> orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
 
         assertNotNull(orgsResponse);
-        assertNotNull(orgsResponse.get("organisations"));
+        assertThat(orgsResponse.size()).isPositive();
+        assertThat(orgsResponse.stream()).allMatch(org -> org.getOrganisationStatus().isActive());
+
+        List<FetchPbaByStatusResponse> pbaByStatusResponses = new ArrayList<>();
+        orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
+
+        assertThat(pbaByStatusResponses.size()).isPositive();
+        assertThat(pbaByStatusResponses.stream()).allMatch(pba -> pba.getStatus().equals("ACCEPTED"));
+        assertThat(pbaByStatusResponses).allMatch(pba -> nonNull(pba.getDateAccepted()));
 
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
+    }
+
+    public void findOrganisationByPbaStatusShouldBeSuccessWithNoPbas() {
+        log.info("findOrganisationByPbaStatusShouldBeSuccessWithNoPbas :: STARTED");
+
+        List<OrganisationsWithPbaStatusResponse> orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
+                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.REJECTED);
+
+        assertNotNull(orgsResponse);
+        assertThat(orgsResponse.size()).isZero();
+        log.info("findOrganisationByPbaStatusShouldBeSuccessWithNoPbas :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationInternalController.retrieveOrgByPbaStatus", withFeature = false)
+    public void findOrganisationByPbaStatusShouldReturn403WhenToggledOff() throws IOException {
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: STARTED");
+
+        professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
+
+        log.info("findOrganisationByPbaStatusShouldReturn403WhenToggledOff :: END");
     }
 }

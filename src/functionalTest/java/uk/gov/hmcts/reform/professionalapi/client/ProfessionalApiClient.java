@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.idam.IdamOpenIdClient;
@@ -863,7 +864,7 @@ public class ProfessionalApiClient {
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
 
-    public Object findOrganisationsByPbaStatus(HttpStatus status, PbaStatus pbaStatus) {
+    public Object findOrganisationsByPbaStatus(HttpStatus expectedStatus, PbaStatus pbaStatus) {
 
         Response response = getMultipleAuthHeadersInternal()
                 .get("/refdata/internal/v1/organisations/pba/" + pbaStatus.toString())
@@ -871,8 +872,12 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(status.value());
+                .statusCode(expectedStatus.value());
 
-        return response.body().as(OrganisationWithPbasResponse[].class);
+        if (expectedStatus.is2xxSuccessful()) {
+            return Arrays.asList(response.getBody().as(OrganisationsWithPbaStatusResponse[].class));
+        } else {
+            return response.getBody().as(ErrorResponse.class);
+        }
     }
 }
