@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -11,6 +12,7 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest.anOrganisationCreationRequest;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.REVIEW;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         updatePbaScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
+        updateOrgStatusScenarios();
     }
 
     public void setUpTestData() {
@@ -500,5 +503,26 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updateOrgMFAShouldReturn403 :: END");
+    }
+
+    public void  updateOrgStatusScenarios() {
+        updateOrgStatusShouldBeSuccess();
+    }
+
+    public void updateOrgStatusShouldBeSuccess() {
+        log.info("updateOrgStatusShouldBeSuccess :: STARTED");
+
+        Map<String, Object> response = professionalApiClient.createOrganisation();
+        String orgIdentifier = (String) response.get("organisationIdentifier");
+        String statusMessage = "Company in review";
+
+        professionalApiClient.updateOrganisationToReview(orgIdentifier, statusMessage, hmctsAdmin);
+
+        Map<String, Object> orgResponse = professionalApiClient
+                .retrieveOrganisationDetails(orgIdentifier, hmctsAdmin, OK);
+        assertEquals(REVIEW.toString(), orgResponse.get("status"));
+        assertEquals(statusMessage, orgResponse.get("statusMessage"));
+
+        log.info("updateOrgStatusShouldBeSuccess :: END");
     }
 }
