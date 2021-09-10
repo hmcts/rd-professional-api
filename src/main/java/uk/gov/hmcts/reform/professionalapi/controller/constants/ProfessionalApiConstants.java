@@ -57,5 +57,15 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
+    public static final String PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN = "PBA accepted by Admin";
+
+    public static final String ERROR_MSG_PARTIAL_SUCCESS_UPDATE = "Some of the PBAs updated successfully";
+    public static final String ERROR_MSG_PBA_NOT_PENDING = "PBA is not in Pending status";
+    public static final String ERROR_MSG_PBA_NOT_IN_ORG = "PBA is not associated with the Organisation";
+    public static final String ERROR_MSG_PBA_MISSING = "Mandatory field PBA number is missing";
+    public static final String ERROR_MSG_STATUS_MISSING = "Mandatory field Status missing";
+    public static final String ERROR_MSG_STATUS_INVALID = "Value for Status field is invalid";
+    public static final String ERROR_MSG_PBA_INVALID_FORMAT =
+            "PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters";
 
 }
