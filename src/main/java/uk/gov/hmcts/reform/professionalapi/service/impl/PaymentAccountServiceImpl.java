@@ -190,7 +190,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             }
         });
 
-        //Check individual PBA numbers are valid, pending and exist within given organisation
+        //Check individual PBA numbers are valid and exist within given organisation
         invalidPbaRequests.addAll(getInvalidPbas(pbasFromRequest, orgId));
 
         return invalidPbaRequests;
