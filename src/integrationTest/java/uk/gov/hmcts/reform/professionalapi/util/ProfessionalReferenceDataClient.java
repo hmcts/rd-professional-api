@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -104,14 +105,14 @@ public class ProfessionalReferenceDataClient {
                     responseEntity.getBody(), expectedClass));
         } else {
             Map<String, Object> errorResponseMap = new HashMap<>();
-            errorResponseMap.put("response_body",  objectMapper.readValue(
+            errorResponseMap.put("response_body", objectMapper.readValue(
                     responseEntity.getBody().toString(), ErrorResponse.class));
             errorResponseMap.put("http_status", status);
             return errorResponseMap;
         }
     }
 
-    public Map<String,Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
+    public Map<String, Object> retrieveAllOrganisationDetailsByStatusTest(String status, String role) {
         return getRequest(APP_INT_BASE_PATH + "?status={status}", role, status);
     }
 
@@ -242,7 +243,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Map<String, Object> getRequestToGetEmailFromHeader(String uriPath, String role,String userId,
+    private Map<String, Object> getRequestToGetEmailFromHeader(String uriPath, String role, String userId,
                                                                Object... params) {
 
         ResponseEntity<Map> responseEntity;
@@ -313,7 +314,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     private Map<String, Object> getRequestForExternalRoles(
-            String uriPath,String role, String userId, Object... params) {
+            String uriPath, String role, String userId, Object... params) {
 
         ResponseEntity<Map> responseEntity;
 
@@ -409,7 +410,7 @@ public class ProfessionalReferenceDataClient {
         if (responseEntity.hasBody()) {
             response = objectMapper
                     .convertValue(
-                         responseEntity.getBody(), Map.class);
+                            responseEntity.getBody(), Map.class);
         }
 
         response.put("http_status", responseEntity.getStatusCode().toString());
@@ -481,6 +482,26 @@ public class ProfessionalReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> updatePaymentsAccountsByOrgId(UpdatePbaRequest updatePbaRequest, String orgId,
+                                                             String hmctsAdmin) {
+        ResponseEntity<Map> responseEntity = null;
+        String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/pba/status";
+
+        try {
+            HttpEntity<UpdatePbaRequest> requestEntity = new HttpEntity<>(updatePbaRequest,
+                    getMultipleAuthHeaders(hmctsAdmin));
+            responseEntity = restTemplate.exchange(urlPath, HttpMethod.PUT, requestEntity, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>();
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
     public Map<String, Object> updateOrgMfaStatus(MfaUpdateRequest mfaUpdateRequest, String orgId,
                                                   String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
@@ -503,7 +524,7 @@ public class ProfessionalReferenceDataClient {
     }
 
     public Map<String, Object> updateOrgMfaStatusUnauthorised(MfaUpdateRequest mfaUpdateRequest, String orgId,
-                                                  String hmctsAdmin) {
+                                                              String hmctsAdmin) {
         ResponseEntity<Map> responseEntity = null;
         String urlPath = "http://localhost:" + prdApiPort + APP_INT_BASE_PATH + "/" + orgId + "/mfa";
 
