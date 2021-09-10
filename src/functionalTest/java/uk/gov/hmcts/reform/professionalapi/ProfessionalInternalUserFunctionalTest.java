@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.ACCEPTED;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -25,8 +26,11 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.RoleName;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.professionalapi.util.CustomSerenityRunner;
@@ -62,6 +66,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         retrieveOrganisationPbaScenarios();
         modifyUserRolesScenarios();
         reinviteUserScenarios();
+        updatePbaScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
     }
@@ -83,7 +88,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         roles.add(puiOrgManager);
         roles.add(puiFinanceManager);
         idamOpenIdClient.createUser(roles, invitedUserEmail, "firstName", "lastName");
- 
+
     }
 
     public void createOrganisationScenario() {
@@ -124,6 +129,10 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         reinviteActiveUserShouldReturnBadRequest();
         reinviteUserWithinOneHourShouldReturnConflict();
         reinviteSuperUserWithinOneHourShouldReturnTooManyRequest();
+    }
+
+    public void updatePbaScenarios() {
+        updatePaymentAccountsShouldReturnSuccess();
     }
 
     public void editPbaScenarios() {
@@ -174,7 +183,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat((String) newUserResponse.get("errorDescription")).contains("409 User already exists");
         log.info("inviteUserWithDuplicateUserShouldReturnConflict :: END");
     }
-    
+
     public void findUsersByInternalUserWithRolesShouldReturnSuccess() {
         log.info("findUsersByInternalUserWithRolesShouldReturnSuccess :: STARTED");
         validateRetrievedUsers(professionalApiClient
@@ -243,7 +252,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(response.size()).isGreaterThanOrEqualTo(1);
         log.info("findPendingOrganisationsByInternalUserShouldBeSuccess :: END");
     }
-    
+
     public void findOrganisationPbaWithEmailByInternalUserShouldBeSuccess() {
         log.info("findOrganisationPbaWithEmailByInternalUserShouldBeSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
@@ -277,7 +286,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .modifyUserToExistingUserForPrdAdmin(HttpStatus.OK, userProfileUpdatedData, intActiveOrgId,
                         invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
-        assertThat(((Map)modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
+        assertThat(((Map) modifiedUserResponse.get("roleAdditionResponse")).get("idamStatusCode")).isEqualTo("201");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
         rolesToValidate.add(puiOrgManager);
@@ -299,7 +308,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
                 .modifyUserToExistingUserForPrdAdmin(
                         HttpStatus.OK, userProfileUpdatedData, intActiveOrgId, invitedUserId);
         assertThat(modifiedUserResponse).isNotNull().hasSize(3);
-        assertThat(((Map)((List)modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
+        assertThat(((Map) ((List) modifiedUserResponse.get("roleDeletionResponse")).get(0)).get("idamStatusCode"))
                 .isEqualTo("204");
         List<String> rolesToValidate = new ArrayList<>();
         rolesToValidate.add(puiUserManager);
@@ -345,6 +354,54 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: END");
     }
 
+    public void updatePaymentAccountsShouldReturnSuccess() {
+        log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.ACCEPTED.name(), "")));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin);
+
+        //assertStatusCode
+
+        log.info("updatePaymentAccountsShouldReturnSuccess :: END");
+    }
+
+    public void updatePaymentAccountsShouldReturnPartialSuccess() {
+        log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.ACCEPTED.name(), "")));
+
+        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbasPartialSuccess(updatePbaRequest, intActiveOrgId, hmctsAdmin);
+
+        //assert Status Code
+        //assert Message
+        //assert Invalid Pba Message
+
+        log.info("updatePaymentAccountsShouldReturnSuccess :: END");
+    }
+
     public void editPaymentAccountsShouldReturnSuccess() {
         log.info("editPaymentAccountsShouldReturnSuccess :: STARTED");
         String oldPba = organisationCreationRequest.getPaymentAccount().iterator().next();
@@ -361,7 +418,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(pbaResponse).isNotEmpty();
 
         Map<String, Object> org = professionalApiClient.retrieveOrganisationDetails(intActiveOrgId, hmctsAdmin, OK);
-        assertThat((List)org.get("paymentAccount")).contains(oldPba.toUpperCase())
+        assertThat((List) org.get("paymentAccount")).contains(oldPba.toUpperCase())
                 .contains(pba1.toUpperCase())
                 .contains(pba2.toUpperCase());
         log.info("editPaymentAccountsShouldReturnSuccess :: END");

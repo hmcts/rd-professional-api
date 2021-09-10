@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -666,6 +667,38 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
+    public Map<String, Object> updatePbas(UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(updatePbaRequest)
+                .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")
+                .andReturn();
+
+        log.info("{}:: Update pba response: {}", loggingComponentName, response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+    public Map<String, Object> updatePbasPartialSuccess(UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(updatePbaRequest)
+                .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")
+                .andReturn();
+
+        log.info("{}:: Update pba response: {}", loggingComponentName, response.asString());
+
+        response.then()
+                .assertThat()
+                .statusCode(OK.value());
+
+        return response.body().as(Map.class);
+    }
+
+
+
     public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status,
                                                                    UserProfileUpdatedData userProfileUpdatedData,
                                                                    RequestSpecification requestSpecification,
@@ -860,4 +893,6 @@ public class ProfessionalApiClient {
 
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
+
+
 }
