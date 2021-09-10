@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserProf
 import uk.gov.hmcts.reform.professionalapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.service.OrganisationService;
 import uk.gov.hmcts.reform.professionalapi.service.PaymentAccountService;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
@@ -28,12 +29,15 @@ public class OrganisationalExternalControllerProviderTestConfiguration extends P
     @MockBean
     protected OrganisationService organisationService;
 
+    @MockBean
+    protected PaymentAccountRepository paymentAccountRepository;
+
     @Bean
     @Primary
     public PaymentAccountService paymentAccountService() {
         return new PaymentAccountServiceImpl(configuration, userProfileFeignClient,
             emf, professionalUserRepository, organisationService,
-            userAccountMapService);
+            userAccountMapService, paymentAccountRepository);
     }
 
     @Bean
