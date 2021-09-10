@@ -480,7 +480,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void retrieveOrgsByPbaStatusScenario() {
         setUpTestData();
         findOrganisationByPbaStatusShouldBeSuccessWithPbas();
-        findOrganisationByPbaStatusShouldBeSuccessWithNoPbas();
     }
 
     public void findOrganisationByPbaStatusShouldBeSuccessWithPbas() {
@@ -501,17 +500,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(pbaByStatusResponses).allMatch(pba -> nonNull(pba.getDateAccepted()));
 
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: END");
-    }
-
-    public void findOrganisationByPbaStatusShouldBeSuccessWithNoPbas() {
-        log.info("findOrganisationByPbaStatusShouldBeSuccessWithNoPbas :: STARTED");
-
-        List<OrganisationsWithPbaStatusResponse> orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
-                professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.REJECTED);
-
-        assertNotNull(orgsResponse);
-        assertThat(orgsResponse.size()).isZero();
-        log.info("findOrganisationByPbaStatusShouldBeSuccessWithNoPbas :: END");
     }
 
     @Test

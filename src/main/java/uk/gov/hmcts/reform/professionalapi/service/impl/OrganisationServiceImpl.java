@@ -343,7 +343,8 @@ public class OrganisationServiceImpl implements OrganisationService {
         Organisation savedOrganisation = organisationRepository.save(organisation);
         //Update Organisation service done
 
-        if (isNotEmpty(savedOrganisation.getPaymentAccounts())) {
+        if (isNotEmpty(savedOrganisation.getPaymentAccounts())
+                && organisationCreationRequest.getStatus().equals("ACTIVE")) {
             updatePaymentAccounts(savedOrganisation.getPaymentAccounts());
         }
 

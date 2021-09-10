@@ -489,23 +489,19 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The list of organisations with given PBA status"
+                    message = ""
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid request was provided"
+                    message = "PBA status is not valid"
             ),
             @ApiResponse(
                     code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+                    message = ""
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = "No Organisation was found with the given PBA"
+                    message = ""
             ),
             @ApiResponse(
                     code = 500,
