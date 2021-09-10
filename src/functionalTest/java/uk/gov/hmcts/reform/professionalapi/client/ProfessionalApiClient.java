@@ -574,6 +574,16 @@ public class ProfessionalApiClient {
             .statusCode(expectedStatus.value());
     }
 
+    public void updateOrganisationToReview(String organisationIdentifier, String statusMessage, String role) {
+
+        OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest()
+                .status("REVIEW")
+                .statusMessage(statusMessage)
+                .build();
+
+        updateOrganisation(organisationCreationRequest, role, organisationIdentifier);
+    }
+
     public void updateOrganisationWithoutBearerToken(String role, String organisationIdentifier,
                                                      HttpStatus expectedStatus) {
         OrganisationCreationRequest organisationCreationRequest = createOrganisationRequest().status("ACTIVE").build();
