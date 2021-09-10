@@ -1,34 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.controller;
 
-import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
-import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
-
 import feign.FeignException;
 import feign.Response;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +52,31 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import uk.gov.hmcts.reform.professionalapi.util.JsonFeignResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.EMPTY;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.USER_EMAIL;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.isInputOrganisationStatusValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateNewUserCreationRequestForMandatoryFields;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.UserCreationRequestValidator.validateRoles;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.valueOf;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.createPageableObject;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getReturnRolesValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.getShowDeletedValue;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeAllSpaces;
+import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.removeEmptySpaces;
 
 @RestController
 @Slf4j
@@ -410,9 +411,13 @@ public abstract class SuperController {
 
     protected void deletePaymentAccountsOfGivenOrganisation(PbaRequest deletePbaRequest,
                                                             String orgId, String userId) {
-
-        if (isEmpty(deletePbaRequest.getPaymentAccounts())) {
+        Set<String> paymentAccounts = deletePbaRequest.getPaymentAccounts();
+        if (ObjectUtils.isEmpty(deletePbaRequest.getPaymentAccounts())) {
             throw new InvalidRequest("No PBA number passed in the request");
+        }
+
+        if (paymentAccounts.contains(null) || paymentAccounts.contains(EMPTY)) {
+            throw new InvalidRequest("Invalid PBA number passed in the request");
         }
 
         //check if user status is 'ACTIVE'

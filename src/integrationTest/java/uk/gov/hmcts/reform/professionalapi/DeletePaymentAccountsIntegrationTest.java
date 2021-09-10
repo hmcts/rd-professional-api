@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
@@ -62,9 +63,8 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     }
 
     @Test
-    public void test_deletePaymentAccountsShouldThrow400IfInvalidPbaIsPassed() {
+    public void test_deletePaymentAccountsShouldThrow400IfNoPbaIsPassed() {
         Set<String> paymentAccountsToDelete = new HashSet<>();
-        paymentAccountsToDelete.add("this-is-invalid");
 
         PbaRequest pbaDeleteRequest = new PbaRequest();
         pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
@@ -74,6 +74,75 @@ public class DeletePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
         Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
                 puiFinanceManager, userId);
         assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("No PBA number passed in the request");
+    }
+
+    @Test
+    public void test_deletePaymentAccountsShouldThrow400IfInvalidRequestBodyPassed() {
+
+        PbaRequest pbaDeleteRequest = new PbaRequest();
+        pbaDeleteRequest.setPaymentAccounts(null);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
+                puiFinanceManager, userId);
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("No PBA number passed in the request");
+    }
+
+    @Test
+    public void test_deletePaymentAccountsShouldThrow400IfNullIsPassedAsPba() {
+        Set<String> paymentAccountsToDelete = new HashSet<>();
+        paymentAccountsToDelete.add(null);
+
+        PbaRequest pbaDeleteRequest = new PbaRequest();
+        pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
+                puiFinanceManager, userId);
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("Invalid PBA number passed in the request");
+    }
+
+    @Test
+    public void test_deletePaymentAccountsShouldThrow400IfEmptyValuePassedAsPba() {
+        Set<String> paymentAccountsToDelete = new HashSet<>();
+        paymentAccountsToDelete.add(StringUtils.EMPTY);
+
+        PbaRequest pbaDeleteRequest = new PbaRequest();
+        pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
+                puiFinanceManager, userId);
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("Invalid PBA number passed in the request");
+    }
+
+    @Test
+    public void test_deletePaymentAccountsShouldThrow400IfPassedPbasContainsNull() {
+        Set<String> paymentAccountsToDelete = new HashSet<>();
+        paymentAccountsToDelete.add("PBA0000001");
+        paymentAccountsToDelete.add(null);
+
+        PbaRequest pbaDeleteRequest = new PbaRequest();
+        pbaDeleteRequest.setPaymentAccounts(paymentAccountsToDelete);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> response = professionalReferenceDataClient.deletePaymentsAccountsByOrgId(pbaDeleteRequest,
+                puiFinanceManager, userId);
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("Invalid PBA number passed in the request");
     }
 
     @Test
