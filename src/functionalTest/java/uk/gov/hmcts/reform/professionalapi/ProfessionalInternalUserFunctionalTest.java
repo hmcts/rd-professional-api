@@ -454,7 +454,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("updateOrgMFAShouldReturn403 :: END");
     }
   
-  public void  updateOrgStatusScenarios() {
+    public void  updateOrgStatusScenarios() {
         updateOrgStatusShouldBeSuccess();
     }
 
