@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
+
 @Component
 @Slf4j
 @NoArgsConstructor
@@ -39,24 +41,25 @@ public class PaymentAccountValidator {
 
     public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
         String invalidPbas = paymentAccounts.stream()
-                .filter(pbaAccount -> {
-                    if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
-                        Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
-                        Matcher matcher = pattern.matcher(pbaAccount);
-                        if (matcher.matches()) {
-                            return false;
-                        }
-                    }
-                    return true;
-                })
+                .filter(PaymentAccountValidator::isPbaValid)
                 .collect(Collectors.joining(", "));
 
         if (!StringUtils.isEmpty(invalidPbas)) {
-            throw new InvalidRequest("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric "
-                    .concat("characters. The following PBAs entered are invalid: " + invalidPbas));
+            throw new InvalidRequest(ERROR_MSG_PBA_INVALID_FORMAT
+                    .concat(" . The following PBAs entered are invalid: " + invalidPbas));
         }
     }
 
+    public static boolean isPbaValid(String pbaAccount) {
+        if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
+            Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
+            Matcher matcher = pattern.matcher(pbaAccount);
+            if (matcher.matches()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
         Set<String> upperCasePbas = paymentAccounts.stream().map(String::toUpperCase).collect(Collectors.toSet());

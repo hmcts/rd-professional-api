@@ -96,4 +96,9 @@ public class OrganisationIdentifierValidatorImpl implements OrganisationIdentifi
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
     }
+
+    public void validateOrganisationExistsAndActive(String orgId) {
+        validateOrganisationExistsWithGivenOrgId(orgId);
+        validateOrganisationIsActive(organisationService.getOrganisationByOrgIdentifier(orgId));
+    }
 }
