@@ -495,11 +495,6 @@ public class OrganisationInternalController extends SuperController {
                     response = NewUserResponse.class
             ),
             @ApiResponse(
-                    code = 202,
-                    message = "",
-                    response = NewUserResponse.class
-            ),
-            @ApiResponse(
                     code = 400,
                     message = "An invalid request was provided"
             ),
@@ -509,16 +504,11 @@ public class OrganisationInternalController extends SuperController {
             ),
             @ApiResponse(
                     code = 404,
-                    message = "No Organisation found with the given ID to add new User to"
+                    message = "No Organisation found with the given ID"
             ),
             @ApiResponse(
-                    code = 409,
-                    message = "A User already exists with the given Email Address or is already active in SIDAM during"
-                            + " resend invite"
-            ),
-            @ApiResponse(
-                    code = 429,
-                    message = "Too many requests for resend invite"
+                    code = 422,
+                    message = "All requested PBAs failed to update"
             ),
             @ApiResponse(
                     code = 500,
