@@ -19,7 +19,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.UserProfileCreati
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 import uk.gov.hmcts.reform.professionalapi.domain.SuperUser;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
@@ -30,8 +32,10 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -206,5 +210,27 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         userProfileCreationResponse.setIdamId(UUID.randomUUID().toString());
         userProfileCreationResponse.setIdamRegistrationResponse(201);
         return userProfileCreationResponse;
+    }
+
+    @State("Organisations with payment accounts exist for given Pba status")
+    public void setUpOrganisationWithStatusForGivenPbaStatus() {
+        Organisation organisation = getOrganisationWithPbaStatus();
+        when(organisationRepository.findByPbaStatus(anyString())).thenReturn(Arrays.asList(organisation));
+    }
+
+    private Organisation getOrganisationWithPbaStatus() {
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA12345");
+        paymentAccount.setStatusMessage("Approved");
+        paymentAccount.setPbaStatus(PbaStatus.ACCEPTED);
+        paymentAccount.setCreated(LocalDateTime.now());
+        paymentAccount.setLastUpdated(LocalDateTime.now());
+        Organisation organisation = new Organisation("Org-Name", OrganisationStatus.ACTIVE, "sra-id",
+                "companyN", false, "www.org.com");
+        organisation.setSraRegulated(true);
+        organisation.setOrganisationIdentifier("org1");
+        organisation.setPaymentAccounts(Collections.singletonList(paymentAccount));
+
+        return organisation;
     }
 }
