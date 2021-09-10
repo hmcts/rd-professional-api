@@ -183,7 +183,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                 invalidPbaRequests.add(new PbaUpdateStatusResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_MISSING));
                 pbasFromRequest.remove(pba.getPbaNumber());
                 //check status is valid
-            } else if (!ACCEPTED.name().equalsIgnoreCase(pba.getStatus()) && !REJECTED.name().equalsIgnoreCase(pba.getStatus())) {
+            } else if (!ACCEPTED.name().equalsIgnoreCase(pba.getStatus())
+                    && !REJECTED.name().equalsIgnoreCase(pba.getStatus())) {
                 invalidPbaRequests.add(new PbaUpdateStatusResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_INVALID));
                 pbasFromRequest.remove(pba.getPbaNumber());
             }
