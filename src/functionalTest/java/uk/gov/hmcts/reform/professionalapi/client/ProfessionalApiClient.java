@@ -682,7 +682,8 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> updatePbasPartialSuccess(UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
+    public Map<String, Object> updatePbasPartialSuccess(
+            UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(updatePbaRequest)
                 .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")

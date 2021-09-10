@@ -74,9 +74,9 @@ public class PaymentAccountServiceImplTest {
         organisationService.setPaymentAccountValidator(paymentAccountValidatorMock);
         organisationService.setPaymentAccountRepository(paymentAccountRepositoryMock);
 
-        sut = new PaymentAccountServiceImpl(
-                applicationConfigurationMock, userProfileFeignClientMock, entityManagerFactoryMock,
-                professionalUserRepositoryMock, organisationService, userAccountMapServiceMock);
+        sut = new PaymentAccountServiceImpl(applicationConfigurationMock, userProfileFeignClientMock,
+                entityManagerFactoryMock, professionalUserRepositoryMock, organisationService,
+                userAccountMapServiceMock, paymentAccountRepositoryMock);
 
         superUsers.add(superUser);
         paymentAccounts.add(paymentAccount);
