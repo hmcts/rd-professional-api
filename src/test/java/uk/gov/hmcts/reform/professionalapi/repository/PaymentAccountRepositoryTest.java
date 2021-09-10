@@ -38,7 +38,8 @@ public class PaymentAccountRepositoryTest extends BaseRepository {
 
     @Test
     public void test_findByPbaNumber() {
-        Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(this.paymentAccount.getPbaNumber());
+        Optional<PaymentAccount> paymentAccount =
+                paymentAccountRepository.findByPbaNumber(this.paymentAccount.getPbaNumber());
 
         assertTrue(paymentAccount.isPresent());
         assertThat(paymentAccount.get()).isEqualTo(this.paymentAccount);
