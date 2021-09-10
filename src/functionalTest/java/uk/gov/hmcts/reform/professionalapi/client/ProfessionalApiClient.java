@@ -667,7 +667,7 @@ public class ProfessionalApiClient {
         return response.body().as(Map.class);
     }
 
-    public Map<String, Object> updatePbas(UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
+    public Map<String, Object> updatePbas(UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin, HttpStatus status) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(updatePbaRequest)
                 .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")
@@ -677,28 +677,10 @@ public class ProfessionalApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(OK.value());
+                .statusCode(status.value());
 
         return response.body().as(Map.class);
     }
-
-    public Map<String, Object> updatePbasPartialSuccess(
-            UpdatePbaRequest updatePbaRequest, String orgId, String hmctsAdmin) {
-        Response response = getMultipleAuthHeadersInternal()
-                .body(updatePbaRequest)
-                .put("/refdata/internal/v1/organisations/" + orgId + "/pba/status")
-                .andReturn();
-
-        log.info("{}:: Update pba response: {}", loggingComponentName, response.asString());
-
-        response.then()
-                .assertThat()
-                .statusCode(OK.value());
-
-        return response.body().as(Map.class);
-    }
-
-
 
     public Map<String, Object> modifyUserToExistingUserForExternal(HttpStatus status,
                                                                    UserProfileUpdatedData userProfileUpdatedData,
