@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +12,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +24,7 @@ import feign.Request;
 import feign.Response;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
@@ -53,6 +58,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
@@ -60,6 +66,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -81,6 +88,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
+@SuppressWarnings("unchecked")
 public class OrganisationServiceImplTest {
 
     private final OrganisationRepository organisationRepository = mock(OrganisationRepository.class);
@@ -834,5 +842,65 @@ public class OrganisationServiceImplTest {
         organisation.addPaymentAccount(paymentAccount);
         return organisation;
     }
+
+    @Test
+    public void test_getOrganisationsByPbaStatus() {
+
+        List<Organisation> organisations = getOrgsWithPbaSetup();
+        when(organisationRepository.findByPbaStatus(ACCEPTED.toString())).thenReturn(organisations);
+
+        ResponseEntity<Object> responseEntity = sut.getOrganisationsByPbaStatus(ACCEPTED);
+
+        assertNotNull(responseEntity);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertNotNull(responseEntity.getBody());
+
+        List<OrganisationsWithPbaStatusResponse> orgsWithPbas = (List<OrganisationsWithPbaStatusResponse>)
+                responseEntity.getBody();
+        assertThat(orgsWithPbas.size()).isEqualTo(2);
+        assertThat(orgsWithPbas.get(0).getOrganisationIdentifier()).isEqualTo("ABCDEFG1");
+        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+        assertThat(orgsWithPbas.get(1).getOrganisationIdentifier()).isEqualTo("ABCDEFG2");
+        assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
+
+        verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED.toString());
+    }
+
+    private List<Organisation> getOrgsWithPbaSetup() {
+        String orgId1 = "ABCDEFG1";
+        String orgId2 = "ABCDEFG2";
+        List<Organisation> orgs = new ArrayList<>();
+        List<PaymentAccount> pbas = new ArrayList<>();
+
+        PaymentAccount pba1 = new PaymentAccount();
+        pba1.setPbaStatus(ACCEPTED);
+        pba1.setPbaNumber("PBA123456");
+        pba1.setCreated(LocalDateTime.now());
+        pba1.setLastUpdated(LocalDateTime.now());
+        PaymentAccount pba2 = new PaymentAccount();
+        pba2.setPbaStatus(PENDING);
+        pba2.setPbaNumber("PBA123457");
+        pba1.setCreated(LocalDateTime.now());
+        pba1.setLastUpdated(LocalDateTime.now());
+
+        pbas.add(pba1);
+        pbas.add(pba2);
+
+        Organisation org1 = new Organisation();
+        org1.setStatus(OrganisationStatus.ACTIVE);
+        org1.setOrganisationIdentifier(orgId1);
+        org1.setPaymentAccounts(pbas);
+
+        Organisation org2 = new Organisation();
+        org2.setStatus(OrganisationStatus.ACTIVE);
+        org2.setOrganisationIdentifier(orgId2);
+        org2.setPaymentAccounts(pbas);
+
+        orgs.add(org1);
+        orgs.add(org2);
+
+        return orgs;
+    }
+
 
 }

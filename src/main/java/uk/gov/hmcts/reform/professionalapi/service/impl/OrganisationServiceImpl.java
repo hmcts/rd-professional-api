@@ -485,11 +485,5 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .body(organisationsWithPbaStatusResponses);
     }
 
-    public static void main(String[] args) {
-        OrganisationServiceImpl organisationService = new OrganisationServiceImpl();
-        ResponseEntity<Object> responseEntity = organisationService.getOrganisationsByPbaStatus(ACCEPTED);
-
-    }
-
 }
 
