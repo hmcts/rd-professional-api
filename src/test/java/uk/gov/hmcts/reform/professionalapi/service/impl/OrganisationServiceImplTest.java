@@ -66,7 +66,6 @@ import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnumId;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
@@ -867,35 +866,35 @@ public class OrganisationServiceImplTest {
     }
 
     private List<Organisation> getOrgsWithPbaSetup() {
-        String orgId1 = "ABCDEFG1";
-        String orgId2 = "ABCDEFG2";
-        List<Organisation> orgs = new ArrayList<>();
-        List<PaymentAccount> pbas = new ArrayList<>();
-
         PaymentAccount pba1 = new PaymentAccount();
         pba1.setPbaStatus(ACCEPTED);
         pba1.setPbaNumber("PBA123456");
         pba1.setCreated(LocalDateTime.now());
         pba1.setLastUpdated(LocalDateTime.now());
+
         PaymentAccount pba2 = new PaymentAccount();
         pba2.setPbaStatus(PENDING);
         pba2.setPbaNumber("PBA123457");
         pba1.setCreated(LocalDateTime.now());
         pba1.setLastUpdated(LocalDateTime.now());
 
+        List<PaymentAccount> pbas = new ArrayList<>();
         pbas.add(pba1);
         pbas.add(pba2);
 
+        String orgId1 = "ABCDEFG1";
         Organisation org1 = new Organisation();
         org1.setStatus(OrganisationStatus.ACTIVE);
         org1.setOrganisationIdentifier(orgId1);
         org1.setPaymentAccounts(pbas);
 
+        String orgId2 = "ABCDEFG2";
         Organisation org2 = new Organisation();
         org2.setStatus(OrganisationStatus.ACTIVE);
         org2.setOrganisationIdentifier(orgId2);
         org2.setPaymentAccounts(pbas);
 
+        List<Organisation> orgs = new ArrayList<>();
         orgs.add(org1);
         orgs.add(org2);
 
