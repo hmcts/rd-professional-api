@@ -164,7 +164,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         invalidPbaResponses.forEach(pba -> pbasFromRequest.remove(pba.getPbaNumber()));
 
         //Update valid PBAs, returns any remaining invalid PBAs
-        invalidPbaResponses = acceptOrRejectPbas(pbasFromRequest, pbaRequestList, invalidPbaResponses);
+        if (isNotEmpty(pbasFromRequest)) {
+            invalidPbaResponses = acceptOrRejectPbas(pbasFromRequest, pbaRequestList, invalidPbaResponses);
+        }
 
         return generateUpdatePbaResponse(invalidPbaResponses, pbasFromRequest);
     }
@@ -224,27 +226,25 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public List<PbaUpdateStatusResponse> acceptOrRejectPbas(
             Set<String> pbasFromRequest, List<PbaRequest> pbaRequestList, List<PbaUpdateStatusResponse> invalidPbas) {
 
-        if (isNotEmpty(pbasFromRequest)) {
-            pbasFromRequest.forEach(pba -> pbaRequestList.forEach(pba1 -> {
-                if (pba1.getPbaNumber().equals(pba)) {
-                    Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
-                    //if PBA status is ACCEPTED update status and statusMessage in DB
-                    if (pba1.getStatus().equals(ACCEPTED.name())) {
-                        //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
-                        if (!ACCEPTED.equals(paymentAccount.get().getPbaStatus())) {
-                            paymentAccount.get().setPbaStatus(ACCEPTED);
-                            paymentAccount.get().setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
-                            paymentAccountRepository.save(paymentAccount.get());
-                        } else {
-                            invalidPbas.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_PENDING));
-                        }
-                        //if REJECTED delete from DB
-                    } else if (pba1.getStatus().equals(REJECTED.name())) {
-                        paymentAccountRepository.delete(paymentAccount.get());
+        pbasFromRequest.forEach(pba -> pbaRequestList.forEach(pba1 -> {
+            if (pba1.getPbaNumber().equals(pba)) {
+                Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
+                //if PBA status is ACCEPTED update status and statusMessage in DB
+                if (pba1.getStatus().equals(ACCEPTED.name())) {
+                    //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
+                    if (!ACCEPTED.equals(paymentAccount.get().getPbaStatus())) {
+                        paymentAccount.get().setPbaStatus(ACCEPTED);
+                        paymentAccount.get().setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
+                        paymentAccountRepository.save(paymentAccount.get());
+                    } else {
+                        invalidPbas.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_PENDING));
                     }
+                    //if REJECTED delete from DB
+                } else if (pba1.getStatus().equals(REJECTED.name())) {
+                    paymentAccountRepository.delete(paymentAccount.get());
                 }
-            }));
-        }
+            }
+        }));
 
         return invalidPbas;
     }
