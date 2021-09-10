@@ -46,7 +46,7 @@ public class PaymentAccountValidator {
 
         if (!StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest(ERROR_MSG_PBA_INVALID_FORMAT
-                    .concat(" . The following PBAs entered are invalid: " + invalidPbas));
+                    .concat(". The following PBAs entered are invalid: " + invalidPbas));
         }
     }
 
