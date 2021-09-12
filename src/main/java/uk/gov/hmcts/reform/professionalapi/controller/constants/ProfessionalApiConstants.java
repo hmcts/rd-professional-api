@@ -59,5 +59,6 @@ public class ProfessionalApiConstants {
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
 
     public static final String ERROR_MSG_PARTIAL_SUCCESS = "Some of the PBAs successfully added to organisation";
+    public static final String ADD_PBA_REQUEST_EMPTY = "PBA request is empty";
 
 }

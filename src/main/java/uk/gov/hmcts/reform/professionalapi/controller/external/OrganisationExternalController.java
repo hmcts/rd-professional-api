@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.external;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator.validateEmail;
 import static uk.gov.hmcts.reform.professionalapi.util.RefDataUtil.checkOrganisationAndPbaExists;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ADD_PBA_REQUEST_EMPTY;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.OrgId;
 import uk.gov.hmcts.reform.professionalapi.configuration.resolver.UserId;
 import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
+import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -41,7 +43,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationRespo
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 
 @RequestMapping(
         path = "refdata/external/v1/organisations"
@@ -353,13 +355,19 @@ public class OrganisationExternalController extends SuperController {
     @ResponseBody
     @Secured("pui-finance-manager")
     public ResponseEntity<Object> addPaymentAccountsToOrganisation(
-            @Valid @NotNull @RequestBody PbaEditRequest pbaEditRequest,
+            @Valid @NotNull @RequestBody PbaAddRequest pbaAddRequest,
             @ApiParam(hidden = true) @OrgId String organisationIdentifier,
             @ApiParam(hidden = true) @UserId String userId) {
 
         log.info("Received request to add payment accounts to organisation Id");
 
-        return organisationService.addPaymentAccountsToOrganisation(pbaEditRequest, organisationIdentifier, userId);
+        if (pbaAddRequest == null
+                || pbaAddRequest.getPaymentAccounts() == null
+                || pbaAddRequest.getPaymentAccounts().size() == 0
+                || pbaAddRequest.getPaymentAccounts().stream().anyMatch(s -> (s == null || s.equals("")))) {
+            throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
+        }
+        return organisationService.addPaymentAccountsToOrganisation(pbaAddRequest, organisationIdentifier, userId);
 
     }
 

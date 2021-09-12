@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -862,11 +863,11 @@ public class ProfessionalApiClient {
         log.info("{}:: Update organisation mfa status response: {}", loggingComponentName, response.getStatusCode());
     }
 
-    public ResponseBody addPaymentAccountsOfOrganisation(PbaEditRequest pbaEditRequest,
+    public ResponseBody addPaymentAccountsOfOrganisation(PbaAddRequest pbaAddRequest,
                                                          RequestSpecification requestSpecification,
                                                          HttpStatus expectedStatus) {
         Response response = requestSpecification
-                .body(pbaEditRequest)
+                .body(pbaAddRequest)
                 .post("/refdata/external/v1/organisations/pba")
                 .andReturn();
 

@@ -71,7 +71,7 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
@@ -477,7 +477,7 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest,
+    public ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaAddRequest pbaAddRequest,
                                                       String organisationIdentifier, String userId) {
         Optional<Organisation> organisation = Optional.ofNullable(
                 getOrganisationByOrgIdentifier(organisationIdentifier));
@@ -490,28 +490,28 @@ public class OrganisationServiceImpl implements OrganisationService {
         organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
-        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaEditRequest);
+        Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaAddRequest);
 
-        if (!isEmpty(pbaEditRequest.getPaymentAccounts())) {
-            addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation.get(), false, false);
+        if (!isEmpty(pbaAddRequest.getPaymentAccounts())) {
+            addPbaAccountToOrganisation(pbaAddRequest.getPaymentAccounts(), organisation.get(), false, false);
         }
         return getResponse(unsuccessfulPbas.getLeft(),
-                unsuccessfulPbas.getRight(), pbaEditRequest.getPaymentAccounts());
+                unsuccessfulPbas.getRight(), pbaAddRequest.getPaymentAccounts());
 
     }
 
-    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaEditRequest pbaEditRequest) {
+    private Pair<Set<String>, Set<String>> getUnsuccessfulPbas(PbaAddRequest pbaAddRequest) {
         Set<String> invalidPaymentAccounts = null;
-        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaEditRequest.getPaymentAccounts(),
+        String invalidPbas = PaymentAccountValidator.checkPbaNumberIsValid(pbaAddRequest.getPaymentAccounts(),
                 Boolean.FALSE);
         if (StringUtils.isNotEmpty(invalidPbas)) {
             invalidPaymentAccounts = new HashSet<>(Arrays.asList(invalidPbas.split(",")));
-            pbaEditRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
+            pbaAddRequest.getPaymentAccounts().removeAll(invalidPaymentAccounts);
         }
 
         Set<String> duplicatePaymentAccounts = paymentAccountValidator.getDuplicatePbas(
-                pbaEditRequest.getPaymentAccounts());
-        pbaEditRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
+                pbaAddRequest.getPaymentAccounts());
+        pbaAddRequest.getPaymentAccounts().removeAll(duplicatePaymentAccounts);
 
         return Pair.of(invalidPaymentAccounts, duplicatePaymentAccounts);
     }

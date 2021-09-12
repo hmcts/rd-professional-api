@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 
 
 public interface OrganisationService {
@@ -39,6 +39,6 @@ public interface OrganisationService {
 
     void updatePaymentAccounts(List<PaymentAccount> pbas);
 
-    ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest,
+    ResponseEntity<Object> addPaymentAccountsToOrganisation(PbaAddRequest pbaAddRequest,
                                                String organisationIdentifier, String userId);
 }
