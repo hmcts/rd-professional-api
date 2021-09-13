@@ -412,7 +412,9 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
         assertThat(pbaResponses.size()).isEqualTo(4);
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-                .contains("PBA is not associated with the Organisation");
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
+                .contains("PBA is not in Pending status");
 
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
     }
