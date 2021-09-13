@@ -528,11 +528,11 @@ public class OrganisationInternalController extends SuperController {
 
         //Received request to update an Organisation's PBAs
 
-        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
-
         if (updatePbaRequest.getPbaRequestList().isEmpty()) {
             throw new InvalidRequest("No PBAs have been sent in the request");
         }
+
+        organisationIdentifierValidatorImpl.validateOrganisationExistsAndActive(organisationIdentifier);
 
         UpdatePbaStatusResponse updatePbaStatusResponse =
                 updateAnOrganisationsPbas(updatePbaRequest.getPbaRequestList(), organisationIdentifier);
