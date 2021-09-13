@@ -75,7 +75,7 @@ public class UpdatePaymentAccountsTest extends AuthorizationEnabledIntegrationTe
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
                 .contains("PBA123");
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-                .contains("PBA is not associated with the Organisation");
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
                 .contains(pba2);
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
@@ -105,7 +105,7 @@ public class UpdatePaymentAccountsTest extends AuthorizationEnabledIntegrationTe
         assertThat(updatePbaResponse.get("response_body").toString())
                 .contains("PBA123");
         assertThat(updatePbaResponse.get("response_body").toString())
-                .contains("PBA is not associated with the Organisation");
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
         assertThat(updatePbaResponse.get("response_body").toString())
                 .contains("Mandatory field Status missing");
         assertThat(updatePbaResponse.get("response_body").toString())

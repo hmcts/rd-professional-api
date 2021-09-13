@@ -50,7 +50,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_MISSING;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator.isPbaValid;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator.isPbaInvalid;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
 
@@ -203,8 +203,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         pbasFromRequest.forEach(pba -> {
             //check PBA has a valid format
-            if (!isPbaValid(pba)) {
-                new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_INVALID_FORMAT);
+            if (isPbaInvalid(pba)) {
+                pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_INVALID_FORMAT));
             } else {
                 Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
 

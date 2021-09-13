@@ -14,6 +14,4 @@ public interface PaymentAccountRepository extends JpaRepository<PaymentAccount, 
     Optional<PaymentAccount> findByPbaNumber(String pbaNumber);
 
     List<PaymentAccount> findByPbaNumberIn(Set<String> pbaNumbers);
-
-    void deleteByPbaNumber(String pbaNumber);
 }

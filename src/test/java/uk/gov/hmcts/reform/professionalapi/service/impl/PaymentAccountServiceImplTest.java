@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_NOT_IN_ORG;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.*;
 
 import java.util.ArrayList;
@@ -198,7 +199,7 @@ public class PaymentAccountServiceImplTest {
 
     @Test
     public void testUpdatePaymentAccountsForAnOrganisation_200_success_scenario() {
-        String pbaNumber = "PBA123567";
+        String pbaNumber = "PBA1234567";
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
         when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
@@ -222,7 +223,7 @@ public class PaymentAccountServiceImplTest {
 
     @Test
     public void testUpdatePaymentAccountsForAnOrganisation_200_partial_success_scenario() {
-        String pbaNumber = "PBA123567";
+        String pbaNumber = "PBA1234567";
 
         PaymentAccount paymentAccount = mock(PaymentAccount.class);
         when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
@@ -252,14 +253,13 @@ public class PaymentAccountServiceImplTest {
         String orgId = UUID.randomUUID().toString();
         List<PbaRequest> pbaRequestList = new ArrayList<>();
 
-        pbaRequestList.add(new PbaRequest("PBA123567", ACCEPTED.name(), ""));
-        pbaRequestList.add(new PbaRequest("PBA456789", ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA1234567", ACCEPTED.name(), ""));
 
         UpdatePbaStatusResponse response = sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, orgId);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(422);
         assertThat(response.getPartialSuccessMessage()).isNull();
-        assertThat(response.getPbaUpdateStatusResponses()).isNull();
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage()).contains(ERROR_MSG_PBA_NOT_IN_ORG);
     }
 }

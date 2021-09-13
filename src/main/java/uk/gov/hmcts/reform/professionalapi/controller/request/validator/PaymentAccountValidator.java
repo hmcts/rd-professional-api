@@ -41,7 +41,7 @@ public class PaymentAccountValidator {
 
     public static void checkPbaNumberIsValid(Set<String> paymentAccounts) {
         String invalidPbas = paymentAccounts.stream()
-                .filter(PaymentAccountValidator::isPbaValid)
+                .filter(PaymentAccountValidator::isPbaInvalid)
                 .collect(Collectors.joining(", "));
 
         if (!StringUtils.isEmpty(invalidPbas)) {
@@ -50,15 +50,15 @@ public class PaymentAccountValidator {
         }
     }
 
-    public static boolean isPbaValid(String pbaAccount) {
+    public static boolean isPbaInvalid(String pbaAccount) {
         if (!StringUtils.isBlank(pbaAccount) && pbaAccount.length() == 10) {
             Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
             Matcher matcher = pattern.matcher(pbaAccount);
             if (matcher.matches()) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {
