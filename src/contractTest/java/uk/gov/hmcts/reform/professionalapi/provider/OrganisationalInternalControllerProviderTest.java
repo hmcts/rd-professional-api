@@ -215,7 +215,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
     @State("Organisations with payment accounts exist for given Pba status")
     public void setUpOrganisationWithStatusForGivenPbaStatus() {
         Organisation organisation = getOrganisationWithPbaStatus();
-        when(organisationRepository.findByPbaStatus(anyString())).thenReturn(Arrays.asList(organisation));
+        when(organisationRepository.findByPbaStatus(anyString())).thenReturn(List.of(organisation));
     }
 
     private Organisation getOrganisationWithPbaStatus() {

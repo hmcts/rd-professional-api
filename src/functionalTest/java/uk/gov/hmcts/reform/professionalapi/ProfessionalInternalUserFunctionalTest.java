@@ -485,14 +485,14 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     public void findOrganisationByPbaStatusShouldBeSuccessWithPbas() {
         log.info("findOrganisationByPbaStatusShouldBeSuccess :: STARTED");
 
-        List<OrganisationsWithPbaStatusResponse> orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
+        var orgsResponse = (List<OrganisationsWithPbaStatusResponse>)
                 professionalApiClient.findOrganisationsByPbaStatus(OK, PbaStatus.ACCEPTED);
 
         assertNotNull(orgsResponse);
         assertThat(orgsResponse.size()).isPositive();
         assertThat(orgsResponse.stream()).allMatch(org -> org.getOrganisationStatus().isActive());
 
-        List<FetchPbaByStatusResponse> pbaByStatusResponses = new ArrayList<>();
+        var pbaByStatusResponses = new ArrayList<FetchPbaByStatusResponse>();
         orgsResponse.forEach(org -> pbaByStatusResponses.addAll(org.getPbaNumbers()));
 
         assertThat(pbaByStatusResponses.size()).isPositive();

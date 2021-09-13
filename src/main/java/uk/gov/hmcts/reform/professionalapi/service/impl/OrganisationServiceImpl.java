@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static com.nimbusds.oauth2.sdk.util.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
@@ -27,6 +26,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -483,7 +483,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 .collect(Collectors.groupingBy(
                         Organisation::getOrganisationIdentifier,LinkedHashMap::new, Collectors.toList()));
 
-        List<OrganisationsWithPbaStatusResponse> organisationsWithPbaStatusResponses = new ArrayList<>();
+        var organisationsWithPbaStatusResponses = new ArrayList<OrganisationsWithPbaStatusResponse>();
 
         orgPbaMap.forEach((k,v) -> organisationsWithPbaStatusResponses.add(
                 new OrganisationsWithPbaStatusResponse(k, v.get(0).getStatus(),
@@ -493,7 +493,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                        .collect(Collectors.toList()))));
 
         return ResponseEntity
-                .status(200)
+                .status(HttpStatus.OK)
                 .body(organisationsWithPbaStatusResponses);
     }
 
