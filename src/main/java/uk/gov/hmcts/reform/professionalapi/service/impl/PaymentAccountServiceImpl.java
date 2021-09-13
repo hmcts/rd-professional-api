@@ -252,13 +252,14 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     public UpdatePbaStatusResponse generateUpdatePbaResponse(
             List<PbaUpdateStatusResponse> invalidPbaResponses, Set<String> pbasFromRequest) {
 
+        //if there are only invalid PBAs
         if (isNotEmpty(invalidPbaResponses) && isEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(null, invalidPbaResponses, 422);
-
+        //if there are some invalid PBAs and some valid PBAs that have been updated
         } else if (isNotEmpty(invalidPbaResponses) && isNotEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(ERROR_MSG_PARTIAL_SUCCESS_UPDATE, invalidPbaResponses, 200);
         }
-
+        //if there are only valid PBAs that have been updated
         return new UpdatePbaStatusResponse(null, null, 200);
     }
 }
