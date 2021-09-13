@@ -2,14 +2,17 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ONE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_AUTO_ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ZERO_INDEX;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORG_NOT_ACTIVE_NO_USERS_RETURNED;
 import static uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus.ACTIVE;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -73,12 +76,10 @@ import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.NO_ORG_FOUND_FOR_GIVEN_ID;
+
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
 import java.util.Arrays;
@@ -113,8 +114,6 @@ public class OrganisationServiceImpl implements OrganisationService {
     OrganisationMfaStatusRepository organisationMfaStatusRepository;
     @Autowired
     ProfessionalUserService professionalUserService;
-    @Autowired
-    OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImpl;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -487,7 +486,7 @@ public class OrganisationServiceImpl implements OrganisationService {
             throw new ResourceNotFoundException(NO_ORG_FOUND_FOR_GIVEN_ID);
         }
 
-        organisationIdentifierValidatorImpl.validateOrganisationIsActive(organisation.get());
+        validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
         Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaAddRequest);
@@ -543,6 +542,12 @@ public class OrganisationServiceImpl implements OrganisationService {
         return addPbaResponse;
     }
 
+    public void validateOrganisationIsActive(Organisation existingOrganisation) {
+        if (OrganisationStatus.ACTIVE != existingOrganisation.getStatus()) {
+            log.error("{}:: {}", loggingComponentName, ORG_NOT_ACTIVE_NO_USERS_RETURNED);
+            throw new EmptyResultDataAccessException(1);
+        }
+    }
 
 }
 

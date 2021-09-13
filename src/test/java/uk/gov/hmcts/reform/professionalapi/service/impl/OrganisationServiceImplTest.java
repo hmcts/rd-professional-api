@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
-import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
 import uk.gov.hmcts.reform.professionalapi.controller.response.DeleteOrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
@@ -107,8 +106,6 @@ public class OrganisationServiceImplTest {
             = mock(OrganisationMfaStatusRepository.class);
     private final ProfessionalUserService professionalUserServiceMock
             = mock(ProfessionalUserService.class);
-    private final OrganisationIdentifierValidatorImpl organisationIdentifierValidatorImplMock
-            = mock(OrganisationIdentifierValidatorImpl.class);
     private final Organisation organisation = new Organisation("some-org-name", null,
             "PENDING", null, null, null);
     private final ProfessionalUser professionalUser = new ProfessionalUser("some-fname",
@@ -166,7 +163,6 @@ public class OrganisationServiceImplTest {
         sut.setPaymentAccountValidator(paymentAccountValidator);
         sut.setOrganisationMfaStatusRepository(organisationMfaStatusRepositoryMock);
         sut.setProfessionalUserService(professionalUserServiceMock);
-        sut.setOrganisationIdentifierValidatorImpl(organisationIdentifierValidatorImplMock);
 
         paymentAccountList = new HashSet<>();
         String pbaNumber = "PBA1234567";
@@ -861,12 +857,12 @@ public class OrganisationServiceImplTest {
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
-        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
     }
 
     @Test
@@ -882,12 +878,12 @@ public class OrganisationServiceImplTest {
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
-        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
     }
 
     @Test
@@ -896,6 +892,7 @@ public class OrganisationServiceImplTest {
         pbas.add("PBA00000012");
         PbaAddRequest pbaAddRequest = new PbaAddRequest();
         pbaAddRequest.setPaymentAccounts(pbas);
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         PaymentAccount paymentAccount = new PaymentAccount();
@@ -911,7 +908,6 @@ public class OrganisationServiceImplTest {
                 UUID.randomUUID().toString().substring(0, 7), UUID.randomUUID().toString());
         assertThat(responseEntity.getBody()).isNotNull();
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
-        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
 
     }
 
@@ -948,6 +944,7 @@ public class OrganisationServiceImplTest {
 
         String orgId = UUID.randomUUID().toString().substring(0, 7);
         String userId = UUID.randomUUID().toString();
+        organisation.setStatus(OrganisationStatus.ACTIVE);
         when(organisationRepository.findByOrganisationIdentifier(any())).thenReturn(organisation);
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
@@ -957,7 +954,6 @@ public class OrganisationServiceImplTest {
         assertThat(response.getReason()).isNotNull();
         assertThat(response.getMessage()).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
         verify(professionalUserServiceMock, times(1)).checkUserStatusIsActiveByUserId(any());
-        verify(organisationIdentifierValidatorImplMock, times(1)).validateOrganisationIsActive(any());
     }
 
 
