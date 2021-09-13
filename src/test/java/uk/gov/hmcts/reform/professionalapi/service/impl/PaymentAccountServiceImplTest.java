@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
+import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -8,6 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS_UPDATE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,7 +28,9 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
+import uk.gov.hmcts.reform.professionalapi.controller.response.UpdatePbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -188,5 +194,72 @@ public class PaymentAccountServiceImplTest {
         assertThat(sut.generateListOfAccountsToDelete(prefU, paymentAccounts)).isNotNull();
         listUserMap = sut.generateListOfAccountsToDelete(prefU, paymentAccounts);
         assertThat(listUserMap.get(0).getProfessionalUser().getFirstName()).isEqualTo("Con");
+    }
+
+    @Test
+    public void testUpdatePaymentAccountsForAnOrganisation_200_success_scenario() {
+        String pbaNumber = "PBA123567";
+
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
+        when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
+        when(paymentAccount.getOrganisation()).thenReturn(organisation);
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
+
+        when(paymentAccountRepositoryMock.findByPbaNumber(pbaNumber)).thenReturn(of(paymentAccount));
+
+        UpdatePbaStatusResponse response =
+                sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getPartialSuccessMessage()).isNull();
+        assertThat(response.getPbaUpdateStatusResponses()).isNull();
+    }
+
+    @Test
+    public void testUpdatePaymentAccountsForAnOrganisation_200_partial_success_scenario() {
+        String pbaNumber = "PBA123567";
+
+        PaymentAccount paymentAccount = mock(PaymentAccount.class);
+        when(paymentAccount.getPbaNumber()).thenReturn(pbaNumber);
+        when(paymentAccount.getPbaStatus()).thenReturn(PENDING);
+        when(paymentAccount.getOrganisation()).thenReturn(organisation);
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA123", ACCEPTED.name(), ""));
+
+        when(paymentAccountRepositoryMock.findByPbaNumber(pbaNumber)).thenReturn(of(paymentAccount));
+
+        UpdatePbaStatusResponse response =
+                sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getPartialSuccessMessage()).contains(ERROR_MSG_PARTIAL_SUCCESS_UPDATE);
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getPbaNumber()).contains("PBA123");
+        assertThat(response.getPbaUpdateStatusResponses().get(0).getErrorMessage())
+                .contains(ERROR_MSG_PBA_INVALID_FORMAT);
+    }
+
+    @Test
+    public void testUpdatePaymentAccountsForAnOrganisation_422_failure_scenario() {
+        String orgId = UUID.randomUUID().toString();
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaRequest("PBA123567", ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA456789", ACCEPTED.name(), ""));
+
+        UpdatePbaStatusResponse response = sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, orgId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getPartialSuccessMessage()).isNull();
+        assertThat(response.getPbaUpdateStatusResponses()).isNull();
     }
 }

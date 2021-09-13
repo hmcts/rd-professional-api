@@ -55,10 +55,10 @@ public class PaymentAccountValidator {
             Pattern pattern = Pattern.compile("(?i)pba\\w{7}$");
             Matcher matcher = pattern.matcher(pbaAccount);
             if (matcher.matches()) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public void checkPbasAreUniqueWithOrgId(Set<String> paymentAccounts, String orgId) {

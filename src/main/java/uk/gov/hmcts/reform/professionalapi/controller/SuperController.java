@@ -413,7 +413,7 @@ public abstract class SuperController {
 
     public UpdatePbaStatusResponse updateAnOrganisationsPbas(List<PbaRequest> pbaRequestList, String orgId) {
 
-        return paymentAccountService.updatePaymentAccountsforAnOrganisation(pbaRequestList, orgId);
+        return paymentAccountService.updatePaymentAccountsForAnOrganisation(pbaRequestList, orgId);
     }
 
     public void checkUserAlreadyExist(String userEmail) {

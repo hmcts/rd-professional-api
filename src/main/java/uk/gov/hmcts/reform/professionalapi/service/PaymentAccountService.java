@@ -14,6 +14,6 @@ public interface PaymentAccountService {
 
     PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest);
 
-    UpdatePbaStatusResponse updatePaymentAccountsforAnOrganisation(List<PbaRequest> pbaRequestList, String orgId);
+    UpdatePbaStatusResponse updatePaymentAccountsForAnOrganisation(List<PbaRequest> pbaRequestList, String orgId);
 
 }

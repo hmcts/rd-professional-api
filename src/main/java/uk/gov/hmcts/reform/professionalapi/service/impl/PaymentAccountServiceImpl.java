@@ -148,7 +148,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     }
 
-    public UpdatePbaStatusResponse updatePaymentAccountsforAnOrganisation(
+    public UpdatePbaStatusResponse updatePaymentAccountsForAnOrganisation(
             List<PbaRequest> pbaRequestList, String orgId) {
 
         Set<String> pbasFromRequest = new HashSet<>();
@@ -203,20 +203,20 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         pbasFromRequest.forEach(pba -> {
             //check PBA has a valid format
-            if (isPbaValid(pba)) {
+            if (!isPbaValid(pba)) {
                 new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_INVALID_FORMAT);
-            }
+            } else {
+                Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
 
-            Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
-
-            //check PBA exists in DB
-            if (paymentAccount.isPresent()) {
-                //check PBA belongs to the given Organisation
-                if (!paymentAccount.get().getOrganisation().getOrganisationIdentifier().equals(orgId)) {
+                //check PBA exists in DB
+                if (paymentAccount.isPresent()) {
+                    //check PBA belongs to the given Organisation
+                    if (!paymentAccount.get().getOrganisation().getOrganisationIdentifier().equals(orgId)) {
+                        pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG));
+                    }
+                } else {
                     pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG));
                 }
-            } else {
-                pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG));
             }
         });
 
