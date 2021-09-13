@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -362,7 +363,7 @@ public class OrganisationExternalController extends SuperController {
         log.info("Received request to add payment accounts to organisation Id");
 
         if (pbaAddRequest.getPaymentAccounts() == null
-                || pbaAddRequest.getPaymentAccounts().size() == 0
+                || CollectionUtils.isEmpty(pbaAddRequest.getPaymentAccounts())
                 || pbaAddRequest.getPaymentAccounts().stream().anyMatch(s -> (s == null || s.equals("")))) {
             throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);
         }
