@@ -379,7 +379,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         Map<String, Object> orgResponse1 = professionalApiClient.retrievePaymentAccountsByEmail(
                 superUserEmail.toLowerCase(), hmctsAdmin);
 
-        List<String> updatedPbaList = (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
+        List<String> updatedPbaList =
+                (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
 
         assertThat(updatedPbaList).doesNotContain(orgPba);
 
@@ -410,7 +411,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(updatePbaResponse.get("message")).hasToString("Some of the PBAs updated successfully");
         List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
         assertThat(pbaResponses.size()).isEqualTo(4);
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString()).contains("PBA is not associated with the Organisation");
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
+                .contains("PBA is not associated with the Organisation");
 
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
     }
