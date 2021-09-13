@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.professionalapi.configuration.ApplicationConfiguration;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -67,7 +67,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     @Override
     @Transactional
-    public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaEditRequest pbaEditRequest) {
+    public PbaResponse editPaymentAccountsByOrganisation(Organisation organisation, PbaRequest pbaEditRequest) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
@@ -79,6 +79,11 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         transaction.commit();
         em.close();
         return pbaResponse;
+    }
+
+    @Override
+    public void deletePaymentsOfOrganisation(PbaRequest deletePbaRequest, Organisation organisation) {
+        organisationService.deletePaymentsOfOrganisation(deletePbaRequest.getPaymentAccounts(), organisation);
     }
 
     public void deleteUserAccountMapsAndPaymentAccounts(EntityManager em, Organisation organisation) {
@@ -96,7 +101,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         organisation.setPaymentAccounts(new ArrayList<>());
     }
 
-    public void addPaymentAccountsToOrganisation(PbaEditRequest pbaEditRequest, Organisation organisation) {
+    public void addPaymentAccountsToOrganisation(PbaRequest pbaEditRequest, Organisation organisation) {
         organisationService.addPbaAccountToOrganisation(pbaEditRequest.getPaymentAccounts(), organisation, true, true);
     }
 

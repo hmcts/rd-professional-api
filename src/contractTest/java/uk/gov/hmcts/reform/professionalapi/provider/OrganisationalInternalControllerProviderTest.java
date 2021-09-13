@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.professionalapi.controller.internal.OrganisationInternalController;
-import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsersResponse;
@@ -171,7 +171,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
 
         when(paymentAccountService.editPaymentAccountsByOrganisation(any(Organisation.class),
-            any(PbaEditRequest.class)))
+            any(PbaRequest.class)))
             .thenReturn(new PbaResponse("200", "Success"));
     }
 

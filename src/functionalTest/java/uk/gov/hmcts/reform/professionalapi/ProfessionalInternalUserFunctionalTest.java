@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.FetchPbaByStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.MFAStatus;
@@ -362,7 +363,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         paymentAccountsEdit.add(oldPba);
         paymentAccountsEdit.add(pba1);
         paymentAccountsEdit.add(pba2);
-        PbaEditRequest pbaEditRequest = new PbaEditRequest();
+        PbaRequest pbaEditRequest = new PbaRequest();
         pbaEditRequest.setPaymentAccounts(paymentAccountsEdit);
         Map<String, Object> pbaResponse = professionalApiClient.editPbaAccountsByOrgId(
                 pbaEditRequest, intActiveOrgId, hmctsAdmin);

@@ -179,6 +179,16 @@ public class OrganisationServiceImpl implements OrganisationService {
         paymentAccount.setStatusMessage(statusMessage);
     }
 
+    @Override
+    @Transactional
+    public void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation) {
+        final Set<String> paymentAccountsUpper = paymentAccounts.stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+
+        paymentAccountRepository.deleteByPbaNumberUpperCase(paymentAccountsUpper);
+    }
+
     public void addSuperUserToOrganisation(
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
