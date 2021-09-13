@@ -361,8 +361,7 @@ public class OrganisationExternalController extends SuperController {
 
         log.info("Received request to add payment accounts to organisation Id");
 
-        if (pbaAddRequest == null
-                || pbaAddRequest.getPaymentAccounts() == null
+        if (pbaAddRequest.getPaymentAccounts() == null
                 || pbaAddRequest.getPaymentAccounts().size() == 0
                 || pbaAddRequest.getPaymentAccounts().stream().anyMatch(s -> (s == null || s.equals("")))) {
             throw new InvalidRequest(ADD_PBA_REQUEST_EMPTY);

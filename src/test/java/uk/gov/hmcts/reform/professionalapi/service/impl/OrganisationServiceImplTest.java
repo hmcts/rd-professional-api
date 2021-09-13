@@ -11,8 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
@@ -934,12 +932,6 @@ public class OrganisationServiceImplTest {
 
         responseEntity = sut.addPaymentAccountsToOrganisation(pbaAddRequest, orgId, userId);
         assertThat(responseEntity.getBody()).isNotNull();
-    }
-
-    @Test
-    public void test_updateStatusAndMessage() {
-        PaymentAccount paymentAccount = new PaymentAccount("PBA1234567");
-        sut.updateStatusAndMessage(paymentAccount, ACCEPTED, PBA_STATUS_MESSAGE_ACCEPTED);
     }
 
     @Test
