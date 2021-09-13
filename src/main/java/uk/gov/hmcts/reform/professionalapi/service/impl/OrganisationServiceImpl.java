@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.Arrays;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import lombok.Setter;
@@ -77,12 +79,10 @@ import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 
-import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.professionalapi.domain.AddPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.FailedPbaReason;
-import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -489,6 +489,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         validateOrganisationIsActive(organisation.get());
         professionalUserService.checkUserStatusIsActiveByUserId(userId);
 
+        pbaAddRequest.getPaymentAccounts().removeIf(item -> item == null || "".equals(item.trim()));
         Pair<Set<String>, Set<String>> unsuccessfulPbas = getUnsuccessfulPbas(pbaAddRequest);
 
         if (!isEmpty(pbaAddRequest.getPaymentAccounts())) {

@@ -411,10 +411,25 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         Map<String, Object> pbaResponse = professionalReferenceDataClient
                 .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
 
-        ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
-        assertThat(pbaResponse).containsEntry("http_status", "400");
-        assertThat(errorResponse.getErrorDescription()).isEqualTo(ADD_PBA_REQUEST_EMPTY);
-        assertThat(errorResponse.getErrorMessage()).isEqualTo(INVALID_REQUEST.getErrorMessage());
+        LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
+        ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
+        ArrayList invalidPaymentAccountsList = (ArrayList) reason.get("invalidPaymentAccounts");
+        Object message = pbaResponse.get("message");
+
+        assertThat(message).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
+        assertThat(invalidPaymentAccountsList).contains("PBA00000000");
+        assertThat(duplicatePaymentAccountsList).isNull();
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(10)
+                .contains("PBAKQNROCA","PBAKQNR1CA","PBAC013ABE");
 
     }
 
@@ -487,7 +502,75 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         assertThat(pbaResponse).containsEntry("http_status", "400");
         assertThat(errorResponse.getErrorDescription()).isEqualTo(ADD_PBA_REQUEST_EMPTY);
         assertThat(errorResponse.getErrorMessage()).isEqualTo(INVALID_REQUEST.getErrorMessage());
+    }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void test_add_PaymentAccounts_PartialSuccess_Dupl_And_null_ShouldReturn_201() {
+        Set<String> paymentAccountsToAdd = new HashSet<>();
+        paymentAccountsToAdd.add("PBA0000001");
+        paymentAccountsToAdd.add("PBA0000002");
+        paymentAccountsToAdd.add("PBA0000003");
+        paymentAccountsToAdd.add("invalid-test01");
+        paymentAccountsToAdd.add("invalid-test02");
+
+        Set<String> paymentAccountsEmptyOrNullToAdd = new HashSet<>();
+        paymentAccountsEmptyOrNullToAdd.add(null);
+        paymentAccountsEmptyOrNullToAdd.add(null);
+        paymentAccountsEmptyOrNullToAdd.add("");
+        paymentAccountsEmptyOrNullToAdd.add(" ");
+
+        PbaAddRequest pbaAddRequest = new PbaAddRequest();
+        pbaAddRequest.setPaymentAccounts(paymentAccountsToAdd);
+        pbaAddRequest.getPaymentAccounts().addAll(paymentAccountsEmptyOrNullToAdd);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+
+        LinkedHashMap reason = (LinkedHashMap)pbaResponse.get("reason");
+        ArrayList duplicatePaymentAccountsList = (ArrayList) reason.get("duplicatePaymentAccounts");
+        ArrayList invalidPaymentAccountsList = (ArrayList) reason.get("invalidPaymentAccounts");
+        Object message = pbaResponse.get("message");
+
+        assertThat(message).isEqualTo(ERROR_MSG_PARTIAL_SUCCESS);
+        assertThat(duplicatePaymentAccountsList).contains("PBA0000001", "PBA0000003");
+        assertThat(invalidPaymentAccountsList).contains("invalid-test01","invalid-test02");
+        assertThat(pbaResponse).containsEntry("http_status", "201 CREATED");
+
+        java.util.Map<String, Object> retrievePaymentAccountsByEmailResponse = professionalReferenceDataClient
+                .findPaymentAccountsByEmailFromHeader("someone@somewhere.com", hmctsAdmin);
+
+        Map<String, Object> organisationEntityResponse =
+                (Map<String, Object>) retrievePaymentAccountsByEmailResponse.get("organisationEntityResponse");
+        List<String> paymentAccount = (List<String>) organisationEntityResponse.get("paymentAccount");
+        assertThat(paymentAccount)
+                .hasSize(8)
+                .contains("PBA0000001","PBA0000001","PBA0000001");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void test_add_PaymentAccounts_Failure_Has_Single_emptySpace_PBA_ShouldThrow_400() {
+
+        String request = "{\n"
+                + "    \"paymentAccounts\": [\n"
+                + "        \"  \"\n"
+                + "    ]\n"
+                + "}";
+
+        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+
+        ErrorResponse errorResponse = convertJsonToErrorResponseObj(pbaResponse);
+        assertThat(pbaResponse).containsEntry("http_status", "400");
+        assertThat(errorResponse.getErrorDescription()).isEqualTo(ADD_PBA_REQUEST_EMPTY);
+        assertThat(errorResponse.getErrorMessage()).isEqualTo(INVALID_REQUEST.getErrorMessage());
     }
 
 }
