@@ -492,8 +492,14 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The requested PBAs have been successfully Updated",
-                    response = NewUserResponse.class
+                    message = "Success: The requested PBAs have been successfully Updated",
+                    response = UpdatePbaStatusResponse.class
+            ),
+            @ApiResponse(
+                    code = 200,
+                    message = "Partial Success: Some of the requested PBAs have been successfully Updated"
+                            + " and the invalid ones returned with individual error message",
+                    response = UpdatePbaStatusResponse.class
             ),
             @ApiResponse(
                     code = 400,
