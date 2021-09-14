@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.internal;
 
+import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ORGANISATION_IDENTIFIER_FORMAT_REGEX;
@@ -528,7 +529,7 @@ public class OrganisationInternalController extends SuperController {
 
         //Received request to update an Organisation's PBAs
 
-        if (updatePbaRequest.getPbaRequestList().isEmpty()) {
+        if (isEmpty(updatePbaRequest.getPbaRequestList())) {
             throw new InvalidRequest("No PBAs have been sent in the request");
         }
 

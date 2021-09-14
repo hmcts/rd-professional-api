@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.request.MfaUpdateRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaEditRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.UpdatePbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.OrganisationCreationRequestValidator;
@@ -401,5 +402,12 @@ public class OrganisationInternalControllerTest {
 
         verify(orgIdValidatorMock, times(1)).validateOrganisationExistsWithGivenOrgId(orgId);
         verify(organisationServiceMock, times(1)).getOrganisationByOrgIdentifier(orgId);
+    }
+
+    @Test(expected = InvalidRequest.class)
+    public void testUpdatePbasThrows400WhenPbaRequestIsEmpty() {
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+
+        organisationInternalController.updateAnOrganisationsRegisteredPbas(updatePbaRequest, "orgId");
     }
 }
