@@ -221,7 +221,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                             //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
                             if (PENDING.equals(pba.getPbaStatus())) {
                                 pba.setPbaStatus(ACCEPTED);
-                                pba.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
+                                pba.setStatusMessage(pba1.getStatusMessage() ==  null ? "" :  pba1.getStatusMessage());
                                 pbasToSave.add(pba);
                             } else {
                                 invalidPbaResponses.add(
