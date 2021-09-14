@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
@@ -83,6 +84,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         Optional<PaymentAccount> persistedPaymentAccount = paymentAccountRepository.findByPbaNumber(pba3);
 
+        assertTrue(persistedPaymentAccount.isPresent());
         assertThat(persistedPaymentAccount.get().getPbaStatus()).isEqualTo(ACCEPTED);
     }
 
