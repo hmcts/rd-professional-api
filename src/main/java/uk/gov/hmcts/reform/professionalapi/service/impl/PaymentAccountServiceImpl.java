@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.professionalapi.service.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -166,7 +165,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         //Update valid PBAs, returns any remaining invalid PBAs
         if (isNotEmpty(pbasFromRequest)) {
             List<PaymentAccount> pbasFromDb = paymentAccountRepository.findByPbaNumberIn(pbasFromRequest);
-            invalidPbaResponses = acceptOrRejectPbas(pbasFromDb, pbaRequestList, invalidPbaResponses, pbasFromRequest, orgId);
+            invalidPbaResponses =
+                    acceptOrRejectPbas(pbasFromDb, pbaRequestList, invalidPbaResponses, pbasFromRequest, orgId);
             invalidPbaResponses.forEach(pba -> pbasFromRequest.remove(pba.getPbaNumber()));
         }
 
@@ -236,7 +236,8 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             updatePBAsInDb(pbasToSave, pbasToDelete);
         } else {
             //if list of PBAs from DB is empty, add invalid PBAs to response
-            pbasFromRequest.forEach(pba -> invalidPbaResponses.add(generateInvalidResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG)));
+            pbasFromRequest.forEach(pba ->
+                    invalidPbaResponses.add(generateInvalidResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG)));
         }
 
         return invalidPbaResponses;
