@@ -3,8 +3,6 @@
 GRADLE_CLEAN=true
 GRADLE_INSTALL=true
 
-# Test S2S key - not used in any HMCTS key vaults or services
-export S2S_SECRET=SZDUA3L7N32PE2IS
 export S2S_MICROSERVICE=rd_professional_api
 
 build_s2s_image() {

@@ -34,7 +34,7 @@ spring:
         registration:
           oidc:
             client-id: microservicekey-rd-professional-api
-            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+            client-secret: ${PRD_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration,classpath:db/postgres
@@ -44,7 +44,7 @@ spring:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5428}/${POSTGRES_NAME:dbrefdata}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:dbrefdata}
-    password: ${POSTGRES_PASSWORD:dbrefdata}
+    password: ${POSTGRES_PASSWORD:}
     properties:
       charSet: UTF-8
     hikari:
@@ -92,7 +92,7 @@ security:
 ### dependency configuration
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+    totp_secret: ${PRD_API_S2S_SECRET:}
     microservice: rd_professional_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
