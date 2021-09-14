@@ -519,7 +519,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = false)
     public void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
         log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
         List<PbaRequest> pbaRequestList = new ArrayList<>();
