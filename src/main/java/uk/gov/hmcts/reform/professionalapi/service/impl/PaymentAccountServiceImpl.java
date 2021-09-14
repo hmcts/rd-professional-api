@@ -48,7 +48,6 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_NOT_PENDING;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_STATUS_MISSING;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator.isPbaInvalid;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;

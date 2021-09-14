@@ -58,7 +58,6 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_NO_PBA_FOUND = "No PBAs associated with given email";
     public static final String PBA_STATUS_MESSAGE_ACCEPTED = "Edited by Admin";
     public static final String PBA_STATUS_MESSAGE_AUTO_ACCEPTED = "Auto approved by Admin";
-    public static final String PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN = "PBA accepted by Admin";
 
     public static final String ERROR_MSG_PARTIAL_SUCCESS_UPDATE = "Some of the PBAs updated successfully";
     public static final String ERROR_MSG_PBA_NOT_PENDING = "PBA is not in Pending status";
