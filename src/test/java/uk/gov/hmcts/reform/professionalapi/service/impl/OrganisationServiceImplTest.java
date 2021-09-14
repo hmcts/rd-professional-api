@@ -875,7 +875,7 @@ public class OrganisationServiceImplTest {
     public void test_getOrganisationsByPbaStatus() {
 
         List<Organisation> organisations = getOrgsWithPbaSetup();
-        when(organisationRepository.findByPbaStatus(ACCEPTED.toString())).thenReturn(organisations);
+        when(organisationRepository.findByPbaStatus(ACCEPTED)).thenReturn(organisations);
 
         ResponseEntity<Object> responseEntity = sut.getOrganisationsByPbaStatus(ACCEPTED);
 
@@ -891,7 +891,7 @@ public class OrganisationServiceImplTest {
         assertThat(orgsWithPbas.get(1).getOrganisationIdentifier()).isEqualTo("ABCDEFG2");
         assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);
 
-        verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED.toString());
+        verify(organisationRepository, times(1)).findByPbaStatus(ACCEPTED);
     }
 
     private List<Organisation> getOrgsWithPbaSetup() {

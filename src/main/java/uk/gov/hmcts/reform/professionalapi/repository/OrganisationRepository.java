@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
+import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.ProfessionalUser;
 
 @Repository
@@ -29,9 +30,9 @@ public interface OrganisationRepository extends JpaRepository<Organisation, UUID
     @EntityGraph(value = "Organisation.alljoins")
     List<Organisation> findAll();
 
-    @Query(value = "select * from organisation as o, payment_account as p \n"
-            + "where p.organisation_id = o.id \n"
-            + "and p.pba_status = :pbaStatus \n"
-            + "order by p.created asc", nativeQuery = true)
-    List<Organisation> findByPbaStatus(@Param("pbaStatus")String pbaStatus);
+    @Query("select o from Organisation o join fetch payment_account p \n"
+            + "on p.organisationId = o.id \n"
+            + "where p.pbaStatus = :pbaStatus \n"
+            + "order by p.created asc")
+    List<Organisation> findByPbaStatus(@Param("pbaStatus") PbaStatus pbaStatus);
 }

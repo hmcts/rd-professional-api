@@ -476,7 +476,7 @@ public class OrganisationServiceImpl implements OrganisationService {
 
     public ResponseEntity<Object> getOrganisationsByPbaStatus(PbaStatus pbaStatus) {
 
-        List<Organisation> organisations = organisationRepository.findByPbaStatus(pbaStatus.toString());
+        List<Organisation> organisations = organisationRepository.findByPbaStatus(pbaStatus);
 
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
