@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static java.util.Optional.of;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -47,8 +47,8 @@ import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.util.RefDataUtil;
 
-
 public class PaymentAccountServiceImplTest {
+
     private final ApplicationConfiguration applicationConfigurationMock = mock(ApplicationConfiguration.class);
     private final ProfessionalUserRepository professionalUserRepositoryMock = mock(ProfessionalUserRepository.class);
     private final UserProfileFeignClient userProfileFeignClientMock = mock(UserProfileFeignClient.class);
@@ -211,7 +211,7 @@ public class PaymentAccountServiceImplTest {
 
         pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
 
-        when(paymentAccountRepositoryMock.findByPbaNumber(pbaNumber)).thenReturn(of(paymentAccount));
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
         UpdatePbaStatusResponse response =
                 sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
@@ -236,7 +236,7 @@ public class PaymentAccountServiceImplTest {
         pbaRequestList.add(new PbaRequest(pbaNumber, ACCEPTED.name(), ""));
         pbaRequestList.add(new PbaRequest("PBA123", ACCEPTED.name(), ""));
 
-        when(paymentAccountRepositoryMock.findByPbaNumber(pbaNumber)).thenReturn(of(paymentAccount));
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
         UpdatePbaStatusResponse response =
                 sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
