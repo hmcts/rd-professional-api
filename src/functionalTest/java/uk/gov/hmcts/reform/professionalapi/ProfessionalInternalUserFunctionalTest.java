@@ -65,7 +65,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         retrieveOrganisationPbaScenarios();
         modifyUserRolesScenarios();
         reinviteUserScenarios();
-        updatePbaScenarios();
         editPbaScenarios();
         deleteOrganisationScenarios();
     }
@@ -128,11 +127,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         reinviteActiveUserShouldReturnBadRequest();
         reinviteUserWithinOneHourShouldReturnConflict();
         reinviteSuperUserWithinOneHourShouldReturnTooManyRequest();
-    }
-
-    public void updatePbaScenarios() {
-        updatePaymentAccountsShouldReturnSuccess();
-        updatePaymentAccountsShouldReturnPartialSuccess();
     }
 
     public void editPbaScenarios() {
@@ -354,71 +348,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         log.info("reinviteSuperUserWithinOneHourShouldReturnTooManyRequest :: END");
     }
 
-    public void updatePaymentAccountsShouldReturnSuccess() {
-        log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
-                superUserEmail.toLowerCase(), hmctsAdmin);
-
-        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
-
-        String orgPba = pbaList.get(0);
-
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
-
-        pbaRequestList.add(new PbaRequest(orgPba, PbaStatus.REJECTED.name(), ""));
-
-        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
-        updatePbaRequest.setPbaRequestList(pbaRequestList);
-
-        Map<String, Object> updatePbaResponse =
-                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
-
-        assertThat(updatePbaResponse).isNotNull();
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
-
-        Map<String, Object> orgResponse1 = professionalApiClient.retrievePaymentAccountsByEmail(
-                superUserEmail.toLowerCase(), hmctsAdmin);
-
-        List<String> updatedPbaList =
-                (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
-
-        assertThat(updatedPbaList).doesNotContain(orgPba);
-
-        log.info("updatePaymentAccountsShouldReturnSuccess :: END");
-    }
-
-    public void updatePaymentAccountsShouldReturnPartialSuccess() {
-        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
-        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
-                superUserEmail.toLowerCase(), hmctsAdmin);
-        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
-
-        List<PbaRequest> pbaRequestList = new ArrayList<>();
-
-        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.ACCEPTED.name(), "")));
-
-        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
-        pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
-
-        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
-        updatePbaRequest.setPbaRequestList(pbaRequestList);
-
-        Map<String, Object> updatePbaResponse =
-                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
-
-        assertThat(updatePbaResponse).isNotNull();
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNotNull();
-        assertThat(updatePbaResponse.get("message")).hasToString("Some of the PBAs updated successfully");
-        List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
-        assertThat(pbaResponses.size()).isEqualTo(4);
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-                .contains("PBA is not in Pending status");
-
-        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
-    }
-
     public void editPaymentAccountsShouldReturnSuccess() {
         log.info("editPaymentAccountsShouldReturnSuccess :: STARTED");
         String oldPba = organisationCreationRequest.getPaymentAccount().iterator().next();
@@ -518,5 +447,91 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         professionalApiClient.updateOrgMfaStatus(mfaUpdateRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
 
         log.info("updateOrgMFAShouldReturn403 :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
+    public void updatePaymentAccountsShouldReturnSuccess() {
+        log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        String orgPba = pbaList.get(0);
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaRequest(orgPba, PbaStatus.REJECTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNull();
+
+        Map<String, Object> orgResponse1 = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+
+        List<String> updatedPbaList =
+                (List) ((Map) orgResponse1.get("organisationEntityResponse")).get("paymentAccount");
+
+        assertThat(updatedPbaList).doesNotContain(orgPba);
+
+        log.info("updatePaymentAccountsShouldReturnSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
+    public void updatePaymentAccountsShouldReturnPartialSuccess() {
+        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
+        Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
+                superUserEmail.toLowerCase(), hmctsAdmin);
+        List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
+
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.ACCEPTED.name(), "")));
+
+        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        Map<String, Object> updatePbaResponse =
+                professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, OK);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses")).isNotNull();
+        assertThat(updatePbaResponse.get("message")).hasToString("Some of the PBAs updated successfully");
+        List pbaResponses = (List) updatePbaResponse.get("pbaUpdateStatusResponses");
+        assertThat(pbaResponses.size()).isEqualTo(4);
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
+                .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
+        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
+                .contains("PBA is not in Pending status");
+
+        log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = false)
+    public void updatePaymentAccountsShouldReturnForbiddenWhenToggledOff() {
+        log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: STARTED");
+        List<PbaRequest> pbaRequestList = new ArrayList<>();
+
+        pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
+        pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
+
+        UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
+        updatePbaRequest.setPbaRequestList(pbaRequestList);
+
+        professionalApiClient.updatePbas(updatePbaRequest, intActiveOrgId, hmctsAdmin, FORBIDDEN);
+
+        log.info("updatePaymentAccountsShouldReturnForbiddenWhenToggledOff :: END");
     }
 }
