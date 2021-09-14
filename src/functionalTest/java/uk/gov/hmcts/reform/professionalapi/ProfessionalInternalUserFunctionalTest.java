@@ -453,6 +453,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
     public void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
+        setUpTestData();
+
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
                 superUserEmail.toLowerCase(), hmctsAdmin);
 
@@ -488,6 +490,8 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
     public void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
+        setUpTestData();
+
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
                 superUserEmail.toLowerCase(), hmctsAdmin);
         List<String> pbaList = (List) ((Map) orgResponse.get("organisationEntityResponse")).get("paymentAccount");
