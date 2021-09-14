@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.organisationRequestWithAllFieldsAreUpdated;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
-public class UpdatePaymentAccountsTest extends AuthorizationEnabledIntegrationTest {
+public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     Set<String> paymentAccounts = new HashSet<>();
     String pba1 = "PBA1234567";
