@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.professionalapi.controller.constants;
 
 public class ProfessionalApiConstants {
 
+
     private ProfessionalApiConstants() {
     }
 
@@ -67,5 +68,7 @@ public class ProfessionalApiConstants {
     public static final String ERROR_MSG_STATUS_INVALID = "Value for Status field is invalid";
     public static final String ERROR_MSG_PBA_INVALID_FORMAT =
             "PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters";
+    public static final String ERROR_MSG_PBAS_ENTERED_ARE_INVALID = ". The following PBAs entered are invalid: ";
+
 
 }

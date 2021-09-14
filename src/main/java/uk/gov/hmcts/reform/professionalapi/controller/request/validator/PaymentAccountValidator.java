@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBAS_ENTERED_ARE_INVALID;
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ERROR_MSG_PBA_INVALID_FORMAT;
 
 @Component
@@ -46,7 +48,7 @@ public class PaymentAccountValidator {
 
         if (!StringUtils.isEmpty(invalidPbas)) {
             throw new InvalidRequest(ERROR_MSG_PBA_INVALID_FORMAT
-                    .concat(". The following PBAs entered are invalid: " + invalidPbas));
+                    .concat(ERROR_MSG_PBAS_ENTERED_ARE_INVALID + invalidPbas));
         }
     }
 
