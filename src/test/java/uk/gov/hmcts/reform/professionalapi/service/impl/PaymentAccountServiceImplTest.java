@@ -214,7 +214,7 @@ public class PaymentAccountServiceImplTest {
         when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
         UpdatePbaStatusResponse response =
-                sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+                sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
@@ -239,7 +239,7 @@ public class PaymentAccountServiceImplTest {
         when(paymentAccountRepositoryMock.findByPbaNumberIn(Set.of(pbaNumber))).thenReturn(asList(paymentAccount));
 
         UpdatePbaStatusResponse response =
-                sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
+                sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, organisation.getOrganisationIdentifier());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
@@ -256,7 +256,7 @@ public class PaymentAccountServiceImplTest {
 
         pbaRequestList.add(new PbaRequest("PBA1234567", ACCEPTED.name(), ""));
 
-        UpdatePbaStatusResponse response = sut.updatePaymentAccountsForAnOrganisation(pbaRequestList, orgId);
+        UpdatePbaStatusResponse response = sut.updatePaymentAccountsStatusForAnOrganisation(pbaRequestList, orgId);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(422);

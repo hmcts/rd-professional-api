@@ -147,7 +147,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     }
 
-    public UpdatePbaStatusResponse updatePaymentAccountsForAnOrganisation(
+    public UpdatePbaStatusResponse updatePaymentAccountsStatusForAnOrganisation(
             List<PbaRequest> pbaRequestList, String orgId) {
 
         Set<String> pbasFromRequest = new HashSet<>();
