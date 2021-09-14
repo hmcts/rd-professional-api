@@ -64,10 +64,8 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
 
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus("Invalid Status", hmctsAdmin, Boolean.FALSE);
-        ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
 
-        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.BAD_REQUEST);
-        assertThat(errorResponse.getErrorMessage()).isEqualTo(ErrorConstants.INVALID_REQUEST.getErrorMessage());
+        validateInvalidRequestErrorResponse(errorResponseMap);
     }
 
     @Test
@@ -75,10 +73,18 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
 
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(null, hmctsAdmin, Boolean.FALSE);
-        ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
 
-        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.BAD_REQUEST);
-        assertThat(errorResponse.getErrorMessage()).isEqualTo(ErrorConstants.INVALID_REQUEST.getErrorMessage());
+        validateInvalidRequestErrorResponse(errorResponseMap);
+    }
+
+    @Test
+    public void get_request_returns_400_when_multiple_pba_status() throws JsonProcessingException {
+
+        Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
+                .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED + "," + PbaStatus.PENDING, hmctsAdmin,
+                        Boolean.FALSE);
+
+        validateInvalidRequestErrorResponse(errorResponseMap);
     }
 
     @Test
@@ -147,6 +153,12 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
         } else if (expectedPbaStatus.equals(PbaStatus.PENDING)) {
             orgPbaResponse.forEach(org -> org.getPbaNumbers().forEach(pba -> assertNull(pba.getDateAccepted())));
         }
+    }
+
+    private void validateInvalidRequestErrorResponse(Map<String, Object> errorResponseMap) {
+        ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
+        assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.BAD_REQUEST);
+        assertThat(errorResponse.getErrorMessage()).isEqualTo(ErrorConstants.INVALID_REQUEST.getErrorMessage());
     }
 
 }
