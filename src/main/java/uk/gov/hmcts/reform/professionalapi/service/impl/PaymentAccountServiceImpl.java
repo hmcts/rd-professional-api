@@ -173,7 +173,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         //Update valid PBAs, returns any remaining invalid PBAs
         if (isNotEmpty(pbasFromRequest)) {
-            invalidPbaResponses = acceptOrRejectPbas(pbasFromDb, pbaRequestList, invalidPbaResponses, orgId);
+            invalidPbaResponses = acceptOrRejectPbas(pbasFromDb, pbaRequestList, invalidPbaResponses);
             invalidPbaResponses.forEach(pba -> pbasFromRequest.remove(pba.getPbaNumber()));
         }
 
@@ -211,7 +211,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
     public List<PbaUpdateStatusResponse> acceptOrRejectPbas(
             List<PaymentAccount> pbasFromDb, List<PbaRequest> pbaRequestList,
-            List<PbaUpdateStatusResponse> invalidPbaResponses, String orgId) {
+            List<PbaUpdateStatusResponse> invalidPbaResponses) {
 
         List<PaymentAccount> pbasToSave = new ArrayList<>();
         List<PaymentAccount> pbasToDelete = new ArrayList<>();
@@ -223,11 +223,10 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                     //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
                     if (PENDING.equals(pba.getPbaStatus())) {
                         pba.setPbaStatus(ACCEPTED);
-                        pba.setStatusMessage(pba1.getStatusMessage() == null ? "" : pba1.getStatusMessage());
+                        pba.setStatusMessage(getStatusMessageFromRequest(pba1));
                         pbasToSave.add(pba);
                     } else {
-                        invalidPbaResponses.add(
-                                generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_PBA_NOT_PENDING));
+                        invalidPbaResponses.add(generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_PBA_NOT_PENDING));
                     }
                     //if REJECTED delete from DB
                 } else if (pba1.getStatus().equals(REJECTED.name())) {
@@ -291,5 +290,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         //if there are only valid PBAs that have been updated
         return new UpdatePbaStatusResponse(
                 null, null, HttpStatus.OK.value());
+    }
+
+    public String getStatusMessageFromRequest(PbaRequest pba) {
+        return pba.getStatusMessage() == null ? "" : pba.getStatusMessage();
     }
 }
