@@ -18,7 +18,9 @@ import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.someMinimalOrganisationRequest;
 
 @SuppressWarnings("unchecked")
@@ -35,11 +37,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.FALSE);
 
-        assertThat(orgPbaResponse).isNotNull();
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().size()).isEqualTo(1);
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getStatus()).isEqualTo(ACCEPTED.toString());
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getPbaNumber()).isEqualTo("PBA1234568");
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getDateAccepted()).isNotNull();
+        validatePbaResponse(orgPbaResponse, 2, PbaStatus.ACCEPTED);
     }
 
     @Test
@@ -48,27 +46,12 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.PENDING.toString(), hmctsAdmin, Boolean.FALSE);
 
-        assertThat(orgPbaResponse).isNotNull();
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().size()).isEqualTo(1);
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getStatus()).isEqualTo(PbaStatus.PENDING.toString());
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getPbaNumber()).isEqualTo("PBA1234569");
-        assertThat(orgPbaResponse.get(0).getPbaNumbers().get(0).getDateAccepted()).isNull();
-    }
-
-    @Test
-    public void get_request_returns_no_organisations_for_pending_org_with_accepted_pba_status()
-            throws JsonProcessingException {
-        var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
-                professionalReferenceDataClient.findOrganisationsByPbaStatus(
-                        PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.FALSE);
-
-        assertThat(orgPbaResponse).isEmpty();
+        validatePbaResponse(orgPbaResponse, 1, PbaStatus.PENDING);
     }
 
 
     @Test
     public void get_request_returns_no_organisations_for_given_pba_status() throws JsonProcessingException {
-
         var orgPbaResponse = (List<OrganisationsWithPbaStatusResponse>)
                 professionalReferenceDataClient.findOrganisationsByPbaStatus(
                         PbaStatus.REJECTED.toString(), hmctsAdmin, Boolean.FALSE);
@@ -88,7 +71,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_403_when_invalid_role() throws JsonProcessingException {
+    public void get_request_returns_400_when_null_pba_status() throws JsonProcessingException {
 
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
                 .findOrganisationsByPbaStatus(null, hmctsAdmin, Boolean.FALSE);
@@ -99,9 +82,9 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_403_when_unauthorised_role() throws JsonProcessingException {
+    public void get_request_returns_403_when_invalid_role() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(ACCEPTED.toString(), "unauthorised role", Boolean.FALSE);
+                .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), "prd-role", Boolean.FALSE);
         ErrorResponse errorResponse = (ErrorResponse) errorResponseMap.get("response_body");
 
         assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.FORBIDDEN);
@@ -109,9 +92,9 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
     }
 
     @Test
-    public void get_request_returns_401_when_invalid_role() throws JsonProcessingException {
+    public void get_request_returns_401_when_unauthorised() throws JsonProcessingException {
         Map<String, Object> errorResponseMap = (Map<String, Object>) professionalReferenceDataClient
-                .findOrganisationsByPbaStatus(ACCEPTED.toString(), hmctsAdmin, Boolean.TRUE);
+                .findOrganisationsByPbaStatus(PbaStatus.ACCEPTED.toString(), hmctsAdmin, Boolean.TRUE);
 
         assertThat(errorResponseMap).isNotNull().containsEntry("http_status", HttpStatus.UNAUTHORIZED);
     }
@@ -120,6 +103,7 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         createActiveOrganisation1();
         createActiveOrganisation2();
+        createPendingOrganisation();
     }
 
     public void createActiveOrganisation1() {
@@ -140,6 +124,29 @@ public class FindOrganisationsByPbaStatusTest extends AuthorizationEnabledIntegr
         createAndActivateOrganisationWithGivenRequest(
                 someMinimalOrganisationRequest().name(orgName2).sraId(randomAlphabetic(10))
                         .paymentAccount(paymentAccountsOrg2).build());
+    }
+
+    public void createPendingOrganisation() {
+        Set<String> paymentAccountsOrg3 =  new HashSet<>();
+        paymentAccountsOrg3.add("PBA1234571");
+        paymentAccountsOrg3.add("PBA1234572");
+        String orgName3 = randomAlphabetic(7);
+        createOrganisationWithGivenRequest(
+                someMinimalOrganisationRequest().name(orgName3).sraId(randomAlphabetic(10))
+                        .paymentAccount(paymentAccountsOrg3).build());
+    }
+
+    private void validatePbaResponse(List<OrganisationsWithPbaStatusResponse> orgPbaResponse, int expectedOrgsize,
+                                     PbaStatus expectedPbaStatus) {
+        assertThat(orgPbaResponse).isNotNull().hasSize(expectedOrgsize);
+        orgPbaResponse.forEach(org -> assertNotNull((org.getPbaNumbers())));
+        orgPbaResponse.forEach(org -> assertTrue(org.getPbaNumbers().stream()
+                .allMatch(pba -> pba.getStatus().equalsIgnoreCase(expectedPbaStatus.toString()))));
+        if (expectedPbaStatus.equals(PbaStatus.ACCEPTED)) {
+            orgPbaResponse.forEach(org -> org.getPbaNumbers().forEach(pba -> assertNotNull(pba.getDateAccepted())));
+        } else if (expectedPbaStatus.equals(PbaStatus.PENDING)) {
+            orgPbaResponse.forEach(org -> org.getPbaNumbers().forEach(pba -> assertNull(pba.getDateAccepted())));
+        }
     }
 
 }
