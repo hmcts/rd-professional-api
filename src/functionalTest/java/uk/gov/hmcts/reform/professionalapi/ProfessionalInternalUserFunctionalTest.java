@@ -498,7 +498,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
 
         List<PbaRequest> pbaRequestList = new ArrayList<>();
 
-        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.ACCEPTED.name(), "")));
+        pbaList.forEach(pba -> pbaRequestList.add(new PbaRequest(pba, PbaStatus.REJECTED.name(), "")));
 
         pbaRequestList.add(new PbaRequest("PBA123", PbaStatus.ACCEPTED.name(), ""));
         pbaRequestList.add(new PbaRequest("PBA456", PbaStatus.ACCEPTED.name(), ""));
