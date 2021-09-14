@@ -516,8 +516,6 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
         assertThat(pbaResponses.size()).isEqualTo(2);
         assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
                 .contains("PBA numbers must start with PBA/pba and be followed by 7 alphanumeric characters");
-        assertThat(updatePbaResponse.get("pbaUpdateStatusResponses").toString())
-                .contains("PBA is not in Pending status");
 
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: END");
     }
