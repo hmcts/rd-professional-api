@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.professionalapi.controller.constants.Professio
 import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN;
 import static uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator.isPbaInvalid;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.ACCEPTED;
+import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.PENDING;
 import static uk.gov.hmcts.reform.professionalapi.domain.PbaStatus.REJECTED;
 
 @Service
@@ -218,7 +219,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
                         //if PBA status is ACCEPTED update status and statusMessage in DB
                         if (pba1.getStatus().equals(ACCEPTED.name())) {
                             //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
-                            if (!ACCEPTED.equals(pba.getPbaStatus())) {
+                            if (PENDING.equals(pba.getPbaStatus())) {
                                 pba.setPbaStatus(ACCEPTED);
                                 pba.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
                                 pbasToSave.add(pba);
