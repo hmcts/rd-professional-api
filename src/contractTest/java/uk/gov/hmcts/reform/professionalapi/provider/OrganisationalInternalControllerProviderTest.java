@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -110,7 +109,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
             "companyN", false, "www.org.com");
         addSuperUser(organisation);
 
-        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(asList(organisation));
+        when(organisationRepository.findByStatus(OrganisationStatus.ACTIVE)).thenReturn(List.of(organisation));
 
         ProfessionalUsersEntityResponse professionalUsersEntityResponse = new ProfessionalUsersEntityResponse();
         List<ProfessionalUsersResponse> userProfiles = new ArrayList<>();
@@ -141,7 +140,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         when(professionalUserService
             .findProfessionalUserByEmailAddress(anyString())).thenReturn(pu);
 
-        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(asList("role"));
+        when(prdEnumService.getPrdEnumByEnumType(any())).thenReturn(List.of("role"));
 
         UserProfileCreationResponse userProfileCreationResponse = getUserProfileCreationResponse();
 
@@ -199,8 +198,8 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
 
         doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
         when(organisationRepository.findByOrganisationIdentifier(anyString())).thenReturn(organisation);
-        when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(asList(paymentAccount));
-        when(paymentAccountRepository.saveAll(anyList())).thenReturn(asList(paymentAccount));
+        when(paymentAccountRepository.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
+        when(paymentAccountRepository.saveAll(anyList())).thenReturn(List.of(paymentAccount));
     }
 
 
@@ -224,7 +223,7 @@ public class OrganisationalInternalControllerProviderTest extends MockMvcProvide
         contactInformation.setAddressLine2("addressLine2");
         contactInformation.setCountry("country");
         contactInformation.setPostCode("HA5 1BJ");
-        organisation.setContactInformations(asList(contactInformation));
+        organisation.setContactInformations(List.of(contactInformation));
         return organisation;
     }
 
