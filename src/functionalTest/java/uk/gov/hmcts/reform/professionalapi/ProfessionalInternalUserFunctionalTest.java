@@ -450,7 +450,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
     public void updatePaymentAccountsShouldReturnSuccess() {
         log.info("updatePaymentAccountsShouldReturnSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
@@ -485,7 +485,7 @@ public class ProfessionalInternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     @Test
-    @ToggleEnable(mapKey = "OrganisationExternalController.addPaymentAccountsToOrganisation", withFeature = true)
+    @ToggleEnable(mapKey = "OrganisationInternalController.updateAnOrganisationsRegisteredPbas", withFeature = true)
     public void updatePaymentAccountsShouldReturnPartialSuccess() {
         log.info("updatePaymentAccountsShouldReturnPartialSuccess :: STARTED");
         Map<String, Object> orgResponse = professionalApiClient.retrievePaymentAccountsByEmail(
