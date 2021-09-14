@@ -165,7 +165,9 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
 
         //Update valid PBAs, returns any remaining invalid PBAs
         if (isNotEmpty(pbasFromRequest)) {
-            invalidPbaResponses = acceptOrRejectPbas(pbasFromRequest, pbaRequestList, invalidPbaResponses);
+            List<PaymentAccount> pbasFromDb = paymentAccountRepository.findByPbaNumberIn(pbasFromRequest);
+            invalidPbaResponses = acceptOrRejectPbas(pbasFromDb, pbaRequestList, invalidPbaResponses, pbasFromRequest, orgId);
+            invalidPbaResponses.forEach(pba -> pbasFromRequest.remove(pba.getPbaNumber()));
         }
 
         return generateUpdatePbaResponse(invalidPbaResponses, pbasFromRequest);
@@ -174,79 +176,84 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
     private List<PbaUpdateStatusResponse> getInvalidPbaRequests(
             List<PbaRequest> pbaRequestList, Set<String> pbasFromRequest, String orgId) {
 
-        List<PbaUpdateStatusResponse> invalidPbaRequests = new ArrayList<>();
+        List<PbaUpdateStatusResponse> invalidPbaResponses = new ArrayList<>();
 
         pbaRequestList.forEach(pba -> {
             //check pba is present
             if (isNullOrEmpty(pba.getPbaNumber())) {
-                invalidPbaRequests.add(new PbaUpdateStatusResponse("", ERROR_MSG_PBA_MISSING));
+                invalidPbaResponses.add(generateInvalidResponse("", ERROR_MSG_PBA_MISSING));
+                //check pba is invalid
+            } else if (isPbaInvalid(pba.getPbaNumber())) {
+                invalidPbaResponses.add(generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_PBA_INVALID_FORMAT));
+                pbasFromRequest.remove(pba.getPbaNumber());
                 //check status is present
             } else if (isNullOrEmpty(pba.getStatus())) {
-                invalidPbaRequests.add(new PbaUpdateStatusResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_MISSING));
+                invalidPbaResponses.add(generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_MISSING));
                 pbasFromRequest.remove(pba.getPbaNumber());
                 //check status is valid
             } else if (!ACCEPTED.name().equalsIgnoreCase(pba.getStatus())
                     && !REJECTED.name().equalsIgnoreCase(pba.getStatus())) {
-                invalidPbaRequests.add(new PbaUpdateStatusResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_INVALID));
+                invalidPbaResponses.add(generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_STATUS_INVALID));
                 pbasFromRequest.remove(pba.getPbaNumber());
             }
         });
 
-        //Check individual PBA numbers are valid and exist within given organisation
-        invalidPbaRequests.addAll(getInvalidPbas(pbasFromRequest, orgId));
-
-        return invalidPbaRequests;
-    }
-
-    public List<PbaUpdateStatusResponse> getInvalidPbas(Set<String> pbasFromRequest, String orgId) {
-        List<PbaUpdateStatusResponse> pbaUpdateStatusResponses = new ArrayList<>();
-
-        pbasFromRequest.forEach(pba -> {
-            //check PBA has a valid format
-            if (isPbaInvalid(pba)) {
-                pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_INVALID_FORMAT));
-            } else {
-                Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
-
-                //check PBA exists in DB
-                if (paymentAccount.isPresent()) {
-                    //check PBA belongs to the given Organisation
-                    if (!paymentAccount.get().getOrganisation().getOrganisationIdentifier().equals(orgId)) {
-                        pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG));
-                    }
-                } else {
-                    pbaUpdateStatusResponses.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG));
-                }
-            }
-        });
-
-        return pbaUpdateStatusResponses;
+        return invalidPbaResponses;
     }
 
     public List<PbaUpdateStatusResponse> acceptOrRejectPbas(
-            Set<String> pbasFromRequest, List<PbaRequest> pbaRequestList, List<PbaUpdateStatusResponse> invalidPbas) {
+            List<PaymentAccount> pbasFromDb, List<PbaRequest> pbaRequestList,
+            List<PbaUpdateStatusResponse> invalidPbaResponses, Set<String> pbasFromRequest, String orgId) {
 
-        pbasFromRequest.forEach(pba -> pbaRequestList.forEach(pba1 -> {
-            if (pba1.getPbaNumber().equals(pba)) {
-                Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba);
-                //if PBA status is ACCEPTED update status and statusMessage in DB
-                if (pba1.getStatus().equals(ACCEPTED.name())) {
-                    //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
-                    if (!ACCEPTED.equals(paymentAccount.get().getPbaStatus())) {
-                        paymentAccount.get().setPbaStatus(ACCEPTED);
-                        paymentAccount.get().setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
-                        paymentAccountRepository.save(paymentAccount.get());
-                    } else {
-                        invalidPbas.add(new PbaUpdateStatusResponse(pba, ERROR_MSG_PBA_NOT_PENDING));
+        List<PaymentAccount> pbasToSave = new ArrayList<>();
+        List<PaymentAccount> pbasToDelete = new ArrayList<>();
+
+        if (isNotEmpty(pbasFromDb)) {
+            pbasFromDb.forEach(pba -> pbaRequestList.forEach(pba1 -> {
+                //check PBA belongs to the given Organisation
+                if (!pba.getOrganisation().getOrganisationIdentifier().equals(orgId)) {
+                    invalidPbaResponses.add(generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_PBA_NOT_IN_ORG));
+                } else {
+                    if (pba1.getPbaNumber().equals(pba.getPbaNumber())) {
+                        //if PBA status is ACCEPTED update status and statusMessage in DB
+                        if (pba1.getStatus().equals(ACCEPTED.name())) {
+                            //check PBA's current status is NOT ACCEPTED before updating to ACCEPTED
+                            if (!ACCEPTED.equals(pba.getPbaStatus())) {
+                                pba.setPbaStatus(ACCEPTED);
+                                pba.setStatusMessage(PBA_STATUS_MESSAGE_ACCEPTED_BY_ADMIN);
+                                pbasToSave.add(pba);
+                            } else {
+                                invalidPbaResponses.add(
+                                        generateInvalidResponse(pba.getPbaNumber(), ERROR_MSG_PBA_NOT_PENDING));
+                            }
+                            //if REJECTED delete from DB
+                        } else if (pba1.getStatus().equals(REJECTED.name())) {
+                            pbasToDelete.add(pba);
+                        }
                     }
-                    //if REJECTED delete from DB
-                } else if (pba1.getStatus().equals(REJECTED.name())) {
-                    paymentAccountRepository.delete(paymentAccount.get());
                 }
-            }
-        }));
+            }));
+            updatePBAsInDb(pbasToSave, pbasToDelete);
+        } else {
+            //if list of PBAs from DB is empty, add invalid PBAs to response
+            pbasFromRequest.forEach(pba -> invalidPbaResponses.add(generateInvalidResponse(pba, ERROR_MSG_PBA_NOT_IN_ORG)));
+        }
 
-        return invalidPbas;
+        return invalidPbaResponses;
+    }
+
+    public void updatePBAsInDb(List<PaymentAccount> pbasToSave, List<PaymentAccount> pbasToDelete) {
+        if (isNotEmpty(pbasToSave)) {
+            paymentAccountRepository.saveAll(pbasToSave);
+        }
+
+        if (isNotEmpty(pbasToDelete)) {
+            paymentAccountRepository.deleteAll(pbasToDelete);
+        }
+    }
+
+    public PbaUpdateStatusResponse generateInvalidResponse(String pbaNumber, String errorMessage) {
+        return new PbaUpdateStatusResponse(pbaNumber, errorMessage);
     }
 
     public UpdatePbaStatusResponse generateUpdatePbaResponse(
@@ -256,7 +263,7 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
         if (isNotEmpty(invalidPbaResponses) && isEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(
                     null, invalidPbaResponses, HttpStatus.UNPROCESSABLE_ENTITY.value());
-        //if there are some invalid PBAs and some valid PBAs that have been updated
+            //if there are some invalid PBAs and some valid PBAs that have been updated
         } else if (isNotEmpty(invalidPbaResponses) && isNotEmpty(pbasFromRequest)) {
             return new UpdatePbaStatusResponse(
                     ERROR_MSG_PARTIAL_SUCCESS_UPDATE, invalidPbaResponses, HttpStatus.OK.value());
