@@ -25,7 +25,7 @@ java:
         - name: LD-SDK-KEY
           alias: LD_SDK_KEY
         - name: professional-api-s2s-secret
-          alias: PRD_API_S2S_SECRET
+          alias: PROFESSIONAL_API_S2S_SECRET
   autoscaling:
     enabled: true
     maxReplicas: 5

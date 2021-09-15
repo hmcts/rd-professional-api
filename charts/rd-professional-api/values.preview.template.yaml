@@ -20,4 +20,4 @@ java:
         - name: ApplicationInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
         - name: professional-api-s2s-secret
-          alias: PRD_API_S2S_SECRET
+          alias: PROFESSIONAL_API_S2S_SECRET
