@@ -437,14 +437,15 @@ public class OrganisationInternalControllerTest {
         final HttpStatus expectedHttpStatus = HttpStatus.OK;
         ResponseEntity<Object> responseEntity = ResponseEntity.status(HttpStatus.OK).build();
         PbaStatus pbaStatus = PbaStatus.ACCEPTED;
-        when(organisationServiceMock.getOrganisationsByPbaStatus(pbaStatus)).thenReturn(responseEntity);
+        when(organisationServiceMock.getOrganisationsByPbaStatus(pbaStatus.toString())).thenReturn(responseEntity);
 
-        ResponseEntity<Object> response = organisationInternalController.retrieveOrgByPbaStatus(pbaStatus);
+        ResponseEntity<Object> response = organisationInternalController.retrieveOrgByPbaStatus(pbaStatus.toString());
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
 
-        verify(organisationServiceMock, times(1)).getOrganisationsByPbaStatus(pbaStatus);
+        verify(organisationServiceMock, times(1))
+                .getOrganisationsByPbaStatus(pbaStatus.toString());
     }
 
 }

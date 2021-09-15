@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDeta
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 
 
 public interface OrganisationService {
@@ -41,5 +40,5 @@ public interface OrganisationService {
 
     void updatePaymentAccounts(List<PaymentAccount> pbas);
 
-    ResponseEntity<Object> getOrganisationsByPbaStatus(PbaStatus pbaStatus);
+    ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus);
 }

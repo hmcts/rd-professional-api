@@ -85,28 +85,8 @@ import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 @SuppressWarnings("unchecked")
 public class OrganisationServiceImplTest {
@@ -877,14 +857,13 @@ public class OrganisationServiceImplTest {
         List<Organisation> organisations = getOrgsWithPbaSetup();
         when(organisationRepository.findByPbaStatus(ACCEPTED)).thenReturn(organisations);
 
-        ResponseEntity<Object> responseEntity = sut.getOrganisationsByPbaStatus(ACCEPTED);
+        ResponseEntity<Object> responseEntity = sut.getOrganisationsByPbaStatus(ACCEPTED.toString());
 
         assertNotNull(responseEntity);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertNotNull(responseEntity.getBody());
 
-        List<OrganisationsWithPbaStatusResponse> orgsWithPbas = (List<OrganisationsWithPbaStatusResponse>)
-                responseEntity.getBody();
+        var orgsWithPbas = (List<OrganisationsWithPbaStatusResponse>) responseEntity.getBody();
         assertThat(orgsWithPbas.size()).isEqualTo(2);
         assertThat(orgsWithPbas.get(0).getOrganisationIdentifier()).isEqualTo("ABCDEFG1");
         assertThat(orgsWithPbas.get(0).getPbaNumbers().size()).isEqualTo(1);

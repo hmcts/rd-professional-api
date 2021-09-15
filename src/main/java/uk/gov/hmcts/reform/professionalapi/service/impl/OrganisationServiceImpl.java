@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -474,9 +475,13 @@ public class OrganisationServiceImpl implements OrganisationService {
         return organisationRepository.findByStatus(status);
     }
 
-    public ResponseEntity<Object> getOrganisationsByPbaStatus(PbaStatus pbaStatus) {
+    public ResponseEntity<Object> getOrganisationsByPbaStatus(String pbaStatus) {
 
-        List<Organisation> organisations = organisationRepository.findByPbaStatus(pbaStatus);
+        if (Stream.of(PbaStatus.values()).noneMatch(status -> status.name().equalsIgnoreCase(pbaStatus))) {
+            throw new InvalidRequest("Invalid PBA status provided");
+        }
+
+        List<Organisation> organisations = organisationRepository.findByPbaStatus(PbaStatus.valueOf(pbaStatus));
 
         LinkedHashMap<String, List<Organisation>> orgPbaMap = organisations
                 .stream()
@@ -489,7 +494,7 @@ public class OrganisationServiceImpl implements OrganisationService {
                 new OrganisationsWithPbaStatusResponse(k, v.get(0).getStatus(),
                 v.get(0).getPaymentAccounts()
                        .stream()
-                       .filter(paymentAccount -> paymentAccount.getPbaStatus().equals(pbaStatus))
+                       .filter(paymentAccount -> paymentAccount.getPbaStatus().equals(PbaStatus.valueOf(pbaStatus)))
                        .collect(Collectors.toList()))));
 
         return ResponseEntity

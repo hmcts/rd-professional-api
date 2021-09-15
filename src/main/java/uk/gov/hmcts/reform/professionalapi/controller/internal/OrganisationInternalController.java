@@ -49,9 +49,9 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationPbaResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsDetailResponse;
+import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationsWithPbaStatusResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.PbaResponse;
-import uk.gov.hmcts.reform.professionalapi.domain.PbaStatus;
 
 @RequestMapping(
         path = "refdata/internal/v1/organisations"
@@ -489,7 +489,8 @@ public class OrganisationInternalController extends SuperController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = ""
+                    message = "",
+                    response = OrganisationsWithPbaStatusResponse.class
             ),
             @ApiResponse(
                     code = 400,
@@ -513,10 +514,9 @@ public class OrganisationInternalController extends SuperController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("prd-admin")
-    public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotNull PbaStatus pbaStatus) {
+    public ResponseEntity<Object> retrieveOrgByPbaStatus(@PathVariable("status") @NotBlank String pbaStatus) {
 
         log.info("{}:: Received request to retrieve organisations by pba status::", loggingComponentName);
-
-        return organisationService.getOrganisationsByPbaStatus(pbaStatus);
+        return organisationService.getOrganisationsByPbaStatus(pbaStatus.toUpperCase());
     }
 }

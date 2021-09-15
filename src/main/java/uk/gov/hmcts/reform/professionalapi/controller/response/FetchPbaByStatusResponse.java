@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.professionalapi.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class FetchPbaByStatusResponse extends PbaAccountResponse {
     private String statusMessage;
     @JsonProperty
     private String dateCreated;
-    @JsonProperty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String dateAccepted;
 
     public FetchPbaByStatusResponse(PaymentAccount paymentAccount) {
