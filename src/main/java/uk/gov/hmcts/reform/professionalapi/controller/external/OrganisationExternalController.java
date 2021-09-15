@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.SuperController;
 import uk.gov.hmcts.reform.professionalapi.controller.request.InvalidRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.NewUserResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationEntityResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
@@ -286,6 +288,56 @@ public class OrganisationExternalController extends SuperController {
             @RequestParam(value = "address", required = false, defaultValue = "false") boolean address) {
 
         return retrieveAllOrganisationsByStatus(status, address);
+    }
+
+    @ApiOperation(
+            value = "Deletes the provided list of payment accounts from the organisation.",
+            notes = "**IDAM Roles to access API** : \n - pui-finance-manager",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 204,
+                    message = "Successfully deleted the list of provided payment accounts from the organisation."
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request Error: One of the below reasons: \n"
+                            + "- Organisation is not ACTIVE.\n"
+                            + "- No payment accounts passed to be deleted in the request body.\n"
+                            + "- Passed payment account numbers are in an invalid format."
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied for either invalid permissions or user is pending"
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = "Resource Not Found Error: The payment accounts are not associated "
+                            + "with users organisation"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @DeleteMapping(path = "/pba")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Secured({"pui-finance-manager"})
+    public void deletePaymentAccountsOfOrganisation(
+            @Valid @NotNull @RequestBody PbaRequest deletePbaRequest,
+            @ApiParam(hidden = true) @OrgId String organisationIdentifier,
+            @ApiParam(hidden = true) @UserId String userId) {
+
+        deletePaymentAccountsOfGivenOrganisation(deletePbaRequest, organisationIdentifier, userId);
+
     }
 
     protected ResponseEntity<OrganisationPbaResponse> retrievePaymentAccountByUserEmail(String email,

@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.external.OrganisationExternalController;
 import uk.gov.hmcts.reform.professionalapi.controller.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.PaymentAccountValidator;
 import uk.gov.hmcts.reform.professionalapi.controller.request.validator.impl.OrganisationIdentifierValidatorImpl;
-import uk.gov.hmcts.reform.professionalapi.controller.response.GetUserProfileResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
@@ -31,9 +31,11 @@ import uk.gov.hmcts.reform.professionalapi.service.ProfessionalUserService;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -112,22 +114,21 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
 
     }
 
-    @State({"Add payment accounts of an active organisation"})
-    public void toAddPaymentAccountsOfAnOrganisation()  {
+    @State({"Delete payment accounts of an active organisation"})
+    public void toDeletePaymentAccountsOfAnOrganisation() throws IOException {
+
+        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
 
         when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
                 .thenReturn(organisationMock);
-        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
-        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
-        doNothing().when(paymentAccountValidatorMock).checkPbaNumberIsValid(any(), any());
-        doNothing().when(paymentAccountValidatorMock).getDuplicatePbas(any());
 
         PaymentAccount paymentAccount = new PaymentAccount();
         paymentAccount.setPbaNumber("PBA0000001");
         when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
+        when(organisationMock.getPaymentAccounts()).thenReturn(List.of(paymentAccount));
 
-        when(paymentAccountRepositoryMock.save(any(PaymentAccount.class))).thenReturn(paymentAccount);
-
+        when(paymentAccountRepositoryMock.findByPbaNumberIn(anySet())).thenReturn(List.of(paymentAccount));
+        doNothing().when(paymentAccountRepositoryMock).deleteByPbaNumberUpperCase(anySet());
     }
 
     private ProfessionalUser getProfessionalUser(String name, String sraId, String companyNumber, String companyUrl) {
@@ -155,6 +156,24 @@ public class OrganisationalExternalControllerProviderTest extends MockMvcProvide
         pu.setEmailAddress(ORGANISATION_EMAIL);
         pu.setOrganisation(organisation);
         return pu;
+
+    }
+
+    @State({"Add payment accounts of an active organisation"})
+    public void toAddPaymentAccountsOfAnOrganisation()  {
+
+        when(organisationServiceMock.getOrganisationByOrgIdentifier(any()))
+                .thenReturn(organisationMock);
+        doNothing().when(organisationIdentifierValidatorImplMock).validateOrganisationIsActive(any());
+        doNothing().when(professionalUserServiceMock).checkUserStatusIsActiveByUserId(any());
+        doNothing().when(paymentAccountValidatorMock).checkPbaNumberIsValid(any(), any());
+        doNothing().when(paymentAccountValidatorMock).getDuplicatePbas(any());
+
+        PaymentAccount paymentAccount = new PaymentAccount();
+        paymentAccount.setPbaNumber("PBA0000001");
+        when(organisationMock.getOrganisationIdentifier()).thenReturn("someIdentifier");
+
+        when(paymentAccountRepositoryMock.save(any(PaymentAccount.class))).thenReturn(paymentAccount);
 
     }
 }

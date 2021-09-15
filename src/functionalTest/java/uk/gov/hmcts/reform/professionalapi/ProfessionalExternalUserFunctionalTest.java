@@ -1,23 +1,7 @@
 package uk.gov.hmcts.reform.professionalapi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.SUSPENDED;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
-import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
-
-import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import io.restassured.response.ResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -27,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.request.NewUserCreationRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.OrganisationCreationRequest;
+import uk.gov.hmcts.reform.professionalapi.controller.request.PbaRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.request.PbaAddRequest;
 import uk.gov.hmcts.reform.professionalapi.controller.response.OrganisationMinimalInfoResponse;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfileUpdatedData;
@@ -43,7 +28,22 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static uk.gov.hmcts.reform.professionalapi.client.ProfessionalApiClient.createOrganisationRequest;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus.SUSPENDED;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.ACTIVE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.FALSE;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.TRUE;
+import static uk.gov.hmcts.reform.professionalapi.controller.request.UserCreationRequest.aUserCreationRequest;
 
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -124,6 +124,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
             caseworkerBearerToken = inviteUser(caseworker);
         }
     }
+
 
     public void inviteUserScenarios() {
         inviteUserByPuiUserManagerShouldBeSuccess();
@@ -445,6 +446,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     }
 
     public String inviteUser(String role) {
+        log.info("Inviting user for role - {}", role);
         List<String> userRoles = new ArrayList<>();
         activeUserEmail = generateRandomEmail();
         userRoles.add(role);
@@ -481,10 +483,50 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
     public void findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest() {
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: STARTED");
 
+
         professionalApiClient.retrievePaymentAccountsWithoutEmailForExternal(
                 professionalApiClient.getMultipleAuthHeaders(pumBearerToken));
 
         log.info("findOrganisationPbaWithoutEmailByExternalUserShouldBeBadRequest :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = false)
+    public void deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff() {
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        PbaRequest deletePbaRequest = new PbaRequest();
+        deletePbaRequest.setPaymentAccounts(Set.of("PBA0000021", "PBA0000022", "PBA0000023"));
+
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
+
+        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
+    }
+
+    @Test
+    @ToggleEnable(mapKey = "OrganisationExternalController.deletePaymentAccountsOfOrganisation", withFeature = true)
+    public void deletePbaOfExistingOrganisationShouldBeSuccess() {
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: STARTED");
+
+        setUpOrgTestData();
+        setUpUserBearerTokens(List.of(puiFinanceManager));
+
+        PbaRequest deletePbaRequest = new PbaRequest();
+        deletePbaRequest.setPaymentAccounts(organisationCreationRequest.getPaymentAccount());
+
+        professionalApiClient.deletePaymentAccountsOfOrganisation(deletePbaRequest,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), NO_CONTENT);
+
+        Map<String, Object> response = professionalApiClient.retrieveOrganisationByOrgIdExternal(OK,
+                professionalApiClient.getMultipleAuthHeaders(pfmBearerToken));
+
+        var paymentAccounts = (List<String>) response.get("paymentAccount");
+        assertThat(paymentAccounts).isEmpty();
+        log.info("deletePbaOfExistingOrganisationShouldBeSuccess :: END");
     }
 
     @Test
@@ -501,7 +543,7 @@ public class ProfessionalExternalUserFunctionalTest extends AuthorizationFunctio
         ResponseBody addPbaResponse = professionalApiClient.addPaymentAccountsOfOrganisation(pbaAddRequest,
                 professionalApiClient.getMultipleAuthHeaders(pfmBearerToken), FORBIDDEN);
 
-        log.info("deletePbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
+        log.info("addPbaOfExistingOrganisationShouldBeForbiddenWhenLDOff :: END");
     }
 
     @Test

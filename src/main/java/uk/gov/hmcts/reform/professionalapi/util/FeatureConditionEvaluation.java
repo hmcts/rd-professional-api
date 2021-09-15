@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.professionalapi.util;
 
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +7,11 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import uk.gov.hmcts.reform.professionalapi.exception.ForbiddenException;
 import uk.gov.hmcts.reform.professionalapi.service.FeatureToggleService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.BooleanUtils.isNotTrue;
@@ -46,7 +46,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
 
             flagStatus = featureToggleService
-                    .isFlagEnabled(EMPTY, launchDarklyUrlMap.get(clazz + "." + restMethod));
+                .isFlagEnabled(EMPTY, launchDarklyUrlMap.get(clazz + "." + restMethod));
 
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
@@ -54,6 +54,5 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         }
         return flagStatus;
     }
-
 
 }

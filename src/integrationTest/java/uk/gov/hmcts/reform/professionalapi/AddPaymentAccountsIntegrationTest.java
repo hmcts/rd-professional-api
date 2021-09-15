@@ -573,4 +573,34 @@ public class AddPaymentAccountsIntegrationTest extends AuthorizationEnabledInteg
         assertThat(errorResponse.getErrorMessage()).isEqualTo(INVALID_REQUEST.getErrorMessage());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void test_add_PaymentAccounts_PartialSuccess_Dupl_And_null_02_ShouldReturn_201() {
+        String request = "{\n"
+                + "    \"paymentAccounts\": [\n"
+                + "       \"PBAKQNROCB8\",\n"
+                + "        null,\n"
+                + "        \"PBAKQNROCB8\",\n"
+                + "        null,\n"
+                + "        \"PBA3DE3PKJ8\",        \n"
+                + "        null,\n"
+                + "        \"\",\n"
+                + "        \" \"\n"
+                + "    ]\n"
+                + "}";
+
+        PbaAddRequest pbaAddRequest = convertJsonReqStringToObj(request);
+
+        String userId = createActiveUserAndOrganisation(true);
+
+        Map<String, Object> pbaResponse = professionalReferenceDataClient
+                .addPaymentsAccountsByOrgId(pbaAddRequest, puiFinanceManager, userId);
+
+        AddPbaResponse addPbaResponse = convertJsonStringToObj(pbaResponse);
+        assertThat(addPbaResponse.getMessage()).isNull();
+        assertThat(addPbaResponse.getReason().getDuplicatePaymentAccounts()).isNull();
+        assertThat(addPbaResponse.getReason().getInvalidPaymentAccounts()).contains("PBAKQNROCB8", "PBA3DE3PKJ8");
+        assertThat(pbaResponse).containsEntry("http_status", "400");
+    }
+
 }
