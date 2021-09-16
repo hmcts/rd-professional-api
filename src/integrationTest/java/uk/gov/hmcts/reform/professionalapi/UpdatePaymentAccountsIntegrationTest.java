@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,9 +27,9 @@ import static uk.gov.hmcts.reform.professionalapi.helper.OrganisationFixtures.so
 public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     Set<String> paymentAccounts = new HashSet<>();
-    String pba1 = "PBA1234567";
-    String pba2 = "PBA2345678";
-    String pba3 = "PBA3456789";
+    String pba1 = "PBA2345678";
+    String pba2 = "PBA3456789";
+    String pba3 = "PBA4567890";
 
     @Test
     public void update_pba_account_numbers_for_an_organisation_200_success_scenario() {
@@ -36,9 +37,9 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
-                new PbaRequest(pba1, ACCEPTED.name(), ""),
+                new PbaRequest(pba1, ACCEPTED.name(), null),
                 new PbaRequest(pba2, REJECTED.name(), ""),
-                new PbaRequest(pba3, ACCEPTED.name(), "")));
+                new PbaRequest(pba3, ACCEPTED.name(), null)));
 
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
@@ -54,6 +55,8 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 .filter(pba -> REJECTED.equals(pba.getPbaStatus())).count()).isZero();
         assertThat(persistedPaymentAccountsAfterUpdate.stream()
                 .filter(pba -> ACCEPTED.equals(pba.getPbaStatus())).count()).isEqualTo(2);
+        persistedPaymentAccountsAfterUpdate.forEach(pba ->
+                assertThat(pba.getStatusMessage()).isEmpty());
     }
 
     @Test
@@ -92,12 +95,23 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
     public void update_pba_account_numbers_for_an_organisation_422_failure_scenario() {
         String orgId = setUpData();
 
+        createOrganisationRequest();
+
+        Optional<PaymentAccount> paymentAccount = paymentAccountRepository.findByPbaNumber(pba3);
+        paymentAccount.ifPresent(account -> {
+            account.setPbaStatus(ACCEPTED);
+            paymentAccountRepository.save(paymentAccount.get());
+        });
+
         UpdatePbaRequest updatePbaRequest = new UpdatePbaRequest();
         updatePbaRequest.setPbaRequestList(asList(
+                new PbaRequest("PBA1234567", ACCEPTED.name(), ""),
+                new PbaRequest(pba3, ACCEPTED.name(), ""),
                 new PbaRequest("PBA123", ACCEPTED.name(), ""),
                 new PbaRequest(pba2, "INVALID STATUS", ""),
-                new PbaRequest(null, ACCEPTED.name(), ""),
-                new PbaRequest("PBA1234567", null, "")));
+                new PbaRequest("", ACCEPTED.name(), ""),
+                new PbaRequest("PBA1122334", ACCEPTED.name(), ""),
+                new PbaRequest("PBA1239999", null, "")));
 
         Map<String, Object> updatePbaResponse =
                 professionalReferenceDataClient.updatePaymentsAccountsByOrgId(updatePbaRequest, orgId, hmctsAdmin);
@@ -116,8 +130,15 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
                 .contains("Value for Status field is invalid");
         assertThat(updatePbaResponse.get("response_body").toString())
                 .contains("Mandatory field PBA number is missing");
+        assertThat(updatePbaResponse.get("response_body").toString())
+                .contains("PBA1234567");
+        assertThat(updatePbaResponse.get("response_body").toString())
+                .contains("PBA is not associated with the Organisation");
+        assertThat(updatePbaResponse.get("response_body").toString())
+                .contains("PBA is not in Pending status");
     }
 
+    @Test
     public void update_pba_account_numbers_for_a_pending_organisation_400_failure_scenario() {
         Map<String, Object> createOrganisationResponse =
                 professionalReferenceDataClient.createOrganisation(someMinimalOrganisationRequest().build());
@@ -131,6 +152,26 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
         assertThat(updatePbaResponse).isNotNull();
         assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
+    }
+
+    @Test
+    public void update_pba_account_numbers_with_empty_pba_request_400_failure_scenario() {
+        String orgId = setUpData();
+
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), orgId, hmctsAdmin);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("http_status")).asString().contains("400");
+    }
+
+    @Test
+    public void update_pba_account_numbers_with_non_prdAdmin_role_403_failure_scenario() {
+        Map<String, Object> updatePbaResponse = professionalReferenceDataClient
+                .updatePaymentsAccountsByOrgId(new UpdatePbaRequest(), UUID.randomUUID().toString(), puiUserManager);
+
+        assertThat(updatePbaResponse).isNotNull();
+        assertThat(updatePbaResponse.get("http_status")).asString().contains("403");
     }
 
     public String setUpData() {
