@@ -4,6 +4,7 @@ public enum OrganisationStatus {
    PENDING,
    ACTIVE,
    BLOCKED,
+   REVIEW,
    DELETED;
 
     public boolean isPending() {
@@ -12,5 +13,13 @@ public enum OrganisationStatus {
 
     public boolean isActive() {
         return this == ACTIVE;
+    }
+
+    public boolean isReview() {
+        return this == REVIEW;
+    }
+
+    public boolean isDeleted() {
+        return this == DELETED;
     }
 }

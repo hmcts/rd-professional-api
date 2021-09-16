@@ -1,33 +1,10 @@
 package uk.gov.hmcts.reform.professionalapi.service.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
-import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import feign.Request;
 import feign.Response;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.assertj.core.api.Assertions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
@@ -35,7 +12,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
-
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.professionalapi.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.professionalapi.controller.constants.IdamStatus;
@@ -58,6 +34,7 @@ import uk.gov.hmcts.reform.professionalapi.controller.response.ProfessionalUsers
 import uk.gov.hmcts.reform.professionalapi.domain.ContactInformation;
 import uk.gov.hmcts.reform.professionalapi.domain.DxAddress;
 import uk.gov.hmcts.reform.professionalapi.domain.Organisation;
+import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.OrganisationStatus;
 import uk.gov.hmcts.reform.professionalapi.domain.PaymentAccount;
 import uk.gov.hmcts.reform.professionalapi.domain.PrdEnum;
@@ -68,18 +45,40 @@ import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMap;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAccountMapId;
 import uk.gov.hmcts.reform.professionalapi.domain.UserAttribute;
 import uk.gov.hmcts.reform.professionalapi.domain.UserProfile;
-import uk.gov.hmcts.reform.professionalapi.domain.OrganisationMfaStatus;
 import uk.gov.hmcts.reform.professionalapi.repository.ContactInformationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.DxAddressRepository;
+import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.OrganisationRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PaymentAccountRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.PrdEnumRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.ProfessionalUserRepository;
 import uk.gov.hmcts.reform.professionalapi.repository.UserAccountMapRepository;
-import uk.gov.hmcts.reform.professionalapi.repository.OrganisationMfaStatusRepository;
 import uk.gov.hmcts.reform.professionalapi.service.PrdEnumService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAccountMapService;
 import uk.gov.hmcts.reform.professionalapi.service.UserAttributeService;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.professionalapi.controller.constants.ProfessionalApiConstants.LENGTH_OF_ORGANISATION_IDENTIFIER;
+import static uk.gov.hmcts.reform.professionalapi.generator.ProfessionalApiGenerator.generateUniqueAlphanumericId;
 
 public class OrganisationServiceImplTest {
 
@@ -185,7 +184,7 @@ public class OrganisationServiceImplTest {
 
         contactInformationCreationRequests.add(contactInformationCreationRequest);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "number01", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
         deleteOrganisationResponse = new DeleteOrganisationResponse(204,"successfully deleted");
@@ -255,6 +254,13 @@ public class OrganisationServiceImplTest {
         sut.addPbaAccountToOrganisation(paymentAccounts, organisationMock, false, true);
 
         verify(organisationMock, times(1)).addPaymentAccount(any(PaymentAccount.class));
+    }
+
+    @Test
+    public void test_deletePbaAccountFromOrganisation() {
+        doNothing().when(paymentAccountRepositoryMock).delete(any(PaymentAccount.class));
+        sut.deletePaymentsOfOrganisation(paymentAccountList, organisation);
+        verify(paymentAccountRepositoryMock, times(1)).deleteByPbaNumberUpperCase(anySet());
     }
 
     @Test
@@ -511,7 +517,7 @@ public class OrganisationServiceImplTest {
         String pbaNumber = "GBA1234567";
         paymentAccountList.add(pbaNumber);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 
@@ -527,7 +533,7 @@ public class OrganisationServiceImplTest {
         superUserCreationRequest = new UserCreationRequest("some-fname", "some-lname",
                 null);
 
-        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING",
+        organisationCreationRequest = new OrganisationCreationRequest("some-org-name", "PENDING", null,
                 "sra-id", "false", "company-number", "company-url",
                 superUserCreationRequest, paymentAccountList, contactInformationCreationRequests);
 

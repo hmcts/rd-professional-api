@@ -227,6 +227,20 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
+    public void userProfileGetPendingUserWireMock() {
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", APPLICATION_JSON)
+                        .withStatus(200)
+                        .withBody("{"
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"testuser\","
+                                + "  \"lastName\": \"dummy\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"idamStatus\": \"" + IdamStatus.PENDING + "\""
+                                + "}")));
+    }
+
     @After
     public void cleanupTestData() {
         dxAddressRepository.deleteAll();

@@ -175,6 +175,16 @@ public class OrganisationServiceImpl implements OrganisationService {
         paymentAccount.setStatusMessage(statusMessage);
     }
 
+    @Override
+    @Transactional
+    public void deletePaymentsOfOrganisation(Set<String> paymentAccounts, Organisation organisation) {
+        final Set<String> paymentAccountsUpper = paymentAccounts.stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
+
+        paymentAccountRepository.deleteByPbaNumberUpperCase(paymentAccountsUpper);
+    }
+
     public void addSuperUserToOrganisation(
             UserCreationRequest userCreationRequest,
             Organisation organisation) {
@@ -330,6 +340,7 @@ public class OrganisationServiceImpl implements OrganisationService {
         //Into update Organisation service
         organisation.setName(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getName()));
         organisation.setStatus(OrganisationStatus.valueOf(organisationCreationRequest.getStatus()));
+        organisation.setStatusMessage(organisationCreationRequest.getStatusMessage());
         organisation.setSraId(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getSraId()));
         organisation.setCompanyNumber(RefDataUtil.removeEmptySpaces(organisationCreationRequest.getCompanyNumber()));
         organisation.setSraRegulated(Boolean.parseBoolean(RefDataUtil.removeEmptySpaces(organisationCreationRequest
