@@ -228,13 +228,17 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
             });
 
             //get PBA Numbers from Payment Accounts
-            List<String> pbaNumbersFromDb = pbasFromDb.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toList());
+            List<String> pbaNumbersFromDb =
+                    pbasFromDb.stream().map(PaymentAccount::getPbaNumber).collect(Collectors.toList());
 
             //Get the PBA Numbers that are not present in DB
-            List<String> pbasNotInDb = pbasFromRequest.stream().filter(pba -> !pbaNumbersFromDb.contains(pba)).collect(Collectors.toList());
+            List<String> pbasNotInDb =
+                    pbasFromRequest.stream().filter(pba -> !pbaNumbersFromDb.contains(pba))
+                            .collect(Collectors.toList());
 
             //Generate invalid responses for PBAs not in DB
-            pbasNotInDb.forEach(invalidPba -> invalidPbaResponses.add(generateInvalidResponse(invalidPba, ERROR_MSG_PBA_NOT_IN_ORG)));
+            pbasNotInDb.forEach(invalidPba -> invalidPbaResponses.add(
+                    generateInvalidResponse(invalidPba, ERROR_MSG_PBA_NOT_IN_ORG)));
         }
 
         return invalidPbaResponses;

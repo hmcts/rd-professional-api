@@ -93,7 +93,7 @@ public class UpdatePaymentAccountsIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     public void update_pba_account_numbers_for_an_organisation_422_failure_scenario() {
-        String orgId = setUpData();
+        final String orgId = setUpData();
 
         createOrganisationRequest();
 
