@@ -852,7 +852,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void test_addPaymentAccountsToOrganisation() {
-        Set<String> pbas = new HashSet<>();
+        var pbas = new HashSet<String>();
         pbas.add("PBA0000001");
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
@@ -873,7 +873,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void test_addPaymentAccountsToOrganisation_pba_invalid() {
-        Set<String> pbas = new HashSet<>();
+        var pbas = new HashSet<String>();
         pbas.add("PBA00000012");
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
@@ -894,7 +894,7 @@ public class OrganisationServiceImplTest {
 
     @Test
     public void test_addPaymentAccountsToOrganisation_pbaDb_NoMatch() {
-        Set<String> pbas = new HashSet<>();
+        var pbas = new HashSet<String>();
         pbas.add("PBA00000012");
         PbaRequest pbaRequest = new PbaRequest();
         pbaRequest.setPaymentAccounts(pbas);
